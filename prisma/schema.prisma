@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  budgets   Budget[]
+  
+  @@map("users")
+}
+
+model Budget {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  month     Int      // 1-12
+  year      Int      // 2025
+  currency  String   @default("₪") // ₪, $, €, £
+  
+  incomes   Income[]
+  expenses  Expense[]
+  bills     Bill[]
+  debts     Debt[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, month, year])
+  @@map("budgets")
+}
+
+model Income {
+  id        String   @id @default(cuid())
+  budgetId  String
+  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  
+  source    String   // "משכורת", "הכנסה נוספת", "עבודה נוספת"
+  amount    Float
+  date      DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("incomes")
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  budgetId    String
+  budget      Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  
+  category    String   // "מזון", "תחבורה", "בילויים", "קניות", "אחר"
+  description String
+  amount      Float
+  date        DateTime
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("expenses")
+}
+
+model Bill {
+  id        String    @id @default(cuid())
+  budgetId  String
+  budget    Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  
+  name      String    // "חשמל", "ארנונה", "נטפליקס", "אינטרנט"
+  amount    Float
+  dueDay    Int       // 1-31 (יום בחודש)
+  isPaid    Boolean   @default(false)
+  paidDate  DateTime?
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@map("bills")
+}
+
+model Debt {
+  id             String    @id @default(cuid())
+  budgetId       String
+  budget         Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  
+  creditor       String    // למי חייב
+  totalAmount    Float     // סכום כולל
+  monthlyPayment Float     // תשלום חודשי
+  dueDay         Int       // יום תשלום (1-31)
+  isPaid         Boolean   @default(false)
+  paidDate       DateTime?
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  
+  @@map("debts")
+}
