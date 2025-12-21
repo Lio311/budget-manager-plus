@@ -9,13 +9,13 @@ export default function HomePage() {
             <div className="container mx-auto px-4 py-16">
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <div className="flex items-center justify-center gap-3 mb-6">
+                    <div className="flex items-center justify-center gap-3 mb-2">
                         <Image
                             src="/keseflow.png"
                             alt="Keseflow"
-                            width={400}
-                            height={120}
-                            className="h-24 w-auto"
+                            width={600}
+                            height={180}
+                            className="h-32 w-auto"
                             priority
                         />
                     </div>
