@@ -31,25 +31,25 @@ export function DashboardHeader() {
 
     return (
         <div className="border-b bg-white/50 backdrop-blur-sm sticky top-0 z-10">
-            <div className="container mx-auto px-4 py-4">
-                <div className="flex items-center justify-between">
+            <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
+                <div className="flex items-center justify-between gap-2">
                     {/* Month/Year Selector */}
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon" onClick={handlePrevMonth}>
-                            <ChevronRight className="h-4 w-4" />
+                    <div className="flex items-center gap-1 sm:gap-2">
+                        <Button variant="outline" size="icon" onClick={handlePrevMonth} className="h-8 w-8 sm:h-10 sm:w-10">
+                            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
-                        <div className="text-center min-w-[180px]">
-                            <h2 className="text-2xl font-bold">
+                        <div className="text-center min-w-[120px] sm:min-w-[180px]">
+                            <h2 className="text-base sm:text-2xl font-bold whitespace-nowrap">
                                 {getMonthName(month)} {year}
                             </h2>
                         </div>
-                        <Button variant="outline" size="icon" onClick={handleNextMonth}>
-                            <ChevronLeft className="h-4 w-4" />
+                        <Button variant="outline" size="icon" onClick={handleNextMonth} className="h-8 w-8 sm:h-10 sm:w-10">
+                            <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                     </div>
 
-                    {/* Currency Selector */}
-                    <div className="flex items-center gap-4">
+                    {/* User Button */}
+                    <div className="flex items-center">
                         <UserButton afterSignOutUrl="/" />
                     </div>
                 </div>
