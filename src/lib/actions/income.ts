@@ -155,6 +155,32 @@ export async function cancelRecurringIncome(incomeId: string, fromMonth: number,
     }
 }
 
+export async function updateIncome(
+    id: string,
+    data: {
+        source?: string
+        amount?: number
+        date?: string
+    }
+) {
+    try {
+        const income = await prisma.income.update({
+            where: { id },
+            data: {
+                ...(data.source && { source: data.source }),
+                ...(data.amount && { amount: data.amount }),
+                ...(data.date && { date: new Date(data.date) })
+            }
+        })
+
+        revalidatePath('/dashboard')
+        return { success: true, data: income }
+    } catch (error) {
+        console.error('Error updating income:', error)
+        return { success: false, error: 'Failed to update income' }
+    }
+}
+
 export async function deleteIncome(id: string) {
     try {
         await prisma.income.delete({

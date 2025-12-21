@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Loader2 } from 'lucide-react'
+import { Plus, Trash2, Loader2, Pencil } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
 import { format } from 'date-fns'
-import { getIncomes, addIncome, deleteIncome } from '@/lib/actions/income'
+import { getIncomes, addIncome, deleteIncome, updateIncome } from '@/lib/actions/income'
 import { useToast } from '@/hooks/use-toast'
 
 interface Income {
@@ -26,6 +26,8 @@ export function IncomeTab() {
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [newIncome, setNewIncome] = useState({ source: '', amount: '', date: '' })
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editData, setEditData] = useState({ source: '', amount: '', date: '' })
 
     const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0)
 
