@@ -18,7 +18,18 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <ClerkProvider localization={heIL}>
+        <ClerkProvider
+            localization={heIL}
+            appearance={{
+                elements: {
+                    logoImage: "/keseflow.png",
+                    logoBox: {
+                        height: "3rem",
+                        justifyContent: "center"
+                    }
+                }
+            }}
+        >
             <html lang="he" dir="rtl">
                 <body>
                     {children}
