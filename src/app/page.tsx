@@ -82,7 +82,6 @@ export default function HomePage() {
                         <BenefitItem text="מעקב חובות ותשלומים חודשיים" />
                         <BenefitItem text="לוח שנה עם תזכורות אוטומטיות" />
                         <BenefitItem text="גרפים צבעוניים וברורים" />
-                        <BenefitItem text="תמיכה במספר מטבעות (₪/$/ €/£)" />
                         <BenefitItem text="ממשק בעברית וידידותי" />
                         <BenefitItem text="גישה ממכשיר, טלפון וטאבלט" />
                     </div>

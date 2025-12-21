@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Plus, Trash2 } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
+import { DatePicker } from '@/components/ui/date-picker'
+import { format } from 'date-fns'
 
 interface Income {
     id: string
@@ -65,24 +67,32 @@ export function IncomeTab() {
                     <CardTitle>הוסף הכנסה חדשה</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-4 md:grid-cols-4">
-                        <Input
-                            placeholder="מקור הכנסה (משכורת, עבודה נוספת...)"
-                            value={newIncome.source}
-                            onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })}
-                        />
-                        <Input
-                            type="number"
-                            placeholder="סכום"
-                            value={newIncome.amount}
-                            onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })}
-                        />
-                        <Input
-                            type="date"
-                            value={newIncome.date}
-                            onChange={(e) => setNewIncome({ ...newIncome, date: e.target.value })}
-                        />
-                        <Button onClick={handleAdd} className="gap-2">
+                    <div className="grid gap-4 md:grid-cols-4 items-end">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">מקור הכנסה</label>
+                            <Input
+                                placeholder="משכורת, עבודה נוספת..."
+                                value={newIncome.source}
+                                onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">סכום</label>
+                            <Input
+                                type="number"
+                                placeholder="0.00"
+                                value={newIncome.amount}
+                                onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">תאריך</label>
+                            <DatePicker
+                                date={newIncome.date ? new Date(newIncome.date) : undefined}
+                                setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                            />
+                        </div>
+                        <Button onClick={handleAdd} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
                             <Plus className="h-4 w-4" />
                             הוסף
                         </Button>
@@ -108,7 +118,7 @@ export function IncomeTab() {
                                     >
                                         <div className="flex-1">
                                             <p className="font-medium">{income.source}</p>
-                                            <p className="text-sm text-muted-foreground">{income.date}</p>
+                                            <p className="text-sm text-muted-foreground">{format(new Date(income.date), 'dd/MM/yyyy')}</p>
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <span className="text-lg font-bold text-green-600">

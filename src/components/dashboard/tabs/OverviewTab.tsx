@@ -24,6 +24,20 @@ const COLORS = {
     other: 'hsl(200, 10%, 65%)', // Gray
 }
 
+const CustomTooltip = ({ active, payload, label, currency }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-white p-2 border rounded shadow-md text-right dir-rtl">
+                <span className="font-bold text-gray-900 block mb-1">{payload[0].name}</span>
+                <span className="text-sm text-gray-600">
+                    {formatCurrency(Number(payload[0].value), currency)}
+                </span>
+            </div>
+        )
+    }
+    return null
+}
+
 export function OverviewTab() {
     const { currency } = useBudget()
 
@@ -116,7 +130,7 @@ export function OverviewTab() {
                                         className="text-lg font-bold fill-foreground"
                                     />
                                 </Pie>
-                                <Tooltip formatter={(value) => [formatCurrency(Number(value), currency), '']} />
+                                <Tooltip content={<CustomTooltip currency={currency} />} />
                                 <Legend
                                     formatter={(value) => <span className="mr-2">{value}</span>}
                                 />
@@ -134,7 +148,7 @@ export function OverviewTab() {
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart
                                 data={expensesByCategory}
-                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                margin={{ top: 20, right: 40, left: 10, bottom: 5 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <XAxis
@@ -143,15 +157,12 @@ export function OverviewTab() {
                                     axisLine={false}
                                 />
                                 <YAxis
-                                    width={80}
+                                    width={70}
                                     tickLine={false}
                                     axisLine={false}
                                     tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
                                 />
-                                <Tooltip
-                                    formatter={(value) => [formatCurrency(Number(value), currency), '']}
-                                    cursor={{ fill: 'transparent' }}
-                                />
+                                <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
                                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                                     {expensesByCategory.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />

@@ -6,13 +6,9 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
-import { Trash2, Plus, Calendar as CalendarIcon } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
+import { Trash2, Plus } from 'lucide-react'
+import { DatePicker } from '@/components/ui/date-picker'
 import { format } from 'date-fns'
-import { he } from 'date-fns/locale'
-import { cn } from '@/lib/utils'
 
 interface Expense {
     id: string
@@ -43,7 +39,6 @@ export function ExpensesTab() {
 
     const [newExpense, setNewExpense] = useState({ category: 'מזון', description: '', amount: '', date: '' })
     const [filterCategory, setFilterCategory] = useState<string>('הכל')
-    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
     const filteredExpenses = filterCategory === 'הכל'
@@ -122,31 +117,10 @@ export function ExpensesTab() {
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">תאריך</label>
-                            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-full justify-start text-right font-normal",
-                                            !newExpense.date && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <CalendarIcon className="ml-2 h-4 w-4" />
-                                        {newExpense.date ? format(new Date(newExpense.date), "dd/MM/yyyy") : <span>בחר תאריך</span>}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={newExpense.date ? new Date(newExpense.date) : undefined}
-                                        onSelect={(date) => {
-                                            setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })
-                                            setIsCalendarOpen(false)
-                                        }}
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                            <DatePicker
+                                date={newExpense.date ? new Date(newExpense.date) : undefined}
+                                setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                            />
                         </div>
                         <Button onClick={handleAdd} className="bg-primary hover:bg-primary/90">
                             <Plus className="ml-2 h-4 w-4" /> הוסף
@@ -198,7 +172,7 @@ export function ExpensesTab() {
                                             </span>
                                             <div>
                                                 <p className="font-medium">{expense.description}</p>
-                                                <p className="text-sm text-muted-foreground">{expense.date}</p>
+                                                <p className="text-sm text-muted-foreground">{format(new Date(expense.date), 'dd/MM/yyyy')}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
