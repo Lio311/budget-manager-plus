@@ -164,11 +164,12 @@ export function DebtsTab() {
                     <CardTitle>הוסף חוב חדש</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-4 md:grid-cols-5">
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
                         <Input
                             placeholder="נושה (בנק, כרטיס אשראי...)"
                             value={newDebt.creditor}
                             onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
+                            className="sm:col-span-2 lg:col-span-1"
                         />
                         <Input
                             type="number"
@@ -190,8 +191,12 @@ export function DebtsTab() {
                             value={newDebt.dueDay}
                             onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
                         />
-                        <Button onClick={handleAdd} className="gap-2">
-                            <Plus className="h-4 w-4" />
+                        <Button onClick={handleAdd} className="gap-2 sm:col-span-2 lg:col-span-1" disabled={submitting}>
+                            {submitting ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <Plus className="h-4 w-4" />
+                            )}
                             הוסף
                         </Button>
                     </div>
