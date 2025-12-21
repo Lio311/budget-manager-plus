@@ -82,82 +82,72 @@ export function DebtsTab() {
 
     const handleDelete = async (id: string) => {
         const result = await deleteDebt(id)
-
         if (result.success) {
             await loadDebts()
             toast({
                 title: 'הצלחה',
                 description: 'החוב נמחק בהצלחה'
             })
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן למחוק חוב',
-                variant: 'destructive'
-            })
         }
     }
 
     const togglePaid = async (id: string, currentStatus: boolean) => {
         const result = await toggleDebtPaid(id, !currentStatus)
-
         if (result.success) {
             await loadDebts()
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לעדכן סטטוס',
-                variant: 'destructive'
-            })
         }
     }
 
     return (
-        <div className="space-y-6">
+        // הוספת overflow-x-hidden כאן מונעת את המלבן הלבן שבורח הצידה
+        <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10">
             {loading ? (
                 <div className="flex items-center justify-center py-12">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
             ) : (
                 <>
-                    {/* Summary Cards */}
-                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                        <Card className="bg-gradient-to-l from-purple-50 to-white border-purple-200">
-                            <CardHeader>
-                                <CardTitle className="text-purple-700 text-sm">סך חובות</CardTitle>
+                    {/* Summary Cards - שינוי ל-grid-cols-1 במובייל */}
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                        <Card className="bg-gradient-to-l from-purple-50 to-white border-purple-200 shadow-sm">
+                            <CardHeader className="p-4 pb-2">
+                                <CardTitle className="text-purple-700 text-xs sm:text-sm">סך חובות</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-purple-600">
+                            <CardContent className="p-4 pt-0">
+                                <div className="text-xl sm:text-2xl font-bold text-purple-600 break-all">
                                     {formatCurrency(totalDebts, currency)}
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="bg-gradient-to-l from-orange-50 to-white border-orange-200">
-                            <CardHeader>
-                                <CardTitle className="text-orange-700 text-sm">תשלום חודשי</CardTitle>
+
+                        <Card className="bg-gradient-to-l from-orange-50 to-white border-orange-200 shadow-sm">
+                            <CardHeader className="p-4 pb-2">
+                                <CardTitle className="text-orange-700 text-xs sm:text-sm">תשלום חודשי</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-orange-600">
+                            <CardContent className="p-4 pt-0">
+                                <div className="text-xl sm:text-2xl font-bold text-orange-600 break-all">
                                     {formatCurrency(monthlyPayments, currency)}
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="bg-gradient-to-l from-green-50 to-white border-green-200">
-                            <CardHeader>
-                                <CardTitle className="text-green-700 text-sm">שולם החודש</CardTitle>
+
+                        <Card className="bg-gradient-to-l from-green-50 to-white border-green-200 shadow-sm">
+                            <CardHeader className="p-4 pb-2">
+                                <CardTitle className="text-green-700 text-xs sm:text-sm">שולם החודש</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-green-600">
+                            <CardContent className="p-4 pt-0">
+                                <div className="text-xl sm:text-2xl font-bold text-green-600 break-all">
                                     {formatCurrency(paidThisMonth, currency)}
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card className="bg-gradient-to-l from-red-50 to-white border-red-200">
-                            <CardHeader>
-                                <CardTitle className="text-red-700 text-sm">ממתין לתשלום</CardTitle>
+
+                        <Card className="bg-gradient-to-l from-red-50 to-white border-red-200 shadow-sm">
+                            <CardHeader className="p-4 pb-2">
+                                <CardTitle className="text-red-700 text-xs sm:text-sm">ממתין לתשלום</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-red-600">
+                            <CardContent className="p-4 pt-0">
+                                <div className="text-xl sm:text-2xl font-bold text-red-600 break-all">
                                     {formatCurrency(unpaidThisMonth, currency)}
                                 </div>
                             </CardContent>
@@ -165,14 +155,14 @@ export function DebtsTab() {
                     </div>
 
                     {/* Add New Debt */}
-                    <Card>
+                    <Card className="mx-0 sm:mx-auto">
                         <CardHeader>
-                            <CardTitle>הוסף חוב חדש</CardTitle>
+                            <CardTitle className="text-lg">הוסף חוב חדש</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                                 <Input
-                                    placeholder="נושה (בנק, כרטיס אשראי...)"
+                                    placeholder="נושה (בנק, כרטיס...)"
                                     value={newDebt.creditor}
                                     onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
                                     className="sm:col-span-2 lg:col-span-1"
@@ -191,18 +181,14 @@ export function DebtsTab() {
                                 />
                                 <Input
                                     type="number"
-                                    placeholder="יום תשלום (1-31)"
+                                    placeholder="יום (1-31)"
                                     min="1"
                                     max="31"
                                     value={newDebt.dueDay}
                                     onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
                                 />
-                                <Button onClick={handleAdd} className="gap-2 sm:col-span-2 lg:col-span-1" disabled={submitting}>
-                                    {submitting ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <Plus className="h-4 w-4" />
-                                    )}
+                                <Button onClick={handleAdd} className="w-full gap-2 sm:col-span-2 lg:col-span-1" disabled={submitting}>
+                                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                                     הוסף
                                 </Button>
                             </div>
@@ -210,63 +196,62 @@ export function DebtsTab() {
                     </Card>
                 </>
             )}
+
             {/* Debts List */}
             <Card>
                 <CardHeader>
-                    <CardTitle>רשימת חובות</CardTitle>
+                    <CardTitle className="text-lg">רשימת חובות</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="space-y-2">
+                <CardContent className="px-2 sm:px-6">
+                    <div className="space-y-3">
                         {debts.length === 0 ? (
-                            <p className="text-center text-muted-foreground py-8">אין חובות רשומים</p>
+                            <p className="text-center text-muted-foreground py-8 italic">אין חובות רשומים</p>
                         ) : (
-                            <div className="space-y-2">
-                                {debts.map((debt) => (
-                                    <div
-                                        key={debt.id}
-                                        className={`flex items-center justify-between p-4 border rounded-lg transition-colors ${debt.isPaid ? 'bg-green-50 border-green-200' : 'hover:bg-accent'
-                                            }`}
-                                    >
-                                        <div className="flex items-center gap-4 flex-1">
-                                            <button
-                                                onClick={() => togglePaid(debt.id, debt.isPaid)}
-                                                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${debt.isPaid
-                                                    ? 'bg-green-500 border-green-500'
-                                                    : 'border-gray-300 hover:border-green-500'
-                                                    }`}
-                                            >
-                                                {debt.isPaid && <Check className="h-4 w-4 text-white" />}
-                                            </button>
-                                            <div className="flex-1">
-                                                <p className={`font-medium ${debt.isPaid ? 'line-through text-muted-foreground' : ''}`}>
-                                                    {debt.creditor}
-                                                </p>
-                                                <div className="flex gap-4 text-sm text-muted-foreground">
-                                                    <span>סך חוב: {formatCurrency(debt.totalAmount, currency)}</span>
-                                                    <span>תשלום חודשי: {formatCurrency(debt.monthlyPayment, currency)}</span>
-                                                    <span>יום תשלום: {debt.dueDay}</span>
-                                                </div>
+                            debts.map((debt) => (
+                                <div
+                                    key={debt.id}
+                                    className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg gap-4 transition-all ${debt.isPaid ? 'bg-green-50/50 border-green-200' : 'bg-white hover:bg-slate-50'
+                                        }`}
+                                >
+                                    <div className="flex items-start gap-3 w-full sm:w-auto">
+                                        <button
+                                            onClick={() => togglePaid(debt.id, debt.isPaid)}
+                                            className={`mt-1 w-6 h-6 shrink-0 rounded border-2 flex items-center justify-center transition-colors ${debt.isPaid ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-500'
+                                                }`}
+                                        >
+                                            {debt.isPaid && <Check className="h-4 w-4 text-white" />}
+                                        </button>
+
+                                        <div className="flex-1 min-w-0">
+                                            <p className={`font-bold text-base truncate ${debt.isPaid ? 'line-through text-muted-foreground' : 'text-slate-900'}`}>
+                                                {debt.creditor}
+                                            </p>
+                                            <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
+                                                <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, currency)}</span>
+                                                <span className="text-slate-500">יום תשלום: {debt.dueDay}</span>
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <div className="text-left">
-                                                <p className="text-xs text-muted-foreground">תשלום החודש</p>
-                                                <span className={`text-lg font-bold ${debt.isPaid ? 'text-green-600' : 'text-purple-600'}`}>
-                                                    {formatCurrency(debt.monthlyPayment, currency)}
-                                                </span>
-                                            </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDelete(debt.id)}
-                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+
+                                    <div className="flex items-center justify-between w-full sm:w-auto sm:gap-6 pt-3 sm:pt-0 border-t sm:border-0 border-slate-100">
+                                        <div className="text-right sm:text-left">
+                                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">תשלום החודש</p>
+                                            <span className={`text-lg font-black ${debt.isPaid ? 'text-green-600' : 'text-purple-600'}`}>
+                                                {formatCurrency(debt.monthlyPayment, currency)}
+                                            </span>
+                                        </div>
+
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleDelete(debt.id)}
+                                            className="text-red-400 hover:text-red-600 hover:bg-red-50 h-10 w-10"
+                                        >
+                                            <Trash2 className="h-5 w-5" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))
                         )}
                     </div>
                 </CardContent>
