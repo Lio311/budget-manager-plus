@@ -170,8 +170,8 @@ export function OverviewTab() {
                                         data={incomeVsExpenses}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={50}
-                                        outerRadius={70}
+                                        innerRadius={70}
+                                        outerRadius={110}
                                         paddingAngle={5}
                                         dataKey="value"
                                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -179,11 +179,6 @@ export function OverviewTab() {
                                         {incomeVsExpenses.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
-                                        <Label
-                                            value={formatCurrency(totalForPie, currency)}
-                                            position="center"
-                                            className="text-lg font-bold fill-foreground"
-                                        />
                                     </Pie>
                                     <Tooltip content={<CustomTooltip currency={currency} />} />
                                     <Legend
@@ -209,24 +204,24 @@ export function OverviewTab() {
                             <ResponsiveContainer width="100%" height={300}>
                                 <BarChart
                                     data={data.expensesByCategory}
-                                    margin={{ top: 20, right: 60, left: 10, bottom: 5 }}
+                                    margin={{ top: 20, right: 10, left: 60, bottom: 5 }}
+                                    layout="horizontal"
                                 >
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                     <XAxis
                                         dataKey="name"
                                         tickLine={false}
                                         axisLine={false}
-                                        reversed={true}
                                     />
                                     <YAxis
-                                        orientation="right"
-                                        width={70}
+                                        orientation="left"
+                                        width={60}
                                         tickLine={false}
                                         axisLine={false}
                                         tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
                                     />
                                     <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
-                                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                    <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={80}>
                                         {data.expensesByCategory.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
