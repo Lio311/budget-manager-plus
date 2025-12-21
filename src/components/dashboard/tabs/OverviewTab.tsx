@@ -115,8 +115,8 @@ export function OverviewTab() {
                                     data={incomeVsExpenses}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={70}
-                                    outerRadius={90}
+                                    innerRadius={55}
+                                    outerRadius={75}
                                     paddingAngle={5}
                                     dataKey="value"
                                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -148,15 +148,17 @@ export function OverviewTab() {
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart
                                 data={expensesByCategory}
-                                margin={{ top: 20, right: 40, left: 10, bottom: 5 }}
+                                margin={{ top: 20, right: 10, left: 10, bottom: 5 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <XAxis
                                     dataKey="name"
                                     tickLine={false}
                                     axisLine={false}
+                                    reversed={true}
                                 />
                                 <YAxis
+                                    orientation="right"
                                     width={70}
                                     tickLine={false}
                                     axisLine={false}
