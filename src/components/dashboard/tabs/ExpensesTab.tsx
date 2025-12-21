@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
-import { Trash2, Plus, Loader2 } from 'lucide-react'
+import { Trash2, Plus, Loader2, Pencil, Check, X } from 'lucide-react'
 import { DatePicker } from '@/components/ui/date-picker'
 import { format } from 'date-fns'
-import { getExpenses, addExpense, deleteExpense } from '@/lib/actions/expense'
+import { getExpenses, addExpense, deleteExpense, updateExpense } from '@/lib/actions/expense'
 import { useToast } from '@/hooks/use-toast'
 
 interface Expense {
@@ -39,6 +39,8 @@ export function ExpensesTab() {
     const [submitting, setSubmitting] = useState(false)
     const [newExpense, setNewExpense] = useState({ category: 'מזון', description: '', amount: '', date: '' })
     const [filterCategory, setFilterCategory] = useState<string>('הכל')
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editData, setEditData] = useState({ category: '', description: '', amount: '', date: '' })
 
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
     const filteredExpenses = filterCategory === 'הכל'
@@ -59,18 +61,20 @@ export function ExpensesTab() {
             toast({
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לטעון הוצאות',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 2000
             })
         }
         setLoading(false)
     }
 
     async function handleAdd() {
-        if (!newExpense.description || !newExpense.amount || !newExpense.date) {
+        if (!newExpense.category || !newExpense.description || !newExpense.amount || !newExpense.date) {
             toast({
                 title: 'שגיאה',
-                description: 'נא למלא את כל השדות הנדרשים',
-                variant: 'destructive'
+                description: 'נא למלא את כל השדות',
+                variant: 'destructive',
+                duration: 2000
             })
             return
         }
@@ -86,7 +90,8 @@ export function ExpensesTab() {
         if (result.success) {
             toast({
                 title: 'הצלחה',
-                description: 'ההוצאה נוספה בהצלחה'
+                description: 'ההוצאה נוספה בהצלחה',
+                duration: 2000
             })
             setNewExpense({ category: 'מזון', description: '', amount: '', date: '' })
             await loadExpenses()
@@ -94,7 +99,8 @@ export function ExpensesTab() {
             toast({
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן להוסיף הוצאה',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 2000
             })
         }
         setSubmitting(false)
@@ -106,16 +112,72 @@ export function ExpensesTab() {
         if (result.success) {
             toast({
                 title: 'הצלחה',
-                description: 'ההוצאה נמחקה בהצלחה'
+                description: 'ההוצאה נמחקה בהצלחה',
+                duration: 2000
             })
             await loadExpenses()
         } else {
             toast({
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן למחוק הוצאה',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 2000
             })
         }
+    }
+
+    function handleEdit(expense: Expense) {
+        setEditingId(expense.id)
+        setEditData({
+            category: expense.category,
+            description: expense.description,
+            amount: expense.amount.toString(),
+            date: format(expense.date, 'yyyy-MM-dd')
+        })
+    }
+
+    function handleCancelEdit() {
+        setEditingId(null)
+        setEditData({ category: '', description: '', amount: '', date: '' })
+    }
+
+    async function handleUpdate() {
+        if (!editingId || !editData.category || !editData.description || !editData.amount || !editData.date) {
+            toast({
+                title: 'שגיאה',
+                description: 'נא למלא את כל השדות',
+                variant: 'destructive',
+                duration: 2000
+            })
+            return
+        }
+
+        setSubmitting(true)
+        const result = await updateExpense(editingId, {
+            category: editData.category,
+            description: editData.description,
+            amount: parseFloat(editData.amount),
+            date: editData.date
+        })
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'ההוצאה עודכנה בהצלחה',
+                duration: 2000
+            })
+            setEditingId(null)
+            setEditData({ category: '', description: '', amount: '', date: '' })
+            await loadExpenses()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לעדכן הוצאה',
+                variant: 'destructive',
+                duration: 2000
+            })
+        }
+        setSubmitting(false)
     }
 
     if (loading) {
@@ -150,12 +212,12 @@ export function ExpensesTab() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">קטגוריה</label>
                             <select
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="w-full p-2 border rounded-md"
                                 value={newExpense.category}
                                 onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
                                 disabled={submitting}
                             >
-                                {CATEGORIES.map((cat) => (
+                                {CATEGORIES.map(cat => (
                                     <option key={cat} value={cat}>{cat}</option>
                                 ))}
                             </select>
@@ -163,7 +225,7 @@ export function ExpensesTab() {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">תיאור</label>
                             <Input
-                                placeholder="מה קנינו?"
+                                placeholder="תיאור ההוצאה"
                                 value={newExpense.description}
                                 onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
                                 disabled={submitting}
@@ -181,20 +243,18 @@ export function ExpensesTab() {
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">תאריך</label>
-                            <DatePicker
-                                date={newExpense.date ? new Date(newExpense.date) : undefined}
-                                setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                            <Input
+                                type="date"
+                                value={newExpense.date}
+                                onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
+                                disabled={submitting}
                             />
                         </div>
-                        <Button
-                            onClick={handleAdd}
-                            className="bg-primary hover:bg-primary/90"
-                            disabled={submitting}
-                        >
+                        <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
                             {submitting ? (
-                                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                                <Plus className="ml-2 h-4 w-4" />
+                                <Plus className="h-4 w-4" />
                             )}
                             הוסף
                         </Button>
@@ -203,25 +263,32 @@ export function ExpensesTab() {
             </Card>
 
             {/* Filter */}
-            <div className="flex gap-2 flex-wrap">
-                <Button
-                    variant={filterCategory === 'הכל' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setFilterCategory('הכל')}
-                >
-                    הכל
-                </Button>
-                {CATEGORIES.map((cat) => (
-                    <Button
-                        key={cat}
-                        variant={filterCategory === cat ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setFilterCategory(cat)}
-                    >
-                        {cat}
-                    </Button>
-                ))}
-            </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>סינון לפי קטגוריה</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                        <Button
+                            variant={filterCategory === 'הכל' ? 'default' : 'outline'}
+                            onClick={() => setFilterCategory('הכל')}
+                            size="sm"
+                        >
+                            הכל
+                        </Button>
+                        {CATEGORIES.map(cat => (
+                            <Button
+                                key={cat}
+                                variant={filterCategory === cat ? 'default' : 'outline'}
+                                onClick={() => setFilterCategory(cat)}
+                                size="sm"
+                            >
+                                {cat}
+                            </Button>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Expenses List */}
             <Card>
@@ -239,28 +306,96 @@ export function ExpensesTab() {
                                         key={expense.id}
                                         className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors"
                                     >
-                                        <div className="flex items-center gap-3 flex-1">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${CATEGORY_COLORS[expense.category]}`}>
-                                                {expense.category}
-                                            </span>
-                                            <div>
-                                                <p className="font-medium">{expense.description}</p>
-                                                <p className="text-sm text-muted-foreground">{format(new Date(expense.date), 'dd/MM/yyyy')}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <span className="text-lg font-bold text-red-600">
-                                                {formatCurrency(expense.amount, currency)}
-                                            </span>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDelete(expense.id)}
-                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
+                                        {editingId === expense.id ? (
+                                            <>
+                                                <div className="flex-1 grid gap-4 md:grid-cols-4">
+                                                    <select
+                                                        className="p-2 border rounded-md"
+                                                        value={editData.category}
+                                                        onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                                                        disabled={submitting}
+                                                    >
+                                                        {CATEGORIES.map(cat => (
+                                                            <option key={cat} value={cat}>{cat}</option>
+                                                        ))}
+                                                    </select>
+                                                    <Input
+                                                        placeholder="תיאור"
+                                                        value={editData.description}
+                                                        onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="סכום"
+                                                        value={editData.amount}
+                                                        onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                    <Input
+                                                        type="date"
+                                                        value={editData.date}
+                                                        onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-2 mr-4">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleUpdate}
+                                                        disabled={submitting}
+                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                    >
+                                                        <Check className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleCancelEdit}
+                                                        disabled={submitting}
+                                                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${CATEGORY_COLORS[expense.category]}`}>
+                                                            {expense.category}
+                                                        </span>
+                                                        <p className="font-medium">{expense.description}</p>
+                                                    </div>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {format(new Date(expense.date), 'dd/MM/yyyy')}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-lg font-bold text-red-600">
+                                                        {formatCurrency(expense.amount, currency)}
+                                                    </span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleEdit(expense)}
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleDelete(expense.id)}
+                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 ))}
                             </div>

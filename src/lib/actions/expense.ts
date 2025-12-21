@@ -166,6 +166,34 @@ export async function cancelRecurringExpense(expenseId: string, fromMonth: numbe
     }
 }
 
+export async function updateExpense(
+    id: string,
+    data: {
+        category?: string
+        description?: string
+        amount?: number
+        date?: string
+    }
+) {
+    try {
+        const expense = await prisma.expense.update({
+            where: { id },
+            data: {
+                ...(data.category && { category: data.category }),
+                ...(data.description && { description: data.description }),
+                ...(data.amount && { amount: data.amount }),
+                ...(data.date && { date: new Date(data.date) })
+            }
+        })
+
+        revalidatePath('/dashboard')
+        return { success: true, data: expense }
+    } catch (error) {
+        console.error('Error updating expense:', error)
+        return { success: false, error: 'Failed to update expense' }
+    }
+}
+
 export async function deleteExpense(id: string) {
     try {
         await prisma.expense.delete({
