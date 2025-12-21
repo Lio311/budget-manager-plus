@@ -8,6 +8,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { Trash2, Plus, Loader2, Pencil, Check, X } from 'lucide-react'
 import { DatePicker } from '@/components/ui/date-picker'
+import { Checkbox } from '@/components/ui/checkbox'
 import { format } from 'date-fns'
 import { getExpenses, addExpense, deleteExpense, updateExpense } from '@/lib/actions/expense'
 import { useToast } from '@/hooks/use-toast'
@@ -37,7 +38,7 @@ export function ExpensesTab() {
     const [expenses, setExpenses] = useState<Expense[]>([])
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
-    const [newExpense, setNewExpense] = useState({ category: 'מזון', description: '', amount: '', date: '' })
+    const [newExpense, setNewExpense] = useState({ category: 'מזון', description: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
     const [filterCategory, setFilterCategory] = useState<string>('הכל')
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ category: '', description: '', amount: '', date: '' })
@@ -84,7 +85,10 @@ export function ExpensesTab() {
             category: newExpense.category,
             description: newExpense.description,
             amount: parseFloat(newExpense.amount),
-            date: newExpense.date
+            date: newExpense.date,
+            isRecurring: newExpense.isRecurring,
+            recurringStartDate: newExpense.isRecurring ? newExpense.recurringStartDate : undefined,
+            recurringEndDate: newExpense.isRecurring ? newExpense.recurringEndDate : undefined
         })
 
         if (result.success) {
@@ -93,7 +97,7 @@ export function ExpensesTab() {
                 description: 'ההוצאה נוספה בהצלחה',
                 duration: 1000
             })
-            setNewExpense({ category: 'מזון', description: '', amount: '', date: '' })
+            setNewExpense({ category: 'מזון', description: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
             await loadExpenses()
         } else {
             toast({
@@ -208,54 +212,89 @@ export function ExpensesTab() {
                     <CardTitle>הוסף הוצאה חדשה</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-4 md:grid-cols-5 items-end">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">קטגוריה</label>
-                            <select
-                                className="w-full p-2 border rounded-md"
-                                value={newExpense.category}
-                                onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
-                                disabled={submitting}
-                            >
-                                {CATEGORIES.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </select>
+                    <div className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-5 items-end">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">קטגוריה</label>
+                                <select
+                                    className="w-full p-2 border rounded-md"
+                                    value={newExpense.category}
+                                    onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+                                    disabled={submitting}
+                                >
+                                    {CATEGORIES.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">תיאור</label>
+                                <Input
+                                    placeholder="תיאור ההוצאה"
+                                    value={newExpense.description}
+                                    onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+                                    disabled={submitting}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">סכום</label>
+                                <Input
+                                    type="number"
+                                    placeholder="0.00"
+                                    value={newExpense.amount}
+                                    onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+                                    disabled={submitting}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">תאריך</label>
+                                <DatePicker
+                                    date={newExpense.date ? new Date(newExpense.date) : undefined}
+                                    setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                />
+                            </div>
+                            <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
+                                {submitting ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Plus className="h-4 w-4" />
+                                )}
+                                הוסף
+                            </Button>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">תיאור</label>
-                            <Input
-                                placeholder="תיאור ההוצאה"
-                                value={newExpense.description}
-                                onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
-                                disabled={submitting}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">סכום</label>
-                            <Input
-                                type="number"
-                                placeholder="0.00"
-                                value={newExpense.amount}
-                                onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
-                                disabled={submitting}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">תאריך</label>
-                            <DatePicker
-                                date={newExpense.date ? new Date(newExpense.date) : undefined}
-                                setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                            />
-                        </div>
-                        <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
-                            {submitting ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Plus className="h-4 w-4" />
+
+                        {/* Recurring Options */}
+                        <div className="flex items-start gap-4 p-4 border rounded-lg bg-slate-50">
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    id="recurring-expense"
+                                    checked={newExpense.isRecurring}
+                                    onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })}
+                                />
+                                <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer">
+                                    הוצאה קבועה (חוזרת)
+                                </label>
+                            </div>
+
+                            {newExpense.isRecurring && (
+                                <div className="flex gap-4 flex-1">
+                                    <div className="space-y-2 flex-1">
+                                        <label className="text-sm font-medium">תאריך התחלה</label>
+                                        <DatePicker
+                                            date={newExpense.recurringStartDate ? new Date(newExpense.recurringStartDate) : undefined}
+                                            setDate={(date) => setNewExpense({ ...newExpense, recurringStartDate: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2 flex-1">
+                                        <label className="text-sm font-medium">תאריך סיום</label>
+                                        <DatePicker
+                                            date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
+                                            setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                        />
+                                    </div>
+                                </div>
                             )}
-                            הוסף
-                        </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
