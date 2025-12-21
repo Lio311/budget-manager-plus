@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowDown, ArrowUp, DollarSign, PiggyBank, TrendingUp, Wallet } from 'lucide-react'
+import { ArrowDown, ArrowUp, PiggyBank, TrendingUp, Wallet } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label } from 'recharts'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
@@ -26,9 +26,11 @@ const COLORS = {
 
 const CustomTooltip = ({ active, payload, label, currency }: any) => {
     if (active && payload && payload.length) {
+        // Priority: label (BarChart X-axis) -> payload data name (PieChart) -> generic name
+        const title = label || (payload[0].payload && payload[0].payload.name) || payload[0].name;
         return (
             <div className="bg-white p-2 border rounded shadow-md text-right dir-rtl">
-                <span className="font-bold text-gray-900 block mb-1">{payload[0].name}</span>
+                <span className="font-bold text-gray-900 block mb-1">{title}</span>
                 <span className="text-sm text-gray-600">
                     {formatCurrency(Number(payload[0].value), currency)}
                 </span>
@@ -115,8 +117,8 @@ export function OverviewTab() {
                                     data={incomeVsExpenses}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={55}
-                                    outerRadius={75}
+                                    innerRadius={50}
+                                    outerRadius={70}
                                     paddingAngle={5}
                                     dataKey="value"
                                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -148,7 +150,7 @@ export function OverviewTab() {
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart
                                 data={expensesByCategory}
-                                margin={{ top: 20, right: 10, left: 10, bottom: 5 }}
+                                margin={{ top: 20, right: 60, left: 10, bottom: 5 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <XAxis
