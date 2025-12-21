@@ -8,6 +8,7 @@ import { Plus, Trash2, Loader2, Pencil, Check, X } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
+import { Checkbox } from '@/components/ui/checkbox'
 import { format } from 'date-fns'
 import { getIncomes, addIncome, deleteIncome, updateIncome } from '@/lib/actions/income'
 import { useToast } from '@/hooks/use-toast'
@@ -25,7 +26,7 @@ export function IncomeTab() {
     const [incomes, setIncomes] = useState<Income[]>([])
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
-    const [newIncome, setNewIncome] = useState({ source: '', amount: '', date: '' })
+    const [newIncome, setNewIncome] = useState({ source: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ source: '', amount: '', date: '' })
 
@@ -76,7 +77,7 @@ export function IncomeTab() {
                 description: 'ההכנסה נוספה בהצלחה',
                 duration: 1000
             })
-            setNewIncome({ source: '', amount: '', date: '' })
+            setNewIncome({ source: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
             await loadIncomes()
         } else {
             toast({
@@ -189,41 +190,76 @@ export function IncomeTab() {
                     <CardTitle>הוסף הכנסה חדשה</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-4 md:grid-cols-4 items-end">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">מקור הכנסה</label>
-                            <Input
-                                placeholder="משכורת, עבודה נוספת..."
-                                value={newIncome.source}
-                                onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })}
-                                disabled={submitting}
-                            />
+                    <div className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-4 items-end">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">מקור הכנסה</label>
+                                <Input
+                                    placeholder="משכורת, עבודה נוספת..."
+                                    value={newIncome.source}
+                                    onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })}
+                                    disabled={submitting}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">סכום</label>
+                                <Input
+                                    type="number"
+                                    placeholder="0.00"
+                                    value={newIncome.amount}
+                                    onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })}
+                                    disabled={submitting}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">תאריך</label>
+                                <DatePicker
+                                    date={newIncome.date ? new Date(newIncome.date) : undefined}
+                                    setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                />
+                            </div>
+                            <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
+                                {submitting ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Plus className="h-4 w-4" />
+                                )}
+                                הוסף
+                            </Button>
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">סכום</label>
-                            <Input
-                                type="number"
-                                placeholder="0.00"
-                                value={newIncome.amount}
-                                onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })}
-                                disabled={submitting}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">תאריך</label>
-                            <DatePicker
-                                date={newIncome.date ? new Date(newIncome.date) : undefined}
-                                setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                            />
-                        </div>
-                        <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
-                            {submitting ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Plus className="h-4 w-4" />
+
+                        {/* Recurring Options */}
+                        <div className="flex items-start gap-4 p-4 border rounded-lg bg-slate-50">
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    id="recurring"
+                                    checked={newIncome.isRecurring}
+                                    onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })}
+                                />
+                                <label htmlFor="recurring" className="text-sm font-medium cursor-pointer">
+                                    הכנסה קבועה (חוזרת)
+                                </label>
+                            </div>
+
+                            {newIncome.isRecurring && (
+                                <div className="flex gap-4 flex-1">
+                                    <div className="space-y-2 flex-1">
+                                        <label className="text-sm font-medium">תאריך התחלה</label>
+                                        <DatePicker
+                                            date={newIncome.recurringStartDate ? new Date(newIncome.recurringStartDate) : undefined}
+                                            setDate={(date) => setNewIncome({ ...newIncome, recurringStartDate: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2 flex-1">
+                                        <label className="text-sm font-medium">תאריך סיום</label>
+                                        <DatePicker
+                                            date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
+                                            setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                        />
+                                    </div>
+                                </div>
                             )}
-                            הוסף
-                        </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
