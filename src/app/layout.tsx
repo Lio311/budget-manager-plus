@@ -7,6 +7,9 @@ import { Toaster } from '@/components/ui/toaster'
 export const metadata: Metadata = {
     title: 'מערכת ניהול תקציב חודשי+',
     description: 'נהל את התקציב האישי או המשפחתי שלך בקלות עם לוח שנה חכם ותזכורות תשלומים',
+    icons: {
+        icon: '/icon.png',
+    },
 }
 
 export default function RootLayout({
