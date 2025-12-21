@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Check, Loader2 } from 'lucide-react'
+import { Plus, Trash2, Check, Loader2, Pencil, X } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
-import { getBills, addBill, toggleBillPaid, deleteBill } from '@/lib/actions/bill'
+import { getBills, addBill, toggleBillPaid, deleteBill, updateBill } from '@/lib/actions/bill'
 import { useToast } from '@/hooks/use-toast'
 
 interface Bill {
@@ -25,6 +25,8 @@ export function BillsTab() {
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [newBill, setNewBill] = useState({ name: '', amount: '', dueDay: '' })
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editData, setEditData] = useState({ name: '', amount: '', dueDay: '' })
 
     const totalBills = bills.reduce((sum, bill) => sum + bill.amount, 0)
     const paidBills = bills.filter(b => b.isPaid).reduce((sum, bill) => sum + bill.amount, 0)
@@ -44,7 +46,8 @@ export function BillsTab() {
             toast({
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לטעון חשבונות',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 2000
             })
         }
         setLoading(false)
@@ -236,8 +239,8 @@ export function BillsTab() {
                                             <button
                                                 onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
                                                 className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${bill.isPaid
-                                                        ? 'bg-green-500 border-green-500'
-                                                        : 'border-gray-300 hover:border-green-500'
+                                                    ? 'bg-green-500 border-green-500'
+                                                    : 'border-gray-300 hover:border-green-500'
                                                     }`}
                                             >
                                                 {bill.isPaid && <Check className="h-4 w-4 text-white" />}
