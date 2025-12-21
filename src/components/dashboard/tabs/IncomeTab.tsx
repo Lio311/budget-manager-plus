@@ -213,7 +213,7 @@ export function IncomeTab() {
                             <label className="text-sm font-medium">תאריך</label>
                             <DatePicker
                                 date={newIncome.date ? new Date(newIncome.date) : undefined}
-                                onDateChange={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
                                 disabled={submitting}
                             />
                         </div>

@@ -245,7 +245,7 @@ export function ExpensesTab() {
                             <label className="text-sm font-medium">תאריך</label>
                             <DatePicker
                                 date={newExpense.date ? new Date(newExpense.date) : undefined}
-                                onDateChange={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
                                 disabled={submitting}
                             />
                         </div>
