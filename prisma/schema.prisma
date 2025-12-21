@@ -44,32 +44,42 @@ model Budget {
 }
 
 model Income {
-  id        String   @id @default(cuid())
-  budgetId  String
-  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  id                 String    @id @default(cuid())
+  budgetId           String
+  budget             Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   
-  source    String   // "משכורת", "הכנסה נוספת", "עבודה נוספת"
-  amount    Float
-  date      DateTime?
+  source             String    // "משכורת", "הכנסה נוספת", "עבודה נוספת"
+  amount             Float
+  date               DateTime?
   
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isRecurring        Boolean   @default(false)
+  recurringSourceId  String?
+  recurringStartDate DateTime?
+  recurringEndDate   DateTime?
+  
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
   
   @@map("incomes")
 }
 
 model Expense {
-  id          String   @id @default(cuid())
-  budgetId    String
-  budget      Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  id                 String    @id @default(cuid())
+  budgetId           String
+  budget             Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   
-  category    String   // "מזון", "תחבורה", "בילויים", "קניות", "אחר"
-  description String
-  amount      Float
-  date        DateTime
+  category           String    // "מזון", "תחבורה", "בילויים", "קניות", "אחר"
+  description        String
+  amount             Float
+  date               DateTime
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isRecurring        Boolean   @default(false)
+  recurringSourceId  String?
+  recurringStartDate DateTime?
+  recurringEndDate   DateTime?
+  
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
   
   @@map("expenses")
 }
