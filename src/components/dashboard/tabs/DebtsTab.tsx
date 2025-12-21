@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Check } from 'lucide-react'
+import { Plus, Trash2, Check, Loader2 } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
+import { getDebts, addDebt, deleteDebt, toggleDebtPaid } from '@/lib/actions/debts'
+import { useToast } from '@/hooks/use-toast'
 
 interface Debt {
     id: string
@@ -18,13 +20,11 @@ interface Debt {
 }
 
 export function DebtsTab() {
-    const { currency } = useBudget()
-    const [debts, setDebts] = useState<Debt[]>([
-        { id: '1', creditor: 'בנק הפועלים', totalAmount: 50000, monthlyPayment: 1200, dueDay: 5, isPaid: false },
-        { id: '2', creditor: 'כרטיס אשראי', totalAmount: 8000, monthlyPayment: 800, dueDay: 10, isPaid: true },
-        { id: '3', creditor: 'הלוואה פרטית', totalAmount: 15000, monthlyPayment: 600, dueDay: 20, isPaid: false },
-    ])
-
+    const { month, year, currency } = useBudget()
+    const { toast } = useToast()
+    const [debts, setDebts] = useState<Debt[]>([])
+    const [loading, setLoading] = useState(true)
+    const [submitting, setSubmitting] = useState(false)
     const [newDebt, setNewDebt] = useState({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
 
     const totalDebts = debts.reduce((sum, debt) => sum + debt.totalAmount, 0)
@@ -32,31 +32,84 @@ export function DebtsTab() {
     const paidThisMonth = debts.filter(d => d.isPaid).reduce((sum, debt) => sum + debt.monthlyPayment, 0)
     const unpaidThisMonth = monthlyPayments - paidThisMonth
 
-    const handleAdd = () => {
+    useEffect(() => {
+        loadDebts()
+    }, [month, year])
+
+    async function loadDebts() {
+        setLoading(true)
+        const result = await getDebts(month, year)
+
+        if (result.success && result.data) {
+            setDebts(result.data)
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לטעון חובות',
+                variant: 'destructive'
+            })
+        }
+        setLoading(false)
+    }
+
+    const handleAdd = async () => {
         if (newDebt.creditor && newDebt.totalAmount && newDebt.monthlyPayment && newDebt.dueDay) {
-            setDebts([
-                ...debts,
-                {
-                    id: Date.now().toString(),
-                    creditor: newDebt.creditor,
-                    totalAmount: parseFloat(newDebt.totalAmount),
-                    monthlyPayment: parseFloat(newDebt.monthlyPayment),
-                    dueDay: parseInt(newDebt.dueDay),
-                    isPaid: false,
-                },
-            ])
-            setNewDebt({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+            setSubmitting(true)
+            const result = await addDebt(month, year, {
+                creditor: newDebt.creditor,
+                totalAmount: parseFloat(newDebt.totalAmount),
+                monthlyPayment: parseFloat(newDebt.monthlyPayment),
+                dueDay: parseInt(newDebt.dueDay),
+            })
+
+            if (result.success) {
+                setNewDebt({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+                await loadDebts()
+                toast({
+                    title: 'הצלחה',
+                    description: 'החוב נוסף בהצלחה'
+                })
+            } else {
+                toast({
+                    title: 'שגיאה',
+                    description: result.error || 'לא ניתן להוסיף חוב',
+                    variant: 'destructive'
+                })
+            }
+            setSubmitting(false)
         }
     }
 
-    const handleDelete = (id: string) => {
-        setDebts(debts.filter((debt) => debt.id !== id))
+    const handleDelete = async (id: string) => {
+        const result = await deleteDebt(id)
+
+        if (result.success) {
+            await loadDebts()
+            toast({
+                title: 'הצלחה',
+                description: 'החוב נמחק בהצלחה'
+            })
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן למחוק חוב',
+                variant: 'destructive'
+            })
+        }
     }
 
-    const togglePaid = (id: string) => {
-        setDebts(debts.map(debt =>
-            debt.id === id ? { ...debt, isPaid: !debt.isPaid } : debt
-        ))
+    const togglePaid = async (id: string, currentStatus: boolean) => {
+        const result = await toggleDebtPaid(id, !currentStatus)
+
+        if (result.success) {
+            await loadDebts()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לעדכן סטטוס',
+                variant: 'destructive'
+            })
+        }
     }
 
     return (
@@ -164,10 +217,10 @@ export function DebtsTab() {
                                     >
                                         <div className="flex items-center gap-4 flex-1">
                                             <button
-                                                onClick={() => togglePaid(debt.id)}
+                                                onClick={() => togglePaid(debt.id, debt.isPaid)}
                                                 className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${debt.isPaid
-                                                        ? 'bg-green-500 border-green-500'
-                                                        : 'border-gray-300 hover:border-green-500'
+                                                    ? 'bg-green-500 border-green-500'
+                                                    : 'border-gray-300 hover:border-green-500'
                                                     }`}
                                             >
                                                 {debt.isPaid && <Check className="h-4 w-4 text-white" />}
