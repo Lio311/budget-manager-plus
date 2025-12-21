@@ -115,7 +115,7 @@ export function DebtsTab() {
     return (
         <div className="space-y-6">
             {/* Summary Cards */}
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
                 <Card className="bg-gradient-to-l from-purple-50 to-white border-purple-200">
                     <CardHeader>
                         <CardTitle className="text-purple-700 text-sm">סך חובות</CardTitle>
