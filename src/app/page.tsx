@@ -64,7 +64,7 @@ export default function HomePage() {
                     </SignedOut>
 
                     <SignedIn>
-                        <Link href="/dashboard">
+                        <Link href="/onboarding">
                             <button className="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl inline-flex items-center gap-2">
                                 כניסה לדשבורד
                                 <ArrowLeft className="w-5 h-5" />
