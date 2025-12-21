@@ -1,11 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Check, Loader2 } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency, getDaysInMonth, getMonthName } from '@/lib/utils'
+import { getCalendarPayments } from '@/lib/actions/calendar'
+import { toggleBillPaid } from '@/lib/actions/bill'
+import { toggleDebtPaid } from '@/lib/actions/debts'
+import { useToast } from '@/hooks/use-toast'
 
 interface Payment {
     id: string
@@ -18,23 +22,47 @@ interface Payment {
 
 export function CalendarTab() {
     const { month, year, currency } = useBudget()
+    const { toast } = useToast()
+    const [payments, setPayments] = useState<Payment[]>([])
+    const [loading, setLoading] = useState(true)
 
-    // Mock payments - will be replaced with real data from bills and debts
-    const [payments, setPayments] = useState<Payment[]>([
-        { id: '1', name: 'חשמל', amount: 450, day: 10, type: 'bill', isPaid: false },
-        { id: '2', name: 'ארנונה', amount: 800, day: 15, type: 'bill', isPaid: true },
-        { id: '3', name: 'נטפליקס', amount: 55, day: 5, type: 'bill', isPaid: false },
-        { id: '4', name: 'בנק הפועלים', amount: 1200, day: 5, type: 'debt', isPaid: false },
-        { id: '5', name: 'כרטיס אשראי', amount: 800, day: 10, type: 'debt', isPaid: true },
-    ])
+    useEffect(() => {
+        loadPayments()
+    }, [month, year])
+
+    async function loadPayments() {
+        setLoading(true)
+        const result = await getCalendarPayments(month, year)
+
+        if (result.success && result.data) {
+            setPayments(result.data)
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לטעון תשלומים',
+                variant: 'destructive'
+            })
+        }
+        setLoading(false)
+    }
 
     const daysInMonth = getDaysInMonth(month, year)
     const firstDayOfMonth = new Date(year, month - 1, 1).getDay()
 
-    const togglePaid = (id: string) => {
-        setPayments(payments.map(p =>
-            p.id === id ? { ...p, isPaid: !p.isPaid } : p
-        ))
+    const togglePaid = async (payment: Payment) => {
+        const result = payment.type === 'bill'
+            ? await toggleBillPaid(payment.id, !payment.isPaid)
+            : await toggleDebtPaid(payment.id, !payment.isPaid)
+
+        if (result.success) {
+            await loadPayments()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לעדכן סטטוס',
+                variant: 'destructive'
+            })
+        }
     }
 
     const getPaymentsForDay = (day: number) => {
@@ -113,12 +141,12 @@ export function CalendarTab() {
                                 <div
                                     key={index}
                                     className={`min-h-[80px] p-2 border rounded-lg ${day === null
-                                            ? 'bg-gray-50'
-                                            : hasPayments
-                                                ? allPaid
-                                                    ? 'bg-green-50 border-green-200'
-                                                    : 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100'
-                                                : 'hover:bg-accent'
+                                        ? 'bg-gray-50'
+                                        : hasPayments
+                                            ? allPaid
+                                                ? 'bg-green-50 border-green-200'
+                                                : 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100'
+                                            : 'hover:bg-accent'
                                         } transition-colors`}
                                 >
                                     {day && (
@@ -130,8 +158,8 @@ export function CalendarTab() {
                                                         <div
                                                             key={payment.id}
                                                             className={`text-xs p-1 rounded ${payment.type === 'bill'
-                                                                    ? 'bg-yellow-200 text-yellow-800'
-                                                                    : 'bg-purple-200 text-purple-800'
+                                                                ? 'bg-yellow-200 text-yellow-800'
+                                                                : 'bg-purple-200 text-purple-800'
                                                                 } ${payment.isPaid ? 'opacity-50 line-through' : ''}`}
                                                         >
                                                             {payment.name}
@@ -172,10 +200,10 @@ export function CalendarTab() {
                                         >
                                             <div className="flex items-center gap-4 flex-1">
                                                 <button
-                                                    onClick={() => togglePaid(payment.id)}
+                                                    onClick={() => togglePaid(payment)}
                                                     className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${payment.isPaid
-                                                            ? 'bg-green-500 border-green-500'
-                                                            : 'border-gray-300 hover:border-green-500'
+                                                        ? 'bg-green-500 border-green-500'
+                                                        : 'border-gray-300 hover:border-green-500'
                                                         }`}
                                                 >
                                                     {payment.isPaid && <Check className="h-4 w-4 text-white" />}
@@ -186,8 +214,8 @@ export function CalendarTab() {
                                                             {payment.name}
                                                         </p>
                                                         <span className={`text-xs px-2 py-0.5 rounded-full ${payment.type === 'bill'
-                                                                ? 'bg-yellow-100 text-yellow-700'
-                                                                : 'bg-purple-100 text-purple-700'
+                                                            ? 'bg-yellow-100 text-yellow-700'
+                                                            : 'bg-purple-100 text-purple-700'
                                                             }`}>
                                                             {payment.type === 'bill' ? 'חשבון' : 'חוב'}
                                                         </span>
