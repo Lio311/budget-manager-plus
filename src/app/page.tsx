@@ -4,13 +4,13 @@ import { ArrowLeft, Calendar, PieChart, TrendingUp, Wallet } from 'lucide-react'
 
 export default function HomePage() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100">
+        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100">
             <div className="container mx-auto px-4 py-16">
                 {/* Header */}
                 <div className="text-center mb-16">
                     <div className="flex items-center justify-center gap-3 mb-6">
                         <Wallet className="w-16 h-16 text-primary" />
-                        <h1 className="text-5xl font-bold bg-gradient-to-l from-primary to-purple-600 bg-clip-text text-transparent">
+                        <h1 className="text-5xl font-bold bg-gradient-to-l from-primary to-green-600 bg-clip-text text-transparent">
                             מערכת ניהול תקציב+
                         </h1>
                     </div>
@@ -55,7 +55,7 @@ export default function HomePage() {
                                     </button>
                                 </SignUpButton>
                                 <SignInButton mode="modal">
-                                    <button className="px-8 py-4 bg-white border-2 border-primary text-primary rounded-lg font-semibold text-lg hover:bg-purple-50 transition-all">
+                                    <button className="px-8 py-4 bg-white border-2 border-primary text-primary rounded-lg font-semibold text-lg hover:bg-green-50 transition-all">
                                         כניסה למערכת
                                     </button>
                                 </SignInButton>
@@ -104,11 +104,11 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
 
 function BenefitItem({ text }: { text: string }) {
     return (
-        <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <div className="flex items-center justify-center gap-3 bg-white/50 p-4 rounded-lg shadow-sm">
+            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                 <div className="w-2 h-2 rounded-full bg-primary" />
             </div>
-            <p className="text-foreground">{text}</p>
+            <p className="text-foreground font-medium">{text}</p>
         </div>
     )
 }

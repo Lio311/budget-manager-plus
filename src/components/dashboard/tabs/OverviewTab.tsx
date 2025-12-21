@@ -15,13 +15,13 @@ const mockData = {
 }
 
 const COLORS = {
-    income: 'hsl(142, 76%, 36%)',
-    expenses: 'hsl(0, 84%, 60%)',
-    food: 'hsl(262, 52%, 60%)',
-    transport: 'hsl(217, 91%, 60%)',
-    entertainment: 'hsl(142, 76%, 36%)',
-    bills: 'hsl(45, 93%, 47%)',
-    other: 'hsl(240, 5%, 65%)',
+    income: 'hsl(142, 76%, 36%)', // Green
+    expenses: 'hsl(0, 84%, 60%)', // Red
+    food: 'hsl(142, 76%, 36%)', // Green (Primary)
+    transport: 'hsl(160, 84%, 39%)', // Teal-ish Green
+    entertainment: 'hsl(80, 80%, 45%)', // Lime Green
+    bills: 'hsl(45, 93%, 47%)', // Yellow/Orange
+    other: 'hsl(200, 10%, 65%)', // Gray
 }
 
 export function OverviewTab() {
@@ -80,8 +80,8 @@ export function OverviewTab() {
                     icon={<Wallet className="h-4 w-4" />}
                     trend="-10%"
                     trendUp={true}
-                    color="text-purple-600"
-                    bgColor="bg-purple-50"
+                    color="text-orange-600"
+                    bgColor="bg-orange-50"
                 />
             </div>
 
@@ -99,10 +99,9 @@ export function OverviewTab() {
                                     data={incomeVsExpenses}
                                     cx="50%"
                                     cy="50%"
-                                    labelLine={false}
-                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    innerRadius={60}
                                     outerRadius={80}
-                                    fill="#8884d8"
+                                    paddingAngle={5}
                                     dataKey="value"
                                 >
                                     {incomeVsExpenses.map((entry, index) => (
@@ -124,11 +123,22 @@ export function OverviewTab() {
                     <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={expensesByCategory}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip formatter={(value) => formatCurrency(Number(value), currency)} />
-                                <Bar dataKey="value" fill={COLORS.food}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis
+                                    dataKey="name"
+                                    tickLine={false}
+                                    axisLine={false}
+                                />
+                                <YAxis
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(value) => `${value}`}
+                                />
+                                <Tooltip
+                                    formatter={(value) => formatCurrency(Number(value), currency)}
+                                    cursor={{ fill: 'transparent' }}
+                                />
+                                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                                     {expensesByCategory.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
                                     ))}

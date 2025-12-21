@@ -18,9 +18,9 @@ interface Expense {
 
 const CATEGORIES = ['מזון', 'תחבורה', 'בילויים', 'קניות', 'בריאות', 'חינוך', 'אחר']
 const CATEGORY_COLORS: Record<string, string> = {
-    'מזון': 'bg-purple-100 text-purple-700 border-purple-200',
+    'מזון': 'bg-green-100 text-green-700 border-green-200',
     'תחבורה': 'bg-blue-100 text-blue-700 border-blue-200',
-    'בילויים': 'bg-green-100 text-green-700 border-green-200',
+    'בילויים': 'bg-purple-100 text-purple-700 border-purple-200',
     'קניות': 'bg-pink-100 text-pink-700 border-pink-200',
     'בריאות': 'bg-red-100 text-red-700 border-red-200',
     'חינוך': 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -106,6 +106,7 @@ export function ExpensesTab() {
                         />
                         <Input
                             type="date"
+                            className="cursor-pointer"
                             value={newExpense.date}
                             onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
                         />

@@ -12,27 +12,27 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 262 52% 60%;
+    --primary: 142 76% 36%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 262 30% 80%;
-    --secondary-foreground: 262 52% 20%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 262 20% 92%;
-    --accent-foreground: 262 52% 30%;
+    --secondary: 142 30% 90%;
+    --secondary-foreground: 142 76% 26%;
+    --muted: 142 20% 96%;
+    --muted-foreground: 142 10% 46%;
+    --accent: 142 30% 94%;
+    --accent-foreground: 142 76% 26%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 262 52% 60%;
+    --border: 142 20% 90%;
+    --input: 142 20% 90%;
+    --ring: 142 76% 36%;
     --radius: 0.5rem;
     
     /* Custom budget colors */
     --budget-income: 142 76% 36%;
     --budget-expense: 0 84% 60%;
-    --budget-food: 262 52% 60%;
+    --budget-food: 142 76% 36%;
     --budget-transport: 217 91% 60%;
-    --budget-entertainment: 142 76% 36%;
+    --budget-entertainment: 262 50% 60%;
     --budget-bills: 45 93% 47%;
     --budget-debt: 0 84% 60%;
   }

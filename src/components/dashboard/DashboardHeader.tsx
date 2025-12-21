@@ -50,20 +50,6 @@ export function DashboardHeader() {
 
                     {/* Currency Selector */}
                     <div className="flex items-center gap-4">
-                        <div className="flex gap-1 bg-muted rounded-lg p-1">
-                            {CURRENCIES.map((curr) => (
-                                <button
-                                    key={curr}
-                                    onClick={() => setCurrency(curr)}
-                                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${currency === curr
-                                            ? 'bg-primary text-primary-foreground shadow-sm'
-                                            : 'hover:bg-background'
-                                        }`}
-                                >
-                                    {curr}
-                                </button>
-                            ))}
-                        </div>
                         <UserButton afterSignOutUrl="/" />
                     </div>
                 </div>
