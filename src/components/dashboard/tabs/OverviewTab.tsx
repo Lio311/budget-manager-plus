@@ -8,13 +8,13 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 
 const COLORS = {
-    income: '#22C55E',      // ירוק חזק
+    income: '#22C55E',      // ירוק
     expenses: '#EF4444',    // אדום
-    food: '#22C55E',        // ירוק (מזון)
-    transport: '#10B981',   // ירוק טורקיז
-    entertainment: '#84CC16', // ירוק ליים
-    bills: '#F59E0B',       // כתום/צהוב
-    other: '#94A3B8',       // אפור
+    bills: '#F59E0B',       // צהוב-כתום
+    food: '#22C55E',
+    transport: '#10B981',
+    entertainment: '#84CC16',
+    other: '#94A3B8',
 }
 
 const CustomTooltip = ({ active, payload, label, currency }: any) => {
@@ -44,6 +44,7 @@ export function OverviewTab() {
 
     const savings = mockData.totalIncome - mockData.totalExpenses - mockData.totalBills
 
+    // סידור הנתונים לפי סדר ההופעה במקרא (מימין לשמאל)
     const incomeVsExpenses = [
         { name: 'הכנסות', value: mockData.totalIncome, color: COLORS.income },
         { name: 'הוצאות', value: mockData.totalExpenses, color: COLORS.expenses },
@@ -57,8 +58,6 @@ export function OverviewTab() {
         { name: 'קניות', value: 1200, color: COLORS.other },
         { name: 'אחר', value: 920, color: COLORS.other },
     ].sort((a, b) => b.value - a.value);
-
-    const totalForPie = 27120.00;
 
     return (
         <div className="space-y-6 p-2" dir="rtl">
@@ -110,34 +109,40 @@ export function OverviewTab() {
                         <CardTitle className="text-right">התפלגות תקציב</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={320}>
                             <PieChart>
                                 <Pie
                                     data={incomeVsExpenses}
                                     cx="50%"
-                                    cy="50%"
+                                    cy="45%"
                                     innerRadius={70}
-                                    outerRadius={90}
+                                    outerRadius={95}
                                     paddingAngle={5}
                                     dataKey="value"
                                     stroke="none"
-                                    label={false} // הסרת התגיות החיצוניות
-                                    labelLine={false} // הסרת הקווים המובילים
+                                    label={false}
+                                    labelLine={false}
                                 >
                                     {incomeVsExpenses.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
                                     ))}
                                     <Label
-                                        value={formatCurrency(totalForPie, currency)}
+                                        value={formatCurrency(27120, currency)}
                                         position="center"
-                                        className="text-lg font-bold fill-foreground"
+                                        className="text-xl font-bold fill-foreground"
                                     />
                                 </Pie>
                                 <Tooltip content={<CustomTooltip currency={currency} />} />
-                                <Legend 
-                                    verticalAlign="bottom" 
-                                    align="center" 
-                                    formatter={(value) => <span className="text-sm font-medium ml-2">{value}</span>} 
+                                <Legend
+                                    verticalAlign="bottom"
+                                    align="center"
+                                    iconType="square"
+                                    iconSize={14}
+                                    formatter={(value) => (
+                                        <span className="text-sm font-medium mr-2 ml-6 text-gray-700">
+                                            {value}
+                                        </span>
+                                    )}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
@@ -149,7 +154,7 @@ export function OverviewTab() {
                         <CardTitle className="text-right">הוצאות לפי קטגוריה</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={320}>
                             <BarChart data={expensesByCategory} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
@@ -166,7 +171,6 @@ export function OverviewTab() {
                 </Card>
             </div>
 
-            {/* Budget Progress Section */}
             <Card>
                 <CardHeader>
                     <CardTitle className="text-right font-bold">מצב תקציב חודשי</CardTitle>
@@ -204,19 +208,19 @@ function StatCard({ title, value, icon, trend, trendUp, color, bgColor, isDebt }
     const Icon = trendUp ? ArrowUp : ArrowDown;
 
     return (
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden border-none shadow-sm bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-500">{title}</CardTitle>
                 <div className={`${bgColor} ${color} p-2 rounded-lg`}>{icon}</div>
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold tracking-tight">{value}</div>
+                <div className="text-2xl font-bold tracking-tight text-gray-900">{value}</div>
                 <div className={`flex items-center gap-1 mt-1 text-xs font-bold ${trendColor}`}>
                     <span style={{ direction: 'ltr', unicodeBidi: 'isolate' }}>
                         {trendUp ? '+' : '-'}{trend.replace(/[+-]/g, '')}
                     </span>
                     <Icon className="h-3 w-3" />
-                    <span className="text-muted-foreground font-normal mr-1">מהחודש הקודם</span>
+                    <span className="text-gray-400 font-normal mr-1">מהחודש הקודם</span>
                 </div>
             </CardContent>
         </Card>
