@@ -4,7 +4,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.0-2D3748)](https://www.prisma.io/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 
 An advanced full-stack web application for intelligent personal and family budget management with Hebrew-first interface, real-time tracking, and smart automation features.
 
