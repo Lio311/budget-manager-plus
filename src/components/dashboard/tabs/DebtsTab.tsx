@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Check, Loader2 } from 'lucide-react'
+import { Plus, Trash2, Check, Loader2, Pencil, X } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
-import { getDebts, addDebt, deleteDebt, toggleDebtPaid } from '@/lib/actions/debts'
+import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib/actions/debts'
 import { useToast } from '@/hooks/use-toast'
 
 interface Debt {
@@ -26,6 +26,8 @@ export function DebtsTab() {
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [newDebt, setNewDebt] = useState({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editData, setEditData] = useState({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
 
     const totalDebts = debts.reduce((sum, debt) => sum + debt.totalAmount, 0)
     const monthlyPayments = debts.reduce((sum, debt) => sum + debt.monthlyPayment, 0)
@@ -46,7 +48,8 @@ export function DebtsTab() {
             toast({
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לטעון חובות',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 1000
             })
         }
         setLoading(false)
@@ -96,6 +99,71 @@ export function DebtsTab() {
         if (result.success) {
             await loadDebts()
         }
+    }
+
+    function handleEdit(debt: Debt) {
+        setEditingId(debt.id)
+        setEditData({
+            creditor: debt.creditor,
+            totalAmount: debt.totalAmount.toString(),
+            monthlyPayment: debt.monthlyPayment.toString(),
+            dueDay: debt.dueDay.toString()
+        })
+    }
+
+    function handleCancelEdit() {
+        setEditingId(null)
+        setEditData({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+    }
+
+    async function handleUpdate() {
+        if (!editingId || !editData.creditor || !editData.totalAmount || !editData.monthlyPayment || !editData.dueDay) {
+            toast({
+                title: 'שגיאה',
+                description: 'נא למלא את כל השדות',
+                variant: 'destructive',
+                duration: 1000
+            })
+            return
+        }
+
+        const dueDay = parseInt(editData.dueDay)
+        if (dueDay < 1 || dueDay > 31) {
+            toast({
+                title: 'שגיאה',
+                description: 'יום תשלום חייב להיות בין 1 ל-31',
+                variant: 'destructive',
+                duration: 1000
+            })
+            return
+        }
+
+        setSubmitting(true)
+        const result = await updateDebt(editingId, {
+            creditor: editData.creditor,
+            totalAmount: parseFloat(editData.totalAmount),
+            monthlyPayment: parseFloat(editData.monthlyPayment),
+            dueDay
+        })
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'החוב עודכן בהצלחה',
+                duration: 1000
+            })
+            setEditingId(null)
+            setEditData({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+            await loadDebts()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לעדכן חוב',
+                variant: 'destructive',
+                duration: 1000
+            })
+        }
+        setSubmitting(false)
     }
 
     return (
@@ -213,43 +281,111 @@ export function DebtsTab() {
                                     className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg gap-4 transition-all ${debt.isPaid ? 'bg-green-50/50 border-green-200' : 'bg-white hover:bg-slate-50'
                                         }`}
                                 >
-                                    <div className="flex items-start gap-3 w-full sm:w-auto">
-                                        <button
-                                            onClick={() => togglePaid(debt.id, debt.isPaid)}
-                                            className={`mt-1 w-6 h-6 shrink-0 rounded border-2 flex items-center justify-center transition-colors ${debt.isPaid ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-500'
-                                                }`}
-                                        >
-                                            {debt.isPaid && <Check className="h-4 w-4 text-white" />}
-                                        </button>
-
-                                        <div className="flex-1 min-w-0">
-                                            <p className={`font-bold text-base truncate ${debt.isPaid ? 'line-through text-muted-foreground' : 'text-slate-900'}`}>
-                                                {debt.creditor}
-                                            </p>
-                                            <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
-                                                <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, currency)}</span>
-                                                <span className="text-slate-500">יום תשלום: {debt.dueDay}</span>
+                                    {editingId === debt.id ? (
+                                        <>
+                                            <div className="flex-1 grid gap-4 md:grid-cols-4 w-full">
+                                                <Input
+                                                    placeholder="שם הנושה"
+                                                    value={editData.creditor}
+                                                    onChange={(e) => setEditData({ ...editData, creditor: e.target.value })}
+                                                    disabled={submitting}
+                                                />
+                                                <Input
+                                                    type="number"
+                                                    placeholder="סכום כולל"
+                                                    value={editData.totalAmount}
+                                                    onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
+                                                    disabled={submitting}
+                                                />
+                                                <Input
+                                                    type="number"
+                                                    placeholder="תשלום חודשי"
+                                                    value={editData.monthlyPayment}
+                                                    onChange={(e) => setEditData({ ...editData, monthlyPayment: e.target.value })}
+                                                    disabled={submitting}
+                                                />
+                                                <Input
+                                                    type="number"
+                                                    placeholder="יום (1-31)"
+                                                    min="1"
+                                                    max="31"
+                                                    value={editData.dueDay}
+                                                    onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
+                                                    disabled={submitting}
+                                                />
                                             </div>
-                                        </div>
-                                    </div>
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={handleUpdate}
+                                                    disabled={submitting}
+                                                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                >
+                                                    <Check className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={handleCancelEdit}
+                                                    disabled={submitting}
+                                                    className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-start gap-3 w-full sm:w-auto">
+                                                <button
+                                                    onClick={() => togglePaid(debt.id, debt.isPaid)}
+                                                    className={`mt-1 w-6 h-6 shrink-0 rounded border-2 flex items-center justify-center transition-colors ${debt.isPaid ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-500'
+                                                        }`}
+                                                >
+                                                    {debt.isPaid && <Check className="h-4 w-4 text-white" />}
+                                                </button>
 
-                                    <div className="flex items-center justify-between w-full sm:w-auto sm:gap-6 pt-3 sm:pt-0 border-t sm:border-0 border-slate-100">
-                                        <div className="text-right sm:text-left">
-                                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">תשלום החודש</p>
-                                            <span className={`text-lg font-black ${debt.isPaid ? 'text-green-600' : 'text-purple-600'}`}>
-                                                {formatCurrency(debt.monthlyPayment, currency)}
-                                            </span>
-                                        </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className={`font-bold text-base truncate ${debt.isPaid ? 'line-through text-muted-foreground' : 'text-slate-900'}`}>
+                                                        {debt.creditor}
+                                                    </p>
+                                                    <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
+                                                        <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, currency)}</span>
+                                                        <span className="text-slate-500">יום תשלום: {debt.dueDay}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleDelete(debt.id)}
-                                            className="text-red-400 hover:text-red-600 hover:bg-red-50 h-10 w-10"
-                                        >
-                                            <Trash2 className="h-5 w-5" />
-                                        </Button>
-                                    </div>
+                                            <div className="flex items-center justify-between w-full sm:w-auto sm:gap-6 pt-3 sm:pt-0 border-t sm:border-0 border-slate-100">
+                                                <div className="text-right sm:text-left">
+                                                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">תשלום החודש</p>
+                                                    <span className={`text-lg font-black ${debt.isPaid ? 'text-green-600' : 'text-purple-600'}`}>
+                                                        {formatCurrency(debt.monthlyPayment, currency)}
+                                                    </span>
+                                                </div>
+
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleEdit(debt)}
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-10 w-10"
+                                                    >
+                                                        <Pencil className="h-5 w-5" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleDelete(debt.id)}
+                                                        className="text-red-400 hover:text-red-600 hover:bg-red-50 h-10 w-10"
+                                                    >
+                                                        <Trash2 className="h-5 w-5" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             ))
                         )}
