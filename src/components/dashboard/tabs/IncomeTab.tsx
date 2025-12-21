@@ -1,50 +1,113 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Loader2 } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
 import { format } from 'date-fns'
+import { getIncomes, addIncome, deleteIncome } from '@/lib/actions/income'
+import { useToast } from '@/hooks/use-toast'
 
 interface Income {
     id: string
     source: string
     amount: number
-    date: string
+    date: Date | null
 }
 
 export function IncomeTab() {
-    const { currency } = useBudget()
-    const [incomes, setIncomes] = useState<Income[]>([
-        { id: '1', source: 'משכורת', amount: 12000, date: '2025-12-01' },
-        { id: '2', source: 'עבודה נוספת', amount: 3000, date: '2025-12-15' },
-    ])
-
+    const { month, year, currency } = useBudget()
+    const { toast } = useToast()
+    const [incomes, setIncomes] = useState<Income[]>([])
+    const [loading, setLoading] = useState(true)
+    const [submitting, setSubmitting] = useState(false)
     const [newIncome, setNewIncome] = useState({ source: '', amount: '', date: '' })
 
     const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0)
 
-    const handleAdd = () => {
-        if (newIncome.source && newIncome.amount) {
-            setIncomes([
-                ...incomes,
-                {
-                    id: Date.now().toString(),
-                    source: newIncome.source,
-                    amount: parseFloat(newIncome.amount),
-                    date: newIncome.date || new Date().toISOString().split('T')[0],
-                },
-            ])
+    // Load incomes when month/year changes
+    useEffect(() => {
+        loadIncomes()
+    }, [month, year])
+
+    async function loadIncomes() {
+        setLoading(true)
+        const result = await getIncomes(month, year)
+
+        if (result.success && result.data) {
+            setIncomes(result.data)
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לטעון הכנסות',
+                variant: 'destructive'
+            })
+        }
+        setLoading(false)
+    }
+
+    async function handleAdd() {
+        if (!newIncome.source || !newIncome.amount) {
+            toast({
+                title: 'שגיאה',
+                description: 'נא למלא את כל השדות הנדרשים',
+                variant: 'destructive'
+            })
+            return
+        }
+
+        setSubmitting(true)
+        const result = await addIncome(month, year, {
+            source: newIncome.source,
+            amount: parseFloat(newIncome.amount),
+            date: newIncome.date || undefined
+        })
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'ההכנסה נוספה בהצלחה'
+            })
             setNewIncome({ source: '', amount: '', date: '' })
+            await loadIncomes()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן להוסיף הכנסה',
+                variant: 'destructive'
+            })
+        }
+        setSubmitting(false)
+    }
+
+    async function handleDelete(id: string) {
+        const result = await deleteIncome(id)
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'ההכנסה נמחקה בהצלחה'
+            })
+            await loadIncomes()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן למחוק הכנסה',
+                variant: 'destructive'
+            })
         }
     }
 
-    const handleDelete = (id: string) => {
-        setIncomes(incomes.filter((income) => income.id !== id))
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
     }
 
     return (
@@ -74,6 +137,7 @@ export function IncomeTab() {
                                 placeholder="משכורת, עבודה נוספת..."
                                 value={newIncome.source}
                                 onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })}
+                                disabled={submitting}
                             />
                         </div>
                         <div className="space-y-2">
@@ -83,6 +147,7 @@ export function IncomeTab() {
                                 placeholder="0.00"
                                 value={newIncome.amount}
                                 onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })}
+                                disabled={submitting}
                             />
                         </div>
                         <div className="space-y-2">
@@ -92,8 +157,16 @@ export function IncomeTab() {
                                 setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
                             />
                         </div>
-                        <Button onClick={handleAdd} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
-                            <Plus className="h-4 w-4" />
+                        <Button
+                            onClick={handleAdd}
+                            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                            disabled={submitting}
+                        >
+                            {submitting ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <Plus className="h-4 w-4" />
+                            )}
                             הוסף
                         </Button>
                     </div>
@@ -118,7 +191,9 @@ export function IncomeTab() {
                                     >
                                         <div className="flex-1">
                                             <p className="font-medium">{income.source}</p>
-                                            <p className="text-sm text-muted-foreground">{format(new Date(income.date), 'dd/MM/yyyy')}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}
+                                            </p>
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <span className="text-lg font-bold text-green-600">

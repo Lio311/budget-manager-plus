@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { heIL } from '@clerk/localizations'
+import { Toaster } from '@/components/ui/toaster'
 
 export const metadata: Metadata = {
     title: 'מערכת ניהול תקציב חודשי+',
@@ -16,7 +17,10 @@ export default function RootLayout({
     return (
         <ClerkProvider localization={heIL}>
             <html lang="he" dir="rtl">
-                <body>{children}</body>
+                <body>
+                    {children}
+                    <Toaster />
+                </body>
             </html>
         </ClerkProvider>
     )

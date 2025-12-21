@@ -1,21 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
-import { Trash2, Plus } from 'lucide-react'
+import { Trash2, Plus, Loader2 } from 'lucide-react'
 import { DatePicker } from '@/components/ui/date-picker'
 import { format } from 'date-fns'
+import { getExpenses, addExpense, deleteExpense } from '@/lib/actions/expense'
+import { useToast } from '@/hooks/use-toast'
 
 interface Expense {
     id: string
     category: string
     description: string
     amount: number
-    date: string
+    date: Date
 }
 
 const CATEGORIES = ['מזון', 'תחבורה', 'בילויים', 'קניות', 'בריאות', 'חינוך', 'אחר']
@@ -30,13 +32,11 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 export function ExpensesTab() {
-    const { currency } = useBudget()
-    const [expenses, setExpenses] = useState<Expense[]>([
-        { id: '1', category: 'מזון', description: 'קניות שבועיות', amount: 800, date: '2025-12-05' },
-        { id: '2', category: 'תחבורה', description: 'דלק', amount: 450, date: '2025-12-10' },
-        { id: '3', category: 'בילויים', description: 'קולנוע', amount: 120, date: '2025-12-12' },
-    ])
-
+    const { month, year, currency } = useBudget()
+    const { toast } = useToast()
+    const [expenses, setExpenses] = useState<Expense[]>([])
+    const [loading, setLoading] = useState(true)
+    const [submitting, setSubmitting] = useState(false)
     const [newExpense, setNewExpense] = useState({ category: 'מזון', description: '', amount: '', date: '' })
     const [filterCategory, setFilterCategory] = useState<string>('הכל')
 
@@ -45,24 +45,85 @@ export function ExpensesTab() {
         ? expenses
         : expenses.filter(e => e.category === filterCategory)
 
-    const handleAdd = () => {
-        if (newExpense.description && newExpense.amount) {
-            setExpenses([
-                ...expenses,
-                {
-                    id: Date.now().toString(),
-                    category: newExpense.category,
-                    description: newExpense.description,
-                    amount: parseFloat(newExpense.amount),
-                    date: newExpense.date || new Date().toISOString().split('T')[0],
-                },
-            ])
+    useEffect(() => {
+        loadExpenses()
+    }, [month, year])
+
+    async function loadExpenses() {
+        setLoading(true)
+        const result = await getExpenses(month, year)
+
+        if (result.success && result.data) {
+            setExpenses(result.data)
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לטעון הוצאות',
+                variant: 'destructive'
+            })
+        }
+        setLoading(false)
+    }
+
+    async function handleAdd() {
+        if (!newExpense.description || !newExpense.amount || !newExpense.date) {
+            toast({
+                title: 'שגיאה',
+                description: 'נא למלא את כל השדות הנדרשים',
+                variant: 'destructive'
+            })
+            return
+        }
+
+        setSubmitting(true)
+        const result = await addExpense(month, year, {
+            category: newExpense.category,
+            description: newExpense.description,
+            amount: parseFloat(newExpense.amount),
+            date: newExpense.date
+        })
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'ההוצאה נוספה בהצלחה'
+            })
             setNewExpense({ category: 'מזון', description: '', amount: '', date: '' })
+            await loadExpenses()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן להוסיף הוצאה',
+                variant: 'destructive'
+            })
+        }
+        setSubmitting(false)
+    }
+
+    async function handleDelete(id: string) {
+        const result = await deleteExpense(id)
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'ההוצאה נמחקה בהצלחה'
+            })
+            await loadExpenses()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן למחוק הוצאה',
+                variant: 'destructive'
+            })
         }
     }
 
-    const handleDelete = (id: string) => {
-        setExpenses(expenses.filter((expense) => expense.id !== id))
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
     }
 
     return (
@@ -92,6 +153,7 @@ export function ExpensesTab() {
                                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 value={newExpense.category}
                                 onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+                                disabled={submitting}
                             >
                                 {CATEGORIES.map((cat) => (
                                     <option key={cat} value={cat}>{cat}</option>
@@ -104,6 +166,7 @@ export function ExpensesTab() {
                                 placeholder="מה קנינו?"
                                 value={newExpense.description}
                                 onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+                                disabled={submitting}
                             />
                         </div>
                         <div className="space-y-2">
@@ -113,6 +176,7 @@ export function ExpensesTab() {
                                 placeholder="0.00"
                                 value={newExpense.amount}
                                 onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+                                disabled={submitting}
                             />
                         </div>
                         <div className="space-y-2">
@@ -122,8 +186,17 @@ export function ExpensesTab() {
                                 setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
                             />
                         </div>
-                        <Button onClick={handleAdd} className="bg-primary hover:bg-primary/90">
-                            <Plus className="ml-2 h-4 w-4" /> הוסף
+                        <Button
+                            onClick={handleAdd}
+                            className="bg-primary hover:bg-primary/90"
+                            disabled={submitting}
+                        >
+                            {submitting ? (
+                                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                <Plus className="ml-2 h-4 w-4" />
+                            )}
+                            הוסף
                         </Button>
                     </div>
                 </CardContent>

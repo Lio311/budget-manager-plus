@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Check } from 'lucide-react'
+import { Plus, Trash2, Check, Loader2 } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
+import { getBills, addBill, toggleBillPaid, deleteBill } from '@/lib/actions/bill'
+import { useToast } from '@/hooks/use-toast'
 
 interface Bill {
     id: string
@@ -17,44 +19,119 @@ interface Bill {
 }
 
 export function BillsTab() {
-    const { currency } = useBudget()
-    const [bills, setBills] = useState<Bill[]>([
-        { id: '1', name: 'חשמל', amount: 450, dueDay: 10, isPaid: false },
-        { id: '2', name: 'ארנונה', amount: 800, dueDay: 15, isPaid: true },
-        { id: '3', name: 'נטפליקס', amount: 55, dueDay: 5, isPaid: false },
-        { id: '4', name: 'אינטרנט', amount: 120, dueDay: 1, isPaid: false },
-    ])
-
+    const { month, year, currency } = useBudget()
+    const { toast } = useToast()
+    const [bills, setBills] = useState<Bill[]>([])
+    const [loading, setLoading] = useState(true)
+    const [submitting, setSubmitting] = useState(false)
     const [newBill, setNewBill] = useState({ name: '', amount: '', dueDay: '' })
 
     const totalBills = bills.reduce((sum, bill) => sum + bill.amount, 0)
     const paidBills = bills.filter(b => b.isPaid).reduce((sum, bill) => sum + bill.amount, 0)
     const unpaidBills = totalBills - paidBills
 
-    const handleAdd = () => {
-        if (newBill.name && newBill.amount && newBill.dueDay) {
-            setBills([
-                ...bills,
-                {
-                    id: Date.now().toString(),
-                    name: newBill.name,
-                    amount: parseFloat(newBill.amount),
-                    dueDay: parseInt(newBill.dueDay),
-                    isPaid: false,
-                },
-            ])
+    useEffect(() => {
+        loadBills()
+    }, [month, year])
+
+    async function loadBills() {
+        setLoading(true)
+        const result = await getBills(month, year)
+
+        if (result.success && result.data) {
+            setBills(result.data)
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לטעון חשבונות',
+                variant: 'destructive'
+            })
+        }
+        setLoading(false)
+    }
+
+    async function handleAdd() {
+        if (!newBill.name || !newBill.amount || !newBill.dueDay) {
+            toast({
+                title: 'שגיאה',
+                description: 'נא למלא את כל השדות הנדרשים',
+                variant: 'destructive'
+            })
+            return
+        }
+
+        const dueDay = parseInt(newBill.dueDay)
+        if (dueDay < 1 || dueDay > 31) {
+            toast({
+                title: 'שגיאה',
+                description: 'יום תשלום חייב להיות בין 1 ל-31',
+                variant: 'destructive'
+            })
+            return
+        }
+
+        setSubmitting(true)
+        const result = await addBill(month, year, {
+            name: newBill.name,
+            amount: parseFloat(newBill.amount),
+            dueDay
+        })
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'החשבון נוסף בהצלחה'
+            })
             setNewBill({ name: '', amount: '', dueDay: '' })
+            await loadBills()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן להוסיף חשבון',
+                variant: 'destructive'
+            })
+        }
+        setSubmitting(false)
+    }
+
+    async function handleTogglePaid(id: string, currentStatus: boolean) {
+        const result = await toggleBillPaid(id, !currentStatus)
+
+        if (result.success) {
+            await loadBills()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לעדכן סטטוס',
+                variant: 'destructive'
+            })
         }
     }
 
-    const handleDelete = (id: string) => {
-        setBills(bills.filter((bill) => bill.id !== id))
+    async function handleDelete(id: string) {
+        const result = await deleteBill(id)
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'החשבון נמחק בהצלחה'
+            })
+            await loadBills()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן למחוק חשבון',
+                variant: 'destructive'
+            })
+        }
     }
 
-    const togglePaid = (id: string) => {
-        setBills(bills.map(bill =>
-            bill.id === id ? { ...bill, isPaid: !bill.isPaid } : bill
-        ))
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
     }
 
     return (
@@ -104,12 +181,14 @@ export function BillsTab() {
                             placeholder="שם החשבון (חשמל, ארנונה...)"
                             value={newBill.name}
                             onChange={(e) => setNewBill({ ...newBill, name: e.target.value })}
+                            disabled={submitting}
                         />
                         <Input
                             type="number"
                             placeholder="סכום"
                             value={newBill.amount}
                             onChange={(e) => setNewBill({ ...newBill, amount: e.target.value })}
+                            disabled={submitting}
                         />
                         <Input
                             type="number"
@@ -118,9 +197,18 @@ export function BillsTab() {
                             max="31"
                             value={newBill.dueDay}
                             onChange={(e) => setNewBill({ ...newBill, dueDay: e.target.value })}
+                            disabled={submitting}
                         />
-                        <Button onClick={handleAdd} className="gap-2">
-                            <Plus className="h-4 w-4" />
+                        <Button
+                            onClick={handleAdd}
+                            className="gap-2"
+                            disabled={submitting}
+                        >
+                            {submitting ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <Plus className="h-4 w-4" />
+                            )}
                             הוסף
                         </Button>
                     </div>
@@ -146,7 +234,7 @@ export function BillsTab() {
                                     >
                                         <div className="flex items-center gap-4 flex-1">
                                             <button
-                                                onClick={() => togglePaid(bill.id)}
+                                                onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
                                                 className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${bill.isPaid
                                                         ? 'bg-green-500 border-green-500'
                                                         : 'border-gray-300 hover:border-green-500'
