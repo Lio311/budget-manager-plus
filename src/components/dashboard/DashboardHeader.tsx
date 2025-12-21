@@ -30,7 +30,7 @@ export function DashboardHeader() {
     }
 
     return (
-        <div className="border-b bg-white/50 backdrop-blur-sm sticky top-0 z-10">
+        <div className="border-b bg-white/50 backdrop-blur-sm sticky top-0 z-30">
             <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
                 <div className="flex items-center justify-between gap-2">
                     {/* Month/Year Selector */}
