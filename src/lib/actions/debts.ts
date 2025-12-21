@@ -66,6 +66,34 @@ export async function deleteDebt(id: string) {
     }
 }
 
+export async function updateDebt(
+    id: string,
+    data: {
+        creditor?: string
+        totalAmount?: number
+        monthlyPayment?: number
+        dueDay?: number
+    }
+) {
+    try {
+        const debt = await prisma.debt.update({
+            where: { id },
+            data: {
+                ...(data.creditor && { creditor: data.creditor }),
+                ...(data.totalAmount && { totalAmount: data.totalAmount }),
+                ...(data.monthlyPayment && { monthlyPayment: data.monthlyPayment }),
+                ...(data.dueDay && { dueDay: data.dueDay })
+            }
+        })
+
+        revalidatePath('/dashboard')
+        return { success: true, data: debt }
+    } catch (error) {
+        console.error('Error updating debt:', error)
+        return { success: false, error: 'Failed to update debt' }
+    }
+}
+
 export async function toggleDebtPaid(id: string, isPaid: boolean) {
     try {
         await prisma.debt.update({

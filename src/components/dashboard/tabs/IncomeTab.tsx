@@ -210,7 +210,7 @@ export function IncomeTab() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">תאריך (אופציונלי)</label>
+                            <label className="text-sm font-medium">תאריך</label>
                             <Input
                                 type="date"
                                 value={newIncome.date}

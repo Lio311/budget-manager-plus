@@ -46,6 +46,32 @@ export async function addBill(
     }
 }
 
+export async function updateBill(
+    id: string,
+    data: {
+        name?: string
+        amount?: number
+        dueDay?: number
+    }
+) {
+    try {
+        const bill = await prisma.bill.update({
+            where: { id },
+            data: {
+                ...(data.name && { name: data.name }),
+                ...(data.amount && { amount: data.amount }),
+                ...(data.dueDay && { dueDay: data.dueDay })
+            }
+        })
+
+        revalidatePath('/dashboard')
+        return { success: true, data: bill }
+    } catch (error) {
+        console.error('Error updating bill:', error)
+        return { success: false, error: 'Failed to update bill' }
+    }
+}
+
 export async function toggleBillPaid(id: string, isPaid: boolean) {
     try {
         const bill = await prisma.bill.update({
