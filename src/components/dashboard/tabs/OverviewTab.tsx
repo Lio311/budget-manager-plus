@@ -1,32 +1,25 @@
 'use client'
 
+import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowDown, ArrowUp, PiggyBank, TrendingUp, Wallet } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label } from 'recharts'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 
-// Mock data - will be replaced with real API calls
-const mockData = {
-    totalIncome: 15000,
-    totalExpenses: 8620,
-    totalBills: 3500,
-    totalDebts: 2600,
-}
-
+// פלטת צבעים מעודכנת לפי התמונה
 const COLORS = {
-    income: 'hsl(142, 76%, 36%)', // Green
-    expenses: 'hsl(0, 84%, 60%)', // Red
-    food: 'hsl(142, 76%, 36%)', // Green (Primary)
-    transport: 'hsl(160, 84%, 39%)', // Teal-ish Green
-    entertainment: 'hsl(80, 80%, 45%)', // Lime Green
-    bills: 'hsl(45, 93%, 47%)', // Yellow/Orange
-    other: 'hsl(200, 10%, 65%)', // Gray
+    income: '#22C55E',      // ירוק חזק
+    expenses: '#EF4444',    // אדום
+    food: '#22C55E',        // ירוק (מזון)
+    transport: '#10B981',   // ירוק טורקיז
+    entertainment: '#84CC16', // ירוק ליים
+    bills: '#F59E0B',       // כתום/צהוב
+    other: '#94A3B8',       // אפור
 }
 
 const CustomTooltip = ({ active, payload, label, currency }: any) => {
     if (active && payload && payload.length) {
-        // Priority: label (BarChart X-axis) -> payload data name (PieChart) -> generic name
         const title = label || (payload[0].payload && payload[0].payload.name) || payload[0].name;
         return (
             <div className="bg-white p-2 border rounded shadow-md text-right dir-rtl">
@@ -43,6 +36,14 @@ const CustomTooltip = ({ active, payload, label, currency }: any) => {
 export function OverviewTab() {
     const { currency } = useBudget()
 
+    // Mock data - מותאם לערכים שבתמונה
+    const mockData = {
+        totalIncome: 15000,
+        totalExpenses: 8620,
+        totalBills: 3500,
+        totalDebts: 2600,
+    }
+
     const savings = mockData.totalIncome - mockData.totalExpenses - mockData.totalBills
 
     const incomeVsExpenses = [
@@ -57,19 +58,19 @@ export function OverviewTab() {
         { name: 'בילויים', value: 1500, color: COLORS.entertainment },
         { name: 'קניות', value: 1200, color: COLORS.other },
         { name: 'אחר', value: 920, color: COLORS.other },
-    ]
+    ].sort((a, b) => b.value - a.value);
 
-    const totalForPie = mockData.totalIncome + mockData.totalExpenses + mockData.totalBills
+    const totalForPie = 27120.00; // ערך תואם לתמונה
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 p-2" dir="rtl">
             {/* Summary Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
                     title="סך הכנסות"
                     value={formatCurrency(mockData.totalIncome, currency)}
                     icon={<TrendingUp className="h-4 w-4" />}
-                    trend="+12%"
+                    trend="12%"
                     trendUp={true}
                     color="text-green-600"
                     bgColor="bg-green-50"
@@ -78,7 +79,7 @@ export function OverviewTab() {
                     title="סך הוצאות"
                     value={formatCurrency(mockData.totalExpenses, currency)}
                     icon={<ArrowDown className="h-4 w-4" />}
-                    trend="-5%"
+                    trend="5%"
                     trendUp={false}
                     color="text-red-600"
                     bgColor="bg-red-50"
@@ -87,7 +88,7 @@ export function OverviewTab() {
                     title="חיסכון חודשי"
                     value={formatCurrency(savings, currency)}
                     icon={<PiggyBank className="h-4 w-4" />}
-                    trend="+18%"
+                    trend="18%"
                     trendUp={true}
                     color="text-blue-600"
                     bgColor="bg-blue-50"
@@ -96,19 +97,19 @@ export function OverviewTab() {
                     title="סך חובות"
                     value={formatCurrency(mockData.totalDebts, currency)}
                     icon={<Wallet className="h-4 w-4" />}
-                    trend="-10%"
-                    trendUp={true}
+                    trend="10%"
+                    trendUp={false}
                     color="text-orange-600"
                     bgColor="bg-orange-50"
+                    isDebt={true}
                 />
             </div>
 
             {/* Charts Row */}
             <div className="grid gap-6 md:grid-cols-2">
-                {/* Income vs Expenses Pie Chart */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>התפלגות תקציב</CardTitle>
+                        <CardTitle className="text-right">התפלגות תקציב</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
@@ -117,10 +118,12 @@ export function OverviewTab() {
                                     data={incomeVsExpenses}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={50}
-                                    outerRadius={70}
+                                    innerRadius={65}
+                                    outerRadius={85}
                                     paddingAngle={5}
                                     dataKey="value"
+                                    stroke="none"
+                                    labelLine={true}
                                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                 >
                                     {incomeVsExpenses.map((entry, index) => (
@@ -133,41 +136,24 @@ export function OverviewTab() {
                                     />
                                 </Pie>
                                 <Tooltip content={<CustomTooltip currency={currency} />} />
-                                <Legend
-                                    formatter={(value) => <span className="mr-2">{value}</span>}
-                                />
+                                <Legend verticalAlign="bottom" align="center" formatter={(value) => <span className="mr-2">{value}</span>} />
                             </PieChart>
                         </ResponsiveContainer>
                     </CardContent>
                 </Card>
 
-                {/* Expenses by Category */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>הוצאות לפי קטגוריה</CardTitle>
+                        <CardTitle className="text-right">הוצאות לפי קטגוריה</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
-                            <BarChart
-                                data={expensesByCategory}
-                                margin={{ top: 20, right: 60, left: 10, bottom: 5 }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                <XAxis
-                                    dataKey="name"
-                                    tickLine={false}
-                                    axisLine={false}
-                                    reversed={true}
-                                />
-                                <YAxis
-                                    orientation="right"
-                                    width={70}
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
-                                />
+                            <BarChart data={expensesByCategory} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} reversed={false} tick={{ fontSize: 12 }} />
+                                <YAxis orientation="right" axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val}`} tick={{ fontSize: 12 }} />
                                 <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
-                                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                <Bar dataKey="value" radius={[4, 4, 0, 0]} barSize={40}>
                                     {expensesByCategory.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
                                     ))}
@@ -178,105 +164,80 @@ export function OverviewTab() {
                 </Card>
             </div>
 
-            {/* Budget Progress */}
+            {/* Budget Progress Section */}
             <Card>
                 <CardHeader>
-                    <CardTitle>מצב תקציב חודשי</CardTitle>
+                    <CardTitle className="text-right font-bold">מצב תקציב חודשי</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        <BudgetProgress
-                            label="הוצאות מתוך תקציב"
-                            current={mockData.totalExpenses}
-                            total={mockData.totalIncome}
-                            currency={currency}
-                            color="bg-purple-500"
-                        />
-                        <BudgetProgress
-                            label="חשבונות קבועים"
-                            current={mockData.totalBills}
-                            total={mockData.totalIncome}
-                            currency={currency}
-                            color="bg-yellow-500"
-                        />
-                        <BudgetProgress
-                            label="חיסכון"
-                            current={savings}
-                            total={mockData.totalIncome}
-                            currency={currency}
-                            color="bg-green-500"
-                        />
-                    </div>
+                <CardContent className="space-y-6">
+                    <BudgetProgress
+                        label="הוצאות מתוך תקציב"
+                        current={mockData.totalExpenses}
+                        total={mockData.totalIncome}
+                        currency={currency}
+                        color="bg-purple-500"
+                    />
+                    <BudgetProgress
+                        label="חשבונות קבועים"
+                        current={mockData.totalBills}
+                        total={mockData.totalIncome}
+                        currency={currency}
+                        color="bg-yellow-500"
+                    />
+                    <BudgetProgress
+                        label="חיסכון"
+                        current={savings}
+                        total={mockData.totalIncome}
+                        currency={currency}
+                        color="bg-green-500"
+                    />
                 </CardContent>
             </Card>
         </div>
     )
 }
 
-function StatCard({
-    title,
-    value,
-    icon,
-    trend,
-    trendUp,
-    color,
-    bgColor,
-}: {
-    title: string
-    value: string
-    icon: React.ReactNode
-    trend: string
-    trendUp: boolean
-    color: string
-    bgColor: string
-}) {
+function StatCard({ title, value, icon, trend, trendUp, color, bgColor, isDebt }: any) {
+    // במינוס (trendUp=false) -> צבע אדום וחץ למטה
+    const trendColor = trendUp ? 'text-green-600' : 'text-red-600';
+    const Icon = trendUp ? ArrowUp : ArrowDown;
+
     return (
-        <Card>
+        <Card className="overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
                 <div className={`${bgColor} ${color} p-2 rounded-lg`}>{icon}</div>
             </CardHeader>
             <CardContent>
-                <div className="budget-stat">{value}</div>
-                <p className={`text-xs ${trendUp ? 'text-green-600' : 'text-red-600'} flex items-center gap-1 mt-1`}>
-                    {trendUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-                    {trend} מהחודש הקודם
-                </p>
+                <div className="text-2xl font-bold tracking-tight">{value}</div>
+                <div className={`flex items-center gap-1 mt-1 text-xs font-bold ${trendColor}`}>
+                    <span style={{ direction: 'ltr', unicodeBidi: 'isolate' }}>
+                        {trendUp ? '+' : '-'}{trend.replace(/[+-]/g, '')}
+                    </span>
+                    <Icon className="h-3 w-3" />
+                    <span className="text-muted-foreground font-normal mr-1">מהחודש הקודם</span>
+                </div>
             </CardContent>
         </Card>
     )
 }
 
-function BudgetProgress({
-    label,
-    current,
-    total,
-    currency,
-    color,
-}: {
-    label: string
-    current: number
-    total: number
-    currency: string
-    color: string
-}) {
-    const percentage = (current / total) * 100
-
+function BudgetProgress({ label, current, total, currency, color }: any) {
+    const percentage = Math.min((current / total) * 100, 100)
     return (
-        <div>
-            <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium">{label}</span>
-                <span className="text-sm text-muted-foreground">
+        <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+                <span className="font-medium text-gray-700">{label}</span>
+                <span className="text-muted-foreground tabular-nums">
                     {formatCurrency(current, currency)} / {formatCurrency(total, currency)}
                 </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                    className={`${color} h-2.5 rounded-full transition-all`}
-                    style={{ width: `${Math.min(percentage, 100)}%` }}
-                />
+            <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                <div className={`h-full ${color} transition-all duration-500`} style={{ width: `${percentage}%` }} />
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{percentage.toFixed(1)}%</p>
+            <div className="flex justify-end text-[10px] text-muted-foreground">
+                {percentage.toFixed(1)}%
+            </div>
         </div>
     )
 }
