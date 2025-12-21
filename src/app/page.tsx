@@ -75,7 +75,7 @@ export default function HomePage() {
 
                 {/* Features List */}
                 <div className="mt-20 max-w-4xl mx-auto">
-                    <h3 className="text-2xl font-bold text-center mb-10">מה כולל המערכת?</h3>
+                    <h3 className="text-2xl font-bold text-center mb-10">מה כוללת המערכת?</h3>
                     <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
                         <BenefitItem text="מעקב אחר הכנסות והוצאות לפי קטגוריות" />
                         <BenefitItem text="ניהול חשבונות קבועים ומנויים" />

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowDown, ArrowUp, DollarSign, PiggyBank, TrendingUp, Wallet } from 'lucide-react'
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label } from 'recharts'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 
@@ -42,6 +42,8 @@ export function OverviewTab() {
         { name: 'קניות', value: 1200, color: COLORS.other },
         { name: 'אחר', value: 920, color: COLORS.other },
     ]
+
+    const totalForPie = mockData.totalIncome + mockData.totalExpenses + mockData.totalBills
 
     return (
         <div className="space-y-6">
@@ -99,8 +101,8 @@ export function OverviewTab() {
                                     data={incomeVsExpenses}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
+                                    innerRadius={70}
+                                    outerRadius={90}
                                     paddingAngle={5}
                                     dataKey="value"
                                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -108,9 +110,16 @@ export function OverviewTab() {
                                     {incomeVsExpenses.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
                                     ))}
+                                    <Label
+                                        value={formatCurrency(totalForPie, currency)}
+                                        position="center"
+                                        className="text-lg font-bold fill-foreground"
+                                    />
                                 </Pie>
-                                <Tooltip formatter={(value) => formatCurrency(Number(value), currency)} />
-                                <Legend />
+                                <Tooltip formatter={(value) => [formatCurrency(Number(value), currency), '']} />
+                                <Legend
+                                    formatter={(value) => <span className="mr-2">{value}</span>}
+                                />
                             </PieChart>
                         </ResponsiveContainer>
                     </CardContent>
@@ -123,7 +132,10 @@ export function OverviewTab() {
                     </CardHeader>
                     <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={expensesByCategory}>
+                            <BarChart
+                                data={expensesByCategory}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            >
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <XAxis
                                     dataKey="name"
@@ -137,7 +149,7 @@ export function OverviewTab() {
                                     tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
                                 />
                                 <Tooltip
-                                    formatter={(value) => formatCurrency(Number(value), currency)}
+                                    formatter={(value) => [formatCurrency(Number(value), currency), '']}
                                     cursor={{ fill: 'transparent' }}
                                 />
                                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
