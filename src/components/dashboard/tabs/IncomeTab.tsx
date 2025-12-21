@@ -68,7 +68,10 @@ export function IncomeTab() {
         const result = await addIncome(month, year, {
             source: newIncome.source,
             amount: parseFloat(newIncome.amount),
-            date: newIncome.date || undefined
+            date: newIncome.date || undefined,
+            isRecurring: newIncome.isRecurring,
+            recurringStartDate: newIncome.isRecurring ? newIncome.recurringStartDate : undefined,
+            recurringEndDate: newIncome.isRecurring ? newIncome.recurringEndDate : undefined
         })
 
         if (result.success) {
