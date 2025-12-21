@@ -106,9 +106,73 @@ export function BillsTab() {
             toast({
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לעדכן סטטוס',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 1000
             })
         }
+    }
+
+    function handleEdit(bill: Bill) {
+        setEditingId(bill.id)
+        setEditData({
+            name: bill.name,
+            amount: bill.amount.toString(),
+            dueDay: bill.dueDay.toString()
+        })
+    }
+
+    function handleCancelEdit() {
+        setEditingId(null)
+        setEditData({ name: '', amount: '', dueDay: '' })
+    }
+
+    async function handleUpdate() {
+        if (!editingId || !editData.name || !editData.amount || !editData.dueDay) {
+            toast({
+                title: 'שגיאה',
+                description: 'נא למלא את כל השדות',
+                variant: 'destructive',
+                duration: 1000
+            })
+            return
+        }
+
+        const dueDay = parseInt(editData.dueDay)
+        if (dueDay < 1 || dueDay > 31) {
+            toast({
+                title: 'שגיאה',
+                description: 'יום תשלום חייב להיות בין 1 ל-31',
+                variant: 'destructive',
+                duration: 1000
+            })
+            return
+        }
+
+        setSubmitting(true)
+        const result = await updateBill(editingId, {
+            name: editData.name,
+            amount: parseFloat(editData.amount),
+            dueDay
+        })
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'החשבון עודכן בהצלחה',
+                duration: 1000
+            })
+            setEditingId(null)
+            setEditData({ name: '', amount: '', dueDay: '' })
+            await loadBills()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לעדכן חשבון',
+                variant: 'destructive',
+                duration: 1000
+            })
+        }
+        setSubmitting(false)
     }
 
     async function handleDelete(id: string) {
@@ -235,38 +299,97 @@ export function BillsTab() {
                                         className={`flex items-center justify-between p-4 border rounded-lg transition-colors ${bill.isPaid ? 'bg-green-50 border-green-200' : 'hover:bg-accent'
                                             }`}
                                     >
-                                        <div className="flex items-center gap-4 flex-1">
-                                            <button
-                                                onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
-                                                className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${bill.isPaid
-                                                    ? 'bg-green-500 border-green-500'
-                                                    : 'border-gray-300 hover:border-green-500'
-                                                    }`}
-                                            >
-                                                {bill.isPaid && <Check className="h-4 w-4 text-white" />}
-                                            </button>
-                                            <div className="flex-1">
-                                                <p className={`font-medium ${bill.isPaid ? 'line-through text-muted-foreground' : ''}`}>
-                                                    {bill.name}
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    תאריך תשלום: {bill.dueDay} בחודש
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <span className={`text-lg font-bold ${bill.isPaid ? 'text-green-600' : 'text-yellow-600'}`}>
-                                                {formatCurrency(bill.amount, currency)}
-                                            </span>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDelete(bill.id)}
-                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
+                                        {editingId === bill.id ? (
+                                            <>
+                                                <div className="flex-1 grid gap-4 md:grid-cols-3">
+                                                    <Input
+                                                        placeholder="שם החשבון"
+                                                        value={editData.name}
+                                                        onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="סכום"
+                                                        value={editData.amount}
+                                                        onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="יום תשלום (1-31)"
+                                                        min="1"
+                                                        max="31"
+                                                        value={editData.dueDay}
+                                                        onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-2 mr-4">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleUpdate}
+                                                        disabled={submitting}
+                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                    >
+                                                        <Check className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleCancelEdit}
+                                                        disabled={submitting}
+                                                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center gap-4 flex-1">
+                                                    <button
+                                                        onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
+                                                        className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${bill.isPaid
+                                                            ? 'bg-green-500 border-green-500'
+                                                            : 'border-gray-300 hover:border-green-500'
+                                                            }`}
+                                                    >
+                                                        {bill.isPaid && <Check className="h-4 w-4 text-white" />}
+                                                    </button>
+                                                    <div className="flex-1">
+                                                        <p className={`font-medium ${bill.isPaid ? 'line-through text-muted-foreground' : ''}`}>
+                                                            {bill.name}
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            תאריך תשלום: {bill.dueDay} בחודש
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`text-lg font-bold ${bill.isPaid ? 'text-green-600' : 'text-yellow-600'}`}>
+                                                        {formatCurrency(bill.amount, currency)}
+                                                    </span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleEdit(bill)}
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleDelete(bill.id)}
+                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 ))}
                             </div>
