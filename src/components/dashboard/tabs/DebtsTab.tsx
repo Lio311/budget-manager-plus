@@ -114,95 +114,102 @@ export function DebtsTab() {
 
     return (
         <div className="space-y-6">
-            {/* Summary Cards */}
-            <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                <Card className="bg-gradient-to-l from-purple-50 to-white border-purple-200">
-                    <CardHeader>
-                        <CardTitle className="text-purple-700 text-sm">סך חובות</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-purple-600">
-                            {formatCurrency(totalDebts, currency)}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-gradient-to-l from-orange-50 to-white border-orange-200">
-                    <CardHeader>
-                        <CardTitle className="text-orange-700 text-sm">תשלום חודשי</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-orange-600">
-                            {formatCurrency(monthlyPayments, currency)}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-gradient-to-l from-green-50 to-white border-green-200">
-                    <CardHeader>
-                        <CardTitle className="text-green-700 text-sm">שולם החודש</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-green-600">
-                            {formatCurrency(paidThisMonth, currency)}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-gradient-to-l from-red-50 to-white border-red-200">
-                    <CardHeader>
-                        <CardTitle className="text-red-700 text-sm">ממתין לתשלום</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-red-600">
-                            {formatCurrency(unpaidThisMonth, currency)}
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Add New Debt */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>הוסף חוב חדש</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                        <Input
-                            placeholder="נושה (בנק, כרטיס אשראי...)"
-                            value={newDebt.creditor}
-                            onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
-                            className="sm:col-span-2 lg:col-span-1"
-                        />
-                        <Input
-                            type="number"
-                            placeholder="סכום כולל"
-                            value={newDebt.totalAmount}
-                            onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
-                        />
-                        <Input
-                            type="number"
-                            placeholder="תשלום חודשי"
-                            value={newDebt.monthlyPayment}
-                            onChange={(e) => setNewDebt({ ...newDebt, monthlyPayment: e.target.value })}
-                        />
-                        <Input
-                            type="number"
-                            placeholder="יום תשלום (1-31)"
-                            min="1"
-                            max="31"
-                            value={newDebt.dueDay}
-                            onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
-                        />
-                        <Button onClick={handleAdd} className="gap-2 sm:col-span-2 lg:col-span-1" disabled={submitting}>
-                            {submitting ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Plus className="h-4 w-4" />
-                            )}
-                            הוסף
-                        </Button>
+            {loading ? (
+                <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+            ) : (
+                <>
+                    {/* Summary Cards */}
+                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                        <Card className="bg-gradient-to-l from-purple-50 to-white border-purple-200">
+                            <CardHeader>
+                                <CardTitle className="text-purple-700 text-sm">סך חובות</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-purple-600">
+                                    {formatCurrency(totalDebts, currency)}
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-l from-orange-50 to-white border-orange-200">
+                            <CardHeader>
+                                <CardTitle className="text-orange-700 text-sm">תשלום חודשי</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-orange-600">
+                                    {formatCurrency(monthlyPayments, currency)}
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-l from-green-50 to-white border-green-200">
+                            <CardHeader>
+                                <CardTitle className="text-green-700 text-sm">שולם החודש</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-green-600">
+                                    {formatCurrency(paidThisMonth, currency)}
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-l from-red-50 to-white border-red-200">
+                            <CardHeader>
+                                <CardTitle className="text-red-700 text-sm">ממתין לתשלום</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-red-600">
+                                    {formatCurrency(unpaidThisMonth, currency)}
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
-                </CardContent>
-            </Card>
 
+                    {/* Add New Debt */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>הוסף חוב חדש</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                                <Input
+                                    placeholder="נושה (בנק, כרטיס אשראי...)"
+                                    value={newDebt.creditor}
+                                    onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
+                                    className="sm:col-span-2 lg:col-span-1"
+                                />
+                                <Input
+                                    type="number"
+                                    placeholder="סכום כולל"
+                                    value={newDebt.totalAmount}
+                                    onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
+                                />
+                                <Input
+                                    type="number"
+                                    placeholder="תשלום חודשי"
+                                    value={newDebt.monthlyPayment}
+                                    onChange={(e) => setNewDebt({ ...newDebt, monthlyPayment: e.target.value })}
+                                />
+                                <Input
+                                    type="number"
+                                    placeholder="יום תשלום (1-31)"
+                                    min="1"
+                                    max="31"
+                                    value={newDebt.dueDay}
+                                    onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
+                                />
+                                <Button onClick={handleAdd} className="gap-2 sm:col-span-2 lg:col-span-1" disabled={submitting}>
+                                    {submitting ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Plus className="h-4 w-4" />
+                                    )}
+                                    הוסף
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </>
+            )}
             {/* Debts List */}
             <Card>
                 <CardHeader>
