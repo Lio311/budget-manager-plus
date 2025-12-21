@@ -8,8 +8,6 @@
 
 An advanced full-stack web application for intelligent personal and family budget management with Hebrew-first interface, real-time tracking, and smart automation features.
 
-![Keseflow Banner](public/keseflow.png)
-
 ---
 
 ## ✨ Key Features
