@@ -2,11 +2,17 @@
 
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
+import { Trash2, Plus, Calendar as CalendarIcon } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
+import { format } from 'date-fns'
+import { he } from 'date-fns/locale'
+import { cn } from '@/lib/utils'
 
 interface Expense {
     id: string
@@ -37,6 +43,7 @@ export function ExpensesTab() {
 
     const [newExpense, setNewExpense] = useState({ category: 'מזון', description: '', amount: '', date: '' })
     const [filterCategory, setFilterCategory] = useState<string>('הכל')
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
 
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
     const filteredExpenses = filterCategory === 'הכל'
@@ -83,36 +90,66 @@ export function ExpensesTab() {
                     <CardTitle>הוסף הוצאה חדשה</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-4 md:grid-cols-5">
-                        <select
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                            value={newExpense.category}
-                            onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
-                        >
-                            {CATEGORIES.map((cat) => (
-                                <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                        </select>
-                        <Input
-                            placeholder="תיאור"
-                            value={newExpense.description}
-                            onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
-                        />
-                        <Input
-                            type="number"
-                            placeholder="סכום"
-                            value={newExpense.amount}
-                            onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
-                        />
-                        <Input
-                            type="date"
-                            className="cursor-pointer"
-                            value={newExpense.date}
-                            onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
-                        />
-                        <Button onClick={handleAdd} className="gap-2">
-                            <Plus className="h-4 w-4" />
-                            הוסף
+                    <div className="grid gap-4 md:grid-cols-5 items-end">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">קטגוריה</label>
+                            <select
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={newExpense.category}
+                                onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+                            >
+                                {CATEGORIES.map((cat) => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">תיאור</label>
+                            <Input
+                                placeholder="מה קנינו?"
+                                value={newExpense.description}
+                                onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">סכום</label>
+                            <Input
+                                type="number"
+                                placeholder="0.00"
+                                value={newExpense.amount}
+                                onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">תאריך</label>
+                            <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-right font-normal",
+                                            !newExpense.date && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="ml-2 h-4 w-4" />
+                                        {newExpense.date ? format(new Date(newExpense.date), "dd/MM/yyyy") : <span>בחר תאריך</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={newExpense.date ? new Date(newExpense.date) : undefined}
+                                        onSelect={(date) => {
+                                            setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })
+                                            setIsCalendarOpen(false)
+                                        }}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                        <Button onClick={handleAdd} className="bg-primary hover:bg-primary/90">
+                            <Plus className="ml-2 h-4 w-4" /> הוסף
                         </Button>
                     </div>
                 </CardContent>

@@ -76,7 +76,7 @@ export default function HomePage() {
                 {/* Features List */}
                 <div className="mt-20 max-w-4xl mx-auto">
                     <h3 className="text-2xl font-bold text-center mb-10">מה כולל המערכת?</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
                         <BenefitItem text="מעקב אחר הכנסות והוצאות לפי קטגוריות" />
                         <BenefitItem text="ניהול חשבונות קבועים ומנויים" />
                         <BenefitItem text="מעקב חובות ותשלומים חודשיים" />
@@ -104,11 +104,11 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
 
 function BenefitItem({ text }: { text: string }) {
     return (
-        <div className="flex items-center justify-center gap-3 bg-white/50 p-4 rounded-lg shadow-sm">
-            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+        <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 text-primary">
                 <div className="w-2 h-2 rounded-full bg-primary" />
             </div>
-            <p className="text-foreground font-medium">{text}</p>
+            <p className="text-lg font-medium">{text}</p>
         </div>
     )
 }

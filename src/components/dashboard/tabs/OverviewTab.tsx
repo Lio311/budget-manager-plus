@@ -103,6 +103,7 @@ export function OverviewTab() {
                                     outerRadius={80}
                                     paddingAngle={5}
                                     dataKey="value"
+                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                 >
                                     {incomeVsExpenses.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -130,9 +131,10 @@ export function OverviewTab() {
                                     axisLine={false}
                                 />
                                 <YAxis
+                                    width={80}
                                     tickLine={false}
                                     axisLine={false}
-                                    tickFormatter={(value) => `${value}`}
+                                    tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
                                 />
                                 <Tooltip
                                     formatter={(value) => formatCurrency(Number(value), currency)}
