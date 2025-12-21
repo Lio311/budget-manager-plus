@@ -62,7 +62,7 @@ export function ExpensesTab() {
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לטעון הוצאות',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
         }
         setLoading(false)
@@ -74,7 +74,7 @@ export function ExpensesTab() {
                 title: 'שגיאה',
                 description: 'נא למלא את כל השדות',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
             return
         }
@@ -91,7 +91,7 @@ export function ExpensesTab() {
             toast({
                 title: 'הצלחה',
                 description: 'ההוצאה נוספה בהצלחה',
-                duration: 2000
+                duration: 1000
             })
             setNewExpense({ category: 'מזון', description: '', amount: '', date: '' })
             await loadExpenses()
@@ -100,7 +100,7 @@ export function ExpensesTab() {
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן להוסיף הוצאה',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
         }
         setSubmitting(false)
@@ -113,7 +113,7 @@ export function ExpensesTab() {
             toast({
                 title: 'הצלחה',
                 description: 'ההוצאה נמחקה בהצלחה',
-                duration: 2000
+                duration: 1000
             })
             await loadExpenses()
         } else {
@@ -121,7 +121,7 @@ export function ExpensesTab() {
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן למחוק הוצאה',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
         }
     }
@@ -147,7 +147,7 @@ export function ExpensesTab() {
                 title: 'שגיאה',
                 description: 'נא למלא את כל השדות',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
             return
         }
@@ -164,7 +164,7 @@ export function ExpensesTab() {
             toast({
                 title: 'הצלחה',
                 description: 'ההוצאה עודכנה בהצלחה',
-                duration: 2000
+                duration: 1000
             })
             setEditingId(null)
             setEditData({ category: '', description: '', amount: '', date: '' })
@@ -174,7 +174,7 @@ export function ExpensesTab() {
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לעדכן הוצאה',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
         }
         setSubmitting(false)

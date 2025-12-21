@@ -46,7 +46,7 @@ export function IncomeTab() {
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לטעון הכנסות',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
         }
         setLoading(false)
@@ -58,7 +58,7 @@ export function IncomeTab() {
                 title: 'שגיאה',
                 description: 'נא למלא את כל השדות הנדרשים',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
             return
         }
@@ -74,7 +74,7 @@ export function IncomeTab() {
             toast({
                 title: 'הצלחה',
                 description: 'ההכנסה נוספה בהצלחה',
-                duration: 2000
+                duration: 1000
             })
             setNewIncome({ source: '', amount: '', date: '' })
             await loadIncomes()
@@ -83,7 +83,7 @@ export function IncomeTab() {
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן להוסיף הכנסה',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
         }
         setSubmitting(false)
@@ -96,7 +96,7 @@ export function IncomeTab() {
             toast({
                 title: 'הצלחה',
                 description: 'ההכנסה נמחקה בהצלחה',
-                duration: 2000
+                duration: 1000
             })
             await loadIncomes()
         } else {
@@ -104,7 +104,7 @@ export function IncomeTab() {
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן למחוק הכנסה',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
         }
     }
@@ -129,7 +129,7 @@ export function IncomeTab() {
                 title: 'שגיאה',
                 description: 'נא למלא את כל השדות הנדרשים',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
             return
         }
@@ -145,7 +145,7 @@ export function IncomeTab() {
             toast({
                 title: 'הצלחה',
                 description: 'ההכנסה עודכנה בהצלחה',
-                duration: 2000
+                duration: 1000
             })
             setEditingId(null)
             setEditData({ source: '', amount: '', date: '' })
@@ -155,7 +155,7 @@ export function IncomeTab() {
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לעדכן הכנסה',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
         }
         setSubmitting(false)

@@ -47,7 +47,7 @@ export function BillsTab() {
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לטעון חשבונות',
                 variant: 'destructive',
-                duration: 2000
+                duration: 1000
             })
         }
         setLoading(false)
