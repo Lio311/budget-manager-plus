@@ -47,6 +47,11 @@ export function OverviewTab() {
         totalBills: 0,
         expensesByCategory: [] as { name: string; value: number; color: string }[]
     })
+    const [previousData, setPreviousData] = useState({
+        totalIncome: 0,
+        totalExpenses: 0,
+        totalBills: 0
+    })
 
     useEffect(() => {
         loadData()
@@ -55,10 +60,17 @@ export function OverviewTab() {
     async function loadData() {
         setLoading(true)
 
-        const [incomesResult, expensesResult, billsResult] = await Promise.all([
+        // Calculate previous month
+        const prevMonth = month === 1 ? 12 : month - 1
+        const prevYear = month === 1 ? year - 1 : year
+
+        const [incomesResult, expensesResult, billsResult, prevIncomesResult, prevExpensesResult, prevBillsResult] = await Promise.all([
             getIncomes(month, year),
             getExpenses(month, year),
-            getBills(month, year)
+            getBills(month, year),
+            getIncomes(prevMonth, prevYear),
+            getExpenses(prevMonth, prevYear),
+            getBills(prevMonth, prevYear)
         ])
 
         const totalIncome = incomesResult.success && incomesResult.data
@@ -71,6 +83,18 @@ export function OverviewTab() {
 
         const totalBills = billsResult.success && billsResult.data
             ? billsResult.data.reduce((sum, bill) => sum + bill.amount, 0)
+            : 0
+
+        const prevTotalIncome = prevIncomesResult.success && prevIncomesResult.data
+            ? prevIncomesResult.data.reduce((sum, income) => sum + income.amount, 0)
+            : 0
+
+        const prevTotalExpenses = prevExpensesResult.success && prevExpensesResult.data
+            ? prevExpensesResult.data.reduce((sum, expense) => sum + expense.amount, 0)
+            : 0
+
+        const prevTotalBills = prevBillsResult.success && prevBillsResult.data
+            ? prevBillsResult.data.reduce((sum, bill) => sum + bill.amount, 0)
             : 0
 
         // Group expenses by category
@@ -96,6 +120,11 @@ export function OverviewTab() {
             totalBills,
             expensesByCategory
         })
+        setPreviousData({
+            totalIncome: prevTotalIncome,
+            totalExpenses: prevTotalExpenses,
+            totalBills: prevTotalBills
+        })
         setLoading(false)
     }
 
@@ -108,6 +137,18 @@ export function OverviewTab() {
     }
 
     const savings = data.totalIncome - data.totalExpenses - data.totalBills
+    const prevSavings = previousData.totalIncome - previousData.totalExpenses - previousData.totalBills
+
+    // Calculate percentage changes
+    const calculateChange = (current: number, previous: number) => {
+        if (previous === 0) return current > 0 ? 100 : 0
+        return ((current - previous) / previous) * 100
+    }
+
+    const incomeChange = calculateChange(data.totalIncome, previousData.totalIncome)
+    const expensesChange = calculateChange(data.totalExpenses, previousData.totalExpenses)
+    const savingsChange = calculateChange(savings, prevSavings)
+    const billsChange = calculateChange(data.totalBills, previousData.totalBills)
 
     const incomeVsExpenses = [
         { name: 'הכנסות', value: data.totalIncome, color: COLORS.income },
@@ -127,6 +168,8 @@ export function OverviewTab() {
                     icon={<TrendingUp className="h-4 w-4" />}
                     color="text-green-600"
                     bgColor="bg-green-50"
+                    change={incomeChange}
+                    changeType="income"
                 />
                 <StatCard
                     title="סך הוצאות"
@@ -134,6 +177,8 @@ export function OverviewTab() {
                     icon={<ArrowDown className="h-4 w-4" />}
                     color="text-red-600"
                     bgColor="bg-red-50"
+                    change={expensesChange}
+                    changeType="expense"
                 />
                 <StatCard
                     title="חיסכון חודשי"
@@ -141,6 +186,8 @@ export function OverviewTab() {
                     icon={<PiggyBank className="h-4 w-4" />}
                     color="text-blue-600"
                     bgColor="bg-blue-50"
+                    change={savingsChange}
+                    changeType="income"
                 />
                 <StatCard
                     title="סך חשבונות"
@@ -148,6 +195,8 @@ export function OverviewTab() {
                     icon={<Wallet className="h-4 w-4" />}
                     color="text-orange-600"
                     bgColor="bg-orange-50"
+                    change={billsChange}
+                    changeType="expense"
                 />
             </div>
 
@@ -273,13 +322,23 @@ function StatCard({
     icon,
     color,
     bgColor,
+    change,
+    changeType = 'income'
 }: {
     title: string
     value: string
     icon: React.ReactNode
     color: string
     bgColor: string
+    change?: number
+    changeType?: 'income' | 'expense'
 }) {
+    // For income/savings: green if up, red if down
+    // For expenses/bills: red if up, green if down
+    const isPositiveChange = changeType === 'income' ? change && change > 0 : change && change < 0
+    const changeColor = isPositiveChange ? 'text-green-600' : 'text-red-600'
+    const ChangeIcon = change && change > 0 ? ArrowUp : ArrowDown
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -288,6 +347,13 @@ function StatCard({
             </CardHeader>
             <CardContent>
                 <div className="budget-stat">{value}</div>
+                {change !== undefined && change !== 0 && (
+                    <div className={`flex items-center gap-1 text-xs ${changeColor} mt-1`}>
+                        <ChangeIcon className="h-3 w-3" />
+                        <span>{Math.abs(change).toFixed(1)}%</span>
+                        <span className="text-muted-foreground">מהחודש הקודם</span>
+                    </div>
+                )}
             </CardContent>
         </Card>
     )
