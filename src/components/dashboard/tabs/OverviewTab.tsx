@@ -7,7 +7,6 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Ba
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 
-// פלטת צבעים מעודכנת לפי התמונה
 const COLORS = {
     income: '#22C55E',      // ירוק חזק
     expenses: '#EF4444',    // אדום
@@ -36,7 +35,6 @@ const CustomTooltip = ({ active, payload, label, currency }: any) => {
 export function OverviewTab() {
     const { currency } = useBudget()
 
-    // Mock data - מותאם לערכים שבתמונה
     const mockData = {
         totalIncome: 15000,
         totalExpenses: 8620,
@@ -60,7 +58,7 @@ export function OverviewTab() {
         { name: 'אחר', value: 920, color: COLORS.other },
     ].sort((a, b) => b.value - a.value);
 
-    const totalForPie = 27120.00; // ערך תואם לתמונה
+    const totalForPie = 27120.00;
 
     return (
         <div className="space-y-6 p-2" dir="rtl">
@@ -118,13 +116,13 @@ export function OverviewTab() {
                                     data={incomeVsExpenses}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={65}
-                                    outerRadius={85}
+                                    innerRadius={70}
+                                    outerRadius={90}
                                     paddingAngle={5}
                                     dataKey="value"
                                     stroke="none"
-                                    labelLine={true}
-                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    label={false} // הסרת התגיות החיצוניות
+                                    labelLine={false} // הסרת הקווים המובילים
                                 >
                                     {incomeVsExpenses.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -136,7 +134,11 @@ export function OverviewTab() {
                                     />
                                 </Pie>
                                 <Tooltip content={<CustomTooltip currency={currency} />} />
-                                <Legend verticalAlign="bottom" align="center" formatter={(value) => <span className="mr-2">{value}</span>} />
+                                <Legend 
+                                    verticalAlign="bottom" 
+                                    align="center" 
+                                    formatter={(value) => <span className="text-sm font-medium ml-2">{value}</span>} 
+                                />
                             </PieChart>
                         </ResponsiveContainer>
                     </CardContent>
@@ -150,7 +152,7 @@ export function OverviewTab() {
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={expensesByCategory} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} reversed={false} tick={{ fontSize: 12 }} />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
                                 <YAxis orientation="right" axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val}`} tick={{ fontSize: 12 }} />
                                 <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
                                 <Bar dataKey="value" radius={[4, 4, 0, 0]} barSize={40}>
@@ -198,7 +200,6 @@ export function OverviewTab() {
 }
 
 function StatCard({ title, value, icon, trend, trendUp, color, bgColor, isDebt }: any) {
-    // במינוס (trendUp=false) -> צבע אדום וחץ למטה
     const trendColor = trendUp ? 'text-green-600' : 'text-red-600';
     const Icon = trendUp ? ArrowUp : ArrowDown;
 
