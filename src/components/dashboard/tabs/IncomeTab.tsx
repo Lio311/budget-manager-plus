@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Loader2, Pencil } from 'lucide-react'
+import { Plus, Trash2, Loader2, Pencil, Check, X } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -31,7 +31,6 @@ export function IncomeTab() {
 
     const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0)
 
-    // Load incomes when month/year changes
     useEffect(() => {
         loadIncomes()
     }, [month, year])
@@ -46,7 +45,8 @@ export function IncomeTab() {
             toast({
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן לטעון הכנסות',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 2000
             })
         }
         setLoading(false)
@@ -57,7 +57,8 @@ export function IncomeTab() {
             toast({
                 title: 'שגיאה',
                 description: 'נא למלא את כל השדות הנדרשים',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 2000
             })
             return
         }
@@ -72,7 +73,8 @@ export function IncomeTab() {
         if (result.success) {
             toast({
                 title: 'הצלחה',
-                description: 'ההכנסה נוספה בהצלחה'
+                description: 'ההכנסה נוספה בהצלחה',
+                duration: 2000
             })
             setNewIncome({ source: '', amount: '', date: '' })
             await loadIncomes()
@@ -80,7 +82,8 @@ export function IncomeTab() {
             toast({
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן להוסיף הכנסה',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 2000
             })
         }
         setSubmitting(false)
@@ -92,16 +95,70 @@ export function IncomeTab() {
         if (result.success) {
             toast({
                 title: 'הצלחה',
-                description: 'ההכנסה נמחקה בהצלחה'
+                description: 'ההכנסה נמחקה בהצלחה',
+                duration: 2000
             })
             await loadIncomes()
         } else {
             toast({
                 title: 'שגיאה',
                 description: result.error || 'לא ניתן למחוק הכנסה',
-                variant: 'destructive'
+                variant: 'destructive',
+                duration: 2000
             })
         }
+    }
+
+    function handleEdit(income: Income) {
+        setEditingId(income.id)
+        setEditData({
+            source: income.source,
+            amount: income.amount.toString(),
+            date: income.date ? format(income.date, 'yyyy-MM-dd') : ''
+        })
+    }
+
+    function handleCancelEdit() {
+        setEditingId(null)
+        setEditData({ source: '', amount: '', date: '' })
+    }
+
+    async function handleUpdate() {
+        if (!editingId || !editData.source || !editData.amount) {
+            toast({
+                title: 'שגיאה',
+                description: 'נא למלא את כל השדות הנדרשים',
+                variant: 'destructive',
+                duration: 2000
+            })
+            return
+        }
+
+        setSubmitting(true)
+        const result = await updateIncome(editingId, {
+            source: editData.source,
+            amount: parseFloat(editData.amount),
+            date: editData.date || undefined
+        })
+
+        if (result.success) {
+            toast({
+                title: 'הצלחה',
+                description: 'ההכנסה עודכנה בהצלחה',
+                duration: 2000
+            })
+            setEditingId(null)
+            setEditData({ source: '', amount: '', date: '' })
+            await loadIncomes()
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן לעדכן הכנסה',
+                variant: 'destructive',
+                duration: 2000
+            })
+        }
+        setSubmitting(false)
     }
 
     if (loading) {
@@ -153,17 +210,15 @@ export function IncomeTab() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">תאריך</label>
-                            <DatePicker
-                                date={newIncome.date ? new Date(newIncome.date) : undefined}
-                                setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                            <label className="text-sm font-medium">תאריך (אופציונלי)</label>
+                            <Input
+                                type="date"
+                                value={newIncome.date}
+                                onChange={(e) => setNewIncome({ ...newIncome, date: e.target.value })}
+                                disabled={submitting}
                             />
                         </div>
-                        <Button
-                            onClick={handleAdd}
-                            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-                            disabled={submitting}
-                        >
+                        <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
                             {submitting ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
@@ -191,25 +246,81 @@ export function IncomeTab() {
                                         key={income.id}
                                         className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors"
                                     >
-                                        <div className="flex-1">
-                                            <p className="font-medium">{income.source}</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <span className="text-lg font-bold text-green-600">
-                                                {formatCurrency(income.amount, currency)}
-                                            </span>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDelete(income.id)}
-                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
+                                        {editingId === income.id ? (
+                                            <>
+                                                <div className="flex-1 grid gap-4 md:grid-cols-3">
+                                                    <Input
+                                                        placeholder="מקור הכנסה"
+                                                        value={editData.source}
+                                                        onChange={(e) => setEditData({ ...editData, source: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="סכום"
+                                                        value={editData.amount}
+                                                        onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                    <Input
+                                                        type="date"
+                                                        value={editData.date}
+                                                        onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-2 mr-4">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleUpdate}
+                                                        disabled={submitting}
+                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                    >
+                                                        <Check className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleCancelEdit}
+                                                        disabled={submitting}
+                                                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="flex-1">
+                                                    <p className="font-medium">{income.source}</p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-lg font-bold text-green-600">
+                                                        {formatCurrency(income.amount, currency)}
+                                                    </span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleEdit(income)}
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleDelete(income.id)}
+                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 ))}
                             </div>
