@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { SignInButton, SignUpButton, SignedIn, SignedOut } from '@clerk/nextjs'
 import { ArrowLeft, Calendar, PieChart, TrendingUp, Wallet } from 'lucide-react'
+import Image from 'next/image'
 
 export default function HomePage() {
     return (
@@ -9,10 +10,14 @@ export default function HomePage() {
                 {/* Header */}
                 <div className="text-center mb-16">
                     <div className="flex items-center justify-center gap-3 mb-6">
-                        <Wallet className="w-16 h-16 text-primary" />
-                        <h1 className="text-5xl font-bold bg-gradient-to-l from-primary to-green-600 bg-clip-text text-transparent">
-                            מערכת ניהול תקציב+
-                        </h1>
+                        <Image
+                            src="/keseflow.png"
+                            alt="Keseflow"
+                            width={400}
+                            height={120}
+                            className="h-24 w-auto"
+                            priority
+                        />
                     </div>
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                         המיטב משני העולמות – תקציב ולוח שנה! נהל את הכספים שלך בקלות עם גרפים מתקדמים ותזכורות תשלומים חכמות
