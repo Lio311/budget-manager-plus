@@ -246,7 +246,6 @@ export function ExpensesTab() {
                             <DatePicker
                                 date={newExpense.date ? new Date(newExpense.date) : undefined}
                                 setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                disabled={submitting}
                             />
                         </div>
                         <Button onClick={handleAdd} className="gap-2" disabled={submitting}>

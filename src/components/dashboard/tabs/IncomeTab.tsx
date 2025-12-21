@@ -214,7 +214,6 @@ export function IncomeTab() {
                             <DatePicker
                                 date={newIncome.date ? new Date(newIncome.date) : undefined}
                                 setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                disabled={submitting}
                             />
                         </div>
                         <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
