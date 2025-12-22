@@ -97,52 +97,65 @@ export function ExpensesTab() {
         }
 
         setSubmitting(true)
-        const result = await addExpense(month, year, {
-            description: newExpense.description || 'הוצאה ללא תיאור',
-            amount: parseFloat(newExpense.amount),
-            category: newExpense.category,
-            date: newExpense.date,
-            isRecurring: newExpense.isRecurring,
-            recurringEndDate: newExpense.recurringEndDate
-        })
-
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'הוצאה נוספה בהצלחה' })
-            setNewExpense({
-                description: '',
-                amount: '',
-                category: categories.length > 0 ? categories[0].name : '',
-                date: format(new Date(), 'yyyy-MM-dd'),
-                isRecurring: false,
-                recurringEndDate: undefined
+        try {
+            const result = await addExpense(month, year, {
+                description: newExpense.description || 'הוצאה ללא תיאור',
+                amount: parseFloat(newExpense.amount),
+                category: newExpense.category,
+                date: newExpense.date,
+                isRecurring: newExpense.isRecurring,
+                recurringEndDate: newExpense.recurringEndDate
             })
-            await mutateExpenses()
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הוצאה', variant: 'destructive' })
+
+            if (result.success) {
+                toast({ title: 'הצלחה', description: 'הוצאה נוספה בהצלחה' })
+                setNewExpense({
+                    description: '',
+                    amount: '',
+                    category: categories.length > 0 ? categories[0].name : '',
+                    date: format(new Date(), 'yyyy-MM-dd'),
+                    isRecurring: false,
+                    recurringEndDate: undefined
+                })
+                await mutateExpenses()
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הוצאה', variant: 'destructive' })
+            }
+        } catch (error) {
+            console.error('Add expense failed:', error)
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה בלתי צפויה', variant: 'destructive' })
+        } finally {
+            setSubmitting(false)
         }
-        setSubmitting(false)
     }
 
     async function handleAddCategory() {
         if (!newCategoryName.trim()) return
 
         setSubmitting(true)
-        const result = await addCategory({
-            name: newCategoryName.trim(),
-            type: 'expense',
-            color: newCategoryColor
-        })
+        try {
+            const result = await addCategory({
+                name: newCategoryName.trim(),
+                type: 'expense',
+                color: newCategoryColor
+            })
 
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
-            setNewCategoryName('')
-            setIsAddCategoryOpen(false)
-            await mutateCategories()
-            setNewExpense(prev => ({ ...prev, category: newCategoryName.trim() }))
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
+            if (result.success) {
+                toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
+                setNewCategoryName('')
+                setIsAddCategoryOpen(false)
+                await mutateCategories()
+                const newCatName = newCategoryName.trim()
+                setNewExpense(prev => ({ ...prev, category: newCatName }))
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
+            }
+        } catch (error) {
+            console.error('Add category failed:', error)
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשרת', variant: 'destructive' })
+        } finally {
+            setSubmitting(false)
         }
-        setSubmitting(false)
     }
 
     async function handleDelete(id: string) {
@@ -290,13 +303,13 @@ export function ExpensesTab() {
                                     <div key={exp.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors">
                                         {editingId === exp.id ? (
                                             <>
-                                                <div className="flex-1 grid gap-4 md:grid-cols-4">
-                                                    <select className="p-2 border rounded-md text-sm" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
+                                                <div className="flex flex-nowrap gap-2 items-center flex-1 w-full overflow-x-auto pb-1">
+                                                    <select className="p-2 border rounded-md h-10 bg-background text-sm min-w-[120px]" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
                                                         {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
                                                     </select>
-                                                    <Input value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} />
-                                                    <Input type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
-                                                    <Input type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
+                                                    <Input className="flex-1 min-w-[150px]" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} />
+                                                    <Input className="w-32" type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
+                                                    <Input className="w-[140px]" type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
                                                 </div>
                                                 <div className="flex items-center gap-2 mr-4">
                                                     <Button variant="ghost" size="icon" onClick={handleUpdate} className="text-green-600"><Check className="h-4 w-4" /></Button>

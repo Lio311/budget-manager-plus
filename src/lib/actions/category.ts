@@ -129,7 +129,7 @@ export async function addCategory(data: { name: string; type: string; color?: st
             }
         })
 
-        revalidatePath('/')
+        revalidatePath('/dashboard')
         return { success: true, data: category }
     } catch (error) {
         console.error('Error adding category:', error)
@@ -152,7 +152,7 @@ export async function updateCategory(id: string, data: { name?: string; color?: 
             }
         })
 
-        revalidatePath('/')
+        revalidatePath('/dashboard')
         return { success: true, data: category }
     } catch (error) {
         console.error('Error updating category:', error)
@@ -171,7 +171,7 @@ export async function deleteCategory(id: string) {
             where: { id }
         })
 
-        revalidatePath('/')
+        revalidatePath('/dashboard')
         return { success: true }
     } catch (error) {
         console.error('Error deleting category:', error)
@@ -208,7 +208,7 @@ export async function seedCategories(type: string = 'expense') {
             }))
         })
 
-        revalidatePath('/')
+        revalidatePath('/dashboard')
         return { success: true }
     } catch (error) {
         console.error("Error seeding categories:", error)

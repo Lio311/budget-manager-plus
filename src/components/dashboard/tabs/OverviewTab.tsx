@@ -132,8 +132,8 @@ export function OverviewTab() {
     const loadSettings = async () => {
         const result = await getUserSettings()
         if (result.success && result.data) {
-            setInitialBalance(result.data.initialBalance?.toString() || '0')
-            setInitialSavings(result.data.initialSavings?.toString() || '0')
+            setInitialBalance((result.data as any).initialBalance?.toString() || '0')
+            setInitialSavings((result.data as any).initialSavings?.toString() || '0')
         }
     }
 

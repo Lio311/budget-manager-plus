@@ -23,7 +23,7 @@ export async function getNetWorthHistory() {
         })
 
         const budgets = await prisma.budget.findMany({
-            where: { userId },
+            where: { userId: user.id },
             select: {
                 month: true,
                 year: true,
@@ -40,7 +40,7 @@ export async function getNetWorthHistory() {
 
         if (!budgets || budgets.length === 0) {
             // Even if no budgets, return initial state if user exists
-            if (user && ((user.initialBalance || 0) > 0 || (user.initialSavings || 0) > 0)) {
+            if (user && (((user as any).initialBalance || 0) > 0 || ((user as any).initialSavings || 0) > 0)) {
                 return {
                     success: true,
                     data: [{
@@ -49,7 +49,7 @@ export async function getNetWorthHistory() {
                         income: 0,
                         expenses: 0,
                         netChange: 0,
-                        accumulatedNetWorth: (user.initialBalance || 0) + (user.initialSavings || 0)
+                        accumulatedNetWorth: ((user as any).initialBalance || 0) + ((user as any).initialSavings || 0)
                     }]
                 }
             }
@@ -57,8 +57,7 @@ export async function getNetWorthHistory() {
         }
 
         // Start with initial state
-        // Start with initial state
-        let accumulatedNetWorth = (user?.initialBalance || 0) + (user?.initialSavings || 0)
+        let accumulatedNetWorth = ((user as any)?.initialBalance || 0) + ((user as any)?.initialSavings || 0)
         const history: MonthlyData[] = []
 
         // 2. Iterate through budgets to calculate monthly stats

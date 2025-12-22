@@ -54,7 +54,7 @@ export function BillsTab() {
         if (!newBill.name || !newBill.amount || !newBill.dueDay) {
             toast({
                 title: 'שגיאה',
-                description: 'נא למלא את כל השדות הנדרשים',
+                description: 'נא למלא את כל השדות',
                 variant: 'destructive'
             })
             return
@@ -71,27 +71,37 @@ export function BillsTab() {
         }
 
         setSubmitting(true)
-        const result = await addBill(month, year, {
-            name: newBill.name,
-            amount: parseFloat(newBill.amount),
-            dueDay
-        })
-
-        if (result.success) {
-            toast({
-                title: 'הצלחה',
-                description: 'החשבון נוסף בהצלחה'
+        try {
+            const result = await addBill(month, year, {
+                name: newBill.name,
+                amount: parseFloat(newBill.amount),
+                dueDay: parseInt(newBill.dueDay)
             })
-            setNewBill({ name: '', amount: '', dueDay: '' })
-            await mutate()
-        } else {
+
+            if (result.success) {
+                toast({
+                    title: 'הצלחה',
+                    description: 'החשבון נוסף בהצלחה'
+                })
+                setNewBill({ name: '', amount: '', dueDay: '' })
+                await mutate()
+            } else {
+                toast({
+                    title: 'שגיאה',
+                    description: result.error || 'לא ניתן להוסיף חשבון',
+                    variant: 'destructive'
+                })
+            }
+        } catch (error) {
+            console.error('Add bill failed:', error)
             toast({
                 title: 'שגיאה',
-                description: result.error || 'לא ניתן להוסיף חשבון',
+                description: 'אירעה שגיאה בלתי צפויה',
                 variant: 'destructive'
             })
+        } finally {
+            setSubmitting(false)
         }
-        setSubmitting(false)
     }
 
     async function handleTogglePaid(id: string, currentStatus: boolean) {
@@ -307,9 +317,10 @@ export function BillsTab() {
                                     >
                                         {editingId === bill.id ? (
                                             <>
-                                                <div className="flex-1 grid gap-4 md:grid-cols-3">
+                                                <div className="flex flex-nowrap gap-2 items-center flex-1 w-full overflow-x-auto pb-1">
                                                     <Input
                                                         placeholder="שם החשבון"
+                                                        className="flex-1 min-w-[150px]"
                                                         value={editData.name}
                                                         onChange={(e) => setEditData({ ...editData, name: e.target.value })}
                                                         disabled={submitting}
@@ -317,6 +328,7 @@ export function BillsTab() {
                                                     <Input
                                                         type="number"
                                                         placeholder="סכום"
+                                                        className="w-32"
                                                         value={editData.amount}
                                                         onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
                                                         disabled={submitting}
@@ -326,6 +338,7 @@ export function BillsTab() {
                                                         placeholder="יום חיוב"
                                                         min="1"
                                                         max="31"
+                                                        className="w-20"
                                                         value={editData.dueDay}
                                                         onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
                                                         disabled={submitting}

@@ -85,32 +85,38 @@ export function DebtsTab() {
         }
 
         setSubmitting(true)
-        const totalAmount = parseFloat(newDebt.totalAmount)
-        const monthlyPayment = newDebt.isRecurring
-            ? totalAmount / parseInt(newDebt.numberOfInstallments)
-            : totalAmount
+        try {
+            const totalAmount = parseFloat(newDebt.totalAmount)
+            const monthlyPayment = newDebt.isRecurring
+                ? totalAmount / parseInt(newDebt.numberOfInstallments)
+                : totalAmount
 
-        const result = await addDebt(month, year, {
-            creditor: newDebt.creditor.trim(),
-            totalAmount,
-            monthlyPayment,
-            dueDay: parseInt(newDebt.dueDay),
-            isRecurring: newDebt.isRecurring,
-            totalDebtAmount: newDebt.isRecurring ? totalAmount : undefined,
-            numberOfInstallments: newDebt.isRecurring ? parseInt(newDebt.numberOfInstallments) : undefined
-        })
-
-        if (result.success) {
-            setNewDebt({ creditor: '', totalAmount: '', dueDay: '', isRecurring: false, numberOfInstallments: '' })
-            await mutate() // Refresh data
-            toast({
-                title: 'הצלחה',
-                description: newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'החוב נוסף בהצלחה'
+            const result = await addDebt(month, year, {
+                creditor: newDebt.creditor.trim(),
+                totalAmount,
+                monthlyPayment,
+                dueDay: parseInt(newDebt.dueDay),
+                isRecurring: newDebt.isRecurring,
+                totalDebtAmount: newDebt.isRecurring ? totalAmount : undefined,
+                numberOfInstallments: newDebt.isRecurring ? parseInt(newDebt.numberOfInstallments) : undefined
             })
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חוב', variant: 'destructive' })
+
+            if (result.success) {
+                setNewDebt({ creditor: '', totalAmount: '', dueDay: '', isRecurring: false, numberOfInstallments: '' })
+                await mutate() // Refresh data
+                toast({
+                    title: 'הצלחה',
+                    description: newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'החוב נוסף בהצלחה'
+                })
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חוב', variant: 'destructive' })
+            }
+        } catch (error) {
+            console.error('Add debt failed:', error)
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה בלתי צפויה', variant: 'destructive' })
+        } finally {
+            setSubmitting(false)
         }
-        setSubmitting(false)
     }
 
     const handleDelete = async (id: string) => {
@@ -366,9 +372,10 @@ export function DebtsTab() {
                                 >
                                     {editingId === debt.id ? (
                                         <>
-                                            <div className="flex flex-wrap gap-2 items-center flex-1 w-full">
+                                            <div className="flex flex-nowrap gap-2 items-center flex-1 w-full overflow-x-auto pb-1">
                                                 <Input
                                                     placeholder="שם הנושה"
+                                                    className="min-w-[120px] flex-1"
                                                     value={editData.creditor}
                                                     onChange={(e) => setEditData({ ...editData, creditor: e.target.value })}
                                                     disabled={submitting}
@@ -376,6 +383,7 @@ export function DebtsTab() {
                                                 <Input
                                                     type="number"
                                                     placeholder="סכום כולל"
+                                                    className="w-24 sm:w-32"
                                                     value={editData.totalAmount}
                                                     onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
                                                     disabled={submitting}
@@ -383,6 +391,7 @@ export function DebtsTab() {
                                                 <Input
                                                     type="number"
                                                     placeholder="תשלום חודשי"
+                                                    className="w-24 sm:w-32"
                                                     value={editData.monthlyPayment}
                                                     onChange={(e) => setEditData({ ...editData, monthlyPayment: e.target.value })}
                                                     disabled={submitting}
@@ -392,6 +401,7 @@ export function DebtsTab() {
                                                     placeholder="יום חיוב"
                                                     min="1"
                                                     max="31"
+                                                    className="w-16 sm:w-20"
                                                     value={editData.dueDay}
                                                     onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
                                                     disabled={submitting}

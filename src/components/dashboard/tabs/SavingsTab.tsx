@@ -65,7 +65,15 @@ export function SavingsTab() {
 
     const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
         ['categories', 'saving'],
-        fetcherCategories,
+        async () => {
+            const data = await fetcherCategories()
+            if (data.length === 0) {
+                const { seedCategories } = await import('@/lib/actions/category')
+                await seedCategories('saving')
+                return fetcherCategories()
+            }
+            return data
+        },
         { revalidateOnFocus: false }
     )
 
@@ -117,55 +125,69 @@ export function SavingsTab() {
         }
 
         setSubmitting(true)
-        const result = await addSaving(month, year, {
-            category: newSaving.category,
-            description: newSaving.description,
-            monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
-            goal: newSaving.goal || undefined,
-            date: newSaving.date,
-            isRecurring: newSaving.isRecurring,
-            recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
-            recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined
-        })
+        try {
+            const result = await addSaving(month, year, {
+                category: newSaving.category,
+                description: newSaving.description,
+                monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
+                goal: newSaving.goal || undefined,
+                date: newSaving.date, // Server component will handle the conversion
+                isRecurring: newSaving.isRecurring,
+                recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
+                recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined
+            } as any)
 
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'החיסכון נוסף בהצלחה' })
-            setNewSaving({
-                category: categories.length > 0 ? categories[0].name : '',
-                description: '',
-                monthlyDeposit: '',
-                goal: '',
-                date: new Date(),
-                isRecurring: false,
-                recurringEndDate: undefined
-            })
-            await mutateSavings()
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חיסכון', variant: 'destructive' })
+            if (result.success) {
+                toast({ title: 'הצלחה', description: 'החיסכון נוסף בהצלחה' })
+                setNewSaving({
+                    category: categories.length > 0 ? categories[0].name : '',
+                    description: '',
+                    monthlyDeposit: '',
+                    goal: '',
+                    date: new Date(),
+                    isRecurring: false,
+                    recurringEndDate: undefined
+                })
+                await mutateSavings()
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חיסכון', variant: 'destructive' })
+            }
+        } catch (error) {
+            console.error('Add saving failed:', error)
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה בלתי צפויה', variant: 'destructive' })
+        } finally {
+            setSubmitting(false)
         }
-        setSubmitting(false)
     }
 
     async function handleAddCategory() {
         if (!newCategoryName.trim()) return
 
         setSubmitting(true)
-        const result = await addCategory({
-            name: newCategoryName.trim(),
-            type: 'saving',
-            color: newCategoryColor
-        })
+        try {
+            const result = await addCategory({
+                name: newCategoryName.trim(),
+                type: 'saving',
+                color: newCategoryColor
+            })
 
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
-            setNewCategoryName('')
-            setIsAddCategoryOpen(false)
-            await mutateCategories()
-            setNewSaving(prev => ({ ...prev, category: newCategoryName.trim() }))
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
+            if (result.success) {
+                toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
+                setNewCategoryName('')
+                setIsAddCategoryOpen(false)
+                await mutateCategories()
+                // Update local state to select the new category
+                const newCatName = newCategoryName.trim()
+                setNewSaving(prev => ({ ...prev, category: newCatName }))
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
+            }
+        } catch (error) {
+            console.error('Add category failed:', error)
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשרת', variant: 'destructive' })
+        } finally {
+            setSubmitting(false)
         }
-        setSubmitting(false)
     }
 
     async function handleDelete(id: string) {
@@ -387,9 +409,9 @@ export function SavingsTab() {
                                 >
                                     {editingId === saving.id ? (
                                         <>
-                                            <div className="grid gap-2 sm:grid-cols-5 flex-1 w-full">
+                                            <div className="flex flex-nowrap gap-2 items-center flex-1 w-full overflow-x-auto pb-1">
                                                 <select
-                                                    className="p-2 border rounded-md bg-background h-10 text-sm"
+                                                    className="p-2 border rounded-md bg-background h-10 text-sm min-w-[120px]"
                                                     value={editData.category}
                                                     onChange={(e) => setEditData({ ...editData, category: e.target.value })}
                                                 >
@@ -398,24 +420,29 @@ export function SavingsTab() {
                                                     ))}
                                                 </select>
                                                 <Input
+                                                    className="flex-1 min-w-[150px]"
                                                     value={editData.description}
                                                     onChange={(e) => setEditData({ ...editData, description: e.target.value })}
                                                 />
                                                 <Input
+                                                    className="w-24 sm:w-32 flex-shrink-0"
                                                     type="number"
                                                     value={editData.monthlyDeposit}
                                                     onChange={(e) => setEditData({ ...editData, monthlyDeposit: e.target.value })}
                                                 />
                                                 <Input
+                                                    className="w-32 flex-shrink-0"
                                                     value={editData.goal}
                                                     onChange={(e) => setEditData({ ...editData, goal: e.target.value })}
                                                     placeholder="מטרה"
                                                 />
-                                                <DatePicker
-                                                    date={editData.date}
-                                                    setDate={(date) => setEditData({ ...editData, date: date || new Date() })}
-                                                    placeholder="תאריך"
-                                                />
+                                                <div className="w-[140px] flex-shrink-0">
+                                                    <DatePicker
+                                                        date={editData.date}
+                                                        setDate={(date) => setEditData({ ...editData, date: date || new Date() })}
+                                                        placeholder="תאריך"
+                                                    />
+                                                </div>
                                             </div>
                                             <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                                                 <Button onClick={() => handleUpdate(saving.id)} size="sm" disabled={submitting}>
