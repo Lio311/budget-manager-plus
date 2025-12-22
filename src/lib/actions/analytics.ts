@@ -17,10 +17,10 @@ export async function getNetWorthHistory() {
         const { userId } = await auth()
         if (!userId) throw new Error('Unauthorized')
 
-        const user = await prisma.user.findUnique({
+        const user = (await (prisma.user as any).findUnique({
             where: { clerkId: userId },
-            select: { id: true, initialBalance: true, initialSavings: true } as any
-        })
+            select: { id: true, initialBalance: true, initialSavings: true }
+        })) as any
 
         if (!user) {
             return { success: true, data: [] } // No user found, return empty history
