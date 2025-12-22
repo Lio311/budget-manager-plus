@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Loader2, Pencil, Check, X, Palette } from 'lucide-react'
+import { Plus, Trash2, Loader2, Pencil, Check, X } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -41,7 +41,6 @@ export function IncomeTab() {
 
     // --- Data Fetching ---
 
-    // Incomes Fetcher
     const fetcherIncomes = async () => {
         const result = await getIncomes(month, year)
         if (result.success && result.data) return result.data
@@ -54,7 +53,6 @@ export function IncomeTab() {
         { revalidateOnFocus: false }
     )
 
-    // Categories Fetcher
     const fetcherCategories = async () => {
         const result = await getCategories('income')
         if (result.success && result.data && result.data.length === 0) {
@@ -86,12 +84,10 @@ export function IncomeTab() {
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ source: '', category: '', amount: '', date: '' })
 
-    // New Category State
     const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
     const [newCategoryName, setNewCategoryName] = useState('')
     const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
 
-    // Set default category
     useEffect(() => {
         if (categories.length > 0 && !newIncome.category) {
             setNewIncome(prev => ({ ...prev, category: categories[0].name }))
@@ -104,11 +100,7 @@ export function IncomeTab() {
 
     async function handleAdd() {
         if (!newIncome.source || !newIncome.amount || !newIncome.category) {
-            toast({
-                title: 'שגיאה',
-                description: 'נא למלא את כל השדות',
-                variant: 'destructive',
-            })
+            toast({ title: 'שגיאה', description: 'נא למלא את כל השדות', variant: 'destructive' })
             return
         }
 
@@ -119,13 +111,19 @@ export function IncomeTab() {
             amount: parseFloat(newIncome.amount),
             date: newIncome.date || undefined,
             isRecurring: newIncome.isRecurring,
-            recurringStartDate: undefined,
             recurringEndDate: newIncome.isRecurring ? newIncome.recurringEndDate : undefined
         })
 
         if (result.success) {
             toast({ title: 'הצלחה', description: 'ההכנסה נוספה בהצלחה' })
-            setNewIncome(prev => ({ ...prev, source: '', amount: '', date: '', isRecurring: false }))
+            setNewIncome({
+                source: '',
+                category: categories.length > 0 ? categories[0].name : '',
+                amount: '',
+                date: '',
+                isRecurring: false,
+                recurringEndDate: ''
+            })
             await mutateIncomes()
         } else {
             toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הכנסה', variant: 'destructive' })
@@ -165,7 +163,7 @@ export function IncomeTab() {
         }
     }
 
-    function handleEdit(income: Income) {
+    function handleEdit(income: any) {
         setEditingId(income.id)
         setEditData({
             source: income.source,
@@ -175,17 +173,8 @@ export function IncomeTab() {
         })
     }
 
-    function handleCancelEdit() {
-        setEditingId(null)
-        setEditData({ source: '', category: '', amount: '', date: '' })
-    }
-
     async function handleUpdate() {
-        if (!editingId || !editData.source || !editData.amount || !editData.category) {
-            toast({ title: 'שגיאה', description: 'נא למלא את כל השדות', variant: 'destructive' })
-            return
-        }
-
+        if (!editingId) return
         setSubmitting(true)
         const result = await updateIncome(editingId, {
             source: editData.source,
@@ -197,7 +186,6 @@ export function IncomeTab() {
         if (result.success) {
             toast({ title: 'הצלחה', description: 'ההכנסה עודכנה בהצלחה' })
             setEditingId(null)
-            setEditData({ source: '', category: '', amount: '', date: '' })
             await mutateIncomes()
         } else {
             toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן הכנסה', variant: 'destructive' })
@@ -220,252 +208,133 @@ export function IncomeTab() {
 
     return (
         <div className="space-y-6">
-            {/* Summary Card */}
-            <Card className="bg-gradient-to-l from-green-50 to-white border-green-200">
-                <CardHeader>
-                    <CardTitle className="text-green-700">סך הכנסות חודשיות</CardTitle>
+            <Card className="bg-gradient-to-l from-green-50 to-white border-green-200 shadow-sm">
+                <CardHeader className="p-4 pb-2">
+                    <CardTitle className="text-green-700 text-xs sm:text-sm">סך הכנסות חודשיות</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="text-4xl font-bold text-green-600">
+                <CardContent className="p-4 pt-0">
+                    <div className="text-xl sm:text-2xl font-bold text-green-600">
                         {formatCurrency(totalIncome, currency)}
                     </div>
                 </CardContent>
             </Card>
 
-            {/* Add New Income */}
             <Card>
                 <CardHeader>
                     <CardTitle>הוסף הכנסה חדשה</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-4">
-                        <div className="grid gap-4 md:grid-cols-5 items-end">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">קטגוריה</label>
-                                <div className="flex gap-2">
-                                    <select
-                                        className="w-full p-2 border rounded-md h-10 bg-background"
-                                        value={newIncome.category}
-                                        onChange={(e) => setNewIncome({ ...newIncome, category: e.target.value })}
-                                        disabled={submitting}
-                                    >
-                                        <option value="" disabled>בחר קטגוריה</option>
-                                        {categories.map(cat => (
-                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
-                                        ))}
-                                    </select>
-
-                                    <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-                                        <PopoverTrigger asChild>
-                                            <Button type="button" variant="outline" size="icon" className="shrink-0">
-                                                <Plus className="h-4 w-4" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-80 p-4 z-50" dir="rtl">
-                                            <div className="space-y-4">
-                                                <h4 className="font-medium leading-none mb-4">קטגוריה חדשה</h4>
-                                                <div className="space-y-2">
-                                                    <Input
-                                                        placeholder="שם הקטגוריה"
-                                                        value={newCategoryName}
-                                                        onChange={(e) => setNewCategoryName(e.target.value)}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                e.preventDefault(); // Prevent form submission if any
-                                                                handleAddCategory();
-                                                            }
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="grid grid-cols-5 gap-2">
-                                                    {PRESET_COLORS.map((color) => (
-                                                        <div
-                                                            key={color.name}
-                                                            className={`h-6 w-6 rounded-full cursor-pointer border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-primary' : 'border-transparent'
-                                                                }`}
-                                                            onClick={() => setNewCategoryColor(color.class)}
-                                                            title={color.name}
-                                                        />
-                                                    ))}
-                                                </div>
-                                                <Button type="button" onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>
-                                                    שמור קטגוריה
-                                                </Button>
+                    <div className="flex flex-wrap gap-3 items-end">
+                        <div className="flex gap-2">
+                            <div className="min-w-[120px]">
+                                <label className="text-xs font-medium mb-1 block text-muted-foreground italic">קטגוריה</label>
+                                <select
+                                    className="w-full p-2 border rounded-md h-10 bg-background text-sm"
+                                    value={newIncome.category}
+                                    onChange={(e) => setNewIncome({ ...newIncome, category: e.target.value })}
+                                >
+                                    <option value="" disabled>בחר קטגוריה</option>
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="pt-5">
+                                <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="outline" size="icon" className="shrink-0 h-10 w-10"><Plus className="h-4 w-4" /></Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80 p-4 z-50" dir="rtl">
+                                        <div className="space-y-4">
+                                            <h4 className="font-medium mb-4">קטגוריה חדשה</h4>
+                                            <Input placeholder="שם הקטגוריה" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
+                                            <div className="grid grid-cols-5 gap-2">
+                                                {PRESET_COLORS.map(color => (
+                                                    <div key={color.name} className={`h-6 w-6 rounded-full cursor-pointer border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-primary' : 'border-transparent'}`} onClick={() => setNewCategoryColor(color.class)} />
+                                                ))}
                                             </div>
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
+                                            <Button onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>שמור</Button>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">מקור ההכנסה</label>
-                                <Input
-                                    placeholder="שם המקור (למשל: עבודה)"
-                                    value={newIncome.source}
-                                    onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })}
-                                    disabled={submitting}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">סכום</label>
-                                <Input
-                                    type="number"
-                                    placeholder="0.00"
-                                    className="w-full sm:w-32"
-                                    value={newIncome.amount}
-                                    onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })}
-                                    disabled={submitting}
-                                    dir="ltr"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">תאריך</label>
-                                <DatePicker
-                                    date={newIncome.date ? new Date(newIncome.date) : undefined}
-                                    setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                />
-                            </div>
-                            <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
-                                {submitting ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                    <Plus className="h-4 w-4" />
-                                )}
-                                הוסף
-                            </Button>
                         </div>
 
-                        {/* Recurring Options */}
-                        <div className="flex items-start gap-4 p-4 border rounded-lg">
-                            <div className="flex items-center gap-2">
-                                <Checkbox
-                                    id="recurring-income"
-                                    checked={newIncome.isRecurring}
-                                    onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })}
-                                />
-                                <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer">
-                                    הכנסה קבועה (חוזרת)
-                                </label>
-                            </div>
+                        <div className="flex-1 min-w-[200px]">
+                            <label className="text-xs font-medium mb-1 block text-muted-foreground italic">מקור ההכנסה</label>
+                            <Input placeholder="שם המקור (למשל: עבודה)" value={newIncome.source} onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })} />
+                        </div>
 
-                            {newIncome.isRecurring && (
+                        <div className="w-32">
+                            <label className="text-xs font-medium mb-1 block text-muted-foreground italic">סכום</label>
+                            <Input type="number" placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
+                        </div>
+
+                        <div className="w-[140px]">
+                            <label className="text-xs font-medium mb-1 block text-muted-foreground italic">תאריך</label>
+                            <DatePicker date={newIncome.date ? new Date(newIncome.date) : undefined} setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
+                        </div>
+
+                        <Button onClick={handleAdd} className="gap-2 h-10" disabled={submitting}>
+                            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} הוסף
+                        </Button>
+                    </div>
+
+                    <div className="flex items-start gap-4 p-4 mt-3 border rounded-lg">
+                        <div className="flex items-center gap-2">
+                            <Checkbox id="recurring-income" checked={newIncome.isRecurring} onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })} />
+                            <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer">הכנסה קבועה</label>
+                        </div>
+                        {newIncome.isRecurring && (
+                            <div className="flex gap-4 flex-1">
                                 <div className="space-y-2 w-[240px]">
-                                    <label className="text-sm font-medium">תאריך סיום</label>
-                                    <DatePicker
-                                        date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
-                                        setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                    />
+                                    <label className="text-xs font-medium">תאריך סיום</label>
+                                    <DatePicker date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined} setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
                                 </div>
-                            )}
-
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>
 
-            {/* Incomes List */}
             <Card>
                 <CardHeader>
                     <CardTitle>רשימת הכנסות</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-2">
-                        {incomes.length === 0 ? (
-                            <p className="text-center text-muted-foreground py-8">אין הכנסות רשומות לחודש זה</p>
-                        ) : (
+                        {incomes.length === 0 ? <p className="text-center text-muted-foreground py-8">אין הכנסות רשומות לחודש זה</p> : (
                             <div className="space-y-2">
                                 {incomes.map((income: any) => (
-                                    <div
-                                        key={income.id}
-                                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors"
-                                    >
+                                    <div key={income.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors">
                                         {editingId === income.id ? (
                                             <>
                                                 <div className="flex-1 grid gap-4 md:grid-cols-4">
-                                                    <select
-                                                        className="p-2 border rounded-md"
-                                                        value={editData.category}
-                                                        onChange={(e) => setEditData({ ...editData, category: e.target.value })}
-                                                        disabled={submitting}
-                                                    >
-                                                        {categories.map(cat => (
-                                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
-                                                        ))}
+                                                    <select className="p-2 border rounded-md text-sm" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
+                                                        {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
                                                     </select>
-                                                    <Input
-                                                        placeholder="מקור"
-                                                        value={editData.source}
-                                                        onChange={(e) => setEditData({ ...editData, source: e.target.value })}
-                                                        disabled={submitting}
-                                                    />
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="סכום"
-                                                        value={editData.amount}
-                                                        onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
-                                                        disabled={submitting}
-                                                        dir="ltr"
-                                                    />
-                                                    <Input
-                                                        type="date"
-                                                        value={editData.date}
-                                                        onChange={(e) => setEditData({ ...editData, date: e.target.value })}
-                                                        disabled={submitting}
-                                                    />
+                                                    <Input value={editData.source} onChange={(e) => setEditData({ ...editData, source: e.target.value })} />
+                                                    <Input type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
+                                                    <Input type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
                                                 </div>
                                                 <div className="flex items-center gap-2 mr-4">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={handleUpdate}
-                                                        disabled={submitting}
-                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                                    >
-                                                        <Check className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={handleCancelEdit}
-                                                        disabled={submitting}
-                                                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
+                                                    <Button variant="ghost" size="icon" onClick={handleUpdate} className="text-green-600"><Check className="h-4 w-4" /></Button>
+                                                    <Button variant="ghost" size="icon" onClick={() => setEditingId(null)}><X className="h-4 w-4" /></Button>
                                                 </div>
                                             </>
                                         ) : (
                                             <>
                                                 <div className="flex-1">
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(income.category)}`}>
-                                                            {income.category || 'כללי'}
-                                                        </span>
+                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(income.category)}`}>{income.category || 'כללי'}</span>
                                                         <p className="font-medium">{income.source}</p>
                                                     </div>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}
-                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</p>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-lg font-bold text-green-600">
-                                                        {formatCurrency(income.amount, currency)}
-                                                    </span>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleEdit(income)}
-                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                                    >
-                                                        <Pencil className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleDelete(income.id)}
-                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
+                                                    <span className="text-lg font-bold text-green-600">{formatCurrency(income.amount, currency)}</span>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="text-blue-600"><Pencil className="h-4 w-4" /></Button>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(income.id)} className="text-red-600"><Trash2 className="h-4 w-4" /></Button>
                                                 </div>
                                             </>
                                         )}
@@ -476,6 +345,6 @@ export function IncomeTab() {
                     </div>
                 </CardContent>
             </Card>
-        </div >
+        </div>
     )
 }

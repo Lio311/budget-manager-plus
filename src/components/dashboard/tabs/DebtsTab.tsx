@@ -257,35 +257,43 @@ export function DebtsTab() {
                         </CardHeader>
                         <CardContent>
                             {/* שורת האינפוטים והכפתור */}
-                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                                <Input
-                                    placeholder="נושה (למי חייב)"
-                                    value={newDebt.creditor}
-                                    onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
-                                    disabled={submitting}
-                                />
+                            <div className="flex flex-wrap gap-3 items-end">
+                                <div className="flex-1 min-w-[200px]">
+                                    <Input
+                                        placeholder="נושה (למי חייב)"
+                                        value={newDebt.creditor}
+                                        onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
+                                        disabled={submitting}
+                                    />
+                                </div>
                                 <Input
                                     type="number"
                                     placeholder="סכום כולל"
-                                    className="w-full sm:w-32"
+                                    className="w-32"
                                     value={newDebt.totalAmount}
                                     onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
                                     disabled={submitting}
-                                    dir="ltr"
                                 />
                                 <Input
                                     type="number"
                                     placeholder="יום חיוב"
                                     min="1"
                                     max="31"
-                                    className="w-full sm:w-24"
+                                    className="w-24"
                                     value={newDebt.dueDay}
                                     onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
                                     disabled={submitting}
-                                    dir="ltr"
                                 />
-                                <Button onClick={handleAdd} className="w-full gap-2" disabled={submitting}>
-                                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                                <Button
+                                    onClick={handleAdd}
+                                    className="gap-2"
+                                    disabled={submitting}
+                                >
+                                    {submitting ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Plus className="h-4 w-4" />
+                                    )}
                                     הוסף
                                 </Button>
                             </div>
@@ -358,7 +366,7 @@ export function DebtsTab() {
                                 >
                                     {editingId === debt.id ? (
                                         <>
-                                            <div className="flex-1 grid gap-4 md:grid-cols-4 w-full">
+                                            <div className="flex flex-wrap gap-2 items-center flex-1 w-full">
                                                 <Input
                                                     placeholder="שם הנושה"
                                                     value={editData.creditor}
@@ -371,7 +379,6 @@ export function DebtsTab() {
                                                     value={editData.totalAmount}
                                                     onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
                                                     disabled={submitting}
-                                                    dir="ltr"
                                                 />
                                                 <Input
                                                     type="number"
@@ -379,7 +386,6 @@ export function DebtsTab() {
                                                     value={editData.monthlyPayment}
                                                     onChange={(e) => setEditData({ ...editData, monthlyPayment: e.target.value })}
                                                     disabled={submitting}
-                                                    dir="ltr"
                                                 />
                                                 <Input
                                                     type="number"
@@ -389,7 +395,6 @@ export function DebtsTab() {
                                                     value={editData.dueDay}
                                                     onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
                                                     disabled={submitting}
-                                                    dir="ltr"
                                                 />
                                             </div>
                                             <div className="flex items-center gap-2">

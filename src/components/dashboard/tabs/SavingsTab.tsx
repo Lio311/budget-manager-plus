@@ -131,7 +131,7 @@ export function SavingsTab() {
         if (result.success) {
             toast({ title: 'הצלחה', description: 'החיסכון נוסף בהצלחה' })
             setNewSaving({
-                category: '',
+                category: categories.length > 0 ? categories[0].name : '',
                 description: '',
                 monthlyDeposit: '',
                 goal: '',
@@ -178,7 +178,7 @@ export function SavingsTab() {
         }
     }
 
-    const startEdit = (saving: Saving) => {
+    const startEdit = (saving: any) => {
         setEditingId(saving.id)
         setEditData({
             category: saving.category || saving.type || '',
@@ -260,10 +260,10 @@ export function SavingsTab() {
                     <CardTitle className="text-lg">הוסף חיסכון חדש</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6 items-end">
-                        <div className="sm:col-span-2 lg:col-span-1 flex gap-2">
+                    <div className="flex flex-wrap gap-3 items-end">
+                        <div className="flex gap-2">
                             <select
-                                className="w-full p-2 border rounded-md h-10 bg-background"
+                                className="w-full p-2 border rounded-md h-10 bg-background text-sm min-w-[120px]"
                                 value={newSaving.category}
                                 onChange={(e) => setNewSaving({ ...newSaving, category: e.target.value })}
                                 disabled={submitting}
@@ -287,66 +287,61 @@ export function SavingsTab() {
                                                 placeholder="שם הקטגוריה"
                                                 value={newCategoryName}
                                                 onChange={(e) => setNewCategoryName(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        e.preventDefault();
-                                                        handleAddCategory();
-                                                    }
-                                                }}
                                             />
                                         </div>
                                         <div className="grid grid-cols-5 gap-2">
                                             {PRESET_COLORS.map((color) => (
                                                 <div
                                                     key={color.name}
-                                                    className={`h-6 w-6 rounded-full cursor-pointer border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-primary' : 'border-transparent'
-                                                        }`}
+                                                    className={`h-6 w-6 rounded-full cursor-pointer border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-primary' : 'border-transparent'}`}
                                                     onClick={() => setNewCategoryColor(color.class)}
-                                                    title={color.name}
                                                 />
                                             ))}
                                         </div>
-                                        <Button type="button" onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>
-                                            שמור קטגוריה
-                                        </Button>
+                                        <Button onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>שמור</Button>
                                     </div>
                                 </PopoverContent>
                             </Popover>
                         </div>
 
-                        <Input
-                            placeholder="תיאור"
-                            value={newSaving.description}
-                            onChange={(e) => setNewSaving({ ...newSaving, description: e.target.value })}
-                            className="sm:col-span-2 lg:col-span-1"
-                        />
+                        <div className="flex-1 min-w-[200px]">
+                            <Input
+                                placeholder="תיאור"
+                                value={newSaving.description}
+                                onChange={(e) => setNewSaving({ ...newSaving, description: e.target.value })}
+                            />
+                        </div>
+
                         <Input
                             type="number"
                             placeholder="הפקדה חודשית"
-                            className="w-full sm:w-32"
+                            className="w-32"
                             value={newSaving.monthlyDeposit}
                             onChange={(e) => setNewSaving({ ...newSaving, monthlyDeposit: e.target.value })}
-                            dir="ltr"
                         />
-                        <Input
-                            placeholder="מטרה (אופציונלי)"
-                            value={newSaving.goal}
-                            onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
-                        />
-                        <div className="flex flex-col gap-1">
+
+                        <div className="flex-1 min-w-[150px]">
+                            <Input
+                                placeholder="מטרה (אופציונלי)"
+                                value={newSaving.goal}
+                                onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="w-[140px]">
                             <DatePicker
                                 date={newSaving.date}
                                 setDate={(date) => setNewSaving({ ...newSaving, date: date || new Date() })}
                                 placeholder="תאריך"
                             />
                         </div>
-                        <Button onClick={handleAdd} className="w-full gap-2 sm:col-span-2 lg:col-span-1" disabled={submitting}>
+
+                        <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
                             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                             הוסף
                         </Button>
                     </div>
 
-                    {/* Recurring Savings Options */}
                     <div className="flex items-start gap-4 p-4 mt-3 border rounded-lg">
                         <div className="flex items-center gap-2">
                             <Checkbox
@@ -362,7 +357,7 @@ export function SavingsTab() {
                         {newSaving.isRecurring && (
                             <div className="flex gap-4 flex-1">
                                 <div className="space-y-2 w-[240px]">
-                                    <label className="text-sm font-medium">תאריך סיום</label>
+                                    <label className="text-xs font-medium">תאריך סיום</label>
                                     <DatePicker
                                         date={newSaving.recurringEndDate}
                                         setDate={(date) => setNewSaving({ ...newSaving, recurringEndDate: date })}
@@ -394,7 +389,7 @@ export function SavingsTab() {
                                         <>
                                             <div className="grid gap-2 sm:grid-cols-5 flex-1 w-full">
                                                 <select
-                                                    className="p-2 border rounded-md bg-background h-10"
+                                                    className="p-2 border rounded-md bg-background h-10 text-sm"
                                                     value={editData.category}
                                                     onChange={(e) => setEditData({ ...editData, category: e.target.value })}
                                                 >
@@ -410,7 +405,6 @@ export function SavingsTab() {
                                                     type="number"
                                                     value={editData.monthlyDeposit}
                                                     onChange={(e) => setEditData({ ...editData, monthlyDeposit: e.target.value })}
-                                                    dir="ltr"
                                                 />
                                                 <Input
                                                     value={editData.goal}

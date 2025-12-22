@@ -240,36 +240,41 @@ export function BillsTab() {
                     <CardTitle>הוסף חשבון קבוע</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-4 md:grid-cols-4">
-                        <Input
-                            placeholder="שם החשבון (חשמל, ארנונה...)"
-                            value={newBill.name}
-                            onChange={(e) => setNewBill({ ...newBill, name: e.target.value })}
-                            disabled={submitting}
-                        />
-                        <Input
-                            type="number"
-                            placeholder="סכום"
-                            className="w-full sm:w-32"
-                            value={newBill.amount}
-                            onChange={(e) => setNewBill({ ...newBill, amount: e.target.value })}
-                            disabled={submitting}
-                            dir="ltr"
-                        />
-                        <Input
-                            type="number"
-                            placeholder="יום חיוב"
-                            min="1"
-                            max="31"
-                            className="w-full sm:w-24"
-                            value={newBill.dueDay}
-                            onChange={(e) => setNewBill({ ...newBill, dueDay: e.target.value })}
-                            disabled={submitting}
-                            dir="ltr"
-                        />
+                    <div className="flex flex-wrap gap-3 items-end">
+                        <div className="flex-1 min-w-[200px]">
+                            <label className="text-xs font-medium mb-1 block text-muted-foreground italic">שם החשבון</label>
+                            <Input
+                                placeholder="חשמל, ארנונה..."
+                                value={newBill.name}
+                                onChange={(e) => setNewBill({ ...newBill, name: e.target.value })}
+                                disabled={submitting}
+                            />
+                        </div>
+                        <div className="w-32">
+                            <label className="text-xs font-medium mb-1 block text-muted-foreground italic">סכום</label>
+                            <Input
+                                type="number"
+                                placeholder="סכום"
+                                value={newBill.amount}
+                                onChange={(e) => setNewBill({ ...newBill, amount: e.target.value })}
+                                disabled={submitting}
+                            />
+                        </div>
+                        <div className="w-24">
+                            <label className="text-xs font-medium mb-1 block text-muted-foreground italic">יום חיוב</label>
+                            <Input
+                                type="number"
+                                placeholder="1-31"
+                                min="1"
+                                max="31"
+                                value={newBill.dueDay}
+                                onChange={(e) => setNewBill({ ...newBill, dueDay: e.target.value })}
+                                disabled={submitting}
+                            />
+                        </div>
                         <Button
                             onClick={handleAdd}
-                            className="gap-2"
+                            className="gap-2 h-10"
                             disabled={submitting}
                         >
                             {submitting ? (
@@ -315,7 +320,6 @@ export function BillsTab() {
                                                         value={editData.amount}
                                                         onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
                                                         disabled={submitting}
-                                                        dir="ltr"
                                                     />
                                                     <Input
                                                         type="number"
@@ -325,7 +329,6 @@ export function BillsTab() {
                                                         value={editData.dueDay}
                                                         onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
                                                         disabled={submitting}
-                                                        dir="ltr"
                                                     />
                                                 </div>
                                                 <div className="flex items-center gap-2 mr-4">
