@@ -101,9 +101,9 @@ export function ExpensesTab() {
             description: newExpense.description || 'הוצאה ללא תיאור',
             amount: parseFloat(newExpense.amount),
             category: newExpense.category,
-            date: new Date(newExpense.date),
+            date: newExpense.date,
             isRecurring: newExpense.isRecurring,
-            recurringEndDate: newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined
+            recurringEndDate: newExpense.recurringEndDate
         })
 
         if (result.success) {
@@ -172,7 +172,7 @@ export function ExpensesTab() {
             description: editData.description,
             amount: parseFloat(editData.amount),
             category: editData.category,
-            date: new Date(editData.date)
+            date: editData.date
         })
 
         if (result.success) {
