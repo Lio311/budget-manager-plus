@@ -37,13 +37,10 @@ function Calendar({
                     dropdown_month: "min-w-[140px]",
                     dropdown_year: "min-w-[100px]",
                     vhidden: "hidden",
-                    nav: "flex items-center gap-1",
-                    nav_button: cn(
-                        buttonVariants({ variant: "outline" }),
-                        "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-                    ),
-                    nav_button_previous: "absolute right-1",
-                    nav_button_next: "absolute left-1",
+                    nav: "hidden",
+                    nav_button: "hidden",
+                    nav_button_previous: "hidden",
+                    nav_button_next: "hidden",
                     table: "w-full border-collapse",
                     head_row: "flex mb-1",
                     head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] text-center",
