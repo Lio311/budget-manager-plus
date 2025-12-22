@@ -291,7 +291,7 @@ export function DebtsTab() {
                                         onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
                                     />
                                     <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer">
-                                        חוב קבוע (חודרי)
+                                        חוב קבוע
                                     </label>
                                 </div>
 
