@@ -398,7 +398,7 @@ export function OverviewTab() {
                         <CardHeader>
                             <CardTitle>התפלגות תקציב</CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="p-0">
                             {totalForPie === 0 ? (
                                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
                                     אין נתונים להצגה
@@ -407,7 +407,7 @@ export function OverviewTab() {
                                 <ResponsiveContainer width="100%" height={300}>
                                     <BarChart
                                         data={incomeVsExpenses}
-                                        margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
+                                        margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
                                         layout="horizontal"
                                     >
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
