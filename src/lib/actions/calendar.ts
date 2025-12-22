@@ -7,8 +7,8 @@ export async function getCalendarPayments(month: number, year: number) {
     try {
         const budget = await getCurrentBudget(month, year)
 
-        // Get bills, debts, income, and expenses for the month
-        const [bills, debts, incomes, expenses] = await Promise.all([
+        // Get bills, debts, income, expenses, and savings for the month
+        const [bills, debts, incomes, expenses, savings] = await Promise.all([
             prisma.bill.findMany({
                 where: { budgetId: budget.id },
                 orderBy: { dueDay: 'asc' }
@@ -22,6 +22,10 @@ export async function getCalendarPayments(month: number, year: number) {
                 orderBy: { date: 'asc' }
             }),
             prisma.expense.findMany({
+                where: { budgetId: budget.id },
+                orderBy: { date: 'asc' }
+            }),
+            prisma.saving.findMany({
                 where: { budgetId: budget.id },
                 orderBy: { date: 'asc' }
             })
@@ -60,6 +64,14 @@ export async function getCalendarPayments(month: number, year: number) {
                 day: expense.date ? expense.date.getDate() : 1,
                 type: 'expense' as const,
                 isPaid: true // Expenses don't have paid status
+            })),
+            ...savings.map(saving => ({
+                id: saving.id,
+                name: saving.description,
+                amount: saving.monthlyDeposit,
+                day: saving.date.getDate(),
+                type: 'saving' as const,
+                isPaid: true // Savings don't have paid status
             }))
         ]
 

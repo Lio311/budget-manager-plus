@@ -16,7 +16,7 @@ interface Payment {
     name: string
     amount: number
     day: number
-    type: 'bill' | 'debt' | 'income' | 'expense'
+    type: 'bill' | 'debt' | 'income' | 'expense' | 'saving'
     isPaid: boolean
 }
 
@@ -158,12 +158,12 @@ export function CalendarTab() {
                                                         <div
                                                             key={payment.id}
                                                             className={`text-xs p-1 rounded ${payment.type === 'bill'
-                                                                    ? 'bg-yellow-200 text-yellow-800'
-                                                                    : payment.type === 'debt'
-                                                                        ? 'bg-purple-200 text-purple-800'
-                                                                        : payment.type === 'income'
-                                                                            ? 'bg-green-200 text-green-800'
-                                                                            : 'bg-red-200 text-red-800'
+                                                                ? 'bg-yellow-200 text-yellow-800'
+                                                                : payment.type === 'debt'
+                                                                    ? 'bg-purple-200 text-purple-800'
+                                                                    : payment.type === 'income'
+                                                                        ? 'bg-green-200 text-green-800'
+                                                                        : 'bg-red-200 text-red-800'
                                                                 } ${payment.isPaid ? 'opacity-50 line-through' : ''}`}
                                                         >
                                                             {payment.name}
@@ -218,12 +218,12 @@ export function CalendarTab() {
                                                             {payment.name}
                                                         </p>
                                                         <span className={`text-xs px-2 py-0.5 rounded-full ${payment.type === 'bill'
-                                                                ? 'bg-yellow-100 text-yellow-700'
-                                                                : payment.type === 'debt'
-                                                                    ? 'bg-purple-100 text-purple-700'
-                                                                    : payment.type === 'income'
-                                                                        ? 'bg-green-100 text-green-700'
-                                                                        : 'bg-red-100 text-red-700'
+                                                            ? 'bg-yellow-100 text-yellow-700'
+                                                            : payment.type === 'debt'
+                                                                ? 'bg-purple-100 text-purple-700'
+                                                                : payment.type === 'income'
+                                                                    ? 'bg-green-100 text-green-700'
+                                                                    : 'bg-red-100 text-red-700'
                                                             }`}>
                                                             {payment.type === 'bill' ? 'חשבון' : payment.type === 'debt' ? 'חוב' : payment.type === 'income' ? 'הכנסה' : 'הוצאה'}
                                                         </span>
@@ -235,14 +235,14 @@ export function CalendarTab() {
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <span className={`text-lg font-bold ${payment.isPaid
-                                                        ? 'text-green-600'
-                                                        : payment.type === 'bill'
-                                                            ? 'text-yellow-600'
-                                                            : payment.type === 'debt'
-                                                                ? 'text-purple-600'
-                                                                : payment.type === 'income'
-                                                                    ? 'text-green-600'
-                                                                    : 'text-red-600'
+                                                    ? 'text-green-600'
+                                                    : payment.type === 'bill'
+                                                        ? 'text-yellow-600'
+                                                        : payment.type === 'debt'
+                                                            ? 'text-purple-600'
+                                                            : payment.type === 'income'
+                                                                ? 'text-green-600'
+                                                                : 'text-red-600'
                                                     }`}>
                                                     {formatCurrency(payment.amount, currency)}
                                                 </span>
