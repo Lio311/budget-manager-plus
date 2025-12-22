@@ -18,14 +18,23 @@ async function createRecurringSavings(
     userId: string
 ) {
     const savings = []
-    let currentDate = startOfMonth(data.recurringStartDate)
+
+    // Preserve the day of month from start date
+    const dayOfMonth = data.recurringStartDate.getDate()
+    let currentDate = new Date(data.recurringStartDate)
     const endDate = endOfMonth(data.recurringEndDate)
     const sourceId = `recurring-saving-${Date.now()}`
 
     // 1. Identify all months needed
     const dates: Date[] = []
     while (isBefore(currentDate, endDate) || currentDate.getTime() === startOfMonth(endDate).getTime()) {
-        dates.push(new Date(currentDate))
+        // Handle invalid days (e.g., Feb 31 -> Feb 28/29)
+        const year = currentDate.getFullYear()
+        const month = currentDate.getMonth()
+        const lastDayOfMonth = new Date(year, month + 1, 0).getDate()
+        const dayToUse = Math.min(dayOfMonth, lastDayOfMonth)
+
+        dates.push(new Date(year, month, dayToUse))
         currentDate = addMonths(currentDate, 1)
     }
 

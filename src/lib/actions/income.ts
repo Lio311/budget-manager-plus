@@ -74,6 +74,9 @@ async function createRecurringIncomes(
     const startDate = new Date(startDateStr)
     const endDate = new Date(endDateStr)
 
+    // Extract the day of month from start date
+    const dayOfMonth = startDate.getDate()
+
     const startMonth = startDate.getMonth() + 1
     const startYear = startDate.getFullYear()
     const endMonth = endDate.getMonth() + 1
@@ -97,13 +100,17 @@ async function createRecurringIncomes(
         try {
             const budget = await getCurrentBudget(currentMonth, currentYear)
 
+            // Handle invalid days (e.g., Feb 31 -> Feb 28/29)
+            const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate()
+            const dayToUse = Math.min(dayOfMonth, lastDayOfMonth)
+
             await prisma.income.create({
                 data: {
                     budgetId: budget.id,
                     source,
                     category,
                     amount,
-                    date: new Date(currentYear, currentMonth - 1, 1),
+                    date: new Date(currentYear, currentMonth - 1, dayToUse),
                     isRecurring: true,
                     recurringSourceId: sourceId,
                     recurringStartDate: startDate,
