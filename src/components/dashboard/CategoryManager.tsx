@@ -123,6 +123,7 @@ export function CategoryManager() {
                             value={newItemName}
                             onChange={(e) => setNewItemName(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+                            className="flex-1"
                         />
                         <Button onClick={handleAdd} disabled={!newItemName.trim() || isSubmitting}>
                             {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -131,7 +132,7 @@ export function CategoryManager() {
                     </div>
 
                     {/* Color Picker Grid */}
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-2 flex-wrap justify-start">
                         {PRESET_COLORS.map((color) => (
                             <div
                                 key={color.name}

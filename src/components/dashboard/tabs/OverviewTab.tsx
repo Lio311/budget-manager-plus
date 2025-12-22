@@ -232,16 +232,13 @@ export function OverviewTab() {
 
                         <Tabs defaultValue="general" className="flex-1 flex flex-col overflow-hidden">
                             <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="general">כללי</TabsTrigger>
+                                <TabsTrigger value="general">הון ראשוני</TabsTrigger>
                                 <TabsTrigger value="categories">ניהול קטגוריות</TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="general" className="mt-4 space-y-4">
                                 <div className="grid gap-4 py-4">
                                     <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="initialBalance" className="text-right col-span-1">
-                                            עובר ושב
-                                        </Label>
                                         <Input
                                             id="initialBalance"
                                             type="number"
@@ -249,11 +246,11 @@ export function OverviewTab() {
                                             onChange={(e) => setInitialBalance(e.target.value)}
                                             className="col-span-3"
                                         />
+                                        <Label htmlFor="initialBalance" className="text-right col-span-1">
+                                            עובר ושב
+                                        </Label>
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="initialSavings" className="text-right col-span-1">
-                                            חסכונות קיימים
-                                        </Label>
                                         <Input
                                             id="initialSavings"
                                             type="number"
@@ -261,6 +258,9 @@ export function OverviewTab() {
                                             onChange={(e) => setInitialSavings(e.target.value)}
                                             className="col-span-3"
                                         />
+                                        <Label htmlFor="initialSavings" className="text-right col-span-1">
+                                            חסכונות קיימים
+                                        </Label>
                                     </div>
                                 </div>
                                 <div className="flex justify-end">
