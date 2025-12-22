@@ -416,15 +416,22 @@ export function OverviewTab() {
                                             tickLine={false}
                                             axisLine={false}
                                         />
+
                                         <YAxis
                                             orientation="left"
-                                            width={100}
+                                            width={45}
                                             tickLine={false}
                                             axisLine={false}
                                             tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
                                         />
                                         <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
-                                        <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={100}>
+
+                                        // 2. הסר את ההגבלה ב-Bar
+                                        <Bar
+                                            dataKey="value"
+                                            radius={[4, 4, 0, 0]}
+                                        // maxBarSize={100}  <--- מחק את השורה הזו או הגדל ל-1000
+                                        >
                                             {incomeVsExpenses.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={entry.color} />
                                             ))}
