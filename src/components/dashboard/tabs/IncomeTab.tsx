@@ -346,7 +346,7 @@ export function IncomeTab() {
                             </div>
 
                             {newIncome.isRecurring && (
-                                <div className="space-y-2 flex-1">
+                                <div className="space-y-2 w-[240px]">
                                     <label className="text-sm font-medium">תאריך סיום</label>
                                     <DatePicker
                                         date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}

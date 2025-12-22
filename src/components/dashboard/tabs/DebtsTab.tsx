@@ -310,7 +310,7 @@ export function DebtsTab() {
                                                 type="number"
                                                 placeholder="12"
                                                 min="1"
-                                                className="h-9"
+                                                className="h-9 w-[120px]"
                                                 value={newDebt.numberOfInstallments}
                                                 onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
                                                 disabled={submitting}

@@ -341,7 +341,7 @@ export function ExpensesTab() {
                             </div>
 
                             {newExpense.isRecurring && (
-                                <div className="space-y-2 flex-1">
+                                <div className="space-y-2 w-[240px]">
                                     <label className="text-sm font-medium">תאריך סיום</label>
                                     <DatePicker
                                         date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
