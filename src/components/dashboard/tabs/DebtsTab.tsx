@@ -290,6 +290,7 @@ export function DebtsTab() {
                             <CardTitle className="text-lg">הוסף חוב חדש</CardTitle>
                         </CardHeader>
                         <CardContent>
+                            {/* שורת האינפוטים והכפתור */}
                             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                 <Input
                                     placeholder="נושה (למי חייב)"
@@ -319,36 +320,37 @@ export function DebtsTab() {
                                 </Button>
                             </div>
 
-                            {/* Recurring Debt Section */}
-                            <div className="flex items-start gap-4 p-4 border rounded-lg">
+                            {/* Recurring Debt Section - עיצוב נקי ללא מסגרת */}
+                            <div className="mt-4 space-y-3">
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="recurring-debt"
                                         checked={newDebt.isRecurring}
                                         onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
                                     />
-                                    <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer">
+                                    <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none">
                                         חוב בתשלומים
                                     </label>
                                 </div>
 
                                 {newDebt.isRecurring && (
-                                    <div className="flex gap-4 flex-1">
-                                        <div className="space-y-2 flex-1">
-                                            <label className="text-sm font-medium">מספר תשלומים</label>
+                                    <div className="flex gap-4 items-end animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <div className="space-y-1.5 w-32">
+                                            <label className="text-xs text-muted-foreground">מספר תשלומים</label>
                                             <Input
                                                 type="number"
                                                 placeholder="12"
                                                 min="1"
+                                                className="h-9"
                                                 value={newDebt.numberOfInstallments}
                                                 onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
                                                 disabled={submitting}
                                             />
                                         </div>
                                         {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
-                                            <div className="space-y-2 flex-1">
-                                                <label className="text-sm font-medium">תשלום חודשי</label>
-                                                <div className="h-10 px-3 py-2 border rounded-md bg-muted flex items-center">
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs text-muted-foreground">תשלום חודשי משוער</label>
+                                                <div className="h-9 px-3 py-1.5 border rounded-md bg-muted/50 text-sm flex items-center min-w-[100px]">
                                                     {formatCurrency(
                                                         parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
                                                         currency
