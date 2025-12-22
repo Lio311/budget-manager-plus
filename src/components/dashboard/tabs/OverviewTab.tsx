@@ -519,7 +519,9 @@ function BudgetProgress({
                     style={{ width: `${Math.min(percentage, 100)}%` }}
                 />
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{percentage.toFixed(1)}%</p>
+            <p className="text-xs text-muted-foreground mt-1">
+                <span dir="ltr">{percentage.toFixed(1)}%</span>
+            </p>
         </div>
     )
 }
