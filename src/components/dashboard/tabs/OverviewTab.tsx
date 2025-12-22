@@ -119,20 +119,30 @@ export function OverviewTab() {
     // Calculations
     const totalIncome = incomes.reduce((sum: number, i: any) => sum + i.amount, 0)
     const standardExpenses = expenses.reduce((sum: number, e: any) => sum + e.amount, 0)
-    const totalBills = bills.reduce((sum: number, b: any) => sum + b.amount, 0)
+
+    // Bills splitting
+    const totalPaidBills = bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + b.amount, 0)
+    const totalRemainingBills = bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + b.amount, 0)
+    const totalBills = totalRemainingBills // We will show remaining bills in the "Bills" card
+
     const totalPaidDebts = debts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)
     const totalSavingsDeposits = savingsItems.reduce((sum: number, s: any) => sum + s.monthlyDeposit, 0)
 
     // Combined Expenses (everything that leaves the account)
-    const totalExpenses = standardExpenses + totalPaidDebts + totalSavingsDeposits
+    // Now including paid bills here
+    const totalExpenses = standardExpenses + totalPaidDebts + totalSavingsDeposits + totalPaidBills
 
     const prevTotalIncome = prevIncomes.reduce((sum: number, i: any) => sum + i.amount, 0)
     const prevStandardExpenses = prevExpenses.reduce((sum: number, e: any) => sum + e.amount, 0)
-    const prevTotalBills = prevBills.reduce((sum: number, b: any) => sum + b.amount, 0)
+
+    const prevPaidBills = prevBills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + b.amount, 0)
+    const prevRemainingBills = prevBills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + b.amount, 0)
+    const prevTotalBills = prevRemainingBills
+
     const prevTotalPaidDebts = prevDebts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)
     const prevTotalSavingsDeposits = prevSavingsItems.reduce((sum: number, s: any) => sum + s.monthlyDeposit, 0)
 
-    const prevTotalExpenses = prevStandardExpenses + prevTotalPaidDebts + prevTotalSavingsDeposits
+    const prevTotalExpenses = prevStandardExpenses + prevTotalPaidDebts + prevTotalSavingsDeposits + prevPaidBills
 
     const savingsRemainder = totalIncome - totalExpenses - totalBills
     const prevSavingsRemainder = prevTotalIncome - prevTotalExpenses - prevTotalBills
@@ -189,12 +199,15 @@ export function OverviewTab() {
             return { name, value, color }
         })
 
-    // Add Debts and Savings as virtual categories
+    // Add Debts, Savings and Paid Bills as virtual categories
     if (totalPaidDebts > 0) {
         expensesByCategory.push({ name: 'חובות ששולמו', value: totalPaidDebts, color: '#F43F5E' }) // Rose 500
     }
     if (totalSavingsDeposits > 0) {
         expensesByCategory.push({ name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }) // Blue 500
+    }
+    if (totalPaidBills > 0) {
+        expensesByCategory.push({ name: 'חשבונות ששולמו', value: totalPaidBills, color: '#F59E0B' }) // Amber 500
     }
 
     expensesByCategory.sort((a, b) => b.value - a.value)
@@ -330,7 +343,7 @@ export function OverviewTab() {
                     changeType="income"
                 />
                 <StatCard
-                    title="סך חשבונות"
+                    title="יתרת חשבונות"
                     value={formatCurrency(data.totalBills, currency)}
                     icon={<Wallet className="h-4 w-4" />}
                     color="text-orange-600"
