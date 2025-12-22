@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import useSWR from 'swr'
+
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowDown, ArrowUp, PiggyBank, TrendingUp, Wallet, Loader2 } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label } from 'recharts'
@@ -40,93 +42,30 @@ const CustomTooltip = ({ active, payload, label, currency }: any) => {
 
 export function OverviewTab() {
     const { month, year, currency } = useBudget()
-    const [loading, setLoading] = useState(true)
-    const [data, setData] = useState({
-        totalIncome: 0,
-        totalExpenses: 0,
-        totalBills: 0,
-        expensesByCategory: [] as { name: string; value: number; color: string }[]
-    })
-    const [previousData, setPreviousData] = useState({
-        totalIncome: 0,
-        totalExpenses: 0,
-        totalBills: 0
-    })
 
-    useEffect(() => {
-        loadData()
-    }, [month, year])
+    // Calculate previous date
+    const prevMonth = month === 1 ? 12 : month - 1
+    const prevYear = month === 1 ? year - 1 : year
 
-    async function loadData() {
-        setLoading(true)
+    // Data Fetchers
+    const fetchIncomesData = async () => (await getIncomes(month, year)).data || []
+    const fetchExpensesData = async () => (await getExpenses(month, year)).data || []
+    const fetchBillsData = async () => (await getBills(month, year)).data || []
 
-        // Calculate previous month
-        const prevMonth = month === 1 ? 12 : month - 1
-        const prevYear = month === 1 ? year - 1 : year
+    const fetchPrevIncomesData = async () => (await getIncomes(prevMonth, prevYear)).data || []
+    const fetchPrevExpensesData = async () => (await getExpenses(prevMonth, prevYear)).data || []
+    const fetchPrevBillsData = async () => (await getBills(prevMonth, prevYear)).data || []
 
-        const [incomesResult, expensesResult, billsResult, prevIncomesResult, prevExpensesResult, prevBillsResult] = await Promise.all([
-            getIncomes(month, year),
-            getExpenses(month, year),
-            getBills(month, year),
-            getIncomes(prevMonth, prevYear),
-            getExpenses(prevMonth, prevYear),
-            getBills(prevMonth, prevYear)
-        ])
+    // SWR Hooks
+    const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year], fetchIncomesData)
+    const { data: expenses = [], isLoading: loadingExpenses } = useSWR(['expenses', month, year], fetchExpensesData)
+    const { data: bills = [], isLoading: loadingBills } = useSWR(['bills', month, year], fetchBillsData)
 
-        const totalIncome = incomesResult.success && incomesResult.data
-            ? incomesResult.data.reduce((sum, income) => sum + income.amount, 0)
-            : 0
+    const { data: prevIncomes = [], isLoading: loadingPrevIncomes } = useSWR(['incomes', prevMonth, prevYear], fetchPrevIncomesData)
+    const { data: prevExpenses = [], isLoading: loadingPrevExpenses } = useSWR(['expenses', prevMonth, prevYear], fetchPrevExpensesData)
+    const { data: prevBills = [], isLoading: loadingPrevBills } = useSWR(['bills', prevMonth, prevYear], fetchPrevBillsData)
 
-        const totalExpenses = expensesResult.success && expensesResult.data
-            ? expensesResult.data.reduce((sum, expense) => sum + expense.amount, 0)
-            : 0
-
-        const totalBills = billsResult.success && billsResult.data
-            ? billsResult.data.reduce((sum, bill) => sum + bill.amount, 0)
-            : 0
-
-        const prevTotalIncome = prevIncomesResult.success && prevIncomesResult.data
-            ? prevIncomesResult.data.reduce((sum, income) => sum + income.amount, 0)
-            : 0
-
-        const prevTotalExpenses = prevExpensesResult.success && prevExpensesResult.data
-            ? prevExpensesResult.data.reduce((sum, expense) => sum + expense.amount, 0)
-            : 0
-
-        const prevTotalBills = prevBillsResult.success && prevBillsResult.data
-            ? prevBillsResult.data.reduce((sum, bill) => sum + bill.amount, 0)
-            : 0
-
-        // Group expenses by category
-        const categoryMap = new Map<string, number>()
-        if (expensesResult.success && expensesResult.data) {
-            expensesResult.data.forEach(expense => {
-                const current = categoryMap.get(expense.category) || 0
-                categoryMap.set(expense.category, current + expense.amount)
-            })
-        }
-
-        const expensesByCategory = Array.from(categoryMap.entries())
-            .map(([name, value]) => ({
-                name,
-                value,
-                color: COLORS[name as keyof typeof COLORS] || COLORS['אחר']
-            }))
-            .sort((a, b) => b.value - a.value)
-
-        setData({
-            totalIncome,
-            totalExpenses,
-            totalBills,
-            expensesByCategory
-        })
-        setPreviousData({
-            totalIncome: prevTotalIncome,
-            totalExpenses: prevTotalExpenses,
-            totalBills: prevTotalBills
-        })
-        setLoading(false)
-    }
+    const loading = loadingIncomes || loadingExpenses || loadingBills || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills
 
     if (loading) {
         return (
@@ -136,8 +75,46 @@ export function OverviewTab() {
         )
     }
 
-    const savings = data.totalIncome - data.totalExpenses - data.totalBills
-    const prevSavings = previousData.totalIncome - previousData.totalExpenses - previousData.totalBills
+    // Calculations
+    const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0)
+    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
+    const totalBills = bills.reduce((sum, b) => sum + b.amount, 0)
+
+    const prevTotalIncome = prevIncomes.reduce((sum, i) => sum + i.amount, 0)
+    const prevTotalExpenses = prevExpenses.reduce((sum, e) => sum + e.amount, 0)
+    const prevTotalBills = prevBills.reduce((sum, b) => sum + b.amount, 0)
+
+    const savings = totalIncome - totalExpenses - totalBills
+    const prevSavings = prevTotalIncome - prevTotalExpenses - prevTotalBills
+
+    // Group expenses by category
+    const categoryMap = new Map<string, number>()
+    expenses.forEach(expense => {
+        const current = categoryMap.get(expense.category) || 0
+        categoryMap.set(expense.category, current + expense.amount)
+    })
+
+    const expensesByCategory = Array.from(categoryMap.entries())
+        .map(([name, value]) => ({
+            name,
+            value,
+            color: COLORS[name as keyof typeof COLORS] || COLORS['אחר']
+        }))
+        .sort((a, b) => b.value - a.value)
+
+    // Derived Data Object for compatibility
+    const data = {
+        totalIncome,
+        totalExpenses,
+        totalBills,
+        expensesByCategory
+    }
+
+    const previousData = {
+        totalIncome: prevTotalIncome,
+        totalExpenses: prevTotalExpenses,
+        totalBills: prevTotalBills
+    }
 
     // Calculate percentage changes
     const calculateChange = (current: number, previous: number) => {

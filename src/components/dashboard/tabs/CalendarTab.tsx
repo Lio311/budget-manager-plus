@@ -1,12 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import useSWR, { mutate } from 'swr'
+
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Check, Loader2 } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency, getDaysInMonth, getMonthName } from '@/lib/utils'
-import { getCalendarPayments } from '@/lib/actions/calendar'
+import { getBills } from '@/lib/actions/bill'
+import { getDebts } from '@/lib/actions/debts'
+import { getIncomes } from '@/lib/actions/income'
+import { getExpenses } from '@/lib/actions/expense'
+import { getSavings } from '@/lib/actions/savings'
 import { toggleBillPaid } from '@/lib/actions/bill'
 import { toggleDebtPaid } from '@/lib/actions/debts'
 import { useToast } from '@/hooks/use-toast'
@@ -23,31 +29,66 @@ interface Payment {
 export function CalendarTab() {
     const { month, year, currency } = useBudget()
     const { toast } = useToast()
-    const [payments, setPayments] = useState<Payment[]>([])
-    const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
-        loadPayments()
-    }, [month, year])
+    // Fetchers
+    const fetchBills = async () => (await getBills(month, year)).data || []
+    const fetchDebts = async () => (await getDebts(month, year)).data || []
+    const fetchIncomes = async () => (await getIncomes(month, year)).data || []
+    const fetchExpenses = async () => (await getExpenses(month, year)).data || []
+    const fetchSavings = async () => (await getSavings(month, year)).data || []
 
-    async function loadPayments() {
-        setLoading(true)
-        const result = await getCalendarPayments(month, year)
+    // SWR Hooks
+    const { data: bills = [], isLoading: loadingBills, mutate: mutateBills } = useSWR(['bills', month, year], fetchBills)
+    const { data: debts = [], isLoading: loadingDebts, mutate: mutateDebts } = useSWR(['debts', month, year], fetchDebts)
+    const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year], fetchIncomes)
+    const { data: expenses = [], isLoading: loadingExpenses } = useSWR(['expenses', month, year], fetchExpenses)
+    const { data: savings = [], isLoading: loadingSavings } = useSWR(['savings', month, year], fetchSavings)
 
-        if (result.success && result.data) {
-            setPayments(result.data)
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לטעון תשלומים',
-                variant: 'destructive'
-            })
-        }
-        setLoading(false)
-    }
+    const loading = loadingBills || loadingDebts || loadingIncomes || loadingExpenses || loadingSavings
 
-    const daysInMonth = getDaysInMonth(month, year)
-    const firstDayOfMonth = new Date(year, month - 1, 1).getDay()
+    // Aggregate Payments
+    const payments: Payment[] = [
+        ...bills.map((bill: any) => ({
+            id: bill.id,
+            name: bill.name,
+            amount: bill.amount,
+            day: bill.dueDay,
+            type: 'bill' as const,
+            isPaid: bill.isPaid
+        })),
+        ...debts.map((debt: any) => ({
+            id: debt.id,
+            name: debt.creditor,
+            amount: debt.monthlyPayment,
+            day: debt.dueDay,
+            type: 'debt' as const,
+            isPaid: debt.isPaid
+        })),
+        ...incomes.map((income: any) => ({
+            id: income.id,
+            name: income.source,
+            amount: income.amount,
+            day: income.date ? new Date(income.date).getDate() : 1,
+            type: 'income' as const,
+            isPaid: true
+        })),
+        ...expenses.map((expense: any) => ({
+            id: expense.id,
+            name: expense.description,
+            amount: expense.amount,
+            day: expense.date ? new Date(expense.date).getDate() : 1,
+            type: 'expense' as const,
+            isPaid: true
+        })),
+        ...savings.map((saving: any) => ({
+            id: saving.id,
+            name: saving.description,
+            amount: saving.monthlyDeposit,
+            day: saving.date ? new Date(saving.date).getDate() : 1,
+            type: 'saving' as const,
+            isPaid: true
+        }))
+    ]
 
     const togglePaid = async (payment: Payment) => {
         const result = payment.type === 'bill'
@@ -55,7 +96,11 @@ export function CalendarTab() {
             : await toggleDebtPaid(payment.id, !payment.isPaid)
 
         if (result.success) {
-            await loadPayments()
+            if (payment.type === 'bill') {
+                mutateBills()
+            } else {
+                mutateDebts()
+            }
         } else {
             toast({
                 title: 'שגיאה',
@@ -64,6 +109,9 @@ export function CalendarTab() {
             })
         }
     }
+
+    const daysInMonth = getDaysInMonth(month, year)
+    const firstDayOfMonth = new Date(year, month - 1, 1).getDay()
 
     const getPaymentsForDay = (day: number) => {
         return payments.filter(p => p.day === day)

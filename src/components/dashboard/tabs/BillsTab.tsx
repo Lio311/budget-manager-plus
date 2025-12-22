@@ -1,5 +1,7 @@
 'use client'
 
+import useSWR from 'swr'
+
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -21,8 +23,24 @@ interface Bill {
 export function BillsTab() {
     const { month, year, currency } = useBudget()
     const { toast } = useToast()
-    const [bills, setBills] = useState<Bill[]>([])
-    const [loading, setLoading] = useState(true)
+    const fetcher = async () => {
+        const result = await getBills(month, year)
+        if (result.success && result.data) return result.data
+        throw new Error(result.error || 'Failed to fetch bills')
+    }
+
+    const { data: bills = [], isLoading: loading, mutate } = useSWR(['bills', month, year], fetcher, {
+        revalidateOnFocus: false,
+        onError: (err) => {
+            toast({
+                title: 'שגיאה',
+                description: 'לא ניתן לטעון חשבונות',
+                variant: 'destructive',
+                duration: 1000
+            })
+        }
+    })
+
     const [submitting, setSubmitting] = useState(false)
     const [newBill, setNewBill] = useState({ name: '', amount: '', dueDay: '' })
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -31,27 +49,6 @@ export function BillsTab() {
     const totalBills = bills.reduce((sum, bill) => sum + bill.amount, 0)
     const paidBills = bills.filter(b => b.isPaid).reduce((sum, bill) => sum + bill.amount, 0)
     const unpaidBills = totalBills - paidBills
-
-    useEffect(() => {
-        loadBills()
-    }, [month, year])
-
-    async function loadBills() {
-        setLoading(true)
-        const result = await getBills(month, year)
-
-        if (result.success && result.data) {
-            setBills(result.data)
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לטעון חשבונות',
-                variant: 'destructive',
-                duration: 1000
-            })
-        }
-        setLoading(false)
-    }
 
     async function handleAdd() {
         if (!newBill.name || !newBill.amount || !newBill.dueDay) {
@@ -86,7 +83,7 @@ export function BillsTab() {
                 description: 'החשבון נוסף בהצלחה'
             })
             setNewBill({ name: '', amount: '', dueDay: '' })
-            await loadBills()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',
@@ -101,7 +98,7 @@ export function BillsTab() {
         const result = await toggleBillPaid(id, !currentStatus)
 
         if (result.success) {
-            await loadBills()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',
@@ -163,7 +160,7 @@ export function BillsTab() {
             })
             setEditingId(null)
             setEditData({ name: '', amount: '', dueDay: '' })
-            await loadBills()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',
@@ -183,7 +180,7 @@ export function BillsTab() {
                 title: 'הצלחה',
                 description: 'החשבון נמחק בהצלחה'
             })
-            await loadBills()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',

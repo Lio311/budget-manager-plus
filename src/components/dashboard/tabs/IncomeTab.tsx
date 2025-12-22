@@ -1,5 +1,7 @@
 'use client'
 
+import useSWR from 'swr'
+
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -23,35 +25,30 @@ interface Income {
 export function IncomeTab() {
     const { month, year, currency } = useBudget()
     const { toast } = useToast()
-    const [incomes, setIncomes] = useState<Income[]>([])
-    const [loading, setLoading] = useState(true)
+    const fetcher = async () => {
+        const result = await getIncomes(month, year)
+        if (result.success && result.data) return result.data
+        throw new Error(result.error || 'Failed to fetch incomes')
+    }
+
+    const { data: incomes = [], isLoading: loading, mutate } = useSWR(['incomes', month, year], fetcher, {
+        revalidateOnFocus: false,
+        onError: (err) => {
+            toast({
+                title: 'שגיאה',
+                description: 'לא ניתן לטעון הכנסות',
+                variant: 'destructive',
+                duration: 1000
+            })
+        }
+    })
+
     const [submitting, setSubmitting] = useState(false)
     const [newIncome, setNewIncome] = useState({ source: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ source: '', amount: '', date: '' })
 
     const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0)
-
-    useEffect(() => {
-        loadIncomes()
-    }, [month, year])
-
-    async function loadIncomes() {
-        setLoading(true)
-        const result = await getIncomes(month, year)
-
-        if (result.success && result.data) {
-            setIncomes(result.data)
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לטעון הכנסות',
-                variant: 'destructive',
-                duration: 1000
-            })
-        }
-        setLoading(false)
-    }
 
     async function handleAdd() {
         if (!newIncome.source || !newIncome.amount) {
@@ -81,7 +78,7 @@ export function IncomeTab() {
                 duration: 1000
             })
             setNewIncome({ source: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
-            await loadIncomes()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',
@@ -102,7 +99,7 @@ export function IncomeTab() {
                 description: 'ההכנסה נמחקה בהצלחה',
                 duration: 1000
             })
-            await loadIncomes()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',
@@ -153,7 +150,7 @@ export function IncomeTab() {
             })
             setEditingId(null)
             setEditData({ source: '', amount: '', date: '' })
-            await loadIncomes()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',

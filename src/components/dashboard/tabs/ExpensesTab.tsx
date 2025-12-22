@@ -1,5 +1,7 @@
 'use client'
 
+import useSWR from 'swr'
+
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -35,8 +37,24 @@ const CATEGORY_COLORS: Record<string, string> = {
 export function ExpensesTab() {
     const { month, year, currency } = useBudget()
     const { toast } = useToast()
-    const [expenses, setExpenses] = useState<Expense[]>([])
-    const [loading, setLoading] = useState(true)
+    const fetcher = async () => {
+        const result = await getExpenses(month, year)
+        if (result.success && result.data) return result.data
+        throw new Error(result.error || 'Failed to fetch expenses')
+    }
+
+    const { data: expenses = [], isLoading: loading, mutate } = useSWR(['expenses', month, year], fetcher, {
+        revalidateOnFocus: false,
+        onError: (err) => {
+            toast({
+                title: 'שגיאה',
+                description: 'לא ניתן לטעון הוצאות',
+                variant: 'destructive',
+                duration: 1000
+            })
+        }
+    })
+
     const [submitting, setSubmitting] = useState(false)
     const [newExpense, setNewExpense] = useState({ category: 'מזון', description: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
     const [filterCategory, setFilterCategory] = useState<string>('הכל')
@@ -47,27 +65,6 @@ export function ExpensesTab() {
     const filteredExpenses = filterCategory === 'הכל'
         ? expenses
         : expenses.filter(e => e.category === filterCategory)
-
-    useEffect(() => {
-        loadExpenses()
-    }, [month, year])
-
-    async function loadExpenses() {
-        setLoading(true)
-        const result = await getExpenses(month, year)
-
-        if (result.success && result.data) {
-            setExpenses(result.data)
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לטעון הוצאות',
-                variant: 'destructive',
-                duration: 1000
-            })
-        }
-        setLoading(false)
-    }
 
     async function handleAdd() {
         if (!newExpense.category || !newExpense.description || !newExpense.amount || !newExpense.date) {
@@ -98,7 +95,7 @@ export function ExpensesTab() {
                 duration: 1000
             })
             setNewExpense({ category: 'מזון', description: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
-            await loadExpenses()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',
@@ -119,7 +116,7 @@ export function ExpensesTab() {
                 description: 'ההוצאה נמחקה בהצלחה',
                 duration: 1000
             })
-            await loadExpenses()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',
@@ -172,7 +169,7 @@ export function ExpensesTab() {
             })
             setEditingId(null)
             setEditData({ category: '', description: '', amount: '', date: '' })
-            await loadExpenses()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',

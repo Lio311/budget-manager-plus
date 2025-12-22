@@ -36,6 +36,8 @@ export function SavingsTab() {
     const [savings, setSavings] = useState<Saving[]>([])
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
+
+    // Create form state
     const [newSaving, setNewSaving] = useState({
         type: '',
         description: '',
@@ -46,12 +48,15 @@ export function SavingsTab() {
         recurringStartDate: undefined as Date | undefined,
         recurringEndDate: undefined as Date | undefined
     })
+
+    // Edit form state
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({
         type: '',
         description: '',
         monthlyDeposit: '',
-        goal: ''
+        goal: '',
+        date: new Date() // Added date here
     })
 
     const totalMonthlyDeposit = savings.reduce((sum, saving) => sum + saving.monthlyDeposit, 0)
@@ -146,13 +151,14 @@ export function SavingsTab() {
             type: saving.type,
             description: saving.description,
             monthlyDeposit: saving.monthlyDeposit.toString(),
-            goal: saving.goal || ''
+            goal: saving.goal || '',
+            date: new Date(saving.date) // Load existing date
         })
     }
 
     const cancelEdit = () => {
         setEditingId(null)
-        setEditData({ type: '', description: '', monthlyDeposit: '', goal: '' })
+        setEditData({ type: '', description: '', monthlyDeposit: '', goal: '', date: new Date() })
     }
 
     const handleUpdate = async (id: string) => {
@@ -161,7 +167,8 @@ export function SavingsTab() {
             type: editData.type,
             description: editData.description,
             monthlyDeposit: parseFloat(editData.monthlyDeposit),
-            goal: editData.goal || undefined
+            goal: editData.goal || undefined,
+            date: editData.date // Send updated date
         })
 
         if (result.success) {
@@ -268,7 +275,7 @@ export function SavingsTab() {
                             </div>
 
                             {/* Recurring Savings Options */}
-                            <div className="flex items-start gap-4 p-4 border rounded-lg">
+                            <div className="flex items-start gap-4 p-4 mt-3 border rounded-lg">
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="recurring-saving"
@@ -323,7 +330,7 @@ export function SavingsTab() {
                                 >
                                     {editingId === saving.id ? (
                                         <>
-                                            <div className="grid gap-2 sm:grid-cols-4 flex-1 w-full">
+                                            <div className="grid gap-2 sm:grid-cols-5 flex-1 w-full">
                                                 <Select value={editData.type} onValueChange={(value) => setEditData({ ...editData, type: value })}>
                                                     <SelectTrigger>
                                                         <SelectValue />
@@ -350,8 +357,14 @@ export function SavingsTab() {
                                                     onChange={(e) => setEditData({ ...editData, goal: e.target.value })}
                                                     placeholder="מטרה"
                                                 />
+                                                {/* ADDED DATE PICKER TO EDIT MODE */}
+                                                <DatePicker
+                                                    date={editData.date}
+                                                    setDate={(date) => setEditData({ ...editData, date: date || new Date() })}
+                                                    placeholder="תאריך"
+                                                />
                                             </div>
-                                            <div className="flex gap-2 w-full sm:w-auto">
+                                            <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                                                 <Button onClick={() => handleUpdate(saving.id)} size="sm" disabled={submitting}>
                                                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                                 </Button>

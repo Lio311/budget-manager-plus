@@ -273,7 +273,7 @@ export function DebtsTab() {
                                 />
                                 <Input
                                     type="number"
-                                    placeholder="יום (1-31)"
+                                    placeholder="יום תשלום"
                                     min="1"
                                     max="31"
                                     value={newDebt.dueDay}
@@ -376,7 +376,7 @@ export function DebtsTab() {
                                                 />
                                                 <Input
                                                     type="number"
-                                                    placeholder="יום (1-31)"
+                                                    placeholder="יום תשלום"
                                                     min="1"
                                                     max="31"
                                                     value={editData.dueDay}
