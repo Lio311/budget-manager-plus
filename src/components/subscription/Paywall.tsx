@@ -4,22 +4,29 @@ import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { useAuth } from '@clerk/nextjs'
 import { createSubscription } from '@/lib/actions/subscription'
 import { Check } from 'lucide-react'
+import Image from 'next/image'
 
 export function Paywall() {
     const { userId } = useAuth()
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">
             <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
-                <h1 className="text-3xl font-bold text-center mb-2">
-                    Budget Manager Plus
-                </h1>
+                <div className="flex justify-center mb-4">
+                    <Image
+                        src="/keseflow.png"
+                        alt="KesefFlow"
+                        width={200}
+                        height={60}
+                        className="h-16 w-auto"
+                    />
+                </div>
                 <p className="text-center text-gray-600 mb-8">
                     ניהול תקציב חכם ופשוט
                 </p>
 
-                <div className="text-center mb-8 bg-purple-50 rounded-xl p-6">
-                    <div className="text-6xl font-black text-purple-600 mb-2">
+                <div className="text-center mb-8 bg-green-50 rounded-xl p-6">
+                    <div className="text-6xl font-black text-green-600 mb-2">
                         ₪50
                     </div>
                     <div className="text-gray-600 text-lg">לשנה שלמה</div>
@@ -28,7 +35,7 @@ export function Paywall() {
 
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                     <p className="text-sm text-red-800 font-medium">
-                        ⚠️ <strong>חשוב:</strong> אם לא תחדש את המנוי בתום השנה, כל הנתונים שלך יימחקו לצמיתות.
+                        <strong>חשוב:</strong> אם לא תחדש את המנוי בתום השנה, כל הנתונים שלך יימחקו לצמיתות.
                     </p>
                 </div>
 
