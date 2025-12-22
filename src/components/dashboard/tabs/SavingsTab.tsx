@@ -1,317 +1,371 @@
 'use client'
 
+import useSWR from 'swr'
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Plus, Trash2, Loader2, Pencil, X, Check } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getSavings, addSaving, deleteSaving, updateSaving } from '@/lib/actions/savings'
+import { getCategories, addCategory } from '@/lib/actions/category'
 import { useToast } from '@/hooks/use-toast'
 import { DatePicker } from '@/components/ui/date-picker'
+import { format } from 'date-fns'
+import { PRESET_COLORS } from '@/lib/constants'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface Saving {
     id: string
     type: string
+    category: string
     description: string
     monthlyDeposit: number
     goal: string | null
     date: Date
 }
 
-const SAVING_TYPES = [
-    { value: 'bank_deposit', label: 'פיקדון בבנק' },
-    { value: 'pension_fund', label: 'קופת גמל' },
-    { value: 'provident_fund', label: 'קרן השתלמות' },
-    { value: 'study_fund', label: 'קרן השתלמות לימודים' },
-    { value: 'other', label: 'אחר' }
-]
+interface Category {
+    id: string
+    name: string
+    color: string | null
+}
 
 export function SavingsTab() {
     const { month, year, currency } = useBudget()
     const { toast } = useToast()
-    const [savings, setSavings] = useState<Saving[]>([])
-    const [loading, setLoading] = useState(true)
+
+    // --- Data Fetching ---
+
+    // Savings Fetcher
+    const fetcherSavings = async () => {
+        const result = await getSavings(month, year)
+        if (result.success && result.data) return result.data
+        throw new Error(result.error || 'Failed to fetch savings')
+    }
+
+    const { data: savings = [], isLoading: loadingSavings, mutate: mutateSavings } = useSWR(
+        ['savings', month, year],
+        fetcherSavings,
+        { revalidateOnFocus: false }
+    )
+
+    // Categories Fetcher
+    const fetcherCategories = async () => {
+        const result = await getCategories('saving')
+        if (result.success && result.data) return result.data
+        return []
+    }
+
+    const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
+        ['categories', 'saving'],
+        fetcherCategories,
+        { revalidateOnFocus: false }
+    )
+
+    // --- State ---
+
     const [submitting, setSubmitting] = useState(false)
 
     // Create form state
     const [newSaving, setNewSaving] = useState({
-        type: '',
+        category: '',
         description: '',
         monthlyDeposit: '',
         goal: '',
         date: new Date(),
         isRecurring: false,
-        recurringStartDate: undefined as Date | undefined,
         recurringEndDate: undefined as Date | undefined
     })
 
     // Edit form state
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({
-        type: '',
+        category: '',
         description: '',
         monthlyDeposit: '',
         goal: '',
-        date: new Date() // Added date here
+        date: new Date()
     })
 
-    const totalMonthlyDeposit = savings.reduce((sum, saving) => sum + saving.monthlyDeposit, 0)
+    // New Category State
+    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
+    const [newCategoryName, setNewCategoryName] = useState('')
+    const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
 
+    // Set default category
     useEffect(() => {
-        loadSavings()
-    }, [month, year])
-
-    async function loadSavings() {
-        setLoading(true)
-        const result = await getSavings(month, year)
-
-        if (result.success && result.data) {
-            setSavings(result.data)
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לטעון חסכונות',
-                variant: 'destructive',
-                duration: 1000
-            })
+        if (categories.length > 0 && !newSaving.category) {
+            setNewSaving(prev => ({ ...prev, category: categories[0].name }))
         }
-        setLoading(false)
-    }
+    }, [categories, newSaving.category])
 
-    const handleAdd = async () => {
-        if (newSaving.type && newSaving.description && newSaving.monthlyDeposit) {
-            setSubmitting(true)
-            const result = await addSaving(month, year, {
-                type: newSaving.type,
-                description: newSaving.description,
-                monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
-                goal: newSaving.goal || undefined,
-                date: newSaving.date,
-                isRecurring: newSaving.isRecurring,
-                recurringStartDate: newSaving.recurringStartDate,
-                recurringEndDate: newSaving.recurringEndDate
-            })
+    const totalMonthlyDeposit = savings.reduce((sum: number, saving: any) => sum + saving.monthlyDeposit, 0)
 
-            if (result.success) {
-                setNewSaving({
-                    type: '',
-                    description: '',
-                    monthlyDeposit: '',
-                    goal: '',
-                    date: new Date(),
-                    isRecurring: false,
-                    recurringStartDate: undefined,
-                    recurringEndDate: undefined
-                })
-                await loadSavings()
-                toast({
-                    title: 'הצלחה',
-                    description: 'החיסכון נוסף בהצלחה',
-                    duration: 1000
-                })
-            } else {
-                toast({
-                    title: 'שגיאה',
-                    description: result.error || 'לא ניתן להוסיף חיסכון',
-                    variant: 'destructive',
-                    duration: 1000
-                })
-            }
-            setSubmitting(false)
+    // --- Actions ---
+
+    async function handleAdd() {
+        if (!newSaving.category || !newSaving.description || !newSaving.monthlyDeposit) {
+            toast({ title: 'שגיאה', description: 'נא למלא את כל השדות החובה', variant: 'destructive' })
+            return
         }
-    }
 
-    const handleDelete = async (id: string) => {
-        const result = await deleteSaving(id)
+        setSubmitting(true)
+        const result = await addSaving(month, year, {
+            category: newSaving.category,
+            description: newSaving.description,
+            monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
+            goal: newSaving.goal || undefined,
+            date: newSaving.date,
+            isRecurring: newSaving.isRecurring,
+            recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
+            recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined
+        })
 
         if (result.success) {
-            await loadSavings()
-            toast({
-                title: 'הצלחה',
-                description: 'החיסכון נמחק בהצלחה',
-                duration: 1000
+            toast({ title: 'הצלחה', description: 'החיסכון נוסף בהצלחה' })
+            setNewSaving({
+                category: '',
+                description: '',
+                monthlyDeposit: '',
+                goal: '',
+                date: new Date(),
+                isRecurring: false,
+                recurringEndDate: undefined
             })
+            await mutateSavings()
         } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן למחוק חיסכון',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חיסכון', variant: 'destructive' })
+        }
+        setSubmitting(false)
+    }
+
+    async function handleAddCategory() {
+        if (!newCategoryName.trim()) return
+
+        setSubmitting(true)
+        const result = await addCategory({
+            name: newCategoryName.trim(),
+            type: 'saving',
+            color: newCategoryColor
+        })
+
+        if (result.success) {
+            toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
+            setNewCategoryName('')
+            setIsAddCategoryOpen(false)
+            await mutateCategories()
+            setNewSaving(prev => ({ ...prev, category: newCategoryName.trim() }))
+        } else {
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
+        }
+        setSubmitting(false)
+    }
+
+    async function handleDelete(id: string) {
+        const result = await deleteSaving(id)
+        if (result.success) {
+            toast({ title: 'הצלחה', description: 'החיסכון נמחק בהצלחה' })
+            await mutateSavings()
+        } else {
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק חיסכון', variant: 'destructive' })
         }
     }
 
     const startEdit = (saving: Saving) => {
         setEditingId(saving.id)
         setEditData({
-            type: saving.type,
+            category: saving.category || saving.type || '',
             description: saving.description,
             monthlyDeposit: saving.monthlyDeposit.toString(),
             goal: saving.goal || '',
-            date: new Date(saving.date) // Load existing date
+            date: new Date(saving.date)
         })
     }
 
     const cancelEdit = () => {
         setEditingId(null)
-        setEditData({ type: '', description: '', monthlyDeposit: '', goal: '', date: new Date() })
+        setEditData({ category: '', description: '', monthlyDeposit: '', goal: '', date: new Date() })
     }
 
-    const handleUpdate = async (id: string) => {
+    async function handleUpdate(id: string) {
         setSubmitting(true)
         const result = await updateSaving(id, {
-            type: editData.type,
+            category: editData.category,
             description: editData.description,
             monthlyDeposit: parseFloat(editData.monthlyDeposit),
             goal: editData.goal || undefined,
-            date: editData.date // Send updated date
+            date: editData.date
         })
 
         if (result.success) {
+            toast({ title: 'הצלחה', description: 'החיסכון עודכן בהצלחה' })
             setEditingId(null)
-            await loadSavings()
-            toast({
-                title: 'הצלחה',
-                description: 'החיסכון עודכן בהצלחה',
-                duration: 1000
-            })
+            await mutateSavings()
         } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לעדכן חיסכון',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן חיסכון', variant: 'destructive' })
         }
         setSubmitting(false)
     }
 
-    const getTypeLabel = (type: string) => {
-        return SAVING_TYPES.find(t => t.value === type)?.label || type
+    const getCategoryColor = (catName: string) => {
+        const cat = categories.find(c => c.name === catName)
+        return cat?.color || 'bg-gray-100 text-gray-700 border-gray-200'
+    }
+
+    if (loadingSavings) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
     }
 
     return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10">
-            {loading ? (
-                <div className="flex items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-            ) : (
-                <>
-                    {/* Summary Cards */}
-                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-                        <Card className="bg-gradient-to-l from-green-50 to-white border-green-200 shadow-sm">
-                            <CardHeader className="p-4 pb-2">
-                                <CardTitle className="text-green-700 text-xs sm:text-sm">סך הפקדות חודשיות</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-4 pt-0">
-                                <div className="text-xl sm:text-2xl font-bold text-green-600 break-all">
-                                    {formatCurrency(totalMonthlyDeposit, currency)}
-                                </div>
-                            </CardContent>
-                        </Card>
+            {/* Summary Cards */}
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                <Card className="bg-gradient-to-l from-green-50 to-white border-green-200 shadow-sm">
+                    <CardHeader className="p-4 pb-2">
+                        <CardTitle className="text-green-700 text-xs sm:text-sm">סך הפקדות חודשיות</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-0">
+                        <div className="text-xl sm:text-2xl font-bold text-green-600 break-all">
+                            {formatCurrency(totalMonthlyDeposit, currency)}
+                        </div>
+                    </CardContent>
+                </Card>
 
-                        <Card className="bg-gradient-to-l from-blue-50 to-white border-blue-200 shadow-sm">
-                            <CardHeader className="p-4 pb-2">
-                                <CardTitle className="text-blue-700 text-xs sm:text-sm">מספר חסכונות</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-4 pt-0">
-                                <div className="text-xl sm:text-2xl font-bold text-blue-600">
-                                    {savings.length}
-                                </div>
-                            </CardContent>
-                        </Card>
+                <Card className="bg-gradient-to-l from-blue-50 to-white border-blue-200 shadow-sm">
+                    <CardHeader className="p-4 pb-2">
+                        <CardTitle className="text-blue-700 text-xs sm:text-sm">מספר חסכונות</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-0">
+                        <div className="text-xl sm:text-2xl font-bold text-blue-600">
+                            {savings.length}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Add New Saving */}
+            <Card className="mx-0 sm:mx-auto">
+                <CardHeader>
+                    <CardTitle className="text-lg">הוסף חיסכון חדש</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6 items-end">
+                        <div className="sm:col-span-2 lg:col-span-1 flex gap-2">
+                            <select
+                                className="w-full p-2 border rounded-md h-10 bg-background"
+                                value={newSaving.category}
+                                onChange={(e) => setNewSaving({ ...newSaving, category: e.target.value })}
+                                disabled={submitting}
+                            >
+                                <option value="" disabled>בחר סוג</option>
+                                {categories.map(cat => (
+                                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                ))}
+                            </select>
+                            <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" size="icon" className="shrink-0">
+                                        <Plus className="h-4 w-4" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80 p-4" dir="rtl">
+                                    <div className="space-y-4">
+                                        <h4 className="font-medium leading-none mb-4">קטגוריה חדשה</h4>
+                                        <div className="space-y-2">
+                                            <Input
+                                                placeholder="שם הקטגוריה"
+                                                value={newCategoryName}
+                                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-5 gap-2">
+                                            {PRESET_COLORS.map((color) => (
+                                                <div
+                                                    key={color.name}
+                                                    className={`h-6 w-6 rounded-full cursor-pointer border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-primary' : 'border-transparent'
+                                                        }`}
+                                                    onClick={() => setNewCategoryColor(color.class)}
+                                                    title={color.name}
+                                                />
+                                            ))}
+                                        </div>
+                                        <Button onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>
+                                            שמור קטגוריה
+                                        </Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+
+                        <Input
+                            placeholder="תיאור"
+                            value={newSaving.description}
+                            onChange={(e) => setNewSaving({ ...newSaving, description: e.target.value })}
+                            className="sm:col-span-2 lg:col-span-1"
+                        />
+                        <Input
+                            type="number"
+                            placeholder="הפקדה חודשית"
+                            value={newSaving.monthlyDeposit}
+                            onChange={(e) => setNewSaving({ ...newSaving, monthlyDeposit: e.target.value })}
+                        />
+                        <Input
+                            placeholder="מטרה (אופציונלי)"
+                            value={newSaving.goal}
+                            onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
+                        />
+                        <div className="flex flex-col gap-1">
+                            <DatePicker
+                                date={newSaving.date}
+                                setDate={(date) => setNewSaving({ ...newSaving, date: date || new Date() })}
+                                placeholder="תאריך"
+                            />
+                        </div>
+                        <Button onClick={handleAdd} className="w-full gap-2 sm:col-span-2 lg:col-span-1" disabled={submitting}>
+                            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                            הוסף
+                        </Button>
                     </div>
 
-                    {/* Add New Saving */}
-                    <Card className="mx-0 sm:mx-auto">
-                        <CardHeader>
-                            <CardTitle className="text-lg">הוסף חיסכון חדש</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-                                <Select value={newSaving.type} onValueChange={(value) => setNewSaving({ ...newSaving, type: value })}>
-                                    <SelectTrigger className="sm:col-span-2 lg:col-span-1">
-                                        <SelectValue placeholder="סוג חיסכון" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {SAVING_TYPES.map((type) => (
-                                            <SelectItem key={type.value} value={type.value}>
-                                                {type.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <Input
-                                    placeholder="תיאור"
-                                    value={newSaving.description}
-                                    onChange={(e) => setNewSaving({ ...newSaving, description: e.target.value })}
-                                    className="sm:col-span-2 lg:col-span-1"
-                                />
-                                <Input
-                                    type="number"
-                                    placeholder="הפקדה חודשית"
-                                    value={newSaving.monthlyDeposit}
-                                    onChange={(e) => setNewSaving({ ...newSaving, monthlyDeposit: e.target.value })}
-                                />
-                                <Input
-                                    placeholder="מטרה (אופציונלי)"
-                                    value={newSaving.goal}
-                                    onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
-                                />
-                                <DatePicker
-                                    date={newSaving.date}
-                                    setDate={(date) => setNewSaving({ ...newSaving, date: date || new Date() })}
-                                    placeholder="תאריך"
-                                />
-                                <Button onClick={handleAdd} className="w-full gap-2 sm:col-span-2 lg:col-span-1" disabled={submitting}>
-                                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                                    הוסף
-                                </Button>
-                            </div>
+                    {/* Recurring Savings Options */}
+                    <div className="flex items-start gap-4 p-4 mt-3 border rounded-lg">
+                        <div className="flex items-center gap-2">
+                            <Checkbox
+                                id="recurring-saving"
+                                checked={newSaving.isRecurring}
+                                onCheckedChange={(checked) => setNewSaving({ ...newSaving, isRecurring: checked as boolean })}
+                            />
+                            <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer">
+                                חיסכון קבוע
+                            </label>
+                        </div>
 
-                            {/* Recurring Savings Options */}
-                            <div className="flex items-start gap-4 p-4 mt-3 border rounded-lg">
-                                <div className="flex items-center gap-2">
-                                    <Checkbox
-                                        id="recurring-saving"
-                                        checked={newSaving.isRecurring}
-                                        onCheckedChange={(checked) => setNewSaving({ ...newSaving, isRecurring: checked as boolean })}
+                        {newSaving.isRecurring && (
+                            <div className="flex gap-4 flex-1">
+                                <div className="space-y-2 flex-1">
+                                    <label className="text-sm font-medium">תאריך סיום</label>
+                                    <DatePicker
+                                        date={newSaving.recurringEndDate}
+                                        setDate={(date) => setNewSaving({ ...newSaving, recurringEndDate: date })}
+                                        placeholder="בחר תאריך סיום"
                                     />
-                                    <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer">
-                                        חיסכון קבוע
-                                    </label>
                                 </div>
-
-                                {newSaving.isRecurring && (
-                                    <div className="flex gap-4 flex-1">
-                                        <div className="space-y-2 flex-1">
-                                            <label className="text-sm font-medium">תאריך התחלה</label>
-                                            <DatePicker
-                                                date={newSaving.recurringStartDate}
-                                                setDate={(date) => setNewSaving({ ...newSaving, recurringStartDate: date })}
-                                                placeholder="בחר תאריך התחלה"
-                                            />
-                                        </div>
-                                        <div className="space-y-2 flex-1">
-                                            <label className="text-sm font-medium">תאריך סיום</label>
-                                            <DatePicker
-                                                date={newSaving.recurringEndDate}
-                                                setDate={(date) => setNewSaving({ ...newSaving, recurringEndDate: date })}
-                                                placeholder="בחר תאריך סיום"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
                             </div>
-                        </CardContent>
-                    </Card>
-                </>
-            )}
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Savings List */}
             <Card>
@@ -323,7 +377,7 @@ export function SavingsTab() {
                         {savings.length === 0 ? (
                             <p className="text-center text-muted-foreground py-8 italic">אין חסכונות רשומים</p>
                         ) : (
-                            savings.map((saving) => (
+                            savings.map((saving: any) => (
                                 <div
                                     key={saving.id}
                                     className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-accent transition-colors gap-3"
@@ -331,18 +385,15 @@ export function SavingsTab() {
                                     {editingId === saving.id ? (
                                         <>
                                             <div className="grid gap-2 sm:grid-cols-5 flex-1 w-full">
-                                                <Select value={editData.type} onValueChange={(value) => setEditData({ ...editData, type: value })}>
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {SAVING_TYPES.map((type) => (
-                                                            <SelectItem key={type.value} value={type.value}>
-                                                                {type.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                <select
+                                                    className="p-2 border rounded-md bg-background h-10"
+                                                    value={editData.category}
+                                                    onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                                                >
+                                                    {categories.map(cat => (
+                                                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                                    ))}
+                                                </select>
                                                 <Input
                                                     value={editData.description}
                                                     onChange={(e) => setEditData({ ...editData, description: e.target.value })}
@@ -357,7 +408,6 @@ export function SavingsTab() {
                                                     onChange={(e) => setEditData({ ...editData, goal: e.target.value })}
                                                     placeholder="מטרה"
                                                 />
-                                                {/* ADDED DATE PICKER TO EDIT MODE */}
                                                 <DatePicker
                                                     date={editData.date}
                                                     setDate={(date) => setEditData({ ...editData, date: date || new Date() })}
@@ -377,8 +427,8 @@ export function SavingsTab() {
                                         <>
                                             <div className="flex-1 w-full">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                                                        {getTypeLabel(saving.type)}
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(saving.category || saving.type)}`}>
+                                                        {saving.category || saving.type}
                                                     </span>
                                                     <p className="font-medium">{saving.description}</p>
                                                 </div>

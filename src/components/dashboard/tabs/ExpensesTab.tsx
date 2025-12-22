@@ -1,19 +1,24 @@
 'use client'
 
 import useSWR from 'swr'
-
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
-import { Trash2, Plus, Loader2, Pencil, Check, X } from 'lucide-react'
+import { Trash2, Plus, Loader2, Pencil, Check, X, Palette, Settings2 } from 'lucide-react'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Checkbox } from '@/components/ui/checkbox'
 import { format } from 'date-fns'
 import { getExpenses, addExpense, deleteExpense, updateExpense } from '@/lib/actions/expense'
+import { getCategories, addCategory, seedCategories } from '@/lib/actions/category'
 import { useToast } from '@/hooks/use-toast'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface Expense {
     id: string
@@ -23,43 +28,78 @@ interface Expense {
     date: Date | null
 }
 
-const CATEGORIES = ['מזון', 'תחבורה', 'בילויים', 'קניות', 'בריאות', 'חינוך', 'אחר']
-const CATEGORY_COLORS: Record<string, string> = {
-    'מזון': 'bg-green-100 text-green-700 border-green-200',
-    'תחבורה': 'bg-blue-100 text-blue-700 border-blue-200',
-    'בילויים': 'bg-purple-100 text-purple-700 border-purple-200',
-    'קניות': 'bg-pink-100 text-pink-700 border-pink-200',
-    'בריאות': 'bg-red-100 text-red-700 border-red-200',
-    'חינוך': 'bg-yellow-100 text-yellow-700 border-yellow-200',
-    'אחר': 'bg-gray-100 text-gray-700 border-gray-200',
+interface Category {
+    id: string
+    name: string
+    color: string | null
 }
 
+import { PRESET_COLORS } from '@/lib/constants'
+
 export function ExpensesTab() {
+
     const { month, year, currency } = useBudget()
     const { toast } = useToast()
-    const fetcher = async () => {
+
+    // --- Data Fetching ---
+
+    // Expenses Fetcher
+    const fetcherExpenses = async () => {
         const result = await getExpenses(month, year)
         if (result.success && result.data) return result.data
         throw new Error(result.error || 'Failed to fetch expenses')
     }
 
-    const { data: expenses = [], isLoading: loading, mutate } = useSWR(['expenses', month, year], fetcher, {
-        revalidateOnFocus: false,
-        onError: (err) => {
-            toast({
-                title: 'שגיאה',
-                description: 'לא ניתן לטעון הוצאות',
-                variant: 'destructive',
-                duration: 1000
-            })
+    const { data: expenses = [], isLoading: loadingExpenses, mutate: mutateExpenses } = useSWR<Expense[]>(
+        ['expenses', month, year],
+        fetcherExpenses,
+        { revalidateOnFocus: false }
+    )
+
+    // Categories Fetcher
+    const fetcherCategories = async () => {
+        const result = await getCategories('expense')
+        // If no categories, try to seed
+        if (result.success && result.data && result.data.length === 0) {
+            await seedCategories('expense')
+            const retry = await getCategories('expense')
+            if (retry.success && retry.data) return retry.data
         }
-    })
+        if (result.success && result.data) return result.data
+        return []
+    }
+
+    const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
+        ['categories', 'expense'],
+        fetcherCategories,
+        { revalidateOnFocus: false }
+    )
+
+    // --- State ---
 
     const [submitting, setSubmitting] = useState(false)
-    const [newExpense, setNewExpense] = useState({ category: 'מזון', description: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
+    const [newExpense, setNewExpense] = useState({
+        category: '', description: '', amount: '', date: '',
+        isRecurring: false,
+        recurringEndDate: ''
+    })
     const [filterCategory, setFilterCategory] = useState<string>('הכל')
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ category: '', description: '', amount: '', date: '' })
+
+    // New Category State
+    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
+    const [newCategoryName, setNewCategoryName] = useState('')
+    const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
+
+    // Set default category when categories load
+    useEffect(() => {
+        if (categories.length > 0 && !newExpense.category) {
+            setNewExpense(prev => ({ ...prev, category: categories[0].name }))
+        }
+    }, [categories, newExpense.category])
+
+    // --- Actions ---
 
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
     const filteredExpenses = filterCategory === 'הכל'
@@ -68,12 +108,7 @@ export function ExpensesTab() {
 
     async function handleAdd() {
         if (!newExpense.category || !newExpense.description || !newExpense.amount || !newExpense.date) {
-            toast({
-                title: 'שגיאה',
-                description: 'נא למלא את כל השדות',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: 'נא למלא את כל השדות', variant: 'destructive' })
             return
         }
 
@@ -84,46 +119,50 @@ export function ExpensesTab() {
             amount: parseFloat(newExpense.amount),
             date: newExpense.date,
             isRecurring: newExpense.isRecurring,
-            recurringStartDate: newExpense.isRecurring ? newExpense.recurringStartDate : undefined,
+            recurringStartDate: undefined,
             recurringEndDate: newExpense.isRecurring ? newExpense.recurringEndDate : undefined
         })
 
         if (result.success) {
-            toast({
-                title: 'הצלחה',
-                description: 'ההוצאה נוספה בהצלחה',
-                duration: 1000
-            })
-            setNewExpense({ category: 'מזון', description: '', amount: '', date: '', isRecurring: false, recurringStartDate: '', recurringEndDate: '' })
-            await mutate()
+            toast({ title: 'הצלחה', description: 'ההוצאה נוספה בהצלחה' })
+            setNewExpense(prev => ({ ...prev, description: '', amount: '', date: '', isRecurring: false }))
+            await mutateExpenses()
         } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן להוסיף הוצאה',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הוצאה', variant: 'destructive' })
+        }
+        setSubmitting(false)
+    }
+
+    async function handleAddCategory() {
+        if (!newCategoryName.trim()) return
+
+        setSubmitting(true)
+        const result = await addCategory({
+            name: newCategoryName.trim(),
+            type: 'expense',
+            color: newCategoryColor
+        })
+
+        if (result.success) {
+            toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
+            setNewCategoryName('')
+            setIsAddCategoryOpen(false)
+            await mutateCategories()
+            // Select the new category
+            setNewExpense(prev => ({ ...prev, category: newCategoryName.trim() }))
+        } else {
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
         }
         setSubmitting(false)
     }
 
     async function handleDelete(id: string) {
         const result = await deleteExpense(id)
-
         if (result.success) {
-            toast({
-                title: 'הצלחה',
-                description: 'ההוצאה נמחקה בהצלחה',
-                duration: 1000
-            })
-            await mutate()
+            toast({ title: 'הצלחה', description: 'ההוצאה נמחקה בהצלחה' })
+            await mutateExpenses()
         } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן למחוק הוצאה',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הוצאה', variant: 'destructive' })
         }
     }
 
@@ -144,12 +183,7 @@ export function ExpensesTab() {
 
     async function handleUpdate() {
         if (!editingId || !editData.category || !editData.description || !editData.amount || !editData.date) {
-            toast({
-                title: 'שגיאה',
-                description: 'נא למלא את כל השדות',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: 'נא למלא את כל השדות', variant: 'destructive' })
             return
         }
 
@@ -162,26 +196,22 @@ export function ExpensesTab() {
         })
 
         if (result.success) {
-            toast({
-                title: 'הצלחה',
-                description: 'ההוצאה עודכנה בהצלחה',
-                duration: 1000
-            })
+            toast({ title: 'הצלחה', description: 'ההוצאה עודכנה בהצלחה' })
             setEditingId(null)
             setEditData({ category: '', description: '', amount: '', date: '' })
-            await mutate()
+            await mutateExpenses()
         } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לעדכן הוצאה',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן הוצאה', variant: 'destructive' })
         }
         setSubmitting(false)
     }
 
-    if (loading) {
+    const getCategoryColor = (catName: string) => {
+        const cat = categories.find(c => c.name === catName)
+        return cat?.color || 'bg-gray-100 text-gray-700 border-gray-200'
+    }
+
+    if (loadingExpenses) {
         return (
             <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -213,16 +243,53 @@ export function ExpensesTab() {
                         <div className="grid gap-4 md:grid-cols-5 items-end">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">קטגוריה</label>
-                                <select
-                                    className="w-full p-2 border rounded-md"
-                                    value={newExpense.category}
-                                    onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
-                                    disabled={submitting}
-                                >
-                                    {CATEGORIES.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
+                                <div className="flex gap-2">
+                                    <select
+                                        className="w-full p-2 border rounded-md h-10 bg-background"
+                                        value={newExpense.category}
+                                        onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+                                        disabled={submitting}
+                                    >
+                                        <option value="" disabled>בחר קטגוריה</option>
+                                        {categories.map(cat => (
+                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                        ))}
+                                    </select>
+
+                                    <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="outline" size="icon" className="shrink-0">
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-80 p-4" dir="rtl">
+                                            <div className="space-y-4">
+                                                <h4 className="font-medium leading-none mb-4">קטגוריה חדשה</h4>
+                                                <div className="space-y-2">
+                                                    <Input
+                                                        placeholder="שם הקטגוריה"
+                                                        value={newCategoryName}
+                                                        onChange={(e) => setNewCategoryName(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-5 gap-2">
+                                                    {PRESET_COLORS.map((color) => (
+                                                        <div
+                                                            key={color.name}
+                                                            className={`h-6 w-6 rounded-full cursor-pointer border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-primary' : 'border-transparent'
+                                                                }`}
+                                                            onClick={() => setNewCategoryColor(color.class)}
+                                                            title={color.name}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                <Button onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>
+                                                    שמור קטגוריה
+                                                </Button>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">תיאור</label>
@@ -274,21 +341,12 @@ export function ExpensesTab() {
                             </div>
 
                             {newExpense.isRecurring && (
-                                <div className="flex gap-4 flex-1">
-                                    <div className="space-y-2 flex-1">
-                                        <label className="text-sm font-medium">תאריך התחלה</label>
-                                        <DatePicker
-                                            date={newExpense.recurringStartDate ? new Date(newExpense.recurringStartDate) : undefined}
-                                            setDate={(date) => setNewExpense({ ...newExpense, recurringStartDate: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                        />
-                                    </div>
-                                    <div className="space-y-2 flex-1">
-                                        <label className="text-sm font-medium">תאריך סיום</label>
-                                        <DatePicker
-                                            date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
-                                            setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
-                                        />
-                                    </div>
+                                <div className="space-y-2 flex-1">
+                                    <label className="text-sm font-medium">תאריך סיום</label>
+                                    <DatePicker
+                                        date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
+                                        setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                    />
                                 </div>
                             )}
                         </div>
@@ -299,7 +357,9 @@ export function ExpensesTab() {
             {/* Filter */}
             <Card>
                 <CardHeader>
-                    <CardTitle>סינון לפי קטגוריה</CardTitle>
+                    <div className="flex justify-between items-center">
+                        <CardTitle>סינון לפי קטגוריה</CardTitle>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-wrap gap-2">
@@ -310,14 +370,15 @@ export function ExpensesTab() {
                         >
                             הכל
                         </Button>
-                        {CATEGORIES.map(cat => (
+                        {categories.map(cat => (
                             <Button
-                                key={cat}
-                                variant={filterCategory === cat ? 'default' : 'outline'}
-                                onClick={() => setFilterCategory(cat)}
+                                key={cat.id}
+                                variant={filterCategory === cat.name ? 'default' : 'outline'}
+                                onClick={() => setFilterCategory(cat.name)}
                                 size="sm"
+                                className={filterCategory === cat.name ? '' : 'bg-transparent hover:bg-slate-50'}
                             >
-                                {cat}
+                                {cat.name}
                             </Button>
                         ))}
                     </div>
@@ -349,8 +410,8 @@ export function ExpensesTab() {
                                                         onChange={(e) => setEditData({ ...editData, category: e.target.value })}
                                                         disabled={submitting}
                                                     >
-                                                        {CATEGORIES.map(cat => (
-                                                            <option key={cat} value={cat}>{cat}</option>
+                                                        {categories.map(cat => (
+                                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
                                                         ))}
                                                     </select>
                                                     <Input
@@ -398,7 +459,7 @@ export function ExpensesTab() {
                                             <>
                                                 <div className="flex-1">
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${CATEGORY_COLORS[expense.category]}`}>
+                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(expense.category)}`}>
                                                             {expense.category}
                                                         </span>
                                                         <p className="font-medium">{expense.description}</p>
@@ -437,6 +498,6 @@ export function ExpensesTab() {
                     </div>
                 </CardContent>
             </Card>
-        </div>
+        </div >
     )
 }

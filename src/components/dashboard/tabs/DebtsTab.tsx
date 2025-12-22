@@ -273,7 +273,7 @@ export function DebtsTab() {
                                 />
                                 <Input
                                     type="number"
-                                    placeholder="יום תשלום"
+                                    placeholder="יום חיוב"
                                     min="1"
                                     max="31"
                                     value={newDebt.dueDay}
@@ -376,7 +376,7 @@ export function DebtsTab() {
                                                 />
                                                 <Input
                                                     type="number"
-                                                    placeholder="יום תשלום"
+                                                    placeholder="יום חיוב"
                                                     min="1"
                                                     max="31"
                                                     value={editData.dueDay}
@@ -422,7 +422,7 @@ export function DebtsTab() {
                                                     </p>
                                                     <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
                                                         <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, currency)}</span>
-                                                        <span className="text-slate-500">יום תשלום: {debt.dueDay}</span>
+                                                        <span className="text-slate-500">יום חיוב: {debt.dueDay}</span>
                                                     </div>
                                                 </div>
                                             </div>

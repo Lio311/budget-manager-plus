@@ -18,6 +18,11 @@ model User {
   updatedAt DateTime @updatedAt
   
   budgets   Budget[]
+  categories Category[]
+
+  // Initial Financial State for Net Worth Calculation
+  initialBalance Float @default(0) // Liquid cash in checking account at start
+  initialSavings Float @default(0) // Accumulated savings at start
   
   @@map("users")
 }
@@ -50,6 +55,7 @@ model Income {
   budget             Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   
   source             String
+  category           String    @default("כללי")
   amount             Float
   date               DateTime?
   
@@ -135,7 +141,8 @@ model Saving {
   budgetId        String
   budget          Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   
-  type            String   // "bank_deposit", "pension_fund", "provident_fund", "other"
+  type            String   // "bank_deposit", "pension_fund", "provident_fund", "other" - DEPRECATED in favor of category, kept for migration
+  category        String   @default("כללי") 
   description     String
   monthlyDeposit  Float
   goal            String?
@@ -150,4 +157,20 @@ model Saving {
   updatedAt       DateTime @updatedAt
   
   @@map("savings")
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name      String
+  type      String   // "income", "expense"
+  color     String?  // hex code or tailwind class
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name, type])
+  @@map("categories")
 }

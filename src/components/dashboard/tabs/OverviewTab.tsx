@@ -5,24 +5,35 @@ import useSWR from 'swr'
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowDown, ArrowUp, PiggyBank, TrendingUp, Wallet, Loader2 } from 'lucide-react'
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label as RechartsLabel } from 'recharts'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getIncomes } from '@/lib/actions/income'
 import { getExpenses } from '@/lib/actions/expense'
 import { getBills } from '@/lib/actions/bill'
+import { getCategories } from '@/lib/actions/category'
+import { getNetWorthHistory } from '@/lib/actions/analytics'
+import { getHexFromClass } from '@/lib/constants'
+import { NetWorthChart } from '@/components/dashboard/NetWorthChart'
+import { Settings, Save } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { getUserSettings, updateUserSettings } from '@/lib/actions/user'
+import { CategoryManager } from '@/components/dashboard/CategoryManager'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
+interface Category {
+    id: string
+    name: string
+    color: string | null
+}
 
 const COLORS = {
     income: '#22C55E',
     expenses: '#EF4444',
     bills: '#F59E0B',
-    'מזון': '#22C55E',
-    'תחבורה': '#10B981',
-    'בילויים': '#84CC16',
-    'קניות': '#EC4899',
-    'בריאות': '#EF4444',
-    'חינוך': '#F59E0B',
-    'אחר': '#94A3B8',
 }
 
 const CustomTooltip = ({ active, payload, label, currency }: any) => {
@@ -55,6 +66,8 @@ export function OverviewTab() {
     const fetchPrevIncomesData = async () => (await getIncomes(prevMonth, prevYear)).data || []
     const fetchPrevExpensesData = async () => (await getExpenses(prevMonth, prevYear)).data || []
     const fetchPrevBillsData = async () => (await getBills(prevMonth, prevYear)).data || []
+    const fetchCategoriesData = async () => (await getCategories('expense')).data || []
+    const fetchNetWorthData = async () => (await getNetWorthHistory()).data || []
 
     // SWR Hooks
     const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year], fetchIncomesData)
@@ -64,8 +77,10 @@ export function OverviewTab() {
     const { data: prevIncomes = [], isLoading: loadingPrevIncomes } = useSWR(['incomes', prevMonth, prevYear], fetchPrevIncomesData)
     const { data: prevExpenses = [], isLoading: loadingPrevExpenses } = useSWR(['expenses', prevMonth, prevYear], fetchPrevExpensesData)
     const { data: prevBills = [], isLoading: loadingPrevBills } = useSWR(['bills', prevMonth, prevYear], fetchPrevBillsData)
+    const { data: categories = [], isLoading: loadingCategories } = useSWR<Category[]>(['categories', 'expense'], fetchCategoriesData)
+    const { data: netWorthHistory = [], isLoading: loadingNetWorth } = useSWR(['netWorth'], fetchNetWorthData)
 
-    const loading = loadingIncomes || loadingExpenses || loadingBills || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills
+    const loading = loadingIncomes || loadingExpenses || loadingBills || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills || loadingCategories || loadingNetWorth
 
     if (loading) {
         return (
@@ -87,6 +102,46 @@ export function OverviewTab() {
     const savings = totalIncome - totalExpenses - totalBills
     const prevSavings = prevTotalIncome - prevTotalExpenses - prevTotalBills
 
+    // Calculate percentage changes
+    const calculateChange = (current: number, previous: number) => {
+        if (previous === 0) return current > 0 ? 100 : 0
+        return ((current - previous) / previous) * 100
+    }
+
+    // Net Worth Calculations
+    const currentNetWorth = netWorthHistory.length > 0 ? netWorthHistory[netWorthHistory.length - 1].accumulatedNetWorth : 0
+    const prevNetWorth = netWorthHistory.length > 1 ? netWorthHistory[netWorthHistory.length - 2].accumulatedNetWorth : 0
+    const netWorthChange = calculateChange(currentNetWorth, prevNetWorth)
+
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+    const [initialBalance, setInitialBalance] = useState('')
+    const [initialSavings, setInitialSavings] = useState('')
+
+    // Fetch user settings when dialog opens
+    const loadSettings = async () => {
+        const result = await getUserSettings()
+        if (result.success && result.data) {
+            setInitialBalance(result.data.initialBalance?.toString() || '0')
+            setInitialSavings(result.data.initialSavings?.toString() || '0')
+        }
+    }
+
+    const handleSaveSettings = async () => {
+        const result = await updateUserSettings({
+            initialBalance: parseFloat(initialBalance) || 0,
+            initialSavings: parseFloat(initialSavings) || 0
+        })
+
+        if (result.success) {
+            toast.success('הגדרות עודכנו בהצלחה')
+            setIsSettingsOpen(false)
+            // Re-fetch net worth history
+            window.location.reload() // Simple reload to refresh everything for now or use mutate
+        } else {
+            toast.error('שגיאה בעדכון הגדרות')
+        }
+    }
+
     // Group expenses by category
     const categoryMap = new Map<string, number>()
     expenses.forEach(expense => {
@@ -95,11 +150,11 @@ export function OverviewTab() {
     })
 
     const expensesByCategory = Array.from(categoryMap.entries())
-        .map(([name, value]) => ({
-            name,
-            value,
-            color: COLORS[name as keyof typeof COLORS] || COLORS['אחר']
-        }))
+        .map(([name, value]) => {
+            const category = categories.find(c => c.name === name)
+            const color = getHexFromClass(category?.color || null)
+            return { name, value, color }
+        })
         .sort((a, b) => b.value - a.value)
 
     // Derived Data Object for compatibility
@@ -117,10 +172,20 @@ export function OverviewTab() {
     }
 
     // Calculate percentage changes
-    const calculateChange = (current: number, previous: number) => {
-        if (previous === 0) return current > 0 ? 100 : 0
-        return ((current - previous) / previous) * 100
-    }
+    // Removed duplicate definition here. Using the one defined earlier or defining it once.
+    // Actually, in the previous file content, I see I inserted it before Net Worth calculations but I might have left the old one?
+    // Let's check the file content again.
+    // I see in step 2624 diff: I added calculateChange before Net Worth Calculations.
+    // The original calculateChange was around line 133 (before edits).
+    // I probably have two now.
+    // I will remove the one I added in the WRONG place or the duplicate.
+    // Ideally, define it once at the top of calculations.
+
+    // Let's just define it once at the top of the function to be safe.
+    // But for this tool call, I will remove the one at line 133 (original location) if I added one at line 99.
+    // Wait, the diff shows I added it at line 95+.
+    // So the one at line 133 is the duplicate now.
+
 
     const incomeChange = calculateChange(data.totalIncome, previousData.totalIncome)
     const expensesChange = calculateChange(data.totalExpenses, previousData.totalExpenses)
@@ -137,8 +202,84 @@ export function OverviewTab() {
 
     return (
         <div className="space-y-6 p-2" dir="rtl">
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold tracking-tight">סקירה כללית</h2>
+                <Dialog open={isSettingsOpen} onOpenChange={(open) => {
+                    setIsSettingsOpen(open)
+                    if (open) loadSettings()
+                }}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-2">
+                            <Settings className="h-4 w-4" />
+                            הגדרות
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col" dir="rtl">
+                        <DialogHeader>
+                            <DialogTitle className="text-right">הגדרות מערכת</DialogTitle>
+                        </DialogHeader>
+
+                        <Tabs defaultValue="general" className="flex-1 flex flex-col overflow-hidden">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="general">כללי</TabsTrigger>
+                                <TabsTrigger value="categories">ניהול קטגוריות</TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="general" className="mt-4 space-y-4">
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="initialBalance" className="text-right col-span-1">
+                                            עובר ושב
+                                        </Label>
+                                        <Input
+                                            id="initialBalance"
+                                            type="number"
+                                            value={initialBalance}
+                                            onChange={(e) => setInitialBalance(e.target.value)}
+                                            className="col-span-3"
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="initialSavings" className="text-right col-span-1">
+                                            חסכונות קיימים
+                                        </Label>
+                                        <Input
+                                            id="initialSavings"
+                                            type="number"
+                                            value={initialSavings}
+                                            onChange={(e) => setInitialSavings(e.target.value)}
+                                            className="col-span-3"
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex justify-end">
+                                    <Button onClick={handleSaveSettings} className="gap-2">
+                                        <Save className="h-4 w-4" />
+                                        שמור שינויים
+                                    </Button>
+                                </div>
+                            </TabsContent>
+
+                            <TabsContent value="categories" className="flex-1 overflow-hidden mt-4">
+                                <CategoryManager />
+                            </TabsContent>
+                        </Tabs>
+                    </DialogContent>
+                </Dialog>
+            </div>
             {/* Summary Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <StatCard
+                    title="שווי נקי"
+                    value={formatCurrency(currentNetWorth, currency)}
+                    icon={<TrendingUp className="h-4 w-4" />}
+                    color="text-purple-600"
+                    bgColor="bg-purple-50"
+                    change={netWorthChange}
+                    changeType="income"
+                />
                 <StatCard
                     title="סך הכנסות"
                     value={formatCurrency(data.totalIncome, currency)}
@@ -177,6 +318,11 @@ export function OverviewTab() {
                 />
             </div>
 
+            {/* Net Worth Chart */}
+            <div className="grid gap-6">
+                <NetWorthChart data={netWorthHistory} />
+            </div>
+
             {/* Charts Row */}
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Income vs Expenses Pie Chart */}
@@ -213,10 +359,10 @@ export function OverviewTab() {
                             </ResponsiveContainer>
                         )}
                     </CardContent>
-                </Card>
+                </Card >
 
                 {/* Expenses by Category */}
-                <Card>
+                < Card >
                     <CardHeader>
                         <CardTitle>הוצאות לפי קטגוריה</CardTitle>
                     </CardHeader>
@@ -255,11 +401,11 @@ export function OverviewTab() {
                             </ResponsiveContainer>
                         )}
                     </CardContent>
-                </Card>
-            </div>
+                </Card >
+            </div >
 
             {/* Budget Progress */}
-            <Card>
+            < Card >
                 <CardHeader>
                     <CardTitle>מצב תקציב חודשי</CardTitle>
                 </CardHeader>
@@ -288,8 +434,8 @@ export function OverviewTab() {
                         />
                     </div>
                 </CardContent>
-            </Card>
-        </div>
+            </Card >
+        </div >
     )
 }
 

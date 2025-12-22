@@ -25,6 +25,7 @@ export async function addIncome(
     year: number,
     data: {
         source: string
+        category: string
         amount: number
         date?: string
         isRecurring?: boolean
@@ -39,17 +40,19 @@ export async function addIncome(
             data: {
                 budgetId: budget.id,
                 source: data.source,
+                category: data.category,
                 amount: data.amount,
                 date: data.date ? new Date(data.date) : null,
                 isRecurring: data.isRecurring || false,
-                recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : null,
+                recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : (data.date ? new Date(data.date) : new Date()),
                 recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null
             }
         })
 
         // If recurring, create copies for future months
-        if (data.isRecurring && data.recurringStartDate && data.recurringEndDate) {
-            await createRecurringIncomes(income.id, data.source, data.amount, data.recurringStartDate, data.recurringEndDate)
+        if (data.isRecurring && data.recurringEndDate) {
+            const startDate = data.recurringStartDate || data.date || new Date().toISOString()
+            await createRecurringIncomes(income.id, data.source, data.category, data.amount, startDate, data.recurringEndDate)
         }
 
         revalidatePath('/dashboard')
@@ -63,6 +66,7 @@ export async function addIncome(
 async function createRecurringIncomes(
     sourceId: string,
     source: string,
+    category: string,
     amount: number,
     startDateStr: string,
     endDateStr: string
@@ -97,6 +101,7 @@ async function createRecurringIncomes(
                 data: {
                     budgetId: budget.id,
                     source,
+                    category,
                     amount,
                     date: new Date(currentYear, currentMonth - 1, 1),
                     isRecurring: true,
@@ -159,6 +164,7 @@ export async function updateIncome(
     id: string,
     data: {
         source?: string
+        category?: string
         amount?: number
         date?: string
     }
@@ -168,6 +174,7 @@ export async function updateIncome(
             where: { id },
             data: {
                 ...(data.source && { source: data.source }),
+                ...(data.category && { category: data.category }),
                 ...(data.amount && { amount: data.amount }),
                 ...(data.date && { date: new Date(data.date) })
             }

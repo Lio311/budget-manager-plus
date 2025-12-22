@@ -44,19 +44,20 @@ export async function addExpense(
                 amount: data.amount,
                 date: new Date(data.date),
                 isRecurring: data.isRecurring || false,
-                recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : null,
+                recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : (data.date ? new Date(data.date) : new Date()),
                 recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null
             }
         })
 
         // If recurring, create copies for future months
-        if (data.isRecurring && data.recurringStartDate && data.recurringEndDate) {
+        if (data.isRecurring && data.recurringEndDate) {
+            const startDate = data.recurringStartDate || data.date || new Date().toISOString()
             await createRecurringExpenses(
                 expense.id,
                 data.category,
                 data.description,
                 data.amount,
-                data.recurringStartDate,
+                startDate,
                 data.recurringEndDate
             )
         }

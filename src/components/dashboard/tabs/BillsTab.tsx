@@ -256,7 +256,7 @@ export function BillsTab() {
                         />
                         <Input
                             type="number"
-                            placeholder="יום תשלום (1-31)"
+                            placeholder="יום חיוב"
                             min="1"
                             max="31"
                             value={newBill.dueDay}
@@ -314,7 +314,7 @@ export function BillsTab() {
                                                     />
                                                     <Input
                                                         type="number"
-                                                        placeholder="יום תשלום (1-31)"
+                                                        placeholder="יום חיוב"
                                                         min="1"
                                                         max="31"
                                                         value={editData.dueDay}
