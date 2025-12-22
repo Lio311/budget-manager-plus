@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Plus, Trash2, Loader2, Pencil, X, Check } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
@@ -40,7 +41,10 @@ export function SavingsTab() {
         description: '',
         monthlyDeposit: '',
         goal: '',
-        date: new Date()
+        date: new Date(),
+        isRecurring: false,
+        recurringStartDate: undefined as Date | undefined,
+        recurringEndDate: undefined as Date | undefined
     })
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({
@@ -81,7 +85,10 @@ export function SavingsTab() {
                 description: newSaving.description,
                 monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
                 goal: newSaving.goal || undefined,
-                date: newSaving.date
+                date: newSaving.date,
+                isRecurring: newSaving.isRecurring,
+                recurringStartDate: newSaving.recurringStartDate,
+                recurringEndDate: newSaving.recurringEndDate
             })
 
             if (result.success) {
@@ -90,7 +97,10 @@ export function SavingsTab() {
                     description: '',
                     monthlyDeposit: '',
                     goal: '',
-                    date: new Date()
+                    date: new Date(),
+                    isRecurring: false,
+                    recurringStartDate: undefined,
+                    recurringEndDate: undefined
                 })
                 await loadSavings()
                 toast({
@@ -255,6 +265,41 @@ export function SavingsTab() {
                                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                                     הוסף
                                 </Button>
+                            </div>
+
+                            {/* Recurring Savings Options */}
+                            <div className="flex items-start gap-4 p-4 border rounded-lg bg-slate-50">
+                                <div className="flex items-center gap-2">
+                                    <Checkbox
+                                        id="recurring-saving"
+                                        checked={newSaving.isRecurring}
+                                        onCheckedChange={(checked) => setNewSaving({ ...newSaving, isRecurring: checked as boolean })}
+                                    />
+                                    <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer">
+                                        חיסכון קבוע
+                                    </label>
+                                </div>
+
+                                {newSaving.isRecurring && (
+                                    <div className="flex gap-4 flex-1">
+                                        <div className="space-y-2 flex-1">
+                                            <label className="text-sm font-medium">תאריך התחלה</label>
+                                            <DatePicker
+                                                date={newSaving.recurringStartDate}
+                                                setDate={(date) => setNewSaving({ ...newSaving, recurringStartDate: date })}
+                                                placeholder="בחר תאריך התחלה"
+                                            />
+                                        </div>
+                                        <div className="space-y-2 flex-1">
+                                            <label className="text-sm font-medium">תאריך סיום</label>
+                                            <DatePicker
+                                                date={newSaving.recurringEndDate}
+                                                setDate={(date) => setNewSaving({ ...newSaving, recurringEndDate: date })}
+                                                placeholder="בחר תאריך סיום"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
