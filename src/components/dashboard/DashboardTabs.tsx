@@ -10,6 +10,7 @@ import { ExpensesTab } from './tabs/ExpensesTab'
 import { BillsTab } from './tabs/BillsTab'
 import { DebtsTab } from './tabs/DebtsTab'
 import { CalendarTab } from './tabs/CalendarTab'
+import { SavingsTab } from './tabs/SavingsTab'
 
 export function DashboardTabs() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -21,6 +22,7 @@ export function DashboardTabs() {
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown },
         { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard },
         { value: 'debts', label: 'חובות', icon: Wallet },
+        { value: 'savings', label: 'חסכונות', icon: DollarSign },
         { value: 'calendar', label: 'לוח שנה', icon: Calendar },
     ]
 
@@ -75,8 +77,8 @@ export function DashboardTabs() {
                                         key={tab.value}
                                         onClick={() => handleTabChange(tab.value)}
                                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition-colors ${activeTab === tab.value
-                                                ? 'bg-primary text-primary-foreground'
-                                                : 'hover:bg-accent'
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'hover:bg-accent'
                                             }`}
                                     >
                                         <Icon className={`w-5 h-5 ${tab.rotate ? 'rotate-180' : ''}`} />
@@ -125,6 +127,9 @@ export function DashboardTabs() {
                 </TabsContent>
                 <TabsContent value="debts">
                     <DebtsTab />
+                </TabsContent>
+                <TabsContent value="savings">
+                    <SavingsTab />
                 </TabsContent>
                 <TabsContent value="calendar">
                     <CalendarTab />

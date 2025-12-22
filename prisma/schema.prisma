@@ -35,6 +35,7 @@ model Budget {
   expenses  Expense[]
   bills     Bill[]
   debts     Debt[]
+  savings   Saving[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -48,7 +49,7 @@ model Income {
   budgetId           String
   budget             Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   
-  source             String    // "משכורת", "הכנסה נוספת", "עבודה נוספת"
+  source             String
   amount             Float
   date               DateTime?
   
@@ -68,10 +69,10 @@ model Expense {
   budgetId           String
   budget             Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   
-  category           String    // "מזון", "תחבורה", "בילויים", "קניות", "אחר"
   description        String
   amount             Float
-  date               DateTime
+  category           String
+  date               DateTime?
   
   isRecurring        Boolean   @default(false)
   recurringSourceId  String?
@@ -89,9 +90,9 @@ model Bill {
   budgetId  String
   budget    Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   
-  name      String    // "חשמל", "ארנונה", "נטפליקס", "אינטרנט"
+  name      String
   amount    Float
-  dueDay    Int       // 1-31 (יום בחודש)
+  dueDay    Int       // 1-31
   isPaid    Boolean   @default(false)
   paidDate  DateTime?
   
@@ -122,4 +123,21 @@ model Debt {
   updatedAt      DateTime  @updatedAt
   
   @@map("debts")
+}
+
+model Saving {
+  id              String   @id @default(cuid())
+  budgetId        String
+  budget          Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  
+  type            String   // "bank_deposit", "pension_fund", "provident_fund", "other"
+  description     String
+  monthlyDeposit  Float
+  goal            String?
+  date            DateTime
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("savings")
 }
