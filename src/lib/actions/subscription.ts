@@ -18,6 +18,19 @@ export async function createSubscription(paypalOrderId: string, amount: number) 
         console.log('User authenticated:', user.id)
         const userId = user.id
 
+        // Ensure user exists in database (sync from Clerk)
+        console.log('Syncing user to database...')
+        await prisma.user.upsert({
+            where: { id: userId },
+            update: {},
+            create: {
+                id: userId,
+                email: user.emailAddresses[0]?.emailAddress || '',
+                name: user.fullName || user.firstName || 'User'
+            }
+        })
+        console.log('User synced successfully')
+
         // Calculate end date for 1 year from now
         const endDate = addYears(new Date(), 1)
 
