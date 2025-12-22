@@ -418,7 +418,7 @@ export function OverviewTab() {
                                         />
                                         <YAxis
                                             orientation="left"
-                                            width={80}
+                                            width={100}
                                             tickLine={false}
                                             axisLine={false}
                                             tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
