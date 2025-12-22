@@ -10,7 +10,7 @@ async function syncUser() {
     try {
         // Check if user exists
         const existingUser = await prisma.user.findUnique({
-            where: { clerkId }
+            where: { id: clerkId }
         })
 
         if (existingUser) {
@@ -19,7 +19,7 @@ async function syncUser() {
             // Create user
             const newUser = await prisma.user.create({
                 data: {
-                    clerkId,
+                    id: clerkId,
                     email
                 }
             })

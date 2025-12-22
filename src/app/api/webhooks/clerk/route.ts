@@ -73,7 +73,7 @@ export async function POST(req: Request) {
             // Create user in our database
             const newUser = await prisma.user.create({
                 data: {
-                    clerkId: id,
+                    id,
                     email: email_addresses[0].email_address
                 }
             })
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
         try {
             // Delete user from our database
             await prisma.user.delete({
-                where: { clerkId: id as string }
+                where: { id: id as string }
             })
 
             console.log('✅ User deleted from database:', id)

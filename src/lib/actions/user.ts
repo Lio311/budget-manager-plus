@@ -12,7 +12,7 @@ export async function updateUserSettings(data: { initialBalance?: number; initia
         }
 
         const user = await prisma.user.update({
-            where: { clerkId: userId },
+            where: { id: userId },
             data: {
                 ...data
             }
@@ -34,7 +34,7 @@ export async function getUserSettings() {
         }
 
         const user = await prisma.user.findUnique({
-            where: { clerkId: userId },
+            where: { id: userId },
             select: {
                 initialBalance: true,
                 initialSavings: true

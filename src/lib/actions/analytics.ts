@@ -18,7 +18,7 @@ export async function getNetWorthHistory() {
         if (!userId) throw new Error('Unauthorized')
 
         const user = (await (prisma.user as any).findUnique({
-            where: { clerkId: userId },
+            where: { id: userId },
             select: { id: true, initialBalance: true, initialSavings: true }
         })) as any
 

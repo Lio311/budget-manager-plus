@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,19 +8,17 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
+  id        String   @id 
   email     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  budgets   Budget[]
+   
+  budgets    Budget[]
   categories Category[]
 
-  // Initial Financial State for Net Worth Calculation
-  initialBalance Float @default(0) // Liquid cash in checking account at start
-  initialSavings Float @default(0) // Accumulated savings at start
-  
+  initialBalance Float @default(0) 
+  initialSavings Float @default(0) 
+
   @@map("users")
 }
 
@@ -31,63 +26,51 @@ model Budget {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  month     Int      // 1-12
-  year      Int      // 2025
-  currency  String   @default("₪") // ₪, $, €, £
-  
+  month     Int      
+  year      Int      
+  currency  String   @default("₪")
   incomes   Income[]
   expenses  Expense[]
   bills     Bill[]
   debts     Debt[]
   savings   Saving[]
-  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
   @@unique([userId, month, year])
   @@map("budgets")
 }
 
 model Income {
-  id                 String    @id @default(cuid())
-  budgetId           String
-  budget             Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  
-  source             String
-  category           String    @default("כללי")
-  amount             Float
-  date               DateTime?
-  
-  isRecurring        Boolean   @default(false)
-  recurringSourceId  String?
-  recurringStartDate DateTime?
-  recurringEndDate   DateTime?
-  
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  
+  id                String   @id @default(cuid())
+  budgetId          String
+  budget            Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  source            String
+  category          String   @default("כללי")
+  amount            Float
+  date              DateTime?
+  isRecurring         Boolean  @default(false)
+  recurringSourceId   String?
+  recurringStartDate  DateTime?
+  recurringEndDate    DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
   @@map("incomes")
 }
 
 model Expense {
-  id                 String    @id @default(cuid())
-  budgetId           String
-  budget             Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  
-  description        String
-  amount             Float
-  category           String
-  date               DateTime?
-  
-  isRecurring        Boolean   @default(false)
-  recurringSourceId  String?
-  recurringStartDate DateTime?
-  recurringEndDate   DateTime?
-  
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  
+  id                String   @id @default(cuid())
+  budgetId          String
+  budget            Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  description       String
+  amount            Float
+  category          String
+  date              DateTime?
+  isRecurring         Boolean  @default(false)
+  recurringSourceId   String?
+  recurringStartDate  DateTime?
+  recurringEndDate    DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
   @@map("expenses")
 }
 
@@ -95,67 +78,54 @@ model Bill {
   id        String    @id @default(cuid())
   budgetId  String
   budget    Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  
   name      String
   amount    Float
-  dueDay    Int       // 1-31
+  dueDay    Int       
   isPaid    Boolean   @default(false)
   paidDate  DateTime?
-  
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  
   @@map("bills")
 }
 
 model Debt {
-  id             String    @id @default(cuid())
-  budgetId       String
-  budget         Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  
-  creditor       String    // למי חייב
-  totalAmount    Float     // סכום כולל
-  monthlyPayment Float     // תשלום חודשי
-  dueDay         Int       // יום תשלום (1-31)
-  isPaid         Boolean   @default(false)
-  paidDate       DateTime?
-  
-  isRecurring        Boolean   @default(false)
-  recurringSourceId  String?
-  recurringStartDate DateTime?
-  recurringEndDate   DateTime?
-  
-  // Installment fields
+  id                String    @id @default(cuid())
+  budgetId          String
+  budget            Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  creditor          String    
+  totalAmount       Float     
+  monthlyPayment    Float     
+  dueDay            Int       
+  isPaid            Boolean   @default(false)
+  paidDate          DateTime?
+  isRecurring         Boolean  @default(false)
+  recurringSourceId   String?
+  recurringStartDate  DateTime?
+  recurringEndDate    DateTime?
   totalDebtAmount      Float?
   numberOfInstallments Int?
   installmentNumber    Int?
-  
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
   @@map("debts")
 }
 
 model Saving {
-  id              String   @id @default(cuid())
-  budgetId        String
-  budget          Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  
-  type            String   // "bank_deposit", "pension_fund", "provident_fund", "other" - DEPRECATED in favor of category, kept for migration
-  category        String   @default("כללי") 
-  description     String
-  monthlyDeposit  Float
-  goal            String?
-  date            DateTime
-  
-  isRecurring        Boolean   @default(false)
-  recurringSourceId  String?
-  recurringStartDate DateTime?
-  recurringEndDate   DateTime?
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
+  id                String   @id @default(cuid())
+  budgetId          String
+  budget            Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  type              String   
+  category          String   @default("כללי") 
+  description       String
+  monthlyDeposit    Float
+  goal              String?
+  date              DateTime
+  isRecurring         Boolean  @default(false)
+  recurringSourceId   String?
+  recurringStartDate  DateTime?
+  recurringEndDate    DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
   @@map("savings")
 }
 
@@ -163,14 +133,11 @@ model Category {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
   name      String
-  type      String   // "income", "expense"
-  color     String?  // hex code or tailwind class
-  
+  type      String   
+  color     String?  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   @@unique([userId, name, type])
   @@map("categories")
 }

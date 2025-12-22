@@ -28,7 +28,7 @@ export async function ensureUserExists() {
 
         // 1. Try to find existing user first to avoid unnecessary Clerk API calls
         const dbUser = await prisma.user.findUnique({
-            where: { clerkId }
+            where: { id: clerkId }
         })
 
         if (dbUser) return serializeUser(dbUser)
@@ -50,7 +50,7 @@ export async function ensureUserExists() {
         console.log('Creating new user in database:', clerkId)
         const newUser = await prisma.user.create({
             data: {
-                clerkId,
+                id: clerkId,
                 email
             }
         })
