@@ -10,7 +10,6 @@ import { formatCurrency } from '@/lib/utils'
 import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib/actions/debts'
 import { useToast } from '@/hooks/use-toast'
 import { Checkbox } from '@/components/ui/checkbox'
-import { DatePicker } from '@/components/ui/date-picker'
 
 interface Debt {
     id: string
@@ -64,42 +63,21 @@ export function DebtsTab() {
     }
 
     const handleAdd = async () => {
-        // Validate required fields
         if (!newDebt.creditor || !newDebt.creditor.trim()) {
-            toast({
-                title: 'שגיאה',
-                description: 'יש למלא שם נושה',
-                variant: 'destructive'
-            })
+            toast({ title: 'שגיאה', description: 'יש למלא שם נושה', variant: 'destructive' })
             return
         }
-
         if (!newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0) {
-            toast({
-                title: 'שגיאה',
-                description: 'יש למלא סכום כולל תקין',
-                variant: 'destructive'
-            })
+            toast({ title: 'שגיאה', description: 'יש למלא סכום כולל תקין', variant: 'destructive' })
             return
         }
-
         if (!newDebt.dueDay || parseInt(newDebt.dueDay) < 1 || parseInt(newDebt.dueDay) > 31) {
-            toast({
-                title: 'שגיאה',
-                description: 'יש למלא יום תשלום בין 1-31',
-                variant: 'destructive'
-            })
+            toast({ title: 'שגיאה', description: 'יש למלא יום תשלום בין 1-31', variant: 'destructive' })
             return
         }
-
-        // Validate installment-specific fields
         if (newDebt.isRecurring) {
             if (!newDebt.numberOfInstallments || parseInt(newDebt.numberOfInstallments) < 1) {
-                toast({
-                    title: 'שגיאה',
-                    description: 'מספר תשלומים חייב להיות לפחות 1',
-                    variant: 'destructive'
-                })
+                toast({ title: 'שגיאה', description: 'מספר תשלומים חייב להיות לפחות 1', variant: 'destructive' })
                 return
             }
         }
@@ -121,26 +99,14 @@ export function DebtsTab() {
         })
 
         if (result.success) {
-            setNewDebt({
-                creditor: '',
-                totalAmount: '',
-                dueDay: '',
-                isRecurring: false,
-                numberOfInstallments: ''
-            })
+            setNewDebt({ creditor: '', totalAmount: '', dueDay: '', isRecurring: false, numberOfInstallments: '' })
             await loadDebts()
             toast({
                 title: 'הצלחה',
-                description: newDebt.isRecurring
-                    ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה`
-                    : 'החוב נוסף בהצלחה'
+                description: newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'החוב נוסף בהצלחה'
             })
         } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן להוסיף חוב',
-                variant: 'destructive'
-            })
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חוב', variant: 'destructive' })
         }
         setSubmitting(false)
     }
@@ -149,10 +115,7 @@ export function DebtsTab() {
         const result = await deleteDebt(id)
         if (result.success) {
             await loadDebts()
-            toast({
-                title: 'הצלחה',
-                description: 'החוב נמחק בהצלחה'
-            })
+            toast({ title: 'הצלחה', description: 'החוב נמחק בהצלחה' })
         }
     }
 
@@ -180,23 +143,13 @@ export function DebtsTab() {
 
     async function handleUpdate() {
         if (!editingId || !editData.creditor || !editData.totalAmount || !editData.monthlyPayment || !editData.dueDay) {
-            toast({
-                title: 'שגיאה',
-                description: 'נא למלא את כל השדות',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: 'נא למלא את כל השדות', variant: 'destructive', duration: 1000 })
             return
         }
 
         const dueDay = parseInt(editData.dueDay)
         if (dueDay < 1 || dueDay > 31) {
-            toast({
-                title: 'שגיאה',
-                description: 'יום תשלום חייב להיות בין 1 ל-31',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: 'יום תשלום חייב להיות בין 1 ל-31', variant: 'destructive', duration: 1000 })
             return
         }
 
@@ -209,27 +162,17 @@ export function DebtsTab() {
         })
 
         if (result.success) {
-            toast({
-                title: 'הצלחה',
-                description: 'החוב עודכן בהצלחה',
-                duration: 1000
-            })
+            toast({ title: 'הצלחה', description: 'החוב עודכן בהצלחה', duration: 1000 })
             setEditingId(null)
             setEditData({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
             await loadDebts()
         } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לעדכן חוב',
-                variant: 'destructive',
-                duration: 1000
-            })
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן חוב', variant: 'destructive', duration: 1000 })
         }
         setSubmitting(false)
     }
 
     return (
-        // הוספת overflow-x-hidden כאן מונעת את המלבן הלבן שבורח הצידה
         <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10">
             {loading ? (
                 <div className="flex items-center justify-center py-12">
@@ -237,7 +180,7 @@ export function DebtsTab() {
                 </div>
             ) : (
                 <>
-                    {/* Summary Cards - שינוי ל-grid-cols-1 במובייל */}
+                    {/* Summary Cards */}
                     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                         <Card className="bg-gradient-to-l from-purple-50 to-white border-purple-200 shadow-sm">
                             <CardHeader className="p-4 pb-2">
@@ -290,74 +233,85 @@ export function DebtsTab() {
                             <CardTitle className="text-lg">הוסף חוב חדש</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                                <Input
-                                    placeholder="נושה (למי חייב)"
-                                    value={newDebt.creditor}
-                                    onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
-                                    disabled={submitting}
-                                />
-                                <Input
-                                    type="number"
-                                    placeholder="סכום כולל"
-                                    value={newDebt.totalAmount}
-                                    onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
-                                    disabled={submitting}
-                                />
-                                <Input
-                                    type="number"
-                                    placeholder="יום (1-31)"
-                                    min="1"
-                                    max="31"
-                                    value={newDebt.dueDay}
-                                    onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
-                                    disabled={submitting}
-                                />
-                                <Button onClick={handleAdd} className="w-full gap-2" disabled={submitting}>
-                                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                                    הוסף
-                                </Button>
-                            </div>
-
-                            {/* Recurring Debt Section */}
-                            <div className="flex items-start gap-4 p-4 border rounded-lg">
-                                <div className="flex items-center gap-2">
-                                    <Checkbox
-                                        id="recurring-debt"
-                                        checked={newDebt.isRecurring}
-                                        onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
-                                    />
-                                    <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer">
-                                        חוב בתשלומים
-                                    </label>
+                            <div className="space-y-4">
+                                <div className="grid gap-4 md:grid-cols-4 items-end">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">נושה (למי חייב)</label>
+                                        <Input
+                                            placeholder="שם הנושה..."
+                                            value={newDebt.creditor}
+                                            onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
+                                            disabled={submitting}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">סכום כולל</label>
+                                        <Input
+                                            type="number"
+                                            placeholder="0.00"
+                                            value={newDebt.totalAmount}
+                                            onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
+                                            disabled={submitting}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">יום תשלום</label>
+                                        <Input
+                                            type="number"
+                                            placeholder="יום (1-31)"
+                                            min="1"
+                                            max="31"
+                                            value={newDebt.dueDay}
+                                            onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
+                                            disabled={submitting}
+                                        />
+                                    </div>
+                                    <Button onClick={handleAdd} className="w-full gap-2" disabled={submitting}>
+                                        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                                        הוסף
+                                    </Button>
                                 </div>
 
-                                {newDebt.isRecurring && (
-                                    <div className="flex gap-4 flex-1">
-                                        <div className="space-y-2 flex-1">
-                                            <label className="text-sm font-medium">מספר תשלומים</label>
-                                            <Input
-                                                type="number"
-                                                placeholder="12"
-                                                min="1"
-                                                value={newDebt.numberOfInstallments}
-                                                onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
-                                                disabled={submitting}
-                                            />
-                                        </div>
-                                        {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
-                                            <div className="space-y-2 flex-1">
-                                                <label className="text-sm font-medium">תשלום חודשי</label>
-                                                <div className="h-10 px-3 py-2 border rounded-md bg-muted flex items-center">
-                                                    {formatCurrency(
-                                                        parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
-                                                        currency
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )}
+                                {/* Recurring Debt Section */}
+                                <div className="flex items-start gap-4 p-4 border rounded-lg">
+                                    <div className="flex items-center gap-2">
+                                        <Checkbox
+                                            id="recurring-debt"
+                                            checked={newDebt.isRecurring}
+                                            onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
+                                        />
+                                        <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer">
+                                            חוב בתשלומים
+                                        </label>
                                     </div>
-                                )}
+
+                                    {newDebt.isRecurring && (
+                                        <div className="flex gap-4 flex-1">
+                                            <div className="space-y-2 flex-1">
+                                                <label className="text-sm font-medium">מספר תשלומים</label>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="12"
+                                                    min="1"
+                                                    value={newDebt.numberOfInstallments}
+                                                    onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
+                                                    disabled={submitting}
+                                                />
+                                            </div>
+                                            {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
+                                                <div className="space-y-2 flex-1">
+                                                    <label className="text-sm font-medium">תשלום חודשי</label>
+                                                    <div className="h-10 px-3 py-2 border rounded-md bg-muted flex items-center">
+                                                        {formatCurrency(
+                                                            parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
+                                                            currency
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -469,17 +423,17 @@ export function DebtsTab() {
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() => handleEdit(debt)}
-                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-10 w-10"
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                                                     >
-                                                        <Pencil className="h-5 w-5" />
+                                                        <Pencil className="h-4 w-4" />
                                                     </Button>
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() => handleDelete(debt.id)}
-                                                        className="text-red-400 hover:text-red-600 hover:bg-red-50 h-10 w-10"
+                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                                     >
-                                                        <Trash2 className="h-5 w-5" />
+                                                        <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </div>
                                             </div>
@@ -487,7 +441,7 @@ export function DebtsTab() {
                                     )}
                                 </div>
                             ))
-                        )}
+                        }
                     </div>
                 </CardContent>
             </Card>
