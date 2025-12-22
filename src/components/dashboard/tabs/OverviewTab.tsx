@@ -248,6 +248,7 @@ export function OverviewTab() {
                                             value={initialBalance}
                                             onChange={(e) => setInitialBalance(e.target.value)}
                                             className="col-span-3"
+                                            dir="rtl"
                                         />
                                         <Label htmlFor="initialBalance" className="text-right col-span-1">
                                             עובר ושב
@@ -257,9 +258,11 @@ export function OverviewTab() {
                                         <Input
                                             id="initialSavings"
                                             type="number"
+                                            min="0"
                                             value={initialSavings}
                                             onChange={(e) => setInitialSavings(e.target.value)}
                                             className="col-span-3"
+                                            dir="rtl"
                                         />
                                         <Label htmlFor="initialSavings" className="text-right col-span-1">
                                             חסכונות קיימים
