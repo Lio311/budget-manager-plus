@@ -290,24 +290,19 @@ export function DebtsTab() {
                             <CardTitle className="text-lg">הוסף חוב חדש</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                 <Input
-                                    placeholder="נושה (בנק, כרטיס...)"
+                                    placeholder="נושה (למי חייב)"
                                     value={newDebt.creditor}
                                     onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
-                                    className="sm:col-span-2 lg:col-span-1"
+                                    disabled={submitting}
                                 />
                                 <Input
                                     type="number"
                                     placeholder="סכום כולל"
                                     value={newDebt.totalAmount}
                                     onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
-                                />
-                                <Input
-                                    type="number"
-                                    placeholder="תשלום חודשי"
-                                    value={newDebt.monthlyPayment}
-                                    onChange={(e) => setNewDebt({ ...newDebt, monthlyPayment: e.target.value })}
+                                    disabled={submitting}
                                 />
                                 <Input
                                     type="number"
@@ -316,8 +311,9 @@ export function DebtsTab() {
                                     max="31"
                                     value={newDebt.dueDay}
                                     onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
+                                    disabled={submitting}
                                 />
-                                <Button onClick={handleAdd} className="w-full gap-2 sm:col-span-2 lg:col-span-1" disabled={submitting}>
+                                <Button onClick={handleAdd} className="w-full gap-2" disabled={submitting}>
                                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                                     הוסף
                                 </Button>
