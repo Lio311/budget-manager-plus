@@ -2,7 +2,6 @@
 
 import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { useAuth } from '@clerk/nextjs'
-import { createSubscription } from '@/lib/actions/subscription'
 import { Check } from 'lucide-react'
 import Image from 'next/image'
 
@@ -89,8 +88,17 @@ export function Paywall() {
                                     console.log('Order captured:', order.id)
 
                                     if (order.id) {
-                                        console.log('Creating subscription...')
-                                        await createSubscription(order.id, 50)
+                                        console.log('Creating subscription via API...')
+                                        const response = await fetch('/api/subscription/create', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ orderId: order.id, amount: 50 })
+                                        })
+
+                                        if (!response.ok) {
+                                            throw new Error('Failed to create subscription')
+                                        }
+
                                         console.log('Subscription created, redirecting...')
                                         window.location.href = '/dashboard'
                                     }
