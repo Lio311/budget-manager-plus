@@ -512,9 +512,17 @@ export function DebtsTab() {
                                                 </button>
 
                                                 <div className="flex-1 min-w-0">
-                                                    <p className={`font-bold text-base truncate ${debt.isPaid ? 'line-through text-muted-foreground' : 'text-slate-900'}`}>
-                                                        {debt.creditor}
-                                                    </p>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${debt.debtType === DEBT_TYPES.OWED_BY_ME
+                                                                ? 'bg-red-100 text-red-700 border border-red-200'
+                                                                : 'bg-blue-100 text-blue-700 border border-blue-200'
+                                                            }`}>
+                                                            {DEBT_TYPE_LABELS[debt.debtType as keyof typeof DEBT_TYPE_LABELS]}
+                                                        </span>
+                                                        <p className={`font-bold text-base truncate ${debt.isPaid ? 'line-through text-muted-foreground' : 'text-slate-900'}`}>
+                                                            {debt.creditor}
+                                                        </p>
+                                                    </div>
                                                     <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
                                                         <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, currency)}</span>
                                                         <span className="text-slate-500">יום חיוב: {debt.dueDay}</span>
