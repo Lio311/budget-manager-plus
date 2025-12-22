@@ -455,11 +455,11 @@ export function SavingsTab() {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                                                <Button onClick={() => handleUpdate(saving.id)} size="sm" disabled={submitting}>
+                                            <div className="flex items-center gap-2 mr-4">
+                                                <Button variant="ghost" size="icon" onClick={() => handleUpdate(saving.id)} className="text-green-600" disabled={submitting}>
                                                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                                 </Button>
-                                                <Button onClick={cancelEdit} variant="outline" size="sm">
+                                                <Button variant="ghost" size="icon" onClick={cancelEdit}>
                                                     <X className="h-4 w-4" />
                                                 </Button>
                                             </div>
