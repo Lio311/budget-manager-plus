@@ -404,40 +404,41 @@ export function OverviewTab() {
                                     אין נתונים להצגה
                                 </div>
                             ) : (
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart
-                                        data={incomeVsExpenses}
-                                        margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
-                                        layout="horizontal"
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart
+                                    data={incomeVsExpenses}
+                                    // 1. הוספנו מרווחים (margin) כדי לוודא ששום דבר לא נחתך בקצוות
+                                    margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
+                                    layout="horizontal"
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                    <XAxis
+                                        dataKey="name"
+                                        tickLine={false}
+                                        axisLine={false}
+                                    />
+                                    <YAxis
+                                        orientation="left"
+                                        // 2. הגדלנו את הרוחב ל-60 (במקום 45) כדי שיהיה מקום למספרים כמו 8,000
+                                        width={60} 
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
+                                    />
+                                    <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
+                                    
+                                    <Bar 
+                                        dataKey="value" 
+                                        radius={[4, 4, 0, 0]} 
+                                        // 3. הגבלת רוחב העמודות: שנה את המספר 50 למה שנראה לך הכי טוב בעין
+                                        maxBarSize={50} 
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                        <XAxis
-                                            dataKey="name"
-                                            tickLine={false}
-                                            axisLine={false}
-                                        />
-
-                                        <YAxis
-                                            orientation="left"
-                                            width={45}
-                                            tickLine={false}
-                                            axisLine={false}
-                                            tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
-                                        />
-                                        <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
-
-                                        // 2. הסר את ההגבלה ב-Bar
-                                        <Bar
-                                            dataKey="value"
-                                            radius={[4, 4, 0, 0]}
-                                        // maxBarSize={100}  <--- מחק את השורה הזו או הגדל ל-1000
-                                        >
-                                            {incomeVsExpenses.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
+                                        {incomeVsExpenses.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
                             )}
                         </CardContent>
                     </Card>
