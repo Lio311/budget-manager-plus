@@ -454,7 +454,7 @@ export function OverviewTab() {
                                 />
                                 <BudgetProgress
                                     label="חיסכון"
-                                    current={savings}
+                                    current={savingsRemainder}
                                     total={data.totalIncome}
                                     currency={currency}
                                     color="bg-green-500"
