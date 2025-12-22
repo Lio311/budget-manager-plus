@@ -37,7 +37,7 @@ export function DatePicker({ date, setDate, className, placeholder = "בחר ת�
                     {date ? format(date, "dd/MM/yyyy") : <span>{placeholder}</span>}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0" align="center" side="bottom" sideOffset={4}>
                 <Calendar
                     mode="single"
                     selected={date}
