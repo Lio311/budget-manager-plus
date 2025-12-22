@@ -35,8 +35,8 @@ export function NetWorthChart({ data }: { data: NetWorthData[] }) {
 
     return (
         <Card className="w-full h-full shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-bold">הון עצמי</CardTitle>
+            <CardHeader>
+                <CardTitle>הון עצמי</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="h-[300px] w-full pr-0">
