@@ -84,7 +84,6 @@ export function OverviewTab() {
     const swrOptions = useMemo(() => ({
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
-        revalidateIfStale: false,
         refreshInterval: 0
     }), [])
 
@@ -127,6 +126,7 @@ export function OverviewTab() {
     const currentBillsDisplay = totalRemainingBills // We will show remaining bills in the "Bills" card
 
     const totalPaidDebts = debts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)
+    const totalDebtsPlanned = debts.reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)
     const totalSavingsDeposits = savingsItems.reduce((sum: number, s: any) => sum + s.monthlyDeposit, 0)
 
     // Combined Outflows (everything that leaves the account)
@@ -158,7 +158,8 @@ export function OverviewTab() {
     const prevNetWorth = netWorthHistory.length > 1 ? netWorthHistory[netWorthHistory.length - 2].accumulatedNetWorth : 0
     const netWorthChange = calculateChange(currentNetWorth, prevNetWorth)
 
-
+    // SWR Mutate for refreshing data
+    const { mutate: mutateNetWorth } = useSWR(['netWorth'], fetchNetWorthData, swrOptions)
 
     // Fetch user settings when dialog opens
     const loadSettings = async () => {
@@ -178,8 +179,8 @@ export function OverviewTab() {
         if (result.success) {
             toast.success('הגדרות עודכנו בהצלחה')
             setIsSettingsOpen(false)
-            // Re-fetch net worth history
-            window.location.reload() // Simple reload to refresh everything for now or use mutate
+            // Re-fetch net worth history without reloading the whole page
+            mutateNetWorth()
         } else {
             toast.error('שגיאה בעדכון הגדרות')
         }
@@ -470,7 +471,7 @@ export function OverviewTab() {
                                 <BudgetProgress
                                     label="חובות ששולמו"
                                     current={totalPaidDebts}
-                                    total={totalIncome}
+                                    total={totalDebtsPlanned}
                                     currency={currency}
                                     color="bg-rose-500"
                                 />
