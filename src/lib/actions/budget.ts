@@ -7,7 +7,7 @@ import { prisma } from '@/lib/db'
  * Ensures the current user exists in the database
  * Creates a new user record if it doesn't exist
  */
-async function ensureUserExists() {
+export async function ensureUserExists() {
     try {
         const { userId: clerkId } = await auth()
 

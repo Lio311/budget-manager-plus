@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { ensureUserExists } from './budget'
 
 // Default categories to seed if needed (optional)
 export const DEFAULT_EXPENSE_CATEGORIES = [
@@ -34,19 +35,7 @@ export const DEFAULT_SAVINGS_CATEGORIES = [
 
 export async function getCategories(type: string = 'expense') {
     try {
-        const { userId: clerkId } = await auth()
-        if (!clerkId) {
-            return { success: false, error: 'Unauthorized' }
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { clerkId }
-        })
-
-        if (!user) {
-            console.error('[getCategories] User not found for clerkId:', clerkId)
-            return { success: false, error: 'User not found' }
-        }
+        const user = await ensureUserExists()
 
         // Use a safer accessor for the model
         const model = (prisma as any).category || (prisma as any).categories || (prisma as any).Category;
@@ -105,17 +94,7 @@ export async function getCategories(type: string = 'expense') {
 
 export async function addCategory(data: { name: string; type: string; color?: string }) {
     try {
-        const { userId: clerkId } = await auth()
-        if (!clerkId) return { success: false, error: 'Unauthorized' }
-
-        const user = await prisma.user.findUnique({
-            where: { clerkId }
-        })
-
-        if (!user) {
-            console.error('[addCategory] User not found for clerkId:', clerkId)
-            return { success: false, error: 'User not found' }
-        }
+        const user = await ensureUserExists()
 
         const model = (prisma as any).category || (prisma as any).categories || (prisma as any).Category;
         if (!model) {
@@ -208,14 +187,7 @@ export async function deleteCategory(id: string) {
 
 export async function seedCategories(type: string = 'expense') {
     try {
-        const { userId } = await auth()
-        if (!userId) return { success: false, error: 'Unauthorized' }
-
-        const user = await prisma.user.findUnique({ where: { clerkId: userId } })
-        if (!user) {
-            console.error('User not found in seedCategories for clerkId:', userId)
-            return { success: false, error: 'User not found' }
-        }
+        const user = await ensureUserExists()
 
         const categoryModel = (prisma as any).category || (prisma as any).categories;
         const count = await categoryModel.count({

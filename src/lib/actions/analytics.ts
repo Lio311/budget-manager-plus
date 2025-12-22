@@ -19,7 +19,7 @@ export async function getNetWorthHistory() {
 
         const user = await prisma.user.findUnique({
             where: { clerkId: userId },
-            select: { id: true, initialBalance: true, initialSavings: true }
+            select: { id: true, initialBalance: true, initialSavings: true } as any
         })
 
         if (!user) {
