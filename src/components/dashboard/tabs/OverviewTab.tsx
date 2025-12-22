@@ -240,7 +240,6 @@ export function OverviewTab() {
                                             value={initialBalance}
                                             onChange={(e) => setInitialBalance(e.target.value)}
                                             className="col-span-3"
-                                            dir="ltr"
                                         />
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
@@ -253,7 +252,6 @@ export function OverviewTab() {
                                             value={initialSavings}
                                             onChange={(e) => setInitialSavings(e.target.value)}
                                             className="col-span-3"
-                                            dir="ltr"
                                         />
                                     </div>
                                 </div>
@@ -323,48 +321,7 @@ export function OverviewTab() {
 
             {/* Charts Section */}
             <div className="space-y-6">
-                {/* Top Row: Net Worth + Budget Progress (if enough data) vs Just Budget Progress */}
-                <div className={`grid gap-6 ${netWorthHistory.length >= 2 ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
-                    {netWorthHistory.length >= 2 && (
-                        <div className="grid gap-6">
-                            <NetWorthChart data={netWorthHistory} />
-                        </div>
-                    )}
-
-                    {/* Budget Progress */}
-                    <Card className="h-full">
-                        <CardHeader>
-                            <CardTitle>מצב תקציב חודשי</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-6">
-                                <BudgetProgress
-                                    label="הוצאות מתוך תקציב"
-                                    current={data.totalExpenses}
-                                    total={data.totalIncome}
-                                    currency={currency}
-                                    color="bg-purple-500"
-                                />
-                                <BudgetProgress
-                                    label="חשבונות קבועים"
-                                    current={data.totalBills}
-                                    total={data.totalIncome}
-                                    currency={currency}
-                                    color="bg-yellow-500"
-                                />
-                                <BudgetProgress
-                                    label="חיסכון"
-                                    current={savings}
-                                    total={data.totalIncome}
-                                    currency={currency}
-                                    color="bg-green-500"
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Bottom Row: Pie Chart + Expenses Breakdown */}
+                {/* Top Row: Pie Chart + Expenses Breakdown */}
                 <div className="grid gap-6 md:grid-cols-2">
                     {/* Income vs Expenses Pie Chart */}
                     <Card>
@@ -441,6 +398,47 @@ export function OverviewTab() {
                                     </BarChart>
                                 </ResponsiveContainer>
                             )}
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Bottom Row: Net Worth + Budget Progress (if enough data) vs Just Budget Progress */}
+                <div className={`grid gap-6 ${netWorthHistory.length >= 2 ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
+                    {netWorthHistory.length >= 2 && (
+                        <div className="grid gap-6">
+                            <NetWorthChart data={netWorthHistory} />
+                        </div>
+                    )}
+
+                    {/* Budget Progress */}
+                    <Card className="h-full">
+                        <CardHeader>
+                            <CardTitle>מצב תקציב חודשי</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-6">
+                                <BudgetProgress
+                                    label="הוצאות מתוך תקציב"
+                                    current={data.totalExpenses}
+                                    total={data.totalIncome}
+                                    currency={currency}
+                                    color="bg-purple-500"
+                                />
+                                <BudgetProgress
+                                    label="חשבונות קבועים"
+                                    current={data.totalBills}
+                                    total={data.totalIncome}
+                                    currency={currency}
+                                    color="bg-yellow-500"
+                                />
+                                <BudgetProgress
+                                    label="חיסכון"
+                                    current={savings}
+                                    total={data.totalIncome}
+                                    currency={currency}
+                                    color="bg-green-500"
+                                />
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
