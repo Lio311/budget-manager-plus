@@ -320,22 +320,28 @@ export function DebtsTab() {
                                 </Button>
                             </div>
 
-                            {/* Recurring Debt Section - עיצוב נקי ללא מסגרת */}
-                            <div className="mt-4 space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <Checkbox
-                                        id="recurring-debt"
-                                        checked={newDebt.isRecurring}
-                                        onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
-                                    />
-                                    <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none">
-                                        חוב בתשלומים
-                                    </label>
+                            {/* חלק תחתון נפרד - עם מסגרת, רווח מלמעלה, וגובה מותאם */}
+                            <div className="mt-4 border rounded-md bg-white transition-all">
+                                <div className="flex items-center justify-between p-2">
+                                    {/* צד שמאל ריק או לשימוש עתידי, הצ'קבוקס בימין */}
+                                    <div className="flex-1"></div>
+
+                                    <div className="flex items-center gap-2">
+                                        <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none">
+                                            חוב בתשלומים
+                                        </label>
+                                        <Checkbox
+                                            id="recurring-debt"
+                                            checked={newDebt.isRecurring}
+                                            onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
+                                        />
+                                    </div>
                                 </div>
 
+                                {/* שדות שנפתחים בתוך המסגרת אם מסומן */}
                                 {newDebt.isRecurring && (
-                                    <div className="flex gap-4 items-end animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <div className="space-y-1.5 w-32">
+                                    <div className="p-2 pt-0 border-t mt-2 grid gap-4 grid-cols-1 sm:grid-cols-2 animate-in slide-in-from-top-2 duration-200">
+                                        <div className="space-y-1.5 mt-2">
                                             <label className="text-xs text-muted-foreground">מספר תשלומים</label>
                                             <Input
                                                 type="number"
@@ -348,9 +354,9 @@ export function DebtsTab() {
                                             />
                                         </div>
                                         {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
-                                            <div className="space-y-1.5">
+                                            <div className="space-y-1.5 mt-2">
                                                 <label className="text-xs text-muted-foreground">תשלום חודשי משוער</label>
-                                                <div className="h-9 px-3 py-1.5 border rounded-md bg-muted/50 text-sm flex items-center min-w-[100px]">
+                                                <div className="h-9 px-3 py-1.5 border rounded-md bg-muted/50 text-sm flex items-center w-full">
                                                     {formatCurrency(
                                                         parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
                                                         currency
