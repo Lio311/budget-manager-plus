@@ -381,7 +381,7 @@ export function SavingsTab() {
                                                     {formatCurrency(saving.monthlyDeposit, currency)}
                                                 </span>
                                                 <div className="flex gap-2">
-                                                    <Button onClick={() => startEdit(saving)} variant="outline" size="sm">
+                                                    <Button onClick={() => startEdit(saving)} variant="ghost" size="sm">
                                                         <Pencil className="h-4 w-4" />
                                                     </Button>
                                                     <Button onClick={() => handleDelete(saving.id)} variant="destructive" size="sm">
