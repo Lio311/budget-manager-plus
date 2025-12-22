@@ -78,11 +78,25 @@ export function Paywall() {
                                 })
                             }}
                             onApprove={async (data, actions) => {
-                                if (!actions.order) return
-                                const order = await actions.order.capture()
-                                if (order.id) {
-                                    await createSubscription(order.id, 50)
-                                    window.location.href = '/dashboard'
+                                try {
+                                    console.log('Payment approved, capturing order...')
+                                    if (!actions.order) {
+                                        console.error('No order object')
+                                        return
+                                    }
+
+                                    const order = await actions.order.capture()
+                                    console.log('Order captured:', order.id)
+
+                                    if (order.id) {
+                                        console.log('Creating subscription...')
+                                        await createSubscription(order.id, 50)
+                                        console.log('Subscription created, redirecting...')
+                                        window.location.href = '/dashboard'
+                                    }
+                                } catch (error) {
+                                    console.error('Payment error:', error)
+                                    alert('שגיאה בעיבוד התשלום. אנא פנה לתמיכה.')
                                 }
                             }}
                             style={{
