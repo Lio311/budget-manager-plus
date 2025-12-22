@@ -15,9 +15,15 @@ model User {
    
   budgets    Budget[]
   categories Category[]
+  subscription Subscription?
+  paymentHistory PaymentHistory[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
+  
+  // Trial period
+  trialEndsAt    DateTime?
+  hasUsedTrial   Boolean  @default(false)
 
   @@map("users")
 }
@@ -148,4 +154,50 @@ model Category {
   @@unique([userId, name, type])
   @@index([userId, type])
   @@map("categories")
+}
+
+model Subscription {
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // PayPal Details
+  paypalOrderId         String?   @unique
+  paypalPayerId         String?
+  
+  // Subscription Status
+  status                String    @default("inactive")
+  startDate             DateTime?
+  endDate               DateTime?
+  
+  // Deletion tracking
+  expiryNotified30Days  Boolean   @default(false)
+  expiryNotified7Days   Boolean   @default(false)
+  deletionScheduledFor  DateTime?
+  
+  // Payment History
+  lastPaymentDate       DateTime?
+  lastPaymentAmount     Float?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@map("subscriptions")
+}
+
+model PaymentHistory {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Payment Details
+  paypalOrderId     String    @unique
+  amount            Float
+  currency          String    @default("ILS")
+  status            String
+  
+  paymentDate       DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  
+  @@map("payment_history")
 }
