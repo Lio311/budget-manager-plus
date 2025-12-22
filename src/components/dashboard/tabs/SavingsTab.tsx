@@ -353,7 +353,7 @@ export function SavingsTab() {
 
                         {newSaving.isRecurring && (
                             <div className="flex gap-4 flex-1">
-                                <div className="space-y-2 flex-1">
+                                <div className="space-y-2 w-[240px]">
                                     <label className="text-sm font-medium">תאריך סיום</label>
                                     <DatePicker
                                         date={newSaving.recurringEndDate}
