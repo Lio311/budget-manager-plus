@@ -58,19 +58,23 @@ export function Paywall() {
                     <PayPalButtons
                         createOrder={(data, actions) => {
                             return actions.order.create({
+                                intent: 'CAPTURE',
                                 purchase_units: [{
                                     amount: {
                                         value: '50.00',
                                         currency_code: 'ILS'
                                     },
-                                    custom_id: userId!
+                                    custom_id: userId || ''
                                 }]
                             })
                         }}
                         onApprove={async (data, actions) => {
-                            const order = await actions.order!.capture()
-                            await createSubscription(order.id, 50)
-                            window.location.href = '/dashboard'
+                            if (!actions.order) return
+                            const order = await actions.order.capture()
+                            if (order.id) {
+                                await createSubscription(order.id, 50)
+                                window.location.href = '/dashboard'
+                            }
                         }}
                         style={{
                             layout: 'vertical',
