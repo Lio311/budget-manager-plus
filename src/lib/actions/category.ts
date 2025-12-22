@@ -34,27 +34,29 @@ export const DEFAULT_SAVINGS_CATEGORIES = [
 
 export async function getCategories(type: string = 'expense') {
     try {
-        const { userId } = await auth()
-        if (!userId) {
+        const { userId: clerkId } = await auth()
+        if (!clerkId) {
             return { success: false, error: 'Unauthorized' }
         }
 
         const user = await prisma.user.findUnique({
-            where: { clerkId: userId }
+            where: { clerkId }
         })
 
         if (!user) {
-            console.error('User not found in database for clerkId:', userId)
+            console.error('[getCategories] User not found for clerkId:', clerkId)
             return { success: false, error: 'User not found' }
         }
 
-        const categoryModel = (prisma as any).category || (prisma as any).categories;
-        if (!categoryModel) {
-            console.error('Prisma category model not found! Available models:', Object.keys(prisma).filter(k => !k.startsWith('_')))
-            return { success: false, error: 'Database model configuration error' }
+        // Use a safer accessor for the model
+        const model = (prisma as any).category || (prisma as any).categories || (prisma as any).Category;
+
+        if (!model) {
+            console.error('[getCategories] Category model not found in Prisma client')
+            return { success: false, error: 'Database configuration error' }
         }
 
-        let categories = await categoryModel.findMany({
+        let categories = await model.findMany({
             where: {
                 userId: user.id,
                 type
@@ -71,7 +73,8 @@ export async function getCategories(type: string = 'expense') {
                     (type === 'saving' ? DEFAULT_SAVINGS_CATEGORIES : []))
 
             if (defaults.length > 0) {
-                await categoryModel.createMany({
+                console.log(`[getCategories] Seeding ${defaults.length} categories for user ${user.id} type ${type}`)
+                await model.createMany({
                     data: defaults.map(c => ({
                         userId: user.id,
                         name: c.name,
@@ -81,7 +84,7 @@ export async function getCategories(type: string = 'expense') {
                 })
 
                 // Fetch again after seeding
-                categories = await categoryModel.findMany({
+                categories = await model.findMany({
                     where: {
                         userId: user.id,
                         type
@@ -94,29 +97,33 @@ export async function getCategories(type: string = 'expense') {
         }
 
         return { success: true, data: categories }
-    } catch (error) {
-        console.error('Error fetching categories:', error)
-        return { success: false, error: 'Failed to fetch categories' }
+    } catch (error: any) {
+        console.error('[getCategories] Unexpected error:', error)
+        return { success: false, error: error.message || 'Failed to fetch categories' }
     }
 }
 
 export async function addCategory(data: { name: string; type: string; color?: string }) {
     try {
-        const { userId } = await auth()
-        if (!userId) {
-            return { success: false, error: 'Unauthorized' }
-        }
+        const { userId: clerkId } = await auth()
+        if (!clerkId) return { success: false, error: 'Unauthorized' }
 
         const user = await prisma.user.findUnique({
-            where: { clerkId: userId }
+            where: { clerkId }
         })
 
         if (!user) {
+            console.error('[addCategory] User not found for clerkId:', clerkId)
             return { success: false, error: 'User not found' }
         }
 
-        const categoryModel = (prisma as any).category || (prisma as any).categories;
-        const existing = await categoryModel.findFirst({
+        const model = (prisma as any).category || (prisma as any).categories || (prisma as any).Category;
+        if (!model) {
+            console.error('[addCategory] Category model not found')
+            return { success: false, error: 'Database configuration error' }
+        }
+
+        const existing = await model.findFirst({
             where: {
                 userId: user.id,
                 name: data.name,
@@ -128,8 +135,7 @@ export async function addCategory(data: { name: string; type: string; color?: st
             return { success: false, error: 'Category already exists' }
         }
 
-
-        const category = await categoryModel.create({
+        const category = await model.create({
             data: {
                 userId: user.id,
                 name: data.name,
@@ -138,7 +144,9 @@ export async function addCategory(data: { name: string; type: string; color?: st
             }
         })
 
+        console.log(`[addCategory] Successfully added category: ${category.name} for user ${user.id}`)
         revalidatePath('/dashboard')
+
         return {
             success: true,
             data: {
@@ -149,7 +157,7 @@ export async function addCategory(data: { name: string; type: string; color?: st
             }
         }
     } catch (error: any) {
-        console.error('Error adding category:', error)
+        console.error('[addCategory] Unexpected error:', error)
         return { success: false, error: error.message || 'Failed to add category' }
     }
 }
