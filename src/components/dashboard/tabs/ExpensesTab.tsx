@@ -72,10 +72,17 @@ export function ExpensesTab() {
         description: '',
         amount: '',
         category: '',
-        date: format(new Date(), 'yyyy-MM-dd'),
+        date: '',
         isRecurring: false,
         recurringEndDate: undefined as string | undefined
     })
+
+    useEffect(() => {
+        setNewExpense(prev => ({
+            ...prev,
+            date: format(new Date(), 'yyyy-MM-dd')
+        }))
+    }, [])
 
     const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
     const [newCategoryName, setNewCategoryName] = useState('')
@@ -135,6 +142,7 @@ export function ExpensesTab() {
         if (!newCategoryName.trim()) return
 
         setSubmitting(true)
+        console.log(`[ExpensesTab] Calling addCategory for: ${newCategoryName.trim()}`)
         try {
             const result = await addCategory({
                 name: newCategoryName.trim(),
@@ -142,6 +150,7 @@ export function ExpensesTab() {
                 color: newCategoryColor
             })
 
+            console.log(`[ExpensesTab] addCategory result:`, result)
             if (result.success) {
                 toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
                 setNewCategoryName('')
@@ -152,9 +161,13 @@ export function ExpensesTab() {
             } else {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
             }
-        } catch (error) {
-            console.error('Add category failed:', error)
-            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשרת', variant: 'destructive' })
+        } catch (error: any) {
+            console.error('Add category failed on client:', error)
+            toast({
+                title: 'שגיאה',
+                description: `שגיאה: ${error.message || 'אירעה שגיאה בשרת'}`,
+                variant: 'destructive'
+            })
         } finally {
             setSubmitting(false)
         }

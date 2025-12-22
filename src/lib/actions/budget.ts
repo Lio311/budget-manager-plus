@@ -56,9 +56,10 @@ export async function ensureUserExists() {
         })
 
         return serializeUser(newUser)
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error in ensureUserExists:', error)
-        throw error
+        // If it's a validation error or similar, return it gracefully
+        throw new Error(`שגיאת משתמש: ${error.message || 'לא ניתן לוודא משתמש'}`)
     }
 }
 

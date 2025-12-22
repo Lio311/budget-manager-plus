@@ -81,6 +81,13 @@ export function IncomeTab() {
         isRecurring: false,
         recurringEndDate: ''
     })
+
+    useEffect(() => {
+        setNewIncome(prev => ({
+            ...prev,
+            date: format(new Date(), 'yyyy-MM-dd')
+        }))
+    }, [])
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ source: '', category: '', amount: '', date: '' })
 
@@ -92,7 +99,7 @@ export function IncomeTab() {
         if (categories.length > 0 && !newIncome.category) {
             setNewIncome(prev => ({ ...prev, category: categories[0].name }))
         }
-    }, [categories, newIncome.category])
+    }, [categories])
 
     const totalIncome = incomes.reduce((sum: number, income: any) => sum + income.amount, 0)
 
@@ -141,6 +148,7 @@ export function IncomeTab() {
         if (!newCategoryName.trim()) return
 
         setSubmitting(true)
+        console.log(`[IncomeTab] Calling addCategory for: ${newCategoryName.trim()}`)
         try {
             const result = await addCategory({
                 name: newCategoryName.trim(),
@@ -148,6 +156,7 @@ export function IncomeTab() {
                 color: newCategoryColor
             })
 
+            console.log(`[IncomeTab] addCategory result:`, result)
             if (result.success) {
                 toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
                 setNewCategoryName('')
@@ -158,9 +167,13 @@ export function IncomeTab() {
             } else {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
             }
-        } catch (error) {
-            console.error('Add category failed:', error)
-            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשרת', variant: 'destructive' })
+        } catch (error: any) {
+            console.error('Add category failed on client:', error)
+            toast({
+                title: 'שגיאה',
+                description: `נכשל בתהנית: ${error.message || 'אירעה שגיאה בשרת'}`,
+                variant: 'destructive'
+            })
         } finally {
             setSubmitting(false)
         }

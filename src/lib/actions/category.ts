@@ -125,7 +125,6 @@ export async function addCategory(data: { name: string; type: string; color?: st
             }
         })
 
-        console.log(`[addCategory] Successfully added category: ${category.name}`)
         revalidatePath('/dashboard')
 
         return {
@@ -136,9 +135,7 @@ export async function addCategory(data: { name: string; type: string; color?: st
         console.error('[addCategory] Database error:', error)
         return {
             success: false,
-            error: error.code === 'P2002'
-                ? 'A category with this name already exists'
-                : (error.message || 'Failed to save category to database')
+            error: `שגיאת שרת: ${error.message || 'לא ניתן לשמור קטגוריה'}`
         }
     }
 }
