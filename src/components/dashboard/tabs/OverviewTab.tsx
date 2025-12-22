@@ -470,7 +470,7 @@ export function OverviewTab() {
                                     current={totalPaidDebts}
                                     total={totalDebtsPlanned}
                                     currency={currency}
-                                    color="bg-rose-500"
+                                    color="bg-purple-500"
                                 />
                                 <BudgetProgress
                                     label="חיסכון והפקדות"
@@ -488,7 +488,7 @@ export function OverviewTab() {
                                     </div>
                                     <div className="w-full bg-gray-100 rounded-full h-3">
                                         <div
-                                            className="bg-purple-600 h-3 rounded-full transition-all"
+                                            className="bg-green-600 h-3 rounded-full transition-all"
                                             style={{ width: `${Math.min(totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0, 100)}%` }}
                                         />
                                     </div>
