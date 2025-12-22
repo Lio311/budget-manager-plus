@@ -261,7 +261,7 @@ export function IncomeTab() {
                                                 <Plus className="h-4 w-4" />
                                             </Button>
                                         </PopoverTrigger>
-                                        <PopoverContent className="w-80 p-4" dir="rtl">
+                                        <PopoverContent className="w-80 p-4 z-50" dir="rtl">
                                             <div className="space-y-4">
                                                 <h4 className="font-medium leading-none mb-4">קטגוריה חדשה</h4>
                                                 <div className="space-y-2">
@@ -269,6 +269,12 @@ export function IncomeTab() {
                                                         placeholder="שם הקטגוריה"
                                                         value={newCategoryName}
                                                         onChange={(e) => setNewCategoryName(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault(); // Prevent form submission if any
+                                                                handleAddCategory();
+                                                            }
+                                                        }}
                                                     />
                                                 </div>
                                                 <div className="grid grid-cols-5 gap-2">
