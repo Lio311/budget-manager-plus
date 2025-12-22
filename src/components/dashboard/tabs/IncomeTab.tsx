@@ -257,7 +257,7 @@ export function IncomeTab() {
 
                                     <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
                                         <PopoverTrigger asChild>
-                                            <Button variant="outline" size="icon" className="shrink-0">
+                                            <Button type="button" variant="outline" size="icon" className="shrink-0">
                                                 <Plus className="h-4 w-4" />
                                             </Button>
                                         </PopoverTrigger>
@@ -282,7 +282,7 @@ export function IncomeTab() {
                                                         />
                                                     ))}
                                                 </div>
-                                                <Button onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>
+                                                <Button type="button" onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>
                                                     שמור קטגוריה
                                                 </Button>
                                             </div>

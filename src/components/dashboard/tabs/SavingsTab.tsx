@@ -300,7 +300,7 @@ export function SavingsTab() {
                                                 />
                                             ))}
                                         </div>
-                                        <Button onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>
+                                        <Button type="button" onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>
                                             שמור קטגוריה
                                         </Button>
                                     </div>
