@@ -322,19 +322,16 @@ export function DebtsTab() {
 
                             {/* חלק תחתון נפרד - עם מסגרת, רווח מלמעלה, וגובה מותאם */}
                             <div className="mt-4 border rounded-md bg-white transition-all">
-                                <div className="flex items-center justify-between p-2">
-                                    {/* צד שמאל ריק או לשימוש עתידי, הצ'קבוקס בימין */}
-                                    <div className="flex-1"></div>
-
+                                <div className="flex items-center justify-start p-2" dir="rtl">
                                     <div className="flex items-center gap-2">
-                                        <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none">
-                                            חוב בתשלומים
-                                        </label>
                                         <Checkbox
                                             id="recurring-debt"
                                             checked={newDebt.isRecurring}
                                             onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
                                         />
+                                        <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none">
+                                            חוב בתשלומים
+                                        </label>
                                     </div>
                                 </div>
 
