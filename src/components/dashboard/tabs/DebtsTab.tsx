@@ -283,7 +283,7 @@ export function DebtsTab() {
                             </div>
 
                             {/* Recurring Debt Section */}
-                            <div className="mt-4 space-y-3">
+                            <div className="flex items-start gap-4 p-4 border rounded-lg">
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="recurring-debt"
@@ -296,17 +296,17 @@ export function DebtsTab() {
                                 </div>
 
                                 {newDebt.isRecurring && (
-                                    <div className="grid gap-3 sm:grid-cols-2">
-                                        <div>
-                                            <label className="text-sm text-muted-foreground mb-1 block">תאריך התחלה</label>
+                                    <div className="flex gap-4 flex-1">
+                                        <div className="space-y-2 flex-1">
+                                            <label className="text-sm font-medium">תאריך התחלה</label>
                                             <DatePicker
                                                 date={newDebt.recurringStartDate}
                                                 setDate={(date) => setNewDebt({ ...newDebt, recurringStartDate: date })}
                                                 placeholder="בחר תאריך התחלה"
                                             />
                                         </div>
-                                        <div>
-                                            <label className="text-sm text-muted-foreground mb-1 block">תאריך סיום</label>
+                                        <div className="space-y-2 flex-1">
+                                            <label className="text-sm font-medium">תאריך סיום</label>
                                             <DatePicker
                                                 date={newDebt.recurringEndDate}
                                                 setDate={(date) => setNewDebt({ ...newDebt, recurringEndDate: date })}
