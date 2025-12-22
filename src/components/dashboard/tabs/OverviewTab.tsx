@@ -407,7 +407,7 @@ export function OverviewTab() {
                                 <ResponsiveContainer width="100%" height={300}>
                                     <BarChart
                                         data={incomeVsExpenses}
-                                        margin={{ top: 20, right: 20, left: 70, bottom: 20 }}
+                                        margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
                                         layout="horizontal"
                                     >
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -418,7 +418,7 @@ export function OverviewTab() {
                                         />
                                         <YAxis
                                             orientation="left"
-                                            width={70}
+                                            width={80}
                                             tickLine={false}
                                             axisLine={false}
                                             tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
