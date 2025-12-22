@@ -268,7 +268,7 @@ export function SavingsTab() {
                             </div>
 
                             {/* Recurring Savings Options */}
-                            <div className="flex items-start gap-4 p-4 border rounded-lg bg-slate-50">
+                            <div className="flex items-start gap-4 p-4 border rounded-lg">
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="recurring-saving"
