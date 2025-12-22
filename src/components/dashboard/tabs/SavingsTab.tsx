@@ -349,8 +349,8 @@ export function SavingsTab() {
                                 type="number"
                                 placeholder="יעד חיסכון"
                                 className="w-full"
-                                value={newSaving.targetAmount}
-                                onChange={(e) => setNewSaving({ ...newSaving, targetAmount: e.target.value })}
+                                value={newSaving.goal}
+                                onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
                             />
                         </div>
 
