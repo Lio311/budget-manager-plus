@@ -119,6 +119,11 @@ model Debt {
   recurringStartDate DateTime?
   recurringEndDate   DateTime?
   
+  // Installment fields
+  totalDebtAmount      Float?
+  numberOfInstallments Int?
+  installmentNumber    Int?
+  
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   
