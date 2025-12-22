@@ -1,3 +1,4 @@
+```typescript
 'use server'
 
 import { prisma } from '@/lib/db'
@@ -5,48 +6,61 @@ import { currentUser } from '@clerk/nextjs/server'
 import { addYears } from 'date-fns'
 
 export async function createSubscription(paypalOrderId: string, amount: number) {
+  try {
     const user = await currentUser()
-    if (!user) throw new Error('Unauthorized')
+
+    if (!user || !user.id) {
+      throw new Error('User not authenticated.')
+    }
+
     const userId = user.id
 
+    // Calculate end date for 1 year from now
     const endDate = addYears(new Date(), 1)
 
-    // Create/update subscription
+    // Create or update subscription
     const subscription = await prisma.subscription.upsert({
-        where: { userId },
-        create: {
-            userId,
-            paypalOrderId,
-            status: 'active',
-            startDate: new Date(),
-            endDate,
-            lastPaymentDate: new Date(),
-            lastPaymentAmount: amount
-        },
-        update: {
-            paypalOrderId,
-            status: 'active',
-            endDate,
-            lastPaymentDate: new Date(),
-            lastPaymentAmount: amount,
-            expiryNotified30Days: false,
-            expiryNotified7Days: false,
-            deletionScheduledFor: null
-        }
+      where: { userId },
+      update: {
+        status: 'active',
+        startDate: new Date(),
+        endDate: endDate,
+        paypalOrderId: paypalOrderId,
+        amount: amount,
+      },
+      create: {
+        userId,
+        status: 'active',
+        startDate: new Date(),
+        endDate: endDate,
+        paypalOrderId: paypalOrderId,
+        amount: amount,
+      },
     })
+
+    console.log('Subscription created/updated:', subscription.id)
+    console.log('Creating payment history...')
 
     // Record payment
-    await prisma.paymentHistory.create({
-        data: {
-            userId,
-            paypalOrderId,
-            amount,
-            currency: 'ILS',
-            status: 'completed'
-        }
+    const payment = await prisma.paymentHistory.create({
+      data: {
+        userId: user.id,
+        paypalOrderId,
+        amount,
+        currency: 'ILS',
+        status: 'completed'
+      }
     })
 
-    return { success: true, subscription }
+    console.log('Payment history created:', payment.id)
+    console.log('createSubscription completed successfully')
+
+    return { subscription, payment }
+  } catch (error) {
+    console.error('createSubscription error:', error)
+    console.error('Error details:', JSON.stringify(error, null, 2))
+    throw error
+  }
 }
 
 export async function getSubscriptionStatus(userId: string) {
