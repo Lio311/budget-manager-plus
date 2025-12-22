@@ -88,6 +88,8 @@ export function ExpensesTab() {
         }
     }, [categories, newExpense.category])
 
+    const totalExpenses = expenses.reduce((sum: number, exp: any) => sum + exp.amount, 0)
+
     // --- Actions ---
 
     async function handleAdd() {
@@ -213,6 +215,17 @@ export function ExpensesTab() {
 
     return (
         <div className="space-y-6">
+            <Card className="bg-gradient-to-l from-red-50 to-white border-red-200 shadow-sm">
+                <CardHeader className="p-4 pb-2">
+                    <CardTitle className="text-red-700 text-xs sm:text-sm">סך הוצאות חודשיות</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                    <div className="text-xl sm:text-2xl font-bold text-red-600">
+                        {formatCurrency(totalExpenses, currency)}
+                    </div>
+                </CardContent>
+            </Card>
+
             <Card>
                 <CardHeader>
                     <CardTitle>הוסף הוצאה חדשה</CardTitle>
