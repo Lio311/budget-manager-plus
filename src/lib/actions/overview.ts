@@ -28,26 +28,28 @@ export async function getOverviewData(month: number, year: number) {
             return { success: false, error: 'User not found' }
         }
 
-        // Get current and previous budgets
+        // Get current and previous budgets with optimized field selection
         const [currentBudget, previousBudget] = await Promise.all([
             prisma.budget.findFirst({
                 where: { userId, month, year },
-                include: {
-                    incomes: true,
-                    expenses: true,
-                    bills: true,
-                    debts: true,
-                    savings: true
+                select: {
+                    id: true,
+                    incomes: { select: { id: true, source: true, category: true, amount: true, date: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, date: true } },
+                    bills: { select: { id: true, name: true, amount: true, isPaid: true } },
+                    debts: { select: { id: true, creditor: true, monthlyPayment: true, isPaid: true } },
+                    savings: { select: { id: true, type: true, monthlyDeposit: true } }
                 }
             }),
             prisma.budget.findFirst({
                 where: { userId, month: prevMonth, year: prevYear },
-                include: {
-                    incomes: true,
-                    expenses: true,
-                    bills: true,
-                    debts: true,
-                    savings: true
+                select: {
+                    id: true,
+                    incomes: { select: { id: true, source: true, category: true, amount: true, date: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, date: true } },
+                    bills: { select: { id: true, name: true, amount: true, isPaid: true } },
+                    debts: { select: { id: true, creditor: true, monthlyPayment: true, isPaid: true } },
+                    savings: { select: { id: true, type: true, monthlyDeposit: true } }
                 }
             })
         ])

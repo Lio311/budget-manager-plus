@@ -19,6 +19,7 @@ import { getUserSettings, updateUserSettings } from '@/lib/actions/user'
 import { CategoryManager } from '@/components/dashboard/CategoryManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
+import { swrConfig } from '@/lib/swr-config'
 
 interface Category {
     id: string
@@ -70,7 +71,7 @@ export function OverviewTab() {
     const { data: overviewData, isLoading: loading, mutate: mutateOverview } = useSWR(
         ['overview', month, year],
         fetchOverviewData,
-        { revalidateOnFocus: false, revalidateOnReconnect: false, refreshInterval: 0 }
+        swrConfig
     )
 
     if (loading || !overviewData) {
@@ -395,7 +396,7 @@ export function OverviewTab() {
                                         barCategoryGap="15%"
                                     >
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.5} />
-                                        
+
                                         <XAxis
                                             dataKey="name"
                                             tickLine={false}
@@ -406,26 +407,26 @@ export function OverviewTab() {
                                             // זה דוחף את העמודה הראשונה 30 פיקסלים ימינה מציר ה-Y
                                             padding={{ left: 30, right: 10 }}
                                         />
-                                        
+
                                         <YAxis
                                             orientation="left"
-                                            width={45} 
+                                            width={45}
                                             tickLine={false}
                                             axisLine={false}
                                             tick={{ fontSize: 12 }}
                                             tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
                                         />
-                                        
-                                        <Tooltip 
-                                            content={<CustomTooltip currency={currency} />} 
-                                            cursor={{ fill: 'transparent' }} 
+
+                                        <Tooltip
+                                            content={<CustomTooltip currency={currency} />}
+                                            cursor={{ fill: 'transparent' }}
                                         />
-                                        
-                                        <Bar 
-                                            dataKey="value" 
-                                            radius={[4, 4, 0, 0]} 
+
+                                        <Bar
+                                            dataKey="value"
+                                            radius={[4, 4, 0, 0]}
                                             // 3. הגדלתי מעט את המקסימום כדי שהעמודות יוכלו להתרחב ולמלא את החלל שנוצר
-                                            maxBarSize={50} 
+                                            maxBarSize={50}
                                         >
                                             {incomeVsExpenses.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={entry.color} />

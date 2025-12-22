@@ -37,6 +37,7 @@ model Budget {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@unique([userId, month, year])
+  @@index([userId, month, year])
   @@map("budgets")
 }
 
@@ -54,6 +55,7 @@ model Income {
   recurringEndDate    DateTime?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+  @@index([budgetId])
   @@map("incomes")
 }
 
@@ -71,6 +73,7 @@ model Expense {
   recurringEndDate    DateTime?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+  @@index([budgetId])
   @@map("expenses")
 }
 
@@ -85,6 +88,7 @@ model Bill {
   paidDate  DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  @@index([budgetId])
   @@map("bills")
 }
 
@@ -107,6 +111,7 @@ model Debt {
   installmentNumber    Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  @@index([budgetId])
   @@map("debts")
 }
 
@@ -126,6 +131,7 @@ model Saving {
   recurringEndDate    DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  @@index([budgetId])
   @@map("savings")
 }
 
@@ -139,5 +145,6 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@unique([userId, name, type])
+  @@index([userId, type])
   @@map("categories")
 }
