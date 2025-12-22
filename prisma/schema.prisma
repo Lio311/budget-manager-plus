@@ -136,6 +136,11 @@ model Saving {
   goal            String?
   date            DateTime
   
+  isRecurring        Boolean   @default(false)
+  recurringSourceId  String?
+  recurringStartDate DateTime?
+  recurringEndDate   DateTime?
+  
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   
