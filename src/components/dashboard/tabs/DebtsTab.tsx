@@ -11,7 +11,6 @@ import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib
 import { useToast } from '@/hooks/use-toast'
 import { Checkbox } from '@/components/ui/checkbox'
 
-// Interface for Debt items
 interface Debt {
     id: string
     creditor: string
@@ -181,7 +180,6 @@ export function DebtsTab() {
                 </div>
             ) : (
                 <>
-                    {/* Summary Cards */}
                     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                         <Card className="bg-gradient-to-l from-purple-50 to-white border-purple-200 shadow-sm">
                             <CardHeader className="p-4 pb-2">
@@ -228,7 +226,6 @@ export function DebtsTab() {
                         </Card>
                     </div>
 
-                    {/* Add New Debt */}
                     <Card className="mx-0 sm:mx-auto">
                         <CardHeader>
                             <CardTitle className="text-lg">הוסף חוב חדש</CardTitle>
@@ -273,7 +270,6 @@ export function DebtsTab() {
                                     </Button>
                                 </div>
 
-                                {/* Recurring Debt Section */}
                                 <div className="flex items-start gap-4 p-4 border rounded-lg">
                                     <div className="flex items-center gap-2">
                                         <Checkbox
@@ -316,136 +312,135 @@ export function DebtsTab() {
                             </div>
                         </CardContent>
                     </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">רשימת חובות</CardTitle>
+                        </CardHeader>
+                        <CardContent className="px-2 sm:px-6">
+                            <div className="space-y-3">
+                                {debts.length === 0 ? (
+                                    <p className="text-center text-muted-foreground py-8 italic">אין חובות רשומים</p>
+                                ) : (
+                                    debts.map((debt) => (
+                                        <div
+                                            key={debt.id}
+                                            className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg gap-4 transition-all ${debt.isPaid ? 'bg-green-50/50 border-green-200' : 'bg-white hover:bg-slate-50'
+                                                }`}
+                                        >
+                                            {editingId === debt.id ? (
+                                                <>
+                                                    <div className="flex-1 grid gap-4 md:grid-cols-4 w-full">
+                                                        <Input
+                                                            placeholder="שם הנושה"
+                                                            value={editData.creditor}
+                                                            onChange={(e) => setEditData({ ...editData, creditor: e.target.value })}
+                                                            disabled={submitting}
+                                                        />
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="סכום כולל"
+                                                            value={editData.totalAmount}
+                                                            onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
+                                                            disabled={submitting}
+                                                        />
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="תשלום חודשי"
+                                                            value={editData.monthlyPayment}
+                                                            onChange={(e) => setEditData({ ...editData, monthlyPayment: e.target.value })}
+                                                            disabled={submitting}
+                                                        />
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="יום (1-31)"
+                                                            min="1"
+                                                            max="31"
+                                                            value={editData.dueDay}
+                                                            onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
+                                                            disabled={submitting}
+                                                        />
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={handleUpdate}
+                                                            disabled={submitting}
+                                                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                        >
+                                                            <Check className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={handleCancelEdit}
+                                                            disabled={submitting}
+                                                            className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="flex items-start gap-3 w-full sm:w-auto">
+                                                        <button
+                                                            onClick={() => togglePaid(debt.id, debt.isPaid)}
+                                                            className={`mt-1 w-6 h-6 shrink-0 rounded border-2 flex items-center justify-center transition-colors ${debt.isPaid ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-500'
+                                                                }`}
+                                                        >
+                                                            {debt.isPaid && <Check className="h-4 w-4 text-white" />}
+                                                        </button>
+
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className={`font-bold text-base truncate ${debt.isPaid ? 'line-through text-muted-foreground' : 'text-slate-900'}`}>
+                                                                {debt.creditor}
+                                                            </p>
+                                                            <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
+                                                                <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, currency)}</span>
+                                                                <span className="text-slate-500">יום תשלום: {debt.dueDay}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between w-full sm:w-auto sm:gap-6 pt-3 sm:pt-0 border-t sm:border-0 border-slate-100">
+                                                        <div className="text-right sm:text-left">
+                                                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">תשלום החודש</p>
+                                                            <span className={`text-lg font-black ${debt.isPaid ? 'text-green-600' : 'text-purple-600'}`}>
+                                                                {formatCurrency(debt.monthlyPayment, currency)}
+                                                            </span>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleEdit(debt)}
+                                                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleDelete(debt.id)}
+                                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </CardContent>
+                    </Card>
                 </>
             )}
-
-            {/* Debts List */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg">רשימת חובות</CardTitle>
-                </CardHeader>
-                <CardContent className="px-2 sm:px-6">
-                    <div className="space-y-3">
-                        {debts.length === 0 ? (
-                            <p className="text-center text-muted-foreground py-8 italic">אין חובות רשומים</p>
-                        ) : (
-                            debts.map((debt) => (
-                                <div
-                                    key={debt.id}
-                                    className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg gap-4 transition-all ${debt.isPaid ? 'bg-green-50/50 border-green-200' : 'bg-white hover:bg-slate-50'
-                                        }`}
-                                >
-                                    {editingId === debt.id ? (
-                                        <>
-                                            <div className="flex-1 grid gap-4 md:grid-cols-4 w-full">
-                                                <Input
-                                                    placeholder="שם הנושה"
-                                                    value={editData.creditor}
-                                                    onChange={(e) => setEditData({ ...editData, creditor: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    placeholder="סכום כולל"
-                                                    value={editData.totalAmount}
-                                                    onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    placeholder="תשלום חודשי"
-                                                    value={editData.monthlyPayment}
-                                                    onChange={(e) => setEditData({ ...editData, monthlyPayment: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    placeholder="יום (1-31)"
-                                                    min="1"
-                                                    max="31"
-                                                    value={editData.dueDay}
-                                                    onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={handleUpdate}
-                                                    disabled={submitting}
-                                                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                                >
-                                                    <Check className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={handleCancelEdit}
-                                                    disabled={submitting}
-                                                    className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="flex items-start gap-3 w-full sm:w-auto">
-                                                <button
-                                                    onClick={() => togglePaid(debt.id, debt.isPaid)}
-                                                    className={`mt-1 w-6 h-6 shrink-0 rounded border-2 flex items-center justify-center transition-colors ${debt.isPaid ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-500'
-                                                        }`}
-                                                >
-                                                    {debt.isPaid && <Check className="h-4 w-4 text-white" />}
-                                                </button>
-
-                                                <div className="flex-1 min-w-0">
-                                                    <p className={`font-bold text-base truncate ${debt.isPaid ? 'line-through text-muted-foreground' : 'text-slate-900'}`}>
-                                                        {debt.creditor}
-                                                    </p>
-                                                    <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
-                                                        <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, currency)}</span>
-                                                        <span className="text-slate-500">יום תשלום: {debt.dueDay}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center justify-between w-full sm:w-auto sm:gap-6 pt-3 sm:pt-0 border-t sm:border-0 border-slate-100">
-                                                <div className="text-right sm:text-left">
-                                                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">תשלום החודש</p>
-                                                    <span className={`text-lg font-black ${debt.isPaid ? 'text-green-600' : 'text-purple-600'}`}>
-                                                        {formatCurrency(debt.monthlyPayment, currency)}
-                                                    </span>
-                                                </div>
-
-                                                <div className="flex items-center gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleEdit(debt)}
-                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                                    >
-                                                        <Pencil className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleDelete(debt.id)}
-                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            ))
-                        }
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     )
 }
