@@ -25,8 +25,7 @@ export async function createSubscription(paypalOrderId: string, amount: number) 
             update: {},
             create: {
                 id: userId,
-                email: user.emailAddresses[0]?.emailAddress || '',
-                name: user.fullName || user.firstName || 'User'
+                email: user.emailAddresses[0]?.emailAddress || ''
             }
         })
         console.log('User synced successfully')
