@@ -26,11 +26,13 @@ export async function getNetWorthHistory() {
         // We need budgets to link to transactions
         const budgets = await prisma.budget.findMany({
             where: { userId },
-            include: {
-                incomes: true,
-                expenses: true,
-                bills: true,
-                debts: true
+            select: {
+                month: true,
+                year: true,
+                incomes: { select: { amount: true } },
+                expenses: { select: { amount: true } },
+                bills: { select: { amount: true } },
+                debts: { select: { monthlyPayment: true } }
             },
             orderBy: [
                 { year: 'asc' },

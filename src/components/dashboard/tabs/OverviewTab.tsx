@@ -321,124 +321,131 @@ export function OverviewTab() {
                 />
             </div>
 
-            {/* Net Worth Chart */}
-            <div className="grid gap-6">
-                <NetWorthChart data={netWorthHistory} />
-            </div>
+            {/* Charts Section */}
+            <div className="space-y-6">
+                {/* Top Row: Net Worth + Budget Progress (if enough data) vs Just Budget Progress */}
+                <div className={`grid gap-6 ${netWorthHistory.length >= 2 ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
+                    {netWorthHistory.length >= 2 && (
+                        <div className="grid gap-6">
+                            <NetWorthChart data={netWorthHistory} />
+                        </div>
+                    )}
 
-            {/* Charts Row */}
-            <div className="grid gap-6 md:grid-cols-2">
-                {/* Income vs Expenses Pie Chart */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>התפלגות תקציב</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {totalForPie === 0 ? (
-                            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                                אין נתונים להצגה
+                    {/* Budget Progress */}
+                    <Card className="h-full">
+                        <CardHeader>
+                            <CardTitle>מצב תקציב חודשי</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-6">
+                                <BudgetProgress
+                                    label="הוצאות מתוך תקציב"
+                                    current={data.totalExpenses}
+                                    total={data.totalIncome}
+                                    currency={currency}
+                                    color="bg-purple-500"
+                                />
+                                <BudgetProgress
+                                    label="חשבונות קבועים"
+                                    current={data.totalBills}
+                                    total={data.totalIncome}
+                                    currency={currency}
+                                    color="bg-yellow-500"
+                                />
+                                <BudgetProgress
+                                    label="חיסכון"
+                                    current={savings}
+                                    total={data.totalIncome}
+                                    currency={currency}
+                                    color="bg-green-500"
+                                />
                             </div>
-                        ) : (
-                            <ResponsiveContainer width="100%" height={300}>
-                                <PieChart>
-                                    <Pie
-                                        data={incomeVsExpenses}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={70}
-                                        outerRadius={110}
-                                        paddingAngle={5}
-                                        dataKey="value"
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Bottom Row: Pie Chart + Expenses Breakdown */}
+                <div className="grid gap-6 md:grid-cols-2">
+                    {/* Income vs Expenses Pie Chart */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>התפלגות תקציב</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {totalForPie === 0 ? (
+                                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                                    אין נתונים להצגה
+                                </div>
+                            ) : (
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <PieChart>
+                                        <Pie
+                                            data={incomeVsExpenses}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={70}
+                                            outerRadius={110}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {incomeVsExpenses.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip currency={currency} />} />
+                                        <Legend
+                                            formatter={(value) => <span className="mr-2">{value}</span>}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Expenses by Category */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>הוצאות לפי קטגוריה</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {data.expensesByCategory.length === 0 ? (
+                                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                                    אין הוצאות להצגה
+                                </div>
+                            ) : (
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart
+                                        data={data.expensesByCategory}
+                                        margin={{ top: 20, right: 10, left: 60, bottom: 5 }}
+                                        layout="horizontal"
                                     >
-                                        {incomeVsExpenses.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip currency={currency} />} />
-                                    <Legend
-                                        formatter={(value) => <span className="mr-2">{value}</span>}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        )}
-                    </CardContent>
-                </Card >
-
-                {/* Expenses by Category */}
-                < Card >
-                    <CardHeader>
-                        <CardTitle>הוצאות לפי קטגוריה</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {data.expensesByCategory.length === 0 ? (
-                            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                                אין הוצאות להצגה
-                            </div>
-                        ) : (
-                            <ResponsiveContainer width="100%" height={300}>
-                                <BarChart
-                                    data={data.expensesByCategory}
-                                    margin={{ top: 20, right: 10, left: 60, bottom: 5 }}
-                                    layout="horizontal"
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis
-                                        dataKey="name"
-                                        tickLine={false}
-                                        axisLine={false}
-                                    />
-                                    <YAxis
-                                        orientation="left"
-                                        width={60}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
-                                    />
-                                    <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
-                                    <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={80}>
-                                        {data.expensesByCategory.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        )}
-                    </CardContent>
-                </Card >
-            </div >
-
-            {/* Budget Progress */}
-            < Card >
-                <CardHeader>
-                    <CardTitle>מצב תקציב חודשי</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        <BudgetProgress
-                            label="הוצאות מתוך תקציב"
-                            current={data.totalExpenses}
-                            total={data.totalIncome}
-                            currency={currency}
-                            color="bg-purple-500"
-                        />
-                        <BudgetProgress
-                            label="חשבונות קבועים"
-                            current={data.totalBills}
-                            total={data.totalIncome}
-                            currency={currency}
-                            color="bg-yellow-500"
-                        />
-                        <BudgetProgress
-                            label="חיסכון"
-                            current={savings}
-                            total={data.totalIncome}
-                            currency={currency}
-                            color="bg-green-500"
-                        />
-                    </div>
-                </CardContent>
-            </Card >
-        </div >
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis
+                                            dataKey="name"
+                                            tickLine={false}
+                                            axisLine={false}
+                                        />
+                                        <YAxis
+                                            orientation="left"
+                                            width={60}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
+                                        />
+                                        <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
+                                        <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={80}>
+                                            {data.expensesByCategory.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
     )
 }
 
