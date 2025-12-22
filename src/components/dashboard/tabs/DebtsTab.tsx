@@ -1,5 +1,7 @@
 'use client'
 
+import useSWR from 'swr'
+
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -24,8 +26,24 @@ interface Debt {
 export function DebtsTab() {
     const { month, year, currency } = useBudget()
     const { toast } = useToast()
-    const [debts, setDebts] = useState<Debt[]>([])
-    const [loading, setLoading] = useState(true)
+    const fetcher = async () => {
+        const result = await getDebts(month, year)
+        if (result.success && result.data) return result.data
+        throw new Error(result.error || 'Failed to fetch debts')
+    }
+
+    const { data: debts = [], isLoading: loading, mutate } = useSWR(['debts', month, year], fetcher, {
+        revalidateOnFocus: false,
+        onError: (err) => {
+            toast({
+                title: 'שגיאה',
+                description: 'לא ניתן לטעון חובות',
+                variant: 'destructive',
+                duration: 1000
+            })
+        }
+    })
+
     const [submitting, setSubmitting] = useState(false)
     const [newDebt, setNewDebt] = useState({
         creditor: '',
@@ -42,64 +60,26 @@ export function DebtsTab() {
     const paidThisMonth = debts.filter(d => d.isPaid).reduce((sum, debt) => sum + debt.monthlyPayment, 0)
     const unpaidThisMonth = monthlyPayments - paidThisMonth
 
-    useEffect(() => {
-        loadDebts()
-    }, [month, year])
-
-    async function loadDebts() {
-        setLoading(true)
-        const result = await getDebts(month, year)
-
-        if (result.success && result.data) {
-            setDebts(result.data)
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לטעון חובות',
-                variant: 'destructive',
-                duration: 1000
-            })
-        }
-        setLoading(false)
-    }
-
     const handleAdd = async () => {
         // Validate required fields
         if (!newDebt.creditor || !newDebt.creditor.trim()) {
-            toast({
-                title: 'שגיאה',
-                description: 'יש למלא שם נושה',
-                variant: 'destructive'
-            })
+            toast({ title: 'שגיאה', description: 'יש למלא שם נושה', variant: 'destructive' })
             return
         }
 
         if (!newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0) {
-            toast({
-                title: 'שגיאה',
-                description: 'יש למלא סכום כולל תקין',
-                variant: 'destructive'
-            })
+            toast({ title: 'שגיאה', description: 'יש למלא סכום כולל תקין', variant: 'destructive' })
             return
         }
 
         if (!newDebt.dueDay || parseInt(newDebt.dueDay) < 1 || parseInt(newDebt.dueDay) > 31) {
-            toast({
-                title: 'שגיאה',
-                description: 'יש למלא יום תשלום בין 1-31',
-                variant: 'destructive'
-            })
+            toast({ title: 'שגיאה', description: 'יש למלא יום תשלום בין 1-31', variant: 'destructive' })
             return
         }
 
-        // Validate installment-specific fields
         if (newDebt.isRecurring) {
             if (!newDebt.numberOfInstallments || parseInt(newDebt.numberOfInstallments) < 1) {
-                toast({
-                    title: 'שגיאה',
-                    description: 'מספר תשלומים חייב להיות לפחות 1',
-                    variant: 'destructive'
-                })
+                toast({ title: 'שגיאה', description: 'מספר תשלומים חייב להיות לפחות 1', variant: 'destructive' })
                 return
             }
         }
@@ -121,26 +101,14 @@ export function DebtsTab() {
         })
 
         if (result.success) {
-            setNewDebt({
-                creditor: '',
-                totalAmount: '',
-                dueDay: '',
-                isRecurring: false,
-                numberOfInstallments: ''
-            })
-            await loadDebts()
+            setNewDebt({ creditor: '', totalAmount: '', dueDay: '', isRecurring: false, numberOfInstallments: '' })
+            await mutate() // Refresh data
             toast({
                 title: 'הצלחה',
-                description: newDebt.isRecurring
-                    ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה`
-                    : 'החוב נוסף בהצלחה'
+                description: newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'החוב נוסף בהצלחה'
             })
         } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן להוסיף חוב',
-                variant: 'destructive'
-            })
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חוב', variant: 'destructive' })
         }
         setSubmitting(false)
     }
@@ -148,18 +116,16 @@ export function DebtsTab() {
     const handleDelete = async (id: string) => {
         const result = await deleteDebt(id)
         if (result.success) {
-            await loadDebts()
-            toast({
-                title: 'הצלחה',
-                description: 'החוב נמחק בהצלחה'
-            })
+            await mutate() // Refresh data
+            toast({ title: 'הצלחה', description: 'החוב נמחק בהצלחה' })
         }
     }
 
     const togglePaid = async (id: string, currentStatus: boolean) => {
+        // Optimistic update could be done here, but simple revalidation is safer for now
         const result = await toggleDebtPaid(id, !currentStatus)
         if (result.success) {
-            await loadDebts()
+            await mutate() // Refresh data
         }
     }
 
@@ -216,7 +182,7 @@ export function DebtsTab() {
             })
             setEditingId(null)
             setEditData({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
-            await loadDebts()
+            await mutate()
         } else {
             toast({
                 title: 'שגיאה',
