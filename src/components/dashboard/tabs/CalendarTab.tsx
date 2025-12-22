@@ -163,7 +163,9 @@ export function CalendarTab() {
                                                                     ? 'bg-purple-200 text-purple-800'
                                                                     : payment.type === 'income'
                                                                         ? 'bg-green-200 text-green-800'
-                                                                        : 'bg-red-200 text-red-800'
+                                                                        : payment.type === 'saving'
+                                                                            ? 'bg-blue-200 text-blue-800'
+                                                                            : 'bg-red-200 text-red-800'
                                                                 } ${payment.isPaid ? 'opacity-50 line-through' : ''}`}
                                                         >
                                                             {payment.name}
@@ -223,9 +225,11 @@ export function CalendarTab() {
                                                                 ? 'bg-purple-100 text-purple-700'
                                                                 : payment.type === 'income'
                                                                     ? 'bg-green-100 text-green-700'
-                                                                    : 'bg-red-100 text-red-700'
+                                                                    : payment.type === 'saving'
+                                                                        ? 'bg-blue-100 text-blue-700'
+                                                                        : 'bg-red-100 text-red-700'
                                                             }`}>
-                                                            {payment.type === 'bill' ? 'חשבון' : payment.type === 'debt' ? 'חוב' : payment.type === 'income' ? 'הכנסה' : 'הוצאה'}
+                                                            {payment.type === 'bill' ? 'חשבון' : payment.type === 'debt' ? 'חוב' : payment.type === 'income' ? 'הכנסה' : payment.type === 'saving' ? 'חיסכון' : 'הוצאה'}
                                                         </span>
                                                     </div>
                                                     <p className="text-sm text-muted-foreground">
@@ -242,7 +246,9 @@ export function CalendarTab() {
                                                             ? 'text-purple-600'
                                                             : payment.type === 'income'
                                                                 ? 'text-green-600'
-                                                                : 'text-red-600'
+                                                                : payment.type === 'saving'
+                                                                    ? 'text-blue-600'
+                                                                    : 'text-red-600'
                                                     }`}>
                                                     {formatCurrency(payment.amount, currency)}
                                                 </span>
