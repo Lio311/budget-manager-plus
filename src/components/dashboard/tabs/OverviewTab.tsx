@@ -67,7 +67,7 @@ export function OverviewTab() {
         throw new Error(result.error || 'Failed to fetch overview data')
     }, [month, year])
 
-    const { data: overviewData, isLoading: loading } = useSWR(
+    const { data: overviewData, isLoading: loading, mutate: mutateOverview } = useSWR(
         ['overview', month, year],
         fetchOverviewData,
         { revalidateOnFocus: false, revalidateOnReconnect: false, refreshInterval: 0 }
@@ -158,8 +158,8 @@ export function OverviewTab() {
         if (result.success) {
             toast.success('הגדרות עודכנו בהצלחה')
             setIsSettingsOpen(false)
-            // Re-fetch net worth history without reloading the whole page
-            mutateNetWorth()
+            // Re-fetch overview data to update net worth with new initial values
+            mutateOverview()
         } else {
             toast.error('שגיאה בעדכון הגדרות')
         }
