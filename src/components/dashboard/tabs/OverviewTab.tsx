@@ -199,7 +199,7 @@ export function OverviewTab() {
 
     // Add Debts, Savings and Paid Bills as virtual categories
     if (totalPaidDebts > 0) {
-        expensesByCategory.push({ name: 'חובות ששולמו', value: totalPaidDebts, color: '#F43F5E' }) // Rose 500
+        expensesByCategory.push({ name: 'חובות ששולמו', value: totalPaidDebts, color: '#A855F7' }) // Purple 500
     }
     if (totalSavingsDeposits > 0) {
         expensesByCategory.push({ name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }) // Blue 500
@@ -232,7 +232,7 @@ export function OverviewTab() {
     const incomeVsExpenses = [
         { name: 'הכנסות', value: totalIncome, color: COLORS.income },
         { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
-        { name: 'חובות', value: totalPaidDebts, color: '#F43F5E' }, // Rose 500
+        { name: 'חובות', value: totalPaidDebts, color: '#A855F7' }, // Purple 500
         { name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }, // Blue 500
         { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills }, // Orange
     ]
