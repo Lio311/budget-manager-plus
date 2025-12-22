@@ -12,6 +12,7 @@ import { getIncomes } from '@/lib/actions/income'
 import { getExpenses } from '@/lib/actions/expense'
 import { getBills } from '@/lib/actions/bill'
 import { getCategories } from '@/lib/actions/category'
+import { getSavings } from '@/lib/actions/savings'
 import { getNetWorthHistory } from '@/lib/actions/analytics'
 import { getHexFromClass } from '@/lib/constants'
 import { NetWorthChart } from '@/components/dashboard/NetWorthChart'
@@ -67,10 +68,12 @@ export function OverviewTab() {
     const fetchIncomesData = async () => (await getIncomes(month, year)).data || []
     const fetchExpensesData = async () => (await getExpenses(month, year)).data || []
     const fetchBillsData = async () => (await getBills(month, year)).data || []
+    const fetchSavingsData = async () => (await getSavings(month, year)).data || []
 
     const fetchPrevIncomesData = async () => (await getIncomes(prevMonth, prevYear)).data || []
     const fetchPrevExpensesData = async () => (await getExpenses(prevMonth, prevYear)).data || []
     const fetchPrevBillsData = async () => (await getBills(prevMonth, prevYear)).data || []
+    const fetchPrevSavingsData = async () => (await getSavings(prevMonth, prevYear)).data || []
     const fetchCategoriesData = async () => (await getCategories('expense')).data || []
     const fetchNetWorthData = async () => (await getNetWorthHistory()).data || []
 
@@ -86,14 +89,16 @@ export function OverviewTab() {
     const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year], fetchIncomesData, swrOptions)
     const { data: expenses = [], isLoading: loadingExpenses } = useSWR(['expenses', month, year], fetchExpensesData, swrOptions)
     const { data: bills = [], isLoading: loadingBills } = useSWR(['bills', month, year], fetchBillsData, swrOptions)
+    const { data: savingsData = [], isLoading: loadingSavings } = useSWR(['savings', month, year], fetchSavingsData, swrOptions)
 
     const { data: prevIncomes = [], isLoading: loadingPrevIncomes } = useSWR(['incomes', prevMonth, prevYear], fetchPrevIncomesData, swrOptions)
     const { data: prevExpenses = [], isLoading: loadingPrevExpenses } = useSWR(['expenses', prevMonth, prevYear], fetchPrevExpensesData, swrOptions)
     const { data: prevBills = [], isLoading: loadingPrevBills } = useSWR(['bills', prevMonth, prevYear], fetchPrevBillsData, swrOptions)
+    const { data: prevSavingsData = [], isLoading: loadingPrevSavings } = useSWR(['savings', prevMonth, prevYear], fetchPrevSavingsData, swrOptions)
     const { data: categories = [], isLoading: loadingCategories } = useSWR<Category[]>(['categories', 'expense'], fetchCategoriesData, swrOptions)
     const { data: netWorthHistory = [], isLoading: loadingNetWorth } = useSWR(['netWorth'], fetchNetWorthData, swrOptions)
 
-    const loading = loadingIncomes || loadingExpenses || loadingBills || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills || loadingCategories || loadingNetWorth
+    const loading = loadingIncomes || loadingExpenses || loadingBills || loadingSavings || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills || loadingPrevSavings || loadingCategories || loadingNetWorth
 
     if (loading) {
         return (
@@ -112,8 +117,8 @@ export function OverviewTab() {
     const prevTotalExpenses = prevExpenses.reduce((sum, e) => sum + e.amount, 0)
     const prevTotalBills = prevBills.reduce((sum, b) => sum + b.amount, 0)
 
-    const savings = totalIncome - totalExpenses - totalBills
-    const prevSavings = prevTotalIncome - prevTotalExpenses - prevTotalBills
+    const savings = savingsData.reduce((sum, s) => sum + s.monthlyDeposit, 0)
+    const prevSavings = prevSavingsData.reduce((sum, s) => sum + s.monthlyDeposit, 0)
 
     // Calculate percentage changes
     const calculateChange = (current: number, previous: number) => {
