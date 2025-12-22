@@ -11,6 +11,7 @@ import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib
 import { useToast } from '@/hooks/use-toast'
 import { Checkbox } from '@/components/ui/checkbox'
 
+// Interface for Debt items
 interface Debt {
     id: string
     creditor: string
