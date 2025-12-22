@@ -30,10 +30,8 @@ export function DebtsTab() {
     const [newDebt, setNewDebt] = useState({
         creditor: '',
         totalAmount: '',
-        monthlyPayment: '',
         dueDay: '',
         isRecurring: false,
-        totalDebtAmount: '',
         numberOfInstallments: ''
     })
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -66,64 +64,85 @@ export function DebtsTab() {
     }
 
     const handleAdd = async () => {
-        if (newDebt.creditor && newDebt.dueDay) {
-            // For installment debts, we need totalDebtAmount and numberOfInstallments
-            // For regular debts, we need totalAmount and monthlyPayment
-            if (newDebt.isRecurring) {
-                if (!newDebt.totalDebtAmount || !newDebt.numberOfInstallments) {
-                    toast({
-                        title: 'שגיאה',
-                        description: 'יש למלא סכום כולל ומספר תשלומים',
-                        variant: 'destructive'
-                    })
-                    return
-                }
-            } else {
-                if (!newDebt.totalAmount || !newDebt.monthlyPayment) {
-                    toast({
-                        title: 'שגיאה',
-                        description: 'יש למלא סכום כולל ותשלום חודשי',
-                        variant: 'destructive'
-                    })
-                    return
-                }
-            }
-
-            setSubmitting(true)
-            const result = await addDebt(month, year, {
-                creditor: newDebt.creditor,
-                totalAmount: parseFloat(newDebt.totalAmount) || 0,
-                monthlyPayment: parseFloat(newDebt.monthlyPayment) || 0,
-                dueDay: parseInt(newDebt.dueDay),
-                isRecurring: newDebt.isRecurring,
-                totalDebtAmount: newDebt.totalDebtAmount ? parseFloat(newDebt.totalDebtAmount) : undefined,
-                numberOfInstallments: newDebt.numberOfInstallments ? parseInt(newDebt.numberOfInstallments) : undefined
+        // Validate required fields
+        if (!newDebt.creditor || !newDebt.creditor.trim()) {
+            toast({
+                title: 'שגיאה',
+                description: 'יש למלא שם נושה',
+                variant: 'destructive'
             })
+            return
+        }
 
-            if (result.success) {
-                setNewDebt({
-                    creditor: '',
-                    totalAmount: '',
-                    monthlyPayment: '',
-                    dueDay: '',
-                    isRecurring: false,
-                    totalDebtAmount: '',
-                    numberOfInstallments: ''
-                })
-                await loadDebts()
-                toast({
-                    title: 'הצלחה',
-                    description: 'החוב נוסף בהצלחה'
-                })
-            } else {
+        if (!newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0) {
+            toast({
+                title: 'שגיאה',
+                description: 'יש למלא סכום כולל תקין',
+                variant: 'destructive'
+            })
+            return
+        }
+
+        if (!newDebt.dueDay || parseInt(newDebt.dueDay) < 1 || parseInt(newDebt.dueDay) > 31) {
+            toast({
+                title: 'שגיאה',
+                description: 'יש למלא יום תשלום בין 1-31',
+                variant: 'destructive'
+            })
+            return
+        }
+
+        // Validate installment-specific fields
+        if (newDebt.isRecurring) {
+            if (!newDebt.numberOfInstallments || parseInt(newDebt.numberOfInstallments) < 1) {
                 toast({
                     title: 'שגיאה',
-                    description: result.error || 'לא ניתן להוסיף חוב',
+                    description: 'מספר תשלומים חייב להיות לפחות 1',
                     variant: 'destructive'
                 })
+                return
             }
-            setSubmitting(false)
         }
+
+        setSubmitting(true)
+        const totalAmount = parseFloat(newDebt.totalAmount)
+        const monthlyPayment = newDebt.isRecurring
+            ? totalAmount / parseInt(newDebt.numberOfInstallments)
+            : totalAmount
+
+        const result = await addDebt(month, year, {
+            creditor: newDebt.creditor.trim(),
+            totalAmount,
+            monthlyPayment,
+            dueDay: parseInt(newDebt.dueDay),
+            isRecurring: newDebt.isRecurring,
+            totalDebtAmount: newDebt.isRecurring ? totalAmount : undefined,
+            numberOfInstallments: newDebt.isRecurring ? parseInt(newDebt.numberOfInstallments) : undefined
+        })
+
+        if (result.success) {
+            setNewDebt({
+                creditor: '',
+                totalAmount: '',
+                dueDay: '',
+                isRecurring: false,
+                numberOfInstallments: ''
+            })
+            await loadDebts()
+            toast({
+                title: 'הצלחה',
+                description: newDebt.isRecurring
+                    ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה`
+                    : 'החוב נוסף בהצלחה'
+            })
+        } else {
+            toast({
+                title: 'שגיאה',
+                description: result.error || 'לא ניתן להוסיף חוב',
+                variant: 'destructive'
+            })
+        }
+        setSubmitting(false)
     }
 
     const handleDelete = async (id: string) => {
@@ -320,16 +339,6 @@ export function DebtsTab() {
                                 {newDebt.isRecurring && (
                                     <div className="flex gap-4 flex-1">
                                         <div className="space-y-2 flex-1">
-                                            <label className="text-sm font-medium">סכום כולל</label>
-                                            <Input
-                                                type="number"
-                                                placeholder="0.00"
-                                                value={newDebt.totalDebtAmount}
-                                                onChange={(e) => setNewDebt({ ...newDebt, totalDebtAmount: e.target.value })}
-                                                disabled={submitting}
-                                            />
-                                        </div>
-                                        <div className="space-y-2 flex-1">
                                             <label className="text-sm font-medium">מספר תשלומים</label>
                                             <Input
                                                 type="number"
@@ -340,12 +349,12 @@ export function DebtsTab() {
                                                 disabled={submitting}
                                             />
                                         </div>
-                                        {newDebt.totalDebtAmount && newDebt.numberOfInstallments && (
+                                        {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
                                             <div className="space-y-2 flex-1">
                                                 <label className="text-sm font-medium">תשלום חודשי</label>
                                                 <div className="h-10 px-3 py-2 border rounded-md bg-muted flex items-center">
                                                     {formatCurrency(
-                                                        parseFloat(newDebt.totalDebtAmount) / parseInt(newDebt.numberOfInstallments),
+                                                        parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
                                                         currency
                                                     )}
                                                 </div>
