@@ -13,10 +13,12 @@ import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib
 import { useToast } from '@/hooks/use-toast'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
+import { DEBT_TYPES, DEBT_TYPE_LABELS, CREDITOR_LABELS } from '@/lib/constants/debt-types'
 
 interface Debt {
     id: string
     creditor: string
+    debtType: string
     totalAmount: number
     monthlyPayment: number
     dueDay: number
@@ -45,20 +47,46 @@ export function DebtsTab() {
     })
 
     const [submitting, setSubmitting] = useState(false)
-    const [newDebt, setNewDebt] = useState({
+    const [newDebt, setNewDebt] = useState<{
+        creditor: string
+        debtType: string
+        totalAmount: string
+        dueDay: string
+        isRecurring: boolean
+        numberOfInstallments: string
+    }>({
         creditor: '',
+        debtType: DEBT_TYPES.OWED_BY_ME,
         totalAmount: '',
         dueDay: '',
         isRecurring: false,
         numberOfInstallments: ''
     })
     const [editingId, setEditingId] = useState<string | null>(null)
-    const [editData, setEditData] = useState({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+    const [editData, setEditData] = useState<{ creditor: string; debtType: string; totalAmount: string; monthlyPayment: string; dueDay: string }>({
+        creditor: '',
+        debtType: DEBT_TYPES.OWED_BY_ME,
+        totalAmount: '',
+        monthlyPayment: '',
+        dueDay: ''
+    })
 
-    const totalDebts = debts.reduce((sum, debt) => sum + debt.totalAmount, 0)
-    const monthlyPayments = debts.reduce((sum, debt) => sum + debt.monthlyPayment, 0)
-    const paidThisMonth = debts.filter(d => d.isPaid).reduce((sum, debt) => sum + debt.monthlyPayment, 0)
-    const unpaidThisMonth = monthlyPayments - paidThisMonth
+    // Calculate debts split by type
+    const debtsOwedByMe = debts.filter((d: Debt) => d.debtType === DEBT_TYPES.OWED_BY_ME)
+    const debtsOwedToMe = debts.filter((d: Debt) => d.debtType === DEBT_TYPES.OWED_TO_ME)
+
+    const totalDebtsOwedByMe = debtsOwedByMe.reduce((sum: number, debt: Debt) => sum + debt.totalAmount, 0)
+    const totalDebtsOwedToMe = debtsOwedToMe.reduce((sum: number, debt: Debt) => sum + debt.totalAmount, 0)
+    const netDebt = totalDebtsOwedByMe - totalDebtsOwedToMe
+
+    const monthlyPaymentsOwedByMe = debtsOwedByMe.reduce((sum: number, debt: Debt) => sum + debt.monthlyPayment, 0)
+    const monthlyPaymentsOwedToMe = debtsOwedToMe.reduce((sum: number, debt: Debt) => sum + debt.monthlyPayment, 0)
+    const netMonthlyPayment = monthlyPaymentsOwedByMe - monthlyPaymentsOwedToMe
+
+    const paidThisMonth = debts.filter((d: Debt) => d.isPaid).reduce((sum: number, debt: Debt) => {
+        return sum + (debt.debtType === DEBT_TYPES.OWED_BY_ME ? debt.monthlyPayment : -debt.monthlyPayment)
+    }, 0)
+    const unpaidThisMonth = netMonthlyPayment - paidThisMonth
 
     const handleAdd = async () => {
         // Validate required fields
@@ -93,6 +121,7 @@ export function DebtsTab() {
 
             const result = await addDebt(month, year, {
                 creditor: newDebt.creditor.trim(),
+                debtType: newDebt.debtType,
                 totalAmount,
                 monthlyPayment,
                 dueDay: parseInt(newDebt.dueDay),
@@ -102,7 +131,14 @@ export function DebtsTab() {
             })
 
             if (result.success) {
-                setNewDebt({ creditor: '', totalAmount: '', dueDay: '', isRecurring: false, numberOfInstallments: '' })
+                setNewDebt({
+                    creditor: '',
+                    debtType: DEBT_TYPES.OWED_BY_ME,
+                    totalAmount: '',
+                    dueDay: '',
+                    isRecurring: false,
+                    numberOfInstallments: ''
+                })
                 await mutate() // Refresh data
                 toast({
                     title: 'הצלחה',
@@ -139,6 +175,7 @@ export function DebtsTab() {
         setEditingId(debt.id)
         setEditData({
             creditor: debt.creditor,
+            debtType: debt.debtType,
             totalAmount: debt.totalAmount.toString(),
             monthlyPayment: debt.monthlyPayment.toString(),
             dueDay: debt.dueDay.toString()
@@ -147,7 +184,7 @@ export function DebtsTab() {
 
     function handleCancelEdit() {
         setEditingId(null)
-        setEditData({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+        setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', monthlyPayment: '', dueDay: '' })
     }
 
     async function handleUpdate() {
@@ -175,6 +212,7 @@ export function DebtsTab() {
         setSubmitting(true)
         const result = await updateDebt(editingId, {
             creditor: editData.creditor,
+            debtType: editData.debtType,
             totalAmount: parseFloat(editData.totalAmount),
             monthlyPayment: parseFloat(editData.monthlyPayment),
             dueDay
@@ -187,7 +225,7 @@ export function DebtsTab() {
                 duration: 1000
             })
             setEditingId(null)
-            setEditData({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+            setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', monthlyPayment: '', dueDay: '' })
             await mutate()
         } else {
             toast({
@@ -213,11 +251,11 @@ export function DebtsTab() {
                     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                         <Card className="bg-gradient-to-l from-purple-50 to-white border-purple-200 shadow-sm">
                             <CardHeader className="p-4 pb-2">
-                                <CardTitle className="text-purple-700 text-xs sm:text-sm">סך חובות</CardTitle>
+                                <CardTitle className="text-purple-700 text-xs sm:text-sm">סך חובות נטו</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4 pt-0">
                                 <div className="text-xl sm:text-2xl font-bold text-purple-600 break-all">
-                                    {formatCurrency(totalDebts, currency)}
+                                    {formatCurrency(netDebt, currency)}
                                 </div>
                             </CardContent>
                         </Card>
@@ -228,7 +266,7 @@ export function DebtsTab() {
                             </CardHeader>
                             <CardContent className="p-4 pt-0">
                                 <div className="text-xl sm:text-2xl font-bold text-orange-600 break-all">
-                                    {formatCurrency(monthlyPayments, currency)}
+                                    {formatCurrency(netMonthlyPayment, currency)}
                                 </div>
                             </CardContent>
                         </Card>
@@ -262,11 +300,42 @@ export function DebtsTab() {
                             <CardTitle className="text-lg">הוסף חוב חדש</CardTitle>
                         </CardHeader>
                         <CardContent>
+                            {/* Debt Type Selector */}
+                            <div className="mb-4">
+                                <label className="text-sm font-medium mb-2 block">סוג חוב:</label>
+                                <div className="flex gap-4">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="debtType"
+                                            value={DEBT_TYPES.OWED_BY_ME}
+                                            checked={newDebt.debtType === DEBT_TYPES.OWED_BY_ME}
+                                            onChange={(e) => setNewDebt({ ...newDebt, debtType: e.target.value })}
+                                            disabled={submitting}
+                                            className="w-4 h-4"
+                                        />
+                                        <span>{DEBT_TYPE_LABELS[DEBT_TYPES.OWED_BY_ME]}</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="debtType"
+                                            value={DEBT_TYPES.OWED_TO_ME}
+                                            checked={newDebt.debtType === DEBT_TYPES.OWED_TO_ME}
+                                            onChange={(e) => setNewDebt({ ...newDebt, debtType: e.target.value })}
+                                            disabled={submitting}
+                                            className="w-4 h-4"
+                                        />
+                                        <span>{DEBT_TYPE_LABELS[DEBT_TYPES.OWED_TO_ME]}</span>
+                                    </label>
+                                </div>
+                            </div>
+
                             {/* שורת האינפוטים והכפתור */}
                             <div className="flex flex-wrap gap-3 items-end">
                                 <div className="flex-[2] min-w-[200px]">
                                     <Input
-                                        placeholder="נושה (למי חייב)"
+                                        placeholder={CREDITOR_LABELS[newDebt.debtType as keyof typeof CREDITOR_LABELS]}
                                         value={newDebt.creditor}
                                         onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
                                         disabled={submitting}

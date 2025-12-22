@@ -97,6 +97,7 @@ model Debt {
   budgetId          String
   budget            Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   creditor          String    
+  debtType          String    @default("owed_by_me")
   totalAmount       Float     
   monthlyPayment    Float     
   dueDay            Int       

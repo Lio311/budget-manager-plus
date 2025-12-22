@@ -24,6 +24,7 @@ export async function getDebts(month: number, year: number) {
 // Helper function to create debt installments
 async function createDebtInstallments(
     creditor: string,
+    debtType: string,
     totalDebtAmount: number,
     numberOfInstallments: number,
     dueDay: number,
@@ -47,6 +48,7 @@ async function createDebtInstallments(
         installments.push({
             budgetId: budget.id,
             creditor,
+            debtType,
             totalAmount: totalDebtAmount,
             monthlyPayment,
             dueDay,
@@ -69,6 +71,7 @@ export async function addDebt(
     year: number,
     data: {
         creditor: string
+        debtType: string
         totalAmount: number
         monthlyPayment: number
         dueDay: number
@@ -84,6 +87,7 @@ export async function addDebt(
         if (data.isRecurring && data.totalDebtAmount && data.numberOfInstallments) {
             await createDebtInstallments(
                 data.creditor,
+                data.debtType,
                 data.totalDebtAmount,
                 data.numberOfInstallments,
                 data.dueDay,
@@ -96,6 +100,7 @@ export async function addDebt(
                 data: {
                     budgetId: budget.id,
                     creditor: data.creditor,
+                    debtType: data.debtType,
                     totalAmount: data.totalAmount,
                     monthlyPayment: data.monthlyPayment,
                     dueDay: data.dueDay,
@@ -116,6 +121,7 @@ export async function updateDebt(
     id: string,
     data: {
         creditor: string
+        debtType: string
         totalAmount: number
         monthlyPayment: number
         dueDay: number
@@ -126,6 +132,7 @@ export async function updateDebt(
             where: { id },
             data: {
                 creditor: data.creditor,
+                debtType: data.debtType,
                 totalAmount: data.totalAmount,
                 monthlyPayment: data.monthlyPayment,
                 dueDay: data.dueDay
