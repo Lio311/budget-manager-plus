@@ -378,7 +378,7 @@ export function OverviewTab() {
                     {/* Budget Overview Bar Chart */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>הוצאות לפי קטגוריה/CardTitle>
+                            <CardTitle>התפלגות תקציב</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0">
                             {totalForPie === 0 ? (
@@ -389,42 +389,30 @@ export function OverviewTab() {
                                 <ResponsiveContainer width="100%" height={300}>
                                     <BarChart
                                         data={incomeVsExpenses}
-                                        margin={{ top: 20, right: 10, left: 0, bottom: 5 }}
+                                        // 1. הוספנו מרווחים (margin) כדי לוודא ששום דבר לא נחתך בקצוות
+                                        margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
                                         layout="horizontal"
-                                        // 1. צמצום הרווח בין העמודות עצמן (ככל שהאחוז נמוך יותר, העמודות יהיו צפופות יותר)
-                                        barCategoryGap="15%"
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.5} />
-
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                         <XAxis
                                             dataKey="name"
                                             tickLine={false}
                                             axisLine={false}
-                                            tick={{ fontSize: 12 }}
-                                            dy={10}
-                                            // 2. הוספת ריפוד פנימי לציר ה-X.
-                                            // זה דוחף את העמודה הראשונה 30 פיקסלים ימינה מציר ה-Y
-                                            padding={{ left: 30, right: 10 }}
                                         />
-
                                         <YAxis
                                             orientation="left"
-                                            width={45}
+                                            // 2. הגדלנו את הרוחב ל-60 (במקום 45) כדי שיהיה מקום למספרים כמו 8,000
+                                            width={60}
                                             tickLine={false}
                                             axisLine={false}
-                                            tick={{ fontSize: 12 }}
                                             tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
                                         />
-
-                                        <Tooltip
-                                            content={<CustomTooltip currency={currency} />}
-                                            cursor={{ fill: 'transparent' }}
-                                        />
+                                        <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
 
                                         <Bar
                                             dataKey="value"
                                             radius={[4, 4, 0, 0]}
-                                            // 3. הגדלתי מעט את המקסימום כדי שהעמודות יוכלו להתרחב ולמלא את החלל שנוצר
+                                            // 3. הגבלת רוחב העמודות: שנה את המספר 50 למה שנראה לך הכי טוב בעין
                                             maxBarSize={50}
                                         >
                                             {incomeVsExpenses.map((entry, index) => (
