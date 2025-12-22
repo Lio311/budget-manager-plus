@@ -1,8 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-
-import { useState } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowDown, ArrowUp, PiggyBank, TrendingUp, Wallet, Loader2 } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label as RechartsLabel } from 'recharts'
@@ -64,23 +63,24 @@ export function OverviewTab() {
     const prevYear = month === 1 ? year - 1 : year
 
     // Data Fetchers
-    const fetchIncomesData = async () => (await getIncomes(month, year)).data || []
-    const fetchExpensesData = async () => (await getExpenses(month, year)).data || []
-    const fetchBillsData = async () => (await getBills(month, year)).data || []
+    const fetchIncomesData = useCallback(async () => (await getIncomes(month, year)).data || [], [month, year])
+    const fetchExpensesData = useCallback(async () => (await getExpenses(month, year)).data || [], [month, year])
+    const fetchBillsData = useCallback(async () => (await getBills(month, year)).data || [], [month, year])
 
-    const fetchPrevIncomesData = async () => (await getIncomes(prevMonth, prevYear)).data || []
-    const fetchPrevExpensesData = async () => (await getExpenses(prevMonth, prevYear)).data || []
-    const fetchPrevBillsData = async () => (await getBills(prevMonth, prevYear)).data || []
-    const fetchCategoriesData = async () => (await getCategories('expense')).data || []
-    const fetchNetWorthData = async () => (await getNetWorthHistory()).data || []
+    const fetchPrevIncomesData = useCallback(async () => (await getIncomes(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
+    const fetchPrevExpensesData = useCallback(async () => (await getExpenses(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
+    const fetchPrevBillsData = useCallback(async () => (await getBills(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
+    const fetchCategoriesData = useCallback(async () => (await getCategories('expense')).data || [], [])
+    const fetchNetWorthData = useCallback(async () => (await getNetWorthHistory()).data || [], [])
 
     // SWR Hooks
     // SWR Options
-    const swrOptions = {
+    const swrOptions = useMemo(() => ({
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
+        revalidateIfStale: false,
         refreshInterval: 0
-    }
+    }), [])
 
     // SWR Hooks
     const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year], fetchIncomesData, swrOptions)
