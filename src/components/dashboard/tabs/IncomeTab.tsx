@@ -350,6 +350,7 @@ export function IncomeTab() {
                             )}
 
                         </div>
+                    </div>
                 </CardContent>
             </Card>
 
