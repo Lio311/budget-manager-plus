@@ -8,7 +8,7 @@ import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
 import { ExpensesTab } from './tabs/ExpensesTab'
 import { BillsTab } from './tabs/BillsTab'
-import { DebtsTab } from './tabs/DebtsTabV2'
+import { DebtsTab } from './tabs/DebtsTab'
 import { CalendarTab } from './tabs/CalendarTab'
 import { SavingsTab } from './tabs/SavingsTab'
 
