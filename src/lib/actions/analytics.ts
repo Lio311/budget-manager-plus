@@ -17,13 +17,11 @@ export async function getNetWorthHistory() {
         const { userId } = await auth()
         if (!userId) throw new Error('Unauthorized')
 
-        // 1. Fetch user data (initial balance) and all budgets
         const user = await prisma.user.findUnique({
             where: { clerkId: userId },
-            select: { initialBalance: true, initialSavings: true }
+            select: { id: true, initialBalance: true, initialSavings: true }
         })
 
-        // We need budgets to link to transactions
         const budgets = await prisma.budget.findMany({
             where: { userId },
             select: {
@@ -58,6 +56,7 @@ export async function getNetWorthHistory() {
             return { success: true, data: [] }
         }
 
+        // Start with initial state
         // Start with initial state
         let accumulatedNetWorth = (user?.initialBalance || 0) + (user?.initialSavings || 0)
         const history: MonthlyData[] = []

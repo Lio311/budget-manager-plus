@@ -50,7 +50,7 @@ export function DashboardHeader() {
 
                     {/* User Button */}
                     <div className="flex items-center">
-                        <UserButton afterSignOutUrl="/" />
+                        <UserButton />
                     </div>
                 </div>
             </div>
