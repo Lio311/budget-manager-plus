@@ -310,9 +310,11 @@ export function IncomeTab() {
                                 <Input
                                     type="number"
                                     placeholder="0.00"
+                                    className="w-full sm:w-32"
                                     value={newIncome.amount}
                                     onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })}
                                     disabled={submitting}
+                                    dir="ltr"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -401,6 +403,7 @@ export function IncomeTab() {
                                                         value={editData.amount}
                                                         onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
                                                         disabled={submitting}
+                                                        dir="ltr"
                                                     />
                                                     <Input
                                                         type="date"

@@ -323,8 +323,10 @@ export function SavingsTab() {
                         <Input
                             type="number"
                             placeholder="הפקדה חודשית"
+                            className="w-full sm:w-32"
                             value={newSaving.monthlyDeposit}
                             onChange={(e) => setNewSaving({ ...newSaving, monthlyDeposit: e.target.value })}
+                            dir="ltr"
                         />
                         <Input
                             placeholder="מטרה (אופציונלי)"
@@ -408,6 +410,7 @@ export function SavingsTab() {
                                                     type="number"
                                                     value={editData.monthlyDeposit}
                                                     onChange={(e) => setEditData({ ...editData, monthlyDeposit: e.target.value })}
+                                                    dir="ltr"
                                                 />
                                                 <Input
                                                     value={editData.goal}

@@ -267,18 +267,22 @@ export function DebtsTab() {
                                 <Input
                                     type="number"
                                     placeholder="סכום כולל"
+                                    className="w-full sm:w-32"
                                     value={newDebt.totalAmount}
                                     onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
                                     disabled={submitting}
+                                    dir="ltr"
                                 />
                                 <Input
                                     type="number"
                                     placeholder="יום חיוב"
                                     min="1"
                                     max="31"
+                                    className="w-full sm:w-24"
                                     value={newDebt.dueDay}
                                     onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
                                     disabled={submitting}
+                                    dir="ltr"
                                 />
                                 <Button onClick={handleAdd} className="w-full gap-2" disabled={submitting}>
                                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -310,10 +314,11 @@ export function DebtsTab() {
                                                 type="number"
                                                 placeholder="12"
                                                 min="1"
-                                                className="h-9 w-[120px]"
+                                                className="h-9 w-24"
                                                 value={newDebt.numberOfInstallments}
                                                 onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
                                                 disabled={submitting}
+                                                dir="ltr"
                                             />
                                         </div>
                                         {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
@@ -366,6 +371,7 @@ export function DebtsTab() {
                                                     value={editData.totalAmount}
                                                     onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
                                                     disabled={submitting}
+                                                    dir="ltr"
                                                 />
                                                 <Input
                                                     type="number"
@@ -373,6 +379,7 @@ export function DebtsTab() {
                                                     value={editData.monthlyPayment}
                                                     onChange={(e) => setEditData({ ...editData, monthlyPayment: e.target.value })}
                                                     disabled={submitting}
+                                                    dir="ltr"
                                                 />
                                                 <Input
                                                     type="number"
@@ -382,6 +389,7 @@ export function DebtsTab() {
                                                     value={editData.dueDay}
                                                     onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
                                                     disabled={submitting}
+                                                    dir="ltr"
                                                 />
                                             </div>
                                             <div className="flex items-center gap-2">

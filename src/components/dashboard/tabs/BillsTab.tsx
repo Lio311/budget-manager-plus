@@ -250,18 +250,22 @@ export function BillsTab() {
                         <Input
                             type="number"
                             placeholder="סכום"
+                            className="w-full sm:w-32"
                             value={newBill.amount}
                             onChange={(e) => setNewBill({ ...newBill, amount: e.target.value })}
                             disabled={submitting}
+                            dir="ltr"
                         />
                         <Input
                             type="number"
                             placeholder="יום חיוב"
                             min="1"
                             max="31"
+                            className="w-full sm:w-24"
                             value={newBill.dueDay}
                             onChange={(e) => setNewBill({ ...newBill, dueDay: e.target.value })}
                             disabled={submitting}
+                            dir="ltr"
                         />
                         <Button
                             onClick={handleAdd}
@@ -311,6 +315,7 @@ export function BillsTab() {
                                                         value={editData.amount}
                                                         onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
                                                         disabled={submitting}
+                                                        dir="ltr"
                                                     />
                                                     <Input
                                                         type="number"
@@ -320,6 +325,7 @@ export function BillsTab() {
                                                         value={editData.dueDay}
                                                         onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
                                                         disabled={submitting}
+                                                        dir="ltr"
                                                     />
                                                 </div>
                                                 <div className="flex items-center gap-2 mr-4">

@@ -36,8 +36,8 @@ async function createDebtInstallments(
     const installments = []
 
     for (let i = 0; i < numberOfInstallments; i++) {
-        // Start from next month
-        const installmentDate = addMonths(new Date(currentYear, currentMonth - 1, 1), i + 1)
+        // Start from current month
+        const installmentDate = addMonths(new Date(currentYear, currentMonth - 1, 1), i)
         const installmentMonth = installmentDate.getMonth() + 1
         const installmentYear = installmentDate.getFullYear()
 
