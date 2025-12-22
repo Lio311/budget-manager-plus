@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
+import { revalidatePath } from 'next/cache'
 
 // Default categories to seed if needed (optional)
 export const DEFAULT_EXPENSE_CATEGORIES = [
@@ -128,6 +129,7 @@ export async function addCategory(data: { name: string; type: string; color?: st
             }
         })
 
+        revalidatePath('/')
         return { success: true, data: category }
     } catch (error) {
         console.error('Error adding category:', error)
@@ -150,6 +152,7 @@ export async function updateCategory(id: string, data: { name?: string; color?: 
             }
         })
 
+        revalidatePath('/')
         return { success: true, data: category }
     } catch (error) {
         console.error('Error updating category:', error)
@@ -168,6 +171,7 @@ export async function deleteCategory(id: string) {
             where: { id }
         })
 
+        revalidatePath('/')
         return { success: true }
     } catch (error) {
         console.error('Error deleting category:', error)
@@ -204,6 +208,7 @@ export async function seedCategories(type: string = 'expense') {
             }))
         })
 
+        revalidatePath('/')
         return { success: true }
     } catch (error) {
         console.error("Error seeding categories:", error)
