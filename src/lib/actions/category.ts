@@ -33,12 +33,6 @@ export const DEFAULT_SAVINGS_CATEGORIES = [
     { name: 'השקעות', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
 ]
 
-// Defensive helper to get the category model regardless of prisma casing/pluralization
-function getCategoryModel() {
-    if (!prisma) return null;
-    return (prisma as any).category || (prisma as any).Category || (prisma as any).categories || (prisma as any).Categories;
-}
-
 // Helper to serialize category for safe transport over the wire
 function serializeCategory(cat: any) {
     if (!cat) return null
@@ -52,10 +46,8 @@ function serializeCategory(cat: any) {
 export async function getCategories(type: string = 'expense') {
     try {
         const user = await ensureUserExists()
-        const model = getCategoryModel();
-        if (!model) throw new Error('Database model for categories is not available')
 
-        let categories = await model.findMany({
+        let categories = await prisma.category.findMany({
             where: {
                 userId: user.id,
                 type
@@ -74,7 +66,7 @@ export async function getCategories(type: string = 'expense') {
             if (defaults.length > 0) {
                 console.log(`[getCategories] Seeding ${defaults.length} categories for user ${user.id} type ${type}`)
                 try {
-                    await model.createMany({
+                    await prisma.category.createMany({
                         data: defaults.map(c => ({
                             userId: user.id,
                             name: c.name,
@@ -85,7 +77,7 @@ export async function getCategories(type: string = 'expense') {
                     })
 
                     // Fetch again after seeding
-                    categories = await model.findMany({
+                    categories = await prisma.category.findMany({
                         where: {
                             userId: user.id,
                             type
@@ -110,10 +102,8 @@ export async function getCategories(type: string = 'expense') {
 export async function addCategory(data: { name: string; type: string; color?: string }) {
     try {
         const user = await ensureUserExists()
-        const model = getCategoryModel()
-        if (!model) throw new Error('Database model for categories is not available')
 
-        const existing = await model.findFirst({
+        const existing = await prisma.category.findFirst({
             where: {
                 userId: user.id,
                 name: data.name,
@@ -125,7 +115,7 @@ export async function addCategory(data: { name: string; type: string; color?: st
             return { success: false, error: 'Category already exists' }
         }
 
-        const category = await model.create({
+        const category = await prisma.category.create({
             data: {
                 userId: user.id,
                 name: data.name,
@@ -156,9 +146,8 @@ export async function addCategory(data: { name: string; type: string; color?: st
 export async function updateCategory(id: string, data: { name?: string; color?: string }) {
     try {
         const user = await ensureUserExists()
-        const model = getCategoryModel()
 
-        const category = await model.update({
+        const category = await prisma.category.update({
             where: { id },
             data: {
                 ...(data.name && { name: data.name }),
@@ -178,9 +167,8 @@ export async function updateCategory(id: string, data: { name?: string; color?: 
 export async function deleteCategory(id: string) {
     try {
         const user = await ensureUserExists()
-        const model = getCategoryModel()
 
-        await model.delete({
+        await prisma.category.delete({
             where: { id }
         })
 
@@ -195,9 +183,8 @@ export async function deleteCategory(id: string) {
 export async function seedCategories(type: string = 'expense') {
     try {
         const user = await ensureUserExists()
-        const model = getCategoryModel()
 
-        const count = await model.count({
+        const count = await prisma.category.count({
             where: { userId: user.id, type }
         })
 
@@ -209,7 +196,7 @@ export async function seedCategories(type: string = 'expense') {
 
         if (defaults.length === 0) return { success: true, message: 'No defaults for this type' }
 
-        await model.createMany({
+        await prisma.category.createMany({
             data: defaults.map(c => ({
                 userId: user.id,
                 name: c.name,
