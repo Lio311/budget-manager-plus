@@ -3,12 +3,27 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs'
 import { ExpiryBanner } from '@/components/subscription/ExpiryBanner'
 import { SWRConfig } from 'swr'
+import { currentUser } from '@clerk/nextjs/server'
+import { getSubscriptionStatus } from '@/lib/actions/subscription'
+import { redirect } from 'next/navigation'
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    // Check authentication
+    const user = await currentUser()
+    if (!user) {
+        redirect('/sign-in')
+    }
+
+    // Check subscription
+    const { hasAccess } = await getSubscriptionStatus(user.id)
+    if (!hasAccess) {
+        redirect('/subscribe')
+    }
+
     return (
         <SWRConfig
             value={{
