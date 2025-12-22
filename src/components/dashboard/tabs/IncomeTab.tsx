@@ -349,119 +349,123 @@ export function IncomeTab() {
                                 </div>
                             )}
 
-                            {/* Incomes List */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>רשימת הכנסות</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-2">
-                                        {incomes.length === 0 ? (
-                                            <p className="text-center text-muted-foreground py-8">אין הכנסות רשומות לחודש זה</p>
-                                        ) : (
-                                            <div className="space-y-2">
-                                                {incomes.map((income: any) => (
-                                                    <div
-                                                        key={income.id}
-                                                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors"
+                        </div>
+                </CardContent>
+            </Card>
+
+            {/* Incomes List */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>רשימת הכנסות</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-2">
+                        {incomes.length === 0 ? (
+                            <p className="text-center text-muted-foreground py-8">אין הכנסות רשומות לחודש זה</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {incomes.map((income: any) => (
+                                    <div
+                                        key={income.id}
+                                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors"
+                                    >
+                                        {editingId === income.id ? (
+                                            <>
+                                                <div className="flex-1 grid gap-4 md:grid-cols-4">
+                                                    <select
+                                                        className="p-2 border rounded-md"
+                                                        value={editData.category}
+                                                        onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                                                        disabled={submitting}
                                                     >
-                                                        {editingId === income.id ? (
-                                                            <>
-                                                                <div className="flex-1 grid gap-4 md:grid-cols-4">
-                                                                    <select
-                                                                        className="p-2 border rounded-md"
-                                                                        value={editData.category}
-                                                                        onChange={(e) => setEditData({ ...editData, category: e.target.value })}
-                                                                        disabled={submitting}
-                                                                    >
-                                                                        {categories.map(cat => (
-                                                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
-                                                                        ))}
-                                                                    </select>
-                                                                    <Input
-                                                                        placeholder="מקור"
-                                                                        value={editData.source}
-                                                                        onChange={(e) => setEditData({ ...editData, source: e.target.value })}
-                                                                        disabled={submitting}
-                                                                    />
-                                                                    <Input
-                                                                        type="number"
-                                                                        placeholder="סכום"
-                                                                        value={editData.amount}
-                                                                        onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
-                                                                        disabled={submitting}
-                                                                    />
-                                                                    <Input
-                                                                        type="date"
-                                                                        value={editData.date}
-                                                                        onChange={(e) => setEditData({ ...editData, date: e.target.value })}
-                                                                        disabled={submitting}
-                                                                    />
-                                                                </div>
-                                                                <div className="flex items-center gap-2 mr-4">
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        onClick={handleUpdate}
-                                                                        disabled={submitting}
-                                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                                                    >
-                                                                        <Check className="h-4 w-4" />
-                                                                    </Button>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        onClick={handleCancelEdit}
-                                                                        disabled={submitting}
-                                                                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-                                                                    >
-                                                                        <X className="h-4 w-4" />
-                                                                    </Button>
-                                                                </div>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <div className="flex-1">
-                                                                    <div className="flex items-center gap-2 mb-1">
-                                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(income.category)}`}>
-                                                                            {income.category || 'כללי'}
-                                                                        </span>
-                                                                        <p className="font-medium">{income.source}</p>
-                                                                    </div>
-                                                                    <p className="text-sm text-muted-foreground">
-                                                                        {income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}
-                                                                    </p>
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-lg font-bold text-green-600">
-                                                                        {formatCurrency(income.amount, currency)}
-                                                                    </span>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        onClick={() => handleEdit(income)}
-                                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                                                    >
-                                                                        <Pencil className="h-4 w-4" />
-                                                                    </Button>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        onClick={() => handleDelete(income.id)}
-                                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                                    >
-                                                                        <Trash2 className="h-4 w-4" />
-                                                                    </Button>
-                                                                </div>
-                                                            </>
-                                                        )}
+                                                        {categories.map(cat => (
+                                                            <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                                        ))}
+                                                    </select>
+                                                    <Input
+                                                        placeholder="מקור"
+                                                        value={editData.source}
+                                                        onChange={(e) => setEditData({ ...editData, source: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="סכום"
+                                                        value={editData.amount}
+                                                        onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                    <Input
+                                                        type="date"
+                                                        value={editData.date}
+                                                        onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+                                                        disabled={submitting}
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-2 mr-4">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleUpdate}
+                                                        disabled={submitting}
+                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                    >
+                                                        <Check className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={handleCancelEdit}
+                                                        disabled={submitting}
+                                                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(income.category)}`}>
+                                                            {income.category || 'כללי'}
+                                                        </span>
+                                                        <p className="font-medium">{income.source}</p>
                                                     </div>
-                                                ))}
-                                            </div>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-lg font-bold text-green-600">
+                                                        {formatCurrency(income.amount, currency)}
+                                                    </span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleEdit(income)}
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleDelete(income.id)}
+                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </>
                                         )}
                                     </div>
-                                </CardContent>
-                            </Card>
-                        </div >
-                        )
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        </div >
+    )
 }
