@@ -9,6 +9,8 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib/actions/debts'
 import { useToast } from '@/hooks/use-toast'
+import { Checkbox } from '@/components/ui/checkbox'
+import { DatePicker } from '@/components/ui/date-picker'
 
 interface Debt {
     id: string
@@ -25,7 +27,15 @@ export function DebtsTab() {
     const [debts, setDebts] = useState<Debt[]>([])
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
-    const [newDebt, setNewDebt] = useState({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+    const [newDebt, setNewDebt] = useState({
+        creditor: '',
+        totalAmount: '',
+        monthlyPayment: '',
+        dueDay: '',
+        isRecurring: false,
+        recurringStartDate: undefined as Date | undefined,
+        recurringEndDate: undefined as Date | undefined
+    })
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
 
@@ -63,10 +73,21 @@ export function DebtsTab() {
                 totalAmount: parseFloat(newDebt.totalAmount),
                 monthlyPayment: parseFloat(newDebt.monthlyPayment),
                 dueDay: parseInt(newDebt.dueDay),
+                isRecurring: newDebt.isRecurring,
+                recurringStartDate: newDebt.recurringStartDate,
+                recurringEndDate: newDebt.recurringEndDate
             })
 
             if (result.success) {
-                setNewDebt({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
+                setNewDebt({
+                    creditor: '',
+                    totalAmount: '',
+                    monthlyPayment: '',
+                    dueDay: '',
+                    isRecurring: false,
+                    recurringStartDate: undefined,
+                    recurringEndDate: undefined
+                })
                 await loadDebts()
                 toast({
                     title: 'הצלחה',
@@ -259,6 +280,41 @@ export function DebtsTab() {
                                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                                     הוסף
                                 </Button>
+                            </div>
+
+                            {/* Recurring Debt Section */}
+                            <div className="mt-4 space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <Checkbox
+                                        id="recurring-debt"
+                                        checked={newDebt.isRecurring}
+                                        onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
+                                    />
+                                    <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer">
+                                        חוב קבוע (חודרי)
+                                    </label>
+                                </div>
+
+                                {newDebt.isRecurring && (
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        <div>
+                                            <label className="text-sm text-muted-foreground mb-1 block">תאריך התחלה</label>
+                                            <DatePicker
+                                                date={newDebt.recurringStartDate}
+                                                setDate={(date) => setNewDebt({ ...newDebt, recurringStartDate: date })}
+                                                placeholder="בחר תאריך התחלה"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm text-muted-foreground mb-1 block">תאריך סיום</label>
+                                            <DatePicker
+                                                date={newDebt.recurringEndDate}
+                                                setDate={(date) => setNewDebt({ ...newDebt, recurringEndDate: date })}
+                                                placeholder="בחר תאריך סיום"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
