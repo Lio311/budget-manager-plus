@@ -82,8 +82,8 @@ export function NetWorthChart({ data }: NetWorthChartProps) {
     return (
         <Card className="col-span-1 md:col-span-2 shadow-sm border-purple-100 bg-gradient-to-b from-white to-purple-50/20">
             <CardHeader>
-                <CardTitle className="text-purple-700 flex items-center gap-2">
-                    <span className="text-xl">📈</span> שווי נקי לאורך זמן
+                <CardTitle className="flex items-center gap-2">
+                    שווי נקי לאורך זמן
                 </CardTitle>
             </CardHeader>
             <CardContent>
@@ -113,6 +113,7 @@ export function NetWorthChart({ data }: NetWorthChartProps) {
                                 tick={{ fill: '#6b7280', fontSize: 12 }}
                                 tickFormatter={(value) => formatCurrency(value, currency).split('.')[0]}
                                 dx={-10}
+                                domain={[0, 'auto']}
                             />
                             <Tooltip content={<CustomTooltip currency={currency} />} />
 
