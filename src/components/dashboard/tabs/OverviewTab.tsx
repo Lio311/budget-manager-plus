@@ -75,15 +75,23 @@ export function OverviewTab() {
     const fetchNetWorthData = async () => (await getNetWorthHistory()).data || []
 
     // SWR Hooks
-    const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year], fetchIncomesData)
-    const { data: expenses = [], isLoading: loadingExpenses } = useSWR(['expenses', month, year], fetchExpensesData)
-    const { data: bills = [], isLoading: loadingBills } = useSWR(['bills', month, year], fetchBillsData)
+    // SWR Options
+    const swrOptions = {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+        refreshInterval: 0
+    }
 
-    const { data: prevIncomes = [], isLoading: loadingPrevIncomes } = useSWR(['incomes', prevMonth, prevYear], fetchPrevIncomesData)
-    const { data: prevExpenses = [], isLoading: loadingPrevExpenses } = useSWR(['expenses', prevMonth, prevYear], fetchPrevExpensesData)
-    const { data: prevBills = [], isLoading: loadingPrevBills } = useSWR(['bills', prevMonth, prevYear], fetchPrevBillsData)
-    const { data: categories = [], isLoading: loadingCategories } = useSWR<Category[]>(['categories', 'expense'], fetchCategoriesData)
-    const { data: netWorthHistory = [], isLoading: loadingNetWorth } = useSWR(['netWorth'], fetchNetWorthData)
+    // SWR Hooks
+    const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year], fetchIncomesData, swrOptions)
+    const { data: expenses = [], isLoading: loadingExpenses } = useSWR(['expenses', month, year], fetchExpensesData, swrOptions)
+    const { data: bills = [], isLoading: loadingBills } = useSWR(['bills', month, year], fetchBillsData, swrOptions)
+
+    const { data: prevIncomes = [], isLoading: loadingPrevIncomes } = useSWR(['incomes', prevMonth, prevYear], fetchPrevIncomesData, swrOptions)
+    const { data: prevExpenses = [], isLoading: loadingPrevExpenses } = useSWR(['expenses', prevMonth, prevYear], fetchPrevExpensesData, swrOptions)
+    const { data: prevBills = [], isLoading: loadingPrevBills } = useSWR(['bills', prevMonth, prevYear], fetchPrevBillsData, swrOptions)
+    const { data: categories = [], isLoading: loadingCategories } = useSWR<Category[]>(['categories', 'expense'], fetchCategoriesData, swrOptions)
+    const { data: netWorthHistory = [], isLoading: loadingNetWorth } = useSWR(['netWorth'], fetchNetWorthData, swrOptions)
 
     const loading = loadingIncomes || loadingExpenses || loadingBills || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills || loadingCategories || loadingNetWorth
 
@@ -272,15 +280,7 @@ export function OverviewTab() {
             </div>
             {/* Summary Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <StatCard
-                    title="שווי נקי"
-                    value={formatCurrency(currentNetWorth, currency)}
-                    icon={<TrendingUp className="h-4 w-4" />}
-                    color="text-purple-600"
-                    bgColor="bg-purple-50"
-                    change={netWorthChange}
-                    changeType="income"
-                />
+
                 <StatCard
                     title="סך הכנסות"
                     value={formatCurrency(data.totalIncome, currency)}
