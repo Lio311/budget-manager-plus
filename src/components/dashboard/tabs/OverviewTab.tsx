@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input'
 import { getUserSettings, updateUserSettings } from '@/lib/actions/user'
 import { CategoryManager } from '@/components/dashboard/CategoryManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { toast } from 'sonner'
 
 interface Category {
     id: string
