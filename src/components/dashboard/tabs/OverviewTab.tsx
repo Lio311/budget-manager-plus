@@ -7,15 +7,9 @@ import { ArrowDown, ArrowUp, PiggyBank, TrendingUp, Wallet, Loader2 } from 'luci
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label as RechartsLabel } from 'recharts'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
-import { getIncomes } from '@/lib/actions/income'
-import { getExpenses } from '@/lib/actions/expense'
-import { getBills } from '@/lib/actions/bill'
-import { getCategories } from '@/lib/actions/category'
-import { getNetWorthHistory } from '@/lib/actions/analytics'
+import { getOverviewData } from '@/lib/actions/overview'
 import { getHexFromClass } from '@/lib/constants'
 import { NetWorthChart } from '@/components/dashboard/NetWorthChart'
-import { getDebts } from '@/lib/actions/debts'
-import { getSavings } from '@/lib/actions/savings'
 import { Settings, Save } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -64,56 +58,44 @@ export function OverviewTab() {
     const prevMonth = month === 1 ? 12 : month - 1
     const prevYear = month === 1 ? year - 1 : year
 
-    // Data Fetchers
-    const fetchIncomesData = useCallback(async () => (await getIncomes(month, year)).data || [], [month, year])
-    const fetchExpensesData = useCallback(async () => (await getExpenses(month, year)).data || [], [month, year])
-    const fetchBillsData = useCallback(async () => (await getBills(month, year)).data || [], [month, year])
+    // Optimized: Single data fetch instead of 11+ separate calls!
+    const fetchOverviewData = useCallback(async () => {
+        const result = await getOverviewData(month, year)
+        if (result.success && result.data) {
+            return result.data
+        }
+        throw new Error(result.error || 'Failed to fetch overview data')
+    }, [month, year])
 
-    const fetchPrevIncomesData = useCallback(async () => (await getIncomes(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
-    const fetchPrevExpensesData = useCallback(async () => (await getExpenses(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
-    const fetchPrevBillsData = useCallback(async () => (await getBills(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
-    const fetchDebtsData = useCallback(async () => (await getDebts(month, year)).data || [], [month, year])
-    const fetchSavingsData = useCallback(async () => (await getSavings(month, year)).data || [], [month, year])
-    const fetchPrevDebtsData = useCallback(async () => (await getDebts(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
-    const fetchPrevSavingsData = useCallback(async () => (await getSavings(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
-    const fetchCategoriesData = useCallback(async () => (await getCategories('expense')).data || [], [])
-    const fetchNetWorthData = useCallback(async () => (await getNetWorthHistory()).data || [], [])
+    const { data: overviewData, isLoading: loading } = useSWR(
+        ['overview', month, year],
+        fetchOverviewData,
+        { revalidateOnFocus: false, revalidateOnReconnect: false, refreshInterval: 0 }
+    )
 
-    // SWR Hooks
-    // SWR Options
-    const swrOptions = useMemo(() => ({
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-        refreshInterval: 0
-    }), [])
-
-    // SWR Hooks
-    const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year], fetchIncomesData, swrOptions)
-    const { data: expenses = [], isLoading: loadingExpenses } = useSWR(['expenses', month, year], fetchExpensesData, swrOptions)
-    const { data: bills = [], isLoading: loadingBills } = useSWR(['bills', month, year], fetchBillsData, swrOptions)
-
-    const { data: prevIncomes = [], isLoading: loadingPrevIncomes } = useSWR(['incomes', prevMonth, prevYear], fetchPrevIncomesData, swrOptions)
-    const { data: prevExpenses = [], isLoading: loadingPrevExpenses } = useSWR(['expenses', prevMonth, prevYear], fetchPrevExpensesData, swrOptions)
-    const { data: prevBills = [], isLoading: loadingPrevBills } = useSWR(['bills', prevMonth, prevYear], fetchPrevBillsData, swrOptions)
-
-    const { data: debts = [], isLoading: loadingDebts } = useSWR(['debts', month, year], fetchDebtsData, swrOptions)
-    const { data: savingsItems = [], isLoading: loadingSavingsItems } = useSWR(['savings', month, year], fetchSavingsData, swrOptions)
-    const { data: prevDebts = [], isLoading: loadingPrevDebts } = useSWR(['debts', prevMonth, prevYear], fetchPrevDebtsData, swrOptions)
-    const { data: prevSavingsItems = [], isLoading: loadingPrevSavingsItems } = useSWR(['savings', prevMonth, prevYear], fetchPrevSavingsData, swrOptions)
-
-    const { data: categories = [], isLoading: loadingCategories } = useSWR<Category[]>(['categories', 'expense'], fetchCategoriesData, swrOptions)
-    const { data: netWorthHistory = [], isLoading: loadingNetWorth, mutate: mutateNetWorth } = useSWR(['netWorth'], fetchNetWorthData, swrOptions)
-
-    const loading = loadingIncomes || loadingExpenses || loadingBills || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills ||
-        loadingCategories || loadingNetWorth || loadingDebts || loadingSavingsItems || loadingPrevDebts || loadingPrevSavingsItems
-
-    if (loading) {
+    if (loading || !overviewData) {
         return (
             <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         )
     }
+
+    // Extract data from optimized response
+    const incomes = overviewData.current.incomes
+    const expenses = overviewData.current.expenses
+    const bills = overviewData.current.bills
+    const debts = overviewData.current.debts
+    const savingsItems = overviewData.current.savings
+
+    const prevIncomes = overviewData.previous.incomes
+    const prevExpenses = overviewData.previous.expenses
+    const prevBills = overviewData.previous.bills
+    const prevDebts = overviewData.previous.debts
+    const prevSavingsItems = overviewData.previous.savings
+
+    const categories = overviewData.categories
+    const netWorthHistory = overviewData.netWorthHistory
 
     // Calculations
     const totalIncome = incomes.reduce((sum: number, i: any) => sum + i.amount, 0)
@@ -404,41 +386,41 @@ export function OverviewTab() {
                                     אין נתונים להצגה
                                 </div>
                             ) : (
-                            <ResponsiveContainer width="100%" height={300}>
-                                <BarChart
-                                    data={incomeVsExpenses}
-                                    // 1. הוספנו מרווחים (margin) כדי לוודא ששום דבר לא נחתך בקצוות
-                                    margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
-                                    layout="horizontal"
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                    <XAxis
-                                        dataKey="name"
-                                        tickLine={false}
-                                        axisLine={false}
-                                    />
-                                    <YAxis
-                                        orientation="left"
-                                        // 2. הגדלנו את הרוחב ל-60 (במקום 45) כדי שיהיה מקום למספרים כמו 8,000
-                                        width={60} 
-                                        tickLine={false}
-                                        axisLine={false}
-                                        tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
-                                    />
-                                    <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
-                                    
-                                    <Bar 
-                                        dataKey="value" 
-                                        radius={[4, 4, 0, 0]} 
-                                        // 3. הגבלת רוחב העמודות: שנה את המספר 50 למה שנראה לך הכי טוב בעין
-                                        maxBarSize={50} 
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart
+                                        data={incomeVsExpenses}
+                                        // 1. הוספנו מרווחים (margin) כדי לוודא ששום דבר לא נחתך בקצוות
+                                        margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
+                                        layout="horizontal"
                                     >
-                                        {incomeVsExpenses.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis
+                                            dataKey="name"
+                                            tickLine={false}
+                                            axisLine={false}
+                                        />
+                                        <YAxis
+                                            orientation="left"
+                                            // 2. הגדלנו את הרוחב ל-60 (במקום 45) כדי שיהיה מקום למספרים כמו 8,000
+                                            width={60}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
+                                        />
+                                        <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
+
+                                        <Bar
+                                            dataKey="value"
+                                            radius={[4, 4, 0, 0]}
+                                            // 3. הגבלת רוחב העמודות: שנה את המספר 50 למה שנראה לך הכי טוב בעין
+                                            maxBarSize={50}
+                                        >
+                                            {incomeVsExpenses.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
                             )}
                         </CardContent>
                     </Card>
