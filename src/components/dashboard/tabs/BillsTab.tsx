@@ -251,7 +251,7 @@ export function BillsTab() {
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-wrap gap-3 items-end">
-                        <div className="flex-1 min-w-[200px]">
+                        <div className="flex-[2] min-w-[200px]">
                             <label className="text-xs font-medium mb-1 block text-muted-foreground italic">שם החשבון</label>
                             <Input
                                 placeholder="חשמל, ארנונה..."
@@ -260,7 +260,7 @@ export function BillsTab() {
                                 disabled={submitting}
                             />
                         </div>
-                        <div className="w-32">
+                        <div className="flex-1 min-w-[120px]">
                             <label className="text-xs font-medium mb-1 block text-muted-foreground italic">סכום</label>
                             <Input
                                 type="number"
@@ -270,7 +270,7 @@ export function BillsTab() {
                                 disabled={submitting}
                             />
                         </div>
-                        <div className="w-24">
+                        <div className="flex-1 min-w-[100px]">
                             <label className="text-xs font-medium mb-1 block text-muted-foreground italic">יום חיוב</label>
                             <Input
                                 type="number"
@@ -284,7 +284,7 @@ export function BillsTab() {
                         </div>
                         <Button
                             onClick={handleAdd}
-                            className="gap-2 h-10"
+                            className="gap-2 h-10 px-6"
                             disabled={submitting}
                         >
                             {submitting ? (

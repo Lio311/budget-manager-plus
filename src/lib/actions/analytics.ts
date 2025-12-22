@@ -22,6 +22,10 @@ export async function getNetWorthHistory() {
             select: { id: true, initialBalance: true, initialSavings: true }
         })
 
+        if (!user) {
+            return { success: true, data: [] } // No user found, return empty history
+        }
+
         const budgets = await prisma.budget.findMany({
             where: { userId: user.id },
             select: {

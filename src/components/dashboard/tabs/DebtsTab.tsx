@@ -264,7 +264,7 @@ export function DebtsTab() {
                         <CardContent>
                             {/* שורת האינפוטים והכפתור */}
                             <div className="flex flex-wrap gap-3 items-end">
-                                <div className="flex-1 min-w-[200px]">
+                                <div className="flex-[2] min-w-[200px]">
                                     <Input
                                         placeholder="נושה (למי חייב)"
                                         value={newDebt.creditor}
@@ -272,35 +272,38 @@ export function DebtsTab() {
                                         disabled={submitting}
                                     />
                                 </div>
-                                <Input
-                                    type="number"
-                                    placeholder="סכום כולל"
-                                    className="w-32"
-                                    value={newDebt.totalAmount}
-                                    onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
-                                    disabled={submitting}
-                                />
-                                <Input
-                                    type="number"
-                                    placeholder="יום חיוב"
-                                    min="1"
-                                    max="31"
-                                    className="w-24"
-                                    value={newDebt.dueDay}
-                                    onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
-                                    disabled={submitting}
-                                />
+                                <div className="flex-1 min-w-[120px]">
+                                    <Input
+                                        type="number"
+                                        placeholder="סכום כולל"
+                                        className="w-full"
+                                        value={newDebt.totalAmount}
+                                        onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
+                                        disabled={submitting}
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-[100px]">
+                                    <Input
+                                        type="number"
+                                        placeholder="יום חיוב"
+                                        min="1"
+                                        max="31"
+                                        className="w-full"
+                                        value={newDebt.dueDay}
+                                        onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
+                                        disabled={submitting}
+                                    />
+                                </div>
                                 <Button
                                     onClick={handleAdd}
-                                    className="gap-2"
+                                    className="gap-2 px-6"
                                     disabled={submitting}
                                 >
                                     {submitting ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
                                     ) : (
                                         <Plus className="h-4 w-4" />
-                                    )}
-                                    הוסף
+                                    )} הוסף
                                 </Button>
                             </div>
 

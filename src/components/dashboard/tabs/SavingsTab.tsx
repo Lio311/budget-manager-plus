@@ -326,7 +326,7 @@ export function SavingsTab() {
                             </Popover>
                         </div>
 
-                        <div className="flex-1 min-w-[200px]">
+                        <div className="flex-[2] min-w-[200px]">
                             <Input
                                 placeholder="תיאור"
                                 value={newSaving.description}
@@ -334,19 +334,23 @@ export function SavingsTab() {
                             />
                         </div>
 
-                        <Input
-                            type="number"
-                            placeholder="הפקדה חודשית"
-                            className="w-32"
-                            value={newSaving.monthlyDeposit}
-                            onChange={(e) => setNewSaving({ ...newSaving, monthlyDeposit: e.target.value })}
-                        />
-
-                        <div className="flex-1 min-w-[150px]">
+                        <div className="flex-1 min-w-[120px]">
                             <Input
-                                placeholder="מטרה (אופציונלי)"
-                                value={newSaving.goal}
-                                onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
+                                type="number"
+                                placeholder="הפקדה חודשית"
+                                className="w-full"
+                                value={newSaving.monthlyDeposit}
+                                onChange={(e) => setNewSaving({ ...newSaving, monthlyDeposit: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="flex-1 min-w-[120px]">
+                            <Input
+                                type="number"
+                                placeholder="יעד חיסכון"
+                                className="w-full"
+                                value={newSaving.targetAmount}
+                                onChange={(e) => setNewSaving({ ...newSaving, targetAmount: e.target.value })}
                             />
                         </div>
 
@@ -358,9 +362,16 @@ export function SavingsTab() {
                             />
                         </div>
 
-                        <Button onClick={handleAdd} className="gap-2" disabled={submitting}>
-                            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                            הוסף
+                        <Button
+                            onClick={handleAdd}
+                            className="gap-2 h-10 px-6"
+                            disabled={submitting}
+                        >
+                            {submitting ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <Plus className="h-4 w-4" />
+                            )} הוסף
                         </Button>
                     </div>
 

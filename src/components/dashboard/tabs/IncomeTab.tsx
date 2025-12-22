@@ -273,22 +273,22 @@ export function IncomeTab() {
                             </div>
                         </div>
 
-                        <div className="flex-1 min-w-[200px]">
+                        <div className="flex-[2] min-w-[200px]">
                             <label className="text-xs font-medium mb-1 block text-muted-foreground italic">מקור ההכנסה</label>
                             <Input placeholder="שם המקור (למשל: עבודה)" value={newIncome.source} onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })} />
                         </div>
 
-                        <div className="w-32">
+                        <div className="flex-1 min-w-[120px]">
                             <label className="text-xs font-medium mb-1 block text-muted-foreground italic">סכום</label>
                             <Input type="number" placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
                         </div>
 
-                        <div className="w-[140px]">
+                        <div className="flex-1 min-w-[140px]">
                             <label className="text-xs font-medium mb-1 block text-muted-foreground italic">תאריך</label>
                             <DatePicker date={newIncome.date ? new Date(newIncome.date) : undefined} setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
                         </div>
 
-                        <Button onClick={handleAdd} className="gap-2 h-10" disabled={submitting}>
+                        <Button onClick={handleAdd} className="gap-2 h-10 px-6" disabled={submitting}>
                             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} הוסף
                         </Button>
                     </div>

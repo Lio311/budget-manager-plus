@@ -254,22 +254,22 @@ export function ExpensesTab() {
                             </div>
                         </div>
 
-                        <div className="flex-1 min-w-[200px]">
+                        <div className="flex-[2] min-w-[200px]">
                             <label className="text-xs font-medium mb-1 block text-muted-foreground italic">תיאור</label>
                             <Input placeholder="מה קנית?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
                         </div>
 
-                        <div className="w-24">
+                        <div className="flex-1 min-w-[120px]">
                             <label className="text-xs font-medium mb-1 block text-muted-foreground italic">סכום</label>
                             <Input type="number" placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
                         </div>
 
-                        <div className="w-[140px]">
+                        <div className="flex-1 min-w-[140px]">
                             <label className="text-xs font-medium mb-1 block text-muted-foreground italic">תאריך</label>
                             <DatePicker date={newExpense.date ? new Date(newExpense.date) : undefined} setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
                         </div>
 
-                        <Button onClick={handleAdd} className="gap-2 h-10" disabled={submitting}>
+                        <Button onClick={handleAdd} className="gap-2 h-10 px-6" disabled={submitting}>
                             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} הוסף
                         </Button>
                     </div>
