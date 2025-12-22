@@ -118,8 +118,7 @@ export function OverviewTab() {
     const prevNetWorth = netWorthHistory.length > 1 ? netWorthHistory[netWorthHistory.length - 2].accumulatedNetWorth : 0
     const netWorthChange = calculateChange(currentNetWorth, prevNetWorth)
 
-    // Calculations
-    const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0)
+
 
     // Fetch user settings when dialog opens
     const loadSettings = async () => {
