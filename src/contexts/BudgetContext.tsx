@@ -14,10 +14,15 @@ interface BudgetContextType {
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined)
 
 export function BudgetProvider({ children }: { children: React.ReactNode }) {
-    const now = new Date()
-    const [month, setMonth] = useState(now.getMonth() + 1)
-    const [year, setYear] = useState(now.getFullYear())
+    const [month, setMonth] = useState(1) // Default to January
+    const [year, setYear] = useState(2025) // Default to 2025
     const [currency, setCurrency] = useState('₪')
+
+    useEffect(() => {
+        const now = new Date()
+        setMonth(now.getMonth() + 1)
+        setYear(now.getFullYear())
+    }, [])
 
     return (
         <BudgetContext.Provider value={{ month, year, currency, setMonth, setYear, setCurrency }}>
