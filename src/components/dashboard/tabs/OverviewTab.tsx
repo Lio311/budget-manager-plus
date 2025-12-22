@@ -393,21 +393,21 @@ export function OverviewTab() {
                         </CardContent>
                     </Card>
 
-                    {/* Expenses by Category */}
+                    {/* Budget Overview Bar Chart */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>הוצאות לפי קטגוריה</CardTitle>
+                            <CardTitle>התפלגות תקציב</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {data.expensesByCategory.length === 0 ? (
+                            {totalForPie === 0 ? (
                                 <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                                    אין הוצאות להצגה
+                                    אין נתונים להצגה
                                 </div>
                             ) : (
                                 <ResponsiveContainer width="100%" height={300}>
                                     <BarChart
-                                        data={data.expensesByCategory}
-                                        margin={{ top: 20, right: 10, left: 60, bottom: 5 }}
+                                        data={incomeVsExpenses}
+                                        margin={{ top: 20, right: 20, left: 70, bottom: 20 }}
                                         layout="horizontal"
                                     >
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -418,14 +418,14 @@ export function OverviewTab() {
                                         />
                                         <YAxis
                                             orientation="left"
-                                            width={60}
+                                            width={70}
                                             tickLine={false}
                                             axisLine={false}
                                             tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
                                         />
                                         <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
-                                        <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={80}>
-                                            {data.expensesByCategory.map((entry, index) => (
+                                        <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={100}>
+                                            {incomeVsExpenses.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={entry.color} />
                                             ))}
                                         </Bar>
