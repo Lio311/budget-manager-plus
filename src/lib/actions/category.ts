@@ -81,7 +81,7 @@ export async function getCategories(type: string = 'expense') {
                 })
 
                 // Fetch again after seeding
-                categories = await prisma.category.findMany({
+                categories = await categoryModel.findMany({
                     where: {
                         userId: user.id,
                         type
@@ -128,7 +128,7 @@ export async function addCategory(data: { name: string; type: string; color?: st
             return { success: false, error: 'Category already exists' }
         }
 
-        const categoryModel = (prisma as any).category || (prisma as any).categories;
+
         const category = await categoryModel.create({
             data: {
                 userId: user.id,
