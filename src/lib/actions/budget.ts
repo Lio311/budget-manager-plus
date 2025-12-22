@@ -16,29 +16,34 @@ export async function ensureUserExists() {
             throw new Error('Unauthorized - Please sign in')
         }
 
-        const user = await currentUser()
-
-        if (!user || !user.emailAddresses[0]) {
-            console.error('Clerk user found but no email')
-            throw new Error('User profile incomplete')
-        }
-
-        // Find or create user
-        let dbUser = await prisma.user.findUnique({
+        // 1. Try to find existing user first to avoid unnecessary Clerk API calls
+        const dbUser = await prisma.user.findUnique({
             where: { clerkId }
         })
 
-        if (!dbUser) {
-            console.log('Creating new user in database:', clerkId)
-            dbUser = await prisma.user.create({
-                data: {
-                    clerkId,
-                    email: user.emailAddresses[0].emailAddress
-                }
-            })
+        if (dbUser) return dbUser
+
+        // 2. If not found, fetch from Clerk and create
+        const user = await currentUser()
+
+        if (!user) {
+            console.error('Clerk user not found')
+            throw new Error('User profile not found')
         }
 
-        return dbUser
+        const email = user.emailAddresses[0]?.emailAddress
+        if (!email) {
+            console.error('Clerk user found but no email')
+            throw new Error('User email not found')
+        }
+
+        console.log('Creating new user in database:', clerkId)
+        return await prisma.user.create({
+            data: {
+                clerkId,
+                email
+            }
+        })
     } catch (error) {
         console.error('Error in ensureUserExists:', error)
         throw error

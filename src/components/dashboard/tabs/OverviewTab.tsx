@@ -123,13 +123,13 @@ export function OverviewTab() {
     // Bills splitting
     const totalPaidBills = bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + b.amount, 0)
     const totalRemainingBills = bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + b.amount, 0)
-    const totalBills = totalRemainingBills // We will show remaining bills in the "Bills" card
+    const combinedTotalBills = totalPaidBills + totalRemainingBills
+    const currentBillsDisplay = totalRemainingBills // We will show remaining bills in the "Bills" card
 
     const totalPaidDebts = debts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)
     const totalSavingsDeposits = savingsItems.reduce((sum: number, s: any) => sum + s.monthlyDeposit, 0)
 
-    // Combined Expenses (everything that leaves the account)
-    // Now including paid bills here
+    // Combined Outflows (everything that leaves the account)
     const totalExpenses = standardExpenses + totalPaidDebts + totalSavingsDeposits + totalPaidBills
 
     const prevTotalIncome = prevIncomes.reduce((sum: number, i: any) => sum + i.amount, 0)
@@ -137,15 +137,15 @@ export function OverviewTab() {
 
     const prevPaidBills = prevBills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + b.amount, 0)
     const prevRemainingBills = prevBills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + b.amount, 0)
-    const prevTotalBills = prevRemainingBills
+    const prevCombinedBills = prevPaidBills + prevRemainingBills
 
     const prevTotalPaidDebts = prevDebts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)
     const prevTotalSavingsDeposits = prevSavingsItems.reduce((sum: number, s: any) => sum + s.monthlyDeposit, 0)
 
     const prevTotalExpenses = prevStandardExpenses + prevTotalPaidDebts + prevTotalSavingsDeposits + prevPaidBills
 
-    const savingsRemainder = totalIncome - totalExpenses - totalBills
-    const prevSavingsRemainder = prevTotalIncome - prevTotalExpenses - prevTotalBills
+    const savingsRemainder = totalIncome - totalExpenses - totalRemainingBills
+    const prevSavingsRemainder = prevTotalIncome - prevTotalExpenses - prevRemainingBills
 
     // Calculate percentage changes
     const calculateChange = (current: number, previous: number) => {
@@ -216,35 +216,30 @@ export function OverviewTab() {
     const data = {
         totalIncome,
         totalExpenses,
-        totalBills,
+        totalBills: currentBillsDisplay,
         expensesByCategory
     }
 
     const previousData = {
         totalIncome: prevTotalIncome,
         totalExpenses: prevTotalExpenses,
-        totalBills: prevTotalBills
+        totalBills: prevCombinedBills
     }
 
-    const incomeChange = calculateChange(data.totalIncome, previousData.totalIncome)
-    const expensesChange = calculateChange(data.totalExpenses, previousData.totalExpenses)
+    const incomeChange = calculateChange(totalIncome, prevTotalIncome)
+    const expensesChange = calculateChange(totalExpenses, prevTotalExpenses)
     const savingsChange = calculateChange(savingsRemainder, prevSavingsRemainder)
-    const billsChange = calculateChange(data.totalBills, previousData.totalBills)
-
-    const budgetStatusData = [
-        { name: 'הכנסות', value: totalIncome, color: '#22C55E' }, // Green 500
-        { name: 'הוצאות', value: totalExpenses, color: '#EF4444' }, // Red 500
-        { name: 'חשבונות', value: totalBills, color: '#F59E0B' }, // Amber 500
-        { name: 'יתרה', value: Math.max(0, savingsRemainder), color: '#3B82F6' }, // Blue 500
-    ]
+    const billsChange = calculateChange(currentBillsDisplay, prevRemainingBills)
 
     const incomeVsExpenses = [
-        { name: 'הכנסות', value: data.totalIncome, color: COLORS.income },
-        { name: 'הוצאות', value: data.totalExpenses, color: COLORS.expenses },
-        { name: 'חשבונות', value: data.totalBills, color: COLORS.bills },
+        { name: 'הכנסות', value: totalIncome, color: COLORS.income },
+        { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
+        { name: 'חובות', value: totalPaidDebts, color: '#F43F5E' }, // Rose 500
+        { name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }, // Blue 500
+        { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills }, // Orange
     ]
 
-    const totalForPie = data.totalIncome + data.totalExpenses + data.totalBills
+    const totalForPie = totalIncome + standardExpenses + totalPaidDebts + totalSavingsDeposits + combinedTotalBills
 
     return (
         <div className="space-y-6 p-2" dir="rtl">
@@ -351,7 +346,7 @@ export function OverviewTab() {
                 />
                 <StatCard
                     title="יתרת חשבונות"
-                    value={formatCurrency(data.totalBills, currency)}
+                    value={formatCurrency(currentBillsDisplay, currency)}
                     icon={<Wallet className="h-4 w-4" />}
                     color="text-orange-600"
                     bgColor="bg-orange-50"
@@ -451,45 +446,54 @@ export function OverviewTab() {
                         </div>
                     )}
 
-                    {/* Budget Progress (renamed to Monthly Budget Status) */}
+                    {/* Budget Progress (reverted from BarChart) */}
                     <Card className="h-full">
                         <CardHeader>
                             <CardTitle>מצב תקציב חודשי</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {totalIncome === 0 && totalExpenses === 0 ? (
-                                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                                    אין נתונים להצגה
-                                </div>
-                            ) : (
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart
-                                        data={budgetStatusData}
-                                        margin={{ top: 20, right: 10, left: 10, bottom: 5 }}
-                                    >
-                                        <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                                        <YAxis hide />
-                                        <Tooltip content={<CustomTooltip currency={currency} />} cursor={{ fill: 'transparent' }} />
-                                        <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={60}>
-                                            {budgetStatusData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            )}
-                            <div className="mt-4 space-y-2">
-                                <div className="flex justify-between text-sm">
-                                    <span>ניצול תקציב:</span>
-                                    <span className="font-bold">
-                                        {totalIncome > 0 ? ((totalExpenses / totalIncome) * 100).toFixed(1) : 0}%
-                                    </span>
-                                </div>
-                                <div className="w-full bg-gray-100 rounded-full h-2">
-                                    <div
-                                        className="bg-purple-500 h-2 rounded-full transition-all"
-                                        style={{ width: `${Math.min(totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0, 100)}%` }}
-                                    />
+                            <div className="space-y-6">
+                                <BudgetProgress
+                                    label="הוצאות שוטפות"
+                                    current={standardExpenses}
+                                    total={totalIncome}
+                                    currency={currency}
+                                    color="bg-red-500"
+                                />
+                                <BudgetProgress
+                                    label="חשבונות (שולם)"
+                                    current={totalPaidBills}
+                                    total={combinedTotalBills}
+                                    currency={currency}
+                                    color="bg-orange-500"
+                                />
+                                <BudgetProgress
+                                    label="חובות ששולמו"
+                                    current={totalPaidDebts}
+                                    total={totalIncome}
+                                    currency={currency}
+                                    color="bg-rose-500"
+                                />
+                                <BudgetProgress
+                                    label="חיסכון והפקדות"
+                                    current={totalSavingsDeposits}
+                                    total={totalIncome}
+                                    currency={currency}
+                                    color="bg-blue-500"
+                                />
+                                <div className="pt-4 border-t">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-sm font-semibold">ניצול תקציב כולל</span>
+                                        <span className="text-sm font-bold">
+                                            {totalIncome > 0 ? (((totalExpenses) / totalIncome) * 100).toFixed(1) : 0}%
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-gray-100 rounded-full h-3">
+                                        <div
+                                            className="bg-purple-600 h-3 rounded-full transition-all"
+                                            style={{ width: `${Math.min(totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0, 100)}%` }}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>
@@ -543,3 +547,38 @@ function StatCard({
     )
 }
 
+function BudgetProgress({
+    label,
+    current,
+    total,
+    currency,
+    color,
+}: {
+    label: string
+    current: number
+    total: number
+    currency: string
+    color: string
+}) {
+    const percentage = total > 0 ? (current / total) * 100 : 0
+
+    return (
+        <div>
+            <div className="flex justify-between mb-1">
+                <span className="text-xs font-medium">{label}</span>
+                <span className="text-xs text-muted-foreground">
+                    {formatCurrency(current, currency)} / {formatCurrency(total, currency)}
+                </span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2">
+                <div
+                    className={`${color} h-2 rounded-full transition-all`}
+                    style={{ width: `${Math.min(percentage, 100)}%` }}
+                />
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-0.5 text-left">
+                <span dir="ltr">{percentage.toFixed(1)}%</span>
+            </p>
+        </div>
+    )
+}
