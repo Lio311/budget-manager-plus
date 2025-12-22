@@ -102,7 +102,7 @@ export function OverviewTab() {
     const { data: prevSavingsItems = [], isLoading: loadingPrevSavingsItems } = useSWR(['savings', prevMonth, prevYear], fetchPrevSavingsData, swrOptions)
 
     const { data: categories = [], isLoading: loadingCategories } = useSWR<Category[]>(['categories', 'expense'], fetchCategoriesData, swrOptions)
-    const { data: netWorthHistory = [], isLoading: loadingNetWorth } = useSWR(['netWorth'], fetchNetWorthData, swrOptions)
+    const { data: netWorthHistory = [], isLoading: loadingNetWorth, mutate: mutateNetWorth } = useSWR(['netWorth'], fetchNetWorthData, swrOptions)
 
     const loading = loadingIncomes || loadingExpenses || loadingBills || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills ||
         loadingCategories || loadingNetWorth || loadingDebts || loadingSavingsItems || loadingPrevDebts || loadingPrevSavingsItems
@@ -157,9 +157,6 @@ export function OverviewTab() {
     const currentNetWorth = netWorthHistory.length > 0 ? netWorthHistory[netWorthHistory.length - 1].accumulatedNetWorth : 0
     const prevNetWorth = netWorthHistory.length > 1 ? netWorthHistory[netWorthHistory.length - 2].accumulatedNetWorth : 0
     const netWorthChange = calculateChange(currentNetWorth, prevNetWorth)
-
-    // SWR Mutate for refreshing data
-    const { mutate: mutateNetWorth } = useSWR(['netWorth'], fetchNetWorthData, swrOptions)
 
     // Fetch user settings when dialog opens
     const loadSettings = async () => {
