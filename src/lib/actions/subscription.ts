@@ -31,7 +31,8 @@ export async function createSubscription(paypalOrderId: string, amount: number) 
                 startDate: new Date(),
                 endDate,
                 paypalOrderId,
-                amount,
+                lastPaymentDate: new Date(),
+                lastPaymentAmount: amount,
             },
             create: {
                 userId,
@@ -39,7 +40,8 @@ export async function createSubscription(paypalOrderId: string, amount: number) 
                 startDate: new Date(),
                 endDate,
                 paypalOrderId,
-                amount,
+                lastPaymentDate: new Date(),
+                lastPaymentAmount: amount,
             },
         })
 
