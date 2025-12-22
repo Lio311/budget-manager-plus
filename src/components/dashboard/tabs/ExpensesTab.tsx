@@ -18,7 +18,7 @@ interface Expense {
     category: string
     description: string
     amount: number
-    date: Date
+    date: Date | null
 }
 
 const CATEGORIES = ['מזון', 'תחבורה', 'בילויים', 'קניות', 'בריאות', 'חינוך', 'אחר']
@@ -136,7 +136,7 @@ export function ExpensesTab() {
             category: expense.category,
             description: expense.description,
             amount: expense.amount.toString(),
-            date: format(expense.date, 'yyyy-MM-dd')
+            date: expense.date ? format(expense.date, 'yyyy-MM-dd') : ''
         })
     }
 
@@ -407,7 +407,7 @@ export function ExpensesTab() {
                                                         <p className="font-medium">{expense.description}</p>
                                                     </div>
                                                     <p className="text-sm text-muted-foreground">
-                                                        {format(new Date(expense.date), 'dd/MM/yyyy')}
+                                                        {expense.date ? format(new Date(expense.date), 'dd/MM/yyyy') : 'אין תאריך'}
                                                     </p>
                                                 </div>
                                                 <div className="flex items-center gap-2">
