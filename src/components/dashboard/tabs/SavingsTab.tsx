@@ -416,15 +416,17 @@ export function SavingsTab() {
                             savings.map((saving: any) => (
                                 <div
                                     key={saving.id}
-                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-accent transition-colors gap-3"
+                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg gap-4 transition-all bg-white hover:bg-slate-50"
                                 >
                                     {editingId === saving.id ? (
                                         <>
+                                            {/* Edit Mode - Inputs */}
                                             <div className="flex flex-nowrap gap-2 items-center flex-1 w-full overflow-x-auto pb-1">
                                                 <select
                                                     className="p-2 border rounded-md bg-background h-10 text-sm min-w-[120px]"
                                                     value={editData.category}
                                                     onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                                                    disabled={submitting}
                                                 >
                                                     {categories.map(cat => (
                                                         <option key={cat.id} value={cat.name}>{cat.name}</option>
@@ -434,18 +436,23 @@ export function SavingsTab() {
                                                     className="flex-1 min-w-[150px]"
                                                     value={editData.description}
                                                     onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                                                    disabled={submitting}
+                                                    placeholder="תיאור"
                                                 />
                                                 <Input
                                                     className="w-24 sm:w-32 flex-shrink-0"
                                                     type="number"
                                                     value={editData.monthlyDeposit}
                                                     onChange={(e) => setEditData({ ...editData, monthlyDeposit: e.target.value })}
+                                                    disabled={submitting}
+                                                    placeholder="סכום"
                                                 />
                                                 <Input
                                                     className="w-32 flex-shrink-0"
                                                     value={editData.goal}
                                                     onChange={(e) => setEditData({ ...editData, goal: e.target.value })}
                                                     placeholder="מטרה"
+                                                    disabled={submitting}
                                                 />
                                                 <div className="w-[140px] flex-shrink-0">
                                                     <DatePicker
@@ -455,41 +462,76 @@ export function SavingsTab() {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2 mr-4">
-                                                <Button variant="ghost" size="icon" onClick={() => handleUpdate(saving.id)} className="text-green-600" disabled={submitting}>
+
+                                            {/* Edit Mode - Actions (V / X) */}
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => handleUpdate(saving.id)}
+                                                    disabled={submitting}
+                                                    className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                >
                                                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                                 </Button>
-                                                <Button variant="ghost" size="icon" onClick={cancelEdit}>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={cancelEdit}
+                                                    disabled={submitting}
+                                                    className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                                                >
                                                     <X className="h-4 w-4" />
                                                 </Button>
                                             </div>
                                         </>
                                     ) : (
                                         <>
-                                            <div className="flex-1 w-full">
+                                            {/* View Mode - Details */}
+                                            <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(saving.category || saving.type)}`}>
+                                                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${getCategoryColor(saving.category || saving.type)}`}>
                                                         {saving.category || saving.type}
                                                     </span>
-                                                    <p className="font-medium">{saving.description}</p>
+                                                    <p className="font-bold text-base truncate text-slate-900">
+                                                        {saving.description}
+                                                    </p>
                                                 </div>
-                                                {saving.goal && (
-                                                    <p className="text-sm text-muted-foreground">מטרה: {saving.goal}</p>
-                                                )}
-                                                <p className="text-sm text-muted-foreground">
-                                                    {new Date(saving.date).toLocaleDateString('he-IL')}
-                                                </p>
+                                                <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
+                                                    {saving.goal && (
+                                                        <span className="truncate text-slate-500">מטרה: {saving.goal}</span>
+                                                    )}
+                                                    <span className="text-slate-500">
+                                                        תאריך: {new Date(saving.date).toLocaleDateString('he-IL')}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                                                <span className="text-lg font-bold text-green-600">
-                                                    {formatCurrency(saving.monthlyDeposit, currency)}
-                                                </span>
-                                                <div className="flex items-center gap-2 mr-4">
-                                                    <Button onClick={() => startEdit(saving)} variant="ghost" size="sm">
-                                                        <Pencil className="h-4 w-4" />
+
+                                            {/* View Mode - Amount & Actions (Pencil / Trash) */}
+                                            <div className="flex items-center justify-between w-full sm:w-auto sm:gap-6 pt-3 sm:pt-0 border-t sm:border-0 border-slate-100">
+                                                <div className="text-right sm:text-left">
+                                                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">הפקדה</p>
+                                                    <span className="text-lg font-black text-green-600">
+                                                        {formatCurrency(saving.monthlyDeposit, currency)}
+                                                    </span>
+                                                </div>
+
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => startEdit(saving)}
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-10 w-10"
+                                                    >
+                                                        <Pencil className="h-5 w-5" />
                                                     </Button>
-                                                    <Button onClick={() => handleDelete(saving.id)} variant="destructive" size="sm">
-                                                        <Trash2 className="h-4 w-4" />
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleDelete(saving.id)}
+                                                        className="text-red-400 hover:text-red-600 hover:bg-red-50 h-10 w-10"
+                                                    >
+                                                        <Trash2 className="h-5 w-5" />
                                                     </Button>
                                                 </div>
                                             </div>
