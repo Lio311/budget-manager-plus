@@ -14,6 +14,8 @@ import { getCategories } from '@/lib/actions/category'
 import { getNetWorthHistory } from '@/lib/actions/analytics'
 import { getHexFromClass } from '@/lib/constants'
 import { NetWorthChart } from '@/components/dashboard/NetWorthChart'
+import { getDebts } from '@/lib/actions/debts'
+import { getSavings } from '@/lib/actions/savings'
 import { Settings, Save } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -70,6 +72,10 @@ export function OverviewTab() {
     const fetchPrevIncomesData = useCallback(async () => (await getIncomes(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
     const fetchPrevExpensesData = useCallback(async () => (await getExpenses(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
     const fetchPrevBillsData = useCallback(async () => (await getBills(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
+    const fetchDebtsData = useCallback(async () => (await getDebts(month, year)).data || [], [month, year])
+    const fetchSavingsData = useCallback(async () => (await getSavings(month, year)).data || [], [month, year])
+    const fetchPrevDebtsData = useCallback(async () => (await getDebts(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
+    const fetchPrevSavingsData = useCallback(async () => (await getSavings(prevMonth, prevYear)).data || [], [prevMonth, prevYear])
     const fetchCategoriesData = useCallback(async () => (await getCategories('expense')).data || [], [])
     const fetchNetWorthData = useCallback(async () => (await getNetWorthHistory()).data || [], [])
 
@@ -90,10 +96,17 @@ export function OverviewTab() {
     const { data: prevIncomes = [], isLoading: loadingPrevIncomes } = useSWR(['incomes', prevMonth, prevYear], fetchPrevIncomesData, swrOptions)
     const { data: prevExpenses = [], isLoading: loadingPrevExpenses } = useSWR(['expenses', prevMonth, prevYear], fetchPrevExpensesData, swrOptions)
     const { data: prevBills = [], isLoading: loadingPrevBills } = useSWR(['bills', prevMonth, prevYear], fetchPrevBillsData, swrOptions)
+
+    const { data: debts = [], isLoading: loadingDebts } = useSWR(['debts', month, year], fetchDebtsData, swrOptions)
+    const { data: savingsItems = [], isLoading: loadingSavingsItems } = useSWR(['savings', month, year], fetchSavingsData, swrOptions)
+    const { data: prevDebts = [], isLoading: loadingPrevDebts } = useSWR(['debts', prevMonth, prevYear], fetchPrevDebtsData, swrOptions)
+    const { data: prevSavingsItems = [], isLoading: loadingPrevSavingsItems } = useSWR(['savings', prevMonth, prevYear], fetchPrevSavingsData, swrOptions)
+
     const { data: categories = [], isLoading: loadingCategories } = useSWR<Category[]>(['categories', 'expense'], fetchCategoriesData, swrOptions)
     const { data: netWorthHistory = [], isLoading: loadingNetWorth } = useSWR(['netWorth'], fetchNetWorthData, swrOptions)
 
-    const loading = loadingIncomes || loadingExpenses || loadingBills || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills || loadingCategories || loadingNetWorth
+    const loading = loadingIncomes || loadingExpenses || loadingBills || loadingPrevIncomes || loadingPrevExpenses || loadingPrevBills ||
+        loadingCategories || loadingNetWorth || loadingDebts || loadingSavingsItems || loadingPrevDebts || loadingPrevSavingsItems
 
     if (loading) {
         return (
@@ -104,16 +117,25 @@ export function OverviewTab() {
     }
 
     // Calculations
-    const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0)
-    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
-    const totalBills = bills.reduce((sum, b) => sum + b.amount, 0)
+    const totalIncome = incomes.reduce((sum: number, i: any) => sum + i.amount, 0)
+    const standardExpenses = expenses.reduce((sum: number, e: any) => sum + e.amount, 0)
+    const totalBills = bills.reduce((sum: number, b: any) => sum + b.amount, 0)
+    const totalPaidDebts = debts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)
+    const totalSavingsDeposits = savingsItems.reduce((sum: number, s: any) => sum + s.monthlyDeposit, 0)
 
-    const prevTotalIncome = prevIncomes.reduce((sum, i) => sum + i.amount, 0)
-    const prevTotalExpenses = prevExpenses.reduce((sum, e) => sum + e.amount, 0)
-    const prevTotalBills = prevBills.reduce((sum, b) => sum + b.amount, 0)
+    // Combined Expenses (everything that leaves the account)
+    const totalExpenses = standardExpenses + totalPaidDebts + totalSavingsDeposits
 
-    const savings = totalIncome - totalExpenses - totalBills
-    const prevSavings = prevTotalIncome - prevTotalExpenses - prevTotalBills
+    const prevTotalIncome = prevIncomes.reduce((sum: number, i: any) => sum + i.amount, 0)
+    const prevStandardExpenses = prevExpenses.reduce((sum: number, e: any) => sum + e.amount, 0)
+    const prevTotalBills = prevBills.reduce((sum: number, b: any) => sum + b.amount, 0)
+    const prevTotalPaidDebts = prevDebts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)
+    const prevTotalSavingsDeposits = prevSavingsItems.reduce((sum: number, s: any) => sum + s.monthlyDeposit, 0)
+
+    const prevTotalExpenses = prevStandardExpenses + prevTotalPaidDebts + prevTotalSavingsDeposits
+
+    const savingsRemainder = totalIncome - totalExpenses - totalBills
+    const prevSavingsRemainder = prevTotalIncome - prevTotalExpenses - prevTotalBills
 
     // Calculate percentage changes
     const calculateChange = (current: number, previous: number) => {
@@ -166,7 +188,16 @@ export function OverviewTab() {
             const color = getHexFromClass(category?.color || null)
             return { name, value, color }
         })
-        .sort((a, b) => b.value - a.value)
+
+    // Add Debts and Savings as virtual categories
+    if (totalPaidDebts > 0) {
+        expensesByCategory.push({ name: 'חובות ששולמו', value: totalPaidDebts, color: '#F43F5E' }) // Rose 500
+    }
+    if (totalSavingsDeposits > 0) {
+        expensesByCategory.push({ name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }) // Blue 500
+    }
+
+    expensesByCategory.sort((a, b) => b.value - a.value)
 
     // Derived Data Object for compatibility
     const data = {
@@ -182,25 +213,9 @@ export function OverviewTab() {
         totalBills: prevTotalBills
     }
 
-    // Calculate percentage changes
-    // Removed duplicate definition here. Using the one defined earlier or defining it once.
-    // Actually, in the previous file content, I see I inserted it before Net Worth calculations but I might have left the old one?
-    // Let's check the file content again.
-    // I see in step 2624 diff: I added calculateChange before Net Worth Calculations.
-    // The original calculateChange was around line 133 (before edits).
-    // I probably have two now.
-    // I will remove the one I added in the WRONG place or the duplicate.
-    // Ideally, define it once at the top of calculations.
-
-    // Let's just define it once at the top of the function to be safe.
-    // But for this tool call, I will remove the one at line 133 (original location) if I added one at line 99.
-    // Wait, the diff shows I added it at line 95+.
-    // So the one at line 133 is the duplicate now.
-
-
     const incomeChange = calculateChange(data.totalIncome, previousData.totalIncome)
     const expensesChange = calculateChange(data.totalExpenses, previousData.totalExpenses)
-    const savingsChange = calculateChange(savings, prevSavings)
+    const savingsChange = calculateChange(savingsRemainder, prevSavingsRemainder)
     const billsChange = calculateChange(data.totalBills, previousData.totalBills)
 
     const incomeVsExpenses = [
@@ -307,7 +322,7 @@ export function OverviewTab() {
                 />
                 <StatCard
                     title="חיסכון חודשי"
-                    value={formatCurrency(savings, currency)}
+                    value={formatCurrency(savingsRemainder, currency)}
                     icon={<PiggyBank className="h-4 w-4" />}
                     color="text-blue-600"
                     bgColor="bg-blue-50"
