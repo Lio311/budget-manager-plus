@@ -403,8 +403,8 @@ export function OverviewTab() {
                 </div>
 
                 {/* Bottom Row: Net Worth + Budget Progress (if enough data) vs Just Budget Progress */}
-                <div className={`grid gap-6 ${netWorthHistory.length >= 2 ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
-                    {netWorthHistory.length >= 2 && (
+                <div className={`grid gap-6 ${netWorthHistory.length > 0 ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
+                    {netWorthHistory.length > 0 && (
                         <div className="grid gap-6">
                             <NetWorthChart data={netWorthHistory} />
                         </div>
