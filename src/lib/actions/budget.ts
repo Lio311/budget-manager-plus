@@ -3,6 +3,16 @@
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/db'
 
+// Helper to serialize user for safe transport
+function serializeUser(user: any) {
+    if (!user) return null
+    return {
+        ...user,
+        createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
+        updatedAt: user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt,
+    }
+}
+
 /**
  * Ensures the current user exists in the database
  * Creates a new user record if it doesn't exist
@@ -21,7 +31,7 @@ export async function ensureUserExists() {
             where: { clerkId }
         })
 
-        if (dbUser) return dbUser
+        if (dbUser) return serializeUser(dbUser)
 
         // 2. If not found, fetch from Clerk and create
         const user = await currentUser()
@@ -38,12 +48,14 @@ export async function ensureUserExists() {
         }
 
         console.log('Creating new user in database:', clerkId)
-        return await prisma.user.create({
+        const newUser = await prisma.user.create({
             data: {
                 clerkId,
                 email
             }
         })
+
+        return serializeUser(newUser)
     } catch (error) {
         console.error('Error in ensureUserExists:', error)
         throw error

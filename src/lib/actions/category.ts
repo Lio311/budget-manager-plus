@@ -33,17 +33,27 @@ export const DEFAULT_SAVINGS_CATEGORIES = [
     { name: 'השקעות', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
 ]
 
+// Defensive helper to get the category model regardless of prisma casing/pluralization
+function getCategoryModel() {
+    if (!prisma) return null;
+    return (prisma as any).category || (prisma as any).Category || (prisma as any).categories || (prisma as any).Categories;
+}
+
+// Helper to serialize category for safe transport over the wire
+function serializeCategory(cat: any) {
+    if (!cat) return null
+    return {
+        ...cat,
+        createdAt: cat.createdAt instanceof Date ? cat.createdAt.toISOString() : cat.createdAt,
+        updatedAt: cat.updatedAt instanceof Date ? cat.updatedAt.toISOString() : cat.updatedAt,
+    }
+}
+
 export async function getCategories(type: string = 'expense') {
     try {
         const user = await ensureUserExists()
-
-        // Use a safer accessor for the model
-        const model = (prisma as any).category || (prisma as any).categories || (prisma as any).Category;
-
-        if (!model) {
-            console.error('[getCategories] Category model not found in Prisma client')
-            return { success: false, error: 'Database configuration error' }
-        }
+        const model = getCategoryModel();
+        if (!model) throw new Error('Database model for categories is not available')
 
         let categories = await model.findMany({
             where: {
@@ -63,44 +73,45 @@ export async function getCategories(type: string = 'expense') {
 
             if (defaults.length > 0) {
                 console.log(`[getCategories] Seeding ${defaults.length} categories for user ${user.id} type ${type}`)
-                await model.createMany({
-                    data: defaults.map(c => ({
-                        userId: user.id,
-                        name: c.name,
-                        type,
-                        color: c.color
-                    }))
-                })
+                try {
+                    await model.createMany({
+                        data: defaults.map(c => ({
+                            userId: user.id,
+                            name: c.name,
+                            type,
+                            color: c.color,
+                            updatedAt: new Date()
+                        }))
+                    })
 
-                // Fetch again after seeding
-                categories = await model.findMany({
-                    where: {
-                        userId: user.id,
-                        type
-                    },
-                    orderBy: {
-                        createdAt: 'asc'
-                    }
-                })
+                    // Fetch again after seeding
+                    categories = await model.findMany({
+                        where: {
+                            userId: user.id,
+                            type
+                        },
+                        orderBy: {
+                            createdAt: 'asc'
+                        }
+                    })
+                } catch (seedError: any) {
+                    console.error('[getCategories] Seeding error:', seedError)
+                }
             }
         }
 
-        return { success: true, data: categories }
+        return { success: true, data: categories.map(serializeCategory) }
     } catch (error: any) {
-        console.error('[getCategories] Unexpected error:', error)
-        return { success: false, error: error.message || 'Failed to fetch categories' }
+        console.error('[getCategories] Error:', error)
+        return { success: false, error: `Failed to fetch categories: ${error.message}` }
     }
 }
 
 export async function addCategory(data: { name: string; type: string; color?: string }) {
     try {
         const user = await ensureUserExists()
-
-        const model = (prisma as any).category || (prisma as any).categories || (prisma as any).Category;
-        if (!model) {
-            console.error('[addCategory] Category model not found')
-            return { success: false, error: 'Database configuration error' }
-        }
+        const model = getCategoryModel()
+        if (!model) throw new Error('Database model for categories is not available')
 
         const existing = await model.findFirst({
             where: {
@@ -119,78 +130,74 @@ export async function addCategory(data: { name: string; type: string; color?: st
                 userId: user.id,
                 name: data.name,
                 type: data.type,
-                color: data.color
+                color: data.color,
+                updatedAt: new Date()
             }
         })
 
-        console.log(`[addCategory] Successfully added category: ${category.name} for user ${user.id}`)
+        console.log(`[addCategory] Successfully added category: ${category.name}`)
         revalidatePath('/dashboard')
 
         return {
             success: true,
-            data: {
-                id: category.id,
-                name: category.name,
-                type: category.type,
-                color: category.color
-            }
+            data: serializeCategory(category)
         }
     } catch (error: any) {
-        console.error('[addCategory] Unexpected error:', error)
-        return { success: false, error: error.message || 'Failed to add category' }
+        console.error('[addCategory] Database error:', error)
+        return {
+            success: false,
+            error: error.code === 'P2002'
+                ? 'A category with this name already exists'
+                : (error.message || 'Failed to save category to database')
+        }
     }
 }
 
 export async function updateCategory(id: string, data: { name?: string; color?: string }) {
     try {
-        const { userId } = await auth()
-        if (!userId) {
-            return { success: false, error: 'Unauthorized' }
-        }
+        const user = await ensureUserExists()
+        const model = getCategoryModel()
 
-        const categoryModel = (prisma as any).category || (prisma as any).categories;
-        const category = await categoryModel.update({
+        const category = await model.update({
             where: { id },
             data: {
                 ...(data.name && { name: data.name }),
-                ...(data.color && { color: data.color })
+                ...(data.color && { color: data.color }),
+                updatedAt: new Date()
             }
         })
 
         revalidatePath('/dashboard')
-        return { success: true, data: category }
-    } catch (error) {
+        return { success: true, data: serializeCategory(category) }
+    } catch (error: any) {
         console.error('Error updating category:', error)
-        return { success: false, error: 'Failed to update category' }
+        return { success: false, error: error.message || 'Failed to update category' }
     }
 }
 
 export async function deleteCategory(id: string) {
     try {
-        const { userId } = await auth()
-        if (!userId) {
-            return { success: false, error: 'Unauthorized' }
-        }
+        const user = await ensureUserExists()
+        const model = getCategoryModel()
 
-        const categoryModel = (prisma as any).category || (prisma as any).categories;
-        await categoryModel.delete({
+        await model.delete({
             where: { id }
         })
 
         revalidatePath('/dashboard')
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error deleting category:', error)
-        return { success: false, error: 'Failed to delete category' }
+        return { success: false, error: error.message || 'Failed to delete category' }
     }
 }
 
 export async function seedCategories(type: string = 'expense') {
     try {
         const user = await ensureUserExists()
+        const model = getCategoryModel()
 
-        const categoryModel = (prisma as any).category || (prisma as any).categories;
-        const count = await categoryModel.count({
+        const count = await model.count({
             where: { userId: user.id, type }
         })
 
@@ -202,19 +209,20 @@ export async function seedCategories(type: string = 'expense') {
 
         if (defaults.length === 0) return { success: true, message: 'No defaults for this type' }
 
-        await categoryModel.createMany({
+        await model.createMany({
             data: defaults.map(c => ({
                 userId: user.id,
                 name: c.name,
                 type,
-                color: c.color
+                color: c.color,
+                updatedAt: new Date()
             }))
         })
 
         revalidatePath('/dashboard')
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error seeding categories:", error)
-        return { success: false, error: 'Failed to seed' }
+        return { success: false, error: error.message || 'Failed to seed' }
     }
 }
