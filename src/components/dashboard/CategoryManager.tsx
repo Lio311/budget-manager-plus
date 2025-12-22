@@ -118,6 +118,10 @@ export function CategoryManager() {
                 {/* Add New Section */}
                 <div className="mb-4 p-4 border rounded-lg bg-gray-50 flex flex-col gap-3">
                     <div className="flex flex-col sm:flex-row gap-3">
+                        <Button onClick={handleAdd} disabled={!newItemName.trim() || isSubmitting}>
+                            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                            <span className="mr-2">הוסף</span>
+                        </Button>
                         <Input
                             placeholder="שם קטגוריה חדשה"
                             value={newItemName}
@@ -125,14 +129,10 @@ export function CategoryManager() {
                             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
                             className="flex-1"
                         />
-                        <Button onClick={handleAdd} disabled={!newItemName.trim() || isSubmitting}>
-                            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                            <span className="mr-2">הוסף</span>
-                        </Button>
                     </div>
 
                     {/* Color Picker Grid */}
-                    <div className="flex gap-2 flex-wrap justify-start">
+                    <div className="flex gap-2 flex-wrap justify-end">
                         {PRESET_COLORS.map((color) => (
                             <div
                                 key={color.name}
