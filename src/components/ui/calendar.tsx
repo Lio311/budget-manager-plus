@@ -34,8 +34,8 @@ function Calendar({
                     caption_label: "hidden",
                     caption_dropdowns: "flex gap-2 items-center",
                     dropdown: "text-sm font-medium px-3 py-2 border border-input bg-background rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-right",
-                    dropdown_month: "min-w-[120px]",
-                    dropdown_year: "min-w-[80px]",
+                    dropdown_month: "min-w-[140px]",
+                    dropdown_year: "min-w-[100px]",
                     vhidden: "hidden",
                     nav: "flex items-center gap-1",
                     nav_button: cn(
