@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
+import { addMonths } from 'date-fns'
 
 export async function getDebts(month: number, year: number) {
     try {
@@ -20,58 +21,47 @@ export async function getDebts(month: number, year: number) {
     }
 }
 
-// Helper function to create recurring debts
-async function createRecurringDebts(
-    budgetId: string,
-    data: {
-        creditor: string
-        totalAmount: number
-        monthlyPayment: number
-        dueDay: number
-        recurringStartDate: Date
-        recurringEndDate: Date
-    },
-    userId: string
+// Helper function to create debt installments
+async function createDebtInstallments(
+    creditor: string,
+    totalDebtAmount: number,
+    numberOfInstallments: number,
+    dueDay: number,
+    currentMonth: number,
+    currentYear: number
 ) {
-    const recurringSourceId = `recurring_${Date.now()}`
-    const debts = []
+    const monthlyPayment = Math.round((totalDebtAmount / numberOfInstallments) * 100) / 100
+    const recurringSourceId = `debt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
-    const startDate = new Date(data.recurringStartDate)
-    const endDate = new Date(data.recurringEndDate)
+    const installments = []
 
-    let currentDate = new Date(startDate)
-
-    while (currentDate <= endDate) {
-        const month = currentDate.getMonth() + 1
-        const year = currentDate.getFullYear()
+    for (let i = 0; i < numberOfInstallments; i++) {
+        // Start from next month
+        const installmentDate = addMonths(new Date(currentYear, currentMonth - 1, 1), i + 1)
+        const installmentMonth = installmentDate.getMonth() + 1
+        const installmentYear = installmentDate.getFullYear()
 
         // Get or create budget for this month
-        const { getCurrentBudget } = await import('./budget')
-        const monthBudget = await getCurrentBudget(month, year)
+        const budget = await getCurrentBudget(installmentMonth, installmentYear)
 
-        debts.push({
-            budgetId: monthBudget.id,
-            creditor: data.creditor,
-            totalAmount: data.totalAmount,
-            monthlyPayment: data.monthlyPayment,
-            dueDay: data.dueDay,
+        installments.push({
+            budgetId: budget.id,
+            creditor,
+            totalAmount: totalDebtAmount,
+            monthlyPayment,
+            dueDay,
             isPaid: false,
             isRecurring: true,
             recurringSourceId,
-            recurringStartDate: data.recurringStartDate,
-            recurringEndDate: data.recurringEndDate
+            totalDebtAmount,
+            numberOfInstallments,
+            installmentNumber: i + 1
         })
-
-        // Move to next month
-        currentDate.setMonth(currentDate.getMonth() + 1)
     }
 
-    // Create all debts
     await prisma.debt.createMany({
-        data: debts
+        data: installments
     })
-
-    return debts
 }
 
 export async function addDebt(
@@ -83,48 +73,70 @@ export async function addDebt(
         monthlyPayment: number
         dueDay: number
         isRecurring?: boolean
-        recurringStartDate?: Date
-        recurringEndDate?: Date
+        totalDebtAmount?: number
+        numberOfInstallments?: number
     }
 ) {
     try {
         const budget = await getCurrentBudget(month, year)
 
-        // Handle recurring debts
-        if (data.isRecurring && data.recurringStartDate && data.recurringEndDate) {
-            const debts = await createRecurringDebts(
-                budget.id,
-                {
+        // Check if this is an installment-based debt
+        if (data.isRecurring && data.totalDebtAmount && data.numberOfInstallments) {
+            await createDebtInstallments(
+                data.creditor,
+                data.totalDebtAmount,
+                data.numberOfInstallments,
+                data.dueDay,
+                month,
+                year
+            )
+        } else {
+            // Regular single debt
+            await prisma.debt.create({
+                data: {
+                    budgetId: budget.id,
                     creditor: data.creditor,
                     totalAmount: data.totalAmount,
                     monthlyPayment: data.monthlyPayment,
                     dueDay: data.dueDay,
-                    recurringStartDate: data.recurringStartDate,
-                    recurringEndDate: data.recurringEndDate
-                },
-                budget.userId
-            )
-
-            revalidatePath('/dashboard')
-            return { success: true, data: debts }
+                    isPaid: false
+                }
+            })
         }
 
-        const debt = await prisma.debt.create({
+        revalidatePath('/dashboard')
+        return { success: true }
+    } catch (error) {
+        console.error('Error adding debt:', error)
+        return { success: false, error: 'Failed to add debt' }
+    }
+}
+
+export async function updateDebt(
+    id: string,
+    data: {
+        creditor: string
+        totalAmount: number
+        monthlyPayment: number
+        dueDay: number
+    }
+) {
+    try {
+        await prisma.debt.update({
+            where: { id },
             data: {
-                budgetId: budget.id,
                 creditor: data.creditor,
                 totalAmount: data.totalAmount,
                 monthlyPayment: data.monthlyPayment,
-                dueDay: data.dueDay,
-                isPaid: false
+                dueDay: data.dueDay
             }
         })
 
         revalidatePath('/dashboard')
-        return { success: true, data: debt }
+        return { success: true }
     } catch (error) {
-        console.error('Error adding debt:', error)
-        return { success: false, error: 'Failed to add debt' }
+        console.error('Error updating debt:', error)
+        return { success: false, error: 'Failed to update debt' }
     }
 }
 
@@ -139,34 +151,6 @@ export async function deleteDebt(id: string) {
     } catch (error) {
         console.error('Error deleting debt:', error)
         return { success: false, error: 'Failed to delete debt' }
-    }
-}
-
-export async function updateDebt(
-    id: string,
-    data: {
-        creditor?: string
-        totalAmount?: number
-        monthlyPayment?: number
-        dueDay?: number
-    }
-) {
-    try {
-        const debt = await prisma.debt.update({
-            where: { id },
-            data: {
-                ...(data.creditor && { creditor: data.creditor }),
-                ...(data.totalAmount && { totalAmount: data.totalAmount }),
-                ...(data.monthlyPayment && { monthlyPayment: data.monthlyPayment }),
-                ...(data.dueDay && { dueDay: data.dueDay })
-            }
-        })
-
-        revalidatePath('/dashboard')
-        return { success: true, data: debt }
-    } catch (error) {
-        console.error('Error updating debt:', error)
-        return { success: false, error: 'Failed to update debt' }
     }
 }
 

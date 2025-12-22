@@ -33,8 +33,8 @@ export function DebtsTab() {
         monthlyPayment: '',
         dueDay: '',
         isRecurring: false,
-        recurringStartDate: undefined as Date | undefined,
-        recurringEndDate: undefined as Date | undefined
+        totalDebtAmount: '',
+        numberOfInstallments: ''
     })
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ creditor: '', totalAmount: '', monthlyPayment: '', dueDay: '' })
@@ -66,16 +66,38 @@ export function DebtsTab() {
     }
 
     const handleAdd = async () => {
-        if (newDebt.creditor && newDebt.totalAmount && newDebt.monthlyPayment && newDebt.dueDay) {
+        if (newDebt.creditor && newDebt.dueDay) {
+            // For installment debts, we need totalDebtAmount and numberOfInstallments
+            // For regular debts, we need totalAmount and monthlyPayment
+            if (newDebt.isRecurring) {
+                if (!newDebt.totalDebtAmount || !newDebt.numberOfInstallments) {
+                    toast({
+                        title: 'שגיאה',
+                        description: 'יש למלא סכום כולל ומספר תשלומים',
+                        variant: 'destructive'
+                    })
+                    return
+                }
+            } else {
+                if (!newDebt.totalAmount || !newDebt.monthlyPayment) {
+                    toast({
+                        title: 'שגיאה',
+                        description: 'יש למלא סכום כולל ותשלום חודשי',
+                        variant: 'destructive'
+                    })
+                    return
+                }
+            }
+
             setSubmitting(true)
             const result = await addDebt(month, year, {
                 creditor: newDebt.creditor,
-                totalAmount: parseFloat(newDebt.totalAmount),
-                monthlyPayment: parseFloat(newDebt.monthlyPayment),
+                totalAmount: parseFloat(newDebt.totalAmount) || 0,
+                monthlyPayment: parseFloat(newDebt.monthlyPayment) || 0,
                 dueDay: parseInt(newDebt.dueDay),
                 isRecurring: newDebt.isRecurring,
-                recurringStartDate: newDebt.recurringStartDate,
-                recurringEndDate: newDebt.recurringEndDate
+                totalDebtAmount: newDebt.totalDebtAmount ? parseFloat(newDebt.totalDebtAmount) : undefined,
+                numberOfInstallments: newDebt.numberOfInstallments ? parseInt(newDebt.numberOfInstallments) : undefined
             })
 
             if (result.success) {
@@ -85,8 +107,8 @@ export function DebtsTab() {
                     monthlyPayment: '',
                     dueDay: '',
                     isRecurring: false,
-                    recurringStartDate: undefined,
-                    recurringEndDate: undefined
+                    totalDebtAmount: '',
+                    numberOfInstallments: ''
                 })
                 await loadDebts()
                 toast({
@@ -291,28 +313,44 @@ export function DebtsTab() {
                                         onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
                                     />
                                     <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer">
-                                        חוב קבוע
+                                        חוב בתשלומים
                                     </label>
                                 </div>
 
                                 {newDebt.isRecurring && (
                                     <div className="flex gap-4 flex-1">
                                         <div className="space-y-2 flex-1">
-                                            <label className="text-sm font-medium">תאריך התחלה</label>
-                                            <DatePicker
-                                                date={newDebt.recurringStartDate}
-                                                setDate={(date) => setNewDebt({ ...newDebt, recurringStartDate: date })}
-                                                placeholder="בחר תאריך התחלה"
+                                            <label className="text-sm font-medium">סכום כולל</label>
+                                            <Input
+                                                type="number"
+                                                placeholder="0.00"
+                                                value={newDebt.totalDebtAmount}
+                                                onChange={(e) => setNewDebt({ ...newDebt, totalDebtAmount: e.target.value })}
+                                                disabled={submitting}
                                             />
                                         </div>
                                         <div className="space-y-2 flex-1">
-                                            <label className="text-sm font-medium">תאריך סיום</label>
-                                            <DatePicker
-                                                date={newDebt.recurringEndDate}
-                                                setDate={(date) => setNewDebt({ ...newDebt, recurringEndDate: date })}
-                                                placeholder="בחר תאריך סיום"
+                                            <label className="text-sm font-medium">מספר תשלומים</label>
+                                            <Input
+                                                type="number"
+                                                placeholder="12"
+                                                min="1"
+                                                value={newDebt.numberOfInstallments}
+                                                onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
+                                                disabled={submitting}
                                             />
                                         </div>
+                                        {newDebt.totalDebtAmount && newDebt.numberOfInstallments && (
+                                            <div className="space-y-2 flex-1">
+                                                <label className="text-sm font-medium">תשלום חודשי</label>
+                                                <div className="h-10 px-3 py-2 border rounded-md bg-muted flex items-center">
+                                                    {formatCurrency(
+                                                        parseFloat(newDebt.totalDebtAmount) / parseInt(newDebt.numberOfInstallments),
+                                                        currency
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
