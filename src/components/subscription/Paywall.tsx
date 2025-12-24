@@ -168,19 +168,7 @@ export function Paywall() {
                             }
                         }}
                     >
-                        if (user?.id && user?.emailAddresses?.[0]?.emailAddress) {
-                                    const result = await startTrial(user.id, user.emailAddresses[0].emailAddress)
-                        if (result.success) {
-                            window.location.href = '/dashboard'
-                        } else {
-                            toast.error('לא ניתן להתחיל תקופת ניסיון כעת')
-                        }
-                                }
-                            } catch (error) {
-                            toast.error('שגיאה בהפעלת תקופת ניסיון')
-                        }
-                        }}
-                    >
+
                         נסה 14 יום חינם!
                     </Button>
                 )}
