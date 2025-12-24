@@ -27,7 +27,7 @@ export async function getCalendarPayments(month: number, year: number) {
             }),
             prisma.saving.findMany({
                 where: { budgetId: budget.id },
-                orderBy: { date: 'asc' }
+                orderBy: { createdAt: 'asc' }
             })
         ])
 
@@ -59,7 +59,7 @@ export async function getCalendarPayments(month: number, year: number) {
             })),
             ...expenses.map(expense => ({
                 id: expense.id,
-                name: expense.description,
+                name: expense.description || 'הוצאה',
                 amount: expense.amount,
                 day: expense.date ? expense.date.getDate() : 1,
                 type: 'expense' as const,
@@ -67,9 +67,9 @@ export async function getCalendarPayments(month: number, year: number) {
             })),
             ...savings.map(saving => ({
                 id: saving.id,
-                name: saving.description,
-                amount: saving.monthlyDeposit,
-                day: saving.date.getDate(),
+                name: saving.name,
+                amount: saving.monthlyDeposit || 0,
+                day: saving.createdAt.getDate(),
                 type: 'saving' as const,
                 isPaid: true // Savings don't have paid status
             }))
