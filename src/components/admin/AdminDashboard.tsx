@@ -95,20 +95,18 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="text-right">Name</TableHead>
-                                        <TableHead className="text-right">Email</TableHead>
-                                        <TableHead className="text-right">Status</TableHead>
-                                        <TableHead className="text-right">Last Payment</TableHead>
-                                        <TableHead className="text-right">End Date</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead className="text-center">Email</TableHead>
+                                        <TableHead className="text-center">Status</TableHead>
+                                        <TableHead className="text-center">Last Payment</TableHead>
+                                        <TableHead className="text-center">End Date</TableHead>
+                                        <TableHead className="text-center">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {users.map((user) => (
                                         <TableRow key={user.id}>
-                                            <TableCell className="text-center">{user.name || '-'}</TableCell>
-                                            <TableCell>{user.email}</TableCell>
-                                            <TableCell>
+                                            <TableCell className="text-center">{user.email}</TableCell>
+                                            <TableCell className="text-center">
                                                 <span className={`px-2 py-1 rounded-full text-xs ${user.subscription?.status === 'active' ? 'bg-green-100 text-green-800' :
                                                     user.subscription?.status === 'trial' ? 'bg-blue-100 text-blue-800' :
                                                         'bg-gray-100 text-gray-800'
@@ -116,14 +114,14 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                                     {user.subscription?.status || 'None'}
                                                 </span>
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell className="text-center">
                                                 {user.paymentHistory?.[0] ? `₪${user.paymentHistory[0].amount}` : '-'}
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell className="text-center">
                                                 {user.subscription?.endDate ? format(new Date(user.subscription.endDate), 'dd/MM/yyyy') : '-'}
                                             </TableCell>
-                                            <TableCell>
-                                                <div className="flex gap-2">
+                                            <TableCell className="text-center">
+                                                <div className="flex gap-2 justify-center">
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"

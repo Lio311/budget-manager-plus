@@ -48,43 +48,43 @@ export function Paywall() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-4">
-            <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
-                <div className="flex justify-center mb-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-2 sm:p-4">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-6 overflow-y-auto max-h-[95vh]">
+                <div className="flex justify-center mb-2">
                     <Image
                         src="/keseflow.png"
                         alt="KesefFlow"
                         width={300}
                         height={90}
-                        className="h-24 w-auto"
+                        className="h-20 w-auto"
                     />
                 </div>
 
-                <h1 className="text-2xl font-bold text-center mb-2 text-gray-800">
+                <h1 className="text-xl font-bold text-center mb-2 text-gray-800">
                     {isTrialExpired ? 'תקופת הניסיון הסתיימה' : 'ניהול תקציב חכם ופשוט'}
                 </h1>
 
                 {isTrialExpired && (
-                    <p className="text-center text-gray-600 mb-8">
+                    <p className="text-center text-gray-600 mb-4 text-sm">
                         כדי להמשיך להשתמש במערכת ולשמור על הנתונים שלך, יש להסדיר תשלום.
                     </p>
                 )}
 
-                <p className="text-center text-sm font-semibold text-purple-600 mb-8">
+                <p className="text-center text-xs font-semibold text-purple-600 mb-4">
                     בקרוב - ממשק לעסקים!
                 </p>
 
-                <div className="text-center mb-8 bg-green-50 rounded-xl p-6 border border-green-100 relative overflow-hidden">
+                <div className="text-center mb-4 bg-green-50 rounded-lg p-3 border border-green-100 relative overflow-hidden">
                     {discount > 0 && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full transform rotate-12">
+                        <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full transform rotate-12">
                             -{discount}%
                         </div>
                     )}
-                    <div className="text-6xl font-black text-green-600 mb-2 flex items-center justify-center gap-1" dir="ltr">
-                        <span className="text-3xl">₪</span>{price.toFixed(2)}
+                    <div className="text-5xl font-black text-green-600 mb-1 flex items-center justify-center gap-1" dir="ltr">
+                        <span className="text-2xl">₪</span>{price.toFixed(2)}
                     </div>
-                    <div className="text-gray-600 text-lg">לשנה שלמה</div>
-                    <div className="text-sm text-gray-500 mt-2">
+                    <div className="text-gray-600 text-base">לשנה שלמה</div>
+                    <div className="text-xs text-gray-500 mt-1">
                         {discount > 0 ? (
                             <>
                                 <span className="line-through text-red-400 mx-1">₪4.17</span>
@@ -97,53 +97,55 @@ export function Paywall() {
                 </div>
 
                 {/* Coupon Input */}
-                <div className="flex gap-2 mb-6">
+                <div className="flex gap-2 mb-4">
                     <div className="relative flex-1">
                         <Tag className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="קוד קופון"
                             value={couponCode}
                             onChange={(e) => setCouponCode(e.target.value)}
-                            className="pr-9"
+                            className="pr-9 h-9 text-sm"
                         />
                     </div>
-                    <Button onClick={handleApplyCoupon} variant="outline">החל</Button>
+                    <Button onClick={handleApplyCoupon} variant="outline" size="sm">החל</Button>
                 </div>
                 {couponMessage && (
-                    <p className={`text-sm text-center mb-4 ${discount > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                    <p className={`text-xs text-center mb-2 ${discount > 0 ? 'text-green-600' : 'text-red-500'}`}>
                         {couponMessage}
                     </p>
                 )}
 
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                    <p className="text-sm text-red-800 font-medium">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                    <p className="text-xs text-red-800 font-medium">
                         <strong>חשוב:</strong> אם לא תחדש את המנוי בתום השנה, כל הנתונים שלך יימחקו לצמיתות.
                     </p>
                 </div>
 
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-2 mb-4 text-sm">
                     <li className="flex items-start gap-2">
-                        <Check className="text-green-500 mt-1 h-5 w-5 flex-shrink-0" />
+                        <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
                         <span>ניהול תקציב חודשי מלא</span>
                     </li>
                     <li className="flex items-start gap-2">
-                        <Check className="text-green-500 mt-1 h-5 w-5 flex-shrink-0" />
+                        <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
                         <span>מעקב אחר הכנסות והוצאות</span>
                     </li>
                     <li className="flex items-start gap-2">
-                        <Check className="text-green-500 mt-1 h-5 w-5 flex-shrink-0" />
+                        <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
                         <span>ניהול חובות וחסכונות</span>
                     </li>
                     <li className="flex items-start gap-2">
-                        <Check className="text-green-500 mt-1 h-5 w-5 flex-shrink-0" />
+                        <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
                         <span>דוחות ואנליטיקס מתקדמים</span>
                     </li>
                 </ul>
 
+
                 {!isTrialExpired && (
                     <Button
                         variant="secondary"
-                        className="w-full mb-4 bg-purple-100 text-purple-700 hover:bg-purple-200"
+                        size="sm"
+                        className="w-full mb-3 bg-purple-100 text-purple-700 hover:bg-purple-200"
                         onClick={async () => {
                             // We can redirect to dashboard which triggers the auto-trial logic
                             window.location.href = '/dashboard'
@@ -162,63 +164,55 @@ export function Paywall() {
                             createOrder={(data, actions) => {
                                 return actions.order.create({
                                     intent: 'CAPTURE',
-                                    purchase_units: [{
-                                        amount: {
-                                            value: price.toFixed(2),
-                                            currency_code: 'ILS'
+                                    purchase_units: [
+                                        {
+                                            amount: {
+                                                currency_code: 'ILS',
+                                                value: price.toFixed(2),
+                                            },
+                                            description: 'מנוי שנתי למערכת ניהול תקציב',
+                                            custom_id: couponCode || undefined
                                         },
-                                        custom_id: userId
-                                    }]
+                                    ],
                                 })
                             }}
                             onApprove={async (data, actions) => {
-                                try {
-                                    console.log('Payment approved, capturing order...')
-                                    if (!actions.order) {
-                                        console.error('No order object')
-                                        return
-                                    }
-
-                                    const order = await actions.order.capture()
-                                    console.log('Order captured:', order.id)
-
-                                    if (order.id) {
-                                        console.log('Creating subscription via API...')
+                                if (actions.order) {
+                                    const details = await actions.order.capture()
+                                    // Handle successful payment here
+                                    // You might want to call a server action here to update subscription
+                                    try {
                                         const response = await fetch('/api/subscription/create', {
                                             method: 'POST',
-                                            headers: { 'Content-Type': 'application/json' },
-                                            body: JSON.stringify({ orderId: order.id, amount: price })
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify({
+                                                orderId: details.id,
+                                                amount: price
+                                            }),
                                         })
 
-                                        if (!response.ok) {
-                                            throw new Error('Failed to create subscription')
+                                        if (response.ok) {
+                                            window.location.href = '/dashboard'
                                         }
-
-                                        console.log('Subscription created, redirecting...')
-                                        window.location.href = '/dashboard'
+                                    } catch (error) {
+                                        console.error('Payment error:', error)
+                                        toast.error('התשלום עבר אך הייתה שגיאה בעדכון המנוי. אנא צור קשר.')
                                     }
-                                } catch (error) {
-                                    console.error('Payment error:', error)
-                                    alert('שגיאה בעיבוד התשלום. אנא פנה לתמיכה.')
                                 }
                             }}
-                            style={{
-                                layout: 'vertical',
-                                color: 'blue',
-                                shape: 'rect',
-                                label: 'pay'
-                            }}
+                            style={{ layout: 'vertical' }}
                         />
                     </PayPalScriptProvider>
                 ) : (
-                    <div className="text-center py-4">
-                        <p className="text-gray-600">טוען...</p>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                        <p className="text-gray-600 mb-2">יש להרשם למערכת כדי לרכוש מנוי</p>
+                        <Button onClick={() => window.location.href = '/sign-in'}>
+                            הרשמה / התחברות
+                        </Button>
                     </div>
                 )}
-
-                <p className="text-xs text-center text-gray-500 mt-4">
-                    תשלום מאובטח דרך PayPal
-                </p>
             </div>
         </div>
     )
