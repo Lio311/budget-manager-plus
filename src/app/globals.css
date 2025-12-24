@@ -63,3 +63,7 @@
     @apply text-sm text-muted-foreground;
   }
 }
+/* Clerk Overrides */
+.cl-otpCodeFieldInput { direction: ltr !important; }
+.cl-formButtonPrimary svg { display: none !important; }
+.cl-internal-1f7634d { display: none !important; }
