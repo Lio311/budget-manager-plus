@@ -11,7 +11,7 @@ export async function getCalendarPayments(month: number, year: number) {
         const [bills, debts, incomes, expenses, savings] = await Promise.all([
             prisma.bill.findMany({
                 where: { budgetId: budget.id },
-                orderBy: { dueDay: 'asc' }
+                orderBy: { dueDate: 'asc' }
             }),
             prisma.debt.findMany({
                 where: { budgetId: budget.id },
@@ -37,7 +37,7 @@ export async function getCalendarPayments(month: number, year: number) {
                 id: bill.id,
                 name: bill.name,
                 amount: bill.amount,
-                day: bill.dueDay,
+                day: new Date(bill.dueDate).getDate(),
                 type: 'bill' as const,
                 isPaid: bill.isPaid
             })),
