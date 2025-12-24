@@ -54,19 +54,22 @@ export function Paywall() {
                     <Image
                         src="/keseflow.png"
                         alt="KesefFlow"
-                        width={200}
-                        height={60}
-                        className="h-16 w-auto"
+                        width={300}
+                        height={90}
+                        className="h-24 w-auto"
                     />
                 </div>
+
                 <h1 className="text-2xl font-bold text-center mb-2 text-gray-800">
-                    {isTrialExpired ? 'תקופת הניסיון הסתיימה' : 'שדרג ל-Premium'}
+                    {isTrialExpired ? 'תקופת הניסיון הסתיימה' : 'ניהול תקציב חכם ופשוט'}
                 </h1>
-                <p className="text-center text-gray-600 mb-8">
-                    {isTrialExpired
-                        ? 'כדי להמשיך להשתמש במערכת ולשמור על הנתונים שלך, יש להסדיר תשלום.'
-                        : 'ניהול תקציב חכם ופשוט'}
-                </p>
+
+                {isTrialExpired && (
+                    <p className="text-center text-gray-600 mb-8">
+                        כדי להמשיך להשתמש במערכת ולשמור על הנתונים שלך, יש להסדיר תשלום.
+                    </p>
+                )}
+
                 <p className="text-center text-sm font-semibold text-purple-600 mb-8">
                     בקרוב - ממשק לעסקים!
                 </p>
@@ -77,11 +80,20 @@ export function Paywall() {
                             -{discount}%
                         </div>
                     )}
-                    <div className="text-6xl font-black text-green-600 mb-2 flex items-center justify-center gap-1">
+                    <div className="text-6xl font-black text-green-600 mb-2 flex items-center justify-center gap-1" dir="ltr">
                         <span className="text-3xl">₪</span>{price.toFixed(2)}
                     </div>
                     <div className="text-gray-600 text-lg">לשנה שלמה</div>
-                    {discount === 0 && <div className="text-sm text-gray-500 mt-2">רק ₪4.17 לחודש!</div>}
+                    <div className="text-sm text-gray-500 mt-2">
+                        {discount > 0 ? (
+                            <>
+                                <span className="line-through text-red-400 mx-1">₪4.17</span>
+                                <strong>₪{(price / 12).toFixed(2)}</strong>
+                            </>
+                        ) : (
+                            'רק ₪4.17 לחודש!'
+                        )}
+                    </div>
                 </div>
 
                 {/* Coupon Input */}
@@ -128,6 +140,18 @@ export function Paywall() {
                     </li>
                 </ul>
 
+                {!isTrialExpired && (
+                    <Button
+                        variant="secondary"
+                        className="w-full mb-4 bg-purple-100 text-purple-700 hover:bg-purple-200"
+                        onClick={async () => {
+                            // We can redirect to dashboard which triggers the auto-trial logic
+                            window.location.href = '/dashboard'
+                        }}
+                    >
+                        נסה 14 יום חינם!
+                    </Button>
+                )}
 
                 {userId ? (
                     <PayPalScriptProvider options={{

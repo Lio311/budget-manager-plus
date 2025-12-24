@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { currentUser } from '@clerk/nextjs/server'
 import { addYears, addDays } from 'date-fns'
+import { revalidatePath } from 'next/cache'
 
 export async function createSubscription(paypalOrderId: string, amount: number) {
     try {
@@ -115,6 +116,7 @@ export async function startTrial(userId: string, email: string) {
         }
     })
 
+    revalidatePath('/dashboard')
     return { success: true }
 }
 
@@ -159,8 +161,13 @@ export async function getSubscriptionStatus(userId: string) {
 }
 
 export async function validateCoupon(code: string, userEmail: string) {
-    const coupon = await prisma.coupon.findUnique({
-        where: { code }
+    const coupon = await prisma.coupon.findFirst({
+        where: {
+            code: {
+                equals: code,
+                mode: 'insensitive'
+            }
+        }
     })
 
     if (!coupon) {
