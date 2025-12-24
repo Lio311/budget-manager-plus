@@ -103,6 +103,7 @@ model Bill {
   category    String   @default("חשבונות")
   isRecurring         Boolean  @default(false)
   recurringSourceId   String?
+  paidDate            DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   @@map("bills")
