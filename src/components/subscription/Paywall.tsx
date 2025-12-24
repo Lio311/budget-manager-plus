@@ -67,6 +67,9 @@ export function Paywall() {
                         ? 'כדי להמשיך להשתמש במערכת ולשמור על הנתונים שלך, יש להסדיר תשלום.'
                         : 'ניהול תקציב חכם ופשוט'}
                 </p>
+                <p className="text-center text-sm font-semibold text-purple-600 mb-8">
+                    בקרוב - ממשק לעסקים!
+                </p>
 
                 <div className="text-center mb-8 bg-green-50 rounded-xl p-6 border border-green-100 relative overflow-hidden">
                     {discount > 0 && (
