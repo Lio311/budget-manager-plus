@@ -121,14 +121,14 @@ export function Paywall() {
                     </p>
                 </div>
 
-                <ul className="space-y-2 mb-4 text-sm">
+                <ul className="grid grid-cols-2 gap-2 mb-4 text-sm">
                     <li className="flex items-start gap-2">
                         <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
-                        <span>ניהול תקציב חודשי מלא</span>
+                        <span>ניהול תקציב חודשי</span>
                     </li>
                     <li className="flex items-start gap-2">
                         <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
-                        <span>מעקב אחר הכנסות והוצאות</span>
+                        <span>מעקב הכנסות/הוצאות</span>
                     </li>
                     <li className="flex items-start gap-2">
                         <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
@@ -136,7 +136,7 @@ export function Paywall() {
                     </li>
                     <li className="flex items-start gap-2">
                         <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
-                        <span>דוחות ואנליטיקס מתקדמים</span>
+                        <span>דוחות מתקדמים</span>
                     </li>
                 </ul>
 
@@ -147,18 +147,38 @@ export function Paywall() {
                         size="sm"
                         className="w-full mb-3 bg-white text-gray-900 border border-gray-200 shadow-sm hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200"
                         onClick={async () => {
+                            if (!user?.id || !user?.emailAddresses?.[0]?.emailAddress) {
+                                toast.error('אנא התחבר מחדש')
+                                return
+                            }
+
                             try {
-                                if (user?.id && user?.emailAddresses?.[0]?.emailAddress) {
-                                    const result = await startTrial(user.id, user.emailAddresses[0].emailAddress)
-                                    if (result.success) {
-                                        window.location.href = '/dashboard'
-                                    } else {
-                                        toast.error('לא ניתן להתחיל תקופת ניסיון כעת')
-                                    }
+                                toast.loading('מפעיל תקופת ניסיון...')
+                                const result = await startTrial(user.id, user.emailAddresses[0].emailAddress)
+
+                                if (result.success) {
+                                    toast.success('תקופת הניסיון הופעלה בהצלחה!')
+                                    window.location.href = '/dashboard'
+                                } else {
+                                    toast.error(result.reason || 'שגיאה בהפעלת תקופת הניסיון')
                                 }
                             } catch (error) {
-                                toast.error('שגיאה בהפעלת תקופת ניסיון')
+                                console.error('Trial start error:', error)
+                                toast.error('שגיאה בלתי צפויה')
                             }
+                        }}
+                    >
+                        if (user?.id && user?.emailAddresses?.[0]?.emailAddress) {
+                                    const result = await startTrial(user.id, user.emailAddresses[0].emailAddress)
+                        if (result.success) {
+                            window.location.href = '/dashboard'
+                        } else {
+                            toast.error('לא ניתן להתחיל תקופת ניסיון כעת')
+                        }
+                                }
+                            } catch (error) {
+                            toast.error('שגיאה בהפעלת תקופת ניסיון')
+                        }
                         }}
                     >
                         נסה 14 יום חינם!
