@@ -70,21 +70,21 @@ export function Paywall() {
                     </p>
                 )}
 
-                <p className="text-center text-xs font-semibold text-purple-600 mb-4">
+                <p className="text-center text-xs font-semibold text-yellow-500 mb-2">
                     בקרוב - ממשק לעסקים!
                 </p>
 
-                <div className="text-center mb-4 bg-green-50 rounded-lg p-3 border border-green-100 relative overflow-hidden">
+                <div className="text-center mb-3 bg-green-50 rounded-lg p-2 border border-green-100 relative overflow-hidden">
                     {discount > 0 && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full transform rotate-12">
-                            -{discount}%
+                        <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full transform rotate-12 dir-ltr">
+                            {discount}%-
                         </div>
                     )}
-                    <div className="text-5xl font-black text-green-600 mb-1 flex items-center justify-center gap-1" dir="ltr">
-                        <span className="text-2xl">₪</span>{price.toFixed(2)}
+                    <div className="text-4xl font-black text-green-600 mb-0 flex items-center justify-center gap-1" dir="ltr">
+                        <span className="text-xl">₪</span>{price.toFixed(2)}
                     </div>
-                    <div className="text-gray-600 text-base">לשנה שלמה</div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-gray-600 text-sm">לשנה שלמה</div>
+                    <div className="text-[10px] text-gray-500 mt-0">
                         {discount > 0 ? (
                             <>
                                 <span className="line-through text-red-400 mx-1">₪4.17</span>

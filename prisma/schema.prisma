@@ -22,7 +22,7 @@ model User {
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
   
-  // Trial period
+  // Trial period - kept for reference, but TrialTracker handles global email checks
   trialEndsAt    DateTime?
   hasUsedTrial   Boolean  @default(false)
 
@@ -58,11 +58,8 @@ model Income {
   date              DateTime?
   isRecurring         Boolean  @default(false)
   recurringSourceId   String?
-  recurringStartDate  DateTime?
-  recurringEndDate    DateTime?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  @@index([budgetId])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
   @@map("incomes")
 }
 
@@ -70,167 +67,124 @@ model Expense {
   id                String   @id @default(cuid())
   budgetId          String
   budget            Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  description       String
-  amount            Float
   category          String
+  amount            Float
+  description       String?
   date              DateTime?
+  installments      Int      @default(1)
+  currentInstallment Int     @default(1)
   isRecurring         Boolean  @default(false)
   recurringSourceId   String?
-  recurringStartDate  DateTime?
-  recurringEndDate    DateTime?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  @@index([budgetId])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
   @@map("expenses")
 }
 
 model Bill {
-  id        String    @id @default(cuid())
-  budgetId  String
-  budget    Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  name      String
-  amount    Float
-  dueDay    Int       
-  isPaid    Boolean   @default(false)
-  paidDate  DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  @@index([budgetId])
+  id          String   @id @default(cuid())
+  budgetId    String
+  budget      Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  name        String
+  amount      Float
+  dueDate     DateTime
+  isPaid      Boolean  @default(false)
+  category    String   @default("חשבונות")
+  isRecurring         Boolean  @default(false)
+  recurringSourceId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   @@map("bills")
 }
 
 model Debt {
-  id                String    @id @default(cuid())
-  budgetId          String
-  budget            Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  creditor          String    
-  debtType          String    @default("owed_by_me")
-  totalAmount       Float     
-  monthlyPayment    Float     
-  dueDay            Int       
-  isPaid            Boolean   @default(false)
-  paidDate          DateTime?
-  isRecurring         Boolean  @default(false)
-  recurringSourceId   String?
-  recurringStartDate  DateTime?
-  recurringEndDate    DateTime?
-  totalDebtAmount      Float?
-  numberOfInstallments Int?
-  installmentNumber    Int?
+  id              String    @id @default(cuid())
+  budgetId        String?   // Optional linkage to a specific budget month
+  budget          Budget?   @relation(fields: [budgetId], references: [id], onDelete: SetNull)
+  name            String
+  initialAmount   Float     // Original debt amount
+  currentBalance  Float     // Remaining balance
+  interestRate    Float?    // Annual interest rate
+  minimumPayment  Float?
+  dueDate         DateTime?
+  isPaid          Boolean   @default(false)
+  notes           String?
+  category        String    @default("הלוואה") // e.g., Mortgage, Car Loan, Credit Card
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  @@index([budgetId])
   @@map("debts")
 }
 
 model Saving {
-  id                String   @id @default(cuid())
-  budgetId          String
-  budget            Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  type              String   
-  category          String   @default("כללי") 
-  description       String
-  monthlyDeposit    Float
-  goal              String?
-  date              DateTime
-  isRecurring         Boolean  @default(false)
-  recurringSourceId   String?
-  recurringStartDate  DateTime?
-  recurringEndDate    DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  @@index([budgetId])
+  id              String    @id @default(cuid())
+  budgetId        String?
+  budget          Budget?   @relation(fields: [budgetId], references: [id], onDelete: SetNull)
+  name            String
+  targetAmount    Float?
+  currentAmount   Float     @default(0)
+  monthlyDeposit  Float?    // Planned monthly contribution
+  targetDate      DateTime?
+  category        String    @default("חסכון") // e.g., Emergency Fund, Vacation
+  color           String?   // UI color integration
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
   @@map("savings")
 }
 
-model Category {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  type      String   
-  color     String?  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@unique([userId, name, type])
-  @@index([userId, type])
-  @@map("categories")
-}
-
 model Subscription {
-  id                    String    @id @default(cuid())
-  userId                String    @unique
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // PayPal Details
-  paypalOrderId         String?   @unique
-  paypalPayerId         String?
-  
-  // Subscription Status
-  status                String    @default("inactive")
-  startDate             DateTime?
-  endDate               DateTime?
-  
-  // Deletion tracking
-  expiryNotified30Days  Boolean   @default(false)
-  expiryNotified7Days   Boolean   @default(false)
-  deletionScheduledFor  DateTime?
-  
-  // Payment History
-  lastPaymentDate       DateTime?
-  lastPaymentAmount     Float?
-  
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status            String    @default("inactive") // trial, active, expired, inactive
+  startDate         DateTime  @default(now())
+  endDate           DateTime?
+  paypalOrderId     String?
+  lastPaymentDate   DateTime?
+  lastPaymentAmount Float?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
   @@map("subscriptions")
 }
 
 model PaymentHistory {
-  id                String    @id @default(cuid())
-  userId            String
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Payment Details
-  paypalOrderId     String    @unique
-  amount            Float
-  currency          String    @default("ILS")
-  status            String
-  
-  paymentDate       DateTime  @default(now())
-  createdAt         DateTime  @default(now())
-  
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount        Float
+  currency      String   @default("ILS")
+  status        String   // completed, failed, pending
+  paypalOrderId String?
+  createdAt     DateTime @default(now())
   @@map("payment_history")
 }
 
 model Coupon {
   id              String    @id @default(cuid())
   code            String    @unique
-  discountPercent Int
+  discountPercent Float
   expiryDate      DateTime?
-  specificEmail   String?   
+  maxUses         Int?
   usedCount       Int       @default(0)
+  specificEmail   String?   // Optional: restrict to specific user email
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-
   @@map("coupons")
-}
-
-model TrialTracker {
-  id             String   @id @default(cuid())
-  email          String   @unique
-  trialStartedAt DateTime @default(now())
-
-  @@map("trial_trackers")
 }
 
 model Feedback {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
   content   String
   createdAt DateTime @default(now())
+  
+  @@map("feedback")
+}
 
-  @@index([userId])
-  @@map("feedbacks")
+model TrialTracker {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("trial_tracker")
 }

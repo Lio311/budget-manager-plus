@@ -97,8 +97,8 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                     <TableRow>
                                         <TableHead className="text-center">Email</TableHead>
                                         <TableHead className="text-center">Status</TableHead>
-                                        <TableHead className="text-center">Last Payment</TableHead>
-                                        <TableHead className="text-center">End Date</TableHead>
+                                        <TableHead className="text-center">Start Date</TableHead>
+                                        <TableHead className="text-center">Renewal/Expiry</TableHead>
                                         <TableHead className="text-center">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -107,15 +107,24 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                         <TableRow key={user.id}>
                                             <TableCell className="text-center">{user.email}</TableCell>
                                             <TableCell className="text-center">
-                                                <span className={`px-2 py-1 rounded-full text-xs ${user.subscription?.status === 'active' ? 'bg-green-100 text-green-800' :
-                                                    user.subscription?.status === 'trial' ? 'bg-blue-100 text-blue-800' :
-                                                        'bg-gray-100 text-gray-800'
-                                                    }`}>
-                                                    {user.subscription?.status || 'None'}
-                                                </span>
+                                                <div className="flex flex-col items-center gap-1">
+                                                    <span className={`px-2 py-1 rounded-full text-xs ${user.subscription?.status === 'active' ? 'bg-green-100 text-green-800' :
+                                                        user.subscription?.status === 'trial' ? 'bg-blue-100 text-blue-800' :
+                                                            'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        {user.subscription?.status === 'active' ? 'Active' :
+                                                            user.subscription?.status === 'trial' ? 'Trial' :
+                                                                user.subscription?.status || 'None'}
+                                                    </span>
+                                                    {user.subscription?.status === 'trial' && (
+                                                        <span className="text-[10px] text-gray-500">
+                                                            {user.hasUsedTrial ? '(Used)' : ''}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                {user.paymentHistory?.[0] ? `₪${user.paymentHistory[0].amount}` : '-'}
+                                                {user.subscription?.startDate ? format(new Date(user.subscription.startDate), 'dd/MM/yyyy') : '-'}
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 {user.subscription?.endDate ? format(new Date(user.subscription.endDate), 'dd/MM/yyyy') : '-'}
