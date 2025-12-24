@@ -97,7 +97,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                 <TableBody>
                                     {users.map((user) => (
                                         <TableRow key={user.id}>
-                                            <TableCell>{user.name || 'User'}</TableCell>
+                                            <TableCell className="text-center">{user.name || '-'}</TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>
                                                 <span className={`px-2 py-1 rounded-full text-xs ${user.subscription?.status === 'active' ? 'bg-green-100 text-green-800' :
@@ -151,36 +151,44 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                     <Card>
                         <CardHeader><CardTitle>Create Coupon</CardTitle></CardHeader>
                         <CardContent>
-                            <div className="grid gap-4 md:grid-cols-5 items-end">
+                            <div className="grid gap-4 md:grid-cols-5 items-end text-left" dir="ltr">
                                 <div className="space-y-2">
-                                    <Label>Code</Label>
+                                    <Label className="text-left block">Code</Label>
                                     <Input
+                                        className="text-left"
                                         value={newCoupon.code}
                                         onChange={e => setNewCoupon({ ...newCoupon, code: e.target.value })}
+                                        dir="ltr"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Discount %</Label>
+                                    <Label className="text-left block">Discount %</Label>
                                     <Input
+                                        className="text-left"
                                         type="number"
                                         value={newCoupon.discountPercent}
                                         onChange={e => setNewCoupon({ ...newCoupon, discountPercent: Number(e.target.value) })}
+                                        dir="ltr"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Expiry Date (Optional)</Label>
+                                    <Label className="text-left block">Expiry Date (Optional)</Label>
                                     <Input
+                                        className="text-left"
                                         type="datetime-local"
                                         value={newCoupon.expiryDate}
                                         onChange={e => setNewCoupon({ ...newCoupon, expiryDate: e.target.value })}
+                                        dir="ltr"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Specific Email (Optional)</Label>
+                                    <Label className="text-left block">Specific Email (Optional)</Label>
                                     <Input
+                                        className="text-left"
                                         type="email"
                                         value={newCoupon.specificEmail}
                                         onChange={e => setNewCoupon({ ...newCoupon, specificEmail: e.target.value })}
+                                        dir="ltr"
                                     />
                                 </div>
                                 <Button onClick={handleCreateCoupon}>Create Coupon</Button>

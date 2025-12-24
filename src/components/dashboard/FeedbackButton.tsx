@@ -45,10 +45,10 @@ export function FeedbackButton() {
                     הצעה לשיפור
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px]" dir="rtl">
                 <DialogHeader>
-                    <DialogTitle>הצעה לשיפור</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="text-right">הצעה לשיפור</DialogTitle>
+                    <DialogDescription className="text-right">
                         יש לך רעיון איך לשפר את המערכת? נשמח לשמוע!
                     </DialogDescription>
                 </DialogHeader>
@@ -57,7 +57,8 @@ export function FeedbackButton() {
                         placeholder="כתוב כאן את ההצעה שלך..."
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="min-h-[100px]"
+                        className="min-h-[100px] text-right"
+                        dir="rtl"
                     />
                 </div>
                 <DialogFooter>
