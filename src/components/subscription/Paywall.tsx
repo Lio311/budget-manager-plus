@@ -15,7 +15,7 @@ export function Paywall() {
     const { user } = useUser()
     const [couponCode, setCouponCode] = useState('')
     const [discount, setDiscount] = useState(0)
-    const [price, setPrice] = useState(50)
+    const [price, setPrice] = useState(89)
     const [couponMessage, setCouponMessage] = useState('')
     const [isTrialExpired, setIsTrialExpired] = useState(false)
 
@@ -36,12 +36,12 @@ export function Paywall() {
 
         if (result.valid && result.discountPercent) {
             setDiscount(result.discountPercent)
-            setPrice(50 * (1 - result.discountPercent / 100))
+            setPrice(89 * (1 - result.discountPercent / 100))
             setCouponMessage(`קופון הופעל! ${result.discountPercent}% הנחה`)
             toast.success('קופון הופעל בהצלחה!')
         } else {
             setDiscount(0)
-            setPrice(50)
+            setPrice(89)
             setCouponMessage(result.message || 'קופון לא תקין')
             toast.error(result.message || 'קופון לא תקין')
         }
@@ -87,11 +87,11 @@ export function Paywall() {
                     <div className="text-[10px] text-gray-500 mt-0">
                         {discount > 0 ? (
                             <>
-                                <span className="line-through text-red-400 mx-1">₪4.17</span>
+                                <span className="line-through text-red-400 mx-1">₪7.42</span>
                                 <strong>₪{(price / 12).toFixed(2)}</strong>
                             </>
                         ) : (
-                            'רק ₪4.17 לחודש!'
+                            'רק ₪7.42 לחודש!'
                         )}
                     </div>
                 </div>
