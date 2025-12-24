@@ -5,7 +5,7 @@ import { useAuth, useUser } from '@clerk/nextjs'
 import { Check, Tag } from 'lucide-react'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { validateCoupon, getSubscriptionStatus } from '@/lib/actions/subscription'
+import { validateCoupon, getSubscriptionStatus, startTrial } from '@/lib/actions/subscription'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -145,10 +145,20 @@ export function Paywall() {
                     <Button
                         variant="secondary"
                         size="sm"
-                        className="w-full mb-3 bg-purple-100 text-purple-700 hover:bg-purple-200"
+                        className="w-full mb-3 bg-white text-gray-900 border border-gray-200 shadow-sm hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200"
                         onClick={async () => {
-                            // We can redirect to dashboard which triggers the auto-trial logic
-                            window.location.href = '/dashboard'
+                            try {
+                                if (user?.id && user?.emailAddresses?.[0]?.emailAddress) {
+                                    const result = await startTrial(user.id, user.emailAddresses[0].emailAddress)
+                                    if (result.success) {
+                                        window.location.href = '/dashboard'
+                                    } else {
+                                        toast.error('לא ניתן להתחיל תקופת ניסיון כעת')
+                                    }
+                                }
+                            } catch (error) {
+                                toast.error('שגיאה בהפעלת תקופת ניסיון')
+                            }
                         }}
                     >
                         נסה 14 יום חינם!

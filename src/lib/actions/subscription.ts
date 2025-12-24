@@ -161,6 +161,13 @@ export async function getSubscriptionStatus(userId: string) {
 }
 
 export async function validateCoupon(code: string, userEmail: string) {
+    console.log(`Validating coupon: ${code} for email: ${userEmail}`)
+
+    // Check if code is provided
+    if (!code) {
+        return { valid: false, message: 'נא להזין קוד קופון' }
+    }
+
     const coupon = await prisma.coupon.findFirst({
         where: {
             code: {
@@ -171,20 +178,23 @@ export async function validateCoupon(code: string, userEmail: string) {
     })
 
     if (!coupon) {
-        return { valid: false, message: 'Invalid coupon code' }
+        console.log(`Coupon not found: ${code}`)
+        return { valid: false, message: 'קוד הקופון שהוזן שגוי או פג תוקפו' }
     }
 
-    if (coupon.specificEmail && coupon.specificEmail !== userEmail) {
-        return { valid: false, message: 'This coupon is not valid for your email' }
+    if (coupon.specificEmail && coupon.specificEmail.toLowerCase() !== userEmail.toLowerCase()) {
+        console.log(`Coupon email mismatch. Coupon: ${coupon.specificEmail}, User: ${userEmail}`)
+        return { valid: false, message: 'קוד הקופון שהוזן שגוי או פג תוקפו' }
     }
 
     if (coupon.expiryDate && coupon.expiryDate < new Date()) {
-        return { valid: false, message: 'Coupon expired' }
+        console.log(`Coupon expired: ${coupon.expiryDate}`)
+        return { valid: false, message: 'קוד הקופון שהוזן שגוי או פג תוקפו' }
     }
 
     return {
         valid: true,
         discountPercent: coupon.discountPercent,
-        message: 'Coupon applied!'
+        message: 'קופון הופעל בהצלחה!'
     }
 }
