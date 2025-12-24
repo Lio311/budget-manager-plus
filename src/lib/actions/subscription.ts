@@ -84,6 +84,16 @@ export async function createSubscription(paypalOrderId: string, amount: number) 
 }
 
 export async function startTrial(userId: string, email: string) {
+    // Sync user to DB to handle webhook race condition
+    await prisma.user.upsert({
+        where: { id: userId },
+        update: {},
+        create: {
+            id: userId,
+            email: email
+        }
+    })
+
     // Check if already tracked
     const existingTracker = await prisma.trialTracker.findUnique({
         where: { email }
