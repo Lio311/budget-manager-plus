@@ -20,6 +20,7 @@ import { CategoryManager } from '@/components/dashboard/CategoryManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { swrConfig } from '@/lib/swr-config'
+import { FeedbackButton } from '@/components/dashboard/FeedbackButton'
 
 interface Category {
     id: string
@@ -226,74 +227,77 @@ export function OverviewTab() {
         <div className="space-y-6 p-2" dir="rtl">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold tracking-tight">סקירה כללית</h2>
-                <Dialog open={isSettingsOpen} onOpenChange={(open) => {
-                    setIsSettingsOpen(open)
-                    if (open) loadSettings()
-                }}>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2">
-                            <Settings className="h-4 w-4" />
-                            הגדרות
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col" dir="rtl">
-                        <DialogHeader>
-                            <DialogTitle className="text-right">הגדרות מערכת</DialogTitle>
-                            <DialogDescription className="sr-only">
-                                הגדרות וניהול קטגוריות
-                            </DialogDescription>
-                        </DialogHeader>
+                <div className="flex items-center gap-2">
+                    <FeedbackButton />
+                    <Dialog open={isSettingsOpen} onOpenChange={(open) => {
+                        setIsSettingsOpen(open)
+                        if (open) loadSettings()
+                    }}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="gap-2">
+                                <Settings className="h-4 w-4" />
+                                הגדרות
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col" dir="rtl">
+                            <DialogHeader>
+                                <DialogTitle className="text-right">הגדרות מערכת</DialogTitle>
+                                <DialogDescription className="sr-only">
+                                    הגדרות וניהול קטגוריות
+                                </DialogDescription>
+                            </DialogHeader>
 
-                        <Tabs defaultValue="general" className="flex-1 flex flex-col overflow-hidden">
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="general">הון ראשוני</TabsTrigger>
-                                <TabsTrigger value="categories">ניהול קטגוריות</TabsTrigger>
-                            </TabsList>
+                            <Tabs defaultValue="general" className="flex-1 flex flex-col overflow-hidden">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="general">הון ראשוני</TabsTrigger>
+                                    <TabsTrigger value="categories">ניהול קטגוריות</TabsTrigger>
+                                </TabsList>
 
-                            <TabsContent value="general" className="mt-4 space-y-4">
-                                <div className="grid gap-4 py-4">
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Input
-                                            id="initialBalance"
-                                            type="number"
-                                            value={initialBalance}
-                                            onChange={(e) => setInitialBalance(e.target.value)}
-                                            className="col-span-3"
-                                            dir="rtl"
-                                        />
-                                        <Label htmlFor="initialBalance" className="text-right col-span-1">
-                                            עובר ושב
-                                        </Label>
+                                <TabsContent value="general" className="mt-4 space-y-4">
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Input
+                                                id="initialBalance"
+                                                type="number"
+                                                value={initialBalance}
+                                                onChange={(e) => setInitialBalance(e.target.value)}
+                                                className="col-span-3"
+                                                dir="rtl"
+                                            />
+                                            <Label htmlFor="initialBalance" className="text-right col-span-1">
+                                                עובר ושב
+                                            </Label>
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Input
+                                                id="initialSavings"
+                                                type="number"
+                                                min="0"
+                                                value={initialSavings}
+                                                onChange={(e) => setInitialSavings(e.target.value)}
+                                                className="col-span-3"
+                                                dir="rtl"
+                                            />
+                                            <Label htmlFor="initialSavings" className="text-right col-span-1">
+                                                חסכונות קיימים
+                                            </Label>
+                                        </div>
                                     </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Input
-                                            id="initialSavings"
-                                            type="number"
-                                            min="0"
-                                            value={initialSavings}
-                                            onChange={(e) => setInitialSavings(e.target.value)}
-                                            className="col-span-3"
-                                            dir="rtl"
-                                        />
-                                        <Label htmlFor="initialSavings" className="text-right col-span-1">
-                                            חסכונות קיימים
-                                        </Label>
+                                    <div className="flex justify-end">
+                                        <Button onClick={handleSaveSettings} className="gap-2">
+                                            <Save className="h-4 w-4" />
+                                            שמור שינויים
+                                        </Button>
                                     </div>
-                                </div>
-                                <div className="flex justify-end">
-                                    <Button onClick={handleSaveSettings} className="gap-2">
-                                        <Save className="h-4 w-4" />
-                                        שמור שינויים
-                                    </Button>
-                                </div>
-                            </TabsContent>
+                                </TabsContent>
 
-                            <TabsContent value="categories" className="flex-1 overflow-hidden mt-4">
-                                <CategoryManager />
-                            </TabsContent>
-                        </Tabs>
-                    </DialogContent>
-                </Dialog>
+                                <TabsContent value="categories" className="flex-1 overflow-hidden mt-4">
+                                    <CategoryManager />
+                                </TabsContent>
+                            </Tabs>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
             {/* Summary Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

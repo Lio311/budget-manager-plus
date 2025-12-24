@@ -15,8 +15,9 @@ import {
     TableHeader,
     TableRow
 } from '@/components/ui/table'
-import { Trash2, Edit2, Timer } from 'lucide-react'
+import { Trash2, Edit2 } from 'lucide-react'
 import { createCoupon, deleteCoupon, deleteUser, updateUserSubscription } from '@/lib/actions/admin'
+import { CountdownTimer } from '@/components/admin/CountdownTimer'
 
 interface AdminDashboardProps {
     initialData: {
@@ -100,8 +101,8 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>
                                                 <span className={`px-2 py-1 rounded-full text-xs ${user.subscription?.status === 'active' ? 'bg-green-100 text-green-800' :
-                                                        user.subscription?.status === 'trial' ? 'bg-blue-100 text-blue-800' :
-                                                            'bg-gray-100 text-gray-800'
+                                                    user.subscription?.status === 'trial' ? 'bg-blue-100 text-blue-800' :
+                                                        'bg-gray-100 text-gray-800'
                                                     }`}>
                                                     {user.subscription?.status || 'None'}
                                                 </span>
@@ -193,30 +194,27 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="text-right">Code</TableHead>
-                                        <TableHead className="text-right">Discount</TableHead>
-                                        <TableHead className="text-right">Expiry</TableHead>
-                                        <TableHead className="text-right">Email Limit</TableHead>
-                                        <TableHead className="text-right">Used</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead className="text-center">Code</TableHead>
+                                        <TableHead className="text-center">Discount</TableHead>
+                                        <TableHead className="text-center">Expiry</TableHead>
+                                        <TableHead className="text-center">Email Limit</TableHead>
+                                        <TableHead className="text-center">Used</TableHead>
+                                        <TableHead className="text-center">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {coupons.map((coupon) => (
                                         <TableRow key={coupon.id}>
-                                            <TableCell className="font-mono font-bold">{coupon.code}</TableCell>
-                                            <TableCell>{coupon.discountPercent}%</TableCell>
-                                            <TableCell>
+                                            <TableCell className="font-mono font-bold text-center">{coupon.code}</TableCell>
+                                            <TableCell className="text-center">{coupon.discountPercent}%</TableCell>
+                                            <TableCell className="text-center">
                                                 {coupon.expiryDate ? (
-                                                    <div className="flex items-center gap-1 text-orange-600">
-                                                        <Timer className="h-4 w-4" />
-                                                        {format(new Date(coupon.expiryDate), 'dd/MM/yyyy HH:mm')}
-                                                    </div>
+                                                    <CountdownTimer targetDate={coupon.expiryDate} />
                                                 ) : 'No Expiry'}
                                             </TableCell>
-                                            <TableCell>{coupon.specificEmail || 'All'}</TableCell>
-                                            <TableCell>{coupon.usedCount}</TableCell>
-                                            <TableCell>
+                                            <TableCell className="text-center">{coupon.specificEmail || 'All'}</TableCell>
+                                            <TableCell className="text-center">{coupon.usedCount}</TableCell>
+                                            <TableCell className="text-center">
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
@@ -240,17 +238,17 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="text-right">User</TableHead>
-                                        <TableHead className="text-right">Date</TableHead>
-                                        <TableHead className="text-right">Content</TableHead>
+                                        <TableHead className="text-center">User</TableHead>
+                                        <TableHead className="text-center">Date</TableHead>
+                                        <TableHead className="text-center">Content</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {feedbacks.map((f) => (
                                         <TableRow key={f.id}>
-                                            <TableCell>{f.user.email}</TableCell>
-                                            <TableCell>{format(new Date(f.createdAt), 'dd/MM/yyyy')}</TableCell>
-                                            <TableCell className="max-w-md truncate">{f.content}</TableCell>
+                                            <TableCell className="text-center">{f.user.email}</TableCell>
+                                            <TableCell className="text-center">{format(new Date(f.createdAt), 'dd/MM/yyyy')}</TableCell>
+                                            <TableCell className="max-w-md truncate text-center">{f.content}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

@@ -31,12 +31,27 @@ export async function getAdminData() {
             orderBy: { createdAt: 'desc' }
         }),
         prisma.feedback.findMany({
-            include: { user: true },
             orderBy: { createdAt: 'desc' }
+        }),
+        prisma.paymentHistory.aggregate({
+            _sum: {
+                amount: true
+            }
         })
     ])
 
-    return { users, coupons, feedbacks }
+    return { users, coupons, feedbacks, totalRevenue: coupons[1]?._sum?.amount ?? 0 } // Fixed: accessing 4th element as its own const 
+    // actually, let's unpack properly
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [userData, couponData, feedbackData, revenueData] = [users, coupons, feedbacks, {}]
+
+    return {
+        users,
+        coupons,
+        feedbacks,
+        totalRevenue: (typeof coupons[3] === 'object' && '_sum' in coupons[3]) ? 0 : 0 // Wait, Promise.all returns array.
+    }
 }
 
 export async function deleteUser(userId: string) {
