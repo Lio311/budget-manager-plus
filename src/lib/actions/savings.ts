@@ -105,12 +105,12 @@ async function createRecurringSavings(
 
         return {
             budgetId,
-            type: data.category,
             category: data.category,
-            description: data.description,
+            name: data.description || 'חסכון',
             monthlyDeposit: data.monthlyDeposit,
-            goal: data.goal,
-            date: date,
+            notes: data.goal,
+            targetDate: date,
+            createdAt: date, // Set creation date to the target month for sorting
             isRecurring: true,
             recurringSourceId: sourceId,
             recurringStartDate: data.recurringStartDate,
@@ -186,12 +186,11 @@ export async function addSaving(
         const saving = await prisma.saving.create({
             data: {
                 budgetId: budget.id,
-                type: data.category,
                 category: data.category,
-                description: data.description,
+                name: data.description || 'חסכון',
                 monthlyDeposit: data.monthlyDeposit,
-                goal: data.goal,
-                date: data.date
+                notes: data.goal,
+                targetDate: data.date ? new Date(data.date) : new Date()
             }
         })
 
