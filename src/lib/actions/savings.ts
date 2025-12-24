@@ -137,7 +137,7 @@ export async function getSavings(month: number, year: number) {
 
         const savings = await prisma.saving.findMany({
             where: { budgetId: budget.id },
-            orderBy: { date: 'desc' }
+            orderBy: { createdAt: 'desc' }
         })
 
         return { success: true, data: savings }
