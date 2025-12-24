@@ -24,11 +24,12 @@ interface AdminDashboardProps {
         users: any[]
         coupons: any[]
         feedbacks: any[]
+        totalRevenue: number
     }
 }
 
 export function AdminDashboard({ initialData }: AdminDashboardProps) {
-    const { users, coupons, feedbacks } = initialData
+    const { users, coupons, feedbacks, totalRevenue } = initialData
     const [newCoupon, setNewCoupon] = useState({ code: '', discountPercent: 0, expiryDate: '', specificEmail: '' })
 
     const handleCreateCoupon = async () => {
@@ -43,7 +44,15 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
 
     return (
         <div className="space-y-8">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">₪{totalRevenue}</div>
+                    </CardContent>
+                </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Users</CardTitle>
