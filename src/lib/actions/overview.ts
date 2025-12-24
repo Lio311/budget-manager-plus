@@ -38,7 +38,7 @@ export async function getOverviewData(month: number, year: number) {
                     expenses: { select: { id: true, description: true, category: true, amount: true, date: true } },
                     bills: { select: { id: true, name: true, amount: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, isPaid: true } },
-                    savings: { select: { id: true, type: true, monthlyDeposit: true } }
+                    savings: { select: { id: true, category: true, monthlyDeposit: true } }
                 }
             }),
             prisma.budget.findFirst({
@@ -49,7 +49,7 @@ export async function getOverviewData(month: number, year: number) {
                     expenses: { select: { id: true, description: true, category: true, amount: true, date: true } },
                     bills: { select: { id: true, name: true, amount: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, isPaid: true } },
-                    savings: { select: { id: true, type: true, monthlyDeposit: true } }
+                    savings: { select: { id: true, category: true, monthlyDeposit: true } }
                 }
             })
         ])
