@@ -17,6 +17,7 @@ model User {
   categories Category[]
   subscription Subscription?
   paymentHistory PaymentHistory[]
+  feedbacks    Feedback[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -200,4 +201,36 @@ model PaymentHistory {
   createdAt         DateTime  @default(now())
   
   @@map("payment_history")
+}
+
+model Coupon {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  discountPercent Int
+  expiryDate      DateTime?
+  specificEmail   String?   
+  usedCount       Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("coupons")
+}
+
+model TrialTracker {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  trialStartedAt DateTime @default(now())
+
+  @@map("trial_trackers")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("feedbacks")
 }

@@ -5,6 +5,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { getMonthName } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { FeedbackButton } from './FeedbackButton'
 
 const CURRENCIES = ['₪', '$', '€', '£']
 
