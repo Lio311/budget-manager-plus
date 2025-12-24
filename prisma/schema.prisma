@@ -124,6 +124,7 @@ model Debt {
   totalDebtAmount Float?    // For installments tracking
   numberOfInstallments Int?
   installmentNumber Int?
+  paidDate        DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   
