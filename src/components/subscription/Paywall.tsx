@@ -115,13 +115,13 @@ export function Paywall() {
                     </p>
                 )}
 
-                <div className="bg-red-50 border border-red-200 rounded-lg p-2 mb-3">
-                    <p className="text-[10px] text-red-800 font-medium text-center">
-                        <strong>חשוב:</strong> ללא חידוש, הנתונים יימחקו בתום השנה.
+                <div className="bg-red-50 border border-red-200 rounded-lg p-1 mb-2 flex items-center justify-center">
+                    <p className="text-[10px] text-red-800 font-medium text-center whitespace-nowrap overflow-hidden text-ellipsis px-1">
+                        <strong>חשוב:</strong> ללא חידוש, הנתונים יימחקו בסופשנה.
                     </p>
                 </div>
 
-                <ul className="grid grid-cols-2 gap-2 mb-4 text-xs">
+                <ul className="grid grid-cols-2 gap-2 mb-3 text-xs">
                     <li className="flex items-start gap-1.5">
                         <Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" />
                         <span>ניהול תקציב חודשי</span>
@@ -146,38 +146,47 @@ export function Paywall() {
                         type="button"
                         variant="secondary"
                         size="sm"
-                        className="w-full mb-3 bg-white text-gray-900 border border-gray-200 shadow-sm hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200"
-                        onClick={async () => {
+                        className="w-full mb-2 bg-white text-gray-900 border border-gray-200 shadow-sm hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200"
+                        onClick={async (e) => {
+                            const btn = e.currentTarget;
+                            const originalText = btn.innerText;
+                            btn.innerText = 'מפעיל...';
+                            btn.disabled = true;
+
                             console.log('Trial button clicked');
                             if (!user?.id || !user?.emailAddresses?.[0]?.emailAddress) {
                                 console.log('User not found in client');
                                 toast.error('אנא התחבר מחדש');
+                                btn.innerText = originalText;
+                                btn.disabled = false;
                                 return;
                             }
 
                             const toastId = toast.loading('מפעיל תקופת ניסיון...');
                             try {
-                                console.log('Starting trial for:', user.emailAddresses[0].emailAddress);
                                 const result = await startTrial(user.id, user.emailAddresses[0].emailAddress);
-                                console.log('Trial result:', result);
 
                                 if (result.success) {
                                     toast.dismiss(toastId);
-                                    toast.success('תקופת הניסיון הופעלה בהצלחה!');
+                                    toast.success('הופעל בהצלחה! מעביר...');
                                     window.location.href = '/dashboard';
                                 } else {
                                     toast.dismiss(toastId);
-                                    toast.error(result.reason || 'שגיאה בהפעלת תקופת הניסיון');
+                                    toast.error(result.reason || 'שגיאה');
+                                    btn.innerText = originalText;
+                                    btn.disabled = false;
                                 }
                             } catch (error) {
                                 console.error('Trial start error:', error);
                                 toast.dismiss(toastId);
                                 toast.error('שגיאה בלתי צפויה');
+                                btn.innerText = originalText;
+                                btn.disabled = false;
                             }
                         }}
                     >
 
-                        נסה 14 יום חינם!
+                        התחל ניסיון חינם (גישה מיידית!)
                     </Button>
                 )}
 
