@@ -117,7 +117,7 @@ export function Paywall() {
 
                 <div className="bg-red-50 border border-red-200 rounded-lg p-1 mb-2 flex items-center justify-center">
                     <p className="text-[10px] text-red-800 font-medium text-center whitespace-nowrap overflow-hidden text-ellipsis px-1">
-                        <strong>חשוב:</strong> ללא חידוש, הנתונים יימחקו בסופשנה.
+                        <strong>חשוב:</strong> ללא חידוש המנוי בזמן, הנתונים שלך ימחקו לצמיתות.
                     </p>
                 </div>
 
@@ -186,7 +186,7 @@ export function Paywall() {
                         }}
                     >
 
-                        התחל ניסיון חינם (גישה מיידית!)
+                        התנסות במערכת ללא תשלום וללא התחייבות ל-14 ימים
                     </Button>
                 )}
 
