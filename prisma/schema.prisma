@@ -70,6 +70,8 @@ model Income {
   date              DateTime?
   isRecurring         Boolean  @default(false)
   recurringSourceId   String?
+  recurringStartDate  DateTime?
+  recurringEndDate    DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   @@map("incomes")
@@ -87,6 +89,8 @@ model Expense {
   currentInstallment Int     @default(1)
   isRecurring         Boolean  @default(false)
   recurringSourceId   String?
+  recurringStartDate  DateTime?
+  recurringEndDate    DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   @@map("expenses")
