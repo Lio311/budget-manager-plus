@@ -10,7 +10,7 @@ export async function getBills(month: number, year: number) {
 
         const bills = await prisma.bill.findMany({
             where: { budgetId: budget.id },
-            orderBy: { dueDay: 'asc' }
+            orderBy: { dueDate: 'asc' }
         })
 
         return { success: true, data: bills }
@@ -28,12 +28,15 @@ export async function addBill(
     try {
         const budget = await getCurrentBudget(month, year)
 
+        // Create date object for the specific day in the budget month
+        const dueDate = new Date(year, month - 1, data.dueDay)
+
         const bill = await prisma.bill.create({
             data: {
                 budgetId: budget.id,
                 name: data.name,
                 amount: data.amount,
-                dueDay: data.dueDay,
+                dueDate: dueDate,
                 isPaid: false
             }
         })
@@ -55,12 +58,21 @@ export async function updateBill(
     }
 ) {
     try {
+        const existingBill = await prisma.bill.findUnique({ where: { id } })
+        if (!existingBill) return { success: false, error: 'Bill not found' }
+
+        let newDueDate = undefined
+        if (data.dueDay) {
+            const currentDate = new Date(existingBill.dueDate)
+            newDueDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), data.dueDay)
+        }
+
         const bill = await prisma.bill.update({
             where: { id },
             data: {
                 ...(data.name && { name: data.name }),
                 ...(data.amount && { amount: data.amount }),
-                ...(data.dueDay && { dueDay: data.dueDay })
+                ...(newDueDate && { dueDate: newDueDate })
             }
         })
 

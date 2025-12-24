@@ -16,7 +16,7 @@ interface Bill {
     id: string
     name: string
     amount: number
-    dueDay: number
+    dueDate: Date
     isPaid: boolean
 }
 
@@ -124,7 +124,7 @@ export function BillsTab() {
         setEditData({
             name: bill.name,
             amount: bill.amount.toString(),
-            dueDay: bill.dueDay.toString()
+            dueDay: new Date(bill.dueDate).getDate().toString()
         })
     }
 
@@ -382,7 +382,7 @@ export function BillsTab() {
                                                             {bill.name}
                                                         </p>
                                                         <p className="text-sm text-muted-foreground">
-                                                            תאריך תשלום: {bill.dueDay} בחודש
+                                                            תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
                                                         </p>
                                                     </div>
                                                 </div>
@@ -393,7 +393,7 @@ export function BillsTab() {
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        onClick={() => handleEdit(bill)}
+                                                        onClick={() => handleEdit(bill as unknown as Bill)}
                                                         className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                                                     >
                                                         <Pencil className="h-4 w-4" />
