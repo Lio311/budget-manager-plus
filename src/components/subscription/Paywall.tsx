@@ -87,7 +87,7 @@ export function Paywall() {
                     <div className="text-[10px] text-gray-500 mt-0">
                         {discount > 0 ? (
                             <>
-                                מחיר לחודש:
+                                מחיר לחודש:&nbsp;
                                 <span className="line-through text-red-400 mx-1">₪7.42</span>
                                 <strong>₪{(price / 12).toFixed(2)}</strong>
                             </>
