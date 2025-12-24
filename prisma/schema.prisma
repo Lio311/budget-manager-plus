@@ -164,6 +164,9 @@ model Subscription {
   lastPaymentAmount Float?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  expiryNotified30Days Boolean @default(false)
+  expiryNotified7Days  Boolean @default(false)
+  deletionScheduledFor DateTime?
   @@map("subscriptions")
 }
 
