@@ -4,7 +4,7 @@ import { DashboardTabs } from '@/components/dashboard/DashboardTabs'
 import { ExpiryBanner } from '@/components/subscription/ExpiryBanner'
 import { SWRConfig } from 'swr'
 import { currentUser } from '@clerk/nextjs/server'
-import { getSubscriptionStatus, startTrial } from '@/lib/actions/subscription'
+import { getSubscriptionStatus } from '@/lib/actions/subscription'
 import { redirect } from 'next/navigation'
 
 export default async function DashboardLayout({
@@ -23,12 +23,6 @@ export default async function DashboardLayout({
 
     // If no access, check if eligible for trial
     if (!hasAccess) {
-        if (status === 'none') {
-            const result = await startTrial(user.id, user.emailAddresses[0]?.emailAddress || '')
-            if (result.success) {
-                redirect('/dashboard')
-            }
-        }
         redirect('/subscribe')
     }
 
