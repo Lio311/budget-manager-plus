@@ -49,28 +49,28 @@ export function Paywall() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-2 sm:p-4">
-            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-6 overflow-y-auto max-h-[95vh]">
-                <div className="flex justify-center mb-2">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-4 overflow-y-auto max-h-[95vh]">
+                <div className="flex justify-center mb-1">
                     <Image
                         src="/keseflow.png"
                         alt="KesefFlow"
-                        width={300}
-                        height={90}
-                        className="h-20 w-auto"
+                        width={200}
+                        height={60}
+                        className="h-14 w-auto"
                     />
                 </div>
 
-                <h1 className="text-xl font-bold text-center mb-2 text-gray-800">
+                <h1 className="text-lg font-bold text-center mb-1 text-gray-800">
                     {isTrialExpired ? 'תקופת הניסיון הסתיימה' : 'ניהול תקציב חכם ופשוט'}
                 </h1>
 
                 {isTrialExpired && (
-                    <p className="text-center text-gray-600 mb-4 text-sm">
+                    <p className="text-center text-gray-600 mb-2 text-xs">
                         כדי להמשיך להשתמש במערכת ולשמור על הנתונים שלך, יש להסדיר תשלום.
                     </p>
                 )}
 
-                <p className="text-center text-xs font-semibold text-yellow-500 mb-2">
+                <p className="text-center text-[10px] font-semibold text-yellow-500 mb-2">
                     בקרוב - ממשק לעסקים!
                 </p>
 
@@ -80,10 +80,10 @@ export function Paywall() {
                             {discount}%-
                         </div>
                     )}
-                    <div className="text-4xl font-black text-green-600 mb-0 flex items-center justify-center gap-1" dir="ltr">
-                        <span className="text-xl">₪</span>{price.toFixed(2)}
+                    <div className="text-3xl font-black text-green-600 mb-0 flex items-center justify-center gap-1" dir="ltr">
+                        <span className="text-lg">₪</span>{price.toFixed(2)}
                     </div>
-                    <div className="text-gray-600 text-sm">לשנה שלמה</div>
+                    <div className="text-gray-600 text-xs">לשנה שלמה</div>
                     <div className="text-[10px] text-gray-500 mt-0">
                         {discount > 0 ? (
                             <>
@@ -97,45 +97,45 @@ export function Paywall() {
                 </div>
 
                 {/* Coupon Input */}
-                <div className="flex gap-2 mb-4">
+                <div className="flex gap-2 mb-3">
                     <div className="relative flex-1">
-                        <Tag className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
+                        <Tag className="absolute right-3 top-2.5 h-3 w-3 text-gray-400" />
                         <Input
                             placeholder="קוד קופון"
                             value={couponCode}
                             onChange={(e) => setCouponCode(e.target.value)}
-                            className="pr-9 h-9 text-sm"
+                            className="pr-8 h-8 text-xs"
                         />
                     </div>
-                    <Button onClick={handleApplyCoupon} variant="outline" size="sm">החל</Button>
+                    <Button onClick={handleApplyCoupon} variant="outline" size="sm" className="h-8 text-xs">החל</Button>
                 </div>
                 {couponMessage && (
-                    <p className={`text-xs text-center mb-2 ${discount > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                    <p className={`text-[10px] text-center mb-2 ${discount > 0 ? 'text-green-600' : 'text-red-500'}`}>
                         {couponMessage}
                     </p>
                 )}
 
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-                    <p className="text-xs text-red-800 font-medium">
-                        <strong>חשוב:</strong> אם לא תחדש את המנוי בתום השנה, כל הנתונים שלך יימחקו לצמיתות.
+                <div className="bg-red-50 border border-red-200 rounded-lg p-2 mb-3">
+                    <p className="text-[10px] text-red-800 font-medium text-center">
+                        <strong>חשוב:</strong> ללא חידוש, הנתונים יימחקו בתום השנה.
                     </p>
                 </div>
 
-                <ul className="grid grid-cols-2 gap-2 mb-4 text-sm">
-                    <li className="flex items-start gap-2">
-                        <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
+                <ul className="grid grid-cols-2 gap-2 mb-4 text-xs">
+                    <li className="flex items-start gap-1.5">
+                        <Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" />
                         <span>ניהול תקציב חודשי</span>
                     </li>
-                    <li className="flex items-start gap-2">
-                        <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <li className="flex items-start gap-1.5">
+                        <Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" />
                         <span>מעקב הכנסות/הוצאות</span>
                     </li>
-                    <li className="flex items-start gap-2">
-                        <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <li className="flex items-start gap-1.5">
+                        <Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" />
                         <span>ניהול חובות וחסכונות</span>
                     </li>
-                    <li className="flex items-start gap-2">
-                        <Check className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <li className="flex items-start gap-1.5">
+                        <Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" />
                         <span>דוחות מתקדמים</span>
                     </li>
                 </ul>
@@ -143,28 +143,36 @@ export function Paywall() {
 
                 {!isTrialExpired && (
                     <Button
+                        type="button"
                         variant="secondary"
                         size="sm"
                         className="w-full mb-3 bg-white text-gray-900 border border-gray-200 shadow-sm hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200"
                         onClick={async () => {
+                            console.log('Trial button clicked');
                             if (!user?.id || !user?.emailAddresses?.[0]?.emailAddress) {
-                                toast.error('אנא התחבר מחדש')
-                                return
+                                console.log('User not found in client');
+                                toast.error('אנא התחבר מחדש');
+                                return;
                             }
 
+                            const toastId = toast.loading('מפעיל תקופת ניסיון...');
                             try {
-                                toast.loading('מפעיל תקופת ניסיון...')
-                                const result = await startTrial(user.id, user.emailAddresses[0].emailAddress)
+                                console.log('Starting trial for:', user.emailAddresses[0].emailAddress);
+                                const result = await startTrial(user.id, user.emailAddresses[0].emailAddress);
+                                console.log('Trial result:', result);
 
                                 if (result.success) {
-                                    toast.success('תקופת הניסיון הופעלה בהצלחה!')
-                                    window.location.href = '/dashboard'
+                                    toast.dismiss(toastId);
+                                    toast.success('תקופת הניסיון הופעלה בהצלחה!');
+                                    window.location.href = '/dashboard';
                                 } else {
-                                    toast.error(result.reason || 'שגיאה בהפעלת תקופת הניסיון')
+                                    toast.dismiss(toastId);
+                                    toast.error(result.reason || 'שגיאה בהפעלת תקופת הניסיון');
                                 }
                             } catch (error) {
-                                console.error('Trial start error:', error)
-                                toast.error('שגיאה בלתי צפויה')
+                                console.error('Trial start error:', error);
+                                toast.dismiss(toastId);
+                                toast.error('שגיאה בלתי צפויה');
                             }
                         }}
                     >
