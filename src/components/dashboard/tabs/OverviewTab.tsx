@@ -169,7 +169,7 @@ export function OverviewTab() {
 
     // Group expenses by category
     const categoryMap = new Map<string, number>()
-    expenses.forEach(expense => {
+    expenses.forEach((expense: any) => {
         const current = categoryMap.get(expense.category) || 0
         categoryMap.set(expense.category, current + expense.amount)
     })
