@@ -110,19 +110,22 @@ model Bill {
 
 model Debt {
   id              String    @id @default(cuid())
-  budgetId        String?   // Optional linkage to a specific budget month
-  budget          Budget?   @relation(fields: [budgetId], references: [id], onDelete: SetNull)
-  name            String
-  initialAmount   Float     // Original debt amount
-  currentBalance  Float     // Remaining balance
-  interestRate    Float?    // Annual interest rate
-  minimumPayment  Float?
-  dueDate         DateTime?
+  budgetId        String
+  budget          Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  creditor        String
+  debtType        String    // owed_by_me, owed_to_me
+  totalAmount     Float
+  monthlyPayment  Float
+  dueDay          Int
   isPaid          Boolean   @default(false)
-  notes           String?
-  category        String    @default("הלוואה") // e.g., Mortgage, Car Loan, Credit Card
+  isRecurring     Boolean   @default(false)
+  recurringSourceId String?
+  totalDebtAmount Float?    // For installments tracking
+  numberOfInstallments Int?
+  installmentNumber Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  
   @@map("debts")
 }
 
