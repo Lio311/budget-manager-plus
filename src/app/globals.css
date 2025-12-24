@@ -64,6 +64,15 @@
   }
 }
 /* Clerk Overrides */
-.cl-otpCodeFieldInput { direction: ltr !important; }
+/* OTP Inputs */
+.cl-otpCodeFieldInput,
+input[name="code"],
+input[name="email_code"],
+input[name="phone_code"],
+input[aria-label="Enter verification code"],
+input[autocomplete="one-time-code"] { 
+  direction: ltr !important; 
+  text-align: center !important;
+}
 .cl-formButtonPrimary svg { display: none !important; }
 .cl-internal-1f7634d { display: none !important; }
