@@ -8,7 +8,10 @@ const ADMIN_EMAIL = 'lior31197@gmail.com'
 
 async function checkAdmin() {
     const user = await currentUser()
-    if (!user || user.emailAddresses[0]?.emailAddress !== ADMIN_EMAIL) {
+    const userEmail = user?.emailAddresses[0]?.emailAddress?.toLowerCase()
+    const adminEmail = ADMIN_EMAIL.toLowerCase()
+
+    if (!user || userEmail !== adminEmail) {
         throw new Error('Unauthorized')
     }
 }

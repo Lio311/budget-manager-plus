@@ -31,7 +31,8 @@ export function FeedbackButton() {
             setOpen(false)
             setContent('')
         } catch (error) {
-            toast.error('שגיאה בשליחת המשוב. נסה שוב מאוחר יותר.')
+            console.error('Feedback submission error:', error)
+            toast.error('שגיאה בשליחת המשוב. אנא נסה שוב.')
         } finally {
             setLoading(false)
         }
