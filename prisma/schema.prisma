@@ -102,7 +102,7 @@ model Bill {
   budget      Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   name        String
   amount      Float
-  dueDate     DateTime
+  dueDate     DateTime @default(now())
   isPaid      Boolean  @default(false)
   category    String   @default("חשבונות")
   isRecurring         Boolean  @default(false)
@@ -139,7 +139,7 @@ model Saving {
   id              String    @id @default(cuid())
   budgetId        String?
   budget          Budget?   @relation(fields: [budgetId], references: [id], onDelete: SetNull)
-  name            String
+  name            String    @default("חסכון")
   targetAmount    Float?
   currentAmount   Float     @default(0)
   monthlyDeposit  Float?    // Planned monthly contribution
@@ -202,7 +202,7 @@ model Feedback {
   content   String
   createdAt DateTime @default(now())
   
-  @@map("feedback")
+  @@map("feedbacks")
 }
 
 model TrialTracker {
@@ -210,5 +210,5 @@ model TrialTracker {
   email     String   @unique
   createdAt DateTime @default(now())
 
-  @@map("trial_tracker")
+  @@map("trial_trackers")
 }
