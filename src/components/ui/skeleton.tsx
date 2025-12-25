@@ -1,47 +1,35 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+// Common skeleton patterns for all tabs
 
-export function SkeletonCard() {
-    return (
-        <Card className="animate-pulse">
-            <CardHeader>
-                <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-3">
-                    <div className="h-4 bg-gray-200 rounded"></div>
-                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+export const SkeletonStatCards = ({ count = 3 }: { count?: number }) => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {Array.from({ length: count }).map((_, i) => (
+            <div key={i} className="monday-card p-4 border-l-4 border-l-gray-300 min-w-0 animate-pulse">
+                <div className="h-3 bg-gray-200 rounded w-20 mb-2"></div>
+                <div className="h-6 bg-gray-200 rounded w-24"></div>
+            </div>
+        ))}
+    </div>
+)
+
+export const SkeletonList = ({ count = 3 }: { count?: number }) => (
+    <div className="space-y-3">
+        {Array.from({ length: count }).map((_, i) => (
+            <div key={i} className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl animate-pulse">
+                <div className="flex items-center gap-3 flex-1">
+                    <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded w-32"></div>
                 </div>
-            </CardContent>
-        </Card>
-    )
-}
-
-export function SkeletonStat() {
-    return (
-        <div className="monday-card p-4 border-l-4 border-l-gray-300 animate-pulse">
-            <div className="h-3 bg-gray-200 rounded w-20 mb-2"></div>
-            <div className="h-6 bg-gray-200 rounded w-24"></div>
-        </div>
-    )
-}
-
-export function SkeletonTable() {
-    return (
-        <div className="space-y-2 animate-pulse">
-            {[1, 2, 3].map((i) => (
-                <div key={i} className="flex gap-4 p-3 border rounded">
-                    <div className="h-4 bg-gray-200 rounded flex-1"></div>
+                <div className="flex items-center gap-4">
                     <div className="h-4 bg-gray-200 rounded w-20"></div>
+                    <div className="h-4 bg-gray-200 rounded w-12"></div>
                 </div>
-            ))}
-        </div>
-    )
-}
+            </div>
+        ))}
+    </div>
+)
 
-export function SkeletonChart() {
-    return (
-        <div className="h-[300px] bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
-            <div className="text-gray-400">טוען נתונים...</div>
-        </div>
-    )
-}
+export const SkeletonValue = ({ loading, value }: { loading: boolean; value: string | number }) => (
+    <span className={loading ? 'animate-pulse' : ''}>
+        {loading ? '...' : value}
+    </span>
+)
