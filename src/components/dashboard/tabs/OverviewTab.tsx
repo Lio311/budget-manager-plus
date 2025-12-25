@@ -328,12 +328,17 @@ export function OverviewTab() {
                         </div>
                         <div className="h-[300px] w-full" dir="ltr"> {/* Reduced height */}
                             {(() => {
+                                // Recalculate remaining to strictly represent unallocated income
+                                // Income - (Expenses + Bills + Debts + Savings)
+                                const realRemaining = totalIncome - (standardExpenses + combinedTotalBills + totalDebtsPlanned + totalSavingsDeposits);
+
                                 const pieData = [
+                                    { name: 'הכנסות', value: totalIncome, color: '#10B981' }, // Emerald 500 - Income side
                                     { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
                                     { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills },
                                     { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' }, // Purple
                                     { name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }, // Blue
-                                    { name: 'יתרה', value: Math.max(0, savingsRemainder), color: COLORS.income } // Green
+                                    { name: 'יתרה', value: Math.max(0, realRemaining), color: '#34D399' } // Emerald 400 - Remaining from allocation (Lighter)
                                 ].filter(item => item.value > 0);
 
                                 return (
