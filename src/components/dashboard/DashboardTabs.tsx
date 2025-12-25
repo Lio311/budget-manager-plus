@@ -17,13 +17,13 @@ export function DashboardTabs() {
     const [activeTab, setActiveTab] = useState('overview')
 
     const tabs = [
-        { value: 'overview', label: 'סקירה כללית', icon: PieChart },
-        { value: 'income', label: 'הכנסות', icon: TrendingDown, rotate: true },
-        { value: 'expenses', label: 'הוצאות', icon: TrendingDown },
-        { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard },
-        { value: 'debts', label: 'חובות', icon: Wallet },
-        { value: 'savings', label: 'חסכונות', icon: PiggyBank },
-        { value: 'calendar', label: 'לוח שנה', icon: Calendar },
+        { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
+        { value: 'income', label: 'הכנסות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
+        { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
+        { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard, activeClass: 'data-[state=active]:bg-orange-500' },
+        { value: 'debts', label: 'חובות', icon: Wallet, activeClass: 'data-[state=active]:bg-purple-600' },
+        { value: 'savings', label: 'חסכונות', icon: PiggyBank, activeClass: 'data-[state=active]:bg-blue-600' },
+        { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeClass: 'data-[state=active]:bg-black' },
     ]
 
     const handleTabChange = (value: string) => {
@@ -69,50 +69,47 @@ export function DashboardTabs() {
                         {tabs.map((tab) => {
                             const Icon = tab.icon
                             return (
-                                <TabsTrigger
-                                    key={tab.value}
-                                    value={tab.value}
-                                    className="w-full justify-start gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
-                                             data-[state=active]:bg-[#007AFF] data-[state=active]:text-white data-[state=active]:shadow-sm
-                                             hover:bg-white/50 data-[state=active]:hover:bg-[#007AFF]
-                                             text-gray-700 outline-none ring-0 focus:ring-0"
+                                className = {`w-full justify-start gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
+                                             ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-sm
+                                             hover:bg-white/50
+                                             text-gray-700 outline-none ring-0 focus:ring-0`}
                                 >
-                                    <Icon className={`h-4 w-4 ${tab.rotate ? 'rotate-180' : ''}`} />
-                                    {tab.label}
+                            <Icon className={`h-4 w-4 ${tab.rotate ? 'rotate-180' : ''}`} />
+                                    { tab.label }
                                 </TabsTrigger>
-                            )
+                    )
                         })}
-                    </TabsList>
-                </div>
-            </aside>
-
-            {/* Main Content Area */}
-            <div className="flex-1 w-full md:max-w-[calc(100%-18rem)] overflow-y-auto bg-white min-h-[calc(100vh-65px)]">
-                <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
-                    {/* Content Wrappers - Added strict widths to prevent overflow */}
-                    <TabsContent value="overview" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <OverviewTab />
-                    </TabsContent>
-                    <TabsContent value="income" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <IncomeTab />
-                    </TabsContent>
-                    <TabsContent value="expenses" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <ExpensesTab />
-                    </TabsContent>
-                    <TabsContent value="bills" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <BillsTab />
-                    </TabsContent>
-                    <TabsContent value="debts" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <DebtsTab />
-                    </TabsContent>
-                    <TabsContent value="savings" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <SavingsTab />
-                    </TabsContent>
-                    <TabsContent value="calendar" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <CalendarTab />
-                    </TabsContent>
-                </div>
+                </TabsList>
             </div>
-        </Tabs>
+        </aside>
+
+            {/* Main Content Area */ }
+    <div className="flex-1 w-full md:max-w-[calc(100%-18rem)] overflow-y-auto bg-white min-h-[calc(100vh-65px)]">
+        <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
+            {/* Content Wrappers - Added strict widths to prevent overflow */}
+            <TabsContent value="overview" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                <OverviewTab />
+            </TabsContent>
+            <TabsContent value="income" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                <IncomeTab />
+            </TabsContent>
+            <TabsContent value="expenses" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                <ExpensesTab />
+            </TabsContent>
+            <TabsContent value="bills" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                <BillsTab />
+            </TabsContent>
+            <TabsContent value="debts" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                <DebtsTab />
+            </TabsContent>
+            <TabsContent value="savings" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                <SavingsTab />
+            </TabsContent>
+            <TabsContent value="calendar" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                <CalendarTab />
+            </TabsContent>
+        </div>
+    </div>
+        </Tabs >
     )
 }
