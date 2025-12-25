@@ -371,14 +371,14 @@ export function OverviewTab() {
                                                 content={(props) => {
                                                     const { payload } = props;
                                                     return (
-                                                        <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-600" dir="rtl">
+                                                        <ul className="flex flex-nowrap justify-center gap-2 md:gap-4 text-[10px] md:text-xs text-gray-600 overflow-x-auto" dir="rtl">
                                                             {payload?.map((entry: any, index: number) => (
-                                                                <li key={`item-${index}`} className="flex items-center gap-1.5">
+                                                                <li key={`item-${index}`} className="flex items-center gap-1 flex-shrink-0">
                                                                     <div
-                                                                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                                                                        className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full shrink-0"
                                                                         style={{ backgroundColor: entry.payload.color }} // Use payload.color to get the correct color from data
                                                                     />
-                                                                    <span className="font-medium text-[#323338]">{entry.value}</span>
+                                                                    <span className="font-medium text-[#323338] whitespace-nowrap">{entry.value}</span>
                                                                 </li>
                                                             ))}
                                                         </ul>

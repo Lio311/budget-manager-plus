@@ -25,7 +25,10 @@ export default function DashboardLayout({
             <BudgetProvider>
                 <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100">
                     <ExpiryBanner />
-                    <DashboardHeader onMenuClick={() => setMobileMenuOpen(true)} />
+                    <DashboardHeader
+                        onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        menuOpen={mobileMenuOpen}
+                    />
                     <DashboardTabs mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
                 </div>
             </BudgetProvider>

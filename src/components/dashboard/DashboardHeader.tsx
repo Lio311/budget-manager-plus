@@ -12,10 +12,11 @@ import Image from 'next/image'
 const CURRENCIES = ['₪', '$', '€', '£']
 
 interface DashboardHeaderProps {
-    onMenuClick?: () => void
+    onMenuToggle?: () => void
+    menuOpen?: boolean
 }
 
-export function DashboardHeader({ onMenuClick }: DashboardHeaderProps = {}) {
+export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHeaderProps = {}) {
     const { month, year, currency, setMonth, setYear, setCurrency } = useBudget()
 
     const handlePrevMonth = () => {
@@ -63,7 +64,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps = {}) {
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={onMenuClick}
+                        onClick={onMenuToggle}
                         className="h-9 w-9 rounded-full bg-black hover:bg-gray-800 text-white flex-shrink-0"
                     >
                         <Menu className="h-5 w-5" />
