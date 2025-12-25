@@ -9,6 +9,8 @@ export const metadata: Metadata = {
     description: 'נהל את התקציב האישי או המשפחתי שלך בקלות עם לוח שנה חכם ותזכורות תשלומים',
     icons: {
         icon: '/K-ICON.png',
+        apple: '/K-ICON.png',
+        shortcut: '/K-ICON.png',
     },
 }
 
