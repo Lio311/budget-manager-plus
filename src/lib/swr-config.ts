@@ -1,33 +1,35 @@
 /**
  * SWR Configuration for Performance Optimization
  * 
- * This configuration enables client-side caching with deduplication
- * to reduce unnecessary server requests and improve perceived performance.
+ * Optimized for instant perceived performance with aggressive caching
  */
 
 export const swrConfig = {
-    // Dedupe requests within 60 seconds - prevents duplicate requests to the same endpoint
-    dedupingInterval: 60000,
+    // Dedupe requests within 5 seconds - allows faster updates while preventing spam
+    dedupingInterval: 5000,
 
-    // Revalidate on focus after 30 seconds of inactivity
-    focusThrottleInterval: 30000,
+    // Disable focus revalidation for faster perceived performance
+    revalidateOnFocus: false,
 
-    // Keep data fresh by revalidating on window focus
-    revalidateOnFocus: true,
+    // Disable reconnect revalidation
+    revalidateOnReconnect: false,
 
-    // Revalidate when network reconnects
-    revalidateOnReconnect: true,
-
-    // Don't revalidate on mount if data is fresh (within deduping interval)
+    // Don't revalidate on mount if data exists
     revalidateIfStale: false,
 
-    // Error retry configuration
-    errorRetryCount: 3,
-    errorRetryInterval: 5000,
+    // Error retry configuration - fail fast
+    errorRetryCount: 2,
+    errorRetryInterval: 2000,
 
-    // Loading timeout
-    loadingTimeout: 3000,
+    // Shorter loading timeout
+    loadingTimeout: 1000,
 
-    // Keep previous data while revalidating
+    // Keep previous data while revalidating for instant UI
     keepPreviousData: true,
+
+    // Suspense mode for better loading states
+    suspense: false,
+
+    // Fallback data to show immediately
+    fallbackData: undefined,
 }
