@@ -203,7 +203,7 @@ export function OverviewTab() {
         .map(([name, value]) => {
             const category = categories.find(c => c.name === name)
             // Ensure we use the bold version of the color
-            const colorClass = getBoldColor(category?.color)
+            const colorClass = getBoldColor(category?.color || null)
             // For hex, we might need to map the bold class back to hex or just use a lookup if available
             // A simple hack: find the preset that matches the bold class name part (e.g. 'green')
             let colorHex = '#64748B' // slate-500
