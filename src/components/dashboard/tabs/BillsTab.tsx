@@ -276,7 +276,7 @@ export function BillsTab() {
                             />
                         </div>
                         <Button
-                            className="w-full bg-[#0073ea] hover:bg-[#0060b9] h-10 shadow-sm mt-2"
+                            className="w-full bg-orange-500 hover:bg-orange-600 h-10 shadow-sm mt-2 font-medium"
                             onClick={handleAdd}
                             disabled={submitting}
                         >

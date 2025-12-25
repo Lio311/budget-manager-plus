@@ -41,8 +41,8 @@ export function DashboardHeader() {
                         <Button variant="outline" size="icon" onClick={handlePrevMonth} className="h-8 w-8 sm:h-10 sm:w-10">
                             <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
-                        <div className="text-center min-w-[120px] sm:min-w-[180px]">
-                            <h2 className="text-base sm:text-2xl font-bold whitespace-nowrap">
+                        <div className="text-center w-[110px] sm:w-[180px]">
+                            <h2 className="text-sm sm:text-2xl font-bold whitespace-nowrap">
                                 {getMonthName(month)} {year}
                             </h2>
                         </div>

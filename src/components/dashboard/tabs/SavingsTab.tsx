@@ -405,7 +405,7 @@ export function SavingsTab() {
 
                         <Button
                             onClick={handleAdd}
-                            className="w-full h-10 rounded-lg bg-[#00c875] hover:bg-[#00b065] text-white font-medium shadow-sm transition-all hover:shadow-md mt-2"
+                            className="w-full h-10 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-all hover:shadow-md mt-2"
                             disabled={submitting}
                         >
                             {submitting ? (
@@ -524,24 +524,28 @@ export function SavingsTab() {
                                                     </div>
 
                                                     <div className="flex flex-col min-w-0">
-                                                        <span className="font-bold text-[#323338] text-base truncate">{saving.description}</span>
-                                                        <div className="flex items-center gap-2 text-xs text-[#676879]">
-                                                            <span>
-                                                                {(() => {
-                                                                    try {
-                                                                        const dateToFormat = saving.targetDate || saving.date
-                                                                        return dateToFormat ? format(new Date(dateToFormat), 'dd/MM/yyyy') : 'תאריך חסר'
-                                                                    } catch (e) {
-                                                                        return 'תאריך לא תקין'
-                                                                    }
-                                                                })()}
-                                                            </span>
-                                                            {saving.goal && (
-                                                                <>
-                                                                    <span>•</span>
-                                                                    <span>יעד: {formatCurrency(parseFloat(saving.goal), currency)}</span>
-                                                                </>
-                                                            )}
+                                                        {/* Description and Date on the same line, Description right of Date */}
+                                                        <div className="flex items-center gap-2 text-[#323338]">
+                                                            <span className="font-bold text-base truncate">{saving.description}</span>
+                                                            <span className="text-gray-400">|</span>
+                                                            <div className="flex items-center gap-2 text-xs text-[#676879]">
+                                                                <span>
+                                                                    {(() => {
+                                                                        try {
+                                                                            const dateToFormat = saving.targetDate || saving.date
+                                                                            return dateToFormat ? format(new Date(dateToFormat), 'dd/MM/yyyy') : 'תאריך חסר'
+                                                                        } catch (e) {
+                                                                            return 'תאריך לא תקין'
+                                                                        }
+                                                                    })()}
+                                                                </span>
+                                                                {saving.goal && (
+                                                                    <>
+                                                                        <span>•</span>
+                                                                        <span>יעד: {formatCurrency(parseFloat(saving.goal), currency)}</span>
+                                                                    </>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

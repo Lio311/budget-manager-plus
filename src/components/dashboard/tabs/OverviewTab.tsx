@@ -51,7 +51,7 @@ const CustomTooltip = ({ active, payload, label, currency }: any) => {
         return (
             <div className="bg-white p-2 border rounded shadow-md text-right" dir="rtl">
                 <span className="font-bold text-gray-900 block mb-1">{title}</span>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-500 font-medium block" dir="ltr">
                     {currency === 'ILS' || currency === '₪' ? '₪' : currency} {Number(payload[0].value).toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
             </div>
@@ -360,14 +360,14 @@ export function OverviewTab() {
                                         content={(props) => {
                                             const { payload } = props;
                                             return (
-                                                <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-600">
+                                                <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-600" dir="rtl">
                                                     {payload?.map((entry, index) => (
                                                         <li key={`item-${index}`} className="flex items-center gap-1.5">
                                                             <div
-                                                                className="w-2.5 h-2.5 rounded-full"
+                                                                className="w-2.5 h-2.5 rounded-full shrink-0"
                                                                 style={{ backgroundColor: entry.color }}
                                                             />
-                                                            <span>{entry.value}</span>
+                                                            <span className="font-medium text-[#323338]">{entry.value}</span>
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -415,7 +415,7 @@ export function OverviewTab() {
                                                     return (
                                                         <div className="bg-white p-2 border rounded shadow-md text-right" dir="rtl">
                                                             <p className="font-bold text-gray-900">{label}</p>
-                                                            <p className="text-sm text-gray-500 font-medium">
+                                                            <p className="text-sm text-gray-500 font-medium" dir="ltr">
                                                                 {currency === 'ILS' || currency === '₪' ? '₪' : currency} {Number(payload[0].value).toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                             </p>
                                                         </div>
