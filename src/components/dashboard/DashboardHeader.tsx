@@ -65,7 +65,10 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHea
                         variant="ghost"
                         size="icon"
                         onClick={onMenuToggle}
-                        className="h-9 w-9 rounded-full bg-black hover:bg-gray-800 text-white flex-shrink-0"
+                        className={`h-9 w-9 rounded-full flex-shrink-0 transition-colors ${menuOpen
+                                ? 'bg-white hover:bg-gray-100 text-black'
+                                : 'bg-black hover:bg-gray-800 text-white'
+                            }`}
                     >
                         <Menu className="h-5 w-5" />
                     </Button>
