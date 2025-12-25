@@ -351,7 +351,7 @@ export function DebtsTab() {
                                     </div>
                                     <Button
                                         onClick={handleAdd}
-                                        className="h-10 px-6 rounded-lg bg-green-600 hover:bg-green-700 text-white font-medium shadow-sm transition-all hover:shadow-md shrink-0 w-full sm:w-auto"
+                                        className="h-10 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-all hover:shadow-md flex-1 w-full sm:w-auto"
                                         disabled={submitting}
                                     >
                                         {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
