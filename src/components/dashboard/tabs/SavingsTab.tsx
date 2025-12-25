@@ -28,7 +28,9 @@ interface Saving {
     description: string
     monthlyDeposit: number
     goal: string | null
-    date: Date
+    date?: Date
+    targetDate?: Date
+    createdAt: Date
 }
 
 interface Category {
@@ -131,7 +133,7 @@ export function SavingsTab() {
                 description: newSaving.description,
                 monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
                 goal: newSaving.goal || undefined,
-                date: newSaving.date, // Server component will handle the conversion
+                targetDate: newSaving.date, // Server component will handle the conversion
                 isRecurring: newSaving.isRecurring,
                 recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
                 recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined
@@ -163,12 +165,21 @@ export function SavingsTab() {
     async function handleAddCategory() {
         if (!newCategoryName.trim()) return
 
+        // Force bold color for new categories if using presets
+        let colorToSave = newCategoryColor
+        if (colorToSave.includes('bg-') && colorToSave.includes('-100')) {
+            colorToSave = colorToSave
+                .replace(/bg-(\w+)-100/g, 'bg-$1-500')
+                .replace(/text-(\w+)-700/g, 'text-white')
+                .replace(/border-(\w+)-200/g, 'border-$1-600')
+        }
+
         setSubmitting(true)
         try {
             const result = await addCategory({
                 name: newCategoryName.trim(),
                 type: 'saving',
-                color: newCategoryColor
+                color: colorToSave
             })
 
             if (result.success) {
@@ -202,12 +213,14 @@ export function SavingsTab() {
 
     const startEdit = (saving: any) => {
         setEditingId(saving.id)
+        // Handle both targetDate (DB field) and date (Legacy/Prop)
+        const dateToUse = saving.targetDate ? new Date(saving.targetDate) : (saving.date ? new Date(saving.date) : new Date())
         setEditData({
             category: saving.category || saving.type || '',
             description: saving.description,
             monthlyDeposit: saving.monthlyDeposit.toString(),
             goal: saving.goal || '',
-            date: new Date(saving.date)
+            date: dateToUse
         })
     }
 
@@ -223,7 +236,7 @@ export function SavingsTab() {
             description: editData.description,
             monthlyDeposit: parseFloat(editData.monthlyDeposit),
             goal: editData.goal || undefined,
-            date: editData.date
+            targetDate: editData.date
         })
 
         if (result.success) {
@@ -238,7 +251,16 @@ export function SavingsTab() {
 
     const getCategoryColor = (catName: string) => {
         const cat = categories.find(c => c.name === catName)
-        return cat?.color || 'bg-gray-500 text-white border-gray-600'
+        let colorClass = cat?.color || 'bg-gray-500 text-white border-gray-600'
+
+        // Force upgrade legacy pale colors to bold colors
+        if (colorClass.includes('bg-') && colorClass.includes('-100')) {
+            colorClass = colorClass
+                .replace(/bg-(\w+)-100/g, 'bg-$1-500')
+                .replace(/text-(\w+)-700/g, 'text-white')
+                .replace(/border-(\w+)-200/g, 'border-$1-600')
+        }
+        return colorClass
     }
 
     if (loadingSavings) {
@@ -492,7 +514,8 @@ export function SavingsTab() {
                                                     <span>
                                                         {(() => {
                                                             try {
-                                                                return format(new Date(saving.date), 'dd/MM/yyyy')
+                                                                const dateToFormat = saving.targetDate || saving.date
+                                                                return dateToFormat ? format(new Date(dateToFormat), 'dd/MM/yyyy') : 'תאריך חסר'
                                                             } catch (e) {
                                                                 return 'תאריך לא תקין'
                                                             }
