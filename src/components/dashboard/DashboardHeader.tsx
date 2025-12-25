@@ -7,6 +7,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FeedbackButton } from './FeedbackButton'
 
+import Image from 'next/image'
+
 const CURRENCIES = ['₪', '$', '€', '£']
 
 export function DashboardHeader() {
@@ -33,7 +35,7 @@ export function DashboardHeader() {
     return (
         <div className="border-b bg-white/50 backdrop-blur-sm sticky top-0 z-30">
             <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center justify-between gap-2 relative">
                     {/* Month/Year Selector */}
                     <div className="flex items-center gap-1 sm:gap-2">
                         <Button variant="outline" size="icon" onClick={handlePrevMonth} className="h-8 w-8 sm:h-10 sm:w-10">
@@ -47,6 +49,18 @@ export function DashboardHeader() {
                         <Button variant="outline" size="icon" onClick={handleNextMonth} className="h-8 w-8 sm:h-10 sm:w-10">
                             <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
+                    </div>
+
+                    {/* Logo - Centered */}
+                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden md:block">
+                        <Image
+                            src="/keseflow.png"
+                            alt="Keseflow"
+                            width={120}
+                            height={40}
+                            className="h-8 w-auto object-contain"
+                            priority
+                        />
                     </div>
 
                     {/* User Button */}
