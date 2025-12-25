@@ -272,7 +272,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                         <TableRow key={f.id}>
                                             <TableCell className="text-center">{f.user.email}</TableCell>
                                             <TableCell className="text-center">{format(new Date(f.createdAt), 'dd/MM/yyyy')}</TableCell>
-                                            <TableCell className="max-w-md truncate text-center">{f.content}</TableCell>
+                                            <TableCell className="max-w-md truncate text-right" dir="rtl">{f.content}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

@@ -34,11 +34,11 @@ export function DashboardTabs() {
     return (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex min-h-[calc(100vh-65px)] bg-[#F5F5F7]" dir="rtl">
             {/* Mobile Menu Button - Visible only on mobile */}
-            <div className="md:hidden fixed bottom-6 left-6 z-50">
+            <div className="md:hidden fixed top-[80px] left-6 z-50">
                 <Button
                     size="icon"
                     onClick={() => setMobileMenuOpen(true)}
-                    className="h-14 w-14 rounded-full shadow-lg bg-[#007AFF] hover:bg-[#0062cc] text-white"
+                    className="h-12 w-12 rounded-full shadow-lg bg-black hover:bg-gray-800 text-white"
                 >
                     <Menu className="h-6 w-6" />
                 </Button>
