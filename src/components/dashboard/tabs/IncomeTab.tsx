@@ -329,95 +329,94 @@ export function IncomeTab() {
                             </div>
                         </div>
 
+                        <div className="flex items-start gap-4 p-4 mt-4 border border-gray-100 rounded-xl bg-gray-50/50 w-full">
+                            <div className="flex items-center gap-2">
+                                <Checkbox id="recurring-income" checked={newIncome.isRecurring} onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })} className="data-[state=checked]:bg-[#00c875] data-[state=checked]:border-[#00c875]" />
+                                <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338]">הכנסה קבועה</label>
+                            </div>
+                            {newIncome.isRecurring && (
+                                <div className="flex gap-4 flex-1">
+                                    <div className="space-y-2 w-full">
+                                        <label className="text-xs font-medium text-[#676879]">תאריך סיום</label>
+                                        <DatePicker date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined} setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         <Button onClick={handleAdd} className="w-full h-10 rounded-lg bg-[#00c875] hover:bg-[#00b268] text-white font-medium shadow-sm transition-all hover:shadow-md mt-2" disabled={submitting}>
                             {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
                         </Button>
                     </div>
 
-                    <div className="flex items-start gap-4 p-4 mt-4 border border-gray-100 rounded-xl bg-gray-50/50 w-full">
-                        <div className="flex items-center gap-2">
-                            <Checkbox id="recurring-income" checked={newIncome.isRecurring} onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })} className="data-[state=checked]:bg-[#00c875] data-[state=checked]:border-[#00c875]" />
-                            <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338]">הכנסה קבועה</label>
+                    {/* List - Glassmorphism */}
+                    <div className="glass-panel p-5 block">
+                        <div className="flex items-center gap-2 mb-4 px-1">
+                            <h3 className="text-lg font-bold text-[#323338]">רשימת הכנסות</h3>
                         </div>
-                        {newIncome.isRecurring && (
-                            <div className="flex gap-4 flex-1">
-                                <div className="space-y-2 w-full">
-                                    <label className="text-xs font-medium text-[#676879]">תאריך סיום</label>
-                                    <DatePicker date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined} setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
-                                </div>
+
+                        {incomes.length === 0 ? (
+                            <div className="text-center py-10 text-gray-400">
+                                אין הכנסות רשומות לחודש זה
                             </div>
+                        ) : (
+                            <>
+                                <div className="space-y-3">
+                                    {paginatedIncomes.map((income: any) => (
+                                        <div key={income.id} className="group relative flex flex-col sm:flex-row items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+                                            {editingId === income.id ? (
+                                                <div className="flex flex-col gap-3 w-full animate-in fade-in zoom-in-95 duration-200">
+                                                    <div className="flex flex-wrap gap-2 w-full">
+                                                        <select className="p-2 border rounded-md h-9 bg-white text-sm min-w-[100px] flex-1" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
+                                                            {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+                                                        </select>
+                                                        <Input className="h-9 flex-[2]" value={editData.source} onChange={(e) => setEditData({ ...editData, source: e.target.value })} />
+                                                    </div>
+                                                    <div className="flex gap-2 w-full">
+                                                        <Input className="h-9 w-24" type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
+                                                        <div className="flex-1">
+                                                            <Input className="h-9 w-full" type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex justify-end gap-2 mt-2">
+                                                        <Button size="sm" onClick={handleUpdate} className="bg-green-600 hover:bg-green-700 text-white"><Check className="h-4 w-4 ml-1" /> שמור</Button>
+                                                        <Button size="sm" variant="outline" onClick={() => setEditingId(null)}><X className="h-4 w-4 ml-1" /> ביטול</Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="flex items-center gap-3 w-full sm:w-auto overflow-hidden">
+                                                        <div className="shrink-0">
+                                                            <span className={`monday-pill ${getCategoryColor(income.category)} opacity-100 font-bold`}>
+                                                                {income.category || 'כללי'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex flex-col min-w-0">
+                                                            <span className="font-bold text-[#323338] text-base truncate">{income.source}</span>
+                                                            <span className="text-xs text-[#676879]">{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0 pl-1">
+                                                        <span className="text-lg font-bold text-[#00c875]">{formatCurrency(income.amount, currency)}</span>
+                                                        <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
+                                                            <Button variant="ghost" size="icon" onClick={() => handleDelete(income.id)} className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-4 w-4" /></Button>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={setCurrentPage}
+                                />
+                            </>
                         )}
                     </div>
                 </div>
-
-                {/* List - Glassmorphism */}
-                <div className="glass-panel p-5 block">
-                    <div className="flex items-center gap-2 mb-4 px-1">
-                        <h3 className="text-lg font-bold text-[#323338]">רשימת הכנסות</h3>
-                    </div>
-
-                    {incomes.length === 0 ? (
-                        <div className="text-center py-10 text-gray-400">
-                            אין הכנסות רשומות לחודש זה
-                        </div>
-                    ) : (
-                        <>
-                            <div className="space-y-3">
-                                {paginatedIncomes.map((income: any) => (
-                                    <div key={income.id} className="group relative flex flex-col sm:flex-row items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
-                                        {editingId === income.id ? (
-                                            <div className="flex flex-col gap-3 w-full animate-in fade-in zoom-in-95 duration-200">
-                                                <div className="flex flex-wrap gap-2 w-full">
-                                                    <select className="p-2 border rounded-md h-9 bg-white text-sm min-w-[100px] flex-1" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
-                                                        {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
-                                                    </select>
-                                                    <Input className="h-9 flex-[2]" value={editData.source} onChange={(e) => setEditData({ ...editData, source: e.target.value })} />
-                                                </div>
-                                                <div className="flex gap-2 w-full">
-                                                    <Input className="h-9 w-24" type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
-                                                    <div className="flex-1">
-                                                        <Input className="h-9 w-full" type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-end gap-2 mt-2">
-                                                    <Button size="sm" onClick={handleUpdate} className="bg-green-600 hover:bg-green-700 text-white"><Check className="h-4 w-4 ml-1" /> שמור</Button>
-                                                    <Button size="sm" variant="outline" onClick={() => setEditingId(null)}><X className="h-4 w-4 ml-1" /> ביטול</Button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className="flex items-center gap-3 w-full sm:w-auto overflow-hidden">
-                                                    <div className="shrink-0">
-                                                        <span className={`monday-pill ${getCategoryColor(income.category)} opacity-100 font-bold`}>
-                                                            {income.category || 'כללי'}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <span className="font-bold text-[#323338] text-base truncate">{income.source}</span>
-                                                        <span className="text-xs text-[#676879]">{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0 pl-1">
-                                                    <span className="text-lg font-bold text-[#00c875]">{formatCurrency(income.amount, currency)}</span>
-                                                    <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
-                                                        <Button variant="ghost" size="icon" onClick={() => handleDelete(income.id)} className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-4 w-4" /></Button>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={setCurrentPage}
-                            />
-                        </>
-                    )}
-                </div>
             </div>
-        </div>
-    )
+            )
 }
