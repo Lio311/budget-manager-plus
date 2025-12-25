@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Check, Loader2, Pencil, X, TrendingDown } from 'lucide-react'
+import { Plus, Trash2, Check, Loader2, Pencil, X, TrendingDown, Wallet } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib/actions/debts'
@@ -293,7 +293,7 @@ export function DebtsTab() {
                         {/* Add Debt Form */}
                         <div className="glass-panel p-5 h-fit">
                             <div className="flex items-center gap-2 mb-6">
-                                <TrendingDown className="h-5 w-5 text-red-500" />
+                                <Wallet className="h-5 w-5 text-blue-600" />
                                 <h3 className="text-lg font-bold text-[#323338]">הוספת חוב</h3>
                             </div>
 
@@ -337,13 +337,13 @@ export function DebtsTab() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
-                                    <div className="flex items-center gap-2 h-10 bg-gray-50 px-3 rounded-lg border border-gray-100 w-full sm:w-auto">
+                                <div className="flex flex-col gap-4"> {/* Container for Checkbox and Button */}
+                                    <div className="flex items-center gap-2 h-10 bg-gray-50 px-3 rounded-lg border border-gray-100 w-full sm:w-auto self-start">
                                         <Checkbox
                                             id="recurring-debt"
                                             checked={newDebt.isRecurring}
                                             onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
-                                            className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                                            className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                                         />
                                         <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none text-[#323338]">
                                             תשלומים
@@ -351,7 +351,7 @@ export function DebtsTab() {
                                     </div>
                                     <Button
                                         onClick={handleAdd}
-                                        className="h-10 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-all hover:shadow-md flex-1 w-full sm:w-auto"
+                                        className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-all hover:shadow-md"
                                         disabled={submitting}
                                     >
                                         {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
