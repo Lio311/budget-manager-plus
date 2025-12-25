@@ -237,7 +237,6 @@ export function DebtsTab() {
         }
         setSubmitting(false)
     }
-
     return (
         <div className="space-y-8 w-full max-w-full overflow-x-hidden pb-10">
             {loading ? (
@@ -554,6 +553,6 @@ export function DebtsTab() {
                     )}
                 </div>
 
-            </div >
+            </div>
             )
 }
