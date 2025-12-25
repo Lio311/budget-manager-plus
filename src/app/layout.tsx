@@ -24,7 +24,7 @@ export default function RootLayout({
             localization={heIL}
             appearance={{
                 elements: {
-                    logoImage: "/K-ICON.png",
+                    logoImage: "/K-LOGO.png",
                     logoBox: {
                         height: "3rem",
                         justifyContent: "center"

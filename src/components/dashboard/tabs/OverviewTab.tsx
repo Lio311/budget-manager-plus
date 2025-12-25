@@ -241,7 +241,7 @@ export function OverviewTab() {
                         <DialogContent dir="rtl">
                             <DialogHeader>
                                 <DialogTitle>הגדרות</DialogTitle>
-                                <DialogDescription>
+                                <DialogDescription className="text-right">
                                     הגדר את היתרה ההתחלתית עבור חישוב השווי הנקי
                                 </DialogDescription>
                             </DialogHeader>
@@ -269,7 +269,6 @@ export function OverviewTab() {
                             </div>
                             <DialogFooter>
                                 <Button onClick={handleSaveSettings}>
-                                    <Save className="mr-2 h-4 w-4" />
                                     שמור שינויים
                                 </Button>
                             </DialogFooter>
