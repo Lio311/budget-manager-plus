@@ -191,7 +191,7 @@ export function CalendarTab() {
                             return (
                                 <div
                                     key={index}
-                                    className={`min-h-[80px] p-2 border rounded-lg ${day === null
+                                    className={`min-h-[80px] p-2 border rounded-lg overflow-hidden ${day === null
                                         ? 'bg-gray-50'
                                         : hasPayments
                                             ? allPaid
@@ -204,11 +204,11 @@ export function CalendarTab() {
                                         <>
                                             <div className="font-semibold text-sm mb-1">{day}</div>
                                             {hasPayments && (
-                                                <div className="space-y-1">
+                                                <div className="space-y-1 w-full">
                                                     {dayPayments.map((payment) => (
                                                         <div
                                                             key={payment.id}
-                                                            className={`text-[10px] md:text-xs p-1 rounded truncate ${payment.type === 'bill'
+                                                            className={`text-[10px] md:text-xs p-1 rounded truncate w-full block ${payment.type === 'bill'
                                                                 ? 'bg-yellow-200 text-yellow-800'
                                                                 : payment.type === 'debt'
                                                                     ? 'bg-purple-200 text-purple-800'

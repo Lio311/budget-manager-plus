@@ -242,9 +242,9 @@ export function BillsTab() {
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="glass-panel p-5 h-fit">
-                    <div className="flex items-center gap-2 mb-4">
-                        <CreditCard className="h-5 w-5 text-orange-500" />
-                        <h3 className="text-base md:text-lg font-bold text-[#323338] truncate">הוספת חשבון חדש</h3>
+                    <div className="flex items-center gap-2 mb-4 min-w-0">
+                        <CreditCard className="h-5 w-5 text-orange-500 flex-shrink-0" />
+                        <h3 className="text-base md:text-lg font-bold text-[#323338] truncate flex-1 min-w-0">הוספת חשבון חדש</h3>
                     </div>
                     <div className="space-y-4">
                         <div className="space-y-2">
