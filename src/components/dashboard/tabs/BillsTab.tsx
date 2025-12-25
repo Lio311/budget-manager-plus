@@ -226,17 +226,17 @@ export function BillsTab() {
     return (
         <div className="space-y-4 p-1" dir="rtl">
             <div className="grid grid-cols-3 gap-3">
-                <div className="monday-card p-4 border-l-4 border-l-blue-500">
-                    <p className="text-xs text-gray-500 mb-1">סה"כ לתשלום</p>
-                    <p className="text-xl font-bold text-[#323338]">{formatCurrency(totalBills, currency)}</p>
+                <div className="monday-card p-4 border-l-4 border-l-blue-500 min-w-0">
+                    <p className="text-xs text-gray-500 mb-1 truncate">סה"כ לתשלום</p>
+                    <p className="text-base md:text-xl font-bold text-[#323338] truncate">{formatCurrency(totalBills, currency)}</p>
                 </div>
-                <div className="monday-card p-4 border-l-4 border-l-green-500">
-                    <p className="text-xs text-gray-500 mb-1">שולם</p>
-                    <p className="text-xl font-bold text-green-600">{formatCurrency(paidBills, currency)}</p>
+                <div className="monday-card p-4 border-l-4 border-l-green-500 min-w-0">
+                    <p className="text-xs text-gray-500 mb-1 truncate">שולם</p>
+                    <p className="text-base md:text-xl font-bold text-green-600 truncate">{formatCurrency(paidBills, currency)}</p>
                 </div>
-                <div className="monday-card p-4 border-l-4 border-l-red-500">
-                    <p className="text-xs text-gray-500 mb-1">נותר לתשלום</p>
-                    <p className="text-xl font-bold text-red-600">{formatCurrency(unpaidBills, currency)}</p>
+                <div className="monday-card p-4 border-l-4 border-l-red-500 min-w-0">
+                    <p className="text-xs text-gray-500 mb-1 truncate">נותר לתשלום</p>
+                    <p className="text-base md:text-xl font-bold text-red-600 truncate">{formatCurrency(unpaidBills, currency)}</p>
                 </div>
             </div>
 

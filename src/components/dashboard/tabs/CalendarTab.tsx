@@ -182,7 +182,7 @@ export function CalendarTab() {
                     </div>
 
                     {/* Calendar grid */}
-                    <div className="grid grid-cols-7 gap-2">
+                    <div className="grid grid-cols-7 gap-2 max-w-full overflow-x-auto">
                         {calendarDays.map((day, index) => {
                             const dayPayments = day ? getPaymentsForDay(day) : []
                             const hasPayments = dayPayments.length > 0
