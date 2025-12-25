@@ -54,7 +54,7 @@ export function DashboardHeader() {
                     {/* Logo - Centered */}
                     <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <Image
-                            src="/K-ICON.png"
+                            src="/K-LOGO.png"
                             alt="Keseflow"
                             width={120}
                             height={40}
