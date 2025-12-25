@@ -22,7 +22,9 @@ export const metadata: Metadata = {
     authors: [{ name: 'Keseflow' }],
     creator: 'Keseflow',
     publisher: 'Keseflow',
+    applicationName: 'Keseflow',
     metadataBase: new URL('https://keseflow.vercel.app'),
+    manifest: '/manifest.json',
     alternates: {
         canonical: '/',
         languages: {
@@ -67,6 +69,18 @@ export const metadata: Metadata = {
         apple: '/K-ICON.png',
         shortcut: '/K-ICON.png',
     },
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: 'default',
+        title: 'Keseflow',
+    },
+    formatDetection: {
+        telephone: false,
+    },
+    themeColor: [
+        { media: '(prefers-color-scheme: light)', color: '#22c55e' },
+        { media: '(prefers-color-scheme: dark)', color: '#16a34a' },
+    ],
 }
 
 export default function RootLayout({
@@ -88,6 +102,13 @@ export default function RootLayout({
             }}
         >
             <html lang="he" dir="rtl" className={rubik.variable}>
+                <head>
+                    {/* Performance Hints */}
+                    <link rel="preconnect" href="https://fonts.googleapis.com" />
+                    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+                    <link rel="preconnect" href="https://vercel.live" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+                </head>
                 <body>
                     <WebApplicationJsonLd />
                     {children}
