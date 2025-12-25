@@ -235,8 +235,9 @@ export function DebtsTab() {
                 duration: 1000
             })
         }
-        setSubmitting(false)
-    }
+        setSubmitting(false);
+    };
+
     return (
         <div className="space-y-8 w-full max-w-full overflow-x-hidden pb-10">
             {loading ? (
