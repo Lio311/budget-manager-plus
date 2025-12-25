@@ -5,7 +5,8 @@ import useSWR, { mutate } from 'swr'
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Check, Loader2, Calendar } from 'lucide-react'
+import { Check, Loader2, Calendar, X } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency, getDaysInMonth, getMonthName } from '@/lib/utils'
 import { getBills } from '@/lib/actions/bill'
@@ -29,6 +30,7 @@ interface Payment {
 export function CalendarTab() {
     const { month, year, currency } = useBudget()
     const { toast } = useToast()
+    const [selectedDay, setSelectedDay] = useState<number | null>(null)
 
     // Fetchers
     const fetchBills = async () => (await getBills(month, year)).data || []
@@ -191,12 +193,13 @@ export function CalendarTab() {
                             return (
                                 <div
                                     key={index}
+                                    onClick={() => day && hasPayments && setSelectedDay(day)}
                                     className={`min-h-[80px] p-2 border rounded-lg overflow-hidden ${day === null
                                         ? 'bg-gray-50'
                                         : hasPayments
                                             ? allPaid
-                                                ? 'bg-green-50 border-green-200'
-                                                : 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100'
+                                                ? 'bg-green-50 border-green-200 cursor-pointer hover:bg-green-100'
+                                                : 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100 cursor-pointer'
                                             : 'hover:bg-accent'
                                         } transition-colors`}
                                 >
@@ -312,6 +315,71 @@ export function CalendarTab() {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Day Details Dialog */}
+            <Dialog open={selectedDay !== null} onOpenChange={(open) => !open && setSelectedDay(null)}>
+                <DialogContent className="max-w-md" dir="rtl">
+                    <DialogHeader>
+                        <DialogTitle className="text-right">תשלומים ליום {selectedDay}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-3 mt-4">
+                        {selectedDay && getPaymentsForDay(selectedDay).map((payment) => (
+                            <div
+                                key={payment.id}
+                                className={`p-3 rounded-lg border-r-4 ${payment.type === 'bill'
+                                        ? 'bg-yellow-50 border-yellow-500'
+                                        : payment.type === 'debt'
+                                            ? 'bg-purple-50 border-purple-500'
+                                            : payment.type === 'income'
+                                                ? 'bg-green-50 border-green-500'
+                                                : payment.type === 'saving'
+                                                    ? 'bg-blue-50 border-blue-500'
+                                                    : 'bg-red-50 border-red-500'
+                                    } ${payment.isPaid ? 'opacity-60' : ''}`}
+                            >
+                                <div className="flex justify-between items-start gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <p className={`font-semibold text-sm ${payment.isPaid ? 'line-through' : ''}`}>
+                                            {payment.name}
+                                        </p>
+                                        <p className="text-xs text-gray-600 mt-1">
+                                            {payment.type === 'bill' ? 'חשבון קבוע' :
+                                                payment.type === 'debt' ? 'חוב' :
+                                                    payment.type === 'income' ? 'הכנסה' :
+                                                        payment.type === 'saving' ? 'חיסכון' : 'הוצאה'}
+                                        </p>
+                                    </div>
+                                    <div className="text-left flex-shrink-0">
+                                        <p className={`font-bold text-sm ${payment.type === 'bill' ? 'text-yellow-700' :
+                                                payment.type === 'debt' ? 'text-purple-700' :
+                                                    payment.type === 'income' ? 'text-green-700' :
+                                                        payment.type === 'saving' ? 'text-blue-700' : 'text-red-700'
+                                            }`}>
+                                            {formatCurrency(payment.amount, currency)}
+                                        </p>
+                                        {payment.isPaid && (
+                                            <p className="text-xs text-green-600 mt-1">✓ שולם</p>
+                                        )}
+                                    </div>
+                                </div>
+                                {(payment.type === 'bill' || payment.type === 'debt') && !payment.isPaid && (
+                                    <Button
+                                        size="sm"
+                                        onClick={async () => {
+                                            await togglePaid(payment)
+                                            setSelectedDay(null)
+                                        }}
+                                        className="w-full mt-2 bg-green-600 hover:bg-green-700"
+                                    >
+                                        <Check className="h-4 w-4 ml-2" />
+                                        סמן כשולם
+                                    </Button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

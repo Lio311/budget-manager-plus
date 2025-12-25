@@ -225,7 +225,7 @@ export function BillsTab() {
 
     return (
         <div className="space-y-4 p-1" dir="rtl">
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="monday-card p-4 border-l-4 border-l-blue-500 min-w-0">
                     <p className="text-xs text-gray-500 mb-1 truncate">סה"כ לתשלום</p>
                     <p className="text-base md:text-xl font-bold text-[#323338] truncate">{formatCurrency(totalBills, currency)}</p>
