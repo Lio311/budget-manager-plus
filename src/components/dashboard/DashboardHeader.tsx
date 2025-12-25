@@ -3,7 +3,7 @@
 import { UserButton } from '@clerk/nextjs'
 import { useBudget } from '@/contexts/BudgetContext'
 import { getMonthName } from '@/lib/utils'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { FeedbackButton } from './FeedbackButton'
 
@@ -11,7 +11,11 @@ import Image from 'next/image'
 
 const CURRENCIES = ['₪', '$', '€', '£']
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+    onMenuClick?: () => void
+}
+
+export function DashboardHeader({ onMenuClick }: DashboardHeaderProps = {}) {
     const { month, year, currency, setMonth, setYear, setCurrency } = useBudget()
 
     const handlePrevMonth = () => {
@@ -53,19 +57,37 @@ export function DashboardHeader() {
                     </div>
                 </div>
 
-                {/* Mobile Date Selector - Visible only on mobile */}
-                <div className="flex md:hidden items-center gap-1 px-4">
-                    <Button variant="outline" size="icon" onClick={handlePrevMonth} className="h-8 w-8">
-                        <ChevronRight className="h-3 w-3" />
+                {/* Mobile Layout - Compressed */}
+                <div className="flex md:hidden items-center justify-between w-full px-2">
+                    {/* Menu Button */}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onMenuClick}
+                        className="h-9 w-9 rounded-full bg-black hover:bg-gray-800 text-white flex-shrink-0"
+                    >
+                        <Menu className="h-5 w-5" />
                     </Button>
-                    <div className="text-center w-[100px]">
-                        <h2 className="text-sm font-bold whitespace-nowrap">
-                            {getMonthName(month)} {year}
-                        </h2>
+
+                    {/* Date Selector */}
+                    <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-7 w-7">
+                            <ChevronRight className="h-3 w-3" />
+                        </Button>
+                        <div className="text-center min-w-[85px]">
+                            <h2 className="text-xs font-bold whitespace-nowrap">
+                                {getMonthName(month)} {year}
+                            </h2>
+                        </div>
+                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-7 w-7">
+                            <ChevronLeft className="h-3 w-3" />
+                        </Button>
                     </div>
-                    <Button variant="outline" size="icon" onClick={handleNextMonth} className="h-8 w-8">
-                        <ChevronLeft className="h-3 w-3" />
-                    </Button>
+
+                    {/* User Button */}
+                    <div className="flex-shrink-0">
+                        <UserButton />
+                    </div>
                 </div>
 
                 {/* Center Section - Logo */}
@@ -80,8 +102,8 @@ export function DashboardHeader() {
                     />
                 </div>
 
-                {/* Left Section - User Profile */}
-                <div className="w-auto md:w-72 h-full flex items-center justify-end px-4 md:px-8">
+                {/* Left Section - User Profile (Desktop only) */}
+                <div className="hidden md:flex w-72 h-full items-center justify-end px-8">
                     <UserButton />
                 </div>
             </div>

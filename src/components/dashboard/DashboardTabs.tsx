@@ -12,8 +12,12 @@ import { DebtsTab } from './tabs/DebtsTab'
 import { CalendarTab } from './tabs/CalendarTab'
 import { SavingsTab } from './tabs/SavingsTab'
 
-export function DashboardTabs() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+interface DashboardTabsProps {
+    mobileMenuOpen: boolean
+    setMobileMenuOpen: (open: boolean) => void
+}
+
+export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTabsProps) {
     const [activeTab, setActiveTab] = useState('overview')
 
     const tabs = [
@@ -33,16 +37,6 @@ export function DashboardTabs() {
 
     return (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex min-h-[calc(100vh-65px)] bg-[#F5F5F7]" dir="rtl">
-            {/* Mobile Menu Button - Visible only on mobile */}
-            <div className="md:hidden fixed top-[80px] right-4 z-50">
-                <Button
-                    size="icon"
-                    onClick={() => setMobileMenuOpen(true)}
-                    className="h-12 w-12 rounded-full shadow-lg bg-black hover:bg-gray-800 text-white"
-                >
-                    <Menu className="h-6 w-6" />
-                </Button>
-            </div>
 
             {/* Mobile Sidebar Overlay */}
             {mobileMenuOpen && (
