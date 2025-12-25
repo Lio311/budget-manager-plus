@@ -308,7 +308,7 @@ export function SavingsTab() {
                 {/* Add New Saving */}
                 <div className="glass-panel p-5 h-fit">
                     <div className="mb-6 flex items-center gap-2">
-                        <PiggyBank className="h-5 w-5 text-[#00c875]" />
+                        <PiggyBank className="h-5 w-5 text-blue-600" />
                         <h3 className="text-lg font-bold text-[#323338]">הוספת חיסכון</h3>
                     </div>
 
@@ -409,7 +409,7 @@ export function SavingsTab() {
                                     id="recurring-saving"
                                     checked={newSaving.isRecurring}
                                     onCheckedChange={(checked) => setNewSaving({ ...newSaving, isRecurring: checked as boolean })}
-                                    className="data-[state=checked]:bg-[#00c875] data-[state=checked]:border-[#00c875]"
+                                    className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                                 />
                                 <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer text-[#323338]">
                                     חיסכון קבוע
@@ -432,7 +432,7 @@ export function SavingsTab() {
 
                         <Button
                             onClick={handleAdd}
-                            className="w-full h-10 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-all hover:shadow-md mt-2"
+                            className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-all hover:shadow-md mt-2"
                             disabled={submitting}
                         >
                             {submitting ? (

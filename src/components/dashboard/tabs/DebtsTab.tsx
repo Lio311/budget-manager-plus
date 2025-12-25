@@ -293,7 +293,7 @@ export function DebtsTab() {
                         {/* Add Debt Form */}
                         <div className="glass-panel p-5 h-fit">
                             <div className="flex items-center gap-2 mb-6">
-                                <Wallet className="h-5 w-5 text-blue-600" />
+                                <Wallet className="h-5 w-5 text-purple-600" />
                                 <h3 className="text-lg font-bold text-[#323338]">הוספת חוב</h3>
                             </div>
 
@@ -343,7 +343,7 @@ export function DebtsTab() {
                                             id="recurring-debt"
                                             checked={newDebt.isRecurring}
                                             onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
-                                            className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                            className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                                         />
                                         <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none text-[#323338]">
                                             תשלומים
@@ -351,7 +351,7 @@ export function DebtsTab() {
                                     </div>
                                     <Button
                                         onClick={handleAdd}
-                                        className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-all hover:shadow-md"
+                                        className="w-full h-10 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-all hover:shadow-md"
                                         disabled={submitting}
                                     >
                                         {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
