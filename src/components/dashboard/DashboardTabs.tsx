@@ -34,7 +34,7 @@ export function DashboardTabs() {
     return (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex min-h-[calc(100vh-65px)] bg-[#F5F5F7]" dir="rtl">
             {/* Mobile Menu Button - Visible only on mobile */}
-            <div className="md:hidden fixed top-[80px] left-6 z-50">
+            <div className="md:hidden fixed top-[80px] right-4 z-50">
                 <Button
                     size="icon"
                     onClick={() => setMobileMenuOpen(true)}
