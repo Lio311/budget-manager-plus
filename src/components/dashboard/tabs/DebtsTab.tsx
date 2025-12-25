@@ -239,7 +239,6 @@ export function DebtsTab() {
     }
 
     return (
-        // הוספת overflow-x-hidden כאן מונעת את המלבן הלבן שבורח הצידה
         <div className="space-y-8 w-full max-w-full overflow-x-hidden pb-10">
             {loading ? (
                 <div className="flex items-center justify-center py-12">
