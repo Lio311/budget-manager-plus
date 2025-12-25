@@ -62,15 +62,14 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHea
                 <div className="flex md:hidden items-center justify-between w-full px-2">
                     {/* Menu Button */}
                     <Button
-                        variant="ghost"
                         size="icon"
                         onClick={onMenuToggle}
-                        className={`h-9 w-9 rounded-full flex-shrink-0 transition-colors ${menuOpen
+                        className={`h-9 w-9 rounded-full flex-shrink-0 transition-all duration-200 border-0 ${menuOpen
                                 ? 'bg-white hover:bg-gray-100 text-black'
                                 : 'bg-black hover:bg-gray-800 text-white'
                             }`}
                     >
-                        <Menu className="h-5 w-5" />
+                        <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                     </Button>
 
                     {/* Date Selector */}
