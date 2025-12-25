@@ -52,7 +52,7 @@ export function Paywall() {
             <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-4 overflow-y-auto max-h-[95vh]">
                 <div className="flex justify-center mb-1">
                     <Image
-                        src="/keseflow.png"
+                        src="/K-LOGO.png"
                         alt="KesefFlow"
                         width={200}
                         height={60}

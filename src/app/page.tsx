@@ -11,7 +11,7 @@ export default function HomePage() {
                 <div className="text-center mb-16">
                     <div className="flex items-center justify-center gap-3 mb-2">
                         <Image
-                            src="/keseflow.png"
+                            src="/K-LOGO.png"
                             alt="Keseflow"
                             width={600}
                             height={180}

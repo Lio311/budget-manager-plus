@@ -221,15 +221,21 @@ export function BillsTab() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="monday-card p-4 border-l-4 border-l-blue-500 min-w-0">
                     <p className="text-xs text-gray-500 mb-1 truncate">סה"כ לתשלום</p>
-                    <p className="text-base md:text-xl font-bold text-[#323338] truncate">{formatCurrency(totalBills, currency)}</p>
+                    <p className={`text-base md:text-xl font-bold text-[#323338] truncate ${loading ? 'animate-pulse' : ''}`}>
+                        {loading ? '...' : formatCurrency(totalBills, currency)}
+                    </p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-green-500 min-w-0">
                     <p className="text-xs text-gray-500 mb-1 truncate">שולם</p>
-                    <p className="text-base md:text-xl font-bold text-green-600 truncate">{formatCurrency(paidBills, currency)}</p>
+                    <p className={`text-base md:text-xl font-bold text-green-600 truncate ${loading ? 'animate-pulse' : ''}`}>
+                        {loading ? '...' : formatCurrency(paidBills, currency)}
+                    </p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-red-500 min-w-0">
                     <p className="text-xs text-gray-500 mb-1 truncate">נותר לתשלום</p>
-                    <p className="text-base md:text-xl font-bold text-red-600 truncate">{formatCurrency(unpaidBills, currency)}</p>
+                    <p className={`text-base md:text-xl font-bold text-red-600 truncate ${loading ? 'animate-pulse' : ''}`}>
+                        {loading ? '...' : formatCurrency(unpaidBills, currency)}
+                    </p>
                 </div>
             </div>
 
@@ -284,7 +290,23 @@ export function BillsTab() {
                 <div className="glass-panel p-5 block">
                     <h3 className="text-lg font-bold text-[#323338] mb-4">רשימת חשבונות</h3>
                     <div className="space-y-3">
-                        {bills.length === 0 ? (
+                        {loading ? (
+                            // Skeleton loader while loading
+                            <>
+                                {[1, 2, 3].map((i) => (
+                                    <div key={i} className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl animate-pulse">
+                                        <div className="flex items-center gap-3 flex-1">
+                                            <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                                            <div className="h-4 bg-gray-200 rounded w-32"></div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-4 bg-gray-200 rounded w-20"></div>
+                                            <div className="h-4 bg-gray-200 rounded w-12"></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </>
+                        ) : bills.length === 0 ? (
                             <div className="text-center py-10 text-gray-400">
                                 לא נמצאו חשבונות לחודש זה
                             </div>
