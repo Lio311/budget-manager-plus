@@ -403,18 +403,6 @@ export function SavingsTab() {
                             />
                         </div>
 
-                        <Button
-                            onClick={handleAdd}
-                            className="w-full h-10 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-all hover:shadow-md mt-2"
-                            disabled={submitting}
-                        >
-                            {submitting ? (
-                                <Loader2 className="h-4 w-4 animate-rainbow-spin" />
-                            ) : (
-                                'הוסף'
-                            )}
-                        </Button>
-
                         <div className="w-full flex items-start gap-4 p-4 mt-2 border border-gray-100 rounded-xl bg-gray-50/50 transition-all">
                             <div className="flex items-center gap-2">
                                 <Checkbox
@@ -441,6 +429,18 @@ export function SavingsTab() {
                                 </div>
                             )}
                         </div>
+
+                        <Button
+                            onClick={handleAdd}
+                            className="w-full h-10 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-all hover:shadow-md mt-2"
+                            disabled={submitting}
+                        >
+                            {submitting ? (
+                                <Loader2 className="h-4 w-4 animate-rainbow-spin" />
+                            ) : (
+                                'הוסף'
+                            )}
+                        </Button>
                     </div>
                 </div>
 
