@@ -224,7 +224,7 @@ export function OverviewTab() {
         <div className="space-y-4 p-1" dir="rtl"> {/* Reduced padding and gap */}
             <div className="flex justify-between items-center mb-2"> {/* Reduced margin */}
                 <div className="flex items-center gap-2">
-                    <PieChartIcon className="h-6 w-6 text-primary" />
+                    <PieChartIcon className="h-6 w-6 text-black" />
                     <h2 className="text-xl font-bold tracking-tight">סקירה כללית</h2> {/* Smaller title */}
                 </div>
                 <div className="flex items-center gap-2">
