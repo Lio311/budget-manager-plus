@@ -221,15 +221,15 @@ export function ExpensesTab() {
     if (loadingExpenses) {
         return (
             <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 animate-rainbow-spin text-primary" />
             </div>
         )
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-5">
             {/* Summary Card - Monday Style */}
-            <div className="monday-card border-l-4 border-l-[#e2445c] p-6 flex flex-col justify-center gap-2">
+            <div className="monday-card border-l-4 border-l-[#e2445c] p-5 flex flex-col justify-center gap-2">
                 <h3 className="text-sm font-medium text-gray-500">סך הוצאות חודשיות</h3>
                 <div className="text-3xl font-bold text-[#e2445c]">
                     {formatCurrency(totalExpenses, currency)}
@@ -237,18 +237,18 @@ export function ExpensesTab() {
             </div>
 
             {/* Add Form - Glassmorphism */}
-            <div className="glass-panel p-6">
-                <div className="mb-6 flex items-center gap-2">
+            <div className="glass-panel p-5">
+                <div className="mb-4 flex items-center gap-2">
                     <div className="bg-[#e2445c] w-2 h-6 rounded-full"></div>
                     <h3 className="text-lg font-bold text-[#323338]">הוסף הוצאה חדשה</h3>
                 </div>
 
-                <div className="flex flex-wrap gap-4 items-end">
+                <div className="flex flex-wrap gap-3 items-end">
                     <div className="flex gap-2">
                         <div className="min-w-[140px]">
                             <label className="text-xs font-medium mb-1.5 block text-[#676879]">קטגוריה</label>
                             <select
-                                className="w-full p-2.5 border border-gray-200 rounded-lg h-11 bg-white text-sm focus:ring-2 focus:ring-[#e2445c]/20 focus:border-[#e2445c] outline-none transition-all"
+                                className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 focus:ring-[#e2445c]/20 focus:border-[#e2445c] outline-none transition-all"
                                 value={newExpense.category}
                                 onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
                             >
@@ -261,7 +261,7 @@ export function ExpensesTab() {
                         <div className="pt-6">
                             <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
                                 <PopoverTrigger asChild>
-                                    <Button variant="outline" size="icon" className="shrink-0 h-11 w-11 rounded-lg border-gray-200 hover:bg-gray-50"><Plus className="h-4 w-4" /></Button>
+                                    <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 hover:bg-gray-50"><Plus className="h-4 w-4" /></Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80 p-4 z-50 rounded-xl shadow-xl" dir="rtl">
                                     <div className="space-y-4">
@@ -281,12 +281,12 @@ export function ExpensesTab() {
 
                     <div className="flex-[2] min-w-[200px]">
                         <label className="text-xs font-medium mb-1.5 block text-[#676879]">תיאור</label>
-                        <Input className="h-11 border-gray-200 focus:ring-[#e2445c]/20 focus:border-[#e2445c]" placeholder="מה קנית?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
+                        <Input className="h-10 border-gray-200 focus:ring-[#e2445c]/20 focus:border-[#e2445c]" placeholder="מה קנית?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
                     </div>
 
                     <div className="flex-1 min-w-[120px]">
                         <label className="text-xs font-medium mb-1.5 block text-[#676879]">סכום</label>
-                        <Input className="h-11 border-gray-200 focus:ring-[#e2445c]/20 focus:border-[#e2445c]" type="number" placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
+                        <Input className="h-10 border-gray-200 focus:ring-[#e2445c]/20 focus:border-[#e2445c]" type="number" placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
                     </div>
 
                     <div className="flex-1 min-w-[140px]">
@@ -294,12 +294,12 @@ export function ExpensesTab() {
                         <DatePicker date={newExpense.date ? new Date(newExpense.date) : undefined} setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
                     </div>
 
-                    <Button onClick={handleAdd} className="gap-2 h-11 px-8 rounded-lg bg-[#e2445c] hover:bg-[#d43f55] text-white font-medium shadow-sm transition-all hover:shadow-md" disabled={submitting}>
-                        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} הוסף
+                    <Button onClick={handleAdd} className="h-10 px-8 rounded-lg bg-[#e2445c] hover:bg-[#d43f55] text-white font-medium shadow-sm transition-all hover:shadow-md" disabled={submitting}>
+                        {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
                     </Button>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 mt-6 border border-gray-100 rounded-xl bg-gray-50/50">
+                <div className="flex items-start gap-4 p-4 mt-4 border border-gray-100 rounded-xl bg-gray-50/50">
                     <div className="flex items-center gap-2">
                         <Checkbox id="recurring-expense" checked={newExpense.isRecurring} onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })} className="data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]" />
                         <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338]">הוצאה קבועה</label>
@@ -315,8 +315,8 @@ export function ExpensesTab() {
                 </div>
             </div>
 
-            <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-2 px-2">
+            <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-2 px-1">
                     <h3 className="text-lg font-bold text-[#323338]">רשימת הוצאות</h3>
                 </div>
 
@@ -325,9 +325,9 @@ export function ExpensesTab() {
                         אין הוצאות רשומות לחודש זה
                     </div>
                 ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         {expenses.map((exp: any) => (
-                            <div key={exp.id} className="monday-card flex items-center justify-between p-4 group">
+                            <div key={exp.id} className="monday-card flex items-center justify-between p-3 group hover:bg-gray-50/50 transition-colors">
                                 {editingId === exp.id ? (
                                     <>
                                         <div className="flex flex-nowrap gap-3 items-center flex-1 w-full overflow-x-auto pb-1">
@@ -345,9 +345,9 @@ export function ExpensesTab() {
                                     </>
                                 ) : (
                                     <>
-                                        <div className="flex-1 flex items-center gap-6">
+                                        <div className="flex-1 flex items-center gap-4">
                                             <div className="min-w-[100px]">
-                                                <span className={`monday-pill ${getCategoryColor(exp.category)} opacity-90`}>
+                                                <span className={`monday-pill ${getCategoryColor(exp.category)} opacity-100`}>
                                                     {exp.category || 'כללי'}
                                                 </span>
                                             </div>
@@ -357,7 +357,7 @@ export function ExpensesTab() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                            <span className="text-xl font-bold text-[#e2445c]">{formatCurrency(exp.amount, currency)}</span>
+                                            <span className="text-lg font-bold text-[#e2445c]">{formatCurrency(exp.amount, currency)}</span>
                                             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50"><Pencil className="h-4 w-4" /></Button>
                                                 <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>

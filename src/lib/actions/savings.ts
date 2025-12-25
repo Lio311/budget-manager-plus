@@ -220,7 +220,7 @@ export async function updateSaving(
                 ...(data.description && { description: data.description }),
                 ...(data.monthlyDeposit && { monthlyDeposit: data.monthlyDeposit }),
                 ...(data.goal && { goal: data.goal }),
-                ...(data.date && { date: data.date })
+                ...(data.date && { targetDate: data.date })
             }
         })
 

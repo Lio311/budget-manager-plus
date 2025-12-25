@@ -203,175 +203,133 @@ export function BillsTab() {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 animate-rainbow-spin text-primary" />
             </div>
         )
     }
 
     return (
-        <div className="space-y-6">
-            <div className="space-y-8">
-                {/* Summary Cards */}
-                <div className="grid gap-6 md:grid-cols-3">
-                    <div className="monday-card border-l-4 border-l-[#fdab3d] p-6 flex flex-col justify-center gap-2">
-                        <h3 className="text-sm font-medium text-gray-500">סך חשבונות</h3>
-                        <div className="text-2xl font-bold text-[#fdab3d]">
-                            {formatCurrency(totalBills, currency)}
-                        </div>
-                    </div>
-                    <div className="monday-card border-l-4 border-l-[#00c875] p-6 flex flex-col justify-center gap-2">
-                        <h3 className="text-sm font-medium text-gray-500">שולם</h3>
-                        <div className="text-2xl font-bold text-[#00c875]">
-                            {formatCurrency(paidBills, currency)}
-                        </div>
-                    </div>
-                    <div className="monday-card border-l-4 border-l-[#e2445c] p-6 flex flex-col justify-center gap-2">
-                        <h3 className="text-sm font-medium text-gray-500">ממתין לתשלום</h3>
-                        <div className="text-2xl font-bold text-[#e2445c]">
-                            {formatCurrency(unpaidBills, currency)}
-                        </div>
-                    </div>
+        <div className="space-y-4 p-1" dir="rtl">
+            <div className="grid grid-cols-3 gap-3">
+                <div className="monday-card p-4 border-l-4 border-l-blue-500">
+                    <p className="text-xs text-gray-500 mb-1">סה"כ לתשלום</p>
+                    <p className="text-xl font-bold text-[#323338]">{formatCurrency(totalBills, currency)}</p>
                 </div>
+                <div className="monday-card p-4 border-l-4 border-l-green-500">
+                    <p className="text-xs text-gray-500 mb-1">שולם</p>
+                    <p className="text-xl font-bold text-green-600">{formatCurrency(paidBills, currency)}</p>
+                </div>
+                <div className="monday-card p-4 border-l-4 border-l-red-500">
+                    <p className="text-xs text-gray-500 mb-1">נותר לתשלום</p>
+                    <p className="text-xl font-bold text-red-600">{formatCurrency(unpaidBills, currency)}</p>
+                </div>
+            </div>
 
-                {/* Add New Bill */}
-                <div className="glass-panel p-6">
-                    <div className="mb-6 flex items-center gap-2">
-                        <div className="bg-[#fdab3d] w-2 h-6 rounded-full"></div>
-                        <h3 className="text-lg font-bold text-[#323338]">הוסף חשבון קבוע</h3>
-                    </div>
-
-                    <div className="flex flex-wrap gap-4 items-end">
-                        <div className="flex-[2] min-w-[200px]">
-                            <label className="text-xs font-medium mb-1.5 block text-[#676879]">שם החשבון</label>
+            <div className="grid gap-4 md:grid-cols-2">
+                <div className="glass-panel p-5 h-fit">
+                    <h3 className="text-lg font-bold text-[#323338] mb-4">הוספת חשבון חדש</h3>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">שם החשבון</label>
                             <Input
-                                placeholder="חשמל, ארנונה..."
-                                className="h-11 border-gray-200 focus:ring-[#fdab3d]/20 focus:border-[#fdab3d]"
                                 value={newBill.name}
                                 onChange={(e) => setNewBill({ ...newBill, name: e.target.value })}
-                                disabled={submitting}
+                                placeholder="לדוגמה: ארנונה"
+                                className="h-10 text-right"
                             />
                         </div>
-                        <div className="flex-1 min-w-[120px]">
-                            <label className="text-xs font-medium mb-1.5 block text-[#676879]">סכום</label>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">סכום</label>
                             <Input
                                 type="number"
-                                placeholder="סכום"
-                                className="h-11 border-gray-200 focus:ring-[#fdab3d]/20 focus:border-[#fdab3d]"
                                 value={newBill.amount}
                                 onChange={(e) => setNewBill({ ...newBill, amount: e.target.value })}
-                                disabled={submitting}
+                                placeholder="0.00"
+                                className="h-10 text-right"
                             />
                         </div>
-                        <div className="flex-1 min-w-[100px]">
-                            <label className="text-xs font-medium mb-1.5 block text-[#676879]">יום חיוב</label>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">יום בחודש לתשלום</label>
                             <Input
                                 type="number"
-                                placeholder="1-31"
                                 min="1"
                                 max="31"
-                                className="h-11 border-gray-200 focus:ring-[#fdab3d]/20 focus:border-[#fdab3d]"
                                 value={newBill.dueDay}
                                 onChange={(e) => setNewBill({ ...newBill, dueDay: e.target.value })}
-                                disabled={submitting}
+                                placeholder="1-31"
+                                className="h-10 text-right"
                             />
                         </div>
                         <Button
+                            className="w-full bg-[#0073ea] hover:bg-[#0060b9] h-10 shadow-sm mt-2"
                             onClick={handleAdd}
-                            className="gap-2 h-11 px-8 rounded-lg bg-[#fdab3d] hover:bg-[#e99b35] text-white font-medium shadow-sm transition-all hover:shadow-md"
                             disabled={submitting}
                         >
-                            {submitting ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Plus className="h-4 w-4" />
-                            )}
-                            הוסף
+                            {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : "הוסף"}
                         </Button>
                     </div>
                 </div>
 
-                {/* Bills List */}
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-2 px-2">
-                        <h3 className="text-lg font-bold text-[#323338]">רשימת חשבונות קבועים</h3>
-                    </div>
-
-                    {bills.length === 0 ? (
-                        <div className="monday-card p-8 text-center text-[#676879]">
-                            אין חשבונות רשומים
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {bills.map((bill) => (
+                <div className="glass-panel p-5 block">
+                    <h3 className="text-lg font-bold text-[#323338] mb-4">רשימת חשבונות</h3>
+                    <div className="space-y-3">
+                        {bills.length === 0 ? (
+                            <div className="text-center py-10 text-gray-400">
+                                לא נמצאו חשבונות לחודש זה
+                            </div>
+                        ) : (
+                            bills.map((bill) => (
                                 <div
                                     key={bill.id}
-                                    className="monday-card flex items-center justify-between p-4 group"
+                                    className="group relative flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
                                 >
                                     {editingId === bill.id ? (
-                                        <>
-                                            <div className="flex flex-nowrap gap-3 items-center flex-1 w-full overflow-x-auto pb-1">
-                                                <Input
-                                                    placeholder="שם החשבון"
-                                                    className="flex-1 min-w-[150px]"
-                                                    value={editData.name}
-                                                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    placeholder="סכום"
-                                                    className="w-32"
-                                                    value={editData.amount}
-                                                    onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    placeholder="יום חיוב"
-                                                    min="1"
-                                                    max="31"
-                                                    className="w-20"
-                                                    value={editData.dueDay}
-                                                    onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                            </div>
-                                            <div className="flex items-center gap-2 mr-4">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={handleUpdate}
-                                                    disabled={submitting}
-                                                    className="text-[#00c875] hover:bg-green-50"
-                                                >
-                                                    <Check className="h-5 w-5" />
+                                        <div className="flex items-center gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
+                                            <Input
+                                                value={editData.name}
+                                                onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                                                className="h-9 flex-1"
+                                                autoFocus
+                                            />
+                                            <Input
+                                                type="number"
+                                                value={editData.amount}
+                                                onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
+                                                className="w-24 h-9"
+                                            />
+                                            <Input
+                                                type="number"
+                                                value={editData.dueDay}
+                                                onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
+                                                className="w-16 h-9"
+                                            />
+                                            <div className="flex gap-1">
+                                                <Button size="icon" variant="ghost" onClick={handleUpdate} className="h-8 w-8 text-green-600 hover:bg-green-50 hover:text-green-700 rounded-full">
+                                                    <Check className="h-4 w-4" />
                                                 </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={handleCancelEdit}
-                                                    disabled={submitting}
-                                                    className="text-gray-400 hover:text-gray-600"
-                                                >
-                                                    <X className="h-5 w-5" />
+                                                <Button size="icon" variant="ghost" onClick={handleCancelEdit} className="h-8 w-8 text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-full">
+                                                    <X className="h-4 w-4" />
                                                 </Button>
                                             </div>
-                                        </>
+                                        </div>
                                     ) : (
                                         <>
-                                            <div className="flex-1 flex items-center gap-6">
+                                            <div className="flex items-center gap-4">
                                                 <button
                                                     onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
-                                                    className={`min-w-[100px] monday-pill transition-all hover:opacity-90 ${bill.isPaid
-                                                        ? 'bg-[#00c875]'
-                                                        : 'bg-[#fdab3d]'
-                                                        }`}
+                                                    className={`
+                                                        w-16 h-7 rounded-full text-xs font-medium transition-all duration-200 flex items-center justify-center
+                                                        ${bill.isPaid
+                                                            ? 'bg-[#00c875] text-white hover:bg-[#00b065] shadow-sm'
+                                                            : 'bg-[#ffcb00] text-[#323338] hover:bg-[#eabb00]'
+                                                        }
+                                                    `}
                                                 >
                                                     {bill.isPaid ? 'שולם' : 'ממתין'}
                                                 </button>
 
                                                 <div className="flex flex-col">
-                                                    <span className={`font-bold text-base ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338]'}`}>
+                                                    <span className={`font-bold text-base transition-colors ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338]'}`}>
                                                         {bill.name}
                                                     </span>
                                                     <span className="text-xs text-[#676879]">
@@ -381,7 +339,7 @@ export function BillsTab() {
                                             </div>
 
                                             <div className="flex items-center gap-4">
-                                                <span className={`text-xl font-bold ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
+                                                <span className={`text-lg font-bold font-mono ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
                                                     {formatCurrency(bill.amount, currency)}
                                                 </span>
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -389,7 +347,7 @@ export function BillsTab() {
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() => handleEdit(bill as unknown as Bill)}
-                                                        className="h-8 w-8 text-blue-500 hover:bg-blue-50"
+                                                        className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"
                                                     >
                                                         <Pencil className="h-4 w-4" />
                                                     </Button>
@@ -397,7 +355,7 @@ export function BillsTab() {
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() => handleDelete(bill.id)}
-                                                        className="h-8 w-8 text-red-500 hover:bg-red-50"
+                                                        className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
@@ -406,9 +364,9 @@ export function BillsTab() {
                                         </>
                                     )}
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

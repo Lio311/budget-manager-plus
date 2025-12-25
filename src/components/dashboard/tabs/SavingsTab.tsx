@@ -236,7 +236,7 @@ export function SavingsTab() {
             description: editData.description,
             monthlyDeposit: parseFloat(editData.monthlyDeposit),
             goal: editData.goal || undefined,
-            targetDate: editData.date
+            date: editData.date
         })
 
         if (result.success) {
@@ -266,7 +266,7 @@ export function SavingsTab() {
     if (loadingSavings) {
         return (
             <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <Loader2 className="h-8 w-8 animate-rainbow-spin text-primary" />
             </div>
         )
     }
@@ -381,13 +381,13 @@ export function SavingsTab() {
 
                     <Button
                         onClick={handleAdd}
-                        className="gap-2 h-11 px-8 rounded-lg bg-[#00c875] hover:bg-[#00b065] text-white font-medium shadow-sm transition-all hover:shadow-md"
+                        className="h-11 px-8 rounded-lg bg-[#00c875] hover:bg-[#00b065] text-white font-medium shadow-sm transition-all hover:shadow-md"
                         disabled={submitting}
                     >
-                        הוסף {submitting ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                        {submitting ? (
+                            <Loader2 className="h-4 w-4 animate-rainbow-spin" />
                         ) : (
-                            <Plus className="h-4 w-4" />
+                            'הוסף'
                         )}
                     </Button>
                 </div>
@@ -486,7 +486,7 @@ export function SavingsTab() {
                                                 disabled={submitting}
                                                 className="text-[#00c875] hover:bg-green-50"
                                             >
-                                                {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
+                                                {submitting ? <Loader2 className="h-5 w-5 animate-rainbow-spin" /> : <Check className="h-5 w-5" />}
                                             </Button>
                                             <Button
                                                 variant="ghost"

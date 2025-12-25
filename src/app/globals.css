@@ -136,3 +136,32 @@ input[autocomplete="one-time-code"] {
 .cl-internal-1f7634d {
   display: none !important;
 }
+
+@keyframes rainbow-spin {
+  0% {
+    transform: rotate(0deg);
+    color: hsl(0, 80%, 60%);
+  }
+
+  25% {
+    color: hsl(90, 80%, 60%);
+  }
+
+  50% {
+    transform: rotate(180deg);
+    color: hsl(180, 80%, 60%);
+  }
+
+  75% {
+    color: hsl(270, 80%, 60%);
+  }
+
+  100% {
+    transform: rotate(360deg);
+    color: hsl(360, 80%, 60%);
+  }
+}
+
+.animate-rainbow-spin {
+  animation: rainbow-spin 1.5s linear infinite;
+}
