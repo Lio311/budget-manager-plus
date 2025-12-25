@@ -86,29 +86,31 @@ export function OverviewTab() {
         swrConfig
     )
 
-    if (loading || !overviewData) {
-        return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-rainbow-spin text-primary" />
-            </div>
-        )
+    // Default empty data if loading
+    const defaultData = {
+        current: { incomes: [], expenses: [], bills: [], debts: [], savings: [] },
+        previous: { incomes: [], expenses: [], bills: [], debts: [], savings: [] },
+        categories: [],
+        netWorthHistory: []
     }
 
+    const data = overviewData || defaultData
+
     // Extract data from optimized response
-    const incomes = overviewData.current.incomes
-    const expenses = overviewData.current.expenses
-    const bills = overviewData.current.bills
-    const debts = overviewData.current.debts
-    const savingsItems = overviewData.current.savings
+    const incomes = data.current.incomes
+    const expenses = data.current.expenses
+    const bills = data.current.bills
+    const debts = data.current.debts
+    const savingsItems = data.current.savings
 
-    const prevIncomes = overviewData.previous.incomes
-    const prevExpenses = overviewData.previous.expenses
-    const prevBills = overviewData.previous.bills
-    const prevDebts = overviewData.previous.debts
-    const prevSavingsItems = overviewData.previous.savings
+    const prevIncomes = data.previous.incomes
+    const prevExpenses = data.previous.expenses
+    const prevBills = data.previous.bills
+    const prevDebts = data.previous.debts
+    const prevSavingsItems = data.previous.savings
 
-    const categories = overviewData.categories
-    const netWorthHistory = overviewData.netWorthHistory
+    const categories = data.categories
+    const netWorthHistory = data.netWorthHistory
 
     // Calculations
     const totalIncome = incomes.reduce((sum: number, i: any) => sum + i.amount, 0)
