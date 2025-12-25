@@ -247,31 +247,39 @@ export function OverviewTab() {
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="initialBalance" className="text-right">יתרת עו"ש התחלתית</Label>
-                                    <Input
-                                        id="initialBalance"
-                                        value={initialBalance}
-                                        onChange={(e) => setInitialBalance(e.target.value)}
-                                        className="col-span-3"
-                                        type="number"
-                                    />
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="initialBalance" className="text-right">יתרת עו"ש התחלתית</Label>
+                                        <Input
+                                            id="initialBalance"
+                                            value={initialBalance}
+                                            onChange={(e) => setInitialBalance(e.target.value)}
+                                            className="col-span-3 text-right"
+                                            type="number"
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="initialSavings" className="text-right">חיסכון התחלתי</Label>
+                                        <Input
+                                            id="initialSavings"
+                                            value={initialSavings}
+                                            onChange={(e) => {
+                                                const val = parseFloat(e.target.value);
+                                                if (!isNaN(val) && val < 0) return; // Prevent negative
+                                                setInitialSavings(e.target.value)
+                                            }}
+                                            className="col-span-3 text-right"
+                                            type="number"
+                                            min={0}
+                                            dir="ltr"
+                                        />
+                                    </div>
                                 </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="initialSavings" className="text-right">חיסכון התחלתי</Label>
-                                    <Input
-                                        id="initialSavings"
-                                        value={initialSavings}
-                                        onChange={(e) => setInitialSavings(e.target.value)}
-                                        className="col-span-3"
-                                        type="number"
-                                    />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button onClick={handleSaveSettings}>
-                                    שמור שינויים
-                                </Button>
-                            </DialogFooter>
+                                <DialogFooter>
+                                    <Button onClick={handleSaveSettings}>
+                                        שמור שינויים
+                                    </Button>
+                                </DialogFooter>
                         </DialogContent>
                     </Dialog>
                 </div>
