@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { heIL } from '@clerk/localizations'
 import { Toaster } from '@/components/ui/toaster'
 import { Rubik } from 'next/font/google'
+import { WebApplicationJsonLd } from '@/components/seo/JsonLd'
 
 const rubik = Rubik({
     subsets: ['hebrew', 'latin'],
@@ -12,8 +13,55 @@ const rubik = Rubik({
 })
 
 export const metadata: Metadata = {
-    title: 'Keseflow',
-    description: 'נהל את התקציב האישי או המשפחתי שלך בקלות עם לוח שנה חכם ותזכורות תשלומים',
+    title: {
+        default: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
+        template: '%s | Keseflow'
+    },
+    description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות. לוח שנה אינטראקטיבי, תזכורות תשלומים וניתוח פיננסי מתקדם.',
+    keywords: ['ניהול תקציב', 'תקציב אישי', 'תקציב משפחתי', 'ניהול כספים', 'חיסכון', 'הוצאות', 'הכנסות', 'תזכורות תשלומים', 'לוח שנה פיננסי'],
+    authors: [{ name: 'Keseflow' }],
+    creator: 'Keseflow',
+    publisher: 'Keseflow',
+    metadataBase: new URL('https://keseflow.vercel.app'),
+    alternates: {
+        canonical: '/',
+        languages: {
+            'he': '/',
+        },
+    },
+    openGraph: {
+        title: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
+        description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות',
+        url: 'https://keseflow.vercel.app',
+        siteName: 'Keseflow',
+        locale: 'he_IL',
+        type: 'website',
+        images: [
+            {
+                url: '/og-image.png',
+                width: 1200,
+                height: 630,
+                alt: 'Keseflow - ניהול תקציב חכם',
+            },
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
+        description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות',
+        images: ['/og-image.png'],
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+        },
+    },
     icons: {
         icon: '/K-ICON.png',
         apple: '/K-ICON.png',
@@ -41,6 +89,7 @@ export default function RootLayout({
         >
             <html lang="he" dir="rtl" className={rubik.variable}>
                 <body>
+                    <WebApplicationJsonLd />
                     {children}
                     <Toaster />
                 </body>
