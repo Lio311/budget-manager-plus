@@ -296,6 +296,7 @@ export function OverviewTab() {
                     bgColor="bg-green-50"
                     change={incomeChange}
                     changeType="income"
+                    loading={loading}
                 />
                 <StatCard
                     title="סך הוצאות"
@@ -305,6 +306,7 @@ export function OverviewTab() {
                     bgColor="bg-red-50"
                     change={expensesChange}
                     changeType="expense"
+                    loading={loading}
                 />
                 <StatCard
                     title="חיסכון חודשי"
@@ -314,6 +316,7 @@ export function OverviewTab() {
                     bgColor="bg-blue-50"
                     change={savingsChange}
                     changeType="income"
+                    loading={loading}
                 />
                 <StatCard
                     title="יתרת חשבונות"
@@ -323,6 +326,7 @@ export function OverviewTab() {
                     bgColor="bg-orange-50"
                     change={billsChange}
                     changeType="expense"
+                    loading={loading}
                 />
             </div>
 
@@ -523,7 +527,7 @@ export function OverviewTab() {
 }
 
 function StatCard({
-    title, value, icon, color, bgColor, change, changeType = 'income'
+    title, value, icon, color, bgColor, change, changeType = 'income', loading = false
 }: {
     title: string
     value: string
@@ -532,6 +536,7 @@ function StatCard({
     bgColor: string
     change?: number
     changeType?: 'income' | 'expense'
+    loading?: boolean
 }) {
     const isPositiveChange = change !== undefined ? change > 0 : false
     const ChangeIcon = isPositiveChange ? TrendingUp : ArrowDown
@@ -554,7 +559,9 @@ function StatCard({
             <div className="flex justify-between items-start">
                 <div>
                     <h3 className="text-xs font-medium text-gray-500 mb-0.5">{title}</h3>
-                    <div className="text-xl font-bold text-[#323338] tracking-tight">{value}</div>
+                    <div className={`text-xl font-bold text-[#323338] tracking-tight ${loading ? 'animate-pulse' : ''}`}>
+                        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : value}
+                    </div>
                 </div>
                 <div className={`${bgColor} ${color} p-2 rounded-lg shadow-sm opacity-100`}> {/* Opacity 100 forced */}
                     {icon}
