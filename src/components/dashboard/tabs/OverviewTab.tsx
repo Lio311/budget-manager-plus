@@ -327,58 +327,57 @@ export function OverviewTab() {
                             <h3 className="text-base font-bold text-[#323338]">התפלגות תקציב</h3>
                         </div>
                         <div className="h-[300px] w-full" dir="ltr"> {/* Reduced height */}
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={[
-                                            { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
-                                            { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills },
-                                            { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' }, // Purple
-                                            { name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }, // Blue
-                                            { name: 'יתרה', value: Math.max(0, savingsRemainder), color: COLORS.income }
-                                        ].filter(item => item.value > 0)}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={70}
-                                        outerRadius={100}
-                                        paddingAngle={2}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {[
-                                            { name: 'הכנסות', value: totalIncome, color: COLORS.income },
-                                            { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
-                                            { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills },
-                                            { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' },
-                                            { name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' },
-                                            { name: 'יתרה', value: Math.max(0, savingsRemainder), color: '#10B981' } // Emerald for pure balance
-                                        ].filter(item => item.value > 0).map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip currency={currency} />} />
-                                    <Legend
-                                        verticalAlign="bottom"
-                                        height={36}
-                                        content={(props) => {
-                                            const { payload } = props;
-                                            return (
-                                                <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-600" dir="rtl">
-                                                    {payload?.map((entry, index) => (
-                                                        <li key={`item-${index}`} className="flex items-center gap-1.5">
-                                                            <div
-                                                                className="w-2.5 h-2.5 rounded-full shrink-0"
-                                                                style={{ backgroundColor: entry.color }}
-                                                            />
-                                                            <span className="font-medium text-[#323338]">{entry.value}</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            );
-                                        }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                            {(() => {
+                                const pieData = [
+                                    { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
+                                    { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills },
+                                    { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' }, // Purple
+                                    { name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }, // Blue
+                                    { name: 'יתרה', value: Math.max(0, savingsRemainder), color: COLORS.income } // Green
+                                ].filter(item => item.value > 0);
+
+                                return (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={pieData}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={70}
+                                                outerRadius={100}
+                                                paddingAngle={2}
+                                                dataKey="value"
+                                                stroke="none"
+                                            >
+                                                {pieData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip content={<CustomTooltip currency={currency} />} />
+                                            <Legend
+                                                verticalAlign="bottom"
+                                                height={36}
+                                                content={(props) => {
+                                                    const { payload } = props;
+                                                    return (
+                                                        <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-600" dir="rtl">
+                                                            {payload?.map((entry: any, index: number) => (
+                                                                <li key={`item-${index}`} className="flex items-center gap-1.5">
+                                                                    <div
+                                                                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                                                                        style={{ backgroundColor: entry.payload.color }} // Use payload.color to get the correct color from data
+                                                                    />
+                                                                    <span className="font-medium text-[#323338]">{entry.value}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    );
+                                                }}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                );
+                            })()}
                         </div>
                     </div>
 
