@@ -208,7 +208,7 @@ export function CalendarTab() {
                                                     {dayPayments.map((payment) => (
                                                         <div
                                                             key={payment.id}
-                                                            className={`text-xs p-1 rounded ${payment.type === 'bill'
+                                                            className={`text-[10px] md:text-xs p-1 rounded truncate ${payment.type === 'bill'
                                                                 ? 'bg-yellow-200 text-yellow-800'
                                                                 : payment.type === 'debt'
                                                                     ? 'bg-purple-200 text-purple-800'
@@ -218,6 +218,7 @@ export function CalendarTab() {
                                                                             ? 'bg-blue-200 text-blue-800'
                                                                             : 'bg-red-200 text-red-800'
                                                                 } ${payment.isPaid ? 'opacity-50 line-through' : ''}`}
+                                                            title={payment.name}
                                                         >
                                                             {payment.name}
                                                         </div>

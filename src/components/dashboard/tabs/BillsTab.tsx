@@ -244,7 +244,7 @@ export function BillsTab() {
                 <div className="glass-panel p-5 h-fit">
                     <div className="flex items-center gap-2 mb-4">
                         <CreditCard className="h-5 w-5 text-orange-500" />
-                        <h3 className="text-lg font-bold text-[#323338]">הוספת חשבון חדש</h3>
+                        <h3 className="text-base md:text-lg font-bold text-[#323338] truncate">הוספת חשבון חדש</h3>
                     </div>
                     <div className="space-y-4">
                         <div className="space-y-2">
