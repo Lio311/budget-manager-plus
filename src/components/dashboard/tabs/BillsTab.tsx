@@ -11,6 +11,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getBills, addBill, toggleBillPaid, deleteBill, updateBill } from '@/lib/actions/bill'
 import { useToast } from '@/hooks/use-toast'
+import { Pagination } from '@/components/ui/Pagination'
 
 interface Bill {
     id: string
@@ -46,9 +47,23 @@ export function BillsTab() {
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ name: '', amount: '', dueDay: '' })
 
-    const totalBills = bills.reduce((sum, bill) => sum + bill.amount, 0)
-    const paidBills = bills.filter(b => b.isPaid).reduce((sum, bill) => sum + bill.amount, 0)
+    const totalBills = bills.reduce((sum: number, bill: Bill) => sum + bill.amount, 0)
+    const paidBills = bills.filter((b: Bill) => b.isPaid).reduce((sum: number, bill: Bill) => sum + bill.amount, 0)
     const unpaidBills = totalBills - paidBills
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 5
+    const totalPages = Math.ceil(bills.length / itemsPerPage)
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [month, year])
+
+    const paginatedBills = bills.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
 
     async function handleAdd() {
         if (!newBill.name || !newBill.amount || !newBill.dueDay) {
@@ -278,93 +293,100 @@ export function BillsTab() {
                                 לא נמצאו חשבונות לחודש זה
                             </div>
                         ) : (
-                            bills.map((bill) => (
-                                <div
-                                    key={bill.id}
-                                    className="group relative flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
-                                >
-                                    {editingId === bill.id ? (
-                                        <div className="flex items-center gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
-                                            <Input
-                                                value={editData.name}
-                                                onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                                                className="h-9 flex-1"
-                                                autoFocus
-                                            />
-                                            <Input
-                                                type="number"
-                                                value={editData.amount}
-                                                onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
-                                                className="w-24 h-9"
-                                            />
-                                            <Input
-                                                type="number"
-                                                value={editData.dueDay}
-                                                onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
-                                                className="w-16 h-9"
-                                            />
-                                            <div className="flex gap-1">
-                                                <Button size="icon" variant="ghost" onClick={handleUpdate} className="h-8 w-8 text-green-600 hover:bg-green-50 hover:text-green-700 rounded-full">
-                                                    <Check className="h-4 w-4" />
-                                                </Button>
-                                                <Button size="icon" variant="ghost" onClick={handleCancelEdit} className="h-8 w-8 text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-full">
-                                                    <X className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className="flex items-center gap-4">
-                                                <button
-                                                    onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
-                                                    className={`
-                                                        w-16 h-7 rounded-full text-xs font-medium transition-all duration-200 flex items-center justify-center
-                                                        ${bill.isPaid
-                                                            ? 'bg-[#00c875] text-white hover:bg-[#00b065] shadow-sm'
-                                                            : 'bg-[#ffcb00] text-[#323338] hover:bg-[#eabb00]'
-                                                        }
-                                                    `}
-                                                >
-                                                    {bill.isPaid ? 'שולם' : 'ממתין'}
-                                                </button>
-
-                                                <div className="flex flex-col">
-                                                    <span className={`font-bold text-base transition-colors ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338]'}`}>
-                                                        {bill.name}
-                                                    </span>
-                                                    <span className="text-xs text-[#676879]">
-                                                        תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-4">
-                                                <span className={`text-lg font-bold font-mono ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
-                                                    {formatCurrency(bill.amount, currency)}
-                                                </span>
-                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleEdit(bill as unknown as Bill)}
-                                                        className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"
-                                                    >
-                                                        <Pencil className="h-4 w-4" />
+                            <>
+                                {paginatedBills.map((bill: Bill) => (
+                                    <div
+                                        key={bill.id}
+                                        className="group relative flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                                    >
+                                        {editingId === bill.id ? (
+                                            <div className="flex items-center gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
+                                                <Input
+                                                    value={editData.name}
+                                                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                                                    className="h-9 flex-1"
+                                                    autoFocus
+                                                />
+                                                <Input
+                                                    type="number"
+                                                    value={editData.amount}
+                                                    onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
+                                                    className="w-24 h-9"
+                                                />
+                                                <Input
+                                                    type="number"
+                                                    value={editData.dueDay}
+                                                    onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
+                                                    className="w-16 h-9"
+                                                />
+                                                <div className="flex gap-1">
+                                                    <Button size="icon" variant="ghost" onClick={handleUpdate} className="h-8 w-8 text-green-600 hover:bg-green-50 hover:text-green-700 rounded-full">
+                                                        <Check className="h-4 w-4" />
                                                     </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleDelete(bill.id)}
-                                                        className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
+                                                    <Button size="icon" variant="ghost" onClick={handleCancelEdit} className="h-8 w-8 text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-full">
+                                                        <X className="h-4 w-4" />
                                                     </Button>
                                                 </div>
                                             </div>
-                                        </>
-                                    )}
-                                </div>
-                            ))
+                                        ) : (
+                                            <>
+                                                <div className="flex items-center gap-4">
+                                                    <button
+                                                        onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
+                                                        className={`
+                                                            w-16 h-7 rounded-full text-xs font-medium transition-all duration-200 flex items-center justify-center
+                                                            ${bill.isPaid
+                                                                ? 'bg-[#00c875] text-white hover:bg-[#00b065] shadow-sm'
+                                                                : 'bg-[#ffcb00] text-[#323338] hover:bg-[#eabb00]'
+                                                            }
+                                                        `}
+                                                    >
+                                                        {bill.isPaid ? 'שולם' : 'ממתין'}
+                                                    </button>
+
+                                                    <div className="flex flex-col">
+                                                        <span className={`font-bold text-base transition-colors ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338]'}`}>
+                                                            {bill.name}
+                                                        </span>
+                                                        <span className="text-xs text-[#676879]">
+                                                            תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-4">
+                                                    <span className={`text-lg font-bold font-mono ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
+                                                        {formatCurrency(bill.amount, currency)}
+                                                    </span>
+                                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => handleEdit(bill)}
+                                                            className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => handleDelete(bill.id)}
+                                                            className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                ))}
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={setCurrentPage}
+                                />
+                            </>
                         )}
                     </div>
                 </div>

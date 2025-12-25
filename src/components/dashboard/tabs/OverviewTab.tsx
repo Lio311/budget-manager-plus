@@ -49,10 +49,10 @@ const CustomTooltip = ({ active, payload, label, currency }: any) => {
     if (active && payload && payload.length) {
         const title = label || (payload[0].payload && payload[0].payload.name) || payload[0].name;
         return (
-            <div className="bg-white p-2 border rounded shadow-md text-right dir-rtl">
+            <div className="bg-white p-2 border rounded shadow-md text-right" dir="rtl">
                 <span className="font-bold text-gray-900 block mb-1">{title}</span>
                 <span className="text-sm text-gray-600">
-                    {formatCurrency(Number(payload[0].value), currency)}
+                    {currency === 'ILS' || currency === '₪' ? '₪' : currency} {Number(payload[0].value).toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
             </div>
         )
@@ -155,9 +155,11 @@ export function OverviewTab() {
 
     // Pie Chart Data
     const incomeVsExpenses = [
+        { name: 'הכנסות', value: totalIncome, color: COLORS.income }, // Added Income
         { name: 'הוצאות', value: totalExpenses, color: COLORS.expenses },
-        { name: 'יתרה / חיסכון', value: Math.max(0, savingsRemainder), color: COLORS.income },
-        { name: 'חשבונות לתשלום', value: totalRemainingBills, color: COLORS.bills }
+        { name: 'יתרה / חיסכון', value: Math.max(0, savingsRemainder), color: '#3B82F6' }, // Blue for Savings/Balance
+        { name: 'חשבונות', value: totalRemainingBills, color: COLORS.bills },
+        { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' } // Purple for Debts
     ].filter(item => item.value > 0)
 
     const totalForPie = incomeVsExpenses.reduce((sum, item) => sum + item.value, 0)
@@ -341,11 +343,12 @@ export function OverviewTab() {
                                         stroke="none"
                                     >
                                         {[
+                                            { name: 'הכנסות', value: totalIncome, color: COLORS.income },
                                             { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
                                             { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills },
                                             { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' },
                                             { name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' },
-                                            { name: 'יתרה', value: Math.max(0, savingsRemainder), color: COLORS.income }
+                                            { name: 'יתרה', value: Math.max(0, savingsRemainder), color: '#10B981' } // Emerald for pure balance
                                         ].filter(item => item.value > 0).map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
@@ -357,14 +360,14 @@ export function OverviewTab() {
                                         content={(props) => {
                                             const { payload } = props;
                                             return (
-                                                <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-600 rtl:flex-row-reverse">
+                                                <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-600">
                                                     {payload?.map((entry, index) => (
-                                                        <li key={`item-${index}`} className="flex items-center gap-1.5 flex-row-reverse">
-                                                            <span>{entry.value}</span>
+                                                        <li key={`item-${index}`} className="flex items-center gap-1.5">
                                                             <div
-                                                                className="w-2.5 h-2.5 rounded-sm"
+                                                                className="w-2.5 h-2.5 rounded-full"
                                                                 style={{ backgroundColor: entry.color }}
                                                             />
+                                                            <span>{entry.value}</span>
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -390,17 +393,20 @@ export function OverviewTab() {
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
                                         data={expensesByCategory}
-                                        layout="vertical"
                                         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E5E7EB" />
-                                        <XAxis type="number" hide />
-                                        <YAxis
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                        <XAxis
                                             dataKey="name"
-                                            type="category"
-                                            width={100}
                                             tick={{ fill: '#374151', fontSize: 12 }}
-                                            orientation="right"
+                                            interval={0}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={60}
+                                        />
+                                        <YAxis
+                                            tick={{ fill: '#374151', fontSize: 12 }}
+                                            width={60}
                                         />
                                         <Tooltip
                                             cursor={{ fill: '#F3F4F6' }}
@@ -409,8 +415,8 @@ export function OverviewTab() {
                                                     return (
                                                         <div className="bg-white p-2 border rounded shadow-md text-right" dir="rtl">
                                                             <p className="font-bold text-gray-900">{label}</p>
-                                                            <p className="text-sm text-[#00c875]">
-                                                                {formatCurrency(Number(payload[0].value), currency)}
+                                                            <p className="text-sm text-gray-500 font-medium">
+                                                                {currency === 'ILS' || currency === '₪' ? '₪' : currency} {Number(payload[0].value).toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                             </p>
                                                         </div>
                                                     );
