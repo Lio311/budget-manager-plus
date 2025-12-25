@@ -233,144 +233,149 @@ export function IncomeTab() {
     }
 
     return (
-        <div className="space-y-6">
-            <Card className="bg-gradient-to-l from-green-50 to-white border-green-200 shadow-sm">
-                <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-green-700 text-xs sm:text-sm">סך הכנסות חודשיות</CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                    <div className="text-xl sm:text-2xl font-bold text-green-600">
-                        {formatCurrency(totalIncome, currency)}
-                    </div>
-                </CardContent>
-            </Card>
+        <div className="space-y-8">
+            {/* Summary Card - Monday Style */}
+            <div className="monday-card border-l-4 border-l-[#00c875] p-6 flex flex-col justify-center gap-2">
+                <h3 className="text-sm font-medium text-gray-500">סך הכנסות חודשיות</h3>
+                <div className="text-3xl font-bold text-[#00c875]">
+                    {formatCurrency(totalIncome, currency)}
+                </div>
+            </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>הוסף הכנסה חדשה</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex flex-wrap gap-3 items-end">
-                        <div className="flex gap-2">
-                            <div className="min-w-[120px]">
-                                <label className="text-xs font-medium mb-1 block text-muted-foreground italic">קטגוריה</label>
-                                <select
-                                    className="w-full p-2 border rounded-md h-10 bg-background text-sm"
-                                    value={newIncome.category}
-                                    onChange={(e) => setNewIncome({ ...newIncome, category: e.target.value })}
-                                >
-                                    <option value="" disabled>בחר קטגוריה</option>
-                                    {categories.map(cat => (
-                                        <option key={cat.id} value={cat.name}>{cat.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="pt-5">
-                                <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="outline" size="icon" className="shrink-0 h-10 w-10"><Plus className="h-4 w-4" /></Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-80 p-4 z-50" dir="rtl">
-                                        <div className="space-y-4">
-                                            <h4 className="font-medium mb-4">קטגוריה חדשה</h4>
-                                            <Input placeholder="שם הקטגוריה" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
-                                            <div className="grid grid-cols-5 gap-2">
-                                                {PRESET_COLORS.map(color => (
-                                                    <div key={color.name} className={`h-6 w-6 rounded-full cursor-pointer border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-primary' : 'border-transparent'}`} onClick={() => setNewCategoryColor(color.class)} />
-                                                ))}
-                                            </div>
-                                            <Button onClick={handleAddCategory} className="w-full" disabled={!newCategoryName || submitting}>שמור</Button>
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-                        </div>
+            {/* Add Form - Glassmorphism */}
+            <div className="glass-panel p-6">
+                <div className="mb-6 flex items-center gap-2">
+                    <div className="bg-[#00c875] w-2 h-6 rounded-full"></div>
+                    <h3 className="text-lg font-bold text-[#323338]">הוסף הכנסה חדשה</h3>
+                </div>
 
-                        <div className="flex-[2] min-w-[200px]">
-                            <label className="text-xs font-medium mb-1 block text-muted-foreground italic">מקור ההכנסה</label>
-                            <Input placeholder="שם המקור (למשל: עבודה)" value={newIncome.source} onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })} />
-                        </div>
-
-                        <div className="flex-1 min-w-[120px]">
-                            <label className="text-xs font-medium mb-1 block text-muted-foreground italic">סכום</label>
-                            <Input type="number" placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
-                        </div>
-
-                        <div className="flex-1 min-w-[140px]">
-                            <label className="text-xs font-medium mb-1 block text-muted-foreground italic">תאריך</label>
-                            <DatePicker date={newIncome.date ? new Date(newIncome.date) : undefined} setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
-                        </div>
-
-                        <Button onClick={handleAdd} className="gap-2 h-10 px-6" disabled={submitting}>
-                            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} הוסף
-                        </Button>
-                    </div>
-
-                    <div className="flex items-start gap-4 p-4 mt-3 border rounded-lg">
-                        <div className="flex items-center gap-2">
-                            <Checkbox id="recurring-income" checked={newIncome.isRecurring} onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })} />
-                            <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer">הכנסה קבועה</label>
-                        </div>
-                        {newIncome.isRecurring && (
-                            <div className="flex gap-4 flex-1">
-                                <div className="space-y-2 w-[240px]">
-                                    <label className="text-xs font-medium">תאריך סיום</label>
-                                    <DatePicker date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined} setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>רשימת הכנסות</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-2">
-                        {incomes.length === 0 ? <p className="text-center text-muted-foreground py-8">אין הכנסות רשומות לחודש זה</p> : (
-                            <div className="space-y-2">
-                                {incomes.map((income: any) => (
-                                    <div key={income.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors">
-                                        {editingId === income.id ? (
-                                            <>
-                                                <div className="flex flex-nowrap gap-2 items-center flex-1 w-full overflow-x-auto pb-1">
-                                                    <select className="p-2 border rounded-md h-10 bg-background text-sm min-w-[120px]" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
-                                                        {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
-                                                    </select>
-                                                    <Input className="flex-1 min-w-[150px]" value={editData.source} onChange={(e) => setEditData({ ...editData, source: e.target.value })} />
-                                                    <Input className="w-32" type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
-                                                    <Input className="w-[140px]" type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
-                                                </div>
-                                                <div className="flex items-center gap-2 mr-4">
-                                                    <Button variant="ghost" size="icon" onClick={handleUpdate} className="text-green-600"><Check className="h-4 w-4" /></Button>
-                                                    <Button variant="ghost" size="icon" onClick={() => setEditingId(null)}><X className="h-4 w-4" /></Button>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(income.category)}`}>{income.category || 'כללי'}</span>
-                                                        <p className="font-medium">{income.source}</p>
-                                                    </div>
-                                                    <p className="text-sm text-muted-foreground">{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</p>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-lg font-bold text-green-600">{formatCurrency(income.amount, currency)}</span>
-                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="text-blue-600"><Pencil className="h-4 w-4" /></Button>
-                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(income.id)} className="text-red-600"><Trash2 className="h-4 w-4" /></Button>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
+                <div className="flex flex-wrap gap-4 items-end">
+                    <div className="flex gap-2">
+                        <div className="min-w-[140px]">
+                            <label className="text-xs font-medium mb-1.5 block text-[#676879]">קטגוריה</label>
+                            <select
+                                className="w-full p-2.5 border border-gray-200 rounded-lg h-11 bg-white text-sm focus:ring-2 focus:ring-[#00c875]/20 focus:border-[#00c875] outline-none transition-all"
+                                value={newIncome.category}
+                                onChange={(e) => setNewIncome({ ...newIncome, category: e.target.value })}
+                            >
+                                <option value="" disabled>בחר קטגוריה</option>
+                                {categories.map(cat => (
+                                    <option key={cat.id} value={cat.name}>{cat.name}</option>
                                 ))}
-                            </div>
-                        )}
+                            </select>
+                        </div>
+                        <div className="pt-6">
+                            <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="outline" size="icon" className="shrink-0 h-11 w-11 rounded-lg border-gray-200 hover:bg-gray-50"><Plus className="h-4 w-4" /></Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80 p-4 z-50 rounded-xl shadow-xl" dir="rtl">
+                                    <div className="space-y-4">
+                                        <h4 className="font-medium mb-4 text-[#323338]">קטגוריה חדשה</h4>
+                                        <Input className="h-10" placeholder="שם הקטגוריה" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
+                                        <div className="grid grid-cols-5 gap-2">
+                                            {PRESET_COLORS.map(color => (
+                                                <div key={color.name} className={`h-8 w-8 rounded-full cursor-pointer transition-transform hover:scale-110 border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-[#323338] scale-110' : 'border-transparent'}`} onClick={() => setNewCategoryColor(color.class)} />
+                                            ))}
+                                        </div>
+                                        <Button onClick={handleAddCategory} className="w-full bg-[#00c875] hover:bg-[#00b268] text-white rounded-lg h-10" disabled={!newCategoryName || submitting}>שמור</Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
                     </div>
-                </CardContent>
-            </Card>
+
+                    <div className="flex-[2] min-w-[200px]">
+                        <label className="text-xs font-medium mb-1.5 block text-[#676879]">מקור ההכנסה</label>
+                        <Input className="h-11 border-gray-200 focus:ring-[#00c875]/20 focus:border-[#00c875]" placeholder="שם המקור (למשל: עבודה)" value={newIncome.source} onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })} />
+                    </div>
+
+                    <div className="flex-1 min-w-[120px]">
+                        <label className="text-xs font-medium mb-1.5 block text-[#676879]">סכום</label>
+                        <Input className="h-11 border-gray-200 focus:ring-[#00c875]/20 focus:border-[#00c875]" type="number" placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
+                    </div>
+
+                    <div className="flex-1 min-w-[140px]">
+                        <label className="text-xs font-medium mb-1.5 block text-[#676879]">תאריך</label>
+                        <DatePicker date={newIncome.date ? new Date(newIncome.date) : undefined} setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
+                    </div>
+
+                    <Button onClick={handleAdd} className="gap-2 h-11 px-8 rounded-lg bg-[#00c875] hover:bg-[#00b268] text-white font-medium shadow-sm transition-all hover:shadow-md" disabled={submitting}>
+                        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} הוסף
+                    </Button>
+                </div>
+
+                <div className="flex items-start gap-4 p-4 mt-6 border border-gray-100 rounded-xl bg-gray-50/50">
+                    <div className="flex items-center gap-2">
+                        <Checkbox id="recurring-income" checked={newIncome.isRecurring} onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })} className="data-[state=checked]:bg-[#00c875] data-[state=checked]:border-[#00c875]" />
+                        <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338]">הכנסה קבועה</label>
+                    </div>
+                    {newIncome.isRecurring && (
+                        <div className="flex gap-4 flex-1">
+                            <div className="space-y-2 w-[240px]">
+                                <label className="text-xs font-medium text-[#676879]">תאריך סיום</label>
+                                <DatePicker date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined} setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-2 px-2">
+                    <h3 className="text-lg font-bold text-[#323338]">רשימת הכנסות</h3>
+                </div>
+
+                {incomes.length === 0 ? (
+                    <div className="monday-card p-8 text-center text-[#676879]">
+                        אין הכנסות רשומות לחודש זה
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {incomes.map((income: any) => (
+                            <div key={income.id} className="monday-card flex items-center justify-between p-4 group">
+                                {editingId === income.id ? (
+                                    <>
+                                        <div className="flex flex-nowrap gap-3 items-center flex-1 w-full overflow-x-auto pb-1">
+                                            <select className="p-2 border rounded-md h-10 bg-white text-sm min-w-[140px]" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
+                                                {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+                                            </select>
+                                            <Input className="flex-1 min-w-[150px]" value={editData.source} onChange={(e) => setEditData({ ...editData, source: e.target.value })} />
+                                            <Input className="w-32" type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
+                                            <Input className="w-[140px]" type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
+                                        </div>
+                                        <div className="flex items-center gap-2 mr-4">
+                                            <Button variant="ghost" size="icon" onClick={handleUpdate} className="text-[#00c875] hover:bg-green-50"><Check className="h-5 w-5" /></Button>
+                                            <Button variant="ghost" size="icon" onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></Button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex-1 flex items-center gap-6">
+                                            <div className="min-w-[100px]">
+                                                <span className={`monday-pill ${getCategoryColor(income.category)} opacity-90`}>
+                                                    {income.category || 'כללי'}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-[#323338] text-base">{income.source}</span>
+                                                <span className="text-xs text-[#676879]">{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-xl font-bold text-[#00c875]">{formatCurrency(income.amount, currency)}</span>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-8 w-8 text-blue-500 hover:bg-blue-50"><Pencil className="h-4 w-4" /></Button>
+                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(income.id)} className="h-8 w-8 text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

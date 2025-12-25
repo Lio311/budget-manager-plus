@@ -52,6 +52,18 @@ const config = {
                     DEFAULT: "hsl(var(--card))",
                     foreground: "hsl(var(--card-foreground))",
                 },
+                // Monday.com inspired palette
+                monday: {
+                    done: "#00c875",       // Mint Green
+                    stuck: "#e2445c",      // Soft Red/Coral
+                    working: "#fdab3d",    // Sunny Yellow/Orange
+                    future: "#a25ddc",     // Bright Purple
+                    info: "#0086c0",       // Sky Blue
+                    black: "#323338",      // Deep Navy/Black
+                    dark_gray: "#676879",  // Body Text Gray
+                    light_gray: "#f5f7f9", // Page Background
+                    hover_gray: "#dcdfec", // Row Hover
+                },
             },
             borderRadius: {
                 lg: "var(--radius)",

@@ -345,102 +345,65 @@ export function OverviewTab() {
                 {/* Top Row: Pie Chart + Expenses Breakdown */}
                 <div className="grid gap-6 md:grid-cols-2">
                     {/* Income vs Expenses Pie Chart */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>התפלגות תקציב</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {totalForPie === 0 ? (
-                                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                                    אין נתונים להצגה
-                                </div>
-                            ) : (
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <PieChart>
-                                        <Pie
-                                            data={incomeVsExpenses}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={70}
-                                            outerRadius={110}
-                                            paddingAngle={5}
-                                            dataKey="value"
-                                        >
-                                            {incomeVsExpenses.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip content={<CustomTooltip currency={currency} />} />
-                                        <Legend
-                                            formatter={(value) => <span className="mr-2">{value}</span>}
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Budget Overview Bar Chart */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>הוצאות לפי קטגוריה</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            {totalForPie === 0 ? (
-                                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                                    אין נתונים להצגה
-                                </div>
-                            ) : (
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <BarChart
-                                        data={incomeVsExpenses}
-                                        margin={{ top: 20, right: 10, left: 0, bottom: 5 }}
-                                        layout="horizontal"
-                                        // 1. צמצום הרווח בין העמודות עצמן (ככל שהאחוז נמוך יותר, העמודות יהיו צפופות יותר)
-                                        barCategoryGap="15%"
+                    <div className="glass-panel p-6">
+                        <div className="mb-6">
+                            <h3 className="text-lg font-bold text-[#323338]">התפלגות תקציב</h3>
+                        </div>
+                        <div className="h-[300px] w-full" dir="ltr">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={totalForPie > 0 ? incomeVsExpenses : [{ name: 'אין נתונים', value: 1 }]}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={2}
+                                        dataKey="value"
+                                        stroke="none"
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.5} />
+                                        {(totalForPie > 0 ? incomeVsExpenses : [{ name: 'אין נתונים', value: 1, color: '#e5e7eb' }]).map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomTooltip currency={currency} />} />
+                                    <Legend
+                                        verticalAlign="bottom"
+                                        height={36}
+                                        formatter={(value) => <span style={{ color: '#374151', fontSize: '12px' }}>{value}</span>}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
 
-                                        <XAxis
-                                            dataKey="name"
-                                            tickLine={false}
-                                            axisLine={false}
-                                            tick={{ fontSize: 12 }}
-                                            dy={10}
-                                            // 2. הוספת ריפוד פנימי לציר ה-X.
-                                            // זה דוחף את העמודה הראשונה 30 פיקסלים ימינה מציר ה-Y
-                                            padding={{ left: 30, right: 10 }}
-                                        />
-
-                                        <YAxis
-                                            orientation="left"
-                                            width={45}
-                                            tickLine={false}
-                                            axisLine={false}
-                                            tick={{ fontSize: 12 }}
-                                            tickFormatter={(value) => formatCurrency(Number(value), currency).split('.')[0]}
-                                        />
-
-                                        <Tooltip
-                                            content={<CustomTooltip currency={currency} />}
-                                            cursor={{ fill: 'transparent' }}
-                                        />
-
-                                        <Bar
-                                            dataKey="value"
-                                            radius={[4, 4, 0, 0]}
-                                            // 3. הגדלתי מעט את המקסימום כדי שהעמודות יוכלו להתרחב ולמלא את החלל שנוצר
-                                            maxBarSize={50}
-                                        >
-                                            {incomeVsExpenses.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
+                    {/* Expenses Breakdown */}
+                    <div className="glass-panel p-6 flex flex-col">
+                        <div className="mb-6">
+                            <h3 className="text-lg font-bold text-[#323338]">הוצאות לפי קטגוריה</h3>
+                        </div>
+                        <div className="space-y-4 flex-1 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
+                            {expensesByCategory.length === 0 ? (
+                                <div className="text-center py-10 text-muted-foreground text-sm">
+                                    אין מספיק נתונים להצגה
+                                </div>
+                            ) : (
+                                expensesByCategory.map((item, index) => (
+                                    <BudgetProgress
+                                        key={index}
+                                        label={item.name}
+                                        current={item.value}
+                                        total={totalExpenses}
+                                        currency={currency}
+                                        color={getHexFromClass(item.name === 'חובות ששולמו' ? 'text-purple-500' :
+                                            item.name === 'חיסכון' ? 'text-blue-500' :
+                                                item.name === 'חשבונות ששולמו' ? 'text-amber-500' :
+                                                    item.color)}
+                                    />
+                                ))
                             )}
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Bottom Row: Net Worth + Budget Progress (if enough data) vs Just Budget Progress */}
@@ -526,29 +489,40 @@ function StatCard({
     change?: number
     changeType?: 'income' | 'expense'
 }) {
-    // For income/savings: green if up, red if down
-    // For expenses/bills: red if up, green if down
+    // Determine status color for border based on changeType or map from color prop
+    // Simple heuristic: if color has 'green' -> success/done, 'red' -> stuck/error
+    let borderColorClass = 'border-l-4 border-l-gray-300' // default
+    if (color.includes('green')) borderColorClass = 'border-l-[4px] border-l-[#00c875]' // Monday Green
+    else if (color.includes('red')) borderColorClass = 'border-l-[4px] border-l-[#e2445c]' // Monday Red
+    else if (color.includes('blue')) borderColorClass = 'border-l-[4px] border-l-[#0086c0]' // Monday Blue
+    else if (color.includes('orange')) borderColorClass = 'border-l-[4px] border-l-[#fdab3d]' // Monday Yellow/Orange
+
     const isPositiveChange = changeType === 'income' ? change && change > 0 : change && change < 0
-    const changeColor = isPositiveChange ? 'text-green-600' : 'text-red-600'
+    const changeColor = isPositiveChange ? 'text-[#00c875]' : 'text-[#e2445c]' // Monday Green/Red
     const ChangeIcon = change && change > 0 ? ArrowUp : ArrowDown
 
     return (
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                <div className={`${bgColor} ${color} p-2 rounded-lg`}>{icon}</div>
-            </CardHeader>
-            <CardContent>
-                <div className="budget-stat">{value}</div>
-                {change !== undefined && change !== 0 && (
-                    <div className={`flex items-center gap-1 text-xs ${changeColor} mt-1`}>
+        <div className={`monday-card p-5 relative overflow-hidden ${borderColorClass} flex flex-col justify-between h-[140px]`}>
+            <div className="flex justify-between items-start">
+                <div>
+                    <h3 className="text-sm font-medium text-gray-500 mb-1">{title}</h3>
+                    <div className="text-2xl font-bold text-[#323338] tracking-tight">{value}</div>
+                </div>
+                <div className={`${bgColor} ${color} p-2.5 rounded-xl shadow-sm opacity-90`}>
+                    {icon}
+                </div>
+            </div>
+
+            {change !== undefined && change !== 0 && (
+                <div className={`flex items-center gap-1.5 text-xs font-medium ${changeColor} mt-auto`}>
+                    <div className={`flex items-center justify-center w-5 h-5 rounded-full ${isPositiveChange ? 'bg-green-100' : 'bg-red-100'}`}>
                         <ChangeIcon className="h-3 w-3" />
-                        <span>{Math.abs(change).toFixed(1)}%</span>
-                        <span className="text-muted-foreground">מהחודש הקודם</span>
                     </div>
-                )}
-            </CardContent>
-        </Card>
+                    <span>{Math.abs(change).toFixed(1)}%</span>
+                    <span className="text-gray-400 font-normal">מהחודש הקודם</span>
+                </div>
+            )}
+        </div>
     )
 }
 
