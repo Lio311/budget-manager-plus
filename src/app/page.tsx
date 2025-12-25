@@ -25,7 +25,7 @@ export default function HomePage() {
                             alt="Keseflow"
                             width={600}
                             height={180}
-                            className="h-32 w-auto"
+                            className="h-20 md:h-32 w-auto"
                             priority
                         />
                     </div>
