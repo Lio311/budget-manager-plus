@@ -3,6 +3,13 @@ import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { heIL } from '@clerk/localizations'
 import { Toaster } from '@/components/ui/toaster'
+import { Rubik } from 'next/font/google'
+
+const rubik = Rubik({
+    subsets: ['hebrew', 'latin'],
+    display: 'swap',
+    variable: '--font-rubik'
+})
 
 export const metadata: Metadata = {
     title: 'Keseflow',
@@ -32,7 +39,7 @@ export default function RootLayout({
                 }
             }}
         >
-            <html lang="he" dir="rtl">
+            <html lang="he" dir="rtl" className={rubik.variable}>
                 <body>
                     {children}
                     <Toaster />
