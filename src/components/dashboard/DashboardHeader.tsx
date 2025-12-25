@@ -52,9 +52,9 @@ export function DashboardHeader() {
                     </div>
 
                     {/* Logo - Centered */}
-                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden md:block">
+                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <Image
-                            src="/keseflow.png"
+                            src="/K-ICON.png"
                             alt="Keseflow"
                             width={120}
                             height={40}
