@@ -553,7 +553,7 @@ export function DebtsTab() {
                         ))
                     )}
                 </div>
-
             </div>
-            )
+        </div>
+    )
 }
