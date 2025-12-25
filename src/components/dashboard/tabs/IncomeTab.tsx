@@ -249,21 +249,13 @@ export function IncomeTab() {
         return c
     }
 
-    if (loadingIncomes) {
-        return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-rainbow-spin text-primary" />
-            </div>
-        )
-    }
-
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10">
             {/* Summary Card - Monday Style */}
             <div className="monday-card border-l-4 border-l-[#00c875] p-5 flex flex-col justify-center gap-2">
                 <h3 className="text-sm font-medium text-gray-500">סך הכנסות חודשיות</h3>
-                <div className="text-3xl font-bold text-[#00c875]">
-                    {formatCurrency(totalIncome, currency)}
+                <div className={`text-3xl font-bold text-[#00c875] ${loadingIncomes ? 'animate-pulse' : ''}`}>
+                    {loadingIncomes ? '...' : formatCurrency(totalIncome, currency)}
                 </div>
             </div>
 

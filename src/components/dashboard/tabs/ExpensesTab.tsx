@@ -241,21 +241,13 @@ export function ExpensesTab() {
         return c
     }
 
-    if (loadingExpenses) {
-        return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-rainbow-spin text-primary" />
-            </div>
-        )
-    }
-
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10">
             {/* Summary Card - Monday Style */}
             <div className="monday-card border-l-4 border-l-[#e2445c] p-5 flex flex-col justify-center gap-2">
                 <h3 className="text-sm font-medium text-gray-500">סך הוצאות חודשיות</h3>
-                <div className="text-3xl font-bold text-[#e2445c]">
-                    {formatCurrency(totalExpenses, currency)}
+                <div className={`text-3xl font-bold text-[#e2445c] ${loadingExpenses ? 'animate-pulse' : ''}`}>
+                    {loadingExpenses ? '...' : formatCurrency(totalExpenses, currency)}
                 </div>
             </div>
 
