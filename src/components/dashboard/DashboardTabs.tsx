@@ -32,108 +32,86 @@ export function DashboardTabs() {
     }
 
     return (
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full" dir="rtl">
-            {/* Mobile Menu Button */}
-            <div className="md:hidden border-b bg-white/80 backdrop-blur-sm sticky top-[57px] z-20">
-                <div className="container mx-auto px-2 py-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setMobileMenuOpen(true)}
-                        className="gap-2"
-                    >
-                        <Menu className="h-4 w-4" />
-                        תפריט
-                    </Button>
-                </div>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex min-h-[calc(100vh-65px)] bg-[#F5F5F7]" dir="rtl">
+            {/* Mobile Menu Button - Visible only on mobile */}
+            <div className="md:hidden fixed bottom-6 left-6 z-50">
+                <Button
+                    size="icon"
+                    onClick={() => setMobileMenuOpen(true)}
+                    className="h-14 w-14 rounded-full shadow-lg bg-[#007AFF] hover:bg-[#0062cc] text-white"
+                >
+                    <Menu className="h-6 w-6" />
+                </Button>
             </div>
 
-            {/* Mobile Sidebar */}
+            {/* Mobile Sidebar Overlay */}
             {mobileMenuOpen && (
-                <>
-                    {/* Overlay */}
-                    <div
-                        className="fixed inset-0 bg-black/50 z-40 md:hidden"
-                        onClick={() => setMobileMenuOpen(false)}
-                    />
-
-                    {/* Sidebar */}
-                    <div className="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 md:hidden">
-                        <div className="flex items-center justify-between p-4 border-b">
-                            <h2 className="text-lg font-bold">תפריט</h2>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                <X className="h-5 w-5" />
-                            </Button>
-                        </div>
-                        <div className="p-2 space-y-1">
-                            {tabs.map((tab) => {
-                                const Icon = tab.icon
-                                return (
-                                    <button
-                                        key={tab.value}
-                                        onClick={() => handleTabChange(tab.value)}
-                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-right transition-colors ${activeTab === tab.value
-                                            ? 'bg-primary text-primary-foreground'
-                                            : 'hover:bg-accent'
-                                            }`}
-                                    >
-                                        <Icon className={`w-5 h-5 ${tab.rotate ? 'rotate-180' : ''}`} />
-                                        <span>{tab.label}</span>
-                                    </button>
-                                )
-                            })}
-                        </div>
-                    </div>
-                </>
+                <div className="fixed inset-0 bg-black/30 z-40 md:hidden backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
             )}
 
-            {/* Desktop Tabs */}
-            <div className="hidden md:block border-b bg-white/80 backdrop-blur-sm sticky top-[73px] z-10">
-                <div className="container mx-auto px-4">
-                    <TabsList className="w-full justify-start h-auto p-0 bg-transparent gap-1">
+            {/* Sidebar Navigation - Shared Desktop/Mobile Structure */}
+            <aside className={`
+                fixed md:sticky md:top-[65px] h-[calc(100vh-65px)] right-0 z-50
+                w-72 bg-[#f2f2f7] border-l border-gray-200
+                transition-transform duration-300 ease-in-out shadow-xl md:shadow-none
+                ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+                flex flex-col
+            `}>
+                <div className="p-4 md:hidden flex justify-between items-center border-b border-gray-200 bg-[#f2f2f7]">
+                    <span className="font-bold text-lg">תפריט</span>
+                    <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+                        <X className="h-5 w-5" />
+                    </Button>
+                </div>
+
+                <div className="p-3 overflow-y-auto flex-1">
+                    <TabsList className="flex flex-col h-auto bg-transparent gap-1 p-0 w-full text-right">
                         {tabs.map((tab) => {
                             const Icon = tab.icon
                             return (
                                 <TabsTrigger
                                     key={tab.value}
                                     value={tab.value}
-                                    className="gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+                                    className="w-full justify-start gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
+                                             data-[state=active]:bg-[#007AFF] data-[state=active]:text-white data-[state=active]:shadow-sm
+                                             hover:bg-white/50 data-[state=active]:hover:bg-[#007AFF]
+                                             text-gray-700 outline-none ring-0 focus:ring-0"
                                 >
-                                    <Icon className={`w-4 h-4 ${tab.rotate ? 'rotate-180' : ''}`} />
+                                    <Icon className={`h-4 w-4 ${tab.rotate ? 'rotate-180' : ''}`} />
                                     {tab.label}
                                 </TabsTrigger>
                             )
                         })}
                     </TabsList>
                 </div>
-            </div>
+            </aside>
 
-            <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
-                <TabsContent value="overview">
-                    <OverviewTab />
-                </TabsContent>
-                <TabsContent value="income">
-                    <IncomeTab />
-                </TabsContent>
-                <TabsContent value="expenses">
-                    <ExpensesTab />
-                </TabsContent>
-                <TabsContent value="bills">
-                    <BillsTab />
-                </TabsContent>
-                <TabsContent value="debts">
-                    <DebtsTab />
-                </TabsContent>
-                <TabsContent value="savings">
-                    <SavingsTab />
-                </TabsContent>
-                <TabsContent value="calendar">
-                    <CalendarTab />
-                </TabsContent>
+            {/* Main Content Area */}
+            <div className="flex-1 w-full md:max-w-[calc(100%-18rem)] overflow-y-auto bg-white min-h-[calc(100vh-65px)]">
+                <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
+                    {/* Content Wrappers - Added strict widths to prevent overflow */}
+                    <TabsContent value="overview" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <OverviewTab />
+                    </TabsContent>
+                    <TabsContent value="income" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <IncomeTab />
+                    </TabsContent>
+                    <TabsContent value="expenses" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <ExpensesTab />
+                    </TabsContent>
+                    <TabsContent value="bills" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <BillsTab />
+                    </TabsContent>
+                    <TabsContent value="debts" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <DebtsTab />
+                    </TabsContent>
+                    <TabsContent value="savings" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <SavingsTab />
+                    </TabsContent>
+                    <TabsContent value="calendar" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <CalendarTab />
+                    </TabsContent>
+                </div>
             </div>
         </Tabs>
     )
