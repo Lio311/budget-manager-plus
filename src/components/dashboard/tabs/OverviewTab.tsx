@@ -177,19 +177,20 @@ export function OverviewTab() {
     const expensesByCategory = Array.from(categoryMap.entries())
         .map(([name, value]) => {
             const category = categories.find(c => c.name === name)
-            const color = getHexFromClass(category?.color || null)
-            return { name, value, color }
+            const colorHex = getHexFromClass(category?.color || null)
+            const colorClass = category?.color || 'bg-gray-500 text-white'
+            return { name, value, colorHex, colorClass }
         })
 
     // Add Debts, Savings and Paid Bills as virtual categories
     if (totalPaidDebts > 0) {
-        expensesByCategory.push({ name: 'חובות ששולמו', value: totalPaidDebts, color: '#A855F7' }) // Purple 500
+        expensesByCategory.push({ name: 'חובות ששולמו', value: totalPaidDebts, colorHex: '#A855F7', colorClass: 'bg-purple-500' }) // Purple 500
     }
     if (totalSavingsDeposits > 0) {
-        expensesByCategory.push({ name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }) // Blue 500
+        expensesByCategory.push({ name: 'חיסכון', value: totalSavingsDeposits, colorHex: '#3B82F6', colorClass: 'bg-blue-500' }) // Blue 500
     }
     if (totalPaidBills > 0) {
-        expensesByCategory.push({ name: 'חשבונות ששולמו', value: totalPaidBills, color: '#F59E0B' }) // Amber 500
+        expensesByCategory.push({ name: 'חשבונות ששולמו', value: totalPaidBills, colorHex: '#F59E0B', colorClass: 'bg-amber-500' }) // Amber 500
     }
 
     expensesByCategory.sort((a, b) => b.value - a.value)
@@ -349,15 +350,15 @@ export function OverviewTab() {
                         <div className="mb-6">
                             <h3 className="text-lg font-bold text-[#323338]">התפלגות תקציב</h3>
                         </div>
-                        <div className="h-[300px] w-full" dir="ltr">
+                        <div className="h-[400px] w-full" dir="ltr">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
                                         data={totalForPie > 0 ? incomeVsExpenses : [{ name: 'אין נתונים', value: 1 }]}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
+                                        innerRadius={80}
+                                        outerRadius={120}
                                         paddingAngle={2}
                                         dataKey="value"
                                         stroke="none"
@@ -382,7 +383,7 @@ export function OverviewTab() {
                         <div className="mb-6">
                             <h3 className="text-lg font-bold text-[#323338]">הוצאות לפי קטגוריה</h3>
                         </div>
-                        <div className="space-y-4 flex-1 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
+                        <div className="space-y-4 flex-1 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
                             {expensesByCategory.length === 0 ? (
                                 <div className="text-center py-10 text-muted-foreground text-sm">
                                     אין מספיק נתונים להצגה
@@ -395,16 +396,14 @@ export function OverviewTab() {
                                         current={item.value}
                                         total={totalExpenses}
                                         currency={currency}
-                                        color={getHexFromClass(item.name === 'חובות ששולמו' ? 'text-purple-500' :
-                                            item.name === 'חיסכון' ? 'text-blue-500' :
-                                                item.name === 'חשבונות ששולמו' ? 'text-amber-500' :
-                                                    item.color)}
+                                        color={item.colorClass}
                                     />
                                 ))
                             )}
                         </div>
                     </div>
                 </div>
+
 
                 {/* Bottom Row: Net Worth + Budget Progress (if enough data) vs Just Budget Progress */}
                 <div className={`grid gap-6 ${netWorthHistory.length > 0 ? 'md:grid-cols-2' : 'grid-cols-1'}`}>

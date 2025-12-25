@@ -238,7 +238,7 @@ export function SavingsTab() {
 
     const getCategoryColor = (catName: string) => {
         const cat = categories.find(c => c.name === catName)
-        return cat?.color || 'bg-gray-100 text-gray-700 border-gray-200'
+        return cat?.color || 'bg-gray-500 text-white border-gray-600'
     }
 
     if (loadingSavings) {
@@ -362,11 +362,11 @@ export function SavingsTab() {
                         className="gap-2 h-11 px-8 rounded-lg bg-[#00c875] hover:bg-[#00b065] text-white font-medium shadow-sm transition-all hover:shadow-md"
                         disabled={submitting}
                     >
-                        {submitting ? (
+                        הוסף {submitting ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                             <Plus className="h-4 w-4" />
-                        )} הוסף
+                        )}
                     </Button>
                 </div>
 
@@ -489,7 +489,15 @@ export function SavingsTab() {
                                             <div className="flex flex-col">
                                                 <span className="font-bold text-[#323338] text-base">{saving.description}</span>
                                                 <div className="flex items-center gap-2 text-xs text-[#676879]">
-                                                    <span>{format(new Date(saving.date), 'dd/MM/yyyy')}</span>
+                                                    <span>
+                                                        {(() => {
+                                                            try {
+                                                                return format(new Date(saving.date), 'dd/MM/yyyy')
+                                                            } catch (e) {
+                                                                return 'תאריך לא תקין'
+                                                            }
+                                                        })()}
+                                                    </span>
                                                     {saving.goal && (
                                                         <>
                                                             <span>•</span>
