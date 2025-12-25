@@ -533,4 +533,5 @@ function BudgetProgress({
             </p>
         </div>
     )
+}
 
