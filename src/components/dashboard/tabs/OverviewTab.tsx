@@ -240,7 +240,7 @@ export function OverviewTab() {
                         </DialogTrigger>
                         <DialogContent dir="rtl">
                             <DialogHeader>
-                                <DialogTitle>הגדרות</DialogTitle>
+                                <DialogTitle className="text-right">הון עצמי</DialogTitle>
                                 <DialogDescription className="text-right">
                                     הגדר את היתרה ההתחלתית עבור חישוב השווי הנקי
                                 </DialogDescription>
