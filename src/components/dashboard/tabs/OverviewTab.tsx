@@ -338,19 +338,21 @@ export function OverviewTab() {
                         <div className="mb-2">
                             <h3 className="text-base font-bold text-[#323338]">התפלגות תקציב</h3>
                         </div>
-                        <div className="h-[300px] w-full" dir="ltr"> {/* Reduced height */}
-                            {(() => {
-                                // Recalculate remaining to strictly represent unallocated income
-                                // Income - (Expenses + Bills + Debts + Savings)
+                        <div className="h-[300px] w-full" dir="ltr">
+                            {loading ? (
+                                <div className="h-full flex items-center justify-center">
+                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                </div>
+                            ) : (() => {
                                 const realRemaining = totalIncome - (standardExpenses + combinedTotalBills + totalDebtsPlanned + totalSavingsDeposits);
 
                                 const pieData = [
-                                    { name: 'הכנסות', value: totalIncome, color: '#10B981' }, // Emerald 500 - Income side
+                                    { name: 'הכנסות', value: totalIncome, color: '#10B981' },
                                     { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
                                     { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills },
-                                    { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' }, // Purple
-                                    { name: 'חסכונות', value: totalSavingsDeposits, color: '#3B82F6' }, // Blue
-                                    { name: 'יתרה', value: Math.max(0, realRemaining), color: '#34D399' } // Emerald 400 - Remaining from allocation (Lighter)
+                                    { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' },
+                                    { name: 'חסכונות', value: totalSavingsDeposits, color: '#3B82F6' },
+                                    { name: 'יתרה', value: Math.max(0, realRemaining), color: '#34D399' }
                                 ].filter(item => item.value > 0);
 
                                 return (
@@ -382,7 +384,7 @@ export function OverviewTab() {
                                                                 <li key={`item-${index}`} className="flex items-center gap-1 flex-shrink-0">
                                                                     <div
                                                                         className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full shrink-0"
-                                                                        style={{ backgroundColor: entry.payload.color }} // Use payload.color to get the correct color from data
+                                                                        style={{ backgroundColor: entry.payload.color }}
                                                                     />
                                                                     <span className="font-medium text-[#323338] whitespace-nowrap">{entry.value}</span>
                                                                 </li>
@@ -404,9 +406,13 @@ export function OverviewTab() {
                             <h3 className="text-base font-bold text-[#323338]">הוצאות לפי קטגוריה</h3>
                         </div>
                         <div className="h-[300px] w-full" dir="ltr">
-                            {expensesByCategory.length === 0 ? (
-                                <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
-                                    אין מספיק נתונים להצגה
+                            {loading ? (
+                                <div className="h-full flex items-center justify-center">
+                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                </div>
+                            ) : expensesByCategory.length === 0 ? (
+                                <div className="h-full flex items-center justify-center">
+                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                 </div>
                             ) : (
                                 <ResponsiveContainer width="100%" height="100%">
@@ -465,60 +471,66 @@ export function OverviewTab() {
                         </div>
                     )}
 
-                    <Card className="h-full border-0 shadow-sm glass-panel bg-white/60"> {/* unified glass style */}
+                    <Card className="h-full border-0 shadow-sm glass-panel bg-white/60">
                         <CardHeader className="p-4 pb-2">
                             <CardTitle className="text-base">מצב תקציב חודשי</CardTitle>
                         </CardHeader>
-                        <CardContent className="p-4 pt-2">
-                            {/* ... existing BudgetProgress content spaces ... */}
-                            <div className="space-y-4">
-                                <BudgetProgress
-                                    label="הוצאות שוטפות"
-                                    current={standardExpenses}
-                                    total={totalIncome}
-                                    currency={currency}
-                                    color="bg-red-500"
-                                />
-                                {/* ... others ... */}
-                                <BudgetProgress
-                                    label="חשבונות (שולם)"
-                                    current={totalPaidBills}
-                                    total={combinedTotalBills}
-                                    currency={currency}
-                                    color="bg-orange-500"
-                                />
-                                <BudgetProgress
-                                    label="חובות ששולמו"
-                                    current={totalPaidDebts}
-                                    total={totalDebtsPlanned}
-                                    currency={currency}
-                                    color="bg-purple-500"
-                                />
-                                <BudgetProgress
-                                    label="חיסכון והפקדות"
-                                    current={totalSavingsDeposits}
-                                    total={totalIncome}
-                                    currency={currency}
-                                    color="bg-blue-500"
-                                />
-                                <div className="pt-3 border-t">
-                                    {/* ... */}
-                                    {/* Reuse existing logic */}
-                                    <div className="flex justify-between items-center mb-1">
-                                        <span className="text-xs font-semibold">ניצול תקציב כולל</span>
-                                        <span className="text-xs font-bold">
-                                            {totalIncome > 0 ? (((totalExpenses) / totalIncome) * 100).toFixed(1) : 0}%
-                                        </span>
-                                    </div>
-                                    <div className="w-full bg-gray-100 rounded-full h-2.5">
-                                        <div
-                                            className="bg-green-600 h-2.5 rounded-full transition-all"
-                                            style={{ width: `${Math.min(totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0, 100)}%` }}
-                                        />
+                        {loading ? (
+                            <CardContent className="p-4 pt-0 flex items-center justify-center h-40">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </CardContent>
+                        ) : (
+                            <CardContent className="p-4 pt-2">
+                                {/* ... existing BudgetProgress content spaces ... */}
+                                <div className="space-y-4">
+                                    <BudgetProgress
+                                        label="הוצאות שוטפות"
+                                        current={standardExpenses}
+                                        total={totalIncome}
+                                        currency={currency}
+                                        color="bg-red-500"
+                                    />
+                                    {/* ... others ... */}
+                                    <BudgetProgress
+                                        label="חשבונות (שולם)"
+                                        current={totalPaidBills}
+                                        total={combinedTotalBills}
+                                        currency={currency}
+                                        color="bg-orange-500"
+                                    />
+                                    <BudgetProgress
+                                        label="חובות ששולמו"
+                                        current={totalPaidDebts}
+                                        total={totalDebtsPlanned}
+                                        currency={currency}
+                                        color="bg-purple-500"
+                                    />
+                                    <BudgetProgress
+                                        label="חיסכון והפקדות"
+                                        current={totalSavingsDeposits}
+                                        total={totalIncome}
+                                        currency={currency}
+                                        color="bg-blue-500"
+                                    />
+                                    <div className="pt-3 border-t">
+                                        {/* ... */}
+                                        {/* Reuse existing logic */}
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className="text-xs font-semibold">ניצול תקציב כולל</span>
+                                            <span className="text-xs font-bold">
+                                                {totalIncome > 0 ? (((totalExpenses) / totalIncome) * 100).toFixed(1) : 0}%
+                                            </span>
+                                        </div>
+                                        <div className="w-full bg-gray-100 rounded-full h-2.5">
+                                            <div
+                                                className="bg-green-600 h-2.5 rounded-full transition-all"
+                                                style={{ width: `${Math.min(totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0, 100)}%` }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </CardContent>
+                            </CardContent>
+                        )}
                     </Card>
                 </div>
             </div>
