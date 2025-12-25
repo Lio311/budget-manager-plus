@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Check, Loader2, Pencil, X } from 'lucide-react'
+import { Plus, Trash2, Check, Loader2, Pencil, X, CreditCard } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getBills, addBill, toggleBillPaid, deleteBill, updateBill } from '@/lib/actions/bill'
@@ -242,7 +242,10 @@ export function BillsTab() {
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div className="glass-panel p-5 h-fit">
-                    <h3 className="text-lg font-bold text-[#323338] mb-4">הוספת חשבון חדש</h3>
+                    <div className="flex items-center gap-2 mb-4">
+                        <CreditCard className="h-5 w-5 text-orange-500" />
+                        <h3 className="text-lg font-bold text-[#323338]">הוספת חשבון חדש</h3>
+                    </div>
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700">שם החשבון</label>

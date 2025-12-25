@@ -3,7 +3,7 @@
 import useSWR from 'swr'
 import { useState, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowDown, ArrowUp, PiggyBank, TrendingUp, Wallet, Loader2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, PiggyBank, TrendingUp, Wallet, Loader2, PieChart as PieChartIcon } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label as RechartsLabel } from 'recharts'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
@@ -223,7 +223,10 @@ export function OverviewTab() {
     return (
         <div className="space-y-4 p-1" dir="rtl"> {/* Reduced padding and gap */}
             <div className="flex justify-between items-center mb-2"> {/* Reduced margin */}
-                <h2 className="text-xl font-bold tracking-tight">סקירה כללית</h2> {/* Smaller title */}
+                <div className="flex items-center gap-2">
+                    <PieChartIcon className="h-6 w-6 text-primary" />
+                    <h2 className="text-xl font-bold tracking-tight">סקירה כללית</h2> {/* Smaller title */}
+                </div>
                 <div className="flex items-center gap-2">
                     <FeedbackButton />
                     <Dialog open={isSettingsOpen} onOpenChange={(open) => {

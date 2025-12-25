@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Plus, Trash2, Loader2, Pencil, X, Check, ShoppingCart } from 'lucide-react'
+import { Plus, Trash2, Loader2, Pencil, X, Check, TrendingDown } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getExpenses, addExpense, deleteExpense, updateExpense } from '@/lib/actions/expense'
@@ -264,7 +264,7 @@ export function ExpensesTab() {
                 {/* Add Form - Glassmorphism */}
                 <div className="glass-panel p-5 h-fit">
                     <div className="mb-4 flex items-center gap-2">
-                        <ShoppingCart className="h-5 w-5 text-[#e2445c]" />
+                        <TrendingDown className="h-5 w-5 text-[#e2445c]" />
                         <h3 className="text-lg font-bold text-[#323338]">הוספת הוצאה</h3>
                     </div>
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X } from 'lucide-react'
+import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
@@ -22,7 +22,7 @@ export function DashboardTabs() {
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown },
         { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard },
         { value: 'debts', label: 'חובות', icon: Wallet },
-        { value: 'savings', label: 'חסכונות', icon: DollarSign },
+        { value: 'savings', label: 'חסכונות', icon: PiggyBank },
         { value: 'calendar', label: 'לוח שנה', icon: Calendar },
     ]
 

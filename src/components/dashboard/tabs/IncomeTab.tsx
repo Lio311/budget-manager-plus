@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Loader2, Pencil, Check, X, Wallet } from 'lucide-react'
+import { Plus, Trash2, Loader2, Pencil, Check, X, TrendingDown } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -272,7 +272,7 @@ export function IncomeTab() {
                 {/* Add Form - Glassmorphism */}
                 <div className="glass-panel p-5 h-fit">
                     <div className="mb-4 flex items-center gap-2">
-                        <Wallet className="h-5 w-5 text-[#00c875]" />
+                        <TrendingDown className="h-5 w-5 text-[#00c875] rotate-180" />
                         <h3 className="text-lg font-bold text-[#323338]">הוספת הכנסה</h3>
                     </div>
 

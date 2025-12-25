@@ -5,7 +5,7 @@ import useSWR, { mutate } from 'swr'
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Check, Loader2 } from 'lucide-react'
+import { Check, Loader2, Calendar } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency, getDaysInMonth, getMonthName } from '@/lib/utils'
 import { getBills } from '@/lib/actions/bill'
@@ -166,7 +166,10 @@ export function CalendarTab() {
             {/* Calendar */}
             <Card>
                 <CardHeader>
-                    <CardTitle>לוח שנה - {getMonthName(month)} {year}</CardTitle>
+                    <div className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-blue-600" />
+                        <CardTitle>לוח שנה - {getMonthName(month)} {year}</CardTitle>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     {/* Days of week header */}
