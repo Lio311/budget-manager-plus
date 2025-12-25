@@ -276,28 +276,20 @@ export function SavingsTab() {
         return colorClass
     }
 
-    if (loadingSavings) {
-        return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-rainbow-spin text-primary" />
-            </div>
-        )
-    }
-
     return (
         <div className="space-y-4 p-1" dir="rtl">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="monday-card border-l-4 border-l-[#00c875] p-6 flex flex-col justify-center gap-2">
                     <h3 className="text-sm font-medium text-gray-500">סך הפקדות חודשיות</h3>
-                    <div className="text-2xl font-bold text-[#00c875] break-all">
-                        {formatCurrency(totalMonthlyDeposit, currency)}
+                    <div className={`text-2xl font-bold text-[#00c875] break-all ${loadingSavings ? 'animate-pulse' : ''}`}>
+                        {loadingSavings ? '...' : formatCurrency(totalMonthlyDeposit, currency)}
                     </div>
                 </div>
 
                 <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2">
                     <h3 className="text-sm font-medium text-gray-500">מספר חסכונות</h3>
-                    <div className="text-2xl font-bold text-[#0073ea]">
+                    <div className={`text-2xl font-bold text-[#0073ea] ${loadingSavings ? 'animate-pulse' : ''}`}>
                         {savings.length}
                     </div>
                 </div>
