@@ -15,6 +15,7 @@ import { getIncomes, addIncome, deleteIncome, updateIncome } from '@/lib/actions
 import { getCategories, addCategory, seedCategories } from '@/lib/actions/category'
 import { useToast } from '@/hooks/use-toast'
 import { PRESET_COLORS } from '@/lib/constants'
+import { Pagination } from '@/components/ui/Pagination'
 import {
     Popover,
     PopoverContent,
@@ -94,6 +95,21 @@ export function IncomeTab() {
     const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
     const [newCategoryName, setNewCategoryName] = useState('')
     const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 5
+    const totalPages = Math.ceil(incomes.length / itemsPerPage)
+
+    // Reset page when month/year changes
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [month, year])
+
+    const paginatedIncomes = incomes.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
 
     useEffect(() => {
         if (categories.length > 0 && !newIncome.category) {
@@ -219,9 +235,18 @@ export function IncomeTab() {
         setSubmitting(false)
     }
 
+    // Helper to boldify colors
     const getCategoryColor = (catName: string) => {
         const cat = categories.find(c => c.name === catName)
-        return cat?.color || 'bg-gray-100 text-gray-700 border-gray-200'
+        let c = cat?.color || 'bg-gray-100 text-gray-700 border-gray-200'
+
+        // Upgrade to bold if it's a weak color
+        if (c.includes('bg-') && c.includes('-100')) {
+            c = c.replace(/bg-(\w+)-100/g, 'bg-$1-500')
+                .replace(/text-(\w+)-700/g, 'text-white')
+                .replace(/border-(\w+)-200/g, 'border-transparent')
+        }
+        return c
     }
 
     if (loadingIncomes) {
@@ -331,49 +356,56 @@ export function IncomeTab() {
                         אין הכנסות רשומות לחודש זה
                     </div>
                 ) : (
-                    <div className="space-y-2">
-                        {incomes.map((income: any) => (
-                            <div key={income.id} className="monday-card flex items-center justify-between p-3 group hover:bg-gray-50/50 transition-colors">
-                                {editingId === income.id ? (
-                                    <>
-                                        <div className="flex flex-nowrap gap-3 items-center flex-1 w-full overflow-x-auto pb-1">
-                                            <select className="p-2 border rounded-md h-10 bg-white text-sm min-w-[140px]" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
-                                                {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
-                                            </select>
-                                            <Input className="flex-1 min-w-[150px]" value={editData.source} onChange={(e) => setEditData({ ...editData, source: e.target.value })} />
-                                            <Input className="w-32" type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
-                                            <Input className="w-[140px]" type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
-                                        </div>
-                                        <div className="flex items-center gap-2 mr-4">
-                                            <Button variant="ghost" size="icon" onClick={handleUpdate} className="text-[#00c875] hover:bg-green-50"><Check className="h-5 w-5" /></Button>
-                                            <Button variant="ghost" size="icon" onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></Button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="flex-1 flex items-center gap-4">
-                                            <div className="min-w-[100px]">
-                                                <span className={`monday-pill ${getCategoryColor(income.category)} opacity-100`}>
-                                                    {income.category || 'כללי'}
-                                                </span>
+                    <>
+                        <div className="space-y-2">
+                            {paginatedIncomes.map((income: any) => (
+                                <div key={income.id} className="monday-card flex items-center justify-between p-3 group hover:bg-gray-50/50 transition-colors">
+                                    {editingId === income.id ? (
+                                        <>
+                                            <div className="flex flex-nowrap gap-3 items-center flex-1 w-full overflow-x-auto pb-1">
+                                                <select className="p-2 border rounded-md h-10 bg-white text-sm min-w-[140px]" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
+                                                    {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+                                                </select>
+                                                <Input className="flex-1 min-w-[150px]" value={editData.source} onChange={(e) => setEditData({ ...editData, source: e.target.value })} />
+                                                <Input className="w-32" type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
+                                                <Input className="w-[140px]" type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="font-bold text-[#323338] text-base">{income.source}</span>
-                                                <span className="text-xs text-[#676879]">{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                            <div className="flex items-center gap-2 mr-4">
+                                                <Button variant="ghost" size="icon" onClick={handleUpdate} className="text-[#00c875] hover:bg-green-50"><Check className="h-5 w-5" /></Button>
+                                                <Button variant="ghost" size="icon" onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></Button>
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <span className="text-lg font-bold text-[#00c875]">{formatCurrency(income.amount, currency)}</span>
-                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-8 w-8 text-blue-500 hover:bg-blue-50"><Pencil className="h-4 w-4" /></Button>
-                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(income.id)} className="h-8 w-8 text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex-1 flex items-center gap-4">
+                                                <div className="min-w-[100px]">
+                                                    <span className={`monday-pill ${getCategoryColor(income.category)} opacity-100 font-bold`}>
+                                                        {income.category || 'כללי'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-[#323338] text-base">{income.source}</span>
+                                                    <span className="text-xs text-[#676879]">{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-lg font-bold text-[#00c875]">{formatCurrency(income.amount, currency)}</span>
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-8 w-8 text-blue-500 hover:bg-blue-50"><Pencil className="h-4 w-4" /></Button>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(income.id)} className="h-8 w-8 text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </>
                 )}
             </div>
         </div>

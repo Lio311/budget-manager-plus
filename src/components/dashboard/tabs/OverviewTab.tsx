@@ -325,7 +325,13 @@ export function OverviewTab() {
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
-                                        data={totalForPie > 0 ? incomeVsExpenses : [{ name: 'אין נתונים', value: 1 }]}
+                                        data={[
+                                            { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
+                                            { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills },
+                                            { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' }, // Purple
+                                            { name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' }, // Blue
+                                            { name: 'יתרה', value: Math.max(0, savingsRemainder), color: COLORS.income }
+                                        ].filter(item => item.value > 0)}
                                         cx="50%"
                                         cy="50%"
                                         innerRadius={70}
@@ -334,7 +340,13 @@ export function OverviewTab() {
                                         dataKey="value"
                                         stroke="none"
                                     >
-                                        {(totalForPie > 0 ? incomeVsExpenses : [{ name: 'אין נתונים', value: 1, color: '#e5e7eb' }]).map((entry, index) => (
+                                        {[
+                                            { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
+                                            { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills },
+                                            { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' },
+                                            { name: 'חיסכון', value: totalSavingsDeposits, color: '#3B82F6' },
+                                            { name: 'יתרה', value: Math.max(0, savingsRemainder), color: COLORS.income }
+                                        ].filter(item => item.value > 0).map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
                                     </Pie>
@@ -342,34 +354,77 @@ export function OverviewTab() {
                                     <Legend
                                         verticalAlign="bottom"
                                         height={36}
-                                        formatter={(value) => <span style={{ color: '#374151', fontSize: '12px' }}>{value}</span>}
+                                        content={(props) => {
+                                            const { payload } = props;
+                                            return (
+                                                <ul className="flex flex-wrap justify-center gap-4 text-xs text-gray-600 rtl:flex-row-reverse">
+                                                    {payload?.map((entry, index) => (
+                                                        <li key={`item-${index}`} className="flex items-center gap-1.5 flex-row-reverse">
+                                                            <span>{entry.value}</span>
+                                                            <div
+                                                                className="w-2.5 h-2.5 rounded-sm"
+                                                                style={{ backgroundColor: entry.color }}
+                                                            />
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            );
+                                        }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
                     </div>
 
-                    {/* Expenses Breakdown - Reduced padding */}
+                    {/* Expenses Breakdown - Bar Chart */}
                     <div className="glass-panel p-4 flex flex-col">
                         <div className="mb-2">
                             <h3 className="text-base font-bold text-[#323338]">הוצאות לפי קטגוריה</h3>
                         </div>
-                        <div className="space-y-3 flex-1 overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
+                        <div className="h-[300px] w-full" dir="ltr">
                             {expensesByCategory.length === 0 ? (
-                                <div className="text-center py-10 text-muted-foreground text-sm">
+                                <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
                                     אין מספיק נתונים להצגה
                                 </div>
                             ) : (
-                                expensesByCategory.map((item, index) => (
-                                    <BudgetProgress
-                                        key={index}
-                                        label={item.name}
-                                        current={item.value}
-                                        total={totalExpenses}
-                                        currency={currency}
-                                        color={item.colorClass}
-                                    />
-                                ))
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        data={expensesByCategory}
+                                        layout="vertical"
+                                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E5E7EB" />
+                                        <XAxis type="number" hide />
+                                        <YAxis
+                                            dataKey="name"
+                                            type="category"
+                                            width={100}
+                                            tick={{ fill: '#374151', fontSize: 12 }}
+                                            orientation="right"
+                                        />
+                                        <Tooltip
+                                            cursor={{ fill: '#F3F4F6' }}
+                                            content={({ active, payload, label }) => {
+                                                if (active && payload && payload.length) {
+                                                    return (
+                                                        <div className="bg-white p-2 border rounded shadow-md text-right" dir="rtl">
+                                                            <p className="font-bold text-gray-900">{label}</p>
+                                                            <p className="text-sm text-[#00c875]">
+                                                                {formatCurrency(Number(payload[0].value), currency)}
+                                                            </p>
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            }}
+                                        />
+                                        <Bar dataKey="value" radius={[4, 4, 4, 4]} barSize={20}>
+                                            {expensesByCategory.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.colorHex || '#EF4444'} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
                             )}
                         </div>
                     </div>

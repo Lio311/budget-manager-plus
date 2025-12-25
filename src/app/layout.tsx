@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     title: 'Keseflow',
     description: 'נהל את התקציב האישי או המשפחתי שלך בקלות עם לוח שנה חכם ותזכורות תשלומים',
     icons: {
-        icon: '/keseflow.png',
+        icon: '/K-ICON.png',
     },
 }
 
@@ -22,7 +22,7 @@ export default function RootLayout({
             localization={heIL}
             appearance={{
                 elements: {
-                    logoImage: "/keseflow.png",
+                    logoImage: "/K-ICON.png",
                     logoBox: {
                         height: "3rem",
                         justifyContent: "center"

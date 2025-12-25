@@ -12,6 +12,7 @@ import { formatCurrency } from '@/lib/utils'
 import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib/actions/debts'
 import { useToast } from '@/hooks/use-toast'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Pagination } from '@/components/ui/Pagination'
 import { DatePicker } from '@/components/ui/date-picker'
 import { DEBT_TYPES, DEBT_TYPE_LABELS, CREDITOR_LABELS } from '@/lib/constants/debt-types'
 
@@ -45,6 +46,21 @@ export function DebtsTab() {
             })
         }
     })
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 5
+    const totalPages = Math.ceil(debts.length / itemsPerPage)
+
+    const paginatedDebts = debts.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
+
+    // Reset pagination when month/year changes
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [month, year])
 
     const [submitting, setSubmitting] = useState(false)
     const [newDebt, setNewDebt] = useState<{
@@ -379,7 +395,7 @@ export function DebtsTab() {
                     {debts.length === 0 ? (
                         <p className="text-center text-muted-foreground py-8 italic">אין חובות רשומים</p>
                     ) : (
-                        debts.map((debt) => (
+                        paginatedDebts.map((debt) => (
                             <div
                                 key={debt.id}
                                 className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg gap-4 transition-all ${debt.isPaid ? 'bg-green-50/50 border-green-200' : 'bg-white hover:bg-slate-50'
@@ -456,9 +472,9 @@ export function DebtsTab() {
 
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${debt.debtType === DEBT_TYPES.OWED_BY_ME
-                                                        ? 'bg-red-100 text-red-700 border border-red-200'
-                                                        : 'bg-blue-100 text-blue-700 border border-blue-200'
+                                                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${debt.debtType === DEBT_TYPES.OWED_BY_ME
+                                                        ? 'bg-red-500 text-white border-transparent'
+                                                        : 'bg-blue-500 text-white border-transparent'
                                                         }`}>
                                                         {DEBT_TYPE_LABELS[debt.debtType as keyof typeof DEBT_TYPE_LABELS]}
                                                     </span>
@@ -506,6 +522,11 @@ export function DebtsTab() {
                         ))
                     )}
                 </div>
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
             </div>
         </div >
     )

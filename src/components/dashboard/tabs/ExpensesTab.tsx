@@ -2,7 +2,6 @@
 
 import useSWR from 'swr'
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -20,6 +19,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { Pagination } from '@/components/ui/Pagination'
 
 interface Category {
     id: string
@@ -213,9 +213,36 @@ export function ExpensesTab() {
         setSubmitting(false)
     }
 
+    // State for Pagination
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 5
+    const totalPages = Math.ceil(expenses.length / itemsPerPage)
+
+    // Reset page when month/year changes
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [month, year])
+
+    const paginatedExpenses = expenses.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
+
+    // ... existing state
+
+    // ... existing actions
+
     const getCategoryColor = (catName: string) => {
         const cat = categories.find(c => c.name === catName)
-        return cat?.color || 'bg-gray-100 text-gray-700 border-gray-200'
+        let c = cat?.color || 'bg-gray-100 text-gray-700 border-gray-200'
+
+        // Upgrade to bold if it's a weak color
+        if (c.includes('bg-') && c.includes('-100')) {
+            c = c.replace(/bg-(\w+)-100/g, 'bg-$1-500')
+                .replace(/text-(\w+)-700/g, 'text-white')
+                .replace(/border-(\w+)-200/g, 'border-transparent')
+        }
+        return c
     }
 
     if (loadingExpenses) {
@@ -228,6 +255,7 @@ export function ExpensesTab() {
 
     return (
         <div className="space-y-5">
+            {/* ... Summary and Form ... */}
             {/* Summary Card - Monday Style */}
             <div className="monday-card border-l-4 border-l-[#e2445c] p-5 flex flex-col justify-center gap-2">
                 <h3 className="text-sm font-medium text-gray-500">סך הוצאות חודשיות</h3>
@@ -325,49 +353,56 @@ export function ExpensesTab() {
                         אין הוצאות רשומות לחודש זה
                     </div>
                 ) : (
-                    <div className="space-y-2">
-                        {expenses.map((exp: any) => (
-                            <div key={exp.id} className="monday-card flex items-center justify-between p-3 group hover:bg-gray-50/50 transition-colors">
-                                {editingId === exp.id ? (
-                                    <>
-                                        <div className="flex flex-nowrap gap-3 items-center flex-1 w-full overflow-x-auto pb-1">
-                                            <select className="p-2 border rounded-md h-10 bg-white text-sm min-w-[140px]" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
-                                                {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
-                                            </select>
-                                            <Input className="flex-1 min-w-[150px]" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} />
-                                            <Input className="w-32" type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
-                                            <Input className="w-[140px]" type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
-                                        </div>
-                                        <div className="flex items-center gap-2 mr-4">
-                                            <Button variant="ghost" size="icon" onClick={handleUpdate} className="text-[#00c875] hover:bg-green-50"><Check className="h-5 w-5" /></Button>
-                                            <Button variant="ghost" size="icon" onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></Button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="flex-1 flex items-center gap-4">
-                                            <div className="min-w-[100px]">
-                                                <span className={`monday-pill ${getCategoryColor(exp.category)} opacity-100`}>
-                                                    {exp.category || 'כללי'}
-                                                </span>
+                    <>
+                        <div className="space-y-2">
+                            {paginatedExpenses.map((exp: any) => (
+                                <div key={exp.id} className="monday-card flex items-center justify-between p-3 group hover:bg-gray-50/50 transition-colors">
+                                    {editingId === exp.id ? (
+                                        <>
+                                            <div className="flex flex-nowrap gap-3 items-center flex-1 w-full overflow-x-auto pb-1">
+                                                <select className="p-2 border rounded-md h-10 bg-white text-sm min-w-[140px]" value={editData.category} onChange={(e) => setEditData({ ...editData, category: e.target.value })}>
+                                                    {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+                                                </select>
+                                                <Input className="flex-1 min-w-[150px]" value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} />
+                                                <Input className="w-32" type="number" placeholder="סכום" value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} />
+                                                <Input className="w-[140px]" type="date" value={editData.date} onChange={(e) => setEditData({ ...editData, date: e.target.value })} />
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="font-bold text-[#323338] text-base">{exp.description}</span>
-                                                <span className="text-xs text-[#676879]">{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                            <div className="flex items-center gap-2 mr-4">
+                                                <Button variant="ghost" size="icon" onClick={handleUpdate} className="text-[#00c875] hover:bg-green-50"><Check className="h-5 w-5" /></Button>
+                                                <Button variant="ghost" size="icon" onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></Button>
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <span className="text-lg font-bold text-[#e2445c]">{formatCurrency(exp.amount, currency)}</span>
-                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50"><Pencil className="h-4 w-4" /></Button>
-                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex-1 flex items-center gap-4">
+                                                <div className="min-w-[100px]">
+                                                    <span className={`monday-pill ${getCategoryColor(exp.category)} opacity-100 font-bold`}>
+                                                        {exp.category || 'כללי'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-[#323338] text-base">{exp.description}</span>
+                                                    <span className="text-xs text-[#676879]">{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-lg font-bold text-[#e2445c]">{formatCurrency(exp.amount, currency)}</span>
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50"><Pencil className="h-4 w-4" /></Button>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </>
                 )}
             </div>
         </div>

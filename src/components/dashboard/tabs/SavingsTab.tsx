@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Pagination } from '@/components/ui/Pagination'
 import { Plus, Trash2, Loader2, Pencil, X, Check } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
@@ -82,6 +83,18 @@ export function SavingsTab() {
     // --- State ---
 
     const [submitting, setSubmitting] = useState(false)
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 5
+    const totalPages = Math.ceil(savings.length / itemsPerPage)
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [month, year])
+
+    const paginatedSavings = savings.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
 
     // Create form state
     const [newSaving, setNewSaving] = useState({
@@ -258,7 +271,7 @@ export function SavingsTab() {
             colorClass = colorClass
                 .replace(/bg-(\w+)-100/g, 'bg-$1-500')
                 .replace(/text-(\w+)-700/g, 'text-white')
-                .replace(/border-(\w+)-200/g, 'border-$1-600')
+                .replace(/border-(\w+)-200/g, 'border-transparent')
         }
         return colorClass
     }
@@ -432,7 +445,7 @@ export function SavingsTab() {
                             אין חסכונות רשומים
                         </div>
                     ) : (
-                        savings.map((saving: any) => (
+                        paginatedSavings.map((saving: any) => (
                             <div
                                 key={saving.id}
                                 className="monday-card flex flex-col sm:flex-row items-center justify-between p-4 group"
@@ -560,6 +573,11 @@ export function SavingsTab() {
                         ))
                     )}
                 </div>
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
             </div>
         </div>
     )
