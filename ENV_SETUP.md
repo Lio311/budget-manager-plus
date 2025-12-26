@@ -52,7 +52,21 @@ FROM_EMAIL="Budget Manager <noreply@yourdomain.com>"
 - Copy the generated key (starts with `re_`)
 - Set FROM_EMAIL to your verified domain email
 
-### 4. App URL
+### 4. AI Service (Google Gemini)
+
+Get this from [Google AI Studio](https://aistudio.google.com/app/apikey):
+
+```bash
+GEMINI_API_KEY=AIzaSy...
+```
+
+**Where to find:**
+- Go to https://aistudio.google.com/app/apikey
+- Click "Create API Key"
+- Select your Google Cloud project (or create a new one)
+- Copy the generated API key (starts with `AIzaSy`)
+
+### 5. App URL
 
 ```bash
 NEXT_PUBLIC_APP_URL=http://localhost:3000  # For local development

@@ -4,7 +4,11 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
-const genAI = new GoogleGenerativeAI('AIzaSyDO9OvmDhgzqyPB1WrlHhkobretmtVQ3E0')
+const apiKey = process.env.GEMINI_API_KEY
+if (!apiKey) {
+    throw new Error('GEMINI_API_KEY is not set in environment variables')
+}
+const genAI = new GoogleGenerativeAI(apiKey)
 
 interface FinancialData {
     month: number
