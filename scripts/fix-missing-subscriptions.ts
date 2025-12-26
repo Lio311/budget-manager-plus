@@ -7,7 +7,11 @@
  * Run with: npx tsx scripts/fix-missing-subscriptions.ts
  */
 
+import { config } from 'dotenv'
 import { PrismaClient } from '@prisma/client'
+
+// Load environment variables from .env.local
+config({ path: '.env.local' })
 
 const prisma = new PrismaClient()
 
