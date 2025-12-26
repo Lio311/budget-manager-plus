@@ -233,12 +233,13 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                         <p className="font-semibold text-blue-900">📝 How to Toggle Maintenance Mode:</p>
                         <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
                             <li>Go to <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="underline font-medium">Vercel Dashboard</a></li>
-                            <li>Select your project → <strong>Storage</strong> → <strong>Edge Config</strong></li>
-                            <li>Find the <code className="bg-blue-100 px-1 rounded">maintenanceMode</code> key</li>
-                            <li>Set to <code className="bg-blue-100 px-1 rounded">true</code> (maintenance) or <code className="bg-blue-100 px-1 rounded">false</code> (active)</li>
+                            <li>Select your project → <strong>Settings</strong> → <strong>Environment Variables</strong></li>
+                            <li>Find <code className="bg-blue-100 px-1 rounded">MAINTENANCE_MODE</code></li>
+                            <li>Edit and set to <code className="bg-blue-100 px-1 rounded">true</code> (maintenance) or <code className="bg-blue-100 px-1 rounded">false</code> (active)</li>
+                            <li>Click <strong>Save</strong> and redeploy</li>
                         </ol>
                         <p className="text-xs text-blue-700 mt-2">
-                            💡 Changes take effect immediately. Admins can always access /admin during maintenance.
+                            💡 Admins can always access /admin during maintenance.
                         </p>
                     </div>
                 </CardContent>
