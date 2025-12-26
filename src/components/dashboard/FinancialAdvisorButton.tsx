@@ -3,13 +3,20 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Sparkles, Loader2, Clock } from 'lucide-react'
+import { Loader2, Clock } from 'lucide-react'
 import { getFinancialAdvice } from '@/lib/actions/ai'
 import { toast } from 'sonner'
+import Image from 'next/image'
 
 interface FinancialAdvisorButtonProps {
     financialData: any
 }
+
+const SparkleIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" className={className}>
+        <path d="M256 48c-11.7 0-21.2 9.5-21.2 21.2 0 70.2-56.9 127.1-127.1 127.1-11.7 0-21.2 9.5-21.2 21.2s9.5 21.2 21.2 21.2c70.2 0 127.1 56.9 127.1 127.1 0 11.7 9.5 21.2 21.2 21.2s21.2-9.5 21.2-21.2c0-70.2 56.9-127.1 127.1-127.1 11.7 0 21.2-9.5 21.2-21.2s-9.5-21.2-21.2-21.2c-70.2 0-127.1-56.9-127.1-127.1C277.2 57.5 267.7 48 256 48z" />
+    </svg>
+)
 
 export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButtonProps) {
     const [isOpen, setIsOpen] = useState(false)
@@ -57,14 +64,14 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                     className="relative overflow-hidden group"
                     title="ייעוץ פיננסי AI"
                 >
-                    <Sparkles className="h-4 w-4 text-black group-hover:text-gray-700 transition-colors" />
+                    <SparkleIcon className="h-4 w-4 text-black group-hover:text-gray-700 transition-colors" />
                     <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-gray-100 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                     <DialogTitle className="text-right flex items-center gap-2">
-                        <Sparkles className="h-5 w-5 text-black" />
+                        <SparkleIcon className="h-5 w-5 text-black" />
                         ייעוץ פיננסי מבוסס AI
                     </DialogTitle>
                 </DialogHeader>
@@ -104,7 +111,7 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                             className="w-full"
                             disabled={loading}
                         >
-                            <Sparkles className="h-4 w-4 ml-2" />
+                            <SparkleIcon className="h-4 w-4 ml-2" />
                             קבל ייעוץ מחדש
                         </Button>
                     </div>
