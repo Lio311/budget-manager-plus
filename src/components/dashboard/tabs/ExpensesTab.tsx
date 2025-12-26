@@ -28,19 +28,19 @@ interface Category {
 }
 
 export function ExpensesTab() {
-    const { month, year, currency } = useBudget()
+    const { month, year, currency, budgetType } = useBudget()
     const { toast } = useToast()
 
     // --- Data Fetching ---
 
     const fetcherExpenses = async () => {
-        const result = await getExpenses(month, year)
+        const result = await getExpenses(month, year, budgetType)
         if (result.success && result.data) return result.data
         throw new Error(result.error || 'Failed to fetch expenses')
     }
 
     const { data: expenses = [], isLoading: loadingExpenses, mutate: mutateExpenses } = useSWR(
-        ['expenses', month, year],
+        ['expenses', month, year, budgetType],
         fetcherExpenses,
         { revalidateOnFocus: false }
     )
@@ -52,7 +52,7 @@ export function ExpensesTab() {
     }
 
     const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
-        ['categories', 'expense'],
+        ['categories', 'expense', budgetType],
         fetcherCategories,
         { revalidateOnFocus: false }
     )
@@ -114,7 +114,7 @@ export function ExpensesTab() {
                 date: newExpense.date,
                 isRecurring: newExpense.isRecurring,
                 recurringEndDate: newExpense.recurringEndDate
-            })
+            }, budgetType)
 
             if (result.success) {
                 toast({ title: 'הצלחה', description: 'הוצאה נוספה בהצלחה' })

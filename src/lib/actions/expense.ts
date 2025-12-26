@@ -4,9 +4,9 @@ import { prisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 
-export async function getExpenses(month: number, year: number) {
+export async function getExpenses(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
-        const budget = await getCurrentBudget(month, year)
+        const budget = await getCurrentBudget(month, year, '₪', type)
 
         const expenses = await prisma.expense.findMany({
             where: { budgetId: budget.id },
@@ -31,10 +31,11 @@ export async function addExpense(
         isRecurring?: boolean
         recurringStartDate?: string
         recurringEndDate?: string
-    }
+    },
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
-        const budget = await getCurrentBudget(month, year)
+        const budget = await getCurrentBudget(month, year, '₪', type)
 
         const expense = await prisma.expense.create({
             data: {
@@ -58,7 +59,8 @@ export async function addExpense(
                 data.description,
                 data.amount,
                 startDate,
-                data.recurringEndDate
+                data.recurringEndDate,
+                type // Pass type to recursive function
             )
         }
 
@@ -76,7 +78,8 @@ async function createRecurringExpenses(
     description: string,
     amount: number,
     startDateStr: string,
-    endDateStr: string
+    endDateStr: string,
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     const startDate = new Date(startDateStr)
     const endDate = new Date(endDateStr)
@@ -105,7 +108,7 @@ async function createRecurringExpenses(
         (currentYear === endYear && currentMonth <= endMonth)
     ) {
         try {
-            const budget = await getCurrentBudget(currentMonth, currentYear)
+            const budget = await getCurrentBudget(currentMonth, currentYear, '₪', type)
 
             // Handle invalid days (e.g., Feb 31 -> Feb 28/29)
             const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate()
