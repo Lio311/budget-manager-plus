@@ -595,7 +595,7 @@ function StatCard({
                 <div>
                     <h3 className="text-xs font-medium text-gray-500 mb-0.5">{title}</h3>
                     <div className={`text-xl font-bold text-[#323338] tracking-tight ${loading ? 'animate-pulse' : ''}`}>
-                        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : value}
+                        {loading ? <div className="flex justify-center"><Loader2 className="h-5 w-5 animate-spin" /></div> : value}
                     </div>
                 </div>
                 <div className={`${bgColor} ${color} p-2 rounded-lg shadow-sm opacity-100`}> {/* Opacity 100 forced */}
