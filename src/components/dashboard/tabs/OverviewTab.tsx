@@ -529,6 +529,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     <BudgetProgress
                                         label="הוצאות שוטפות"
                                         current={standardExpenses}
+                                        total={totalIncome}
                                         currency={currency}
                                         color="bg-red-500"
                                     />
