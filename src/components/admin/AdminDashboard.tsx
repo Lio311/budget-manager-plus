@@ -89,23 +89,6 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         }
     }
 
-    const handleToggleMaintenance = async () => {
-        setIsTogglingMaintenance(true)
-        try {
-            const result = await toggleMaintenanceMode()
-            if (result.success) {
-                setMaintenanceMode(result.maintenanceMode!)
-                toast.success(result.message)
-            } else {
-                toast.error(result.error || 'Failed to toggle maintenance mode')
-            }
-        } catch (error) {
-            toast.error('An error occurred')
-        } finally {
-            setIsTogglingMaintenance(false)
-        }
-    }
-
     return (
         <div className="space-y-8">
             {/* Edit User Dialog */}
