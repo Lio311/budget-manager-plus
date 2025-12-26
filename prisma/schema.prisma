@@ -7,6 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+// Enums for Business Support
+enum PlanType {
+  PERSONAL
+  BUSINESS
+}
+
+enum VatType {
+  NONE            // Ptor (Eilat etc.)
+  FULL            // 100% recognized
+  PARTIAL         // 2/3 or other %
+  EXEMPT          // Frugality, etc.
+}
+
 model User {
   id        String   @id 
   email     String   @unique
@@ -16,6 +30,7 @@ model User {
   budgets    Budget[]
   categories Category[]
   subscription Subscription?
+  businessProfile BusinessProfile?
   paymentHistory PaymentHistory[]
   feedbacks    Feedback[]
 
@@ -27,6 +42,19 @@ model User {
   hasUsedTrial   Boolean  @default(false)
 
   @@map("users")
+}
+
+model BusinessProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName String
+  companyId   String?  // H.P. / Osek Murshe
+  vatStatus   String   // EXEMPT (Ptor), AUTHORIZED (Murshe), LTD (Baam)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("business_profiles")
 }
 
 model Budget {
@@ -72,6 +100,14 @@ model Income {
   recurringSourceId   String?
   recurringStartDate  DateTime?
   recurringEndDate    DateTime?
+  
+  // Business Fields
+  amountBeforeVat   Float?
+  vatAmount         Float?
+  invoiceDate       DateTime? // Tax event date
+  paymentDate       DateTime? // Cash flow date
+  paymentMethod     String?
+  
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   @@index([budgetId])
@@ -92,6 +128,16 @@ model Expense {
   recurringSourceId   String?
   recurringStartDate  DateTime?
   recurringEndDate    DateTime?
+  
+  // Business Fields
+  amountBeforeVat   Float?
+  vatAmount         Float?
+  vatType           VatType? @default(FULL)
+  isDeductible      Boolean? @default(true) // For income tax recognition
+  invoiceDate       DateTime? // Tax event date
+  paymentDate       DateTime? // Cash flow date
+  paymentMethod     String?
+  
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   @@index([budgetId])
@@ -163,6 +209,7 @@ model Subscription {
   userId            String    @unique
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   status            String    @default("inactive") // trial, active, expired, inactive
+  planType          PlanType  @default(PERSONAL)   // NEW: PERSONAL vs BUSINESS
   startDate         DateTime  @default(now())
   endDate           DateTime?
   paypalOrderId     String?
