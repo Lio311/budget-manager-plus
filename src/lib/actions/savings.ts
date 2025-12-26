@@ -15,7 +15,8 @@ async function createRecurringSavings(
         recurringStartDate: Date
         recurringEndDate: Date
     },
-    userId: string
+    userId: string,
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     const savings = []
 
@@ -48,10 +49,13 @@ async function createRecurringSavings(
 
     // Fetch user once to be sure (though userId is passed)
     // Actually we can just query budgets directly by userId
+    // Fetch user once to be sure (though userId is passed)
+    // Actually we can just query budgets directly by userId
     const existingBudgets = await prisma.budget.findMany({
         where: {
             userId: userId,
-            year: { in: years }
+            year: { in: years },
+            type: type // Filter by type to avoid mixing Personal/Business budgets
         }
     })
 
@@ -68,7 +72,8 @@ async function createRecurringSavings(
                 userId,
                 month: m,
                 year: y,
-                currency: '₪' // Default, or fetch user preference. Ideally we should use user's existing settings but defaulting is safe for now or we could fetch 1 budget to get currency.
+                currency: '₪', // Default
+                type: type // Create with correct type
             })
         }
     }
@@ -89,7 +94,8 @@ async function createRecurringSavings(
         const allBudgets = await prisma.budget.findMany({
             where: {
                 userId: userId,
-                year: { in: years }
+                year: { in: years },
+                type: type // Filter by type on re-fetch too
             }
         })
         allBudgets.forEach(b => budgetMap.set(`${b.month}-${b.year}`, b.id))
@@ -177,7 +183,8 @@ export async function addSaving(
                     recurringStartDate: startDate,
                     recurringEndDate: data.recurringEndDate
                 },
-                budget.userId
+                budget.userId,
+                type
             )
 
             revalidatePath('/dashboard')

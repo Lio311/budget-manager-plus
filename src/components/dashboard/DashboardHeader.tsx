@@ -88,7 +88,16 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHea
                     </div>
 
                     {/* User Button */}
-                    <div className="flex-shrink-0">
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setBudgetType(budgetType === 'PERSONAL' ? 'BUSINESS' : 'PERSONAL')}
+                            className={`px-2 py-1 text-xs font-bold rounded-md border transition-all ${budgetType === 'PERSONAL'
+                                    ? 'bg-blue-50 text-blue-600 border-blue-200'
+                                    : 'bg-green-50 text-green-600 border-green-200'
+                                }`}
+                        >
+                            {budgetType === 'PERSONAL' ? 'פרטי' : 'עסקי'}
+                        </button>
                         <UserButton />
                     </div>
                 </div>
