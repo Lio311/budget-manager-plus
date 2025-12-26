@@ -71,14 +71,14 @@ export default function HomePage() {
                                         <span className="font-bold text-lg">₪12,450</span>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div className="bg-purple-50 p-3 rounded-xl border border-purple-100 text-center">
-                                            <div className="text-purple-600 text-xs font-bold mb-1">חסכונות</div>
-                                            <div className="text-xl font-bold text-gray-800">₪45k</div>
+                                            <div className="text-purple-600 text-[10px] font-bold mb-1">חסכונות</div>
+                                            <div className="text-lg font-bold text-gray-800">₪45k</div>
                                         </div>
                                         <div className="bg-orange-50 p-3 rounded-xl border border-orange-100 text-center">
-                                            <div className="text-orange-600 text-xs font-bold mb-1">חובות</div>
-                                            <div className="text-xl font-bold text-gray-800">₪12k</div>
+                                            <div className="text-orange-600 text-[10px] font-bold mb-1">חובות</div>
+                                            <div className="text-lg font-bold text-gray-800">₪12k</div>
                                         </div>
                                     </div>
 
@@ -178,19 +178,19 @@ export default function HomePage() {
                                     </div>
                                     <div className="text-xs font-bold text-gray-400">BUSINESS DASHBOARD</div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                                        <div className="text-green-600 text-xs font-bold mb-1">הכנסות החודש</div>
-                                        <div className="text-2xl font-bold text-gray-800">₪42,500</div>
-                                        <div className="text-xs text-green-600 mt-1 flex items-center justify-end gap-1">
+                                        <div className="text-green-600 text-[10px] font-bold mb-1">הכנסות החודש</div>
+                                        <div className="text-xl font-bold text-gray-800">₪42,500</div>
+                                        <div className="text-[10px] text-green-600 mt-1 flex items-center justify-end gap-1">
                                             מחודש שעבר
                                             <span dir="ltr" className="font-bold">+12%</span>
                                         </div>
                                     </div>
                                     <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                        <div className="text-blue-600 text-xs font-bold mb-1">מע"מ לתשלום</div>
-                                        <div className="text-2xl font-bold text-gray-800">₪6,120</div>
-                                        <div className="text-xs text-blue-600 mt-1">עד ה-15 לחודש</div>
+                                        <div className="text-blue-600 text-[10px] font-bold mb-1">מע"מ לתשלום</div>
+                                        <div className="text-xl font-bold text-gray-800">₪6,120</div>
+                                        <div className="text-[10px] text-blue-600 mt-1">עד ה-15 לחודש</div>
                                     </div>
                                 </div>
                                 <div className="space-y-2 pt-2">

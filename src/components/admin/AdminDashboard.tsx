@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Construction } from 'lucide-react'
+import { Trash2, Edit2, Construction, ShieldAlert, Globe } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
     Table,
@@ -18,9 +18,11 @@ import {
     TableHeader,
     TableRow
 } from '@/components/ui/table'
-import { Trash2, Edit2 } from 'lucide-react'
 import { createCoupon, deleteCoupon, deleteUser, updateSubscription, updateCoupon } from '@/lib/actions/admin'
+import { toggleMaintenanceMode } from '@/lib/actions/maintenance'
 import { CountdownTimer } from '@/components/admin/CountdownTimer'
+import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
 
 interface AdminDashboardProps {
     initialData: {
@@ -87,6 +89,24 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
         const result = await updateSubscription(subId, data)
         if (!result.success) {
             alert(result.error)
+        }
+    }
+
+    const handleToggleMaintenance = async () => {
+        const nextState = !maintenanceMode
+        const confirmMsg = nextState
+            ? "Are you sure you want to ENABLE maintenance mode? This will block ALL non-admin users."
+            : "Are you sure you want to DISABLE maintenance mode? The site will be public again."
+
+        if (!confirm(confirmMsg)) return
+
+        setMaintenanceMode(nextState)
+        const res = await toggleMaintenanceMode(nextState)
+        if (res.success) {
+            toast.success(`Maintenance mode ${nextState ? 'enabled' : 'disabled'} successfully`)
+        } else {
+            toast.error('Failed to update maintenance mode. Please try again.')
+            setMaintenanceMode(!nextState)
         }
     }
 
@@ -209,38 +229,48 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
 
 
             {/* Maintenance Mode Card */}
-            <Card className="mb-6">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Construction className="w-5 h-5" />
-                        Maintenance Mode
+            <Card className={`border-2 transition-all duration-300 ${maintenanceMode ? 'border-orange-500 bg-orange-50/30' : 'border-green-100'}`}>
+                <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Construction className={`w-5 h-5 ${maintenanceMode ? 'text-orange-600' : 'text-green-600'}`} />
+                            Maintenance Mode
+                        </div>
+                        <Badge variant={maintenanceMode ? "destructive" : "secondary"} className="animate-pulse">
+                            {maintenanceMode ? 'LIVE: MAINTENANCE' : 'LIVE: PUBLIC'}
+                        </Badge>
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="font-medium">Current Status:</p>
-                            <p className={`text-sm ${maintenanceMode ? 'text-orange-600' : 'text-green-600'}`}>
-                                {maintenanceMode ? '🔧 Site in Maintenance' : '✅ Site Active'}
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-white border shadow-sm">
+                        <div className="space-y-1">
+                            <h4 className="font-bold text-gray-900">Site Visibility</h4>
+                            <p className="text-sm text-gray-500">
+                                {maintenanceMode
+                                    ? 'Site is currently hidden. Only admins can access the dashboard.'
+                                    : 'Site is currently public and accessible to everyone.'}
                             </p>
                         </div>
-                        <div className={`px-4 py-2 rounded-lg font-semibold ${maintenanceMode ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
-                            {maintenanceMode ? 'MAINTENANCE' : 'ACTIVE'}
-                        </div>
+
+                        <Button
+                            onClick={handleToggleMaintenance}
+                            variant={maintenanceMode ? "default" : "outline"}
+                            className={`min-w-[160px] font-bold shadow-md transition-all ${maintenanceMode
+                                ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                                : 'bg-white text-green-700 border-green-200 hover:bg-green-50'
+                                }`}
+                        >
+                            {maintenanceMode ? (
+                                <><Globe className="w-4 h-4 mr-2" /> Disable Maintenance</>
+                            ) : (
+                                <><ShieldAlert className="w-4 h-4 mr-2" /> Enable Maintenance</>
+                            )}
+                        </Button>
                     </div>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
-                        <p className="font-semibold text-blue-900">📝 How to Toggle Maintenance Mode:</p>
-                        <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-                            <li>Go to <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="underline font-medium">Vercel Dashboard</a></li>
-                            <li>Select your project → <strong>Settings</strong> → <strong>Environment Variables</strong></li>
-                            <li>Find <code className="bg-blue-100 px-1 rounded">MAINTENANCE_MODE</code></li>
-                            <li>Edit and set to <code className="bg-blue-100 px-1 rounded">true</code> (maintenance) or <code className="bg-blue-100 px-1 rounded">false</code> (active)</li>
-                            <li>Click <strong>Save</strong> and redeploy</li>
-                        </ol>
-                        <p className="text-xs text-blue-700 mt-2">
-                            💡 Admins can always access /admin during maintenance.
-                        </p>
+                    <div className="text-xs text-gray-400 flex items-center gap-1.5 px-2">
+                        <div className={`w-2 h-2 rounded-full ${maintenanceMode ? 'bg-orange-500' : 'bg-green-500'}`} />
+                        Status: {maintenanceMode ? 'Maintenance protocol active' : 'Standard operation'}
                     </div>
                 </CardContent>
             </Card>
