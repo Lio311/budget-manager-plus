@@ -112,7 +112,7 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
 
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-xs text-blue-800 text-right">
-                        💡 <strong>שים לב:</strong> הייעוץ מסופק על ידי בינה מלאכותית ומהווה המלצות כלליות בלבד.
+                        <strong>שים לב:</strong> הייעוץ מסופק על ידי בינה מלאכותית ומהווה המלצות כלליות בלבד.
                         לייעוץ פיננסי מקצועי ומותאם אישית, מומלץ להתייעץ עם יועץ פיננסי מוסמך.
                         {!isCached && advice && (
                             <span className="block mt-2">

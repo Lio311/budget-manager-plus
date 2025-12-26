@@ -231,6 +231,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     <h2 className="text-xl font-bold tracking-tight">סקירה כללית</h2> {/* Smaller title */}
                 </div>
                 <div className="flex items-center gap-2">
+                    <FeedbackButton />
                     <FinancialAdvisorButton
                         financialData={{
                             month,
@@ -246,7 +247,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             savings: savingsItems
                         }}
                     />
-                    <FeedbackButton />
                     <Dialog open={isSettingsOpen} onOpenChange={(open) => {
                         setIsSettingsOpen(open)
                         if (open) loadSettings()
