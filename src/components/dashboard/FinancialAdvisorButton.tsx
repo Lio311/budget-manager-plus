@@ -95,7 +95,7 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                             <p className="text-xs text-gray-400">זה עשוי לקחת כ-10 שניות</p>
                         </div>
                     ) : (
-                        <div className="mt-4 max-h-[60vh] overflow-y-auto">
+                        <div className="mt-4">
                             {advice ? (
                                 <div className="space-y-4">
                                     <div className="prose prose-sm max-w-none text-right" dir="rtl">
