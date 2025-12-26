@@ -17,7 +17,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHeaderProps = {}) {
-    const { month, year, currency, setMonth, setYear, setCurrency } = useBudget()
+    const { month, year, currency, budgetType, setMonth, setYear, setCurrency, setBudgetType } = useBudget()
 
     const handlePrevMonth = () => {
         if (month === 1) {
@@ -65,8 +65,8 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHea
                         size="icon"
                         onClick={onMenuToggle}
                         className={`h-9 w-9 rounded-full flex-shrink-0 transition-all duration-200 border-0 ${menuOpen
-                                ? 'bg-white hover:bg-gray-100 text-black'
-                                : 'bg-black hover:bg-gray-800 text-white'
+                            ? 'bg-white hover:bg-gray-100 text-black'
+                            : 'bg-black hover:bg-gray-800 text-white'
                             }`}
                     >
                         <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
@@ -106,7 +106,27 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHea
                 </div>
 
                 {/* Left Section - User Profile (Desktop only) */}
-                <div className="hidden md:flex w-72 h-full items-center justify-end px-8">
+                <div className="hidden md:flex w-72 h-full items-center justify-end px-8 gap-4">
+                    <div className="flex bg-gray-100 rounded-lg p-1">
+                        <button
+                            onClick={() => setBudgetType('PERSONAL')}
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'PERSONAL'
+                                ? 'bg-white text-gray-900 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-900'
+                                }`}
+                        >
+                            פרטי
+                        </button>
+                        <button
+                            onClick={() => setBudgetType('BUSINESS')}
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'BUSINESS'
+                                ? 'bg-white text-gray-900 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-900'
+                                }`}
+                        >
+                            עסקי
+                        </button>
+                    </div>
                     <UserButton />
                 </div>
             </div>
