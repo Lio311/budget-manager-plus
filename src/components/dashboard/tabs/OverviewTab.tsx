@@ -614,7 +614,7 @@ function BudgetProgress({
             <div className="flex justify-between mb-1">
                 <span className="text-xs font-medium">{label}</span>
                 <span className="text-xs text-muted-foreground">
-                    {formatCurrency(current, currency)} / {formatCurrency(total, currency)}
+                    {formatCurrency(total, currency)} / {formatCurrency(current, currency)}
                 </span>
             </div>
             <div className="w-full bg-gray-100 rounded-full h-2">
