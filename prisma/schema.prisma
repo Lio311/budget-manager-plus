@@ -286,6 +286,14 @@ model TrialTracker {
   @@map("trial_trackers")
 }
 
+model SiteConfig {
+  id              String   @id @default("default")
+  maintenanceMode Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
+
+  @@map("site_config")
+}
+
 model AIAdviceCache {
   id        String   @id @default(cuid())
   userId    String
