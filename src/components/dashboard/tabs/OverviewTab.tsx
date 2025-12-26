@@ -21,6 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { swrConfig } from '@/lib/swr-config'
 import { FeedbackButton } from '@/components/dashboard/FeedbackButton'
+import { FinancialAdvisorButton } from '@/components/dashboard/FinancialAdvisorButton'
 
 interface Category {
     id: string
@@ -230,6 +231,21 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     <h2 className="text-xl font-bold tracking-tight">סקירה כללית</h2> {/* Smaller title */}
                 </div>
                 <div className="flex items-center gap-2">
+                    <FinancialAdvisorButton
+                        financialData={{
+                            month,
+                            year,
+                            currency,
+                            totalIncome,
+                            totalExpenses,
+                            savingsRemainder,
+                            incomes,
+                            expenses,
+                            bills,
+                            debts,
+                            savings: savingsItems
+                        }}
+                    />
                     <FeedbackButton />
                     <Dialog open={isSettingsOpen} onOpenChange={(open) => {
                         setIsSettingsOpen(open)

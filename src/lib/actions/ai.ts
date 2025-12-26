@@ -1,0 +1,86 @@
+'use server'
+
+import { GoogleGenerativeAI } from '@google/generative-ai'
+
+const genAI = new GoogleGenerativeAI('AIzaSyDO9OvmDhgzqyPB1WrlHhkobretmtVQ3E0')
+
+interface FinancialData {
+    month: number
+    year: number
+    currency: string
+    totalIncome: number
+    totalExpenses: number
+    savingsRemainder: number
+    incomes: any[]
+    expenses: any[]
+    bills: any[]
+    debts: any[]
+    savings: any[]
+}
+
+export async function getFinancialAdvice(data: FinancialData) {
+    try {
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+
+        // Format the financial data into a comprehensive prompt
+        const prompt = `אתה יועץ פיננסי מקצועי. נתחת את הנתונים הפיננסיים הבאים של לקוח ותספק ניתוח מקצועי ותובנות.
+
+**נתונים פיננסיים לחודש ${data.month}/${data.year}:**
+
+**הכנסות:**
+- סך הכנסות: ${data.totalIncome} ${data.currency}
+- מספר מקורות הכנסה: ${data.incomes.length}
+${data.incomes.map((inc: any) => `  - ${inc.source}: ${inc.amount} ${data.currency}`).join('\n')}
+
+**הוצאות:**
+- סך הוצאות: ${data.totalExpenses} ${data.currency}
+- מספר הוצאות: ${data.expenses.length}
+${data.expenses.slice(0, 10).map((exp: any) => `  - ${exp.description} (${exp.category}): ${exp.amount} ${data.currency}`).join('\n')}
+${data.expenses.length > 10 ? `  ... ועוד ${data.expenses.length - 10} הוצאות` : ''}
+
+**חשבונות קבועים:**
+- מספר חשבונות: ${data.bills.length}
+- שולמו: ${data.bills.filter((b: any) => b.isPaid).length}
+${data.bills.map((bill: any) => `  - ${bill.name}: ${bill.amount} ${data.currency} ${bill.isPaid ? '✓' : '✗'}`).join('\n')}
+
+**חובות:**
+- מספר חובות: ${data.debts.length}
+- תשלום חודשי כולל: ${data.debts.reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)} ${data.currency}
+${data.debts.map((debt: any) => `  - ${debt.creditor}: ${debt.monthlyPayment} ${data.currency}/חודש (יתרה: ${debt.remainingBalance} ${data.currency})`).join('\n')}
+
+**חסכונות:**
+- הפקדה חודשית: ${data.savings.reduce((sum: number, s: any) => sum + s.monthlyDeposit, 0)} ${data.currency}
+${data.savings.map((sav: any) => `  - ${sav.description}: ${sav.monthlyDeposit} ${data.currency}/חודש`).join('\n')}
+
+**מצב כללי:**
+- יתרה חודשית (חיסכון): ${data.savingsRemainder} ${data.currency}
+- אחוז חיסכון: ${data.totalIncome > 0 ? ((data.savingsRemainder / data.totalIncome) * 100).toFixed(1) : 0}%
+
+---
+
+**בבקשה ספק ניתוח מקצועי הכולל:**
+
+1. **סקירת תיק**: סיכום קצר של המצב הפיננסי הכללי
+2. **נקודות חוזק**: מה הלקוח עושה נכון
+3. **תחומים לשיפור**: המלצות ספציפיות ומעשיות
+4. **ניתוח סיכונים**: סיכונים פוטנציאליים שכדאי לשים לב אליהם
+5. **צעדים מעשיים**: 3-5 פעולות קונקרטיות לשיפור המצב הפיננסי
+
+**חשוב:** כתוב בעברית, בצורה ברורה ומקצועית, עם נקודות ממוספרות וכדורים להדגשה. השתמש באימוג'י רלוונטיים להדגשה.`
+
+        const result = await model.generateContent(prompt)
+        const response = result.response
+        const text = response.text()
+
+        return {
+            success: true,
+            advice: text
+        }
+    } catch (error: any) {
+        console.error('Error getting financial advice:', error)
+        return {
+            success: false,
+            error: error.message || 'שגיאה בקבלת ייעוץ פיננסי'
+        }
+    }
+}
