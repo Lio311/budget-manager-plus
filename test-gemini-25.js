@@ -2,15 +2,15 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const API_KEY = 'AIzaSyDO9OvmDhgzqyPB1WrlHhkobretmtVQ3E0';
 
-async function testGeminiAPI() {
-    console.log('🧪 Testing Gemini API Connection...\n');
+async function testGemini25() {
+    console.log('🧪 Testing Gemini 2.5 Flash Preview...\n');
 
     try {
         const genAI = new GoogleGenerativeAI(API_KEY);
         console.log('✅ API Key initialized');
 
-        console.log('\n📡 Testing model: gemini-1.5-flash');
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        console.log('\n📡 Testing model: gemini-2.5-flash-preview-09-2025');
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-09-2025' });
         console.log('✅ Model loaded');
 
         const testPrompt = `אתה יועץ פיננסי מקצועי. ספק ניתוח קצר (3-4 משפטים) עבור:
@@ -31,26 +31,24 @@ async function testGeminiAPI() {
         const text = response.text();
         const endTime = Date.now();
 
-        console.log('\n✅ SUCCESS! API is working!');
-        console.log('─'.repeat(80));
+        console.log('\n✅ SUCCESS! Gemini 2.5 Flash Preview is working!');
+        console.log('═'.repeat(80));
         console.log('Response:');
         console.log(text);
-        console.log('─'.repeat(80));
+        console.log('═'.repeat(80));
         console.log(`\n📊 Stats:`);
         console.log(`   Response length: ${text.length} characters`);
         console.log(`   Time taken: ${endTime - startTime}ms`);
-        console.log('\n🎉 Gemini API is fully functional!\n');
+        console.log('\n🎉 API is fully functional with gemini-2.5-flash-preview-09-2025!\n');
 
     } catch (error) {
         console.error('\n❌ ERROR:', error.message);
-        console.error('\nFull error details:');
+        if (error.status) {
+            console.error(`Status: ${error.status} - ${error.statusText}`);
+        }
+        console.error('\nFull error:');
         console.error(error);
-        console.log('\n💡 Possible issues:');
-        console.log('   - Invalid API key');
-        console.log('   - Network connectivity');
-        console.log('   - API quota exceeded');
-        console.log('   - Model name incorrect');
     }
 }
 
-testGeminiAPI();
+testGemini25();
