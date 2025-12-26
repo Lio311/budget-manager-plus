@@ -37,7 +37,7 @@ export function ExpiryBanner() {
                     className={`px-6 py-2 rounded-lg font-bold text-white ${isUrgent ? 'bg-red-600 hover:bg-red-700' : 'bg-yellow-600 hover:bg-yellow-700'
                         }`}
                 >
-                    חדש מנוי - ₪50
+                    חדש מנוי - ₪89
                 </Link>
             </div>
         </div>
