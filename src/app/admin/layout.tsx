@@ -2,7 +2,7 @@ import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
 
-const ADMIN_EMAIL = 'lior31197@gmail.com'
+const ADMIN_EMAILS = ['lior31197@gmail.com', 'ron.kor97@gmail.com']
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
     const user = await currentUser()
@@ -11,9 +11,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         redirect('/')
     }
 
-    const userEmail = user.emailAddresses[0]?.emailAddress
+    const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase()
 
-    if (userEmail !== ADMIN_EMAIL) {
+    if (!userEmail || !ADMIN_EMAILS.includes(userEmail)) {
         redirect('/dashboard')
     }
 

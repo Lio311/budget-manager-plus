@@ -4,14 +4,13 @@ import { prisma } from '@/lib/db'
 import { currentUser } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 
-const ADMIN_EMAIL = 'lior31197@gmail.com'
+const ADMIN_EMAILS = ['lior31197@gmail.com', 'ron.kor97@gmail.com']
 
 async function checkAdmin() {
     const user = await currentUser()
     const userEmail = user?.emailAddresses[0]?.emailAddress?.toLowerCase()
-    const adminEmail = ADMIN_EMAIL.toLowerCase()
 
-    if (!user || userEmail !== adminEmail) {
+    if (!user || !userEmail || !ADMIN_EMAILS.includes(userEmail)) {
         throw new Error('Unauthorized')
     }
 }
