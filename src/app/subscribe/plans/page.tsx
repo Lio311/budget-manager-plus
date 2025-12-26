@@ -50,10 +50,10 @@ export default function PlansPage() {
                     className="h-16 w-auto mx-auto mb-6"
                 />
                 <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-                    בחר את המסלול המתאים לך
+                    בחרו את המסלול המתאים לכם
                 </h1>
                 <p className="text-xl text-gray-600">
-                    בין אם אתה מנהל משק בית או עסק עצמאי, יש לנו את הפתרון המושלם בשבילך
+                    בין אם אתם מנהלים משק בית או עסק עצמאי, יש לנו את הפתרון המושלם בשבילכם
                 </p>
             </div>
 
@@ -61,11 +61,11 @@ export default function PlansPage() {
                 {plans.map((plan) => (
                     <div
                         key={plan.id}
-                        className={`bg-white rounded-2xl shadow-xl overflow-hidden relative border-2 ${plan.recommended ? 'border-purple-500' : 'border-transparent'
+                        className={`bg-white rounded-2xl shadow-xl overflow-hidden relative border-2 ${plan.recommended ? 'border-green-500' : 'border-transparent'
                             }`}
                     >
                         {plan.recommended && (
-                            <div className="absolute top-0 right-0 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                            <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
                                 מומלץ
                             </div>
                         )}
@@ -73,22 +73,22 @@ export default function PlansPage() {
                             <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                             <p className="text-gray-500 mb-6 h-10">{plan.description}</p>
                             <div className="flex items-baseline justify-center mb-6" dir="ltr">
+                                <span className="text-gray-500 mr-2">/שנה</span>
                                 <span className="text-5xl font-extrabold text-gray-900">₪{plan.price}</span>
-                                <span className="text-gray-500 ml-2">/שנה</span>
                             </div>
                             <ul className="space-y-4 mb-8 text-right">
                                 {plan.features.map((feature, index) => (
                                     <li key={index} className="flex items-center">
                                         <Check className="h-5 w-5 text-green-500 ml-3 flex-shrink-0" />
-                                        <span className="text-gray-600">{feature}</span>
+                                        <span className="text-gray-600">{feature === "כל הפיצ'רים בתוכנית הפרטית" ? "כל הפיצ'רים מהתוכנית הפרטית" : feature}</span>
                                     </li>
                                 ))}
                             </ul>
                             <Button
                                 onClick={() => router.push(`/subscribe?plan=${plan.id}`)}
                                 className={`w-full py-6 text-lg font-semibold ${plan.recommended
-                                    ? 'bg-purple-600 hover:bg-purple-700'
-                                    : 'bg-gray-800 hover:bg-gray-900'
+                                        ? 'bg-green-600 hover:bg-green-700'
+                                        : 'bg-gray-800 hover:bg-gray-900'
                                     }`}
                             >
                                 בחר בתוכנית {plan.name}
