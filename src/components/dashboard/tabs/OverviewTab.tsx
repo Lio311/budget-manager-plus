@@ -430,8 +430,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                 </div>
                             ) : expensesByCategory.length === 0 ? (
-                                <div className="h-full flex items-center justify-center">
-                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                <div className="h-full flex flex-col items-center justify-center text-center px-4" dir="rtl">
+                                    <PieChartIcon className="h-12 w-12 text-gray-300 mb-3" />
+                                    <p className="text-gray-500 font-medium mb-1">אין נתונים להצגה</p>
+                                    <p className="text-sm text-gray-400">
+                                        ניתן ללחוץ על כרטיסיית "הוצאות" למילוי נתונים
+                                    </p>
                                 </div>
                             ) : (
                                 <ResponsiveContainer width="100%" height="100%">
