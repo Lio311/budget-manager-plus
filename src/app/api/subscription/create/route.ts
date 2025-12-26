@@ -17,7 +17,11 @@ export async function POST(req: NextRequest) {
 
         const result = await createSubscription(orderId, amount, planType, couponCode)
 
-        return NextResponse.json({ success: true, subscription: result.subscription })
+        return NextResponse.json({
+            success: true,
+            personalSubscription: result.personalSubscription,
+            businessSubscription: result.businessSubscription
+        })
     } catch (error) {
         console.error('Create subscription error:', error)
         return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 })
