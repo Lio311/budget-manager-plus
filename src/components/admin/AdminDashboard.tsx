@@ -50,7 +50,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                         <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">₪{totalRevenue}</div>
+                        <div className="text-2xl font-bold text-center">₪{totalRevenue}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -58,7 +58,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                         <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{users.length}</div>
+                        <div className="text-2xl font-bold text-center">{users.length}</div>
                     </CardContent>
                 </Card>
                 <Card>
@@ -66,7 +66,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                         <CardTitle className="text-sm font-medium">Active Subscriptions</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
+                        <div className="text-2xl font-bold text-center">
                             {users.filter(u => u.subscription?.status === 'active').length}
                         </div>
                     </CardContent>
@@ -76,7 +76,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                         <CardTitle className="text-sm font-medium">Total Feedbacks</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{feedbacks.length}</div>
+                        <div className="text-2xl font-bold text-center">{feedbacks.length}</div>
                     </CardContent>
                 </Card>
             </div>
