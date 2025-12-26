@@ -100,8 +100,8 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                     <div className="font-medium text-lg border-b pb-2 mb-2 flex justify-between items-center">
                                         <div className="flex items-center gap-2">
                                             <span className={`px-2 py-0.5 rounded text-xs font-bold border ${sub.planType === 'BUSINESS'
-                                                    ? 'bg-purple-100 text-purple-800 border-purple-200'
-                                                    : 'bg-orange-100 text-orange-800 border-orange-200'
+                                                ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                                : 'bg-orange-100 text-orange-800 border-orange-200'
                                                 }`}>
                                                 {sub.planType}
                                             </span>
@@ -112,35 +112,27 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2">
                                             <Label>Status</Label>
-                                            <Select
+                                            <select
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                                 defaultValue={sub.status}
-                                                onValueChange={(val) => handleUpdateSubscription(sub.id, { status: val })}
+                                                onChange={(e) => handleUpdateSubscription(sub.id, { status: e.target.value })}
                                             >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Status" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="active">Active</SelectItem>
-                                                    <SelectItem value="trial">Trial</SelectItem>
-                                                    <SelectItem value="expired">Expired</SelectItem>
-                                                    <SelectItem value="inactive">Inactive</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                                <option value="active">Active</option>
+                                                <option value="trial">Trial</option>
+                                                <option value="expired">Expired</option>
+                                                <option value="inactive">Inactive</option>
+                                            </select>
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Plan Type</Label>
-                                            <Select
+                                            <select
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                                 defaultValue={sub.planType}
-                                                onValueChange={(val) => handleUpdateSubscription(sub.id, { planType: val as 'PERSONAL' | 'BUSINESS' })}
+                                                onChange={(e) => handleUpdateSubscription(sub.id, { planType: e.target.value as 'PERSONAL' | 'BUSINESS' })}
                                             >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Type" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="PERSONAL">Personal</SelectItem>
-                                                    <SelectItem value="BUSINESS">Business</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                                <option value="PERSONAL">Personal</option>
+                                                <option value="BUSINESS">Business</option>
+                                            </select>
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Expiry Date</Label>
@@ -228,14 +220,24 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                             <TableCell className="text-center">{user.email}</TableCell>
                                             <TableCell className="text-center">
                                                 <div className="flex flex-col items-center gap-1">
-                                                    <span className={`px-2 py-1 rounded-full text-xs ${user.subscription?.status === 'active' ? 'bg-green-100 text-green-800' :
-                                                        user.subscription?.status === 'trial' ? 'bg-blue-100 text-blue-800' :
-                                                            'bg-gray-100 text-gray-800'
-                                                        }`}>
-                                                        {user.subscription?.status === 'active' ? 'Active' :
-                                                            user.subscription?.status === 'trial' ? 'Trial' :
-                                                                user.subscription?.status || 'None'}
-                                                    </span>
+                                                    {user.subscriptions && user.subscriptions.length > 0 ? (
+                                                        user.subscriptions
+                                                            .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
+                                                            .map((sub: any) => (
+                                                                <span key={sub.id} className={`px-2 py-1 rounded-full text-xs ${sub.status === 'active' ? 'bg-green-100 text-green-800' :
+                                                                    sub.status === 'trial' ? 'bg-blue-100 text-blue-800' :
+                                                                        'bg-gray-100 text-gray-800'
+                                                                    }`}>
+                                                                    {sub.status === 'active' ? 'Active' :
+                                                                        sub.status === 'trial' ? 'Trial' :
+                                                                            sub.status || 'None'}
+                                                                </span>
+                                                            ))
+                                                    ) : (
+                                                        <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
+                                                            {user.subscription?.status || 'None'}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-center">
