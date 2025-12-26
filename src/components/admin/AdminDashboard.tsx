@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
     Table,
     TableBody,
@@ -16,7 +18,7 @@ import {
     TableRow
 } from '@/components/ui/table'
 import { Trash2, Edit2 } from 'lucide-react'
-import { createCoupon, deleteCoupon, deleteUser, updateUserSubscription, updateCoupon } from '@/lib/actions/admin'
+import { createCoupon, deleteCoupon, deleteUser, updateSubscription, updateCoupon } from '@/lib/actions/admin'
 import { CountdownTimer } from '@/components/admin/CountdownTimer'
 
 interface AdminDashboardProps {
@@ -38,6 +40,10 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         specificEmail: '',
         planType: 'PERSONAL'
     })
+
+    // New State for Editing User Subscriptions
+    const [editingUser, setEditingUser] = useState<any>(null)
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
     const handleCreateOrUpdateCoupon = async () => {
         if (editingId) {
@@ -72,8 +78,91 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         })
     }
 
+    const handleUpdateSubscription = async (subId: string, data: any) => {
+        const result = await updateSubscription(subId, data)
+        if (!result.success) {
+            alert(result.error)
+        }
+    }
+
     return (
         <div className="space-y-8">
+            {/* Edit User Dialog */}
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogContent className="max-w-3xl py-10">
+                    <DialogHeader>
+                        <DialogTitle>Edit Subscriptions for {editingUser?.email}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6 max-h-[60vh] overflow-y-auto">
+                        {editingUser?.subscriptions?.length > 0 ? (
+                            editingUser.subscriptions.map((sub: any) => (
+                                <div key={sub.id} className="border p-4 rounded-md space-y-4">
+                                    <div className="font-medium text-lg border-b pb-2 mb-2 flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <span className={`px-2 py-0.5 rounded text-xs font-bold border ${sub.planType === 'BUSINESS'
+                                                    ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                                    : 'bg-orange-100 text-orange-800 border-orange-200'
+                                                }`}>
+                                                {sub.planType}
+                                            </span>
+                                            <span className="text-sm text-gray-500">Subscription</span>
+                                        </div>
+                                        <span className="text-xs text-muted-foreground font-mono">{sub.id.slice(-6)}</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="space-y-2">
+                                            <Label>Status</Label>
+                                            <Select
+                                                defaultValue={sub.status}
+                                                onValueChange={(val) => handleUpdateSubscription(sub.id, { status: val })}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Status" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="active">Active</SelectItem>
+                                                    <SelectItem value="trial">Trial</SelectItem>
+                                                    <SelectItem value="expired">Expired</SelectItem>
+                                                    <SelectItem value="inactive">Inactive</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Plan Type</Label>
+                                            <Select
+                                                defaultValue={sub.planType}
+                                                onValueChange={(val) => handleUpdateSubscription(sub.id, { planType: val as 'PERSONAL' | 'BUSINESS' })}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Type" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="PERSONAL">Personal</SelectItem>
+                                                    <SelectItem value="BUSINESS">Business</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Expiry Date</Label>
+                                            <Input
+                                                type="date"
+                                                defaultValue={sub.endDate ? new Date(sub.endDate).toISOString().split('T')[0] : ''}
+                                                onChange={(e) => {
+                                                    const date = e.target.value ? new Date(e.target.value) : undefined
+                                                    if (date) handleUpdateSubscription(sub.id, { endDate: date })
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-4 text-gray-500">No subscriptions found.</div>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
+
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
@@ -156,8 +245,8 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                                             .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
                                                             .map((sub: any) => (
                                                                 <span key={sub.id} className={`px-2 py-0.5 rounded text-[10px] font-medium border ${sub.planType === 'BUSINESS'
-                                                                        ? 'bg-purple-100 text-purple-800 border-purple-200'
-                                                                        : 'bg-orange-100 text-orange-800 border-orange-200'
+                                                                    ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                                                    : 'bg-orange-100 text-orange-800 border-orange-200'
                                                                     }`}>
                                                                     {sub.planType}
                                                                 </span>
@@ -179,10 +268,8 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => {
-                                                            const newDate = prompt('Enter new end date (YYYY-MM-DD):',
-                                                                user.subscription?.endDate ? format(new Date(user.subscription.endDate), 'yyyy-MM-dd') : ''
-                                                            )
-                                                            if (newDate) updateUserSubscription(user.id, new Date(newDate))
+                                                            setEditingUser(user)
+                                                            setIsEditDialogOpen(true)
                                                         }}
                                                     >
                                                         <Edit2 className="h-4 w-4" />

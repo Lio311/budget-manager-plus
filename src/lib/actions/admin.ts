@@ -113,3 +113,26 @@ export async function updateCoupon(id: string, data: {
     })
     revalidatePath('/admin')
 }
+
+export async function updateSubscription(
+    subscriptionId: string,
+    data: {
+        status?: string
+        planType?: 'PERSONAL' | 'BUSINESS'
+        endDate?: Date
+    }
+) {
+    await checkAdmin()
+
+    try {
+        await prisma.subscription.update({
+            where: { id: subscriptionId },
+            data
+        })
+        revalidatePath('/admin')
+        return { success: true }
+    } catch (error) {
+        console.error('Failed to update subscription:', error)
+        return { success: false, error: 'Failed to update. Check if plan type already exists.' }
+    }
+}
