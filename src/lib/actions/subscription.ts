@@ -136,6 +136,7 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
 }
 
 export async function startTrial(userId: string, email: string, planType: string = 'PERSONAL') {
+    // Fixed: Now supports separate trials for PERSONAL and BUSINESS plans
     console.log('[startTrial] Starting trial for user:', userId, email, planType)
 
     // Sync user to DB to handle webhook race condition
