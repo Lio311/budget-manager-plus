@@ -194,7 +194,7 @@ export function CalendarTab() {
                                 <div
                                     key={index}
                                     onClick={() => day && hasPayments && setSelectedDay(day)}
-                                    className={`min-h-[80px] p-2 border rounded-lg overflow-hidden ${day === null
+                                    className={`h-[80px] md:min-h-[80px] md:h-auto p-2 border rounded-lg overflow-hidden ${day === null
                                         ? 'bg-gray-50'
                                         : hasPayments
                                             ? allPaid
@@ -207,29 +207,42 @@ export function CalendarTab() {
                                         <>
                                             <div className="font-semibold text-sm mb-1">{day}</div>
                                             {hasPayments && (
-                                                <div className="space-y-1 w-full">
-                                                    {dayPayments.map((payment) => (
-                                                        <div
-                                                            key={payment.id}
-                                                            className={`text-[10px] md:text-xs p-1 rounded truncate w-full block ${payment.type === 'bill'
-                                                                ? 'bg-yellow-200 text-yellow-800'
-                                                                : payment.type === 'debt'
-                                                                    ? 'bg-purple-200 text-purple-800'
-                                                                    : payment.type === 'income'
-                                                                        ? 'bg-green-200 text-green-800'
-                                                                        : payment.type === 'saving'
-                                                                            ? 'bg-blue-200 text-blue-800'
-                                                                            : 'bg-red-200 text-red-800'
-                                                                } ${payment.isPaid ? 'opacity-50 line-through' : ''}`}
-                                                            title={payment.name}
-                                                        >
-                                                            {payment.name}
+                                                <>
+                                                    {/* Mobile view: compact badge only */}
+                                                    <div className="md:hidden flex flex-col items-center justify-center h-[calc(100%-24px)]">
+                                                        <div className={`text-xs font-bold px-2 py-1 rounded-full ${allPaid
+                                                                ? 'bg-green-200 text-green-800'
+                                                                : 'bg-yellow-200 text-yellow-800'
+                                                            }`}>
+                                                            {dayPayments.length}
                                                         </div>
-                                                    ))}
-                                                    <div className="text-xs font-bold text-center mt-1">
-                                                        {dayPayments.length} תשלומים
                                                     </div>
-                                                </div>
+
+                                                    {/* Desktop view: full payment cards */}
+                                                    <div className="hidden md:block space-y-1 w-full">
+                                                        {dayPayments.map((payment) => (
+                                                            <div
+                                                                key={payment.id}
+                                                                className={`text-[10px] md:text-xs p-1 rounded truncate w-full block ${payment.type === 'bill'
+                                                                    ? 'bg-yellow-200 text-yellow-800'
+                                                                    : payment.type === 'debt'
+                                                                        ? 'bg-purple-200 text-purple-800'
+                                                                        : payment.type === 'income'
+                                                                            ? 'bg-green-200 text-green-800'
+                                                                            : payment.type === 'saving'
+                                                                                ? 'bg-blue-200 text-blue-800'
+                                                                                : 'bg-red-200 text-red-800'
+                                                                    } ${payment.isPaid ? 'opacity-50 line-through' : ''}`}
+                                                                title={payment.name}
+                                                            >
+                                                                {payment.name}
+                                                            </div>
+                                                        ))}
+                                                        <div className="text-xs font-bold text-center mt-1">
+                                                            {dayPayments.length} תשלומים
+                                                        </div>
+                                                    </div>
+                                                </>
                                             )}
                                         </>
                                     )}
@@ -327,14 +340,14 @@ export function CalendarTab() {
                             <div
                                 key={payment.id}
                                 className={`p-3 rounded-lg border-r-4 ${payment.type === 'bill'
-                                        ? 'bg-yellow-50 border-yellow-500'
-                                        : payment.type === 'debt'
-                                            ? 'bg-purple-50 border-purple-500'
-                                            : payment.type === 'income'
-                                                ? 'bg-green-50 border-green-500'
-                                                : payment.type === 'saving'
-                                                    ? 'bg-blue-50 border-blue-500'
-                                                    : 'bg-red-50 border-red-500'
+                                    ? 'bg-yellow-50 border-yellow-500'
+                                    : payment.type === 'debt'
+                                        ? 'bg-purple-50 border-purple-500'
+                                        : payment.type === 'income'
+                                            ? 'bg-green-50 border-green-500'
+                                            : payment.type === 'saving'
+                                                ? 'bg-blue-50 border-blue-500'
+                                                : 'bg-red-50 border-red-500'
                                     } ${payment.isPaid ? 'opacity-60' : ''}`}
                             >
                                 <div className="flex justify-between items-start gap-2">
@@ -351,9 +364,9 @@ export function CalendarTab() {
                                     </div>
                                     <div className="text-left flex-shrink-0">
                                         <p className={`font-bold text-sm ${payment.type === 'bill' ? 'text-yellow-700' :
-                                                payment.type === 'debt' ? 'text-purple-700' :
-                                                    payment.type === 'income' ? 'text-green-700' :
-                                                        payment.type === 'saving' ? 'text-blue-700' : 'text-red-700'
+                                            payment.type === 'debt' ? 'text-purple-700' :
+                                                payment.type === 'income' ? 'text-green-700' :
+                                                    payment.type === 'saving' ? 'text-blue-700' : 'text-red-700'
                                             }`}>
                                             {formatCurrency(payment.amount, currency)}
                                         </p>
