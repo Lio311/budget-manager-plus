@@ -169,6 +169,12 @@ export async function startTrial(userId: string, email: string, planType: string
     }
 
     // Create tracker
+    console.log(`[startTrial] About to create trial tracker with:`, {
+        email,
+        planType: validPlanType,
+        rawPlanType: planType
+    })
+
     // @ts-ignore
     await prisma.trialTracker.create({
         data: {
