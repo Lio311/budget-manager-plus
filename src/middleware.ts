@@ -1,5 +1,4 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { get } from '@vercel/edge-config';
 import { NextResponse } from 'next/server';
 
 const isPublicRoute = createRouteMatcher([
@@ -19,30 +18,21 @@ export default clerkMiddleware(async (auth, req) => {
         return;
     }
 
-    // Check maintenance mode from Edge Config
-    try {
-        const maintenanceMode = await get('maintenanceMode');
+    // Check maintenance mode from environment variable
+    const maintenanceMode = process.env.MAINTENANCE_MODE === 'true';
 
-        if (maintenanceMode === true) {
-            // Get user info to check if admin
-            const { userId } = await auth();
+    if (maintenanceMode) {
+        // Get user info to check if admin
+        const { userId } = await auth();
 
-            // Allow admins to bypass maintenance mode
-            if (userId) {
-                // Note: We can't easily check admin role here without Prisma
-                // So we'll allow all authenticated users to access /admin
-                if (pathname.startsWith('/admin')) {
-                    // Let admin routes through
-                    return;
-                }
-            }
-
-            // Redirect all other users to maintenance page
-            return NextResponse.redirect(new URL('/maintenance', req.url));
+        // Allow admins to bypass maintenance mode
+        if (userId && pathname.startsWith('/admin')) {
+            // Let admin routes through
+            return;
         }
-    } catch (error) {
-        // If Edge Config is not configured, continue normally
-        console.error('Edge Config error:', error);
+
+        // Redirect all other users to maintenance page
+        return NextResponse.redirect(new URL('/maintenance', req.url));
     }
 
     // Allow public routes
