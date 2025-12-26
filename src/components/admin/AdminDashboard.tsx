@@ -226,33 +226,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                 </DialogContent>
             </Dialog>
 
-            {/* Maintenance Mode Toggle */}
-            <Card className="border-2">
-                <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className={`p-3 rounded-full ${maintenanceMode ? 'bg-orange-100' : 'bg-green-100'}`}>
-                                <Construction className={`h-6 w-6 ${maintenanceMode ? 'text-orange-600' : 'text-green-600'}`} />
-                            </div>
-                            <div>
-                                <h3 className="font-semibold text-lg">Maintenance Mode</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    {maintenanceMode ? 'Site is currently in maintenance mode' : 'Site is operational'}
-                                </p>
-                            </div>
-                        </div>
-                        <Button
-                            onClick={handleToggleMaintenance}
-                            disabled={isTogglingMaintenance}
-                            variant={maintenanceMode ? 'destructive' : 'default'}
-                            size="lg"
-                            className="min-w-[140px]"
-                        >
-                            {isTogglingMaintenance ? 'Toggling...' : maintenanceMode ? 'Disable' : 'Enable'}
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+            {/* TODO: Re-implement Maintenance Mode with Edge-compatible solution */}
 
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
