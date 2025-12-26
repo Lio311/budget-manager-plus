@@ -30,28 +30,28 @@ export async function getFinancialAdvice(data: FinancialData) {
             }
         }
 
-        // TODO: Re-enable cache later - currently disabled for testing
-        // Check cache first
-        // const cachedAdvice = await prisma.aIAdviceCache.findUnique({
-        //     where: {
-        //         userId_month_year: {
-        //             userId,
-        //             month: data.month,
-        //             year: data.year
-        //         }
-        //     }
-        // })
+
+        // Check cache first - enforce 24-hour limit
+        const cachedAdvice = await prisma.aIAdviceCache.findUnique({
+            where: {
+                userId_month_year: {
+                    userId,
+                    month: data.month,
+                    year: data.year
+                }
+            }
+        })
 
         // If cache exists and not expired, return it
-        // if (cachedAdvice && cachedAdvice.expiresAt > new Date()) {
-        //     const hoursRemaining = Math.floor((cachedAdvice.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60))
-        //     return {
-        //         success: true,
-        //         advice: cachedAdvice.advice,
-        //         cached: true,
-        //         expiresIn: `${hoursRemaining} שעות`
-        //     }
-        // }
+        if (cachedAdvice && cachedAdvice.expiresAt > new Date()) {
+            const hoursRemaining = Math.floor((cachedAdvice.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60))
+            return {
+                success: true,
+                advice: cachedAdvice.advice,
+                cached: true,
+                expiresIn: `${hoursRemaining} שעות`
+            }
+        }
 
         // If no cache or expired, call Gemini API
         console.log('[AI Advisor] Calling Gemini API for user:', userId)
@@ -125,31 +125,30 @@ ${data.savings.map((sav: any) => `  - ${sav.description}: ${sav.monthlyDeposit} 
         console.log('[AI Advisor] Received response, length:', text.length)
         console.log('[AI Advisor] Response preview:', text.substring(0, 200))
 
-        // TODO: Re-enable cache storage later
         // Store in cache with 24-hour expiry
-        // const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
 
-        // await prisma.aIAdviceCache.upsert({
-        //     where: {
-        //         userId_month_year: {
-        //             userId,
-        //             month: data.month,
-        //             year: data.year
-        //         }
-        //     },
-        //     create: {
-        //         userId,
-        //         month: data.month,
-        //         year: data.year,
-        //         advice: text,
-        //         expiresAt
-        //     },
-        //     update: {
-        //         advice: text,
-        //         expiresAt,
-        //         createdAt: new Date()
-        //     }
-        // })
+        await prisma.aIAdviceCache.upsert({
+            where: {
+                userId_month_year: {
+                    userId,
+                    month: data.month,
+                    year: data.year
+                }
+            },
+            create: {
+                userId,
+                month: data.month,
+                year: data.year,
+                advice: text,
+                expiresAt
+            },
+            update: {
+                advice: text,
+                expiresAt,
+                createdAt: new Date()
+            }
+        })
 
         return {
             success: true,
