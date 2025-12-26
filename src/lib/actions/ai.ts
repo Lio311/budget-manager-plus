@@ -152,7 +152,8 @@ ${data.savings.map((sav: any) => `  - ${sav.description}: ${sav.monthlyDeposit} 
         return {
             success: true,
             advice: text,
-            cached: false
+            cached: false,
+            expiresIn: undefined
         }
     } catch (error: any) {
         console.error('Error getting financial advice:', error)
