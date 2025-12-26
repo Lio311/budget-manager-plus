@@ -89,31 +89,42 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         <div className="space-y-8">
             {/* Edit User Dialog */}
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent className="max-w-3xl py-10">
+                <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto" dir="ltr">
                     <DialogHeader>
-                        <DialogTitle>Edit Subscriptions for {editingUser?.email}</DialogTitle>
+                        <DialogTitle className="text-xl">Edit Subscriptions for {editingUser?.email}</DialogTitle>
+                        <p className="text-sm text-muted-foreground">Manage user subscription plans, status, and expiration dates</p>
                     </DialogHeader>
-                    <div className="space-y-6 max-h-[60vh] overflow-y-auto">
+                    <div className="space-y-4 mt-4">
                         {editingUser?.subscriptions?.length > 0 ? (
                             editingUser.subscriptions.map((sub: any) => (
-                                <div key={sub.id} className="border p-4 rounded-md space-y-4">
-                                    <div className="font-medium text-lg border-b pb-2 mb-2 flex justify-between items-center">
-                                        <div className="flex items-center gap-2">
-                                            <span className={`px-2 py-0.5 rounded text-xs font-bold border ${sub.planType === 'BUSINESS'
-                                                ? 'bg-purple-100 text-purple-800 border-purple-200'
-                                                : 'bg-orange-100 text-orange-800 border-orange-200'
+                                <div key={sub.id} className="border-2 rounded-lg p-5 bg-gradient-to-br from-gray-50 to-white shadow-sm hover:shadow-md transition-shadow">
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between mb-4 pb-3 border-b">
+                                        <div className="flex items-center gap-3">
+                                            <span className={`px-3 py-1.5 rounded-md text-sm font-bold uppercase tracking-wide ${sub.planType === 'BUSINESS'
+                                                    ? 'bg-purple-100 text-purple-800 border-2 border-purple-300'
+                                                    : 'bg-orange-100 text-orange-800 border-2 border-orange-300'
                                                 }`}>
                                                 {sub.planType}
                                             </span>
-                                            <span className="text-sm text-gray-500">Subscription</span>
+                                            <span className={`px-2 py-1 rounded text-xs font-semibold ${sub.status === 'active' ? 'bg-green-100 text-green-800' :
+                                                    sub.status === 'trial' ? 'bg-blue-100 text-blue-800' :
+                                                        sub.status === 'expired' ? 'bg-red-100 text-red-800' :
+                                                            'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                {sub.status.toUpperCase()}
+                                            </span>
                                         </div>
-                                        <span className="text-xs text-muted-foreground font-mono">{sub.id.slice(-6)}</span>
+                                        <span className="text-xs text-gray-400 font-mono">ID: {sub.id.slice(-8)}</span>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                                    {/* Subscription Details Grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                                        {/* Status */}
                                         <div className="space-y-2">
-                                            <Label>Status</Label>
+                                            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</Label>
                                             <select
-                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-medium"
                                                 defaultValue={sub.status}
                                                 onChange={(e) => handleUpdateSubscription(sub.id, { status: e.target.value })}
                                             >
@@ -123,10 +134,12 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                                 <option value="inactive">Inactive</option>
                                             </select>
                                         </div>
+
+                                        {/* Plan Type */}
                                         <div className="space-y-2">
-                                            <Label>Plan Type</Label>
+                                            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Plan Type</Label>
                                             <select
-                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-medium"
                                                 defaultValue={sub.planType}
                                                 onChange={(e) => handleUpdateSubscription(sub.id, { planType: e.target.value as 'PERSONAL' | 'BUSINESS' })}
                                             >
@@ -134,10 +147,27 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                                 <option value="BUSINESS">Business</option>
                                             </select>
                                         </div>
+
+                                        {/* Start Date */}
                                         <div className="space-y-2">
-                                            <Label>Expiry Date</Label>
+                                            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Start Date</Label>
                                             <Input
                                                 type="date"
+                                                className="font-medium"
+                                                defaultValue={sub.startDate ? new Date(sub.startDate).toISOString().split('T')[0] : ''}
+                                                onChange={(e) => {
+                                                    const date = e.target.value ? new Date(e.target.value) : undefined
+                                                    if (date) handleUpdateSubscription(sub.id, { startDate: date })
+                                                }}
+                                            />
+                                        </div>
+
+                                        {/* Expiry Date */}
+                                        <div className="space-y-2">
+                                            <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Expiry Date</Label>
+                                            <Input
+                                                type="date"
+                                                className="font-medium"
                                                 defaultValue={sub.endDate ? new Date(sub.endDate).toISOString().split('T')[0] : ''}
                                                 onChange={(e) => {
                                                     const date = e.target.value ? new Date(e.target.value) : undefined
@@ -146,10 +176,27 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Payment Info */}
+                                    {(sub.lastPaymentDate || sub.lastPaymentAmount) && (
+                                        <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-3">
+                                            <p className="text-xs font-semibold text-blue-900 mb-1">Last Payment</p>
+                                            <div className="flex gap-4 text-xs text-blue-800">
+                                                {sub.lastPaymentAmount && (
+                                                    <span className="font-medium">Amount: ₪{sub.lastPaymentAmount}</span>
+                                                )}
+                                                {sub.lastPaymentDate && (
+                                                    <span>Date: {new Date(sub.lastPaymentDate).toLocaleDateString()}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center py-4 text-gray-500">No subscriptions found.</div>
+                            <div className="text-center py-8 text-gray-500">
+                                <p className="text-sm">No subscriptions found for this user.</p>
+                            </div>
                         )}
                     </div>
                 </DialogContent>
