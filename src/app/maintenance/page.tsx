@@ -33,8 +33,7 @@ export default function MaintenancePage() {
                     {/* Animated Progress Bar */}
                     <div className="pt-8">
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"
-                                style={{ width: '70%' }}>
+                            <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse w-[70%]">
                             </div>
                         </div>
                         <p className="text-sm text-gray-500 mt-3">
@@ -59,21 +58,6 @@ export default function MaintenancePage() {
                     תודה על הסבלנות! 💙
                 </p>
             </div>
-
-            <style jsx>{`
-                @keyframes bounce {
-                    0%, 100% {
-                        transform: translateY(0);
-                    }
-                    50% {
-                        transform: translateY(-20px);
-                    }
-                }
-                
-                .animate-bounce {
-                    animation: bounce 2s ease-in-out infinite;
-                }
-            `}</style>
         </div>
     )
 }
