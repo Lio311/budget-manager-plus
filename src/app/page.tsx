@@ -79,7 +79,7 @@ export default function HomePage() {
 
                             <ul className="space-y-3 mb-8">
                                 <BusinessFeature text="הפרדה מוחלטת בין פרופיל אישי לעסקי" />
-                                <BusinessFeature text="חישובי מע" מ (כולל פטור ומעורב) והכנה לדיווח" />
+                                <BusinessFeature text="חישובי מע״מ (כולל פטור ומעורב) והכנה לדיווח" />
                                 <BusinessFeature text="ניהול תזרים מזומנים (כולל שוטף+)" />
                                 <BusinessFeature text="דוחות רווח והפסד בזמן אמת" />
                             </ul>
