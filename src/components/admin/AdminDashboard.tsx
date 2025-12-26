@@ -17,11 +17,9 @@ import {
     TableHeader,
     TableRow
 } from '@/components/ui/table'
-import { Trash2, Edit2, Construction } from 'lucide-react'
+import { Trash2, Edit2 } from 'lucide-react'
 import { createCoupon, deleteCoupon, deleteUser, updateSubscription, updateCoupon } from '@/lib/actions/admin'
-import { toggleMaintenanceMode } from '@/lib/actions/site-settings'
 import { CountdownTimer } from '@/components/admin/CountdownTimer'
-import { toast } from 'sonner'
 
 interface AdminDashboardProps {
     initialData: {
@@ -29,7 +27,6 @@ interface AdminDashboardProps {
         coupons: any[]
         feedbacks: any[]
         totalRevenue: number
-        maintenanceMode: boolean
     }
 }
 
