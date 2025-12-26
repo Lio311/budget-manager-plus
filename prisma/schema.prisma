@@ -258,6 +258,7 @@ model Coupon {
   maxUses         Int?
   usedCount       Int       @default(0)
   specificEmail   String?   // Optional: restrict to specific user email
+  planType        PlanType? // Optional: restrict to specific plan (PERSONAL/BUSINESS)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   @@map("coupons")

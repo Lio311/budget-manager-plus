@@ -30,20 +30,28 @@ interface AdminDashboardProps {
 
 export function AdminDashboard({ initialData }: AdminDashboardProps) {
     const { users, coupons, feedbacks, totalRevenue } = initialData
-    const [newCoupon, setNewCoupon] = useState({ code: '', discountPercent: 0, expiryDate: '', specificEmail: '' })
+    const [newCoupon, setNewCoupon] = useState({
+        code: '',
+        discountPercent: 0,
+        expiryDate: '',
+        specificEmail: '',
+        planType: 'PERSONAL'
+    })
 
     const handleCreateCoupon = async () => {
         await createCoupon({
             code: newCoupon.code,
             discountPercent: Number(newCoupon.discountPercent),
             expiryDate: newCoupon.expiryDate ? new Date(newCoupon.expiryDate) : undefined,
-            specificEmail: newCoupon.specificEmail || undefined
+            specificEmail: newCoupon.specificEmail || undefined,
+            planType: (newCoupon.planType as 'PERSONAL' | 'BUSINESS') || undefined
         })
-        setNewCoupon({ code: '', discountPercent: 0, expiryDate: '', specificEmail: '' })
+        setNewCoupon({ code: '', discountPercent: 0, expiryDate: '', specificEmail: '', planType: 'PERSONAL' })
     }
 
     return (
         <div className="space-y-8">
+            {/* Same Cards section... */}
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
@@ -82,6 +90,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
             </div>
 
             <Tabs defaultValue="users" className="space-y-4">
+                {/* TabsList... */}
                 <TabsList>
                     <TabsTrigger value="users">Users Management</TabsTrigger>
                     <TabsTrigger value="coupons">Coupons</TabsTrigger>
@@ -167,7 +176,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                     <Card>
                         <CardHeader><CardTitle>Create Coupon</CardTitle></CardHeader>
                         <CardContent>
-                            <div className="grid gap-4 md:grid-cols-5 items-end text-left" dir="ltr">
+                            <div className="grid gap-4 md:grid-cols-6 items-end text-left" dir="ltr">
                                 <div className="space-y-2">
                                     <Label className="text-left block">Code</Label>
                                     <Input
@@ -188,7 +197,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-left block">Expiry Date (Optional)</Label>
+                                    <Label className="text-left block">Expiry Date</Label>
                                     <Input
                                         className="text-left"
                                         type="datetime-local"
@@ -198,7 +207,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-left block">Specific Email (Optional)</Label>
+                                    <Label className="text-left block">Specific Email</Label>
                                     <Input
                                         className="text-left"
                                         type="email"
@@ -206,6 +215,18 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                         onChange={e => setNewCoupon({ ...newCoupon, specificEmail: e.target.value })}
                                         dir="ltr"
                                     />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-left block">Plan Type</Label>
+                                    <select
+                                        className="w-full border rounded-md p-2 h-10"
+                                        value={newCoupon.planType}
+                                        onChange={e => setNewCoupon({ ...newCoupon, planType: e.target.value })}
+                                    >
+                                        <option value="PERSONAL">Personal</option>
+                                        <option value="BUSINESS">Business</option>
+                                        <option value="">Any</option>
+                                    </select>
                                 </div>
                                 <Button onClick={handleCreateCoupon}>Create Coupon</Button>
                             </div>
@@ -220,6 +241,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                     <TableRow>
                                         <TableHead className="text-center">Code</TableHead>
                                         <TableHead className="text-center">Discount</TableHead>
+                                        <TableHead className="text-center">Plan</TableHead>
                                         <TableHead className="text-center">Expiry</TableHead>
                                         <TableHead className="text-center">Email Limit</TableHead>
                                         <TableHead className="text-center">Used</TableHead>
@@ -231,6 +253,13 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                         <TableRow key={coupon.id}>
                                             <TableCell className="font-mono font-bold text-center">{coupon.code}</TableCell>
                                             <TableCell className="text-center">{coupon.discountPercent}%</TableCell>
+                                            <TableCell className="text-center">
+                                                <span className={`px-2 py-1 rounded text-xs ${coupon.planType === 'BUSINESS' ? 'bg-purple-100 text-purple-800' :
+                                                        coupon.planType === 'PERSONAL' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'
+                                                    }`}>
+                                                    {coupon.planType || 'Any'}
+                                                </span>
+                                            </TableCell>
                                             <TableCell className="text-center">
                                                 {coupon.expiryDate ? (
                                                     <CountdownTimer targetDate={coupon.expiryDate} />

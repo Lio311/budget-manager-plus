@@ -69,6 +69,7 @@ export async function createCoupon(data: {
     discountPercent: number
     expiryDate?: Date
     specificEmail?: string
+    planType?: 'PERSONAL' | 'BUSINESS'
 }) {
     await checkAdmin()
     await prisma.coupon.create({ data })
