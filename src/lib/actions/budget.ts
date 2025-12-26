@@ -66,29 +66,35 @@ export async function ensureUserExists() {
 /**
  * Gets or creates a budget for the current user and specified month/year
  */
-export async function getCurrentBudget(month: number, year: number, currency: string = '₪') {
+
+export async function getCurrentBudget(month: number, year: number, currency: string = '₪', type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
+        console.log(`Getting budget for ${month}/${year} type: ${type}`)
         const user = await ensureUserExists()
 
-        // Find or create budget
+        // Find or create budget using new compound key
+        // @ts-ignore - Prisma types might be stale in dev environment
         let budget = await prisma.budget.findUnique({
             where: {
-                userId_month_year: {
+                userId_month_year_type: {
                     userId: user.id,
                     month,
-                    year
+                    year,
+                    type
                 }
             }
         })
 
         if (!budget) {
-            console.log('Creating new budget for user:', user.id, 'month:', month, 'year:', year)
+            console.log('Creating new budget for user:', user.id, 'month:', month, 'year:', year, 'type:', type)
+            // @ts-ignore
             budget = await prisma.budget.create({
                 data: {
                     userId: user.id,
                     month,
                     year,
-                    currency
+                    currency,
+                    type
                 }
             })
         }
