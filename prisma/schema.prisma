@@ -29,7 +29,7 @@ model User {
    
   budgets    Budget[]
   categories Category[]
-  subscription Subscription?
+  subscriptions Subscription[]
   businessProfile BusinessProfile?
   paymentHistory PaymentHistory[]
   feedbacks    Feedback[]
@@ -221,7 +221,7 @@ model Saving {
 
 model Subscription {
   id                String    @id @default(cuid())
-  userId            String    @unique
+  userId            String
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   status            String    @default("inactive") // trial, active, expired, inactive
   planType          PlanType  @default(PERSONAL)   // NEW: PERSONAL vs BUSINESS
@@ -235,6 +235,8 @@ model Subscription {
   expiryNotified30Days Boolean @default(false)
   expiryNotified7Days  Boolean @default(false)
   deletionScheduledFor DateTime?
+  
+  @@unique([userId, planType]) // CHANGED: Allow one subscription per plan type
   @@map("subscriptions")
 }
 

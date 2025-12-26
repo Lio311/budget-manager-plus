@@ -16,7 +16,7 @@ import {
     TableRow
 } from '@/components/ui/table'
 import { Trash2, Edit2 } from 'lucide-react'
-import { createCoupon, deleteCoupon, deleteUser, updateUserSubscription } from '@/lib/actions/admin'
+import { createCoupon, deleteCoupon, deleteUser, updateUserSubscription, updateCoupon } from '@/lib/actions/admin'
 import { CountdownTimer } from '@/components/admin/CountdownTimer'
 
 interface AdminDashboardProps {
@@ -30,6 +30,7 @@ interface AdminDashboardProps {
 
 export function AdminDashboard({ initialData }: AdminDashboardProps) {
     const { users, coupons, feedbacks, totalRevenue } = initialData
+    const [editingId, setEditingId] = useState<string | null>(null)
     const [newCoupon, setNewCoupon] = useState({
         code: '',
         discountPercent: 0,
@@ -38,20 +39,41 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         planType: 'PERSONAL'
     })
 
-    const handleCreateCoupon = async () => {
-        await createCoupon({
-            code: newCoupon.code,
-            discountPercent: Number(newCoupon.discountPercent),
-            expiryDate: newCoupon.expiryDate ? new Date(newCoupon.expiryDate) : undefined,
-            specificEmail: newCoupon.specificEmail || undefined,
-            planType: (newCoupon.planType as 'PERSONAL' | 'BUSINESS') || undefined
-        })
+    const handleCreateOrUpdateCoupon = async () => {
+        if (editingId) {
+            await updateCoupon(editingId, {
+                code: newCoupon.code,
+                discountPercent: Number(newCoupon.discountPercent),
+                expiryDate: newCoupon.expiryDate ? new Date(newCoupon.expiryDate) : undefined,
+                specificEmail: newCoupon.specificEmail || undefined,
+                planType: (newCoupon.planType as 'PERSONAL' | 'BUSINESS') || undefined
+            })
+            setEditingId(null)
+        } else {
+            await createCoupon({
+                code: newCoupon.code,
+                discountPercent: Number(newCoupon.discountPercent),
+                expiryDate: newCoupon.expiryDate ? new Date(newCoupon.expiryDate) : undefined,
+                specificEmail: newCoupon.specificEmail || undefined,
+                planType: (newCoupon.planType as 'PERSONAL' | 'BUSINESS') || undefined
+            })
+        }
         setNewCoupon({ code: '', discountPercent: 0, expiryDate: '', specificEmail: '', planType: 'PERSONAL' })
+    }
+
+    const startEdit = (coupon: any) => {
+        setEditingId(coupon.id)
+        setNewCoupon({
+            code: coupon.code,
+            discountPercent: coupon.discountPercent,
+            expiryDate: coupon.expiryDate ? new Date(coupon.expiryDate).toISOString().slice(0, 16) : '',
+            specificEmail: coupon.specificEmail || '',
+            planType: coupon.planType || ''
+        })
     }
 
     return (
         <div className="space-y-8">
-            {/* Same Cards section... */}
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
@@ -90,7 +112,6 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
             </div>
 
             <Tabs defaultValue="users" className="space-y-4">
-                {/* TabsList... */}
                 <TabsList>
                     <TabsTrigger value="users">Users Management</TabsTrigger>
                     <TabsTrigger value="coupons">Coupons</TabsTrigger>
@@ -106,6 +127,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                     <TableRow>
                                         <TableHead className="text-center">Email</TableHead>
                                         <TableHead className="text-center">Status</TableHead>
+                                        <TableHead className="text-center">Plan</TableHead>
                                         <TableHead className="text-center">Start Date</TableHead>
                                         <TableHead className="text-center">Renewal/Expiry</TableHead>
                                         <TableHead className="text-center">Actions</TableHead>
@@ -125,10 +147,23 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                                             user.subscription?.status === 'trial' ? 'Trial' :
                                                                 user.subscription?.status || 'None'}
                                                     </span>
-                                                    {user.subscription?.status === 'trial' && (
-                                                        <span className="text-[10px] text-gray-500">
-                                                            {user.hasUsedTrial ? '(Used)' : ''}
-                                                        </span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <div className="flex flex-wrap justify-center gap-1">
+                                                    {user.subscriptions && user.subscriptions.length > 0 ? (
+                                                        user.subscriptions
+                                                            .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
+                                                            .map((sub: any) => (
+                                                                <span key={sub.id} className={`px-2 py-0.5 rounded text-[10px] font-medium border ${sub.planType === 'BUSINESS'
+                                                                        ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                                                        : 'bg-orange-100 text-orange-800 border-orange-200'
+                                                                    }`}>
+                                                                    {sub.planType}
+                                                                </span>
+                                                            ))
+                                                    ) : (
+                                                        <span className="text-gray-400 text-xs">-</span>
                                                     )}
                                                 </div>
                                             </TableCell>
@@ -174,7 +209,15 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
 
                 <TabsContent value="coupons" className="space-y-4">
                     <Card>
-                        <CardHeader><CardTitle>Create Coupon</CardTitle></CardHeader>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle>{editingId ? 'Edit Coupon' : 'Create Coupon'}</CardTitle>
+                            {editingId && (
+                                <Button variant="outline" size="sm" onClick={() => {
+                                    setEditingId(null)
+                                    setNewCoupon({ code: '', discountPercent: 0, expiryDate: '', specificEmail: '', planType: 'PERSONAL' })
+                                }}>Cancel Edit</Button>
+                            )}
+                        </CardHeader>
                         <CardContent>
                             <div className="grid gap-4 md:grid-cols-6 items-end text-left" dir="ltr">
                                 <div className="space-y-2">
@@ -228,7 +271,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                         <option value="">Any</option>
                                     </select>
                                 </div>
-                                <Button onClick={handleCreateCoupon}>Create Coupon</Button>
+                                <Button onClick={handleCreateOrUpdateCoupon}>{editingId ? 'Update' : 'Create'}</Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -255,7 +298,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                             <TableCell className="text-center">{coupon.discountPercent}%</TableCell>
                                             <TableCell className="text-center">
                                                 <span className={`px-2 py-1 rounded text-xs ${coupon.planType === 'BUSINESS' ? 'bg-purple-100 text-purple-800' :
-                                                        coupon.planType === 'PERSONAL' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'
+                                                    coupon.planType === 'PERSONAL' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'
                                                     }`}>
                                                     {coupon.planType || 'Any'}
                                                 </span>
@@ -268,13 +311,22 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                             <TableCell className="text-center">{coupon.specificEmail || 'All'}</TableCell>
                                             <TableCell className="text-center">{coupon.usedCount}</TableCell>
                                             <TableCell className="text-center">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => deleteCoupon(coupon.id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-red-500" />
-                                                </Button>
+                                                <div className="flex gap-2 justify-center">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => startEdit(coupon)}
+                                                    >
+                                                        <Edit2 className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => deleteCoupon(coupon.id)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                                    </Button>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     ))}

@@ -5,9 +5,20 @@ import { currentUser } from '@clerk/nextjs/server'
 import { addYears, addDays } from 'date-fns'
 import { revalidatePath } from 'next/cache'
 
-export async function createSubscription(paypalOrderId: string, amount: number, planType: string = 'PERSONAL') {
+export async function createSubscription(paypalOrderId: string, amount: number, planType: string = 'PERSONAL', couponCode?: string) {
     try {
-        console.log('createSubscription called:', { paypalOrderId, amount, planType })
+        console.log('createSubscription called:', { paypalOrderId, amount, planType, couponCode })
+
+        if (couponCode) {
+            console.log('Incrementing usage for coupon:', couponCode)
+            // Fire and forget - don't block subscription on this
+            prisma.coupon.updateMany({
+                where: {
+                    code: { equals: couponCode, mode: 'insensitive' }
+                },
+                data: { usedCount: { increment: 1 } }
+            }).catch(err => console.error('Failed to update coupon usage:', err))
+        }
 
         const user = await currentUser()
 
@@ -40,10 +51,15 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
         // Create or update subscription
         // @ts-ignore - planType issue with Prisma types in dev
         const subscription = await prisma.subscription.upsert({
-            where: { userId },
+            where: {
+                userId_planType: {
+                    userId,
+                    planType: validPlanType as any
+                }
+            },
             update: {
                 status: 'active',
-                planType: validPlanType,
+                planType: validPlanType as any,
                 startDate: new Date(),
                 endDate,
                 paypalOrderId,
@@ -53,7 +69,7 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
             create: {
                 userId,
                 status: 'active',
-                planType: validPlanType,
+                planType: validPlanType as any,
                 startDate: new Date(),
                 endDate,
                 paypalOrderId,
@@ -123,17 +139,22 @@ export async function startTrial(userId: string, email: string, planType: string
 
     // @ts-ignore - planType issue with Prisma types in dev
     const subscription = await prisma.subscription.upsert({
-        where: { userId },
+        where: {
+            userId_planType: {
+                userId,
+                planType: validPlanType as any
+            }
+        },
         create: {
             userId,
             status: 'trial',
-            planType: validPlanType,
+            planType: validPlanType as any,
             startDate,
             endDate,
         },
         update: {
             status: 'trial',
-            planType: validPlanType,
+            planType: validPlanType as any,
             startDate,
             endDate,
         }
@@ -144,13 +165,20 @@ export async function startTrial(userId: string, email: string, planType: string
     return { success: true }
 }
 
-export async function getSubscriptionStatus(userId: string) {
+export async function getSubscriptionStatus(userId: string, planType: string = 'PERSONAL') {
+    const validPlanType = planType === 'BUSINESS' ? 'BUSINESS' : 'PERSONAL'
+
     const subscription = await prisma.subscription.findUnique({
-        where: { userId }
+        where: {
+            userId_planType: {
+                userId,
+                planType: validPlanType as any
+            }
+        }
     })
 
     if (!subscription) {
-        return { hasAccess: false, status: 'none', daysUntilExpiry: null }
+        return { hasAccess: false, status: 'none', daysUntilExpiry: null, planType: validPlanType }
     }
 
     const now = new Date()
@@ -161,7 +189,7 @@ export async function getSubscriptionStatus(userId: string) {
             where: { id: subscription.id },
             data: { status: 'trial_expired' }
         })
-        return { hasAccess: false, status: 'trial_expired', daysUntilExpiry: 0 }
+        return { hasAccess: false, status: 'trial_expired', daysUntilExpiry: 0, planType: validPlanType }
     }
 
     const hasAccess = (subscription.status === 'active' || subscription.status === 'trial') &&

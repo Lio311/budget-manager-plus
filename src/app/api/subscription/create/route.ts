@@ -9,13 +9,13 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { orderId, amount } = await req.json()
+        const { orderId, amount, couponCode, planType } = await req.json()
 
         if (!orderId || !amount) {
             return NextResponse.json({ error: 'Missing orderId or amount' }, { status: 400 })
         }
 
-        const result = await createSubscription(orderId, amount)
+        const result = await createSubscription(orderId, amount, planType, couponCode)
 
         return NextResponse.json({ success: true, subscription: result.subscription })
     } catch (error) {

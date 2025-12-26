@@ -36,11 +36,20 @@ export default async function DashboardLayout({
     }
 
     // Check subscription/trial status
-    const subscriptionStatus = await getSubscriptionStatus(user.id)
-    console.log('[DashboardLayout] Subscription status:', subscriptionStatus)
+    // We check both because Business plan grants access to Personal features too (conceptually),
+    // but strict separation means we might need to check specific plan for specific actions.
+    // For Dashboard access, we just need *some* access.
+
+    const personalStatus = await getSubscriptionStatus(user.id, 'PERSONAL')
+    const businessStatus = await getSubscriptionStatus(user.id, 'BUSINESS')
+
+    const hasAccess = personalStatus.hasAccess || businessStatus.hasAccess
+    const planType = businessStatus.hasAccess ? 'BUSINESS' : (personalStatus.hasAccess ? 'PERSONAL' : 'none')
+
+    console.log('[DashboardLayout] Subscription status:', { personal: personalStatus.hasAccess, business: businessStatus.hasAccess, resolved: planType })
 
     // If user has no access, redirect to subscribe page
-    if (!subscriptionStatus.hasAccess) {
+    if (!hasAccess) {
         console.log('[DashboardLayout] No access, redirecting to /subscribe')
         redirect('/subscribe')
     }
@@ -56,7 +65,7 @@ export default async function DashboardLayout({
             }}
         >
             <BudgetProvider>
-                <DashboardShell userPlan={subscriptionStatus.planType as 'PERSONAL' | 'BUSINESS'} />
+                <DashboardShell userPlan={planType as 'PERSONAL' | 'BUSINESS'} />
             </BudgetProvider>
         </SWRConfig>
     )

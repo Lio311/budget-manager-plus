@@ -231,7 +231,8 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                                             body: JSON.stringify({
                                                 orderId: details.id,
                                                 amount: price,
-                                                planType: initialPlan // Pass plan type to API
+                                                planType: initialPlan, // Pass plan type to API
+                                                couponCode: couponCode || undefined // Pass coupon code to API
                                             }),
                                         })
 

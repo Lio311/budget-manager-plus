@@ -19,7 +19,7 @@ async function grantTrialToUsers() {
             // Find user by email
             const user = await prisma.user.findUnique({
                 where: { email },
-                include: { subscription: true }
+                include: { subscriptions: true }
             })
 
             if (!user) {
@@ -52,15 +52,22 @@ async function grantTrialToUsers() {
             const endDate = addDays(startDate, 14)
 
             const subscription = await prisma.subscription.upsert({
-                where: { userId: user.id },
+                where: {
+                    userId_planType: {
+                        userId: user.id,
+                        planType: 'PERSONAL'
+                    }
+                },
                 create: {
                     userId: user.id,
                     status: 'trial',
+                    planType: 'PERSONAL',
                     startDate,
                     endDate
                 },
                 update: {
                     status: 'trial',
+                    planType: 'PERSONAL',
                     startDate,
                     endDate
                 }

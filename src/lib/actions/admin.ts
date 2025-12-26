@@ -21,7 +21,7 @@ export async function getAdminData() {
     const [users, coupons, feedbacks, revenue, trialTrackers] = await Promise.all([
         prisma.user.findMany({
             include: {
-                subscription: true,
+                subscriptions: true,
                 paymentHistory: {
                     orderBy: { createdAt: 'desc' },
                     take: 1
@@ -44,11 +44,18 @@ export async function getAdminData() {
         prisma.trialTracker.findMany()
     ])
 
-    // Enrich users with trial tracker info
-    const enrichedUsers = users.map(user => ({
-        ...user,
-        hasUsedTrial: trialTrackers.some(tracker => tracker.email === user.email)
-    }))
+    const enrichedUsers = users.map(user => {
+        // @ts-ignore - Prisma returns subscriptions array now
+        const subs = user.subscriptions || []
+        // @ts-ignore
+        const primarySub = subs.find(s => s.status === 'active') || subs[0] || null
+
+        return {
+            ...user,
+            subscription: primarySub,
+            hasUsedTrial: trialTrackers.some(tracker => tracker.email === user.email)
+        }
+    })
 
     return {
         users: enrichedUsers,
@@ -84,9 +91,25 @@ export async function deleteCoupon(id: string) {
 
 export async function updateUserSubscription(userId: string, endDate: Date) {
     await checkAdmin()
-    await prisma.subscription.update({
+    // Update all subscriptions for this user to the new end date
+    await prisma.subscription.updateMany({
         where: { userId },
         data: { endDate }
+    })
+    revalidatePath('/admin')
+}
+
+export async function updateCoupon(id: string, data: {
+    code?: string
+    discountPercent?: number
+    expiryDate?: Date
+    specificEmail?: string
+    planType?: 'PERSONAL' | 'BUSINESS'
+}) {
+    await checkAdmin()
+    await prisma.coupon.update({
+        where: { id },
+        data
     })
     revalidatePath('/admin')
 }
