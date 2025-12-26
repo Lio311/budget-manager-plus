@@ -59,6 +59,84 @@ export default function HomePage() {
                     />
                 </div>
 
+                {/* Business Solution Section */}
+                <div className="mb-20 bg-green-50 p-8 md:p-12 rounded-3xl border border-green-200 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-green-200 rounded-full blur-3xl opacity-20 -mr-32 -mt-32"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mb-32"></div>
+
+                    <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <span className="inline-block px-4 py-1.5 bg-green-600 text-white text-sm font-bold rounded-full mb-4">
+                                חדש! לבעלי עסקים ועצמאיים
+                            </span>
+                            <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                                המשרד הדיגיטלי שלך לניהול העסק
+                            </h2>
+                            <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+                                אל תיתן לכספי העסק והבית להתערבב. ב-Business Plan אתה מקבל הפרדה מלאה,
+                                דוחות מע"מ אוטומטיים, חישוב הוצאות מוכרות, ותמונת מצב עסקית בזמן אמת.
+                            </p>
+
+                            <ul className="space-y-3 mb-8">
+                                <BusinessFeature text="הפרדה מוחלטת בין פרופיל אישי לעסקי" />
+                                <BusinessFeature text="חישובי מע" מ (כולל פטור ומעורב) והכנה לדיווח" />
+                                <BusinessFeature text="ניהול תזרים מזומנים (כולל שוטף+)" />
+                                <BusinessFeature text="דוחות רווח והפסד בזמן אמת" />
+                            </ul>
+
+                            <SignedOut>
+                                <SignUpButton mode="modal">
+                                    <button className="px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg">
+                                        התנסות חינם בתוכנית העסקית
+                                    </button>
+                                </SignUpButton>
+                            </SignedOut>
+                            <SignedIn>
+                                <Link href="/subscribe/plans">
+                                    <button className="px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg">
+                                        שדרג לתוכנית עסקית
+                                    </button>
+                                </Link>
+                            </SignedIn>
+                        </div>
+                        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                            {/* Visual representation of business dashboard */}
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center border-b pb-4">
+                                    <div className="flex gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                                        <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                        <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                                    </div>
+                                    <div className="text-xs font-bold text-gray-400">BUSINESS DASHBOARD</div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                                        <div className="text-green-600 text-xs font-bold mb-1">הכנסות החודש</div>
+                                        <div className="text-2xl font-bold text-gray-800">₪42,500</div>
+                                        <div className="text-xs text-green-600 mt-1">+12% מחודש שעבר</div>
+                                    </div>
+                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                        <div className="text-blue-600 text-xs font-bold mb-1">מע"מ לתשלום</div>
+                                        <div className="text-2xl font-bold text-gray-800">₪6,120</div>
+                                        <div className="text-xs text-blue-600 mt-1">עד ה-15 לחודש</div>
+                                    </div>
+                                </div>
+                                <div className="space-y-2 pt-2">
+                                    <div className="flex justify-between items-center text-sm p-3 bg-gray-50 rounded-lg">
+                                        <span className="font-medium">הוצאות מוכרות</span>
+                                        <span className="font-bold">₪12,800</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-sm p-3 bg-gray-50 rounded-lg">
+                                        <span className="font-medium">רווח נקי משוער</span>
+                                        <span className="font-bold text-green-600">₪23,580</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* CTA Section */}
                 <div className="text-center">
                     <SignedOut>
