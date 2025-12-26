@@ -125,8 +125,8 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                     <p className="text-xs text-blue-800 text-right whitespace-nowrap overflow-hidden text-ellipsis">
                         <strong>שים לב:</strong> הייעוץ מסופק על ידי בינה מלאכותית ומהווה המלצות כלליות בלבד. לייעוץ פיננסי מקצועי ומותאם אישית, מומלץ להתייעץ עם יועץ פיננסי מוסמך.
                         {!isCached && advice && (
-                            <span className="block mt-2">
-                                ⏰ הניתוח נשמר ל-24 שעות הקרובות
+                            <span className="block mt-2 text-[10px]">
+                                הניתוח נשמר ל-24 שעות הקרובות
                             </span>
                         )}
                     </p>
