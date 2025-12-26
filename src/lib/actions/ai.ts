@@ -66,7 +66,7 @@ export async function getFinancialAdvice(data: FinancialData) {
             debtsCount: data.debts?.length || 0
         })
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-09-2025' })
 
         // Format the financial data into a comprehensive prompt
         const prompt = `אתה יועץ פיננסי מקצועי. נתחת את הנתונים הפיננסיים הבאים של לקוח ותספק ניתוח מקצועי ותובנות.
