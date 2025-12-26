@@ -37,19 +37,19 @@ interface Category {
 }
 
 export function IncomeTab() {
-    const { month, year, currency } = useBudget()
+    const { month, year, currency, budgetType } = useBudget()
     const { toast } = useToast()
 
     // --- Data Fetching ---
 
     const fetcherIncomes = async () => {
-        const result = await getIncomes(month, year)
+        const result = await getIncomes(month, year, budgetType)
         if (result.success && result.data) return result.data
         throw new Error(result.error || 'Failed to fetch incomes')
     }
 
     const { data: incomes = [], isLoading: loadingIncomes, mutate: mutateIncomes } = useSWR(
-        ['incomes', month, year],
+        ['incomes', month, year, budgetType],
         fetcherIncomes,
         { revalidateOnFocus: false }
     )
@@ -66,7 +66,7 @@ export function IncomeTab() {
     }
 
     const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
-        ['categories', 'income'],
+        ['categories', 'income', budgetType],
         fetcherCategories,
         { revalidateOnFocus: false }
     )
@@ -83,12 +83,6 @@ export function IncomeTab() {
         recurringEndDate: ''
     })
 
-    useEffect(() => {
-        setNewIncome(prev => ({
-            ...prev,
-            date: format(new Date(), 'yyyy-MM-dd')
-        }))
-    }, [])
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ source: '', category: '', amount: '', date: '' })
 
@@ -110,6 +104,13 @@ export function IncomeTab() {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
+
+    useEffect(() => {
+        setNewIncome(prev => ({
+            ...prev,
+            date: format(new Date(), 'yyyy-MM-dd')
+        }))
+    }, [])
 
     useEffect(() => {
         if (categories.length > 0 && !newIncome.category) {
@@ -136,7 +137,7 @@ export function IncomeTab() {
                 date: newIncome.date || undefined,
                 isRecurring: newIncome.isRecurring,
                 recurringEndDate: newIncome.isRecurring ? newIncome.recurringEndDate : undefined
-            })
+            }, budgetType)
 
             if (result.success) {
                 toast({ title: 'הצלחה', description: 'ההכנסה נוספה בהצלחה' })

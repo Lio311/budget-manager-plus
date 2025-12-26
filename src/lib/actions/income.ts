@@ -4,9 +4,9 @@ import { prisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 
-export async function getIncomes(month: number, year: number) {
+export async function getIncomes(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
-        const budget = await getCurrentBudget(month, year)
+        const budget = await getCurrentBudget(month, year, '₪', type)
 
         const incomes = await prisma.income.findMany({
             where: { budgetId: budget.id },
@@ -31,10 +31,11 @@ export async function addIncome(
         isRecurring?: boolean
         recurringStartDate?: string
         recurringEndDate?: string
-    }
+    },
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
-        const budget = await getCurrentBudget(month, year)
+        const budget = await getCurrentBudget(month, year, '₪', type)
 
         const income = await prisma.income.create({
             data: {
@@ -52,7 +53,7 @@ export async function addIncome(
         // If recurring, create copies for future months
         if (data.isRecurring && data.recurringEndDate) {
             const startDate = data.recurringStartDate || data.date || new Date().toISOString()
-            await createRecurringIncomes(income.id, data.source, data.category, data.amount, startDate, data.recurringEndDate)
+            await createRecurringIncomes(income.id, data.source, data.category, data.amount, startDate, data.recurringEndDate, type)
         }
 
         revalidatePath('/dashboard')
@@ -69,7 +70,8 @@ async function createRecurringIncomes(
     category: string,
     amount: number,
     startDateStr: string,
-    endDateStr: string
+    endDateStr: string,
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     const startDate = new Date(startDateStr)
     const endDate = new Date(endDateStr)
@@ -98,7 +100,7 @@ async function createRecurringIncomes(
         (currentYear === endYear && currentMonth <= endMonth)
     ) {
         try {
-            const budget = await getCurrentBudget(currentMonth, currentYear)
+            const budget = await getCurrentBudget(currentMonth, currentYear, '₪', type)
 
             // Handle invalid days (e.g., Feb 31 -> Feb 28/29)
             const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate()
