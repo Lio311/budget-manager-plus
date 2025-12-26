@@ -268,7 +268,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                         <TableRow key={user.id}>
                                             <TableCell className="text-center">{user.email}</TableCell>
                                             <TableCell className="text-center">
-                                                <div className="flex flex-col items-center gap-1">
+                                                <div className="flex flex-wrap justify-center gap-1">
                                                     {user.subscriptions && user.subscriptions.length > 0 ? (
                                                         user.subscriptions
                                                             .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
