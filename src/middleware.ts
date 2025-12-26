@@ -31,8 +31,8 @@ export default clerkMiddleware(async (auth, req) => {
 
             if (userId) {
                 // Fetch user metadata to check admin role
-                const user = await auth();
-                const isAdmin = user.sessionClaims?.metadata?.role === 'admin';
+                const { sessionClaims } = await auth();
+                const isAdmin = (sessionClaims?.metadata as any)?.role === 'admin';
 
                 // Allow admins to bypass maintenance mode
                 if (!isAdmin) {
