@@ -299,3 +299,12 @@ model AIAdviceCache {
   @@index([userId, expiresAt])
   @@map("ai_advice_cache")
 }
+
+model SiteSettings {
+  id              String   @id @default("site_settings")
+  maintenanceMode Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
+  
+  @@map("site_settings")
+}
+

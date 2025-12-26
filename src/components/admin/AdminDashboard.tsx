@@ -17,9 +17,11 @@ import {
     TableHeader,
     TableRow
 } from '@/components/ui/table'
-import { Trash2, Edit2 } from 'lucide-react'
+import { Trash2, Edit2, Construction } from 'lucide-react'
 import { createCoupon, deleteCoupon, deleteUser, updateSubscription, updateCoupon } from '@/lib/actions/admin'
+import { toggleMaintenanceMode } from '@/lib/actions/site-settings'
 import { CountdownTimer } from '@/components/admin/CountdownTimer'
+import { toast } from 'sonner'
 
 interface AdminDashboardProps {
     initialData: {
@@ -27,11 +29,12 @@ interface AdminDashboardProps {
         coupons: any[]
         feedbacks: any[]
         totalRevenue: number
+        maintenanceMode: boolean
     }
 }
 
 export function AdminDashboard({ initialData }: AdminDashboardProps) {
-    const { users, coupons, feedbacks, totalRevenue } = initialData
+    const { users, coupons, feedbacks, totalRevenue, maintenanceMode: initialMaintenanceMode } = initialData
     const [editingId, setEditingId] = useState<string | null>(null)
     const [newCoupon, setNewCoupon] = useState({
         code: '',
@@ -44,6 +47,10 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
     // New State for Editing User Subscriptions
     const [editingUser, setEditingUser] = useState<any>(null)
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+
+    // Maintenance Mode State
+    const [maintenanceMode, setMaintenanceMode] = useState(initialMaintenanceMode)
+    const [isTogglingMaintenance, setIsTogglingMaintenance] = useState(false)
 
     const handleCreateOrUpdateCoupon = async () => {
         if (editingId) {
@@ -85,6 +92,23 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         }
     }
 
+    const handleToggleMaintenance = async () => {
+        setIsTogglingMaintenance(true)
+        try {
+            const result = await toggleMaintenanceMode()
+            if (result.success) {
+                setMaintenanceMode(result.maintenanceMode!)
+                toast.success(result.message)
+            } else {
+                toast.error(result.error || 'Failed to toggle maintenance mode')
+            }
+        } catch (error) {
+            toast.error('An error occurred')
+        } finally {
+            setIsTogglingMaintenance(false)
+        }
+    }
+
     return (
         <div className="space-y-8">
             {/* Edit User Dialog */}
@@ -102,15 +126,15 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                     <div className="flex items-center justify-between mb-4 pb-3 border-b">
                                         <div className="flex items-center gap-3">
                                             <span className={`px-3 py-1.5 rounded-md text-sm font-bold uppercase tracking-wide ${sub.planType === 'BUSINESS'
-                                                    ? 'bg-purple-100 text-purple-800 border-2 border-purple-300'
-                                                    : 'bg-orange-100 text-orange-800 border-2 border-orange-300'
+                                                ? 'bg-purple-100 text-purple-800 border-2 border-purple-300'
+                                                : 'bg-orange-100 text-orange-800 border-2 border-orange-300'
                                                 }`}>
                                                 {sub.planType}
                                             </span>
                                             <span className={`px-2 py-1 rounded text-xs font-semibold ${sub.status === 'active' ? 'bg-green-100 text-green-800' :
-                                                    sub.status === 'trial' ? 'bg-blue-100 text-blue-800' :
-                                                        sub.status === 'expired' ? 'bg-red-100 text-red-800' :
-                                                            'bg-gray-100 text-gray-800'
+                                                sub.status === 'trial' ? 'bg-blue-100 text-blue-800' :
+                                                    sub.status === 'expired' ? 'bg-red-100 text-red-800' :
+                                                        'bg-gray-100 text-gray-800'
                                                 }`}>
                                                 {sub.status.toUpperCase()}
                                             </span>
@@ -201,6 +225,34 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {/* Maintenance Mode Toggle */}
+            <Card className="border-2">
+                <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className={`p-3 rounded-full ${maintenanceMode ? 'bg-orange-100' : 'bg-green-100'}`}>
+                                <Construction className={`h-6 w-6 ${maintenanceMode ? 'text-orange-600' : 'text-green-600'}`} />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-lg">Maintenance Mode</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    {maintenanceMode ? 'Site is currently in maintenance mode' : 'Site is operational'}
+                                </p>
+                            </div>
+                        </div>
+                        <Button
+                            onClick={handleToggleMaintenance}
+                            disabled={isTogglingMaintenance}
+                            variant={maintenanceMode ? 'destructive' : 'default'}
+                            size="lg"
+                            className="min-w-[140px]"
+                        >
+                            {isTogglingMaintenance ? 'Toggling...' : maintenanceMode ? 'Disable' : 'Enable'}
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
 
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>

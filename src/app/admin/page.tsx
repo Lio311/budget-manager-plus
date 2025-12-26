@@ -1,4 +1,5 @@
 import { getAdminData } from '@/lib/actions/admin'
+import { getMaintenanceMode } from '@/lib/actions/site-settings'
 import { AdminDashboard } from '@/components/admin/AdminDashboard'
 
 export const dynamic = 'force-dynamic'
@@ -9,6 +10,7 @@ export default async function AdminPage() {
     let data
     // try {
     data = await getAdminData()
+    const maintenanceMode = await getMaintenanceMode()
     // } catch (error) {
     //     console.error('Admin page error:', error)
     //     return (
@@ -31,7 +33,7 @@ export default async function AdminPage() {
                 </p>
             </div>
 
-            <AdminDashboard initialData={data} />
+            <AdminDashboard initialData={{ ...data, maintenanceMode }} />
         </div>
     )
 }
