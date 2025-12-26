@@ -278,9 +278,11 @@ model Feedback {
 
 model TrialTracker {
   id        String   @id @default(cuid())
-  email     String   @unique
+  email     String
+  planType  PlanType @default(PERSONAL)
   createdAt DateTime @default(now())
 
+  @@unique([email, planType])
   @@map("trial_trackers")
 }
 

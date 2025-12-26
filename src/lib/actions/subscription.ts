@@ -117,25 +117,38 @@ export async function startTrial(userId: string, email: string, planType: string
     })
 
     // Check if already tracked
+    const validPlanType = planType === 'BUSINESS' ? 'BUSINESS' : 'PERSONAL'
+
+    // Check if already tracked for this specific plan
+    // @ts-ignore - Prisma types update lag
     const existingTracker = await prisma.trialTracker.findUnique({
-        where: { email }
+        where: {
+            email_planType: {
+                email,
+                planType: validPlanType as any
+            }
+        }
     })
 
     if (existingTracker) {
-        console.log('[startTrial] Trial already used for email:', email)
-        return { success: false, reason: 'Trial already used' }
+        console.log(`[startTrial] Trial already used for email: ${email} on plan: ${validPlanType}`)
+        return { success: false, reason: 'Trial already used for this plan' }
     }
 
     // Create tracker
+    // @ts-ignore
     await prisma.trialTracker.create({
-        data: { email }
+        data: {
+            email,
+            planType: validPlanType as any
+        }
     })
-    console.log('[startTrial] Trial tracker created')
+    console.log(`[startTrial] Trial tracker created for ${validPlanType}`)
 
     // Create trial subscription
     const startDate = new Date()
     const endDate = addDays(startDate, 14)
-    const validPlanType = planType === 'BUSINESS' ? 'BUSINESS' : 'PERSONAL'
+    // validPlanType is already defined above
 
     // @ts-ignore - planType issue with Prisma types in dev
     const subscription = await prisma.subscription.upsert({
