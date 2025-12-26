@@ -26,7 +26,7 @@ export function ExpiryBanner() {
             <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4">
                 <div>
                     <p className={`font-bold ${isUrgent ? 'text-red-800' : 'text-yellow-800'}`}>
-                        {isUrgent ? '⚠️ התראה אחרונה!' : '⏰ תזכורת'}
+                        {isUrgent ? 'התראה אחרונה!' : 'תזכורת'}
                     </p>
                     <p className={isUrgent ? 'text-red-700' : 'text-yellow-700'}>
                         המנוי שלך יפוג בעוד {daysLeft} ימים. חדש עכשיו כדי לא לאבד את הנתונים!
