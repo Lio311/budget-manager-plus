@@ -40,55 +40,55 @@ export default function PlansPage() {
     ]
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8" dir="rtl">
-            <div className="max-w-4xl mx-auto text-center mb-12">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col justify-center py-4 px-4 sm:px-6 lg:px-8" dir="rtl">
+            <div className="max-w-4xl mx-auto text-center mb-6">
                 <Image
                     src="/K-LOGO.png"
                     alt="KesefFlow"
-                    width={200}
-                    height={60}
-                    className="h-16 w-auto mx-auto mb-6"
+                    width={180}
+                    height={50}
+                    className="h-10 w-auto mx-auto mb-2"
                 />
-                <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
+                <h1 className="text-2xl font-extrabold text-gray-900 mb-2">
                     בחרו את המסלול המתאים לכם
                 </h1>
-                <p className="text-xl text-gray-600">
+                <p className="text-base text-gray-600">
                     בין אם אתם מנהלים משק בית או עסק עצמאי, יש לנו את הפתרון המושלם בשבילכם
                 </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto w-full">
                 {plans.map((plan) => (
                     <div
                         key={plan.id}
-                        className={`bg-white rounded-2xl shadow-xl overflow-hidden relative border-2 ${plan.recommended ? 'border-green-500' : 'border-transparent'
+                        className={`bg-white rounded-xl shadow-lg overflow-hidden relative border-2 ${plan.recommended ? 'border-green-500' : 'border-transparent'
                             }`}
                     >
                         {plan.recommended && (
-                            <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                            <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-bl-md">
                                 מומלץ
                             </div>
                         )}
-                        <div className="p-8">
-                            <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                            <p className="text-gray-500 mb-6 h-10">{plan.description}</p>
-                            <div className="flex items-baseline justify-center mb-6" dir="ltr">
-                                <span className="text-gray-500 mr-2">/שנה</span>
-                                <span className="text-5xl font-extrabold text-gray-900">₪{plan.price}</span>
+                        <div className="p-5">
+                            <h3 className="text-xl font-bold text-gray-900 mb-1">{plan.name}</h3>
+                            <p className="text-gray-500 text-sm mb-3 h-8 leading-snug">{plan.description}</p>
+                            <div className="flex items-baseline justify-center mb-4" dir="ltr">
+                                <span className="text-gray-500 mr-1 text-sm">/שנה</span>
+                                <span className="text-3xl font-extrabold text-gray-900">₪{plan.price}</span>
                             </div>
-                            <ul className="space-y-4 mb-8 text-right">
+                            <ul className="space-y-2 mb-6 text-right">
                                 {plan.features.map((feature, index) => (
-                                    <li key={index} className="flex items-center">
-                                        <Check className="h-5 w-5 text-green-500 ml-3 flex-shrink-0" />
+                                    <li key={index} className="flex items-center text-sm">
+                                        <Check className="h-4 w-4 text-green-500 ml-2 flex-shrink-0" />
                                         <span className="text-gray-600">{feature === "כל הפיצ'רים בתוכנית הפרטית" ? "כל הפיצ'רים מהתוכנית הפרטית" : feature}</span>
                                     </li>
                                 ))}
                             </ul>
                             <Button
                                 onClick={() => router.push(`/subscribe?plan=${plan.id}`)}
-                                className={`w-full py-6 text-lg font-semibold ${plan.recommended
-                                        ? 'bg-green-600 hover:bg-green-700'
-                                        : 'bg-gray-800 hover:bg-gray-900'
+                                className={`w-full py-2 h-10 text-base font-semibold ${plan.recommended
+                                    ? 'bg-green-600 hover:bg-green-700'
+                                    : 'bg-gray-800 hover:bg-gray-900'
                                     }`}
                             >
                                 בחר בתוכנית {plan.name}
@@ -98,8 +98,8 @@ export default function PlansPage() {
                 ))}
             </div>
 
-            <div className="text-center mt-12">
-                <p className="text-sm text-gray-500">
+            <div className="text-center mt-6">
+                <p className="text-xs text-gray-500">
                     * כל התוכניות כוללות 14 יום ניסיון חינם ללא התחייבות
                 </p>
             </div>
