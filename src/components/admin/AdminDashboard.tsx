@@ -291,20 +291,32 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <div className="flex flex-wrap justify-center gap-1">
-                                                    {user.subscriptions && user.subscriptions.length > 0 ? (
-                                                        user.subscriptions
-                                                            .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
-                                                            .map((sub: any) => (
-                                                                <span key={sub.id} className={`px-2 py-0.5 rounded text-[10px] font-medium border ${sub.planType === 'BUSINESS'
-                                                                    ? 'bg-purple-100 text-purple-800 border-purple-200'
-                                                                    : 'bg-orange-100 text-orange-800 border-orange-200'
-                                                                    }`}>
-                                                                    {sub.planType}
-                                                                </span>
-                                                            ))
-                                                    ) : (
-                                                        <span className="text-gray-400 text-xs">-</span>
-                                                    )}
+                                                    {(() => {
+                                                        console.log(`[CLIENT] User ${user.email}:`, {
+                                                            hasSubscriptions: !!user.subscriptions,
+                                                            subscriptionsLength: user.subscriptions?.length,
+                                                            subscriptions: user.subscriptions?.map((s: any) => ({
+                                                                id: s.id,
+                                                                planType: s.planType,
+                                                                status: s.status
+                                                            }))
+                                                        });
+
+                                                        return user.subscriptions && user.subscriptions.length > 0 ? (
+                                                            user.subscriptions
+                                                                .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
+                                                                .map((sub: any) => (
+                                                                    <span key={sub.id} className={`px-2 py-0.5 rounded text-[10px] font-medium border ${sub.planType === 'BUSINESS'
+                                                                        ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                                                        : 'bg-orange-100 text-orange-800 border-orange-200'
+                                                                        }`}>
+                                                                        {sub.planType}
+                                                                    </span>
+                                                                ))
+                                                        ) : (
+                                                            <span className="text-gray-400 text-xs">-</span>
+                                                        );
+                                                    })()}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-center">
