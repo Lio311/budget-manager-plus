@@ -46,7 +46,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
         <div className="space-y-8">
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -54,7 +54,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -62,7 +62,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Active Subscriptions</CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -72,7 +72,7 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Feedbacks</CardTitle>
                     </CardHeader>
                     <CardContent>
