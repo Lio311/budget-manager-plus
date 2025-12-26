@@ -1,86 +1,79 @@
-import Image from 'next/image'
 import { Construction } from 'lucide-react'
 
 export default function MaintenancePage() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4" dir="rtl">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4" dir="rtl">
             <div className="max-w-2xl w-full">
-                {/* Logo */}
-                <div className="flex justify-center mb-8 animate-pulse">
-                    <Image
-                        src="/K-LOGO.png"
-                        alt="KesefFlow"
-                        width={300}
-                        height={90}
-                        className="h-20 w-auto"
-                        priority
-                    />
-                </div>
-
-                {/* Main Card */}
-                <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 text-center relative overflow-hidden">
-                    {/* Decorative Background Elements */}
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
-
-                    {/* Animated Icon */}
-                    <div className="mb-6 flex justify-center">
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                            <div className="relative bg-gradient-to-br from-blue-500 to-purple-600 rounded-full p-6">
-                                <Construction className="h-16 w-16 text-white animate-bounce" />
-                            </div>
+                {/* Animated Construction Icon */}
+                <div className="flex justify-center mb-8">
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+                        <div className="relative bg-white rounded-full p-8 shadow-2xl">
+                            <Construction className="w-24 h-24 text-blue-600 animate-bounce" strokeWidth={1.5} />
                         </div>
                     </div>
+                </div>
 
-                    {/* Title */}
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        האתר בשיפוצים
+                {/* Main Content */}
+                <div className="bg-white rounded-3xl shadow-2xl p-12 text-center space-y-6 border border-gray-100">
+                    <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        האתר בשיפוצים כרגע
                     </h1>
 
-                    {/* Subtitle */}
-                    <p className="text-xl md:text-2xl text-gray-700 mb-6 font-medium">
-                        אנחנו עובדים על שיפורים מרגשים!
-                    </p>
+                    <div className="space-y-4">
+                        <p className="text-2xl text-gray-700 font-medium">
+                            אנחנו עובדים על שיפורים מרגשים! 🚀
+                        </p>
 
-                    {/* Description */}
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 mb-8">
-                        <p className="text-gray-600 text-lg leading-relaxed">
-                            המערכת שלנו עוברת תחזוקה מתוכננת כדי להביא לכם חוויה טובה יותר.
-                            <br />
-                            <span className="font-semibold text-gray-800">נחזור לפעילות בשעות הקרובות.</span>
+                        <p className="text-xl text-gray-600">
+                            האתר יחזור לפעילות בשעות הקרובות
                         </p>
                     </div>
 
-                    {/* Features Being Improved */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div className="bg-blue-50 rounded-xl p-4">
-                            <div className="text-3xl mb-2">⚡</div>
-                            <p className="text-sm font-semibold text-gray-700">ביצועים משופרים</p>
+                    {/* Animated Progress Bar */}
+                    <div className="pt-8">
+                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"
+                                style={{ width: '70%' }}>
+                            </div>
                         </div>
-                        <div className="bg-purple-50 rounded-xl p-4">
-                            <div className="text-3xl mb-2">🎨</div>
-                            <p className="text-sm font-semibold text-gray-700">עיצוב מחודש</p>
-                        </div>
-                        <div className="bg-pink-50 rounded-xl p-4">
-                            <div className="text-3xl mb-2">🚀</div>
-                            <p className="text-sm font-semibold text-gray-700">תכונות חדשות</p>
-                        </div>
+                        <p className="text-sm text-gray-500 mt-3">
+                            מתקדמים יפה... כמעט מוכנים!
+                        </p>
                     </div>
 
-                    {/* Footer Message */}
-                    <p className="text-gray-500 text-sm">
-                        תודה על הסבלנות! 💙
-                    </p>
+                    {/* Contact Info */}
+                    <div className="pt-6 border-t border-gray-200">
+                        <p className="text-gray-600">
+                            יש שאלות? צרו איתנו קשר:{' '}
+                            <a href="mailto:support@keseflow.com"
+                                className="text-blue-600 hover:text-blue-700 font-semibold underline decoration-2 underline-offset-4 transition-colors">
+                                support@keseflow.com
+                            </a>
+                        </p>
+                    </div>
                 </div>
 
-                {/* Bottom Text */}
-                <p className="text-center text-gray-600 mt-6 text-sm">
-                    לשאלות ובעיות דחופות, צרו קשר בכתובת:
-                    <a href="mailto:support@kesefflow.com" className="text-blue-600 hover:text-blue-700 font-medium mr-1">
-                        support@kesefflow.com
-                    </a>
+                {/* Footer Note */}
+                <p className="text-center text-gray-500 mt-8 text-sm">
+                    תודה על הסבלנות! 💙
                 </p>
             </div>
+
+            <style jsx>{`
+                @keyframes bounce {
+                    0%, 100% {
+                        transform: translateY(0);
+                    }
+                    50% {
+                        transform: translateY(-20px);
+                    }
+                }
+                
+                .animate-bounce {
+                    animation: bounce 2s ease-in-out infinite;
+                }
+            `}</style>
         </div>
     )
 }

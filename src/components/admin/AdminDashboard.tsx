@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Construction } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
     Table,
@@ -28,9 +29,10 @@ interface AdminDashboardProps {
         feedbacks: any[]
         totalRevenue: number
     }
+    maintenanceMode: boolean
 }
 
-export function AdminDashboard({ initialData }: AdminDashboardProps) {
+export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanceMode }: AdminDashboardProps) {
     const { users, coupons, feedbacks, totalRevenue } = initialData
     const [editingId, setEditingId] = useState<string | null>(null)
     const [newCoupon, setNewCoupon] = useState({
@@ -44,6 +46,9 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
     // New State for Editing User Subscriptions
     const [editingUser, setEditingUser] = useState<any>(null)
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+
+    // Maintenance Mode State
+    const [maintenanceMode, setMaintenanceMode] = useState(initialMaintenanceMode)
 
     const handleCreateOrUpdateCoupon = async () => {
         if (editingId) {
@@ -202,7 +207,42 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
                 </DialogContent>
             </Dialog>
 
-            {/* TODO: Re-implement Maintenance Mode with Edge-compatible solution */}
+
+            {/* Maintenance Mode Card */}
+            <Card className="mb-6">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Construction className="w-5 h-5" />
+                        Maintenance Mode
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="font-medium">Current Status:</p>
+                            <p className={`text-sm ${maintenanceMode ? 'text-orange-600' : 'text-green-600'}`}>
+                                {maintenanceMode ? '🔧 Site in Maintenance' : '✅ Site Active'}
+                            </p>
+                        </div>
+                        <div className={`px-4 py-2 rounded-lg font-semibold ${maintenanceMode ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
+                            {maintenanceMode ? 'MAINTENANCE' : 'ACTIVE'}
+                        </div>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+                        <p className="font-semibold text-blue-900">📝 How to Toggle Maintenance Mode:</p>
+                        <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                            <li>Go to <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="underline font-medium">Vercel Dashboard</a></li>
+                            <li>Select your project → <strong>Storage</strong> → <strong>Edge Config</strong></li>
+                            <li>Find the <code className="bg-blue-100 px-1 rounded">maintenanceMode</code> key</li>
+                            <li>Set to <code className="bg-blue-100 px-1 rounded">true</code> (maintenance) or <code className="bg-blue-100 px-1 rounded">false</code> (active)</li>
+                        </ol>
+                        <p className="text-xs text-blue-700 mt-2">
+                            💡 Changes take effect immediately. Admins can always access /admin during maintenance.
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
 
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
