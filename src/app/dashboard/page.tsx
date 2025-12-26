@@ -1,5 +1,4 @@
 import { currentUser } from '@clerk/nextjs/server'
-import { getSubscriptionStatus } from '@/lib/actions/subscription'
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
@@ -19,13 +18,8 @@ export default async function DashboardPage() {
         redirect('/sign-in')
     }
 
-    // Check subscription
-    let { hasAccess } = await getSubscriptionStatus(user.id)
-
-    // If no access, redirect to subscribe
-    if (!hasAccess) {
-        redirect('/subscribe')
-    }
+    // Note: Subscription check is handled by the parent layout.tsx
+    // to ensure the user has at least ONE active subscription (Personal or Business).
 
     return null
 }
