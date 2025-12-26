@@ -55,8 +55,8 @@ async function createRecurringSavings(
         where: {
             userId: userId,
             year: { in: years },
-            type: type // Filter by type to avoid mixing Personal/Business budgets
-        }
+            type: type
+        } as any
     })
 
     // 3. Ensure budgets exist for all dates
@@ -72,9 +72,9 @@ async function createRecurringSavings(
                 userId,
                 month: m,
                 year: y,
-                currency: '₪', // Default
-                type: type // Create with correct type
-            })
+                currency: '₪',
+                type: type
+            } as any)
         }
     }
 
@@ -95,8 +95,8 @@ async function createRecurringSavings(
             where: {
                 userId: userId,
                 year: { in: years },
-                type: type // Filter by type on re-fetch too
-            }
+                type: type
+            } as any
         })
         allBudgets.forEach(b => budgetMap.set(`${b.month}-${b.year}`, b.id))
     }
