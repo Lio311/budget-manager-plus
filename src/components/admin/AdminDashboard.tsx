@@ -277,12 +277,12 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
 
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardHeader className="relative flex flex-row items-center justify-center space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-gray-400 hover:text-red-600 transition-colors"
+                            className="absolute right-2 h-8 w-8 text-gray-400 hover:text-red-600 transition-colors"
                             onClick={async () => {
                                 if (confirm('Are you sure you want to RESET ALL REVENUE data? This will delete all payment history and clear subscription payment info.')) {
                                     const res = await resetRevenue()
