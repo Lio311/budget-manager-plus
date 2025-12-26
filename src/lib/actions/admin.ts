@@ -21,6 +21,7 @@ export async function getAdminData() {
     const [users, coupons, feedbacks, revenue, trialTrackers] = await Promise.all([
         prisma.user.findMany({
             include: {
+                // @ts-ignore - Prisma types lag, subscriptions exists in schema
                 subscriptions: true,
                 paymentHistory: {
                     orderBy: { createdAt: 'desc' },
@@ -49,6 +50,8 @@ export async function getAdminData() {
         const subs = user.subscriptions || []
         // @ts-ignore
         const primarySub = subs.find(s => s.status === 'active') || subs[0] || null
+
+        console.log(`User ${user.email} has ${subs.length} subscriptions:`, subs.map((s: any) => ({ planType: s.planType, status: s.status })))
 
         return {
             ...user,
