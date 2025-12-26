@@ -298,3 +298,50 @@ function BusinessFeature({ text }: { text: string }) {
         </li>
     )
 }
+
+// Mock UI Components for Landing Page
+function MockProgressBar({ category, spent, limit, color, warning }: { category: string, spent: number, limit: number, color: string, warning?: boolean }) {
+    const percent = Math.min((spent / limit) * 100, 100)
+    return (
+        <div>
+            <div className="flex justify-between text-sm mb-1">
+                <span className="font-medium text-gray-700">{category}</span>
+                <span className={`font-bold ${warning ? 'text-red-500' : 'text-gray-500'}`}>
+                    {spent}/{limit}
+                </span>
+            </div>
+            <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                <div className={`h-full rounded-full ${color}`} style={{ width: `${percent}%` }}></div>
+            </div>
+        </div>
+    )
+}
+
+function MockBillItem({ name, date, amount, isAuto }: { name: string, date: string, amount: number, isAuto?: boolean }) {
+    return (
+        <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-100">
+            <div className="flex items-center gap-3">
+                <div className={`w-2 h-2 rounded-full ${isAuto ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+                <span className="text-gray-700 font-medium">{name}</span>
+            </div>
+            <div className="flex flex-col items-end">
+                <span className="font-bold text-gray-900">₪{amount}</span>
+                <span className="text-[10px] text-gray-400">{date}</span>
+            </div>
+        </div>
+    )
+}
+
+function MockSavingsBar({ label, percent }: { label: string, percent: number }) {
+    return (
+        <div className="flex flex-col items-center gap-2 group cursor-pointer w-full">
+            <div className="w-full bg-gray-100 rounded-t-lg relative h-24 flex items-end overflow-hidden">
+                <div
+                    className="w-full bg-green-400 opacity-80 group-hover:opacity-100 transition-all duration-500"
+                    style={{ height: `${percent}%` }}
+                ></div>
+            </div>
+            <span className="text-xs font-medium text-gray-600">{label}</span>
+        </div>
+    )
+}
