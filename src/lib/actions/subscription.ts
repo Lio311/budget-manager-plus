@@ -84,6 +84,8 @@ export async function createSubscription(paypalOrderId: string, amount: number) 
 }
 
 export async function startTrial(userId: string, email: string) {
+    console.log('[startTrial] Starting trial for user:', userId, email)
+
     // Sync user to DB to handle webhook race condition
     await prisma.user.upsert({
         where: { id: userId },
@@ -100,6 +102,7 @@ export async function startTrial(userId: string, email: string) {
     })
 
     if (existingTracker) {
+        console.log('[startTrial] Trial already used for email:', email)
         return { success: false, reason: 'Trial already used' }
     }
 
@@ -107,25 +110,28 @@ export async function startTrial(userId: string, email: string) {
     await prisma.trialTracker.create({
         data: { email }
     })
+    console.log('[startTrial] Trial tracker created')
 
     // Create trial subscription
-    const endDate = addDays(new Date(), 14)
+    const startDate = new Date()
+    const endDate = addDays(startDate, 14)
 
-    await prisma.subscription.upsert({
+    const subscription = await prisma.subscription.upsert({
         where: { userId },
         create: {
             userId,
             status: 'trial',
-            startDate: new Date(),
+            startDate,
             endDate,
         },
         update: {
             status: 'trial',
-            startDate: new Date(),
+            startDate,
             endDate,
         }
     })
 
+    console.log('[startTrial] Subscription created/updated:', subscription)
     revalidatePath('/dashboard')
     return { success: true }
 }
