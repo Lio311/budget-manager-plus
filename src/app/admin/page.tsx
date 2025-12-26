@@ -3,8 +3,15 @@ import { AdminDashboard } from '@/components/admin/AdminDashboard'
 
 export const dynamic = 'force-dynamic'
 
+import { redirect } from 'next/navigation'
+
 export default async function AdminPage() {
-    const data = await getAdminData()
+    let data
+    try {
+        data = await getAdminData()
+    } catch (error) {
+        redirect('/')
+    }
 
     return (
         <div className="space-y-6">
