@@ -90,7 +90,7 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                 <div className="mt-4">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-12 gap-4">
-                            <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                             <p className="text-sm text-muted-foreground">מנתח את הנתונים הפיננסיים שלך...</p>
                             <p className="text-xs text-gray-400">זה עשוי לקחת כ-10 שניות</p>
                         </div>
