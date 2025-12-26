@@ -41,16 +41,6 @@ export default function MaintenancePage() {
                         </p>
                     </div>
 
-                    {/* Contact Info */}
-                    <div className="pt-6 border-t border-gray-200">
-                        <p className="text-gray-600">
-                            יש שאלות? צרו איתנו קשר:{' '}
-                            <a href="mailto:support@keseflow.com"
-                                className="text-blue-600 hover:text-blue-700 font-semibold underline decoration-2 underline-offset-4 transition-colors">
-                                support@keseflow.com
-                            </a>
-                        </p>
-                    </div>
                 </div>
 
                 {/* Footer Note */}

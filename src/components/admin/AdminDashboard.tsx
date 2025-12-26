@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Trash2, Edit2, Construction, ShieldAlert, Globe } from 'lucide-react'
+import { Trash2, Edit2, Construction, ShieldAlert, Globe, RefreshCcw } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
     Table,
@@ -18,7 +18,7 @@ import {
     TableHeader,
     TableRow
 } from '@/components/ui/table'
-import { createCoupon, deleteCoupon, deleteUser, updateSubscription, updateCoupon } from '@/lib/actions/admin'
+import { createCoupon, deleteCoupon, deleteUser, updateSubscription, updateCoupon, resetRevenue } from '@/lib/actions/admin'
 import { toggleMaintenanceMode } from '@/lib/actions/maintenance'
 import { CountdownTimer } from '@/components/admin/CountdownTimer'
 import { toast } from 'sonner'
@@ -277,8 +277,23 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
 
             <div className="grid gap-4 md:grid-cols-4">
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-gray-400 hover:text-red-600 transition-colors"
+                            onClick={async () => {
+                                if (confirm('Are you sure you want to RESET ALL REVENUE data? This will delete all payment history and clear subscription payment info.')) {
+                                    const res = await resetRevenue()
+                                    if (res.success) toast.success('Revenue reset successfully')
+                                    else toast.error(res.error || 'Failed to reset revenue')
+                                }
+                            }}
+                            title="Reset Revenue"
+                        >
+                            <RefreshCcw className="h-4 w-4" />
+                        </Button>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-center">₪{totalRevenue}</div>
@@ -583,6 +598,6 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                     </Card>
                 </TabsContent>
             </Tabs>
-        </div>
+        </div >
     )
 }

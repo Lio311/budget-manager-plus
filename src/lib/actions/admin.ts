@@ -139,3 +139,26 @@ export async function updateSubscription(
         return { success: false, error: 'Failed to update. Check if plan type already exists.' }
     }
 }
+
+export async function resetRevenue() {
+    await checkAdmin()
+
+    try {
+        // 1. Delete all payment history records
+        await prisma.paymentHistory.deleteMany({})
+
+        // 2. Clear payment info from subscriptions
+        await prisma.subscription.updateMany({
+            data: {
+                lastPaymentAmount: null,
+                lastPaymentDate: null,
+            }
+        })
+
+        revalidatePath('/admin')
+        return { success: true }
+    } catch (error) {
+        console.error('Failed to reset revenue:', error)
+        return { success: false, error: 'Failed to reset revenue' }
+    }
+}

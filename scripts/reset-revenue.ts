@@ -1,20 +1,25 @@
 import { PrismaClient } from '@prisma/client'
-import * as dotenv from 'dotenv'
-
-dotenv.config()
 
 const prisma = new PrismaClient()
 
 async function resetRevenue() {
-    console.log('Resetting revenue statistics...')
+    console.log('🚀 Starting revenue reset...')
 
     try {
-        // Delete all records from PaymentHistory table
-        const { count } = await prisma.paymentHistory.deleteMany({})
+        // 1. Delete all payment history records
+        const deletedPayments = await prisma.paymentHistory.deleteMany({})
+        console.log(`✅ Deleted ${deletedPayments.count} payment history records.`)
 
-        console.log(`✅ Successfully deleted ${count} payment records.`)
-        console.log('   Total Revenue should now be 0.')
+        // 2. Clear payment info from subscriptions
+        const updatedSubs = await prisma.subscription.updateMany({
+            data: {
+                lastPaymentAmount: null,
+                lastPaymentDate: null,
+            }
+        })
+        console.log(`✅ Cleared payment info from ${updatedSubs.count} subscriptions.`)
 
+        console.log('✨ Revenue reset complete!')
     } catch (error) {
         console.error('❌ Error resetting revenue:', error)
     } finally {
