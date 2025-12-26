@@ -107,20 +107,6 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                     )}
                 </div>
 
-                {advice && !loading && (
-                    <div className="mt-4 pt-4 border-t">
-                        <Button
-                            onClick={handleGetAdvice}
-                            variant="outline"
-                            className="w-full"
-                            disabled={loading}
-                        >
-                            <SparkleIcon className="h-4 w-4 ml-2" />
-                            קבל ייעוץ מחדש
-                        </Button>
-                    </div>
-                )}
-
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-[11px] text-blue-800 text-right leading-relaxed">
                         <strong>שים לב:</strong> ייעוץ זה מסופק ע"י בינה מלאכותית ומהווה המלצות כלליות בלבד. מומלץ להתייעץ עם יועץ פיננסי מוסמך.
