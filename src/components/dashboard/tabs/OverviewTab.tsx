@@ -508,7 +508,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <CardTitle className="text-base">מצב תקציב חודשי</CardTitle>
                         </CardHeader>
                         {loading ? (
-                            <CardContent className="p-4 pt-0 flex items-center justify-center h-40">
+                            <CardContent className="p-4 pt-0 flex items-center justify-center h-[300px]">
                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                             </CardContent>
                         ) : totalIncome === 0 && standardExpenses === 0 && combinedTotalBills === 0 ? (
