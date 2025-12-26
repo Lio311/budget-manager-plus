@@ -5,6 +5,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { getMonthName } from '@/lib/utils'
 import { ChevronLeft, ChevronRight, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
 import { FeedbackButton } from './FeedbackButton'
 
 import Image from 'next/image'
@@ -14,10 +15,20 @@ const CURRENCIES = ['₪', '$', '€', '£']
 interface DashboardHeaderProps {
     onMenuToggle?: () => void
     menuOpen?: boolean
+    userPlan?: 'PERSONAL' | 'BUSINESS'
 }
 
-export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHeaderProps = {}) {
+export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PERSONAL' }: DashboardHeaderProps) {
     const { month, year, currency, budgetType, setMonth, setYear, setCurrency, setBudgetType } = useBudget()
+    const router = useRouter()
+
+    const handleToggle = (type: 'PERSONAL' | 'BUSINESS') => {
+        if (type === 'BUSINESS' && userPlan === 'PERSONAL') {
+            router.push('/subscribe?plan=BUSINESS')
+            return
+        }
+        setBudgetType(type)
+    }
 
     const handlePrevMonth = () => {
         if (month === 1) {
@@ -90,10 +101,10 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHea
                     {/* User Button */}
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={() => setBudgetType(budgetType === 'PERSONAL' ? 'BUSINESS' : 'PERSONAL')}
+                            onClick={() => handleToggle(budgetType === 'PERSONAL' ? 'BUSINESS' : 'PERSONAL')}
                             className={`px-2 py-1 text-xs font-bold rounded-md border transition-all ${budgetType === 'PERSONAL'
-                                    ? 'bg-blue-50 text-blue-600 border-blue-200'
-                                    : 'bg-green-50 text-green-600 border-green-200'
+                                ? 'bg-blue-50 text-blue-600 border-blue-200'
+                                : 'bg-green-50 text-green-600 border-green-200'
                                 }`}
                         >
                             {budgetType === 'PERSONAL' ? 'פרטי' : 'עסקי'}
@@ -118,7 +129,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHea
                 <div className="hidden md:flex w-72 h-full items-center justify-end px-8 gap-4">
                     <div className="flex bg-gray-100 rounded-lg p-1">
                         <button
-                            onClick={() => setBudgetType('PERSONAL')}
+                            onClick={() => handleToggle('PERSONAL')}
                             className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'PERSONAL'
                                 ? 'bg-white text-gray-900 shadow-sm'
                                 : 'text-gray-500 hover:text-gray-900'
@@ -127,7 +138,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false }: DashboardHea
                             פרטי
                         </button>
                         <button
-                            onClick={() => setBudgetType('BUSINESS')}
+                            onClick={() => handleToggle('BUSINESS')}
                             className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'BUSINESS'
                                 ? 'bg-white text-gray-900 shadow-sm'
                                 : 'text-gray-500 hover:text-gray-900'

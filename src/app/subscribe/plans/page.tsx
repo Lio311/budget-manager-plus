@@ -72,9 +72,9 @@ export default function PlansPage() {
                         <div className="p-5">
                             <h3 className="text-xl font-bold text-gray-900 mb-1">{plan.name}</h3>
                             <p className="text-gray-500 text-sm mb-3 h-8 leading-snug">{plan.description}</p>
-                            <div className="flex items-baseline justify-center mb-4" dir="ltr">
-                                <span className="text-gray-500 mr-1 text-sm">/שנה</span>
+                            <div className="flex items-baseline justify-center mb-4 gap-1" dir="rtl">
                                 <span className="text-3xl font-extrabold text-gray-900">₪{plan.price}</span>
+                                <span className="text-gray-500 text-sm">/ שנה</span>
                             </div>
                             <ul className="space-y-2 mb-6 text-right">
                                 {plan.features.map((feature, index) => (
