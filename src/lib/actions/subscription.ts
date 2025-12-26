@@ -210,8 +210,8 @@ export async function getSubscriptionStatus(userId: string, planType: string = '
     }
 }
 
-export async function validateCoupon(code: string, userEmail: string) {
-    console.log(`Validating coupon: ${code} for email: ${userEmail}`)
+export async function validateCoupon(code: string, userEmail: string, planType: string = 'PERSONAL') {
+    console.log(`Validating coupon: ${code} for email: ${userEmail} and plan: ${planType}`)
 
     // Check if code is provided
     if (!code) {
@@ -235,6 +235,15 @@ export async function validateCoupon(code: string, userEmail: string) {
     if (coupon.specificEmail && coupon.specificEmail.toLowerCase() !== userEmail.toLowerCase()) {
         console.log(`Coupon email mismatch. Coupon: ${coupon.specificEmail}, User: ${userEmail}`)
         return { valid: false, message: 'קוד הקופון שהוזן שגוי או פג תוקפו' }
+    }
+
+    // NEW: Check Plan Type Restriction
+    if (coupon.planType && coupon.planType !== planType) {
+        console.log(`Coupon plan mismatch. Coupon: ${coupon.planType}, Requested: ${planType}`)
+        return {
+            valid: false,
+            message: `קופון זה תקף רק למנוי מסוג ${coupon.planType === 'PERSONAL' ? 'פרטי' : 'עסקי'}`
+        }
     }
 
     if (coupon.expiryDate && coupon.expiryDate < new Date()) {

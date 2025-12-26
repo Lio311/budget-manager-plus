@@ -30,7 +30,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
     const handleApplyCoupon = async () => {
         if (!couponCode || !user?.emailAddresses[0]?.emailAddress) return
 
-        const result = await validateCoupon(couponCode, user.emailAddresses[0].emailAddress)
+        const result = await validateCoupon(couponCode, user.emailAddresses[0].emailAddress, initialPlan)
 
         if (result.valid && result.discountPercent) {
             setDiscount(result.discountPercent)
