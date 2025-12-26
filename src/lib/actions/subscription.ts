@@ -44,58 +44,90 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
 
         // Calculate end date for 1 year from now
         const endDate = addYears(new Date(), 1)
-        const validPlanType = planType === 'BUSINESS' ? 'BUSINESS' : 'PERSONAL'
 
-        console.log('Creating subscription in database with plan:', validPlanType)
+        console.log('Creating BOTH PERSONAL and BUSINESS subscriptions in database')
 
-        // Create or update subscription
-        // @ts-ignore - planType issue with Prisma types in dev
-        const subscription = await prisma.subscription.upsert({
-            where: {
-                userId_planType: {
+        // Create or update BOTH subscriptions in a transaction
+        const result = await prisma.$transaction(async (tx) => {
+            // Create/update PERSONAL subscription
+            const personalSubscription = await tx.subscription.upsert({
+                where: {
+                    userId_planType: {
+                        userId,
+                        planType: 'PERSONAL'
+                    }
+                },
+                update: {
+                    status: 'active',
+                    startDate: new Date(),
+                    endDate,
+                    paypalOrderId,
+                    lastPaymentDate: new Date(),
+                    lastPaymentAmount: amount,
+                },
+                create: {
                     userId,
-                    planType: validPlanType as any
+                    status: 'active',
+                    planType: 'PERSONAL',
+                    startDate: new Date(),
+                    endDate,
+                    paypalOrderId,
+                    lastPaymentDate: new Date(),
+                    lastPaymentAmount: amount,
+                },
+            })
+
+            console.log('PERSONAL subscription created/updated:', personalSubscription.id)
+
+            // Create/update BUSINESS subscription
+            const businessSubscription = await tx.subscription.upsert({
+                where: {
+                    userId_planType: {
+                        userId,
+                        planType: 'BUSINESS'
+                    }
+                },
+                update: {
+                    status: 'active',
+                    startDate: new Date(),
+                    endDate,
+                    paypalOrderId,
+                    lastPaymentDate: new Date(),
+                    lastPaymentAmount: amount,
+                },
+                create: {
+                    userId,
+                    status: 'active',
+                    planType: 'BUSINESS',
+                    startDate: new Date(),
+                    endDate,
+                    paypalOrderId,
+                    lastPaymentDate: new Date(),
+                    lastPaymentAmount: amount,
+                },
+            })
+
+            console.log('BUSINESS subscription created/updated:', businessSubscription.id)
+
+            // Record payment
+            const payment = await tx.paymentHistory.create({
+                data: {
+                    userId,
+                    paypalOrderId,
+                    amount,
+                    currency: 'ILS',
+                    status: 'completed'
                 }
-            },
-            update: {
-                status: 'active',
-                planType: validPlanType as any,
-                startDate: new Date(),
-                endDate,
-                paypalOrderId,
-                lastPaymentDate: new Date(),
-                lastPaymentAmount: amount,
-            },
-            create: {
-                userId,
-                status: 'active',
-                planType: validPlanType as any,
-                startDate: new Date(),
-                endDate,
-                paypalOrderId,
-                lastPaymentDate: new Date(),
-                lastPaymentAmount: amount,
-            },
+            })
+
+            console.log('Payment history created:', payment.id)
+
+            return { personalSubscription, businessSubscription, payment }
         })
 
-        console.log('Subscription created/updated:', subscription.id)
-        console.log('Creating payment history...')
+        console.log('createSubscription completed successfully - created both subscriptions')
 
-        // Record payment
-        const payment = await prisma.paymentHistory.create({
-            data: {
-                userId,
-                paypalOrderId,
-                amount,
-                currency: 'ILS',
-                status: 'completed'
-            }
-        })
-
-        console.log('Payment history created:', payment.id)
-        console.log('createSubscription completed successfully')
-
-        return { subscription, payment }
+        return result
     } catch (error) {
         console.error('createSubscription error:', error)
         console.error('Error details:', JSON.stringify(error, null, 2))
