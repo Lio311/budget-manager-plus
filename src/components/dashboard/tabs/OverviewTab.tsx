@@ -374,6 +374,18 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     { name: 'יתרה', value: Math.max(0, realRemaining), color: '#34D399' }
                                 ].filter(item => item.value > 0);
 
+                                if (pieData.length === 0) {
+                                    return (
+                                        <div className="h-full flex flex-col items-center justify-center text-center px-4" dir="rtl">
+                                            <PieChartIcon className="h-12 w-12 text-gray-300 mb-3" />
+                                            <p className="text-gray-500 font-medium mb-1">אין נתונים להצגה</p>
+                                            <p className="text-sm text-gray-400">
+                                                ניתן ללחוץ על כרטיסיות "הכנסות" ו"הוצאות" למילוי נתונים
+                                            </p>
+                                        </div>
+                                    );
+                                }
+
                                 return (
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
@@ -502,6 +514,14 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <CardContent className="p-4 pt-0 flex items-center justify-center h-40">
                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                             </CardContent>
+                        ) : totalIncome === 0 && standardExpenses === 0 && combinedTotalBills === 0 ? (
+                            <CardContent className="p-4 pt-0 flex flex-col items-center justify-center h-40 text-center" dir="rtl">
+                                <Wallet className="h-12 w-12 text-gray-300 mb-3" />
+                                <p className="text-gray-500 font-medium mb-1">אין נתונים להצגה</p>
+                                <p className="text-sm text-gray-400">
+                                    ניתן ללחוץ על כרטיסיות "הכנסות" ו"הוצאות" למילוי נתונים
+                                </p>
+                            </CardContent>
                         ) : (
                             <CardContent className="p-4 pt-2">
                                 {/* ... existing BudgetProgress content spaces ... */}
@@ -509,7 +529,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     <BudgetProgress
                                         label="הוצאות שוטפות"
                                         current={standardExpenses}
-                                        total={totalIncome}
                                         currency={currency}
                                         color="bg-red-500"
                                     />
