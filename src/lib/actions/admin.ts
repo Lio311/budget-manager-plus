@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 import { currentUser } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 
-const ADMIN_EMAILS = ['lior31197@gmail.com', 'ron.kor97@gmail.com']
+import { ADMIN_EMAILS } from '@/lib/constants'
 
 async function checkAdmin() {
     const user = await currentUser()

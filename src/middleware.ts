@@ -1,6 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from 'next/server';
-const ADMIN_EMAILS = ['lior31197@gmail.com', 'ron.kor97@gmail.com']
 
 const isPublicRoute = createRouteMatcher([
     '/',
@@ -22,15 +21,23 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Check maintenance mode from environment variable (emergency override)
     let isMaintenance = process.env.MAINTENANCE_MODE === 'true';
+    let isAdmin = false;
 
     // If not enabled via ENV, check the DB via API route
     if (!isMaintenance) {
         try {
+            const { userId } = await auth();
+            const statusUrl = new URL('/api/maintenance/status', req.url);
+            if (userId) {
+                statusUrl.searchParams.set('userId', userId);
+            }
+
             // Internal fetch to status API
-            const res = await fetch(new URL('/api/maintenance/status', req.url));
+            const res = await fetch(statusUrl);
             if (res.ok) {
                 const data = await res.json();
                 isMaintenance = data.enabled;
+                isAdmin = data.isAdmin;
             }
         } catch (error) {
             console.error('Middleware maintenance check failed:', error);
@@ -38,16 +45,8 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     if (isMaintenance) {
-        // Get user info to check if admin
-        const { userId, sessionClaims } = await auth();
-
-        // Check if admin by role metadata or by email (if available in claims)
-        const isAdmin =
-            (sessionClaims?.metadata as any)?.role === 'admin' ||
-            ADMIN_EMAILS.includes((sessionClaims as any)?.email?.toLowerCase() || "");
-
         // Allow admins to bypass maintenance mode for ALL routes
-        if (userId && (pathname.startsWith('/admin') || isAdmin)) {
+        if (isAdmin || pathname.startsWith('/admin')) {
             return;
         }
 
