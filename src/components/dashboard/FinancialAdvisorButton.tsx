@@ -57,14 +57,14 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                     className="relative overflow-hidden group"
                     title="ייעוץ פיננסי AI"
                 >
-                    <Sparkles className="h-4 w-4 text-purple-600 group-hover:text-purple-700 transition-colors" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+                    <Sparkles className="h-4 w-4 text-black group-hover:text-gray-700 transition-colors" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-gray-100 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                     <DialogTitle className="text-right flex items-center gap-2">
-                        <Sparkles className="h-5 w-5 text-purple-600" />
+                        <Sparkles className="h-5 w-5 text-black" />
                         ייעוץ פיננסי מבוסס AI
                     </DialogTitle>
                 </DialogHeader>
