@@ -46,7 +46,7 @@ export function ExpensesTab() {
     )
 
     const fetcherCategories = async () => {
-        const result = await getCategories('expense')
+        const result = await getCategories('expense', budgetType)
         if (result.success && result.data) return result.data
         return []
     }
@@ -147,7 +147,8 @@ export function ExpensesTab() {
             const result = await addCategory({
                 name: newCategoryName.trim(),
                 type: 'expense',
-                color: newCategoryColor
+                color: newCategoryColor,
+                scope: budgetType
             })
 
             console.log(`[ExpensesTab] addCategory result:`, result)

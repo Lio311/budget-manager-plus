@@ -16,14 +16,15 @@ function serializeCategory(cat: any) {
     }
 }
 
-export async function getCategories(type: string = 'expense') {
+export async function getCategories(type: string = 'expense', scope: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const user = await ensureUserExists()
 
         let categories = await prisma.category.findMany({
             where: {
                 userId: user.id,
-                type
+                type,
+                scope
             },
             orderBy: {
                 createdAt: 'asc'
@@ -37,13 +38,14 @@ export async function getCategories(type: string = 'expense') {
                     (type === 'saving' ? DEFAULT_SAVINGS_CATEGORIES : []))
 
             if (defaults.length > 0) {
-                console.log(`[getCategories] Seeding ${defaults.length} categories for user ${user.id} type ${type}`)
+                console.log(`[getCategories] Seeding ${defaults.length} categories for user ${user.id} type ${type} scope ${scope}`)
                 try {
                     await prisma.category.createMany({
                         data: defaults.map(c => ({
                             userId: user.id,
                             name: c.name,
                             type,
+                            scope,
                             color: c.color,
                             updatedAt: new Date()
                         }))
@@ -53,7 +55,8 @@ export async function getCategories(type: string = 'expense') {
                     categories = await prisma.category.findMany({
                         where: {
                             userId: user.id,
-                            type
+                            type,
+                            scope
                         },
                         orderBy: {
                             createdAt: 'asc'
@@ -72,15 +75,17 @@ export async function getCategories(type: string = 'expense') {
     }
 }
 
-export async function addCategory(data: { name: string; type: string; color?: string }) {
+export async function addCategory(data: { name: string; type: string; color?: string; scope?: 'PERSONAL' | 'BUSINESS' }) {
     try {
         const user = await ensureUserExists()
+        const scope = data.scope || 'PERSONAL'
 
         const existing = await prisma.category.findFirst({
             where: {
                 userId: user.id,
                 name: data.name,
-                type: data.type
+                type: data.type,
+                scope
             }
         })
 
@@ -94,6 +99,7 @@ export async function addCategory(data: { name: string; type: string; color?: st
                 name: data.name,
                 type: data.type,
                 color: data.color,
+                scope,
                 updatedAt: new Date()
             }
         })
@@ -150,12 +156,12 @@ export async function deleteCategory(id: string) {
     }
 }
 
-export async function seedCategories(type: string = 'expense') {
+export async function seedCategories(type: string = 'expense', scope: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const user = await ensureUserExists()
 
         const count = await prisma.category.count({
-            where: { userId: user.id, type }
+            where: { userId: user.id, type, scope }
         })
 
         if (count > 0) return { success: true, message: 'Categories already exist' }
@@ -171,6 +177,7 @@ export async function seedCategories(type: string = 'expense') {
                 userId: user.id,
                 name: c.name,
                 type,
+                scope,
                 color: c.color,
                 updatedAt: new Date()
             }))
