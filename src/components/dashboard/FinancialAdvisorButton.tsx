@@ -13,16 +13,13 @@ interface FinancialAdvisorButtonProps {
 }
 
 const SparkleIcon = ({ className }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className={className}>
-        <defs>
-            <linearGradient id="sparkleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style={{ stopColor: '#9333ea', stopOpacity: 1 }} />
-                <stop offset="50%" style={{ stopColor: '#3b82f6', stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: '#06b6d4', stopOpacity: 1 }} />
-            </linearGradient>
-        </defs>
-        <path fill="url(#sparkleGradient)" d="M256 48c-11.7 0-21.2 9.5-21.2 21.2 0 70.2-56.9 127.1-127.1 127.1-11.7 0-21.2 9.5-21.2 21.2s9.5 21.2 21.2 21.2c70.2 0 127.1 56.9 127.1 127.1 0 11.7 9.5 21.2 21.2 21.2s21.2-9.5 21.2-21.2c0-70.2 56.9-127.1 127.1-127.1 11.7 0 21.2-9.5 21.2-21.2s-9.5-21.2-21.2-21.2c-70.2 0-127.1-56.9-127.1-127.1C277.2 57.5 267.7 48 256 48z" />
-    </svg>
+    <Image
+        src="/google-gemini.png"
+        alt="Gemini AI"
+        width={20}
+        height={20}
+        className={className}
+    />
 )
 
 export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButtonProps) {

@@ -53,7 +53,19 @@ export async function getFinancialAdvice(data: FinancialData) {
         }
 
         // If no cache or expired, call Gemini API
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-09-2025' })
+        console.log('[AI Advisor] Calling Gemini API for user:', userId)
+        console.log('[AI Advisor] Data summary:', {
+            month: data.month,
+            year: data.year,
+            totalIncome: data.totalIncome,
+            totalExpenses: data.totalExpenses,
+            incomesCount: data.incomes?.length || 0,
+            expensesCount: data.expenses?.length || 0,
+            billsCount: data.bills?.length || 0,
+            debtsCount: data.debts?.length || 0
+        })
+
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
         // Format the financial data into a comprehensive prompt
         const prompt = `אתה יועץ פיננסי מקצועי. נתחת את הנתונים הפיננסיים הבאים של לקוח ותספק ניתוח מקצועי ותובנות.
@@ -78,8 +90,8 @@ ${data.bills.map((bill: any) => `  - ${bill.name}: ${bill.amount} ${data.currenc
 
 **חובות:**
 - מספר חובות: ${data.debts.length}
-- תשלום חודשי כולל: ${data.debts.reduce((sum: number, d: any) => sum + d.monthlyPayment, 0)} ${data.currency}
-${data.debts.map((debt: any) => `  - ${debt.creditor}: ${debt.monthlyPayment} ${data.currency}/חודש (יתרה: ${debt.remainingBalance} ${data.currency})`).join('\n')}
+- תשלום חודשי כולל: ${data.debts.reduce((sum: number, d: any) => sum + (d.monthlyPayment || 0), 0)} ${data.currency}
+${data.debts.map((debt: any) => `  - ${debt.creditor}: ${debt.monthlyPayment || 0} ${data.currency}/חודש${debt.totalAmount ? ` (סה"כ חוב: ${debt.totalAmount} ${data.currency})` : ''}`).join('\n')}
 
 **חסכונות:**
 - הפקדה חודשית: ${data.savings.reduce((sum: number, s: any) => sum + s.monthlyDeposit, 0)} ${data.currency}
@@ -101,9 +113,14 @@ ${data.savings.map((sav: any) => `  - ${sav.description}: ${sav.monthlyDeposit} 
 
 **חשוב:** כתוב בעברית, בצורה ברורה ומקצועית, עם נקודות ממוספרות וכדורים להדגשה. השתמש באימוג'י רלוונטיים להדגשה.`
 
+        console.log('[AI Advisor] Sending prompt to Gemini, length:', prompt.length)
+
         const result = await model.generateContent(prompt)
         const response = result.response
         const text = response.text()
+
+        console.log('[AI Advisor] Received response, length:', text.length)
+        console.log('[AI Advisor] Response preview:', text.substring(0, 200))
 
         // Store in cache with 24-hour expiry
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
