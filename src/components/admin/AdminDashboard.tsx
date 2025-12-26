@@ -31,7 +31,7 @@ interface AdminDashboardProps {
 }
 
 export function AdminDashboard({ initialData }: AdminDashboardProps) {
-    const { users, coupons, feedbacks, totalRevenue, maintenanceMode: initialMaintenanceMode } = initialData
+    const { users, coupons, feedbacks, totalRevenue } = initialData
     const [editingId, setEditingId] = useState<string | null>(null)
     const [newCoupon, setNewCoupon] = useState({
         code: '',
@@ -44,10 +44,6 @@ export function AdminDashboard({ initialData }: AdminDashboardProps) {
     // New State for Editing User Subscriptions
     const [editingUser, setEditingUser] = useState<any>(null)
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-
-    // Maintenance Mode State
-    const [maintenanceMode, setMaintenanceMode] = useState(initialMaintenanceMode)
-    const [isTogglingMaintenance, setIsTogglingMaintenance] = useState(false)
 
     const handleCreateOrUpdateCoupon = async () => {
         if (editingId) {
