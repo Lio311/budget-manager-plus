@@ -19,7 +19,7 @@ async function checkAdmin() {
 export async function getAdminData() {
     await checkAdmin()
 
-    const [users, coupons, feedbacks, revenue] = await Promise.all([
+    const [users, coupons, feedbacks, revenue, trialTrackers] = await Promise.all([
         prisma.user.findMany({
             include: {
                 subscription: true,
@@ -41,11 +41,18 @@ export async function getAdminData() {
             _sum: {
                 amount: true
             }
-        })
+        }),
+        prisma.trialTracker.findMany()
     ])
 
+    // Enrich users with trial tracker info
+    const enrichedUsers = users.map(user => ({
+        ...user,
+        hasUsedTrial: trialTrackers.some(tracker => tracker.email === user.email)
+    }))
+
     return {
-        users,
+        users: enrichedUsers,
         coupons,
         feedbacks,
         totalRevenue: revenue._sum.amount || 0
