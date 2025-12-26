@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Sparkles, Loader2 } from 'lucide-react'
+import { Sparkles, Loader2, Clock } from 'lucide-react'
 import { getFinancialAdvice } from '@/lib/actions/ai'
 import { toast } from 'sonner'
 
@@ -15,16 +15,22 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
     const [isOpen, setIsOpen] = useState(false)
     const [advice, setAdvice] = useState<string>('')
     const [loading, setLoading] = useState(false)
+    const [isCached, setIsCached] = useState(false)
+    const [expiresIn, setExpiresIn] = useState<string>('')
 
     const handleGetAdvice = async () => {
         setLoading(true)
         setAdvice('')
+        setIsCached(false)
+        setExpiresIn('')
 
         try {
             const result = await getFinancialAdvice(financialData)
 
             if (result.success && result.advice) {
                 setAdvice(result.advice)
+                setIsCached(result.cached || false)
+                setExpiresIn(result.expiresIn || '')
             } else {
                 toast.error(result.error || 'שגיאה בקבלת ייעוץ')
             }
@@ -63,11 +69,19 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                     </DialogTitle>
                 </DialogHeader>
 
+                {isCached && expiresIn && (
+                    <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 p-2 rounded-lg">
+                        <Clock className="h-4 w-4" />
+                        <span>ניתוח שמור מהיום - יפוג בעוד {expiresIn}</span>
+                    </div>
+                )}
+
                 <div className="mt-4">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-12 gap-4">
                             <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
                             <p className="text-sm text-muted-foreground">מנתח את הנתונים הפיננסיים שלך...</p>
+                            <p className="text-xs text-gray-400">זה עשוי לקחת כ-10 שניות</p>
                         </div>
                     ) : advice ? (
                         <div className="prose prose-sm max-w-none text-right" dir="rtl">
@@ -100,6 +114,11 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                     <p className="text-xs text-blue-800 text-right">
                         💡 <strong>שים לב:</strong> הייעוץ מסופק על ידי בינה מלאכותית ומהווה המלצות כלליות בלבד.
                         לייעוץ פיננסי מקצועי ומותאם אישית, מומלץ להתייעץ עם יועץ פיננסי מוסמך.
+                        {!isCached && advice && (
+                            <span className="block mt-2">
+                                ⏰ הניתוח נשמר ל-24 שעות הקרובות
+                            </span>
+                        )}
                     </p>
                 </div>
             </DialogContent>

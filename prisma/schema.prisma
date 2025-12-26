@@ -218,3 +218,17 @@ model TrialTracker {
 
   @@map("trial_trackers")
 }
+
+model AIAdviceCache {
+  id        String   @id @default(cuid())
+  userId    String
+  month     Int
+  year      Int
+  advice    String   @db.Text
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  
+  @@unique([userId, month, year])
+  @@index([userId, expiresAt])
+  @@map("ai_advice_cache")
+}

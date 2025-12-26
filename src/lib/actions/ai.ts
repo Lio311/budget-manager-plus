@@ -1,6 +1,8 @@
 'use server'
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { auth } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/prisma'
 
 const genAI = new GoogleGenerativeAI('AIzaSyDO9OvmDhgzqyPB1WrlHhkobretmtVQ3E0')
 
@@ -20,7 +22,38 @@ interface FinancialData {
 
 export async function getFinancialAdvice(data: FinancialData) {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+        const { userId } = await auth()
+        if (!userId) {
+            return {
+                success: false,
+                error: 'משתמש לא מחובר'
+            }
+        }
+
+        // Check cache first
+        const cachedAdvice = await prisma.aIAdviceCache.findUnique({
+            where: {
+                userId_month_year: {
+                    userId,
+                    month: data.month,
+                    year: data.year
+                }
+            }
+        })
+
+        // If cache exists and not expired, return it
+        if (cachedAdvice && cachedAdvice.expiresAt > new Date()) {
+            const hoursRemaining = Math.floor((cachedAdvice.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60))
+            return {
+                success: true,
+                advice: cachedAdvice.advice,
+                cached: true,
+                expiresIn: `${hoursRemaining} שעות`
+            }
+        }
+
+        // If no cache or expired, call Gemini API
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-09-2025' })
 
         // Format the financial data into a comprehensive prompt
         const prompt = `אתה יועץ פיננסי מקצועי. נתחת את הנתונים הפיננסיים הבאים של לקוח ותספק ניתוח מקצועי ותובנות.
@@ -72,9 +105,35 @@ ${data.savings.map((sav: any) => `  - ${sav.description}: ${sav.monthlyDeposit} 
         const response = result.response
         const text = response.text()
 
+        // Store in cache with 24-hour expiry
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
+
+        await prisma.aIAdviceCache.upsert({
+            where: {
+                userId_month_year: {
+                    userId,
+                    month: data.month,
+                    year: data.year
+                }
+            },
+            create: {
+                userId,
+                month: data.month,
+                year: data.year,
+                advice: text,
+                expiresAt
+            },
+            update: {
+                advice: text,
+                expiresAt,
+                createdAt: new Date()
+            }
+        })
+
         return {
             success: true,
-            advice: text
+            advice: text,
+            cached: false
         }
     } catch (error: any) {
         console.error('Error getting financial advice:', error)
