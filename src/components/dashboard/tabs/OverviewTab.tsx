@@ -500,7 +500,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 <div className={`grid gap-3 md:grid-cols-2`}>
                     {/* NetWorth Chart - Always show */}
                     <div className="grid gap-3">
-                        <NetWorthChart data={netWorthHistory} />
+                        <NetWorthChart data={netWorthHistory} loading={loading} />
                     </div>
 
                     <Card className="h-full border-0 shadow-sm glass-panel bg-white/60">
