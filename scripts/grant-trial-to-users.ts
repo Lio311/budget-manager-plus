@@ -29,23 +29,39 @@ async function grantTrialToUsers() {
 
             console.log(`  ✓ Found user: ${user.id}`)
 
-            // Check if trial tracker already exists
+            // Check if trial tracker already exists for PERSONAL plan
+            // @ts-ignore - Prisma types update lag
             const existingTracker = await prisma.trialTracker.findUnique({
-                where: { email }
+                where: {
+                    email_planType: {
+                        email,
+                        planType: 'PERSONAL'
+                    }
+                }
             })
 
             if (existingTracker) {
-                console.log(`  ⚠️  Trial tracker already exists, deleting...`)
+                console.log(`  ⚠️  Trial tracker already exists for PERSONAL plan, deleting...`)
+                // @ts-ignore
                 await prisma.trialTracker.delete({
-                    where: { email }
+                    where: {
+                        email_planType: {
+                            email,
+                            planType: 'PERSONAL'
+                        }
+                    }
                 })
             }
 
-            // Create new trial tracker
+            // Create new trial tracker for PERSONAL plan
+            // @ts-ignore
             await prisma.trialTracker.create({
-                data: { email }
+                data: {
+                    email,
+                    planType: 'PERSONAL'
+                }
             })
-            console.log(`  ✓ Trial tracker created`)
+            console.log(`  ✓ Trial tracker created for PERSONAL plan`)
 
             // Create/update subscription with trial
             const startDate = new Date()
