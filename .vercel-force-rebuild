@@ -1,3 +1,3 @@
-# Force rebuild - clear all caches
-# This file is used to trigger a fresh deployment without any caching
-# Last updated: 2025-12-27 00:11:00
+Force build 1703632000
+Fixing site_config table and admin auth
+Migration: 20251227002600

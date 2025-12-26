@@ -12,6 +12,16 @@ const rubik = Rubik({
     variable: '--font-rubik'
 })
 
+export const viewport = {
+    themeColor: [
+        { media: '(prefers-color-scheme: light)', color: '#22c55e' },
+        { media: '(prefers-color-scheme: dark)', color: '#16a34a' },
+    ],
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+}
+
 export const metadata: Metadata = {
     title: {
         default: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
@@ -77,10 +87,6 @@ export const metadata: Metadata = {
     formatDetection: {
         telephone: false,
     },
-    themeColor: [
-        { media: '(prefers-color-scheme: light)', color: '#22c55e' },
-        { media: '(prefers-color-scheme: dark)', color: '#16a34a' },
-    ],
 }
 
 export default function RootLayout({
