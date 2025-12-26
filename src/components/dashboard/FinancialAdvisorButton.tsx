@@ -13,8 +13,15 @@ interface FinancialAdvisorButtonProps {
 }
 
 const SparkleIcon = ({ className }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" className={className}>
-        <path d="M256 48c-11.7 0-21.2 9.5-21.2 21.2 0 70.2-56.9 127.1-127.1 127.1-11.7 0-21.2 9.5-21.2 21.2s9.5 21.2 21.2 21.2c70.2 0 127.1 56.9 127.1 127.1 0 11.7 9.5 21.2 21.2 21.2s21.2-9.5 21.2-21.2c0-70.2 56.9-127.1 127.1-127.1 11.7 0 21.2-9.5 21.2-21.2s-9.5-21.2-21.2-21.2c-70.2 0-127.1-56.9-127.1-127.1C277.2 57.5 267.7 48 256 48z" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className={className}>
+        <defs>
+            <linearGradient id="sparkleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{ stopColor: '#9333ea', stopOpacity: 1 }} />
+                <stop offset="50%" style={{ stopColor: '#3b82f6', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#06b6d4', stopOpacity: 1 }} />
+            </linearGradient>
+        </defs>
+        <path fill="url(#sparkleGradient)" d="M256 48c-11.7 0-21.2 9.5-21.2 21.2 0 70.2-56.9 127.1-127.1 127.1-11.7 0-21.2 9.5-21.2 21.2s9.5 21.2 21.2 21.2c70.2 0 127.1 56.9 127.1 127.1 0 11.7 9.5 21.2 21.2 21.2s21.2-9.5 21.2-21.2c0-70.2 56.9-127.1 127.1-127.1 11.7 0 21.2-9.5 21.2-21.2s-9.5-21.2-21.2-21.2c-70.2 0-127.1-56.9-127.1-127.1C277.2 57.5 267.7 48 256 48z" />
     </svg>
 )
 
@@ -64,14 +71,14 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                     className="relative overflow-hidden group"
                     title="ייעוץ פיננסי AI"
                 >
-                    <SparkleIcon className="h-4 w-4 text-black group-hover:text-gray-700 transition-colors" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-gray-100 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+                    <SparkleIcon className="h-4 w-4" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                     <DialogTitle className="text-right flex items-center gap-2">
-                        <SparkleIcon className="h-5 w-5 text-black" />
+                        <SparkleIcon className="h-5 w-5" />
                         ייעוץ פיננסי מבוסס AI
                     </DialogTitle>
                 </DialogHeader>
