@@ -85,7 +85,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
                     {/* Content Wrappers - Added strict widths to prevent overflow */}
                     <TabsContent value="overview" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <OverviewTab />
+                        <OverviewTab onNavigateToTab={handleTabChange} />
                     </TabsContent>
                     <TabsContent value="income" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <IncomeTab />

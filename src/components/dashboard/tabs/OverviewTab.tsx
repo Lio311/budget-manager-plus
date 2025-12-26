@@ -60,7 +60,7 @@ const CustomTooltip = ({ active, payload, label, currency }: any) => {
     return null
 }
 
-export function OverviewTab() {
+export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: string) => void }) {
     const { month, year, currency } = useBudget()
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -297,6 +297,7 @@ export function OverviewTab() {
                     change={incomeChange}
                     changeType="income"
                     loading={loading}
+                    onClick={() => onNavigateToTab?.('income')}
                 />
                 <StatCard
                     title="סך הוצאות"
@@ -307,6 +308,7 @@ export function OverviewTab() {
                     change={expensesChange}
                     changeType="expense"
                     loading={loading}
+                    onClick={() => onNavigateToTab?.('expenses')}
                 />
                 <StatCard
                     title="חיסכון חודשי"
@@ -327,6 +329,7 @@ export function OverviewTab() {
                     change={billsChange}
                     changeType="expense"
                     loading={loading}
+                    onClick={() => onNavigateToTab?.('bills')}
                 />
             </div>
 
@@ -539,7 +542,7 @@ export function OverviewTab() {
 }
 
 function StatCard({
-    title, value, icon, color, bgColor, change, changeType = 'income', loading = false
+    title, value, icon, color, bgColor, change, changeType = 'income', loading = false, onClick
 }: {
     title: string
     value: string
@@ -549,6 +552,7 @@ function StatCard({
     change?: number
     changeType?: 'income' | 'expense'
     loading?: boolean
+    onClick?: () => void
 }) {
     const isPositiveChange = change !== undefined ? change > 0 : false
     const ChangeIcon = isPositiveChange ? TrendingUp : ArrowDown
@@ -567,7 +571,10 @@ function StatCard({
 
     // Reduced padding p-5 -> p-4, height 140 -> 110 or auto
     return (
-        <div className={`monday-card p-4 relative overflow-hidden flex flex-col justify-between min-h-[110px] border-l-4 ${color.replace('text-', 'border-l-')}`}>
+        <div
+            onClick={onClick}
+            className={`monday-card p-4 relative overflow-hidden flex flex-col justify-between min-h-[110px] border-l-4 ${color.replace('text-', 'border-l-')} ${onClick ? 'md:cursor-default cursor-pointer active:scale-95 transition-transform' : ''}`}
+        >
             <div className="flex justify-between items-start">
                 <div>
                     <h3 className="text-xs font-medium text-gray-500 mb-0.5">{title}</h3>
