@@ -94,21 +94,27 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                             <p className="text-sm text-muted-foreground">מנתח את הנתונים הפיננסיים שלך...</p>
                             <p className="text-xs text-gray-400">זה עשוי לקחת כ-10 שניות</p>
                         </div>
-                    ) : advice ? (
-                        <div className="prose prose-sm max-w-none text-right" dir="rtl">
-                            <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
-                                {advice}
-                            </div>
-                        </div>
                     ) : (
-                        <div className="text-center py-8 text-muted-foreground">
-                            לחץ לקבלת ייעוץ פיננסי מותאם אישית
+                        <div className="mt-4 max-h-[60vh] overflow-y-auto">
+                            {advice ? (
+                                <div className="space-y-4">
+                                    <div className="prose prose-sm max-w-none text-right" dir="rtl">
+                                        <div className="text-base md:text-lg leading-relaxed whitespace-pre-wrap text-gray-700">
+                                            {advice}
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-muted-foreground text-base">
+                                    לחץ לקבלת ייעוץ פיננסי מותאם אישית
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
 
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-[11px] text-blue-800 text-right leading-relaxed">
+                    <p className="text-xs md:text-sm text-blue-800 text-right leading-relaxed">
                         <strong>שים לב:</strong> ייעוץ זה מסופק ע"י בינה מלאכותית ומהווה המלצות כלליות בלבד. מומלץ להתייעץ עם יועץ פיננסי מוסמך.
                         {!isCached && advice && (
                             <span className="block mt-1.5 text-[10px] text-blue-600">
