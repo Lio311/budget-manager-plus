@@ -5,9 +5,9 @@ import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 import { addMonths } from 'date-fns'
 
-export async function getDebts(month: number, year: number) {
+export async function getDebts(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
-        const budget = await getCurrentBudget(month, year)
+        const budget = await getCurrentBudget(month, year, type)
 
         const debts = await prisma.debt.findMany({
             where: { budgetId: budget.id },
@@ -29,7 +29,8 @@ async function createDebtInstallments(
     numberOfInstallments: number,
     dueDay: number,
     currentMonth: number,
-    currentYear: number
+    currentYear: number,
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     const monthlyPayment = Math.round((totalDebtAmount / numberOfInstallments) * 100) / 100
     const recurringSourceId = `debt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -43,7 +44,7 @@ async function createDebtInstallments(
         const installmentYear = installmentDate.getFullYear()
 
         // Get or create budget for this month
-        const budget = await getCurrentBudget(installmentMonth, installmentYear)
+        const budget = await getCurrentBudget(installmentMonth, installmentYear, type)
 
         installments.push({
             budgetId: budget.id,
@@ -78,10 +79,11 @@ export async function addDebt(
         isRecurring?: boolean
         totalDebtAmount?: number
         numberOfInstallments?: number
-    }
+    },
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
-        const budget = await getCurrentBudget(month, year)
+        const budget = await getCurrentBudget(month, year, type)
 
         // Check if this is an installment-based debt
         if (data.isRecurring && data.totalDebtAmount && data.numberOfInstallments) {
@@ -92,7 +94,8 @@ export async function addDebt(
                 data.numberOfInstallments,
                 data.dueDay,
                 month,
-                year
+                year,
+                type
             )
         } else {
             // Regular single debt

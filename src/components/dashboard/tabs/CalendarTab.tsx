@@ -28,23 +28,23 @@ interface Payment {
 }
 
 export function CalendarTab() {
-    const { month, year, currency } = useBudget()
+    const { month, year, currency, budgetType } = useBudget()
     const { toast } = useToast()
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
 
     // Fetchers
-    const fetchBills = async () => (await getBills(month, year)).data || []
-    const fetchDebts = async () => (await getDebts(month, year)).data || []
-    const fetchIncomes = async () => (await getIncomes(month, year)).data || []
-    const fetchExpenses = async () => (await getExpenses(month, year)).data || []
-    const fetchSavings = async () => (await getSavings(month, year)).data || []
+    const fetchBills = async () => (await getBills(month, year, budgetType)).data || []
+    const fetchDebts = async () => (await getDebts(month, year, budgetType)).data || []
+    const fetchIncomes = async () => (await getIncomes(month, year, budgetType)).data || []
+    const fetchExpenses = async () => (await getExpenses(month, year, budgetType)).data || []
+    const fetchSavings = async () => (await getSavings(month, year, budgetType)).data || []
 
     // SWR Hooks
-    const { data: bills = [], isLoading: loadingBills, mutate: mutateBills } = useSWR(['bills', month, year], fetchBills)
-    const { data: debts = [], isLoading: loadingDebts, mutate: mutateDebts } = useSWR(['debts', month, year], fetchDebts)
-    const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year], fetchIncomes)
-    const { data: expenses = [], isLoading: loadingExpenses } = useSWR(['expenses', month, year], fetchExpenses)
-    const { data: savings = [], isLoading: loadingSavings } = useSWR(['savings', month, year], fetchSavings)
+    const { data: bills = [], isLoading: loadingBills, mutate: mutateBills } = useSWR(['bills', month, year, budgetType], fetchBills)
+    const { data: debts = [], isLoading: loadingDebts, mutate: mutateDebts } = useSWR(['debts', month, year, budgetType], fetchDebts)
+    const { data: incomes = [], isLoading: loadingIncomes } = useSWR(['incomes', month, year, budgetType], fetchIncomes)
+    const { data: expenses = [], isLoading: loadingExpenses } = useSWR(['expenses', month, year, budgetType], fetchExpenses)
+    const { data: savings = [], isLoading: loadingSavings } = useSWR(['savings', month, year, budgetType], fetchSavings)
 
     const loading = loadingBills || loadingDebts || loadingIncomes || loadingExpenses || loadingSavings
 
@@ -211,8 +211,8 @@ export function CalendarTab() {
                                                     {/* Mobile view: compact badge only */}
                                                     <div className="md:hidden flex flex-col items-center justify-center h-[calc(100%-24px)]">
                                                         <div className={`text-xs font-bold px-2 py-1 rounded-full ${allPaid
-                                                                ? 'bg-green-200 text-green-800'
-                                                                : 'bg-yellow-200 text-yellow-800'
+                                                            ? 'bg-green-200 text-green-800'
+                                                            : 'bg-yellow-200 text-yellow-800'
                                                             }`}>
                                                             {dayPayments.length}
                                                         </div>

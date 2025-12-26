@@ -141,12 +141,12 @@ export default function HomePage() {
                                 המשרד הדיגיטלי שלך לניהול העסק
                             </h2>
                             <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                                אל תיתן לכספי העסק והבית להתערבב. ב-Business Plan אתה מקבל הפרדה מלאה,
+                                קבל שליטה מלאה על הפיננסים של העסק שלך במקום אחד. ב-Business Plan אתה מקבל כלי ניהול מתקדמים,
                                 דוחות מע"מ אוטומטיים, חישוב הוצאות מוכרות, ותמונת מצב עסקית בזמן אמת.
                             </p>
 
                             <ul className="space-y-3 mb-8">
-                                <BusinessFeature text="הפרדה מוחלטת בין פרופיל אישי לעסקי" />
+                                <BusinessFeature text="ניהול מלא של כספי העסק באתר" />
                                 <BusinessFeature text="חישובי מע״מ (כולל פטור ומעורב) והכנה לדיווח" />
                                 <BusinessFeature text="ניהול תזרים מזומנים (כולל שוטף+)" />
                                 <BusinessFeature text="דוחות רווח והפסד בזמן אמת" />

@@ -131,9 +131,9 @@ async function createRecurringSavings(
     return []
 }
 
-export async function getSavings(month: number, year: number) {
+export async function getSavings(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
-        const budget = await getCurrentBudget(month, year)
+        const budget = await getCurrentBudget(month, year, type)
 
         const savings = await prisma.saving.findMany({
             where: { budgetId: budget.id },
@@ -159,10 +159,11 @@ export async function addSaving(
         isRecurring?: boolean
         recurringStartDate?: Date
         recurringEndDate?: Date
-    }
+    },
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
-        const budget = await getCurrentBudget(month, year)
+        const budget = await getCurrentBudget(month, year, type)
 
         // Handle recurring savings
         if (data.isRecurring && data.recurringEndDate) {

@@ -41,38 +41,38 @@ interface Category {
 }
 
 export function SavingsTab() {
-    const { month, year, currency } = useBudget()
+    const { month, year, currency, budgetType } = useBudget()
     const { toast } = useToast()
 
     // --- Data Fetching ---
 
     // Savings Fetcher
     const fetcherSavings = async () => {
-        const result = await getSavings(month, year)
+        const result = await getSavings(month, year, budgetType)
         if (result.success && result.data) return result.data
         throw new Error(result.error || 'Failed to fetch savings')
     }
 
     const { data: savings = [], isLoading: loadingSavings, mutate: mutateSavings } = useSWR(
-        ['savings', month, year],
+        ['savings', month, year, budgetType],
         fetcherSavings,
         { revalidateOnFocus: false }
     )
 
     // Categories Fetcher
     const fetcherCategories = async () => {
-        const result = await getCategories('saving')
+        const result = await getCategories('saving', budgetType)
         if (result.success && result.data) return result.data
         return []
     }
 
     const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
-        ['categories', 'saving'],
+        ['categories', 'saving', budgetType],
         async () => {
             const data = await fetcherCategories()
             if (data.length === 0) {
                 const { seedCategories } = await import('@/lib/actions/category')
-                await seedCategories('saving')
+                await seedCategories('saving', budgetType)
                 return fetcherCategories()
             }
             return data
@@ -146,11 +146,11 @@ export function SavingsTab() {
                 description: newSaving.description,
                 monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
                 goal: newSaving.goal || undefined,
-                targetDate: newSaving.date, // Server component will handle the conversion
+                date: newSaving.date, // Server component will handle the conversion
                 isRecurring: newSaving.isRecurring,
                 recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
                 recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined
-            } as any)
+            }, budgetType)
 
             if (result.success) {
                 toast({ title: 'הצלחה', description: 'החיסכון נוסף בהצלחה' })
@@ -192,7 +192,8 @@ export function SavingsTab() {
             const result = await addCategory({
                 name: newCategoryName.trim(),
                 type: 'saving',
-                color: colorToSave
+                color: colorToSave,
+                scope: budgetType
             })
 
             if (result.success) {

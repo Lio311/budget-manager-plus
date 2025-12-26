@@ -26,15 +26,15 @@ interface Debt {
 }
 
 export function DebtsTab() {
-    const { month, year, currency } = useBudget()
+    const { month, year, currency, budgetType } = useBudget()
     const { toast } = useToast()
     const fetcher = async () => {
-        const result = await getDebts(month, year)
+        const result = await getDebts(month, year, budgetType)
         if (result.success && result.data) return result.data
         throw new Error(result.error || 'Failed to fetch debts')
     }
 
-    const { data: debts = [], isLoading: loading, mutate } = useSWR(['debts', month, year], fetcher, {
+    const { data: debts = [], isLoading: loading, mutate } = useSWR(['debts', month, year, budgetType], fetcher, {
         revalidateOnFocus: false,
         onError: (err) => {
             toast({
@@ -143,7 +143,7 @@ export function DebtsTab() {
                 isRecurring: newDebt.isRecurring,
                 totalDebtAmount: newDebt.isRecurring ? totalAmount : undefined,
                 numberOfInstallments: newDebt.isRecurring ? parseInt(newDebt.numberOfInstallments) : undefined
-            })
+            }, budgetType)
 
             if (result.success) {
                 setNewDebt({

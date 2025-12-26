@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Home, ArrowRight } from 'lucide-react'
+import { Home, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function NotFound() {
@@ -42,7 +42,7 @@ export default function NotFound() {
                     <Link href="/dashboard">
                         <Button size="lg" variant="outline" className="gap-2">
                             לוח הבקרה
-                            <ArrowRight className="h-5 w-5" />
+                            <ArrowLeft className="h-5 w-5" />
                         </Button>
                     </Link>
                 </div>

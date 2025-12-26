@@ -22,15 +22,15 @@ interface Bill {
 }
 
 export function BillsTab() {
-    const { month, year, currency } = useBudget()
+    const { month, year, currency, budgetType } = useBudget()
     const { toast } = useToast()
     const fetcher = async () => {
-        const result = await getBills(month, year)
+        const result = await getBills(month, year, budgetType)
         if (result.success && result.data) return result.data
         throw new Error(result.error || 'Failed to fetch bills')
     }
 
-    const { data: bills = [], isLoading: loading, mutate } = useSWR(['bills', month, year], fetcher, {
+    const { data: bills = [], isLoading: loading, mutate } = useSWR(['bills', month, year, budgetType], fetcher, {
         revalidateOnFocus: false,
         onError: (err) => {
             toast({
@@ -91,7 +91,7 @@ export function BillsTab() {
                 name: newBill.name,
                 amount: parseFloat(newBill.amount),
                 dueDay: parseInt(newBill.dueDay)
-            })
+            }, budgetType)
 
             if (result.success) {
                 toast({
