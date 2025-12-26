@@ -57,12 +57,22 @@ model BusinessProfile {
   @@map("business_profiles")
 }
 
+// ... (previous enums)
+
+enum BudgetType {
+  PERSONAL
+  BUSINESS
+}
+
+// ... (User/BusinessProfile models remain same)
+
 model Budget {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   month     Int      
   year      Int      
+  type      BudgetType @default(PERSONAL) // NEW: Supports separating Personal/Business budgets
   currency  String   @default("₪")
   incomes   Income[]
   expenses  Expense[]
@@ -71,7 +81,9 @@ model Budget {
   savings   Saving[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  @@unique([userId, month, year])
+  
+  // CHANGED: Unique constraint now includes 'type' to allow 2 budgets per month (Personal + Business)
+  @@unique([userId, month, year, type])
   @@index([userId, month, year])
   @@map("budgets")
 }
@@ -82,11 +94,14 @@ model Category {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   type      String   // income, expense, saving
+  scope     BudgetType @default(PERSONAL) // NEW: Category belongs to Personal or Business view
   color     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("categories")
 }
+
+// ... (Rest of models)
 
 model Income {
   id                String   @id @default(cuid())
