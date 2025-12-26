@@ -512,7 +512,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                             </CardContent>
                         ) : totalIncome === 0 && standardExpenses === 0 && combinedTotalBills === 0 ? (
-                            <CardContent className="p-4 pt-0 flex flex-col items-center justify-center h-40 text-center" dir="rtl">
+                            <CardContent className="p-4 pt-0 flex flex-col items-center justify-center h-[300px] text-center" dir="rtl">
                                 <Wallet className="h-12 w-12 text-gray-300 mb-3" />
                                 <p className="text-gray-500 font-medium mb-1">אין נתונים להצגה</p>
                                 <p className="text-sm text-gray-400">
