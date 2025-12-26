@@ -39,42 +39,54 @@ export function NetWorthChart({ data }: { data: NetWorthData[] }) {
                 <CardTitle>הון עצמי</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="h-[300px] w-full pr-0">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={translatedData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
-                            <defs>
-                                <linearGradient id="colorNetWorth" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.01} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                            <XAxis
-                                dataKey="name"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fontSize: 11, fill: '#94a3b8' }}
-                                dy={10}
-                            />
-                            <YAxis
-                                hide
-                                axisLine={false}
-                                tickLine={false}
-                            />
-                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#8b5cf6', strokeWidth: 1, strokeDasharray: '4 4' }} />
-                            <Area
-                                type="monotone"
-                                dataKey="accumulatedNetWorth"
-                                stroke="#8b5cf6"
-                                strokeWidth={3}
-                                fillOpacity={1}
-                                fill="url(#colorNetWorth)"
-                                animationDuration={1500}
-                                animationBegin={0}
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </div>
+                {data.length === 0 ? (
+                    <div className="h-[300px] w-full flex flex-col items-center justify-center text-center px-4" dir="rtl">
+                        <svg className="h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                        </svg>
+                        <p className="text-gray-500 font-medium mb-1">טרם נאספו נתונים</p>
+                        <p className="text-sm text-gray-400">
+                            הגרף יתחיל להציג נתונים החל מהחודש הבא
+                        </p>
+                    </div>
+                ) : (
+                    <div className="h-[300px] w-full pr-0">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={translatedData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorNetWorth" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.01} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis
+                                    dataKey="name"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fontSize: 11, fill: '#94a3b8' }}
+                                    dy={10}
+                                />
+                                <YAxis
+                                    hide
+                                    axisLine={false}
+                                    tickLine={false}
+                                />
+                                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#8b5cf6', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                                <Area
+                                    type="monotone"
+                                    dataKey="accumulatedNetWorth"
+                                    stroke="#8b5cf6"
+                                    strokeWidth={3}
+                                    fillOpacity={1}
+                                    fill="url(#colorNetWorth)"
+                                    animationDuration={1500}
+                                    animationBegin={0}
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
             </CardContent>
         </Card>
     )

@@ -497,14 +497,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </div>
 
                 {/* Bottom Row */}
-                <div className={`grid gap-3 ${netWorthHistory.length > 0 ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
-                    {/* ... NetWorth and BudgetProgress ... same logic but reduced padding/gaps */}
-                    {/* I will assume NetWorthChart component handles its own internal sizing or I verify it */}
-                    {netWorthHistory.length > 0 && (
-                        <div className="grid gap-3">
-                            <NetWorthChart data={netWorthHistory} />
-                        </div>
-                    )}
+                <div className={`grid gap-3 md:grid-cols-2`}>
+                    {/* NetWorth Chart - Always show */}
+                    <div className="grid gap-3">
+                        <NetWorthChart data={netWorthHistory} />
+                    </div>
 
                     <Card className="h-full border-0 shadow-sm glass-panel bg-white/60">
                         <CardHeader className="p-4 pb-2">
