@@ -62,7 +62,7 @@ const CustomTooltip = ({ active, payload, label, currency }: any) => {
 }
 
 export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: string) => void }) {
-    const { month, year, currency } = useBudget()
+    const { month, year, currency, budgetType } = useBudget()
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [initialBalance, setInitialBalance] = useState('')
@@ -74,15 +74,15 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     // Optimized: Single data fetch instead of 11+ separate calls!
     const fetchOverviewData = useCallback(async () => {
-        const result = await getOverviewData(month, year)
+        const result = await getOverviewData(month, year, budgetType)
         if (result.success && result.data) {
             return result.data
         }
         throw new Error(result.error || 'Failed to fetch overview data')
-    }, [month, year])
+    }, [month, year, budgetType])
 
     const { data: overviewData, isLoading: loading, mutate: mutateOverview } = useSWR(
-        ['overview', month, year],
+        ['overview', month, year, budgetType],
         fetchOverviewData,
         swrConfig
     )
