@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from 'next/server';
+const ADMIN_EMAILS = ['lior31197@gmail.com', 'ron.kor97@gmail.com']
 
 const isPublicRoute = createRouteMatcher([
     '/',
@@ -40,9 +41,13 @@ export default clerkMiddleware(async (auth, req) => {
         // Get user info to check if admin
         const { userId, sessionClaims } = await auth();
 
-        // Allow admins to bypass maintenance mode
-        // We check sessionClaims for role if available, or just allow /admin prefix for now
-        if (userId && (pathname.startsWith('/admin') || (sessionClaims?.metadata as any)?.role === 'admin')) {
+        // Check if admin by role metadata or by email (if available in claims)
+        const isAdmin =
+            (sessionClaims?.metadata as any)?.role === 'admin' ||
+            ADMIN_EMAILS.includes((sessionClaims as any)?.email?.toLowerCase() || "");
+
+        // Allow admins to bypass maintenance mode for ALL routes
+        if (userId && (pathname.startsWith('/admin') || isAdmin)) {
             return;
         }
 
