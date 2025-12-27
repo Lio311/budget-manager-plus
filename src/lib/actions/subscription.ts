@@ -190,7 +190,7 @@ export async function startTrial(userId: string, email: string, planType: string
 
     // Create trial subscription
     const startDate = new Date()
-    const endDate = addDays(startDate, 14)
+    const endDate = addDays(startDate, 60) // 2 months trial period
     // validPlanType is already defined above
 
     // @ts-ignore - planType issue with Prisma types in dev

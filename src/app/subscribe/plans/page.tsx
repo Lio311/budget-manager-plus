@@ -100,7 +100,7 @@ export default function PlansPage() {
 
             <div className="text-center mt-6">
                 <p className="text-xs text-gray-500">
-                    * כל התוכניות כוללות 14 יום ניסיון חינם ללא התחייבות
+                    * כל התוכניות כוללות חודשיים ניסיון חינם ללא התחייבות
                 </p>
             </div>
         </div>

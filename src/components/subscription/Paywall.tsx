@@ -194,7 +194,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                         }}
                     >
 
-                        התנסות בתוכנית ה-{initialPlan === 'BUSINESS' ? 'עסקית' : 'פרטית'} ל-14 ימים
+                        התנסות בתוכנית ה-{initialPlan === 'BUSINESS' ? 'עסקית' : 'פרטית'} לחודשיים
                     </Button>
                 )}
 
