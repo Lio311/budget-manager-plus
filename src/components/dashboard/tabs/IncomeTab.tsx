@@ -286,7 +286,7 @@ export function IncomeTab() {
                                     <PopoverTrigger asChild>
                                         <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 hover:bg-gray-50"><Plus className="h-4 w-4" /></Button>
                                     </PopoverTrigger>
-                                    // ... Popover Content remains same
+
                                     <PopoverContent className="w-80 p-4 z-50 rounded-xl shadow-xl" dir="rtl">
                                         <div className="space-y-4">
                                             <h4 className="font-medium mb-4 text-[#323338]">קטגוריה חדשה</h4>
