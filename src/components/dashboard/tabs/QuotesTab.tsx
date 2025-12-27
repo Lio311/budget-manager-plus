@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download } from 'lucide-react'
+import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
 import { Switch } from '@/components/ui/switch'
@@ -53,6 +53,7 @@ export function QuotesTab() {
         q.quoteNumber.toString().includes(searchTerm)
     )
 
+    const itemsPerPage = 5
     const totalPages = Math.ceil(filteredQuotes.length / itemsPerPage)
     const paginatedQuotes = filteredQuotes.slice(
         (currentPage - 1) * itemsPerPage,
@@ -319,90 +320,68 @@ export function QuotesTab() {
 
             {/* List */}
             <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-                <table className="w-full">
-                    <thead className="bg-gray-50 border-b">
-                        <tr>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">מספר</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">לקוח</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">תאריך</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">סכום</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">סטטוס</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                        {filteredQuotes.map((quote: any) => {
-                            const StatusIcon = statusConfig[quote.status as keyof typeof statusConfig].icon
-                            const statusInfo = statusConfig[quote.status as keyof typeof statusConfig]
-                            {
-                                paginatedQuotes.length === 0 ? (
-                                    <div className="text-center py-10 text-gray-500">
-                                        לא נמצאו הצעות מחיר
+                <div className="divide-y divide-gray-200">
+                    {paginatedQuotes.length === 0 ? (
+                        <div className="text-center py-10 text-gray-500">
+                            {searchTerm ? 'לא נמצאו הצעות מחיר' : 'אין הצעות מחיר עדיין. צור הצעת מחיר חדשה כדי להתחיל.'}
+                        </div>
+                    ) : (
+                        paginatedQuotes.map((quote) => (
+                            <div key={quote.id} className="bg-white p-4 hover:bg-gray-50 transition-all flex items-center justify-between group">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold">
+                                        {quote.clientName?.[0] || '?'}
                                     </div>
-                                ) : (
-                                paginatedQuotes.map((quote) => (
-                                    <div key={quote.id} className="bg-white p-4 rounded-xl border border-gray-100 hover:border-blue-200 transition-all flex items-center justify-between group">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold">
-                                                {quote.clientName[0]}
-                                            </div>
-                                            <div>
-                                                <div className="font-bold text-[#323338] flex items-center gap-2">
-                                                    {quote.clientName}
-                                                    <span className="text-xs font-normal text-gray-400">
-                                                        #{quote.quoteNumber}
-                                                    </span>
-                                                </div>
-                                                <div className="text-xs text-[#676879] flex items-center gap-2">
-                                                    <span>{format(new Date(quote.date), 'dd/MM/yyyy')}</span>
+                                    <div>
+                                        <div className="font-bold text-[#323338] flex items-center gap-2">
+                                            {quote.clientName}
+                                            <span className="text-xs font-normal text-gray-400">
+                                                #{quote.quoteNumber}
+                                            </span>
+                                            {quote.status === 'DRAFT' && <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">טיוטה</span>}
+                                            {quote.status === 'SENT' && <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">נשלח</span>}
+                                            {quote.status === 'ACCEPTED' && <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded">התקבל</span>}
+                                            {quote.status === 'EXPIRED' && <span className="text-[10px] bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded">פג תוקף</span>}
+                                            {quote.status === 'CANCELLED' && <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">בוטל</span>}
+                                        </div>
+                                        <div className="text-xs text-[#676879] flex items-center gap-2">
+                                            <span>{format(new Date(quote.date), 'dd/MM/yyyy')}</span>
+                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                            <span>{quote.items?.length || 0} פריטים</span>
+                                            {quote.validUntil && (
+                                                <>
                                                     <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                    <span>{quote.items.length} פריטים</span>
-                                                    {quote.validUntil && (
-                                                        <>
-                                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                            <span className={new Date(quote.validUntil) < new Date() ? 'text-red-500' : ''}>
-                                                                בתוקף עד {format(new Date(quote.validUntil), 'dd/MM/yyyy')}
-                                                            </span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-6">
-                                            <div className="text-left">
-                                                <div className="font-bold text-[#323338]">{formatCurrency(quote.totalAmount)}</div>
-                                                <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
-                                            </div>
-                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" onClick={() => generatePDF(quote)}>
-                                                    <Download className="h-4 w-4 text-gray-500" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(quote.id)} className="text-red-500 hover:bg-red-50">
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
+                                                    <span className={new Date(quote.validUntil) < new Date() ? 'text-red-500' : ''}>
+                                                        בתוקף עד {format(new Date(quote.validUntil), 'dd/MM/yyyy')}
+                                                    </span>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
-                                ))
-                            )
-                            }
-
-                            {
-                                totalPages > 1 && (
-                                    <div className="mt-6 flex justify-center direction-ltr">
-                                        <Pagination
-                                            currentPage={currentPage}
-                                            totalPages={totalPages}
-                                            onPageChange={setCurrentPage}
-                                        />
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    <div className="text-left">
+                                        <div className="font-bold text-[#323338]">{formatCurrency(quote.totalAmount)}</div>
+                                        <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
                                     </div>
-                                )
-                            }</tbody>
-                </table>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Button variant="ghost" size="icon" onClick={() => handleDownloadPDF(quote.id)}>
+                                            <Download className="h-4 w-4 text-gray-500" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
 
-                {filteredQuotes.length === 0 && (
-                    <div className="text-center py-12 text-gray-500">
-                        {searchTerm ? 'לא נמצאו הצעות מחיר' : 'אין הצעות מחיר עדיין. צור הצעת מחיר חדשה כדי להתחיל.'}
+                {totalPages > 1 && (
+                    <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
                     </div>
                 )}
             </div>
