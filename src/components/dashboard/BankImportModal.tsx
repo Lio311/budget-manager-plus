@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import * as XLSX from 'xlsx'
 import { Upload, FileSpreadsheet, Check, AlertCircle, X, Loader2, ArrowRight } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
@@ -195,8 +195,11 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-2xl" dir="rtl">
-                <DialogHeader>
-                    <DialogTitle>ייבוא נתונים - מזרחי טפחות</DialogTitle>
+                <DialogHeader className="text-right">
+                    <DialogTitle className="text-xl font-bold text-gray-900">ייבוא נתונים</DialogTitle>
+                    <DialogDescription>
+                        טען קובץ Excel או CSV לייבוא הוצאות.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4">
@@ -292,7 +295,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                             disabled={previewData.length === 0 || importing}
                             className="bg-green-600 hover:bg-green-700 text-white gap-2"
                         >
-                            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                             אשר וייבא
                         </Button>
                     </div>
