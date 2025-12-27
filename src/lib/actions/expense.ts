@@ -12,6 +12,9 @@ export async function getExpenses(month: number, year: number, type: 'PERSONAL' 
 
         const expenses = await prisma.expense.findMany({
             where: { budgetId: budget.id },
+            include: {
+                supplier: true
+            },
             orderBy: { date: 'desc' }
         })
 
@@ -41,6 +44,19 @@ export async function addExpense(
         isRecurring?: boolean
         recurringStartDate?: string
         recurringEndDate?: string
+        // Business Fields
+        supplierId?: string
+        amountBeforeVat?: number
+        vatRate?: number
+        vatAmount?: number
+        vatType?: any
+        isDeductible?: boolean
+        deductibleRate?: number
+        expenseType?: any
+        invoiceDate?: string
+        paymentDate?: string
+        paymentMethod?: any
+        paymentTerms?: number
     },
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
@@ -57,7 +73,20 @@ export async function addExpense(
                 date: new Date(data.date),
                 isRecurring: data.isRecurring || false,
                 recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : (data.date ? new Date(data.date) : new Date()),
-                recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null
+                recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null,
+                // Business Fields
+                supplierId: data.supplierId,
+                amountBeforeVat: data.amountBeforeVat,
+                vatRate: data.vatRate,
+                vatAmount: data.vatAmount,
+                vatType: data.vatType,
+                isDeductible: data.isDeductible,
+                deductibleRate: data.deductibleRate,
+                expenseType: data.expenseType,
+                invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : null,
+                paymentDate: data.paymentDate ? new Date(data.paymentDate) : null,
+                paymentMethod: data.paymentMethod,
+                paymentTerms: data.paymentTerms
             }
         })
 
@@ -199,6 +228,19 @@ export async function updateExpense(
         amount?: number
         currency?: string
         date?: string
+        // Business Fields
+        supplierId?: string
+        amountBeforeVat?: number
+        vatRate?: number
+        vatAmount?: number
+        vatType?: any
+        isDeductible?: boolean
+        deductibleRate?: number
+        expenseType?: any
+        invoiceDate?: string
+        paymentDate?: string
+        paymentMethod?: any
+        paymentTerms?: number
     }
 ) {
     try {
@@ -209,7 +251,20 @@ export async function updateExpense(
                 ...(data.description && { description: data.description }),
                 ...(data.amount && { amount: data.amount }),
                 ...(data.currency && { currency: data.currency }),
-                ...(data.date && { date: new Date(data.date) })
+                ...(data.date && { date: new Date(data.date) }),
+                // Business Fields
+                supplierId: data.supplierId,
+                amountBeforeVat: data.amountBeforeVat,
+                vatRate: data.vatRate,
+                vatAmount: data.vatAmount,
+                vatType: data.vatType,
+                isDeductible: data.isDeductible,
+                deductibleRate: data.deductibleRate,
+                expenseType: data.expenseType,
+                invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : undefined,
+                paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
+                paymentMethod: data.paymentMethod,
+                paymentTerms: data.paymentTerms
             }
         })
 

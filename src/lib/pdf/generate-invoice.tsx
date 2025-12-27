@@ -16,7 +16,7 @@ function registerFont() {
     try {
         Font.register({
             family: 'Alef',
-            src: 'https://fonts.gstatic.com/s/alef/v12/6xKxdS9_T593H7S8.ttf'
+            src: path.join(process.cwd(), 'public', 'fonts', 'Alef-Regular.ttf')
         })
         isFontRegistered = true
     } catch (error) {

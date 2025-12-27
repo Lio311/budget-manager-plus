@@ -158,12 +158,13 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const billsChange = calculateChange(currentBillsDisplay, prevRemainingBills)
 
     // Pie Chart Data
+    const isBusiness = budgetType === 'BUSINESS'
     const incomeVsExpenses = [
-        { name: 'הכנסות', value: totalIncome, color: COLORS.income }, // Added Income
-        { name: 'הוצאות', value: totalExpenses, color: COLORS.expenses },
-        { name: 'יתרה / חיסכון', value: Math.max(0, savingsRemainder), color: '#3B82F6' }, // Blue for Savings/Balance
+        { name: isBusiness ? 'מכירות' : 'הכנסות', value: totalIncome, color: COLORS.income },
+        { name: isBusiness ? 'עלויות' : 'הוצאות', value: totalExpenses, color: COLORS.expenses },
+        { name: isBusiness ? 'רווח נקי' : 'יתרה / חיסכון', value: Math.max(0, savingsRemainder), color: '#3B82F6' },
         { name: 'חשבונות', value: totalRemainingBills, color: COLORS.bills },
-        { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' } // Purple for Debts
+        { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' }
     ].filter(item => item.value > 0)
 
     const totalForPie = incomeVsExpenses.reduce((sum, item) => sum + item.value, 0)
@@ -319,7 +320,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             {/* Summary Cards - Grid Gap 3 instead of 4, height auto */}
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
-                    title="סך הכנסות"
+                    title={isBusiness ? 'סך מכירות' : 'סך הכנסות'}
                     value={formatCurrency(totalIncome, currency)}
                     icon={<TrendingUp className="h-4 w-4" />}
                     color="text-green-600"
@@ -330,7 +331,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     onClick={() => onNavigateToTab?.('income')}
                 />
                 <StatCard
-                    title="סך הוצאות"
+                    title={isBusiness ? 'סך עלויות / הוצאות' : 'סך הוצאות'}
                     value={formatCurrency(totalExpenses, currency)}
                     icon={<ArrowDown className="h-4 w-4" />}
                     color="text-red-600"
@@ -341,7 +342,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     onClick={() => onNavigateToTab?.('expenses')}
                 />
                 <StatCard
-                    title={budgetType === 'BUSINESS' ? 'יתרה חודשית' : 'חיסכון חודשי'}
+                    title={isBusiness ? 'רווח / הפסד חודשי' : 'חיסכון חודשי'}
                     value={formatCurrency(savingsRemainder, currency)}
                     icon={<PiggyBank className="h-4 w-4" />}
                     color="text-blue-600"
@@ -380,12 +381,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 const realRemaining = totalIncome - (standardExpenses + combinedTotalBills + totalDebtsPlanned + totalSavingsDeposits);
 
                                 const pieData = [
-                                    { name: 'הכנסות', value: totalIncome, color: '#10B981' },
-                                    { name: 'הוצאות', value: standardExpenses, color: COLORS.expenses },
+                                    { name: isBusiness ? 'מכירות' : 'הכנסות', value: totalIncome, color: '#10B981' },
+                                    { name: isBusiness ? 'עלויות' : 'הוצאות', value: standardExpenses, color: COLORS.expenses },
                                     { name: 'חשבונות', value: combinedTotalBills, color: COLORS.bills },
                                     { name: 'חובות', value: totalDebtsPlanned, color: '#8B5CF6' },
                                     { name: 'חסכונות', value: totalSavingsDeposits, color: '#3B82F6' },
-                                    { name: 'יתרה', value: Math.max(0, realRemaining), color: '#34D399' }
+                                    { name: isBusiness ? 'רווח נקי' : 'יתרה', value: Math.max(0, realRemaining), color: '#34D399' }
                                 ].filter(item => item.value > 0);
 
                                 if (pieData.length === 0) {
@@ -538,7 +539,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 {/* ... existing BudgetProgress content spaces ... */}
                                 <div className="space-y-4">
                                     <BudgetProgress
-                                        label="הוצאות שוטפות"
+                                        label={isBusiness ? 'עלויות שוטפות' : 'הוצאות שוטפות'}
                                         current={standardExpenses}
                                         total={totalIncome}
                                         currency={currency}

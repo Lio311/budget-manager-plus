@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { getCategories, addCategory, updateCategory, deleteCategory } from '@/lib/actions/category'
 import { PRESET_COLORS } from '@/lib/constants'
+import { useBudget } from '@/contexts/BudgetContext'
 
 interface Category {
     id: string
@@ -19,17 +20,18 @@ interface Category {
 
 export function CategoryManager() {
     const { toast } = useToast()
+    const { budgetType } = useBudget()
     const [activeTab, setActiveTab] = useState('expense')
 
     // Data Fetching
     const fetcher = async () => {
-        const result = await getCategories(activeTab)
+        const result = await getCategories(activeTab, budgetType as 'PERSONAL' | 'BUSINESS')
         if (result.success && result.data) return result.data
         return []
     }
 
     const { data: categories = [], mutate, isLoading } = useSWR<Category[]>(
-        ['categories', activeTab],
+        ['categories', activeTab, budgetType],
         fetcher
     )
 
@@ -50,7 +52,8 @@ export function CategoryManager() {
         const result = await addCategory({
             name: newItemName.trim(),
             type: activeTab,
-            color: newItemColor
+            color: newItemColor,
+            scope: budgetType as 'PERSONAL' | 'BUSINESS'
         })
 
         if (result.success) {
@@ -83,6 +86,7 @@ export function CategoryManager() {
     }
 
     async function handleDelete(id: string) {
+        if (!confirm('האם אתה בטוח שברצונך למחוק קטגוריה זו?')) return
         const result = await deleteCategory(id)
         if (result.success) {
             toast({ title: 'הצלחה', description: 'הקטגוריה נמחקה בהצלחה' })
@@ -110,8 +114,8 @@ export function CategoryManager() {
         <div className="w-full h-full flex flex-col" dir="rtl">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col h-full">
                 <TabsList className="grid w-full grid-cols-3 mb-4">
-                    <TabsTrigger value="expense">הוצאות</TabsTrigger>
-                    <TabsTrigger value="income">הכנסות</TabsTrigger>
+                    <TabsTrigger value="expense">{budgetType === 'BUSINESS' ? 'עלויות' : 'הוצאות'}</TabsTrigger>
+                    <TabsTrigger value="income">{budgetType === 'BUSINESS' ? 'מכירות' : 'הכנסות'}</TabsTrigger>
                     <TabsTrigger value="saving">חסכונות</TabsTrigger>
                 </TabsList>
 
@@ -120,7 +124,7 @@ export function CategoryManager() {
                     <div className="flex flex-col sm:flex-row gap-3">
                         <Button onClick={handleAdd} disabled={!newItemName.trim() || isSubmitting}>
                             {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                            <span className="mr-2">הוסף</span>
+                            <span className="mr-2">הוסף למאגר</span>
                         </Button>
                         <Input
                             placeholder="שם קטגוריה חדשה"
@@ -153,7 +157,7 @@ export function CategoryManager() {
                     ) : (
                         <div className="space-y-2">
                             {categories.length === 0 ? (
-                                <p className="text-center text-muted-foreground py-8">אין קטגוריות</p>
+                                <p className="text-center text-muted-foreground py-8">אין קטגוריות זמינות</p>
                             ) : (
                                 categories.map((cat) => (
                                     <div key={cat.id} className="flex items-center justify-between p-3 border rounded-md bg-white hover:shadow-sm transition-shadow">
@@ -197,39 +201,14 @@ export function CategoryManager() {
                                                         <Pencil className="h-4 w-4 text-gray-500" />
                                                     </Button>
 
-                                                    {deleteConfirmId === cat.id ? (
-                                                        <div className="flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
-                                                            <span className="text-xs text-red-500 font-medium ml-1">למחוק?</span>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="destructive"
-                                                                className="h-7 px-2"
-                                                                onClick={() => {
-                                                                    handleDelete(cat.id)
-                                                                    setDeleteConfirmId(null)
-                                                                }}
-                                                            >
-                                                                כן
-                                                            </Button>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="ghost"
-                                                                className="h-7 px-2"
-                                                                onClick={() => setDeleteConfirmId(null)}
-                                                            >
-                                                                לא
-                                                            </Button>
-                                                        </div>
-                                                    ) : (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="ghost"
-                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                            onClick={() => setDeleteConfirmId(cat.id)}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    )}
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                        onClick={() => handleDelete(cat.id)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
                                                 </div>
                                             </>
                                         )}

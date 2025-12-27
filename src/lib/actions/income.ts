@@ -12,6 +12,10 @@ export async function getIncomes(month: number, year: number, type: 'PERSONAL' |
 
         const incomes = await prisma.income.findMany({
             where: { budgetId: budget.id },
+            include: {
+                client: true,
+                invoice: true
+            },
             orderBy: { date: 'desc' }
         })
 
@@ -41,6 +45,16 @@ export async function addIncome(
         isRecurring?: boolean
         recurringStartDate?: string
         recurringEndDate?: string
+        // Business Fields
+        clientId?: string
+        invoiceId?: string
+        amountBeforeVat?: number
+        vatRate?: number
+        vatAmount?: number
+        invoiceDate?: string
+        paymentDate?: string
+        paymentMethod?: any
+        paymentTerms?: number
     },
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
@@ -57,7 +71,17 @@ export async function addIncome(
                 date: data.date ? new Date(data.date) : null,
                 isRecurring: data.isRecurring || false,
                 recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : (data.date ? new Date(data.date) : new Date()),
-                recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null
+                recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null,
+                // Business Fields
+                clientId: data.clientId,
+                invoiceId: data.invoiceId,
+                amountBeforeVat: data.amountBeforeVat,
+                vatRate: data.vatRate,
+                vatAmount: data.vatAmount,
+                invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : null,
+                paymentDate: data.paymentDate ? new Date(data.paymentDate) : null,
+                paymentMethod: data.paymentMethod,
+                paymentTerms: data.paymentTerms
             }
         })
 
@@ -190,6 +214,16 @@ export async function updateIncome(
         amount?: number
         currency?: string
         date?: string
+        // Business Fields
+        clientId?: string
+        invoiceId?: string
+        amountBeforeVat?: number
+        vatRate?: number
+        vatAmount?: number
+        invoiceDate?: string
+        paymentDate?: string
+        paymentMethod?: any
+        paymentTerms?: number
     }
 ) {
     try {
@@ -200,7 +234,17 @@ export async function updateIncome(
                 ...(data.category && { category: data.category }),
                 ...(data.amount && { amount: data.amount }),
                 ...(data.currency && { currency: data.currency }),
-                ...(data.date && { date: new Date(data.date) })
+                ...(data.date && { date: new Date(data.date) }),
+                // Business Fields
+                clientId: data.clientId,
+                invoiceId: data.invoiceId,
+                amountBeforeVat: data.amountBeforeVat,
+                vatRate: data.vatRate,
+                vatAmount: data.vatAmount,
+                invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : undefined,
+                paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
+                paymentMethod: data.paymentMethod,
+                paymentTerms: data.paymentTerms
             }
         })
 
