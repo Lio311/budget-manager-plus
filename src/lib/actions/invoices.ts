@@ -122,7 +122,7 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
         if (data.invoiceNumber) updateData.invoiceNumber = data.invoiceNumber
         if (data.issueDate) updateData.issueDate = data.issueDate
         if (data.dueDate !== undefined) updateData.dueDate = data.dueDate
-        if (data.dueDate !== undefined) updateData.dueDate = data.dueDate
+
         if (data.notes !== undefined) updateData.notes = data.notes
         if (data.paymentMethod !== undefined) updateData.paymentMethod = data.paymentMethod
 
