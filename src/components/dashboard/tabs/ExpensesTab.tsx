@@ -492,97 +492,101 @@ export function ExpensesTab() {
                             לא נמצאו נתונים לחודש זה
                         </div>
                     ) : (
-                        value = { editData.paymentMethod }
+                        paginatedExpenses.map((exp: any) => (
+                            <div key={exp.id} className="glass-panel p-4 group relative hover:border-orange-200 transition-all border-l-4 border-l-orange-100">
+                                {editingId === exp.id ? (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <Input placeholder="תיאור" value={editData.description} onChange={e => setEditData({ ...editData, description: e.target.value })} />
+                                            <PaymentMethodSelector
+                                                value={editData.paymentMethod}
                                                 onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
-                    color={isBusiness ? 'orange' : 'red'}
+                                                color={isBusiness ? 'orange' : 'red'}
                                             />
-                </div>
-                {isBusiness && (
-                    <div className="w-full">
-                        <select className="w-full p-2 border rounded-lg bg-white text-sm" value={editData.supplierId} onChange={e => setEditData({ ...editData, supplierId: e.target.value })}>
-                            <option value="">ללא ספק</option>
-                            {suppliersData.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                        </select>
-                    </div>
-                )}
-                <div className="grid grid-cols-3 gap-3">
-                    <Input type="number" value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} />
-                    <select className="p-2 border rounded-lg bg-white text-sm" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
-                        {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                    </select>
-                    <Input type="date" value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} />
-                </div>
-                <div className="flex justify-end gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                    <Button size="sm" onClick={handleUpdate} className="bg-orange-600 text-white">שמור שינויים</Button>
-                </div>
-            </div>
-            ) : (
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="shrink-0">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} text-white font-bold text-xs`}>
-                            {exp.category?.[0] || 'ה'}
-                        </div>
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                        <div className="flex items-center gap-2">
-                            <span className="font-bold text-[#323338] truncate">{exp.description}</span>
-                            {exp.supplier && (
-                                <span className="text-[10px] px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded border border-orange-100 font-bold">
-                                    {exp.supplier.name}
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-3 text-[11px] text-[#676879]">
-                            <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                            <span className="w-1 h-1 rounded-full bg-gray-300" />
-                            <span>{exp.category}</span>
-                            {exp.paymentMethod && (
-                                <>
-                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                    <span>{exp.paymentMethod}</span>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                                        </div>
+                                        {isBusiness && (
+                                            <div className="w-full">
+                                                <select className="w-full p-2 border rounded-lg bg-white text-sm" value={editData.supplierId} onChange={e => setEditData({ ...editData, supplierId: e.target.value })}>
+                                                    <option value="">ללא ספק</option>
+                                                    {suppliersData.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                                </select>
+                                            </div>
+                                        )}
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <Input type="number" value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} />
+                                            <select className="p-2 border rounded-lg bg-white text-sm" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
+                                                {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                                            </select>
+                                            <Input type="date" value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} />
+                                        </div>
+                                        <div className="flex justify-end gap-2">
+                                            <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
+                                            <Button size="sm" onClick={handleUpdate} className="bg-orange-600 text-white">שמור שינויים</Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                                            <div className="shrink-0">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} text-white font-bold text-xs`}>
+                                                    {exp.category?.[0] || 'ה'}
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-[#323338] truncate">{exp.description}</span>
+                                                    {exp.supplier && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded border border-orange-100 font-bold">
+                                                            {exp.supplier.name}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-3 text-[11px] text-[#676879]">
+                                                    <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                    <span>{exp.category}</span>
+                                                    {exp.paymentMethod && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                            <span>{exp.paymentMethod}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
 
-                <div className="flex items-center gap-6">
-                    {isBusiness && exp.vatAmount > 0 && (
-                        <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
-                            <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
-                            <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
+                                        <div className="flex items-center gap-6">
+                                            {isBusiness && exp.vatAmount > 0 && (
+                                                <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
+                                                    <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
+                                                    <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
+                                                </div>
+                                            )}
+                                            <div className="text-right shrink-0">
+                                                <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
+                                                    {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
+                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-4 w-4" /></Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    )}
+
+                    {totalPages > 1 && (
+                        <div className="mt-4 flex justify-center direction-ltr">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
                         </div>
                     )}
-                    <div className="text-right shrink-0">
-                        <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
-                            {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
-                        </div>
-                    </div>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-4 w-4" /></Button>
-                    </div>
-                </div>
-            </div>
-                                )}
-        </div>
-    ))
-                    )
-}
-
-{
-    totalPages > 1 && (
-        <div className="mt-4">
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-            />
-        </div>
-    )
-}
                 </div >
             </div >
         </div >
