@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,10 @@ interface DashboardTabsProps {
 export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTabsProps) {
     const [activeTab, setActiveTab] = useState('overview')
     const { budgetType } = useBudget()
+
+    useEffect(() => {
+        setActiveTab('overview')
+    }, [budgetType])
 
     const personalTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
