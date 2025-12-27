@@ -5,7 +5,11 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs'
 import { ExpiryBanner } from '@/components/subscription/ExpiryBanner'
 
-export function DashboardShell({ userPlan }: { userPlan: 'PERSONAL' | 'BUSINESS' }) {
+export function DashboardShell({ userPlan, hasPersonalAccess, hasBusinessAccess }: {
+    userPlan: 'PERSONAL' | 'BUSINESS',
+    hasPersonalAccess: boolean,
+    hasBusinessAccess: boolean
+}) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     return (
@@ -15,6 +19,8 @@ export function DashboardShell({ userPlan }: { userPlan: 'PERSONAL' | 'BUSINESS'
                 onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
                 menuOpen={mobileMenuOpen}
                 userPlan={userPlan}
+                hasPersonalAccess={hasPersonalAccess}
+                hasBusinessAccess={hasBusinessAccess}
             />
             <DashboardTabs mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
         </div>

@@ -65,7 +65,11 @@ export default async function DashboardLayout({
             }}
         >
             <BudgetProvider initialPlan={planType as 'PERSONAL' | 'BUSINESS'}>
-                <DashboardShell userPlan={planType as 'PERSONAL' | 'BUSINESS'} />
+                <DashboardShell
+                    userPlan={planType as 'PERSONAL' | 'BUSINESS'}
+                    hasPersonalAccess={personalStatus.hasAccess || false}
+                    hasBusinessAccess={businessStatus.hasAccess || false}
+                />
             </BudgetProvider>
         </SWRConfig>
     )
