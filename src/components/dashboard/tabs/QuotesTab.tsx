@@ -11,6 +11,7 @@ import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
 import { format } from 'date-fns'
+import { formatCurrency } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
 
 const statusConfig = {
