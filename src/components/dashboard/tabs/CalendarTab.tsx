@@ -22,6 +22,7 @@ interface Payment {
     id: string
     name: string
     amount: number
+    currency: string
     day: number
     type: 'bill' | 'debt' | 'income' | 'expense' | 'saving'
     isPaid: boolean
@@ -63,6 +64,7 @@ export function CalendarTab() {
             id: bill.id,
             name: bill.name,
             amount: bill.amount,
+            currency: bill.currency || 'ILS',
             day: bill.dueDay,
             type: 'bill' as const,
             isPaid: bill.isPaid
@@ -71,6 +73,7 @@ export function CalendarTab() {
             id: debt.id,
             name: debt.creditor,
             amount: debt.monthlyPayment,
+            currency: debt.currency || 'ILS',
             day: debt.dueDay,
             type: 'debt' as const,
             isPaid: debt.isPaid
@@ -79,6 +82,7 @@ export function CalendarTab() {
             id: income.id,
             name: income.source,
             amount: income.amount,
+            currency: income.currency || 'ILS', // Incomes have currency
             day: income.date ? new Date(income.date).getDate() : 1,
             type: 'income' as const,
             isPaid: true
@@ -87,6 +91,7 @@ export function CalendarTab() {
             id: expense.id,
             name: expense.description,
             amount: expense.amount,
+            currency: expense.currency || 'ILS',
             day: expense.date ? new Date(expense.date).getDate() : 1,
             type: 'expense' as const,
             isPaid: true
@@ -95,6 +100,7 @@ export function CalendarTab() {
             id: saving.id,
             name: saving.name || saving.description || 'חיסכון',
             amount: saving.monthlyDeposit || 0,
+            currency: saving.currency || 'ILS',
             day: saving.date ? new Date(saving.date).getDate() : 1,
             type: 'saving' as const,
             isPaid: true
@@ -327,7 +333,7 @@ export function CalendarTab() {
                                                                     ? 'text-blue-600'
                                                                     : 'text-red-600'
                                                     }`}>
-                                                    {formatCurrency(payment.amount, currency)}
+                                                    {formatCurrency(payment.amount, payment.currency)}
                                                 </span>
                                             </div>
                                         </div>
@@ -377,7 +383,7 @@ export function CalendarTab() {
                                                 payment.type === 'income' ? 'text-green-700' :
                                                     payment.type === 'saving' ? 'text-blue-700' : 'text-red-700'
                                             }`}>
-                                            {formatCurrency(payment.amount, currency)}
+                                            {formatCurrency(payment.amount, payment.currency)}
                                         </p>
                                         {payment.isPaid && (
                                             <p className="text-xs text-green-600 mt-1">✓ שולם</p>

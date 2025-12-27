@@ -5,12 +5,29 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(amount: number, currency: string = "₪"): string {
-    return new Intl.NumberFormat('he-IL', {
-        style: 'currency',
-        currency: currency === '₪' ? 'ILS' : currency === '$' ? 'USD' : currency === '€' ? 'EUR' : 'GBP',
-        minimumFractionDigits: 2,
-    }).format(amount)
+export function formatCurrency(amount: number, currency: string = "ILS"): string {
+    const symbolToCode: Record<string, string> = {
+        '₪': 'ILS',
+        '$': 'USD',
+        '€': 'EUR',
+        '£': 'GBP'
+    }
+    const code = symbolToCode[currency] || currency
+
+    try {
+        return new Intl.NumberFormat('he-IL', {
+            style: 'currency',
+            currency: code,
+            minimumFractionDigits: 2,
+        }).format(amount)
+    } catch (e) {
+        // Fallback for invalid currency codes
+        return new Intl.NumberFormat('he-IL', {
+            style: 'currency',
+            currency: 'ILS',
+            minimumFractionDigits: 2,
+        }).format(amount)
+    }
 }
 
 export function getMonthName(month: number): string {
