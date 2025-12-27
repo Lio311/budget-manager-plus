@@ -13,6 +13,8 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { getCategoryBudgets, updateCategoryLimit, getSmartRecommendations, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
 
+import { Pagination } from '@/components/ui/Pagination'
+
 export function BudgetLimitsTab() {
     const { month, year } = useBudget()
     const { toast } = useToast()
@@ -20,6 +22,10 @@ export function BudgetLimitsTab() {
     const [saving, setSaving] = useState<string | null>(null) // categoryId currently saving
     const [activeDefaults, setActiveDefaults] = useState(false)
     const [budgets, setBudgets] = useState<CategoryBudgetUsage[]>([])
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 5
 
     // Load Data
     useEffect(() => {
@@ -41,11 +47,6 @@ export function BudgetLimitsTab() {
         const value = newValue[0]
         // Optimistic UI update
         setBudgets(prev => prev.map(b => b.categoryId === categoryId ? { ...b, limit: value } : b))
-
-        // Debounce actual save could be good, but for now simple:
-        // We'll wait for user to let go of slider? No, slider onChange is continuous.
-        // We should add a "Save" or auto-save on commit.
-        // ShadCN Slider onValueCommit is optimal.
     }
 
     async function handleLimitCommit(categoryId: string, newValue: number[]) {
@@ -63,11 +64,6 @@ export function BudgetLimitsTab() {
         setActiveDefaults(true)
         const res = await getSmartRecommendations(month, year)
         if (res.success && res.data) {
-            // Apply recommendations to current state (not save yet?)
-            // Or just save them all?
-            // "Recommend a logical budget and let user decide" -> Apply to sliders, user saves?
-            // Let's apply to the local state so user deals with it.
-
             const recommended = res.data
             setBudgets(prev => prev.map(b => ({
                 ...b,
@@ -78,10 +74,6 @@ export function BudgetLimitsTab() {
                 title: 'המלצות חכמות יושמו',
                 description: 'התקציב עודכן לפי ממוצע ההוצאות שלך ב-3 החודשים האחרונים. באפשרותך לשנות ולשמור.'
             })
-
-            // Auto save all? Maybe safer to let user review.
-            // But to be user friendly, let's just save them one by one or batch?
-            // For now, let user adjust.
         }
         setActiveDefaults(false)
     }
@@ -90,6 +82,10 @@ export function BudgetLimitsTab() {
     const totalLimit = budgets.reduce((acc, b) => acc + b.limit, 0)
     const totalSpent = budgets.reduce((acc, b) => acc + b.spent, 0)
     const totalProgress = totalLimit > 0 ? (totalSpent / totalLimit) * 100 : 0
+
+    // Pagination Logic
+    const totalPages = Math.ceil(budgets.length / itemsPerPage)
+    const paginatedBudgets = budgets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
     if (loading) return <div className="p-10 text-center">טוען נתוני תקציב...</div>
 
@@ -135,28 +131,27 @@ export function BudgetLimitsTab() {
                 </Card>
             </div>
 
-            <div className="grid gap-4">
-                {budgets.map((budget) => {
+            <div className="grid gap-3">
+                {paginatedBudgets.map((budget) => {
                     const progress = budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0
                     const isOverLimit = budget.spent > budget.limit && budget.limit > 0
-                    // Dynamic max for slider: at least 5000, or 2x limit, or 2x spent
                     const maxSlider = Math.max(5000, budget.limit * 2, budget.spent * 1.5)
 
                     return (
                         <Card key={budget.categoryId} className={`transition-all ${isOverLimit ? 'border-red-200 bg-red-50/30' : ''}`}>
-                            <CardContent className="p-4 sm:p-6">
-                                <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="font-bold text-lg text-gray-800">{budget.categoryName}</div>
+                            <CardContent className="p-3 sm:p-4">
+                                <div className="flex flex-col sm:flex-row justify-between gap-2 mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className="font-bold text-base text-gray-800">{budget.categoryName}</div>
                                         {isOverLimit && (
-                                            <Badge variant="destructive" className="text-[10px] h-5">חריגה!</Badge>
+                                            <Badge variant="destructive" className="text-[10px] h-4 px-1">חריגה!</Badge>
                                         )}
                                         {saving === budget.categoryId && (
-                                            <span className="text-xs text-gray-400 animate-pulse">שומר...</span>
+                                            <span className="text-[10px] text-yellow-500 animate-pulse">שומר...</span>
                                         )}
                                     </div>
                                     <div className="text-left">
-                                        <div className="text-sm text-gray-500">
+                                        <div className="text-xs text-gray-500">
                                             נוצל: <span className={`font-bold ${isOverLimit ? 'text-red-600' : 'text-gray-900'}`}>{formatCurrency(budget.spent)}</span>
                                             {' / '}
                                             <span className="text-gray-400">{formatCurrency(budget.limit)}</span>
@@ -164,7 +159,7 @@ export function BudgetLimitsTab() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     <Slider
                                         value={[budget.limit]}
                                         min={0}
@@ -172,15 +167,19 @@ export function BudgetLimitsTab() {
                                         step={50}
                                         onValueChange={(val) => handleLimitChange(budget.categoryId, val)}
                                         onValueCommit={(val) => handleLimitCommit(budget.categoryId, val)}
-                                        className="py-2"
+                                        className="py-1 cursor-grab active:cursor-grabbing [&>.relative>.bg-primary]:bg-yellow-500 [&>.relative>.border-primary]:border-yellow-500" // Custom yellow styling via utility classes if current slider supports specific targeting, or generic override
                                     />
+                                    {/* Note: ShadCN slider usually uses 'bg-primary'. To force yellow we might need explicit class overrides or inline styles if standard props don't reach. 
+                                        Assuming standard slider structure:
+                                        We can try to wrap or apply global styles, but let's try direct class override if permitted.
+                                    */}
 
                                     <div className="flex items-center gap-2">
                                         <Progress
                                             value={Math.min(progress, 100)}
-                                            className={`h-2 flex-1 [&>div]:${isOverLimit ? 'bg-red-500' : (progress > 80 ? 'bg-orange-500' : 'bg-green-500')}`}
+                                            className={`h-1.5 flex-1 [&>div]:${isOverLimit ? 'bg-red-500' : 'bg-yellow-500'}`}
                                         />
-                                        <span className={`text-xs w-10 text-left font-mono ${isOverLimit ? 'text-red-600 font-bold' : ''}`}>
+                                        <span className={`text-[10px] w-8 text-left font-mono ${isOverLimit ? 'text-red-600 font-bold' : ''}`}>
                                             {progress.toFixed(0)}%
                                         </span>
                                     </div>
@@ -194,6 +193,16 @@ export function BudgetLimitsTab() {
             {budgets.length === 0 && (
                 <div className="text-center py-10 text-gray-400">
                     לא נמצאו קטגוריות להגדרת תקציב.
+                </div>
+            )}
+
+            {totalPages > 1 && (
+                <div className="mt-4 flex justify-center">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
                 </div>
             )}
         </div>
