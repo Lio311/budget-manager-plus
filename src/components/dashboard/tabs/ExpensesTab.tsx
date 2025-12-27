@@ -20,7 +20,7 @@ import { PaymentMethodSelector } from '../PaymentMethodSelector'
 import { getExpenses, addExpense, updateExpense, deleteExpense, importExpenses } from '@/lib/actions/expense'
 import { getSuppliers } from '@/lib/actions/suppliers'
 import { getCategories, addCategory } from '@/lib/actions/category'
-import { BankImportModal } from '../../BankImportModal'
+import { BankImportModal } from '../BankImportModal'
 
 interface Category {
     id: string
