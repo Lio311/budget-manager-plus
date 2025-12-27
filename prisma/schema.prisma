@@ -453,6 +453,7 @@ model Invoice {
   vatAmount     Float
   total         Float
   currency      String        @default("ILS")
+  paymentMethod String?       // NEW: User selected payment method
   
   // Payment
   paidDate      DateTime?

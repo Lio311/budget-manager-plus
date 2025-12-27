@@ -204,7 +204,7 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                 <View style={styles.header}>
                     <View style={{ alignItems: 'flex-end' }}>
                         <Text style={styles.invoiceTitle}>{data.title || 'חשבונית'}</Text>
-                        <Text style={styles.invoiceNumber}>{data.documentNumberLabel || 'מספר חשבונית'}: {data.invoiceNumber}</Text>
+                        <Text style={styles.invoiceNumber}>{data.invoiceNumber} :{data.documentNumberLabel || 'מספר חשבונית'}</Text>
                     </View>
                     {data.businessLogo && (
                         <Image src={data.businessLogo} style={styles.logo} />
@@ -226,12 +226,12 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>פרטי לקוח</Text>
                     <View style={styles.row}>
-                        <Text style={styles.label}>שם:</Text>
+                        <Text style={styles.label}>:שם</Text>
                         <Text style={styles.value}>{data.clientName}</Text>
                     </View>
                     {data.clientId && (
                         <View style={styles.row}>
-                            <Text style={styles.label}>ח.פ / ע.מ:</Text>
+                            <Text style={styles.label}>:ח.פ / ע.מ</Text>
                             <Text style={styles.value}>{data.clientId}</Text>
                         </View>
                     )}
@@ -241,61 +241,63 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>פרטי חשבונית</Text>
                     <View style={styles.row}>
-                        <Text style={styles.label}>תאריך הנפקה:</Text>
+                        <Text style={styles.label}>:תאריך הנפקה</Text>
                         <Text style={styles.value}>{formatDate(data.issueDate)}</Text>
                     </View>
                     <View style={styles.row}>
-                        <Text style={styles.label}>תאריך תשלום:</Text>
+                        <Text style={styles.label}>:תאריך תשלום</Text>
                         <Text style={styles.value}>{formatDate(data.dueDate)}</Text>
                     </View>
                     <View style={styles.row}>
-                        <Text style={styles.label}>אמצעי תשלום:</Text>
+                        <Text style={styles.label}>:אמצעי תשלום</Text>
                         <Text style={styles.value}>{data.paymentMethod}</Text>
                     </View>
                     <View style={styles.row}>
-                        <Text style={styles.label}>סטטוס:</Text>
+                        <Text style={styles.label}>:סטטוס</Text>
                         <Text style={styles.value}>{data.status}</Text>
                     </View>
                 </View>
 
                 {/* Totals */}
-                <View style={styles.totalsSection}>
+                <View style={styles.totalsSection} wrap={false}>
                     <View style={styles.totalRow}>
-                        <Text style={styles.totalLabel}>סכום לפני מע״מ:</Text>
+                        <Text style={styles.totalLabel}>:סכום לפני מע״מ</Text>
                         <Text style={styles.totalValue}>{formatCurrency(data.subtotal)}</Text>
                     </View>
                     <View style={styles.totalRow}>
-                        <Text style={styles.totalLabel}>מע״מ ({data.vatRate}%):</Text>
+                        <Text style={styles.totalLabel}>:({data.vatRate}%) מע״מ</Text>
                         <Text style={styles.totalValue}>{formatCurrency(data.vatAmount)}</Text>
                     </View>
                     <View style={styles.grandTotalRow}>
-                        <Text style={styles.grandTotalLabel}>סה״כ לתשלום:</Text>
+                        <Text style={styles.grandTotalLabel}>:סה״כ לתשלום</Text>
                         <Text style={styles.grandTotalValue}>{formatCurrency(data.total)}</Text>
                     </View>
                 </View>
 
+                <View style={{ flex: 1 }} />
+
                 {/* Notes */}
                 {data.notes && (
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>הערות</Text>
-                        <Text style={styles.value}>{data.notes}</Text>
+                    <View style={{ marginBottom: 40, padding: 10, backgroundColor: '#f9fafb', borderRadius: 4 }} wrap={false}>
+                        <Text style={{ fontSize: 10, color: '#6b7280', textAlign: 'right', marginBottom: 5 }}>הערות</Text>
+                        <Text style={{ fontSize: 10, color: '#1f2937', textAlign: 'right' }}>{data.notes}</Text>
                     </View>
                 )}
 
                 {/* Footer */}
-                <View style={styles.footer}>
+                <View style={styles.footer} wrap={false}>
                     {data.businessSignature && (
-                        <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                        <View style={{ alignItems: 'center', marginBottom: 20 }}>
                             <Image src={data.businessSignature} style={{ width: 120, height: 40, objectFit: 'contain' }} />
                             <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 5 }}>חתימה</Text>
                         </View>
                     )}
                     <Text style={styles.footerText}>
-                        תודה על העסקה!
+                        !תודה על העסקה
                     </Text>
                     <View style={styles.poweredBy}>
-                        <Text style={styles.poweredByText}>הופק על ידי</Text>
                         <Image src="/K-LOGO.png" style={styles.poweredByLogo} />
+                        <Text style={styles.poweredByText}>הופק על ידי</Text>
                     </View>
                 </View>
             </Page>

@@ -76,7 +76,7 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
             issueDate: invoice.issueDate.toISOString(),
             dueDate: invoice.dueDate?.toISOString() || invoice.issueDate.toISOString(),
             status: getStatusLabel(invoice.status),
-            paymentMethod: 'העברה בנקאית', // Default payment method
+            paymentMethod: getPaymentMethodLabel(invoice.paymentMethod),
 
             // Business info
             businessName: businessProfile?.companyName || 'החברה שלי',
@@ -108,6 +108,23 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
         console.error('generateInvoicePDF error:', error)
         throw error
     }
+}
+
+}
+
+function getPaymentMethodLabel(method?: string | null): string {
+    if (!method) return 'העברה בנקאית'
+
+    const labels: Record<string, string> = {
+        'BANK_TRANSFER': 'העברה בנקאית',
+        'CREDIT_CARD': 'כרטיס אשראי',
+        'BIT': 'ביט',
+        'PAYBOX': 'פייבוקס',
+        'CASH': 'מזומן',
+        'CHECK': 'צ\'ק',
+        'OTHER': 'אחר'
+    }
+    return labels[method] || method
 }
 
 function getStatusLabel(status: string): string {

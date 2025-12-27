@@ -32,61 +32,45 @@ export async function getExpenses(month: number, year: number, type: 'PERSONAL' 
     }
 }
 
+import { expenseSchema } from '@/lib/validations/expense'
+import { z } from 'zod'
+
 export async function addExpense(
     month: number,
     year: number,
-    data: {
-        category: string
-        description: string
-        amount: number
-        currency: string
-        date: string
-        isRecurring?: boolean
-        recurringStartDate?: string
-        recurringEndDate?: string
-        // Business Fields
-        supplierId?: string
-        amountBeforeVat?: number
-        vatRate?: number
-        vatAmount?: number
-        vatType?: any
-        isDeductible?: boolean
-        deductibleRate?: number
-        expenseType?: any
-        invoiceDate?: string
-        paymentDate?: string
-        paymentMethod?: any
-        paymentTerms?: number
-    },
+    data: z.infer<typeof expenseSchema>,
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
+        // Validate input
+        const validatedData = expenseSchema.parse(data)
+
         const budget = await getCurrentBudget(month, year, '₪', type)
 
         const expense = await prisma.expense.create({
             data: {
                 budgetId: budget.id,
-                category: data.category,
-                description: data.description,
-                amount: data.amount,
-                currency: data.currency,
-                date: new Date(data.date),
-                isRecurring: data.isRecurring || false,
-                recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : (data.date ? new Date(data.date) : new Date()),
-                recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null,
+                category: validatedData.category,
+                description: validatedData.description,
+                amount: validatedData.amount,
+                currency: validatedData.currency,
+                date: new Date(validatedData.date),
+                isRecurring: validatedData.isRecurring || false,
+                recurringStartDate: validatedData.recurringStartDate ? new Date(validatedData.recurringStartDate) : (validatedData.date ? new Date(validatedData.date) : new Date()),
+                recurringEndDate: validatedData.recurringEndDate ? new Date(validatedData.recurringEndDate) : null,
                 // Business Fields
-                supplierId: data.supplierId,
-                amountBeforeVat: data.amountBeforeVat,
-                vatRate: data.vatRate,
-                vatAmount: data.vatAmount,
-                vatType: data.vatType,
-                isDeductible: data.isDeductible,
-                deductibleRate: data.deductibleRate,
-                expenseType: data.expenseType,
-                invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : null,
-                paymentDate: data.paymentDate ? new Date(data.paymentDate) : null,
-                paymentMethod: data.paymentMethod,
-                paymentTerms: data.paymentTerms
+                supplierId: validatedData.supplierId || null,
+                amountBeforeVat: validatedData.amountBeforeVat,
+                vatRate: validatedData.vatRate,
+                vatAmount: validatedData.vatAmount,
+                vatType: validatedData.vatType,
+                isDeductible: validatedData.isDeductible,
+                deductibleRate: validatedData.deductibleRate,
+                expenseType: validatedData.expenseType,
+                invoiceDate: validatedData.invoiceDate ? new Date(validatedData.invoiceDate) : null,
+                paymentDate: validatedData.paymentDate ? new Date(validatedData.paymentDate) : null,
+                paymentMethod: validatedData.paymentMethod,
+                paymentTerms: validatedData.paymentTerms
             }
         })
 
@@ -222,49 +206,33 @@ export async function cancelRecurringExpense(expenseId: string, fromMonth: numbe
 
 export async function updateExpense(
     id: string,
-    data: {
-        category?: string
-        description?: string
-        amount?: number
-        currency?: string
-        date?: string
-        // Business Fields
-        supplierId?: string
-        amountBeforeVat?: number
-        vatRate?: number
-        vatAmount?: number
-        vatType?: any
-        isDeductible?: boolean
-        deductibleRate?: number
-        expenseType?: any
-        invoiceDate?: string
-        paymentDate?: string
-        paymentMethod?: any
-        paymentTerms?: number
-    }
+    data: Partial<z.infer<typeof expenseSchema>>
 ) {
     try {
+        // Validate partial input
+        const validatedData = expenseSchema.partial().parse(data)
+
         const expense = await prisma.expense.update({
             where: { id },
             data: {
-                ...(data.category && { category: data.category }),
-                ...(data.description && { description: data.description }),
-                ...(data.amount && { amount: data.amount }),
-                ...(data.currency && { currency: data.currency }),
-                ...(data.date && { date: new Date(data.date) }),
+                ...(validatedData.category && { category: validatedData.category }),
+                ...(validatedData.description && { description: validatedData.description }),
+                ...(validatedData.amount && { amount: validatedData.amount }),
+                ...(validatedData.currency && { currency: validatedData.currency }),
+                ...(validatedData.date && { date: new Date(validatedData.date) }),
                 // Business Fields
-                supplierId: data.supplierId,
-                amountBeforeVat: data.amountBeforeVat,
-                vatRate: data.vatRate,
-                vatAmount: data.vatAmount,
-                vatType: data.vatType,
-                isDeductible: data.isDeductible,
-                deductibleRate: data.deductibleRate,
-                expenseType: data.expenseType,
-                invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : undefined,
-                paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
-                paymentMethod: data.paymentMethod,
-                paymentTerms: data.paymentTerms
+                supplierId: validatedData.supplierId,
+                amountBeforeVat: validatedData.amountBeforeVat,
+                vatRate: validatedData.vatRate,
+                vatAmount: validatedData.vatAmount,
+                vatType: validatedData.vatType,
+                isDeductible: validatedData.isDeductible,
+                deductibleRate: validatedData.deductibleRate,
+                expenseType: validatedData.expenseType,
+                invoiceDate: validatedData.invoiceDate ? new Date(validatedData.invoiceDate) : undefined,
+                paymentDate: validatedData.paymentDate ? new Date(validatedData.paymentDate) : undefined,
+                paymentMethod: validatedData.paymentMethod,
+                paymentTerms: validatedData.paymentTerms
             }
         })
 

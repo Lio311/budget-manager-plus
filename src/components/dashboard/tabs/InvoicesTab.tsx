@@ -30,6 +30,7 @@ export function InvoicesTab() {
         dueDate: undefined,
         subtotal: 0,
         vatRate: 0.18,
+        paymentMethod: '',
         notes: ''
     })
 
@@ -67,6 +68,7 @@ export function InvoicesTab() {
                     dueDate: undefined,
                     subtotal: 0,
                     vatRate: 0.18,
+                    paymentMethod: '',
                     notes: ''
                 })
                 mutate()
@@ -252,6 +254,25 @@ export function InvoicesTab() {
                                 >
                                     <option value="0">ללא מע"מ (0%)</option>
                                     <option value="0.18">מע"מ רגיל (18%)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    אמצעי תשלום
+                                </label>
+                                <select
+                                    value={formData.paymentMethod}
+                                    onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+                                >
+                                    <option value="">בחר אמצעי תשלום</option>
+                                    <option value="BANK_TRANSFER">העברה בנקאית</option>
+                                    <option value="CREDIT_CARD">כרטיס אשראי</option>
+                                    <option value="BIT">ביט</option>
+                                    <option value="PAYBOX">פייבוקס</option>
+                                    <option value="CASH">מזומן</option>
+                                    <option value="CHECK">צ'ק</option>
+                                    <option value="OTHER">אחר</option>
                                 </select>
                             </div>
                         </div>

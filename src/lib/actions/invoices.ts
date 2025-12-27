@@ -11,6 +11,7 @@ export interface InvoiceFormData {
     dueDate?: Date
     subtotal: number
     vatRate?: number
+    paymentMethod?: string
     notes?: string
 }
 
@@ -84,7 +85,10 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
                 vatRate,
                 vatAmount,
                 total,
+                vatAmount,
+                total,
                 notes: data.notes,
+                paymentMethod: data.paymentMethod,
                 status: 'DRAFT'
             },
             include: {
@@ -119,7 +123,9 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
         if (data.invoiceNumber) updateData.invoiceNumber = data.invoiceNumber
         if (data.issueDate) updateData.issueDate = data.issueDate
         if (data.dueDate !== undefined) updateData.dueDate = data.dueDate
+        if (data.dueDate !== undefined) updateData.dueDate = data.dueDate
         if (data.notes !== undefined) updateData.notes = data.notes
+        if (data.paymentMethod !== undefined) updateData.paymentMethod = data.paymentMethod
 
         if (data.subtotal !== undefined) {
             const vatRate = data.vatRate ?? existing.vatRate
