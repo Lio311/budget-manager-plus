@@ -99,20 +99,21 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const data = overviewData || defaultData
 
     // Extract data from optimized response
-    const incomes = data.current.incomes
-    const expenses = data.current.expenses
-    const bills = data.current.bills
-    const debts = data.current.debts
-    const savingsItems = data.current.savings
+    // Extract data from optimized response with defensive defaults
+    const incomes = Array.isArray(data.current?.incomes) ? data.current.incomes : []
+    const expenses = Array.isArray(data.current?.expenses) ? data.current.expenses : []
+    const bills = Array.isArray(data.current?.bills) ? data.current.bills : []
+    const debts = Array.isArray(data.current?.debts) ? data.current.debts : []
+    const savingsItems = Array.isArray(data.current?.savings) ? data.current.savings : []
 
-    const prevIncomes = data.previous.incomes
-    const prevExpenses = data.previous.expenses
-    const prevBills = data.previous.bills
-    const prevDebts = data.previous.debts
-    const prevSavingsItems = data.previous.savings
+    const prevIncomes = Array.isArray(data.previous?.incomes) ? data.previous.incomes : []
+    const prevExpenses = Array.isArray(data.previous?.expenses) ? data.previous.expenses : []
+    const prevBills = Array.isArray(data.previous?.bills) ? data.previous.bills : []
+    const prevDebts = Array.isArray(data.previous?.debts) ? data.previous.debts : []
+    const prevSavingsItems = Array.isArray(data.previous?.savings) ? data.previous.savings : []
 
-    const categories = data.categories
-    const netWorthHistory = data.netWorthHistory
+    const categories = Array.isArray(data.categories) ? data.categories : []
+    const netWorthHistory = Array.isArray(data.netWorthHistory) ? data.netWorthHistory : []
 
     // Calculations
     const totalIncome = incomes.reduce((sum: number, i: any) => sum + i.amount, 0)

@@ -27,20 +27,29 @@ export default clerkMiddleware(async (auth, req) => {
     if (!isMaintenance) {
         try {
             const { userId } = await auth();
-            const statusUrl = new URL('/api/maintenance/status', req.url);
+            // Use origin from request headers to ensure correct host in Vercel
+            const origin = req.headers.get('origin') || req.nextUrl.origin;
+            const statusUrl = new URL('/api/maintenance/status', origin);
             if (userId) {
                 statusUrl.searchParams.set('userId', userId);
             }
 
-            // Internal fetch to status API
-            const res = await fetch(statusUrl);
+            // Internal fetch to status API with timeout
+            // Note: In middleware, we should be careful with fetches. 
+            // Better strategy: Use a specialized function or cache, but for now just fix the URL.
+            const res = await fetch(statusUrl.toString(), {
+                next: { revalidate: 60 }, // Cache for 1 min
+                signal: AbortSignal.timeout(3000) // 3s timeout
+            });
+
             if (res.ok) {
                 const data = await res.json();
                 isMaintenance = data.enabled;
                 isAdmin = data.isAdmin;
             }
         } catch (error) {
-            console.error('Middleware maintenance check failed:', error);
+            // Silently fail to verify maintenance mode causing site to stay UP
+            // console.error('Middleware maintenance check failed:', error);
         }
     }
 
