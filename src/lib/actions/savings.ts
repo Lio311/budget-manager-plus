@@ -134,7 +134,7 @@ export async function getSavings(month: number, year: number, type: 'PERSONAL' |
         // Calculate stats in ILS
         let totalMonthlyDepositILS = 0
         for (const saving of savings) {
-            const amountILS = await convertToILS(saving.monthlyDeposit, saving.currency)
+            const amountILS = await convertToILS(saving.monthlyDeposit || 0, saving.currency)
             totalMonthlyDepositILS += amountILS
         }
 
