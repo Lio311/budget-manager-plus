@@ -213,10 +213,13 @@ export async function deleteInvoice(id: string) {
     }
 }
 
-export async function getNextInvoiceNumber(userId: string) {
+export async function getNextInvoiceNumber() {
     try {
+        const user = await currentUser()
+        if (!user) throw new Error('Unauthorized')
+
         const lastInvoice = await prisma.invoice.findFirst({
-            where: { userId },
+            where: { userId: user.id },
             orderBy: { createdAt: 'desc' },
             select: { invoiceNumber: true }
         })

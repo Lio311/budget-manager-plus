@@ -110,8 +110,7 @@ export function InvoicesTab() {
 
     const handleNewInvoice = async () => {
         // Get next invoice number
-        const user = await fetch('/api/user').then(r => r.json())
-        const nextNum = await getNextInvoiceNumber(user.id)
+        const nextNum = await getNextInvoiceNumber()
 
         setFormData({
             ...formData,
