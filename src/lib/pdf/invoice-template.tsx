@@ -4,13 +4,10 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
 
-// Register Hebrew font
+// Register Hebrew font - using Assistant as it's very stable on Vercel
 Font.register({
-    family: 'Heebo',
-    fonts: [
-        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/heebo/Heebo-Regular.ttf', fontWeight: 'normal' },
-        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/heebo/Heebo-Bold.ttf', fontWeight: 'bold' }
-    ]
+    family: 'Assistant',
+    src: 'https://fonts.gstatic.com/s/assistant/v19/2s7S76TlbPr3i8qQqnclE_E.ttf'
 });
 
 // Define styles with green/black/white theme
@@ -18,7 +15,7 @@ const styles = StyleSheet.create({
     page: {
         padding: 40,
         backgroundColor: '#ffffff',
-        fontFamily: 'Heebo',
+        fontFamily: 'Assistant',
     },
     header: {
         flexDirection: 'row-reverse',
@@ -35,7 +32,7 @@ const styles = StyleSheet.create({
     },
     invoiceTitle: {
         fontSize: 28,
-        fontWeight: 'bold',
+        fontWeight: 'normal',
         color: '#10b981',
     },
     invoiceNumber: {
@@ -50,7 +47,7 @@ const styles = StyleSheet.create({
     },
     companyName: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: 'normal',
         color: '#1f2937',
         marginBottom: 5
     },
@@ -68,7 +65,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 12,
-        fontWeight: 'bold',
+        fontWeight: 'normal',
         color: '#1f2937',
         marginBottom: 10,
         textAlign: 'right'
@@ -86,7 +83,7 @@ const styles = StyleSheet.create({
     value: {
         fontSize: 10,
         color: '#1f2937',
-        fontWeight: 'bold',
+        fontWeight: 'normal',
         textAlign: 'right'
     },
     divider: {
@@ -112,7 +109,7 @@ const styles = StyleSheet.create({
     totalValue: {
         fontSize: 12,
         color: '#ffffff',
-        fontWeight: 'bold',
+        fontWeight: 'normal',
     },
     grandTotalRow: {
         flexDirection: 'row-reverse',
@@ -124,12 +121,12 @@ const styles = StyleSheet.create({
     grandTotalLabel: {
         fontSize: 18,
         color: '#ffffff',
-        fontWeight: 'bold',
+        fontWeight: 'normal',
     },
     grandTotalValue: {
         fontSize: 18,
         color: '#ffffff',
-        fontWeight: 'bold',
+        fontWeight: 'normal',
     },
     footer: {
         position: 'absolute',
