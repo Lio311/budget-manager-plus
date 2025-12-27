@@ -95,7 +95,7 @@ export function SignaturePad({ value, onChange, onClear }: SignaturePadProps) {
                 <canvas
                     ref={canvasRef}
                     width={400}
-                    height={150}
+                    height={100}
                     className="border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair bg-white"
                     onMouseDown={startDrawing}
                     onMouseMove={draw}

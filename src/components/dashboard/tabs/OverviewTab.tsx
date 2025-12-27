@@ -257,7 +257,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <Settings className="h-4 w-4" />
                             </Button>
                         </DialogTrigger>
-                        <DialogContent dir="rtl" className="max-w-3xl">
+                        <DialogContent dir="rtl" className="max-w-3xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                                 <DialogTitle className="text-right">
                                     {budgetType === 'BUSINESS' ? 'הגדרות עסק' : 'הון עצמי'}
@@ -269,7 +269,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     }
                                 </DialogDescription>
                             </DialogHeader>
-                            <div className="grid gap-4 py-4">
+                            <div className="grid gap-3 py-3">
                                 {budgetType === 'BUSINESS' ? (
                                     <BusinessSettings />
                                 ) : (

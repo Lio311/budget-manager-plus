@@ -138,7 +138,7 @@ export function BusinessSettings() {
     const currentLogo = preview || profile?.logoUrl
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Logo Section */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
