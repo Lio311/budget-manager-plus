@@ -34,6 +34,24 @@ export async function getExpenses(month: number, year: number, type: 'PERSONAL' 
 
 import { expenseSchema } from '@/lib/validations/expense'
 import { z } from 'zod'
+import { auth } from '@clerk/nextjs/server'
+
+export interface ExpenseInput {
+    description: string
+    amount: number
+    category: string
+    currency: 'ILS' | 'USD' | 'EUR' | 'GBP'
+    date?: string
+    isRecurring?: boolean
+    recurringEndDate?: string
+    supplierId?: string
+    amountBeforeVat?: number
+    vatRate?: number
+    vatAmount?: number
+    isDeductible?: boolean
+    deductibleRate?: number
+    paymentMethod?: string
+}
 
 export async function addExpense(
     month: number,
