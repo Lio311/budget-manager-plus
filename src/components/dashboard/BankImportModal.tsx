@@ -195,7 +195,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-2xl" dir="rtl">
-                <DialogHeader className="text-right">
+                <DialogHeader className="text-right sm:text-right">
                     <DialogTitle className="text-xl font-bold text-gray-900">ייבוא נתונים</DialogTitle>
                     <DialogDescription>
                         טען קובץ Excel או CSV לייבוא הוצאות.
