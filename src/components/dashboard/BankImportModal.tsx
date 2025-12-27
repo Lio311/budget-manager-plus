@@ -74,7 +74,8 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                 const row = jsonData[i]
                 if (Array.isArray(row)) {
                     // Check if row contains all required headers
-                    const rowStr = row.map(cell => String(cell).trim())
+                    // Normalize: replace newlines/tabs with space and trim
+                    const rowStr = row.map(cell => String(cell).replace(/[\r\n]+/g, ' ').trim())
                     console.log(`Row ${i}:`, rowStr)
                     const matches = requiredHeaders.every(header => rowStr.includes(header))
                     if (matches) {
@@ -88,7 +89,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
             if (headerRowIndex === -1) {
                 console.error('Headers not found. Required:', requiredHeaders)
                 toast.error("מבנה קובץ לא תקין", {
-                    description: "לא נמצאו הכותרות: תאריך עסקה, שם בית עסק, סכום חיוב"
+                    description: "לא נמצאו הכותרות: תאריך עסקה, שם בית עסק, סכום חיוב (נא לוודא שאין ירידות שורה בכותרות)"
                 })
                 setFile(null)
                 setLoading(false)
@@ -96,7 +97,8 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
             }
 
             // Parse data starting from the row after header
-            const headers = jsonData[headerRowIndex].map((h: any) => String(h).trim())
+            // Normalize headers here too for indexing
+            const headers = jsonData[headerRowIndex].map((h: any) => String(h).replace(/[\r\n]+/g, ' ').trim())
             const dateIdx = headers.indexOf("תאריך עסקה")
             const descIdx = headers.indexOf("שם בית עסק")
             const amountIdx = headers.indexOf("סכום עסקה")
