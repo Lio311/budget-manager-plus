@@ -36,7 +36,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     ]
 
     const businessTabs = [
-        { value: 'overview', label: 'דשבורד עסקי', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
+        { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
         { value: 'clients', label: 'לקוחות', icon: Users, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'suppliers', label: 'ספקים', icon: Building2, activeClass: 'data-[state=active]:bg-blue-600' },
         { value: 'invoices', label: 'חשבוניות', icon: FileText, activeClass: 'data-[state=active]:bg-purple-600' },
