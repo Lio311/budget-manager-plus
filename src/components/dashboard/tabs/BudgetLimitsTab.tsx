@@ -123,14 +123,14 @@ export function BudgetLimitsTab() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card className="flex flex-col justify-center items-center p-6 bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100">
+                <Card className="flex flex-col justify-center items-center p-6 bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-100">
                     <Button
                         onClick={handleSmartRecommendations}
                         disabled={activeDefaults}
-                        className="w-full h-full bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm gap-2"
+                        className="w-full h-full bg-white hover:bg-yellow-50 text-yellow-700 border border-yellow-200 shadow-sm gap-2"
                         variant="outline"
                     >
-                        {activeDefaults ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5 text-indigo-500" />}
+                        {activeDefaults ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5 text-yellow-500" />}
                         <div className="flex flex-col items-start gap-1">
                             <span className="font-bold">המלץ לי על תקציב</span>
                             <span className="text-[10px] text-muted-foreground font-normal">מבוסס על היסטוריית ההוצאות שלך</span>
@@ -143,8 +143,9 @@ export function BudgetLimitsTab() {
                 {paginatedBudgets.map((budget) => {
                     const progress = budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0
                     const isOverLimit = budget.spent > budget.limit && budget.limit > 0
-                    // Dynamic max for slider: Max(5000, Average Income, 2x Limit, 1.5x Spent)
-                    const maxSlider = Math.max(5000, avgIncome, budget.limit * 2, budget.spent * 1.5)
+                    // Dynamic max for slider: Max(5000, Average Income, Current Limit)
+                    // We include 'budget.limit' to ensure the handle doesn't disappear if value > max, but we don't multiply it.
+                    const maxSlider = Math.max(5000, avgIncome, budget.limit)
 
                     return (
                         <Card key={budget.categoryId} className={`transition-all ${isOverLimit ? 'border-red-200 bg-red-50/30' : ''}`}>
