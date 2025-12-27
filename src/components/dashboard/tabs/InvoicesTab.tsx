@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Pagination } from '@/components/ui/Pagination'
 import { getInvoices, createInvoice, updateInvoiceStatus, getNextInvoiceNumber, type InvoiceFormData } from '@/lib/actions/invoices'
 import { getClients } from '@/lib/actions/clients'
 import useSWR from 'swr'
@@ -44,12 +45,22 @@ export function InvoicesTab() {
         return result.data || []
     }
 
-    const { data: invoices = [], isLoading, mutate } = useSWR(['invoices', budgetType], invoicesFetcher)
+    const { data: invoices = [], mutate } = useSWR<Invoice[]>(
+        ['invoices', budgetType],
+        () => getInvoices(budgetType),
+        { revalidateOnFocus: false }
+    )
     const { data: clients = [] } = useSWR(['clients', budgetType], clientsFetcher)
 
-    const filteredInvoices = invoices.filter((invoice: any) =>
-        invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invoice.client?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredInvoices = invoices.filter(inv =>
+        inv.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inv.invoiceNumber.toString().includes(searchTerm)
+    )
+
+    const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage)
+    const paginatedInvoices = filteredInvoices.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     )
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -346,56 +357,73 @@ export function InvoicesTab() {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                         {filteredInvoices.map((invoice: any) => {
-                            const StatusIcon = statusConfig[invoice.status as keyof typeof statusConfig].icon
-                            const statusInfo = statusConfig[invoice.status as keyof typeof statusConfig]
-
-                            return (
-                                <tr key={invoice.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {invoice.invoiceNumber}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {invoice.client?.name}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {format(new Date(invoice.issueDate), 'dd/MM/yyyy')}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                        ₪{invoice.total.toLocaleString()}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}>
-                                            <StatusIcon className="h-3 w-3" />
-                                            {statusInfo.label}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <div className="flex gap-2">
-                                            <select
-                                                value={invoice.status}
-                                                onChange={(e) => handleStatusChange(invoice.id, e.target.value)}
-                                                className="text-sm border border-gray-300 rounded px-2 py-1"
-                                            >
-                                                <option value="DRAFT">טיוטה</option>
-                                                <option value="SENT">נשלח</option>
-                                                <option value="PAID">שולם</option>
-                                                <option value="OVERDUE">באיחור</option>
-                                                <option value="CANCELLED">בוטל</option>
-                                            </select>
-                                            <Button
-                                                onClick={() => handleDownloadPDF(invoice.id)}
-                                                size="sm"
-                                                variant="outline"
-                                                className="bg-green-50 hover:bg-green-100 border-green-200"
-                                            >
-                                                <Download className="h-4 w-4 text-green-600" />
-                                            </Button>
+                            {
+                                paginatedInvoices.length === 0 ? (
+                                    <div className="text-center py-10 text-gray-500">
+                                        לא נמצאו חשבוניות
+                                    </div>
+                                ) : (
+                                paginatedInvoices.map((inv) => (
+                                    <div key={inv.id} className="bg-white p-4 rounded-xl border border-gray-100 hover:border-blue-200 transition-all flex items-center justify-between group">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold">
+                                                {inv.clientName[0]}
+                                            </div>
+                                            <div>
+                                                <div className="font-bold text-[#323338] flex items-center gap-2">
+                                                    {inv.clientName}
+                                                    <span className="text-xs font-normal text-gray-400">
+                                                        #{inv.invoiceNumber}
+                                                    </span>
+                                                    {inv.status === 'DRAFT' && <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">טיוטה</span>}
+                                                    {inv.status === 'SENT' && <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">נשלח</span>}
+                                                    {inv.status === 'PAID' && <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded">שולם</span>}
+                                                </div>
+                                                <div className="text-xs text-[#676879] flex items-center gap-2">
+                                                    <span>{format(new Date(inv.date), 'dd/MM/yyyy')}</span>
+                                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                    <span>{inv.items.length} פריטים</span>
+                                                    {inv.dueDate && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                            <span className={new Date(inv.dueDate) < new Date() && inv.status !== 'PAID' ? 'text-red-500' : ''}>
+                                                                לתשלום עד {format(new Date(inv.dueDate), 'dd/MM/yyyy')}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
+                                        <div className="flex items-center gap-6">
+                                            <div className="text-left">
+                                                <div className="font-bold text-[#323338]">{formatCurrency(inv.totalAmount)}</div>
+                                                <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(inv.totalAmount - (inv.vatAmount || 0))}</div>
+                                            </div>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" onClick={() => generatePDF(inv)}>
+                                                    <Download className="h-4 w-4 text-gray-500" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(inv.id)} className="text-red-500 hover:bg-red-50">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
                             )
-                        })}
-                    </tbody>
+                            }
+
+                            {
+                                totalPages > 1 && (
+                                    <div className="mt-6 flex justify-center direction-ltr">
+                                        <Pagination
+                                            currentPage={currentPage}
+                                            totalPages={totalPages}
+                                            onPageChange={setCurrentPage}
+                                        />
+                                    </div>
+                                )
+                            }</tbody>
                 </table>
 
                 {filteredInvoices.length === 0 && (

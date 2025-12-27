@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Pagination } from '@/components/ui/Pagination'
+import { Switch } from '@/components/ui/switch'
 import { getQuotes, createQuote, updateQuoteStatus, getNextQuoteNumber, type QuoteFormData } from '@/lib/actions/quotes'
 import { getClients } from '@/lib/actions/clients'
 import useSWR from 'swr'
@@ -43,12 +45,18 @@ export function QuotesTab() {
         return result.data || []
     }
 
-    const { data: quotes = [], isLoading, mutate } = useSWR(['quotes', budgetType], quotesFetcher)
+    const { data: quotes = [], isLoading, mutate } = useSWR(['quotes', budgetType], quotesFetcher, { revalidateOnFocus: false })
     const { data: clients = [] } = useSWR(['clients', budgetType], clientsFetcher)
 
-    const filteredQuotes = quotes.filter((quote: any) =>
-        quote.quoteNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        quote.client?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredQuotes = quotes.filter((q: any) =>
+        q.client?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        q.quoteNumber.toString().includes(searchTerm)
+    )
+
+    const totalPages = Math.ceil(filteredQuotes.length / itemsPerPage)
+    const paginatedQuotes = filteredQuotes.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     )
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -326,54 +334,70 @@ export function QuotesTab() {
                         {filteredQuotes.map((quote: any) => {
                             const StatusIcon = statusConfig[quote.status as keyof typeof statusConfig].icon
                             const statusInfo = statusConfig[quote.status as keyof typeof statusConfig]
-
-                            return (
-                                <tr key={quote.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {quote.quoteNumber}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {quote.client?.name}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {format(new Date(quote.issueDate), 'dd/MM/yyyy')}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                        ₪{quote.total.toLocaleString()}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.bg} ${statusInfo.color}`}>
-                                            <StatusIcon className="h-3 w-3" />
-                                            {statusInfo.label}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <div className="flex gap-2">
-                                            <select
-                                                value={quote.status}
-                                                onChange={(e) => handleStatusChange(quote.id, e.target.value)}
-                                                className="text-sm border border-gray-300 rounded px-2 py-1"
-                                            >
-                                                <option value="DRAFT">טיוטה</option>
-                                                <option value="SENT">נשלח</option>
-                                                <option value="ACCEPTED">התקבל</option>
-                                                <option value="EXPIRED">פג תוקף</option>
-                                                <option value="CANCELLED">בוטל</option>
-                                            </select>
-                                            <Button
-                                                onClick={() => handleDownloadPDF(quote.id)}
-                                                size="sm"
-                                                variant="outline"
-                                                className="bg-yellow-50 hover:bg-yellow-100 border-yellow-200"
-                                            >
-                                                <Download className="h-4 w-4 text-yellow-600" />
-                                            </Button>
+                            {
+                                paginatedQuotes.length === 0 ? (
+                                    <div className="text-center py-10 text-gray-500">
+                                        לא נמצאו הצעות מחיר
+                                    </div>
+                                ) : (
+                                paginatedQuotes.map((quote) => (
+                                    <div key={quote.id} className="bg-white p-4 rounded-xl border border-gray-100 hover:border-blue-200 transition-all flex items-center justify-between group">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold">
+                                                {quote.clientName[0]}
+                                            </div>
+                                            <div>
+                                                <div className="font-bold text-[#323338] flex items-center gap-2">
+                                                    {quote.clientName}
+                                                    <span className="text-xs font-normal text-gray-400">
+                                                        #{quote.quoteNumber}
+                                                    </span>
+                                                </div>
+                                                <div className="text-xs text-[#676879] flex items-center gap-2">
+                                                    <span>{format(new Date(quote.date), 'dd/MM/yyyy')}</span>
+                                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                    <span>{quote.items.length} פריטים</span>
+                                                    {quote.validUntil && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                            <span className={new Date(quote.validUntil) < new Date() ? 'text-red-500' : ''}>
+                                                                בתוקף עד {format(new Date(quote.validUntil), 'dd/MM/yyyy')}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
+                                        <div className="flex items-center gap-6">
+                                            <div className="text-left">
+                                                <div className="font-bold text-[#323338]">{formatCurrency(quote.totalAmount)}</div>
+                                                <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
+                                            </div>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" onClick={() => generatePDF(quote)}>
+                                                    <Download className="h-4 w-4 text-gray-500" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(quote.id)} className="text-red-500 hover:bg-red-50">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
                             )
-                        })}
-                    </tbody>
+                            }
+
+                            {
+                                totalPages > 1 && (
+                                    <div className="mt-6 flex justify-center direction-ltr">
+                                        <Pagination
+                                            currentPage={currentPage}
+                                            totalPages={totalPages}
+                                            onPageChange={setCurrentPage}
+                                        />
+                                    </div>
+                                )
+                            }</tbody>
                 </table>
 
                 {filteredQuotes.length === 0 && (
