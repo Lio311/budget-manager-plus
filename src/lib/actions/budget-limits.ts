@@ -17,9 +17,7 @@ export async function getCategoryBudgets(month: number, year: number) {
         const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
         const categories = await prisma.category.findMany({
             where: {
-                userId: budget.userId,
-                type: 'expense',
-                scope: 'PERSONAL'
+                userId: budget.userId
             }
         })
 
