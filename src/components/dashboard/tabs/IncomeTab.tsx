@@ -19,7 +19,7 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { addIncome, getIncomes, updateIncome, deleteIncome } from '@/lib/actions/income'
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { getClients } from '@/lib/actions/clients'
-import { PaymentMethodSelector } from '@/components/PaymentMethodSelector' // Assuming this component exists
+import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 
 interface Category {
     id: string
