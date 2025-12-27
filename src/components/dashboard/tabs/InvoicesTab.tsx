@@ -215,6 +215,8 @@ export function InvoicesTab() {
                                 <input
                                     type="date"
                                     required
+                                    dir="rtl"
+                                    lang="he-IL"
                                     value={format(formData.issueDate, 'yyyy-MM-dd')}
                                     onChange={(e) => setFormData({ ...formData, issueDate: new Date(e.target.value) })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
@@ -226,6 +228,8 @@ export function InvoicesTab() {
                                 </label>
                                 <input
                                     type="date"
+                                    dir="rtl"
+                                    lang="he-IL"
                                     value={formData.dueDate ? format(formData.dueDate, 'yyyy-MM-dd') : ''}
                                     onChange={(e) => setFormData({ ...formData, dueDate: e.target.value ? new Date(e.target.value) : undefined })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
