@@ -1,10 +1,10 @@
+```javascript
 // Note: This file requires @react-pdf/renderer to be installed
 // Run: npm install @react-pdf/renderer
 
 import { Font, renderToBuffer } from '@react-pdf/renderer'
 import { InvoiceTemplate } from './invoice-template'
 import { prisma } from '@/lib/db'
-import fs from 'fs'
 import path from 'path'
 
 // Keep track of font registration state
@@ -99,7 +99,10 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
             currency: invoice.currency || businessBudget?.currency || 'ILS',
 
             // Notes
-            notes: invoice.notes || undefined
+            notes: invoice.notes || undefined,
+            
+            // System
+            poweredByLogoPath: logoPath
         }
 
         // Generate PDF

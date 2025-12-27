@@ -182,6 +182,9 @@ interface InvoiceData {
 
     // Notes
     notes?: string
+
+    // System
+    poweredByLogoPath?: string
 }
 
 export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
@@ -274,15 +277,15 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                     </View>
                 </View>
 
-                <View style={{ flex: 1 }} />
-
-                {/* Notes */}
+                {/* Notes - Moved immediately below totals */}
                 {data.notes && (
-                    <View style={{ marginBottom: 40, padding: 10, backgroundColor: '#f9fafb', borderRadius: 4 }} wrap={false}>
-                        <Text style={{ fontSize: 10, color: '#6b7280', textAlign: 'right', marginBottom: 5 }}>הערות</Text>
-                        <Text style={{ fontSize: 10, color: '#1f2937', textAlign: 'right' }}>{data.notes}</Text>
+                    <View style={{ marginTop: 5, padding: 5, backgroundColor: '#f3f4f6', borderRadius: 4 }} wrap={false}>
+                        <Text style={{ fontSize: 9, color: '#6b7280', textAlign: 'right', marginBottom: 2 }}>:הערות</Text>
+                        <Text style={{ fontSize: 9, color: '#374151', textAlign: 'right' }}>{data.notes}</Text>
                     </View>
                 )}
+
+                <View style={{ flex: 1 }} />
 
                 {/* Footer */}
                 <View style={styles.footer} wrap={false}>
@@ -296,7 +299,9 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                         !תודה על העסקה
                     </Text>
                     <View style={styles.poweredBy}>
-                        <Image src="/K-LOGO.png" style={styles.poweredByLogo} />
+                        {data.poweredByLogoPath && (
+                            <Image src={data.poweredByLogoPath} style={styles.poweredByLogo} />
+                        )}
                         <Text style={styles.poweredByText}>הופק על ידי</Text>
                     </View>
                 </View>
