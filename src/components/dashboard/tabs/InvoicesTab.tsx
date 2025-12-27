@@ -20,6 +20,19 @@ const statusConfig = {
     CANCELLED: { label: 'בוטל', icon: XCircle, color: 'text-gray-600', bg: 'bg-gray-100' }
 }
 
+interface Invoice {
+    id: string
+    invoiceNumber: string
+    clientName: string
+    clientId: string
+    date: string | Date
+    dueDate?: string | Date
+    status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED'
+    totalAmount: number
+    vatAmount: number
+    items: any[]
+}
+
 export function InvoicesTab() {
     const { budgetType } = useBudget()
     const [searchTerm, setSearchTerm] = useState('')
