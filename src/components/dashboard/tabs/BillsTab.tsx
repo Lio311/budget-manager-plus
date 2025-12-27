@@ -1,4 +1,5 @@
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
+import { useBudget } from '@/contexts/BudgetContext'
 
 interface Bill {
     id: string
