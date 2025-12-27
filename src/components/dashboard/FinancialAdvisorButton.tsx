@@ -106,7 +106,14 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                                 </div>
                             ) : (
                                 <div className="text-center py-8 text-muted-foreground text-base">
-                                    לחץ לקבלת ייעוץ פיננסי מותאם אישית
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleGetAdvice}
+                                        className="gap-2"
+                                    >
+                                        <SparkleIcon className="h-4 w-4" />
+                                        לחץ לקבלת ייעוץ פיננסי מותאם אישית
+                                    </Button>
                                 </div>
                             )}
                         </div>

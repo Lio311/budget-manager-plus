@@ -72,7 +72,7 @@ export function InvoicesTab() {
         return result.data || []
     }
 
-    const { data: invoices = [], mutate } = useSWR<Invoice[]>(
+    const { data: invoices = [], isLoading, mutate } = useSWR<Invoice[]>(
         ['invoices', budgetType],
         invoicesFetcher,
         { revalidateOnFocus: false }
