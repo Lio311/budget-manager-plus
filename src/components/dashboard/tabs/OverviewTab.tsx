@@ -341,7 +341,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     onClick={() => onNavigateToTab?.('expenses')}
                 />
                 <StatCard
-                    title="חיסכון חודשי"
+                    title={budgetType === 'BUSINESS' ? 'יתרה חודשית' : 'חיסכון חודשי'}
                     value={formatCurrency(savingsRemainder, currency)}
                     icon={<PiggyBank className="h-4 w-4" />}
                     color="text-blue-600"
