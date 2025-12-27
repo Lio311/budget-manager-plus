@@ -48,9 +48,18 @@ export function CalendarTab() {
 
     const loading = loadingBills || loadingDebts || loadingIncomes || loadingExpenses || loadingSavings
 
+    // Debug logging for data types
+    if (typeof window !== 'undefined') {
+        if (!Array.isArray(bills)) console.error('Bills is not an array:', bills)
+        if (!Array.isArray(debts)) console.error('Debts is not an array:', debts)
+        if (!Array.isArray(incomes)) console.error('Incomes is not an array:', incomes)
+        if (!Array.isArray(expenses)) console.error('Expenses is not an array:', expenses)
+        if (!Array.isArray(savings)) console.error('Savings is not an array:', savings)
+    }
+
     // Aggregate Payments
     const payments: Payment[] = [
-        ...bills.map((bill: any) => ({
+        ...(Array.isArray(bills) ? bills : []).map((bill: any) => ({
             id: bill.id,
             name: bill.name,
             amount: bill.amount,
@@ -58,7 +67,7 @@ export function CalendarTab() {
             type: 'bill' as const,
             isPaid: bill.isPaid
         })),
-        ...debts.map((debt: any) => ({
+        ...(Array.isArray(debts) ? debts : []).map((debt: any) => ({
             id: debt.id,
             name: debt.creditor,
             amount: debt.monthlyPayment,
@@ -66,7 +75,7 @@ export function CalendarTab() {
             type: 'debt' as const,
             isPaid: debt.isPaid
         })),
-        ...incomes.map((income: any) => ({
+        ...(Array.isArray(incomes) ? incomes : []).map((income: any) => ({
             id: income.id,
             name: income.source,
             amount: income.amount,
@@ -74,7 +83,7 @@ export function CalendarTab() {
             type: 'income' as const,
             isPaid: true
         })),
-        ...expenses.map((expense: any) => ({
+        ...(Array.isArray(expenses) ? expenses : []).map((expense: any) => ({
             id: expense.id,
             name: expense.description,
             amount: expense.amount,
@@ -82,10 +91,10 @@ export function CalendarTab() {
             type: 'expense' as const,
             isPaid: true
         })),
-        ...savings.map((saving: any) => ({
+        ...(Array.isArray(savings) ? savings : []).map((saving: any) => ({
             id: saving.id,
             name: saving.name || saving.description || 'חיסכון',
-            amount: saving.monthlyDeposit,
+            amount: saving.monthlyDeposit || 0,
             day: saving.date ? new Date(saving.date).getDate() : 1,
             type: 'saving' as const,
             isPaid: true
