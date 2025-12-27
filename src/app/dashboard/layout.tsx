@@ -64,7 +64,7 @@ export default async function DashboardLayout({
                 refreshInterval: 0
             }}
         >
-            <BudgetProvider>
+            <BudgetProvider initialPlan={planType as 'PERSONAL' | 'BUSINESS'}>
                 <DashboardShell userPlan={planType as 'PERSONAL' | 'BUSINESS'} />
             </BudgetProvider>
         </SWRConfig>

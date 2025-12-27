@@ -17,11 +17,11 @@ interface BudgetContextType {
 
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined)
 
-export function BudgetProvider({ children }: { children: React.ReactNode }) {
+export function BudgetProvider({ children, initialPlan }: { children: React.ReactNode, initialPlan?: BudgetType }) {
     const [month, setMonth] = useState(1) // Default to January
     const [year, setYear] = useState(2025) // Default to 2025
     const [currency, setCurrency] = useState('₪')
-    const [budgetType, setBudgetTypeInternal] = useState<BudgetType>('PERSONAL')
+    const [budgetType, setBudgetTypeInternal] = useState<BudgetType>(initialPlan || 'PERSONAL')
     const [isInitialized, setIsInitialized] = useState(false)
 
     // Initialize from localStorage
@@ -30,13 +30,19 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
         setMonth(now.getMonth() + 1)
         setYear(now.getFullYear())
 
-        // Load saved budget type
-        const savedType = localStorage.getItem('budgetType')
-        if (savedType === 'PERSONAL' || savedType === 'BUSINESS') {
-            setBudgetTypeInternal(savedType)
+        // If initialPlan is provided, use it and save to localStorage
+        if (initialPlan) {
+            setBudgetTypeInternal(initialPlan)
+            localStorage.setItem('budgetType', initialPlan)
+        } else {
+            // Load saved budget type only if no initialPlan provided
+            const savedType = localStorage.getItem('budgetType')
+            if (savedType === 'PERSONAL' || savedType === 'BUSINESS') {
+                setBudgetTypeInternal(savedType)
+            }
         }
         setIsInitialized(true)
-    }, [])
+    }, [initialPlan])
 
     const setBudgetType = (type: BudgetType) => {
         setBudgetTypeInternal(type)
