@@ -37,6 +37,7 @@ model User {
   suppliers  Supplier[]
   invoices   Invoice[]
   quotes     Quote[]
+  userPaymentMethods UserPaymentMethod[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
