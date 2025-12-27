@@ -16,19 +16,18 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
         const invoice = await prisma.invoice.findFirst({
             where: {
                 id: invoiceId,
-                budget: {
-                    userId: userId,
-                    type: 'BUSINESS'
-                }
+                userId: userId
             },
             include: {
                 client: true,
-                budget: {
+                user: {
                     include: {
-                        user: {
-                            include: {
-                                businessProfile: true
-                            }
+                        businessProfile: true,
+                        budgets: {
+                            where: {
+                                type: 'BUSINESS'
+                            },
+                            take: 1
                         }
                     }
                 }
@@ -39,20 +38,22 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
             throw new Error('Invoice not found')
         }
 
-        const businessProfile = invoice.budget.user.businessProfile
+        const businessProfile = invoice.user.businessProfile
+        const businessBudget = invoice.user.budgets[0]
 
-        // Calculate VAT
-        const vatRate = 17 // Israel VAT rate
-        const subtotal = invoice.amount / (1 + vatRate / 100)
-        const vatAmount = invoice.amount - subtotal
+        // Use invoice's own financial data
+        const vatRate = invoice.vatRate * 100 // Convert to percentage
+        const subtotal = invoice.subtotal
+        const vatAmount = invoice.vatAmount
+        const total = invoice.total
 
         // Prepare invoice data
         const invoiceData = {
             invoiceNumber: invoice.invoiceNumber,
             issueDate: invoice.issueDate.toISOString(),
-            dueDate: invoice.dueDate.toISOString(),
+            dueDate: invoice.dueDate?.toISOString() || invoice.issueDate.toISOString(),
             status: getStatusLabel(invoice.status),
-            paymentMethod: getPaymentMethodLabel(invoice.paymentMethod),
+            paymentMethod: 'העברה בנקאית', // Default payment method
 
             // Business info
             businessName: businessProfile?.companyName || 'החברה שלי',
@@ -70,8 +71,8 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
             subtotal,
             vatRate,
             vatAmount,
-            total: invoice.amount,
-            currency: invoice.budget.currency,
+            total,
+            currency: invoice.currency || businessBudget?.currency || 'ILS',
 
             // Notes
             notes: invoice.notes || undefined
@@ -96,16 +97,4 @@ function getStatusLabel(status: string): string {
         'CANCELLED': 'בוטל'
     }
     return labels[status] || status
-}
-
-function getPaymentMethodLabel(method: string): string {
-    const labels: Record<string, string> = {
-        'BANK_TRANSFER': 'העברה בנקאית',
-        'CREDIT_CARD': 'כרטיס אשראי',
-        'CASH': 'מזומן',
-        'CHECK': 'צ׳ק',
-        'PAYPAL': 'PayPal',
-        'OTHER': 'אחר'
-    }
-    return labels[method] || method
 }
