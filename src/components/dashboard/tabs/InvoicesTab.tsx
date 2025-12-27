@@ -9,6 +9,7 @@ import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
 import { format } from 'date-fns'
+import { DatePicker } from '@/components/ui/date-picker'
 
 const statusConfig = {
     DRAFT: { label: 'טיוטה', icon: FileText, color: 'text-gray-600', bg: 'bg-gray-100' },
@@ -212,27 +213,18 @@ export function InvoicesTab() {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     תאריך הנפקה *
                                 </label>
-                                <input
-                                    type="date"
-                                    required
-                                    dir="rtl"
-                                    lang="he-IL"
-                                    value={format(formData.issueDate, 'yyyy-MM-dd')}
-                                    onChange={(e) => setFormData({ ...formData, issueDate: new Date(e.target.value) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+                                <DatePicker
+                                    date={formData.issueDate}
+                                    setDate={(date) => date && setFormData({ ...formData, issueDate: date })}
                                 />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     תאריך תשלום
                                 </label>
-                                <input
-                                    type="date"
-                                    dir="rtl"
-                                    lang="he-IL"
-                                    value={formData.dueDate ? format(formData.dueDate, 'yyyy-MM-dd') : ''}
-                                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value ? new Date(e.target.value) : undefined })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+                                <DatePicker
+                                    date={formData.dueDate}
+                                    setDate={(date) => setFormData({ ...formData, dueDate: date })}
                                 />
                             </div>
                             <div>

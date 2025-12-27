@@ -2,19 +2,27 @@
 // Run: npm install @react-pdf/renderer
 
 import React from 'react'
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
+import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
+
+Font.register({
+    family: 'Rubik',
+    fonts: [
+        { src: 'https://fonts.gstatic.com/s/rubik/v21/iJWKBXyifDnIV7nFrXw.ttf', fontWeight: 'normal' },
+        { src: 'https://fonts.gstatic.com/s/rubik/v21/iJWKBXyifDnIV7nFrXw.ttf', fontWeight: 'bold' }
+    ]
+});
 
 // Define styles with green/black/white theme
 const styles = StyleSheet.create({
     page: {
         padding: 40,
         backgroundColor: '#ffffff',
-        fontFamily: 'Helvetica',
-        direction: 'rtl'
+        fontFamily: 'Rubik',
     },
     header: {
         flexDirection: 'row-reverse',
         justifyContent: 'space-between',
+        alignItems: 'flex-start',
         marginBottom: 30,
         paddingBottom: 20,
         borderBottom: '3px solid #10b981'
@@ -28,15 +36,14 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: 'bold',
         color: '#10b981',
-        textAlign: 'right'
     },
     invoiceNumber: {
         fontSize: 14,
         color: '#6b7280',
-        textAlign: 'right',
         marginTop: 5
     },
     companyInfo: {
+        alignItems: 'flex-end',
         textAlign: 'right',
         marginBottom: 20
     },
@@ -94,27 +101,34 @@ const styles = StyleSheet.create({
     totalRow: {
         flexDirection: 'row-reverse',
         justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: 8
     },
     totalLabel: {
         fontSize: 12,
         color: '#ffffff',
-        textAlign: 'right'
     },
     totalValue: {
         fontSize: 12,
         color: '#ffffff',
         fontWeight: 'bold',
-        textAlign: 'right'
     },
-    grandTotal: {
-        fontSize: 18,
-        color: '#ffffff',
-        fontWeight: 'bold',
-        textAlign: 'right',
+    grandTotalRow: {
+        flexDirection: 'row-reverse',
+        justifyContent: 'space-between',
         marginTop: 10,
         paddingTop: 10,
         borderTop: '2px solid #ffffff'
+    },
+    grandTotalLabel: {
+        fontSize: 18,
+        color: '#ffffff',
+        fontWeight: 'bold',
+    },
+    grandTotalValue: {
+        fontSize: 18,
+        color: '#ffffff',
+        fontWeight: 'bold',
     },
     footer: {
         position: 'absolute',
@@ -197,9 +211,9 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
             <Page size="A4" style={styles.page}>
                 {/* Header */}
                 <View style={styles.header}>
-                    <View>
+                    <View style={{ alignItems: 'flex-end' }}>
                         <Text style={styles.invoiceTitle}>חשבונית</Text>
-                        <Text style={styles.invoiceNumber}>מס׳ {data.invoiceNumber}</Text>
+                        <Text style={styles.invoiceNumber}>מספר חשבונית: {data.invoiceNumber}</Text>
                     </View>
                     {data.businessLogo && (
                         <Image src={data.businessLogo} style={styles.logo} />
@@ -263,9 +277,10 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                         <Text style={styles.totalLabel}>מע״מ ({data.vatRate}%):</Text>
                         <Text style={styles.totalValue}>{formatCurrency(data.vatAmount)}</Text>
                     </View>
-                    <Text style={styles.grandTotal}>
-                        סה״כ לתשלום: {formatCurrency(data.total)}
-                    </Text>
+                    <View style={styles.grandTotalRow}>
+                        <Text style={styles.grandTotalLabel}>סה״כ לתשלום:</Text>
+                        <Text style={styles.grandTotalValue}>{formatCurrency(data.total)}</Text>
+                    </View>
                 </View>
 
                 {/* Notes */}
