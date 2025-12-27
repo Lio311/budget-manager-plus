@@ -20,8 +20,8 @@ export async function GET(
             userId: user.id
         })
 
-        // Return PDF
-        return new NextResponse(buffer, {
+        // Return PDF - Use Uint8Array to satisfy BodyInit type
+        return new NextResponse(new Uint8Array(buffer), {
             headers: {
                 'Content-Type': 'application/pdf',
                 'Content-Disposition': `attachment; filename="invoice-${invoiceId}.pdf"`,

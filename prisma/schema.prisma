@@ -447,7 +447,7 @@ model Invoice {
   
   // Amounts
   subtotal      Float
-  vatRate       Float         @default(0.17)
+  vatRate       Float         @default(0.18)
   vatAmount     Float
   total         Float
   currency      String        @default("ILS")
