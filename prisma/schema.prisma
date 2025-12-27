@@ -154,6 +154,7 @@ model Expense {
   budget            Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   category          String
   amount            Float
+  currency          String   @default("ILS")
   description       String?
   date              DateTime?
   installments      Int      @default(1)
