@@ -17,6 +17,9 @@ import { formatCurrency } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
+import { getExpenses, addExpense, updateExpense, deleteExpense } from '@/lib/actions/expense'
+import { getSuppliers } from '@/lib/actions/suppliers'
+import { getCategories, addCategory } from '@/lib/actions/category'
 
 interface Category {
     id: string
