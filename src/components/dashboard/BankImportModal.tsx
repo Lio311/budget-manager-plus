@@ -69,21 +69,27 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
             let headerRowIndex = -1
             const requiredHeaders = ["תאריך עסקה", "שם בית עסק", "סכום חיוב"]
 
+            console.log('Searching for headers in first 20 rows...')
             for (let i = 0; i < Math.min(jsonData.length, 20); i++) {
                 const row = jsonData[i]
                 if (Array.isArray(row)) {
                     // Check if row contains all required headers
                     const rowStr = row.map(cell => String(cell).trim())
+                    console.log(`Row ${i}:`, rowStr)
                     const matches = requiredHeaders.every(header => rowStr.includes(header))
                     if (matches) {
                         headerRowIndex = i
+                        console.log('Found headers at row:', i)
                         break
                     }
                 }
             }
 
             if (headerRowIndex === -1) {
-                toast.error("לא נמצאה שורת כותרת תקינה בקובץ")
+                console.error('Headers not found. Required:', requiredHeaders)
+                toast.error("מבנה קובץ לא תקין", {
+                    description: "לא נמצאו הכותרות: תאריך עסקה, שם בית עסק, סכום חיוב"
+                })
                 setFile(null)
                 setLoading(false)
                 return
