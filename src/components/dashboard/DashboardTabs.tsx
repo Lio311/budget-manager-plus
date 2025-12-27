@@ -33,7 +33,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
     const personalTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
-        { value: 'budget_limits', label: 'הגבלת תקציב', icon: Shield, activeClass: 'data-[state=active]:bg-yellow-500 data-[state=active]:text-black' },
+        { value: 'budget_limits', label: 'תקציבים', icon: Shield, activeClass: 'data-[state=active]:bg-yellow-500 data-[state=active]:text-black' },
         { value: 'income', label: 'הכנסות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
         { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard, activeClass: 'data-[state=active]:bg-orange-500' },

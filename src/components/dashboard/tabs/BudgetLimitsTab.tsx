@@ -85,9 +85,15 @@ export function BudgetLimitsTab() {
     const totalSpent = budgets.reduce((acc, b) => acc + b.spent, 0)
     const totalProgress = totalLimit > 0 ? (totalSpent / totalLimit) * 100 : 0
 
+    const [newlyAddedIds, setNewlyAddedIds] = useState<string[]>([])
+
+    // Logic for displayed budgets: Limit > 0 OR in newlyAddedIds
+    const activeBudgets = budgets.filter(b => b.limit > 0 || newlyAddedIds.includes(b.categoryId))
+    const availableCategories = budgets.filter(b => !activeBudgets.some(ab => ab.categoryId === b.categoryId))
+
     // Pagination Logic
-    const totalPages = Math.ceil(budgets.length / itemsPerPage)
-    const paginatedBudgets = budgets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    const totalPages = Math.ceil(activeBudgets.length / itemsPerPage)
+    const paginatedBudgets = activeBudgets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
     if (loading) {
         return (
@@ -137,6 +143,30 @@ export function BudgetLimitsTab() {
                         </div>
                     </Button>
                 </Card>
+            </div>
+
+            {/* Add Budget Section */}
+            <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-800">תקציבים פעילים</h3>
+
+                <div className="w-64">
+                    <select
+                        className="w-full h-10 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/20"
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                setNewlyAddedIds(prev => [...prev, e.target.value])
+                                e.target.value = '' // Reset
+                            }
+                        }}
+                        value=""
+                    >
+                        <option value="" disabled>+ הוסף תקציב לקטגוריה</option>
+                        {availableCategories.length === 0 && <option disabled>אין קטגוריות נוספות</option>}
+                        {availableCategories.map(cat => (
+                            <option key={cat.categoryId} value={cat.categoryId}>{cat.categoryName}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             <div className="grid gap-3">
@@ -201,9 +231,10 @@ export function BudgetLimitsTab() {
                 })}
             </div>
 
-            {budgets.length === 0 && (
-                <div className="text-center py-10 text-gray-400">
-                    לא נמצאו קטגוריות להגדרת תקציב.
+            {activeBudgets.length === 0 && (
+                <div className="text-center py-10 text-gray-400 border-2 border-dashed border-gray-100 rounded-xl">
+                    <p>אין תקציבים פעילים לחודש זה.</p>
+                    <p className="text-sm mt-1">בחר קטגוריה מהתפריט למעלה כדי להגדיר לה תקציב.</p>
                 </div>
             )}
 
