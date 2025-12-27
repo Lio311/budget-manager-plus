@@ -50,7 +50,7 @@ export async function getClients(scope: string = 'BUSINESS') {
                     }
                 })
 
-                // Sum from paid invoices
+                // Sum from paid invoices only
                 const invoiceTotal = await prisma.invoice.aggregate({
                     where: {
                         clientId: client.id,
@@ -61,10 +61,13 @@ export async function getClients(scope: string = 'BUSINESS') {
                     }
                 })
 
+                // Count all invoices (including drafts) for transaction count
+                const allInvoicesCount = await prisma.invoice.count({
+                    where: { clientId: client.id }
+                })
+
                 const totalRevenue = (incomeTotal._sum.amount || 0) + (invoiceTotal._sum.total || 0)
-                const totalTransactions = client._count.incomes + (await prisma.invoice.count({
-                    where: { clientId: client.id, status: 'PAID' }
-                }))
+                const totalTransactions = client._count.incomes + allInvoicesCount
 
                 return {
                     ...client,
