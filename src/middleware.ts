@@ -19,43 +19,17 @@ export default clerkMiddleware(async (auth, req) => {
         return;
     }
 
-    // Check maintenance mode from environment variable (emergency override)
-    let isMaintenance = process.env.MAINTENANCE_MODE === 'true';
-    let isAdmin = false;
-
-    // If not enabled via ENV, check the DB via API route
-    if (!isMaintenance) {
-        try {
-            const { userId } = await auth();
-            // Use origin from request headers to ensure correct host in Vercel
-            const origin = req.headers.get('origin') || req.nextUrl.origin;
-            const statusUrl = new URL('/api/maintenance/status', origin);
-            if (userId) {
-                statusUrl.searchParams.set('userId', userId);
-            }
-
-            // Internal fetch to status API with timeout
-            // Note: In middleware, we should be careful with fetches. 
-            // Better strategy: Use a specialized function or cache, but for now just fix the URL.
-            const res = await fetch(statusUrl.toString(), {
-                next: { revalidate: 60 }, // Cache for 1 min
-                signal: AbortSignal.timeout(3000) // 3s timeout
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                isMaintenance = data.enabled;
-                isAdmin = data.isAdmin;
-            }
-        } catch (error) {
-            // Silently fail to verify maintenance mode causing site to stay UP
-            // console.error('Middleware maintenance check failed:', error);
-        }
-    }
+    // Check maintenance mode from environment variable
+    // Note: We removed the dynamic DB check via fetch because it causes instability in Vercel Edge Runtime (fetch failures)
+    // To enable maintenance mode, set MAINTENANCE_MODE=true in Vercel Environment Variables.
+    const isMaintenance = process.env.MAINTENANCE_MODE === 'true';
 
     if (isMaintenance) {
-        // Allow admins to bypass maintenance mode for ALL routes
-        if (isAdmin || pathname.startsWith('/admin')) {
+        // Allow admins to bypass maintenance mode for ALL routes if we could check it,
+        // but since we removed the fetch, we can only rely on the path or maybe a cookie?
+        // For now, simple logic: All users blocked if Env Var is true.
+        // Or maybe check if path starts with /admin to allow access to admin panel at least?
+        if (pathname.startsWith('/admin') || pathname.startsWith('/sign-in')) {
             return;
         }
 
