@@ -220,7 +220,9 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
             setPreviewData([])
         } catch (error) {
             console.error(error)
-            toast.error("שגיאה בשמירת הנתונים")
+        } catch (error: any) {
+            console.error(error)
+            toast.error(error.message || "שגיאה בשמירת הנתונים")
         } finally {
             setImporting(false)
         }
