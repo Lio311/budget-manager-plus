@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank } from 'lucide-react'
+import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
@@ -11,6 +11,10 @@ import { BillsTab } from './tabs/BillsTab'
 import { DebtsTab } from './tabs/DebtsTab'
 import { CalendarTab } from './tabs/CalendarTab'
 import { SavingsTab } from './tabs/SavingsTab'
+import { ClientsTab } from './tabs/ClientsTab'
+import { SuppliersTab } from './tabs/SuppliersTab'
+import { InvoicesTab } from './tabs/InvoicesTab'
+import { useBudget } from '@/contexts/BudgetContext'
 
 interface DashboardTabsProps {
     mobileMenuOpen: boolean
@@ -19,8 +23,9 @@ interface DashboardTabsProps {
 
 export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTabsProps) {
     const [activeTab, setActiveTab] = useState('overview')
+    const { budgetType } = useBudget()
 
-    const tabs = [
+    const personalTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
         { value: 'income', label: 'הכנסות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
@@ -29,6 +34,18 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         { value: 'savings', label: 'חסכונות', icon: PiggyBank, activeClass: 'data-[state=active]:bg-blue-600' },
         { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeClass: 'data-[state=active]:bg-black' },
     ]
+
+    const businessTabs = [
+        { value: 'overview', label: 'דשבורד עסקי', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
+        { value: 'clients', label: 'לקוחות', icon: Users, activeClass: 'data-[state=active]:bg-green-600' },
+        { value: 'suppliers', label: 'ספקים', icon: Building2, activeClass: 'data-[state=active]:bg-blue-600' },
+        { value: 'invoices', label: 'חשבוניות', icon: FileText, activeClass: 'data-[state=active]:bg-purple-600' },
+        { value: 'income', label: 'מכירות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
+        { value: 'expenses', label: 'עלויות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
+        { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeClass: 'data-[state=active]:bg-black' },
+    ]
+
+    const tabs = budgetType === 'BUSINESS' ? businessTabs : personalTabs
 
     const handleTabChange = (value: string) => {
         setActiveTab(value)
@@ -104,6 +121,15 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </TabsContent>
                     <TabsContent value="calendar" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <CalendarTab />
+                    </TabsContent>
+                    <TabsContent value="clients" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <ClientsTab />
+                    </TabsContent>
+                    <TabsContent value="suppliers" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <SuppliersTab />
+                    </TabsContent>
+                    <TabsContent value="invoices" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <InvoicesTab />
                     </TabsContent>
                 </div>
             </div>
