@@ -55,9 +55,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
         }
     }
 
-    // Only show toggle if user has access to both plans
-    const showToggle = hasPersonalAccess && hasBusinessAccess
-
     return (
         <div className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-[60]">
             <div className="w-full flex h-[65px] items-center">
@@ -110,17 +107,15 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
                     {/* User Button */}
                     <div className="flex items-center gap-2">
-                        {showToggle && (
-                            <button
-                                onClick={() => handleToggle(budgetType === 'PERSONAL' ? 'BUSINESS' : 'PERSONAL')}
-                                className={`px-2 py-1 text-xs font-bold rounded-md border transition-all ${budgetType === 'PERSONAL'
-                                    ? 'bg-blue-50 text-blue-600 border-blue-200'
-                                    : 'bg-green-50 text-green-600 border-green-200'
-                                    }`}
-                            >
-                                {budgetType === 'PERSONAL' ? 'פרטי' : 'עסקי'}
-                            </button>
-                        )}
+                        <button
+                            onClick={() => handleToggle(budgetType === 'PERSONAL' ? 'BUSINESS' : 'PERSONAL')}
+                            className={`px-2 py-1 text-xs font-bold rounded-md border transition-all ${budgetType === 'PERSONAL'
+                                ? 'bg-blue-50 text-blue-600 border-blue-200'
+                                : 'bg-green-50 text-green-600 border-green-200'
+                                }`}
+                        >
+                            {budgetType === 'PERSONAL' ? 'פרטי' : 'עסקי'}
+                        </button>
                         <UserButton />
                     </div>
                 </div>
@@ -139,28 +134,26 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
                 {/* Left Section - User Profile (Desktop only) */}
                 <div className="hidden md:flex w-72 h-full items-center justify-end px-8 gap-4">
-                    {showToggle && (
-                        <div className="flex bg-gray-100 rounded-lg p-1">
-                            <button
-                                onClick={() => handleToggle('PERSONAL')}
-                                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'PERSONAL'
-                                    ? 'bg-white text-gray-900 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-900'
-                                    }`}
-                            >
-                                פרטי
-                            </button>
-                            <button
-                                onClick={() => handleToggle('BUSINESS')}
-                                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'BUSINESS'
-                                    ? 'bg-white text-gray-900 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-900'
-                                    }`}
-                            >
-                                עסקי
-                            </button>
-                        </div>
-                    )}
+                    <div className="flex bg-gray-100 rounded-lg p-1">
+                        <button
+                            onClick={() => handleToggle('PERSONAL')}
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'PERSONAL'
+                                ? 'bg-white text-gray-900 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-900'
+                                }`}
+                        >
+                            פרטי
+                        </button>
+                        <button
+                            onClick={() => handleToggle('BUSINESS')}
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'BUSINESS'
+                                ? 'bg-white text-gray-900 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-900'
+                                }`}
+                        >
+                            עסקי
+                        </button>
+                    </div>
                     <UserButton />
                 </div>
             </div>
