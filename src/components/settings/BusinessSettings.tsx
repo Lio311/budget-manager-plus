@@ -247,19 +247,11 @@ export function BusinessSettings() {
                         />
                     </div>
                 </div>
-                <Button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="bg-green-600 hover:bg-green-700 mt-4"
-                >
-                    {saving ? 'שומר...' : 'שמור פרטים'}
-                    <Save className="h-4 w-4 mr-2" />
-                </Button>
             </div>
 
             {/* Signature Section */}
-            <div className="border-t pt-6">
-                <div className="flex items-center gap-2 mb-4">
+            <div className="border-t pt-4">
+                <div className="flex items-center gap-2 mb-3">
                     <Pen className="h-5 w-5 text-green-600" />
                     <h3 className="text-sm font-medium text-gray-700">חתימה דיגיטלית</h3>
                 </div>
@@ -271,6 +263,18 @@ export function BusinessSettings() {
                     onChange={(sig) => setFormData({ ...formData, signature: sig })}
                     onClear={() => setFormData({ ...formData, signature: '' })}
                 />
+            </div>
+
+            {/* Save Button */}
+            <div className="border-t pt-4">
+                <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="bg-green-600 hover:bg-green-700 w-full"
+                >
+                    {saving ? 'שומר...' : 'שמור פרטים'}
+                    <Save className="h-4 w-4 mr-2" />
+                </Button>
             </div>
         </div>
     )
