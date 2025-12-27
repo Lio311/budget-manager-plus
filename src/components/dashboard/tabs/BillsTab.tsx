@@ -10,6 +10,8 @@ import { Pagination } from '@/components/ui/Pagination'
 import { addBill, getBills, updateBill, deleteBill, toggleBillPaid } from '@/lib/actions/bill'
 import { formatCurrency } from '@/lib/utils'
 
+import { PaymentMethodSelector } from '../PaymentMethodSelector'
+
 interface Bill {
     id: string
     name: string
@@ -17,11 +19,14 @@ interface Bill {
     currency: string
     dueDate: Date
     isPaid: boolean
+    paymentMethod?: string | null
 }
 
 interface BillData {
     bills: Bill[]
     totalILS: number
+    totalPaidILS: number
+    totalUnpaidILS: number
 }
 
 export function BillsTab() {
@@ -48,41 +53,13 @@ export function BillsTab() {
 
     const bills = data?.bills || []
     const totalBillsILS = data?.totalILS || 0
+    const totalPaidILS = data?.totalPaidILS || 0
+    const totalUnpaidILS = data?.totalUnpaidILS || 0
 
     const [submitting, setSubmitting] = useState(false)
-    const [newBill, setNewBill] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '' })
+    const [newBill, setNewBill] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
     const [editingId, setEditingId] = useState<string | null>(null)
-    const [editData, setEditData] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '' })
-
-    // Calculate paid/unpaid in ILS is tricky without individual conversion on client or server returning it.
-    // For now, let's approximate or just rely on the server total for the main card.
-    // Actually, we can't easily sum mixed currencies on client without rates.
-    // Let's assume for the "Paid" and "Unpaid" mini-cards we might show mixed currencies or just omit them?
-    // The user requirement says "All totals displayed to the user... should be consistently shown in ILS".
-    // So the "Paid" and "Unpaid" cards also need to be in ILS.
-    // We didn't update the server to return totalPaidILS and totalUnpaidILS.
-    // Let's do a quick client-side approximation if we have rates, OR update server action.
-    // Updating server action is better but I'm in the middle of this tool call.
-    // I will stick to server returning totalILS for now, and maybe for paid/unpaid I'll just leave them for now or hide?
-    // Wait, the prompt said "All totals...".
-    // I can fetch rates on client or just update server action in next step if needed.
-    // Actually, `getBills` returns `totalILS`. I can calculate `paidILS` if I fetch rates or if I just move logic to server.
-    // Let's leave the Cards as is but use the server total for the main one. For the others, I might need to accept they might be inaccurate if mixed currencies, OR I should have updated `getBills` to return more stats.
-    // Let's stick to updating the UI for now and I can refine `getBills` return values if strictly needed.
-    // Actually, looking at `IncomeTab` I saw it returned `totalILS` and used it.
-    // For Bills, there are 3 cards: Total, Paid, Unpaid.
-    // I should update `getBills` to return `totalPaidILS` and `totalUnpaidILS` too.
-    // I will do that in a subsequent step. For now let's get the UI structure right.
-
-    // Correction: I'll calculate client side if I can't fetch rates easily? No, `getBills` is server action.
-    // I will update `getBills` in the next step to return breakdown.
-    // For this file replace, I will assume `data` contains `totalPaidILS` etc, and update the server action immediately after.
-
-    // WAIT, I can't assume properties that don't exist yet if TypeScript checks.
-    // I'll just use `totalBillsILS` for the total card.
-    // For Paid/Unpaid I'll temporarily leave them zero or use client side accumulation which is wrong for mixed currencies.
-    // BETTER PLAN: Update `bill.ts` AGAIN in next step to return breakdown, then update UI to use it.
-    // So here I will only implement the input/edit fields and the Total display.
+    const [editData, setEditData] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
@@ -124,7 +101,8 @@ export function BillsTab() {
                 name: newBill.name,
                 amount: parseFloat(newBill.amount),
                 currency: newBill.currency,
-                dueDay: parseInt(newBill.dueDay)
+                dueDay: parseInt(newBill.dueDay),
+                paymentMethod: newBill.paymentMethod || undefined
             }, budgetType)
 
             if (result.success) {
@@ -132,7 +110,7 @@ export function BillsTab() {
                     title: 'הצלחה',
                     description: 'החשבון נוסף בהצלחה'
                 })
-                setNewBill({ name: '', amount: '', currency: 'ILS', dueDay: '' })
+                setNewBill({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
                 await mutate()
             } else {
                 toast({
@@ -174,13 +152,14 @@ export function BillsTab() {
             name: bill.name,
             amount: bill.amount.toString(),
             currency: bill.currency || 'ILS',
-            dueDay: new Date(bill.dueDate).getDate().toString()
+            dueDay: new Date(bill.dueDate).getDate().toString(),
+            paymentMethod: bill.paymentMethod || ''
         })
     }
 
     function handleCancelEdit() {
         setEditingId(null)
-        setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '' })
+        setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
     }
 
     async function handleUpdate() {
@@ -210,7 +189,8 @@ export function BillsTab() {
             name: editData.name,
             amount: parseFloat(editData.amount),
             currency: editData.currency,
-            dueDay
+            dueDay,
+            paymentMethod: editData.paymentMethod || undefined
         })
 
         if (result.success) {
@@ -220,7 +200,7 @@ export function BillsTab() {
                 duration: 1000
             })
             setEditingId(null)
-            setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '' })
+            setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
             await mutate()
         } else {
             toast({
@@ -261,15 +241,17 @@ export function BillsTab() {
                         {loading ? '...' : formatCurrency(totalBillsILS, '₪')}
                     </p>
                 </div>
-                {/* Paid/Unpaid cards temporarily hidden or showing simpler info until server update */}
                 <div className="monday-card p-4 border-l-4 border-l-green-500 min-w-0">
                     <p className="text-xs text-gray-500 mb-1 truncate">שולם</p>
-                    {/* Placeholder or calc if same currency - skipping calc for mixed */}
-                    <p className="text-xs text-gray-400">---</p>
+                    <p className={`text-base md:text-xl font-bold text-[#00c875] truncate ${loading ? 'animate-pulse' : ''}`}>
+                        {loading ? '...' : formatCurrency(totalPaidILS, '₪')}
+                    </p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-red-500 min-w-0">
                     <p className="text-xs text-gray-500 mb-1 truncate">נותר לתשלום</p>
-                    <p className="text-xs text-gray-400">---</p>
+                    <p className={`text-base md:text-xl font-bold text-[#e2445c] truncate ${loading ? 'animate-pulse' : ''}`}>
+                        {loading ? '...' : formatCurrency(totalUnpaidILS, '₪')}
+                    </p>
                 </div>
             </div>
 
@@ -293,7 +275,7 @@ export function BillsTab() {
                             <div className="col-span-1">
                                 <label className="text-sm font-medium text-gray-700">מטבע</label>
                                 <select
-                                    className="w-full p-2 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                                    className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
                                     value={newBill.currency}
                                     onChange={(e) => setNewBill({ ...newBill, currency: e.target.value })}
                                 >
@@ -325,6 +307,14 @@ export function BillsTab() {
                                 className="h-10 text-right"
                             />
                         </div>
+
+                        <div className="w-full">
+                            <PaymentMethodSelector
+                                value={newBill.paymentMethod}
+                                onChange={(val) => setNewBill({ ...newBill, paymentMethod: val })}
+                            />
+                        </div>
+
                         <Button
                             className="w-full bg-orange-500 hover:bg-orange-600 h-10 shadow-sm mt-2 font-medium"
                             onClick={handleAdd}
@@ -366,33 +356,44 @@ export function BillsTab() {
                                         className="group relative flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
                                     >
                                         {editingId === bill.id ? (
-                                            <div className="flex items-center gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
-                                                <Input
-                                                    value={editData.name}
-                                                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                                                    className="h-9 flex-1"
-                                                    autoFocus
-                                                />
-                                                <select
-                                                    className="p-2 border rounded-md h-9 bg-white text-sm w-20"
-                                                    value={editData.currency}
-                                                    onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
-                                                >
-                                                    {Object.keys(SUPPORTED_CURRENCIES).map(c => <option key={c} value={c}>{c}</option>)}
-                                                </select>
-                                                <Input
-                                                    type="number"
-                                                    value={editData.amount}
-                                                    onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
-                                                    className="w-24 h-9"
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    value={editData.dueDay}
-                                                    onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
-                                                    className="w-16 h-9"
-                                                />
-                                                <div className="flex gap-1">
+                                            <div className="flex flex-col gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
+                                                <div className="flex items-center gap-2">
+                                                    <Input
+                                                        value={editData.name}
+                                                        onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                                                        className="h-9 flex-1"
+                                                        autoFocus
+                                                    />
+                                                    <select
+                                                        className="p-2 border rounded-md h-9 bg-white text-sm w-20"
+                                                        value={editData.currency}
+                                                        onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
+                                                    >
+                                                        {Object.keys(SUPPORTED_CURRENCIES).map(c => <option key={c} value={c}>{c}</option>)}
+                                                    </select>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Input
+                                                        type="number"
+                                                        value={editData.amount}
+                                                        onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
+                                                        className="w-24 h-9"
+                                                    />
+                                                    <Input
+                                                        type="number"
+                                                        value={editData.dueDay}
+                                                        onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
+                                                        className="w-16 h-9"
+                                                    />
+                                                    <div className="flex-1">
+                                                        <PaymentMethodSelector
+                                                            value={editData.paymentMethod}
+                                                            onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-end gap-1 mt-1">
                                                     <Button size="icon" variant="ghost" onClick={handleUpdate} className="h-8 w-8 text-green-600 hover:bg-green-50 hover:text-green-700 rounded-full">
                                                         <Check className="h-4 w-4" />
                                                     </Button>
@@ -421,9 +422,17 @@ export function BillsTab() {
                                                         <span className={`font-bold text-base transition-colors ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338]'}`}>
                                                             {bill.name}
                                                         </span>
-                                                        <span className="text-xs text-[#676879]">
-                                                            תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
-                                                        </span>
+                                                        <div className="flex items-center gap-2 text-xs text-[#676879]">
+                                                            <span>
+                                                                תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
+                                                            </span>
+                                                            {bill.paymentMethod && (
+                                                                <>
+                                                                    <span>•</span>
+                                                                    <span>{bill.paymentMethod}</span>
+                                                                </>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
 

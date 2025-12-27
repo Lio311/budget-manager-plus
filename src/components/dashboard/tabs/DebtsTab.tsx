@@ -16,6 +16,8 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { DEBT_TYPES, DEBT_TYPE_LABELS, CREDITOR_LABELS } from '@/lib/constants/debt-types'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
+import { PaymentMethodSelector } from '../PaymentMethodSelector'
+
 interface Debt {
     id: string
     creditor: string
@@ -25,6 +27,7 @@ interface Debt {
     monthlyPayment: number
     dueDay: number
     isPaid: boolean
+    paymentMethod?: string | null
 }
 
 interface DebtsData {
@@ -99,6 +102,7 @@ export function DebtsTab() {
         dueDay: string
         isRecurring: boolean
         numberOfInstallments: string
+        paymentMethod: string
     }>({
         creditor: '',
         debtType: DEBT_TYPES.OWED_BY_ME,
@@ -106,16 +110,18 @@ export function DebtsTab() {
         currency: 'ILS',
         dueDay: '',
         isRecurring: false,
-        numberOfInstallments: ''
+        numberOfInstallments: '',
+        paymentMethod: ''
     })
     const [editingId, setEditingId] = useState<string | null>(null)
-    const [editData, setEditData] = useState<{ creditor: string; debtType: string; totalAmount: string; currency: string; monthlyPayment: string; dueDay: string }>({
+    const [editData, setEditData] = useState<{ creditor: string; debtType: string; totalAmount: string; currency: string; monthlyPayment: string; dueDay: string; paymentMethod: string }>({
         creditor: '',
         debtType: DEBT_TYPES.OWED_BY_ME,
         totalAmount: '',
         currency: 'ILS',
         monthlyPayment: '',
-        dueDay: ''
+        dueDay: '',
+        paymentMethod: ''
     })
 
     const handleAdd = async () => {
@@ -158,7 +164,8 @@ export function DebtsTab() {
                 dueDay: parseInt(newDebt.dueDay),
                 isRecurring: newDebt.isRecurring,
                 totalDebtAmount: newDebt.isRecurring ? totalAmount : undefined,
-                numberOfInstallments: newDebt.isRecurring ? parseInt(newDebt.numberOfInstallments) : undefined
+                numberOfInstallments: newDebt.isRecurring ? parseInt(newDebt.numberOfInstallments) : undefined,
+                paymentMethod: newDebt.paymentMethod || undefined
             }, budgetType)
 
             if (result.success) {
@@ -169,7 +176,8 @@ export function DebtsTab() {
                     currency: 'ILS',
                     dueDay: '',
                     isRecurring: false,
-                    numberOfInstallments: ''
+                    numberOfInstallments: '',
+                    paymentMethod: ''
                 })
                 await mutate() // Refresh data
                 toast({
@@ -211,13 +219,14 @@ export function DebtsTab() {
             totalAmount: debt.totalAmount.toString(),
             currency: debt.currency || 'ILS', // Backup default
             monthlyPayment: debt.monthlyPayment.toString(),
-            dueDay: debt.dueDay.toString()
+            dueDay: debt.dueDay.toString(),
+            paymentMethod: debt.paymentMethod || ''
         })
     }
 
     function handleCancelEdit() {
         setEditingId(null)
-        setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', currency: 'ILS', monthlyPayment: '', dueDay: '' })
+        setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', currency: 'ILS', monthlyPayment: '', dueDay: '', paymentMethod: '' })
     }
 
     async function handleUpdate() {
@@ -249,7 +258,8 @@ export function DebtsTab() {
             totalAmount: parseFloat(editData.totalAmount),
             currency: editData.currency,
             monthlyPayment: parseFloat(editData.monthlyPayment),
-            dueDay
+            dueDay,
+            paymentMethod: editData.paymentMethod || undefined
         })
 
         if (result.success) {
@@ -259,7 +269,7 @@ export function DebtsTab() {
                 duration: 1000
             })
             setEditingId(null)
-            setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', currency: 'ILS', monthlyPayment: '', dueDay: '' })
+            setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', currency: 'ILS', monthlyPayment: '', dueDay: '', paymentMethod: '' })
             await mutate()
         } else {
             toast({
@@ -331,7 +341,7 @@ export function DebtsTab() {
                                 <div className="col-span-1">
                                     <label className="text-xs font-medium mb-1.5 block text-[#676879]">מטבע</label>
                                     <select
-                                        className="w-full p-2 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                                        className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
                                         value={newDebt.currency}
                                         onChange={(e) => setNewDebt({ ...newDebt, currency: e.target.value })}
                                         disabled={submitting}
@@ -368,6 +378,13 @@ export function DebtsTab() {
                                     onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
                                     disabled={submitting}
                                     dir="ltr"
+                                />
+                            </div>
+
+                            <div className="w-full">
+                                <PaymentMethodSelector
+                                    value={newDebt.paymentMethod}
+                                    onChange={(val) => setNewDebt({ ...newDebt, paymentMethod: val })}
                                 />
                             </div>
                         </div>
@@ -480,7 +497,7 @@ export function DebtsTab() {
                                                     />
                                                 </div>
                                                 <div className="flex gap-2 justify-between items-center">
-                                                    <div className="flex gap-2">
+                                                    <div className="flex gap-2 flex-1">
                                                         <Input
                                                             type="number"
                                                             placeholder="יום חיוב"
@@ -491,6 +508,12 @@ export function DebtsTab() {
                                                             onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
                                                             disabled={submitting}
                                                         />
+                                                        <div className="flex-1">
+                                                            <PaymentMethodSelector
+                                                                value={editData.paymentMethod}
+                                                                onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                                            />
+                                                        </div>
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <Button size="sm" onClick={handleUpdate} className="bg-green-600 hover:bg-green-700 text-white">
@@ -528,6 +551,11 @@ export function DebtsTab() {
                                                         <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
                                                             <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, getCurrencySymbol(debt.currency))}</span>
                                                             <span className="text-slate-500">יום חיוב: {debt.dueDay}</span>
+                                                            {debt.paymentMethod && (
+                                                                <span className="text-slate-500">
+                                                                    • {debt.paymentMethod}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>

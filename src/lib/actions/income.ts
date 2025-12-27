@@ -55,6 +55,7 @@ export async function addIncome(
         paymentDate?: string
         paymentMethod?: any
         paymentTerms?: number
+        payer?: string
     },
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
@@ -81,7 +82,8 @@ export async function addIncome(
                 invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : null,
                 paymentDate: data.paymentDate ? new Date(data.paymentDate) : null,
                 paymentMethod: data.paymentMethod,
-                paymentTerms: data.paymentTerms
+                paymentTerms: data.paymentTerms,
+                payer: data.payer
             }
         })
 
@@ -224,6 +226,7 @@ export async function updateIncome(
         paymentDate?: string
         paymentMethod?: any
         paymentTerms?: number
+        payer?: string
     }
 ) {
     try {
@@ -244,7 +247,8 @@ export async function updateIncome(
                 invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : undefined,
                 paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
                 paymentMethod: data.paymentMethod,
-                paymentTerms: data.paymentTerms
+                paymentTerms: data.paymentTerms,
+                payer: data.payer
             }
         })
 

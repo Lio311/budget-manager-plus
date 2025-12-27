@@ -29,7 +29,7 @@ interface GenerateQuotePDFParams {
     userId: string
 }
 
-export async function generateQuotePDF({ quoteId, userId }: GenerateQuotePDFParams): Promise<Buffer> {
+export async function generateQuotePDF({ quoteId, userId }: GenerateQuotePDFParams): Promise<{ buffer: Buffer, filename: string }> {
     try {
         // Ensure font is registered
         registerFont()
@@ -103,7 +103,16 @@ export async function generateQuotePDF({ quoteId, userId }: GenerateQuotePDFPara
         }
 
         // Generate PDF
-        return await renderToBuffer(<InvoiceTemplate data={quoteData} />)
+        const buffer = await renderToBuffer(<InvoiceTemplate data={quoteData} />)
+
+        // Construct filename: [Quote Number] Quote from [Business Name]
+        const safeBusinessName = (quoteData.businessName || 'Business').replace(/[^a-zA-Z0-9\u0590-\u05FF\s_-]/g, '')
+        const filename = `${quoteData.invoiceNumber} Quote from ${safeBusinessName}.pdf`
+
+        return {
+            buffer,
+            filename
+        }
     } catch (error) {
         console.error('generateQuotePDF error:', error)
         throw error

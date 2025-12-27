@@ -16,6 +16,7 @@ async function createRecurringSavings(
         goal?: string
         recurringStartDate: Date
         recurringEndDate: Date
+        paymentMethod?: string
     },
     userId: string,
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
@@ -109,7 +110,8 @@ async function createRecurringSavings(
             isRecurring: true,
             recurringSourceId: sourceId,
             recurringStartDate: data.recurringStartDate,
-            recurringEndDate: data.recurringEndDate
+            recurringEndDate: data.recurringEndDate,
+            paymentMethod: data.paymentMethod
         }
     }).filter(s => s !== null)
 
@@ -163,6 +165,7 @@ export async function addSaving(
         isRecurring?: boolean
         recurringStartDate?: Date
         recurringEndDate?: Date
+        paymentMethod?: string
     },
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
@@ -180,7 +183,8 @@ export async function addSaving(
                     currency: data.currency,
                     goal: data.goal,
                     recurringStartDate: startDate,
-                    recurringEndDate: data.recurringEndDate
+                    recurringEndDate: data.recurringEndDate,
+                    paymentMethod: data.paymentMethod
                 },
                 budget.userId,
                 type
@@ -198,7 +202,8 @@ export async function addSaving(
                 monthlyDeposit: data.monthlyDeposit,
                 currency: data.currency,
                 notes: data.goal,
-                targetDate: data.date ? new Date(data.date) : new Date()
+                targetDate: data.date ? new Date(data.date) : new Date(),
+                paymentMethod: data.paymentMethod
             }
         })
 
@@ -219,6 +224,7 @@ export async function updateSaving(
         currency?: string
         goal?: string
         date?: Date
+        paymentMethod?: string
     }
 ) {
     try {

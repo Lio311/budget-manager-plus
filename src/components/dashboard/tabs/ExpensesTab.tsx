@@ -16,9 +16,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { formatCurrency } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
-import { addExpense, getExpenses, updateExpense, deleteExpense } from '@/lib/actions/expense'
-import { getCategories, addCategory } from '@/lib/actions/category'
-import { getSuppliers } from '@/lib/actions/suppliers'
+import { PaymentMethodSelector } from '../PaymentMethodSelector'
 
 interface Category {
     id: string
@@ -40,6 +38,7 @@ interface Expense {
     date: Date | null
     supplier?: Supplier | null
     vatAmount?: number | null
+    paymentMethod?: string | null
 }
 
 interface ExpenseData {
@@ -114,7 +113,8 @@ export function ExpensesTab() {
         vatRate: '0.18',
         vatAmount: '',
         isDeductible: true,
-        deductibleRate: '1.0'
+        deductibleRate: '1.0',
+        paymentMethod: ''
     })
 
     const [editData, setEditData] = useState({
@@ -125,7 +125,8 @@ export function ExpensesTab() {
         date: '',
         supplierId: '',
         vatAmount: '',
-        isDeductible: true
+        isDeductible: true,
+        paymentMethod: ''
     })
 
     // Handle VAT Calculations
@@ -167,7 +168,8 @@ export function ExpensesTab() {
                 vatRate: isBusiness ? parseFloat(newExpense.vatRate) : undefined,
                 vatAmount: isBusiness ? parseFloat(newExpense.vatAmount) : undefined,
                 isDeductible: isBusiness ? newExpense.isDeductible : undefined,
-                deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined
+                deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
+                paymentMethod: newExpense.paymentMethod || undefined
             }, budgetType)
 
             if (result.success) {
@@ -185,7 +187,8 @@ export function ExpensesTab() {
                     vatRate: '0.18',
                     vatAmount: '',
                     isDeductible: true,
-                    deductibleRate: '1.0'
+                    deductibleRate: '1.0',
+                    paymentMethod: ''
                 })
                 await mutateExpenses()
             } else {
@@ -250,7 +253,8 @@ export function ExpensesTab() {
             date: exp.date ? format(new Date(exp.date), 'yyyy-MM-dd') : '',
             supplierId: exp.supplierId || '',
             vatAmount: exp.vatAmount?.toString() || '',
-            isDeductible: exp.isDeductible ?? true
+            isDeductible: exp.isDeductible ?? true,
+            paymentMethod: exp.paymentMethod || ''
         })
     }
 
@@ -265,7 +269,8 @@ export function ExpensesTab() {
             date: editData.date,
             supplierId: isBusiness ? editData.supplierId || undefined : undefined,
             vatAmount: isBusiness ? parseFloat(editData.vatAmount) || undefined : undefined,
-            isDeductible: isBusiness ? editData.isDeductible : undefined
+            isDeductible: isBusiness ? editData.isDeductible : undefined,
+            paymentMethod: editData.paymentMethod || undefined
         })
 
         if (result.success) {
@@ -395,6 +400,13 @@ export function ExpensesTab() {
                             </div>
                         </div>
 
+                        <div className="w-full">
+                            <PaymentMethodSelector
+                                value={newExpense.paymentMethod}
+                                onChange={(val) => setNewExpense({ ...newExpense, paymentMethod: val })}
+                            />
+                        </div>
+
                         {isBusiness && (
                             <div className="grid grid-cols-2 gap-3 p-3 bg-orange-50/50 rounded-lg border border-orange-100">
                                 <div>
@@ -459,11 +471,19 @@ export function ExpensesTab() {
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-2 gap-3">
                                             <Input placeholder="תיאור" value={editData.description} onChange={e => setEditData({ ...editData, description: e.target.value })} />
-                                            <select className="p-2 border rounded-lg bg-white text-sm" value={editData.supplierId} onChange={e => setEditData({ ...editData, supplierId: e.target.value })}>
-                                                <option value="">ללא ספק</option>
-                                                {suppliersData.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                            </select>
+                                            <PaymentMethodSelector
+                                                value={editData.paymentMethod}
+                                                onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                            />
                                         </div>
+                                        {isBusiness && (
+                                            <div className="w-full">
+                                                <select className="w-full p-2 border rounded-lg bg-white text-sm" value={editData.supplierId} onChange={e => setEditData({ ...editData, supplierId: e.target.value })}>
+                                                    <option value="">ללא ספק</option>
+                                                    {suppliersData.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                                </select>
+                                            </div>
+                                        )}
                                         <div className="grid grid-cols-3 gap-3">
                                             <Input type="number" value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} />
                                             <select className="p-2 border rounded-lg bg-white text-sm" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
@@ -497,6 +517,12 @@ export function ExpensesTab() {
                                                     <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                     <span className="w-1 h-1 rounded-full bg-gray-300" />
                                                     <span>{exp.category}</span>
+                                                    {exp.paymentMethod && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                            <span>{exp.paymentMethod}</span>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

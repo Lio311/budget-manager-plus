@@ -152,8 +152,9 @@ model Income {
   vatAmount         Float?
   invoiceDate       DateTime? // Tax event date
   paymentDate       DateTime? // Cash flow date (actual payment)
-  paymentMethod     PaymentMethod?
+  paymentMethod     String?   // Changed from Enum to String for flexibility
   paymentTerms      Int?     @default(0)
+  payer             String?   // NEW: Who paid this income
   currency          String   @default("ILS")
   
   createdAt         DateTime @default(now())
@@ -191,7 +192,7 @@ model Expense {
   expenseType       ExpenseType? @default(OPEX)
   invoiceDate       DateTime? // Tax event date
   paymentDate       DateTime? // Cash flow date
-  paymentMethod     PaymentMethod?
+  paymentMethod     String?    // Changed from Enum to String for flexibility
   paymentTerms      Int?     @default(0)
   
   createdAt         DateTime @default(now())
@@ -215,6 +216,7 @@ model Bill {
   isRecurring         Boolean  @default(false)
   recurringSourceId   String?
   paidDate            DateTime?
+  paymentMethod       String?   // NEW
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   @@index([budgetId])
@@ -239,6 +241,7 @@ model Debt {
   numberOfInstallments Int?
   installmentNumber Int?
   paidDate        DateTime?
+  paymentMethod   String?   // NEW
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   @@index([budgetId])
@@ -259,6 +262,7 @@ model Saving {
   category        String    @default("חסכון") // e.g., Emergency Fund, Vacation
   color           String?   // UI color integration
   notes           String?
+  paymentMethod   String?   // NEW
   
   isRecurring         Boolean  @default(false)
   recurringSourceId   String?

@@ -22,6 +22,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
+import { PaymentMethodSelector } from '../PaymentMethodSelector'
 
 interface Saving {
     id: string
@@ -32,6 +33,7 @@ interface Saving {
     notes: string | null // Updated from goal
     targetDate?: Date | null
     createdAt: Date
+    paymentMethod?: string | null
 }
 
 interface SavingsData {
@@ -116,7 +118,8 @@ export function SavingsTab() {
         goal: '',        // Maps to notes
         date: new Date(),
         isRecurring: false,
-        recurringEndDate: undefined as Date | undefined
+        recurringEndDate: undefined as Date | undefined,
+        paymentMethod: ''
     })
 
     // Edit form state
@@ -127,7 +130,8 @@ export function SavingsTab() {
         monthlyDeposit: '',
         currency: 'ILS',
         goal: '',
-        date: new Date()
+        date: new Date(),
+        paymentMethod: ''
     })
 
     // New Category State
@@ -161,7 +165,8 @@ export function SavingsTab() {
                 date: newSaving.date, // Server component will handle the conversion
                 isRecurring: newSaving.isRecurring,
                 recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
-                recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined
+                recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined,
+                paymentMethod: newSaving.paymentMethod || undefined
             }, budgetType)
 
             if (result.success) {
@@ -174,7 +179,8 @@ export function SavingsTab() {
                     goal: '',
                     date: new Date(),
                     isRecurring: false,
-                    recurringEndDate: undefined
+                    recurringEndDate: undefined,
+                    paymentMethod: ''
                 })
                 await mutateSavings()
             } else {
@@ -248,13 +254,14 @@ export function SavingsTab() {
             monthlyDeposit: saving.monthlyDeposit ? saving.monthlyDeposit.toString() : '',
             currency: saving.currency || 'ILS', // Default fallback
             goal: saving.notes || '',
-            date: dateToUse
+            date: dateToUse,
+            paymentMethod: saving.paymentMethod || ''
         })
     }
 
     const cancelEdit = () => {
         setEditingId(null)
-        setEditData({ category: '', description: '', monthlyDeposit: '', currency: 'ILS', goal: '', date: new Date() })
+        setEditData({ category: '', description: '', monthlyDeposit: '', currency: 'ILS', goal: '', date: new Date(), paymentMethod: '' })
     }
 
     async function handleUpdate(id: string) {
@@ -265,7 +272,8 @@ export function SavingsTab() {
             monthlyDeposit: parseFloat(editData.monthlyDeposit),
             currency: editData.currency,
             goal: editData.goal || undefined,
-            date: editData.date
+            date: editData.date,
+            paymentMethod: editData.paymentMethod || undefined
         })
 
         if (result.success) {
@@ -415,6 +423,13 @@ export function SavingsTab() {
                             </div>
                         </div>
 
+                        <div className="w-full">
+                            <PaymentMethodSelector
+                                value={newSaving.paymentMethod}
+                                onChange={(val) => setNewSaving({ ...newSaving, paymentMethod: val })}
+                            />
+                        </div>
+
                         <div className="w-full space-y-2">
                             <label className="text-sm font-medium text-gray-700">תאריך</label>
                             <DatePicker
@@ -538,6 +553,14 @@ export function SavingsTab() {
                                                         />
                                                     </div>
                                                 </div>
+
+                                                <div className="w-full">
+                                                    <PaymentMethodSelector
+                                                        value={editData.paymentMethod}
+                                                        onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                                    />
+                                                </div>
+
                                                 <div className="flex justify-end gap-2 mt-2">
                                                     <Button size="sm" onClick={() => handleUpdate(saving.id)} className="bg-green-600 hover:bg-green-700 text-white">
                                                         <Check className="h-4 w-4 ml-1" /> שמור
@@ -576,6 +599,12 @@ export function SavingsTab() {
                                                                     <>
                                                                         <span>•</span>
                                                                         <span>יעד: {saving.notes}</span>
+                                                                    </>
+                                                                )}
+                                                                {saving.paymentMethod && (
+                                                                    <>
+                                                                        <span>•</span>
+                                                                        <span>{saving.paymentMethod}</span>
                                                                     </>
                                                                 )}
                                                             </div>

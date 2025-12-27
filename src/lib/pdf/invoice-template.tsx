@@ -47,6 +47,27 @@ const styles = StyleSheet.create({
         color: '#6b7280',
         lineHeight: 1.4 // Reduced from 1.5
     },
+    companyInfoRow: {
+        flexDirection: 'row-reverse',
+        justifyContent: 'flex-start', // Align to right (items start from right in row-reverse? No, start is right in row-reverse. justify-start packs them to the start (Right). No wait. row-reverse starts at right. justify-start packs to right. Yes.
+        alignItems: 'center',
+        marginBottom: 1
+    },
+    companyInfoLabel: {
+        fontSize: 9,
+        color: '#6b7280',
+        marginLeft: 4 // Space between label and value (since label is on right, value on left. marginLeft on label pushes it... wait. Label is Item 1 (Right). Value is Item 2 (Left). MarginLeft on Label pushes away from... Left neighbor? No left neighbor for Item 1. MarginLeft pushes... ) 
+        // Better: MarginRight on Value? Or MarginLeft on Label if it affects gap?
+        // Let's use gap if supported or margin on the label.
+        // In row-reverse: Item 1 (Right), Item 2 (Left).
+        // If I put marginLeft on Item 1, it pushes away from Item 2? No.
+        // Let's just put padding on one.
+    },
+    companyInfoValue: {
+        fontSize: 9,
+        color: '#6b7280',
+        marginRight: 4
+    },
     section: {
         marginBottom: 15, // Reduced from 20
         padding: 10, // Reduced from 15
@@ -217,12 +238,47 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                 {/* Company Info */}
                 <View style={styles.companyInfo}>
                     <Text style={styles.companyName}>{data.businessName}</Text>
-                    <Text style={styles.companyDetails}>
-                        {data.businessId && `ע.מ: ${data.businessId}\n`}
-                        {data.businessAddress && `${data.businessAddress}\n`}
-                        {data.businessPhone && `טלפון: ${data.businessPhone}\n`}
-                        {data.businessEmail && `אימייל: ${data.businessEmail}`}
-                    </Text>
+
+                    {/* Rows for details to ensure correct RTL layout */}
+                    {data.businessId && (
+                        <View style={styles.companyInfoRow}>
+                            <Text style={styles.companyInfoLabel}>:ע.מ</Text>
+                            <Text style={styles.companyInfoValue}>{data.businessId}</Text>
+                        </View>
+                    )}
+                    {data.businessAddress && (
+                        <View style={styles.companyInfoRow}>
+                            <Text style={styles.companyInfoValue}>{data.businessAddress}</Text>
+                            {/* Address usually doesn't have a label in the original single-block text, but let's leave it as just text if no label needed, or format as row if we want consistency. Original was just address line. */}
+                        </View>
+                    )}
+                    {/* Actually original was: businessAddress\n */}
+                    {/* If address is pure text, better to stick to Text block? Or Row?
+                         If address has mixed English/Hebrew, Row is safer?
+                         Original: Just `${data.businessAddress}\n`
+                         Let's keep Address simple, or just put it in a View.
+                         Wait, if I split into rows, I lose the single-block "Text" container wrapping.
+                         I should just render a Text for address.
+                      */}
+                    {data.businessAddress && (
+                        <View style={{ flexDirection: 'row-reverse', justifyContent: 'flex-start', marginBottom: 1 }}>
+                            <Text style={{ fontSize: 9, color: '#6b7280' }}>{data.businessAddress}</Text>
+                        </View>
+                    )}
+
+                    {data.businessPhone && (
+                        <View style={styles.companyInfoRow}>
+                            <Text style={styles.companyInfoLabel}>:טלפון</Text>
+                            <Text style={styles.companyInfoValue}>{data.businessPhone}</Text>
+                        </View>
+                    )}
+
+                    {data.businessEmail && (
+                        <View style={styles.companyInfoRow}>
+                            <Text style={styles.companyInfoLabel}>:אימייל</Text>
+                            <Text style={styles.companyInfoValue}>{data.businessEmail}</Text>
+                        </View>
+                    )}
                 </View>
 
                 {/* Client Section */}

@@ -14,8 +14,8 @@ export async function GET(
 
         const quoteId = params.id
 
-        // Generate PDF buffer
-        const buffer = await generateQuotePDF({
+        // Generate PDF buffer and filename
+        const { buffer, filename } = await generateQuotePDF({
             quoteId,
             userId: user.id
         })
@@ -24,7 +24,7 @@ export async function GET(
         return new NextResponse(new Uint8Array(buffer), {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename="quote-${quoteId}.pdf"`,
+                'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
             },
         })
     } catch (error) {

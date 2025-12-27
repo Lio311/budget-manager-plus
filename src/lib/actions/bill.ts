@@ -15,14 +15,23 @@ export async function getBills(month: number, year: number, type: 'PERSONAL' | '
             orderBy: { dueDate: 'asc' }
         })
 
-        // Calculate total in ILS
+        // Calculate totals in ILS
         let totalILS = 0
+        let totalPaidILS = 0
+        let totalUnpaidILS = 0
+
         for (const bill of bills) {
             const amountInILS = await convertToILS(bill.amount, bill.currency)
             totalILS += amountInILS
+
+            if (bill.isPaid) {
+                totalPaidILS += amountInILS
+            } else {
+                totalUnpaidILS += amountInILS
+            }
         }
 
-        return { success: true, data: { bills, totalILS } }
+        return { success: true, data: { bills, totalILS, totalPaidILS, totalUnpaidILS } }
     } catch (error) {
         console.error('Error fetching bills:', error)
         return { success: false, error: 'Failed to fetch bills' }
@@ -32,7 +41,7 @@ export async function getBills(month: number, year: number, type: 'PERSONAL' | '
 export async function addBill(
     month: number,
     year: number,
-    data: { name: string; amount: number; currency: string; dueDay: number },
+    data: { name: string; amount: number; currency: string; dueDay: number; paymentMethod?: string },
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
@@ -48,7 +57,8 @@ export async function addBill(
                 amount: data.amount,
                 currency: data.currency,
                 dueDate: dueDate,
-                isPaid: false
+                isPaid: false,
+                paymentMethod: data.paymentMethod
             }
         })
 
@@ -67,6 +77,7 @@ export async function updateBill(
         amount?: number
         currency?: string
         dueDay?: number
+        paymentMethod?: string
     }
 ) {
     try {
@@ -85,7 +96,8 @@ export async function updateBill(
                 ...(data.name && { name: data.name }),
                 ...(data.amount && { amount: data.amount }),
                 ...(data.currency && { currency: data.currency }),
-                ...(newDueDate && { dueDate: newDueDate })
+                ...(newDueDate && { dueDate: newDueDate }),
+                ...(data.paymentMethod !== undefined && { paymentMethod: data.paymentMethod })
             }
         })
 

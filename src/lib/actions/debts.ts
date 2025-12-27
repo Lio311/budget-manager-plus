@@ -72,7 +72,8 @@ async function createDebtInstallments(
     dueDay: number,
     currentMonth: number,
     currentYear: number,
-    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL',
+    paymentMethod?: string
 ) {
     const monthlyPayment = Math.round((totalDebtAmount / numberOfInstallments) * 100) / 100
     const recurringSourceId = `debt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -101,7 +102,8 @@ async function createDebtInstallments(
             recurringSourceId,
             totalDebtAmount,
             numberOfInstallments,
-            installmentNumber: i + 1
+            installmentNumber: i + 1,
+            paymentMethod
         })
     }
 
@@ -123,6 +125,7 @@ export async function addDebt(
         isRecurring?: boolean
         totalDebtAmount?: number
         numberOfInstallments?: number
+        paymentMethod?: string
     },
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
@@ -140,7 +143,8 @@ export async function addDebt(
                 data.dueDay,
                 month,
                 year,
-                type
+                type,
+                data.paymentMethod
             )
         } else {
             // Regular single debt
@@ -153,7 +157,8 @@ export async function addDebt(
                     currency: data.currency,
                     monthlyPayment: data.monthlyPayment,
                     dueDay: data.dueDay,
-                    isPaid: false
+                    isPaid: false,
+                    paymentMethod: data.paymentMethod
                 }
             })
         }
@@ -175,6 +180,7 @@ export async function updateDebt(
         currency: string
         monthlyPayment: number
         dueDay: number
+        paymentMethod?: string
     }
 ) {
     try {
@@ -186,7 +192,8 @@ export async function updateDebt(
                 totalAmount: data.totalAmount,
                 currency: data.currency,
                 monthlyPayment: data.monthlyPayment,
-                dueDay: data.dueDay
+                dueDay: data.dueDay,
+                ...(data.paymentMethod !== undefined && { paymentMethod: data.paymentMethod })
             }
         })
 

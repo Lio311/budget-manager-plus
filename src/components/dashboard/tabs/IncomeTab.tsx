@@ -19,6 +19,7 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { addIncome, getIncomes, updateIncome, deleteIncome } from '@/lib/actions/income'
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { getClients } from '@/lib/actions/clients'
+import { PaymentMethodSelector } from '@/components/PaymentMethodSelector' // Assuming this component exists
 
 interface Category {
     id: string
@@ -41,6 +42,8 @@ interface Income {
     client?: Client | null
     invoice?: any | null
     vatAmount?: number | null
+    payer?: string | null
+    paymentMethod?: string | null
 }
 
 interface IncomeData {
@@ -108,7 +111,9 @@ export function IncomeTab() {
         clientId: '',
         amountBeforeVat: '',
         vatRate: '0.18',
-        vatAmount: ''
+        vatAmount: '',
+        paymentMethod: '',
+        payer: ''
     })
 
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -119,7 +124,9 @@ export function IncomeTab() {
         currency: 'ILS',
         date: '',
         clientId: '',
-        vatAmount: ''
+        vatAmount: '',
+        paymentMethod: '',
+        payer: ''
     })
 
     // ... (rest of the logic)
@@ -159,7 +166,9 @@ export function IncomeTab() {
                 clientId: isBusiness ? newIncome.clientId || undefined : undefined,
                 amountBeforeVat: isBusiness ? parseFloat(newIncome.amountBeforeVat) : undefined,
                 vatRate: isBusiness ? parseFloat(newIncome.vatRate) : undefined,
-                vatAmount: isBusiness ? parseFloat(newIncome.vatAmount) : undefined
+                vatAmount: isBusiness ? parseFloat(newIncome.vatAmount) : undefined,
+                paymentMethod: newIncome.paymentMethod || undefined,
+                payer: newIncome.payer || undefined
             }, budgetType)
 
             if (result.success) {
@@ -175,7 +184,9 @@ export function IncomeTab() {
                     clientId: '',
                     amountBeforeVat: '',
                     vatRate: '0.18',
-                    vatAmount: ''
+                    vatAmount: '',
+                    paymentMethod: '',
+                    payer: ''
                 })
                 await mutateIncomes()
             } else {
@@ -253,7 +264,9 @@ export function IncomeTab() {
             currency: income.currency || 'ILS',
             date: income.date ? format(new Date(income.date), 'yyyy-MM-dd') : '',
             clientId: income.clientId || '',
-            vatAmount: income.vatAmount?.toString() || ''
+            vatAmount: income.vatAmount?.toString() || '',
+            paymentMethod: income.paymentMethod || '',
+            payer: income.payer || ''
         })
     }
 
@@ -267,7 +280,9 @@ export function IncomeTab() {
             currency: editData.currency,
             date: editData.date || undefined,
             clientId: isBusiness ? editData.clientId || undefined : undefined,
-            vatAmount: isBusiness ? parseFloat(editData.vatAmount) || undefined : undefined
+            vatAmount: isBusiness ? parseFloat(editData.vatAmount) || undefined : undefined,
+            paymentMethod: editData.paymentMethod || undefined,
+            payer: editData.payer || undefined
         })
 
         if (result.success) {
@@ -403,6 +418,25 @@ export function IncomeTab() {
                             </div>
                         )}
 
+                        {/* Payer Input (Optional) */}
+                        <div className="w-full">
+                            <label className="text-xs font-bold mb-1.5 block text-[#676879]">התקבל מ... (אופציונלי)</label>
+                            <Input
+                                className="h-10 border-gray-200 focus:ring-blue-500/20"
+                                placeholder="שם המשלם"
+                                value={newIncome.payer}
+                                onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
+                            />
+                        </div>
+
+                        {/* Payment Method Selector */}
+                        <div className="w-full">
+                            <PaymentMethodSelector
+                                value={newIncome.paymentMethod}
+                                onChange={(val) => setNewIncome({ ...newIncome, paymentMethod: val })}
+                            />
+                        </div>
+
                         <div className="w-full">
                             <label className="text-xs font-bold mb-1.5 block text-[#676879]">תאריך קבלה</label>
                             <DatePicker date={newIncome.date ? new Date(newIncome.date) : undefined} setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
@@ -448,10 +482,13 @@ export function IncomeTab() {
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-2 gap-3">
                                             <Input placeholder="תיאור" value={editData.source} onChange={e => setEditData({ ...editData, source: e.target.value })} />
-                                            <select className="p-2 border rounded-lg bg-white text-sm" value={editData.clientId} onChange={e => setEditData({ ...editData, clientId: e.target.value })}>
-                                                <option value="">ללא לקוח</option>
-                                                {clientsData.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                            </select>
+                                            <Input placeholder="התקבל מ..." value={editData.payer} onChange={e => setEditData({ ...editData, payer: e.target.value })} />
+                                        </div>
+                                        <div className="w-full">
+                                            <PaymentMethodSelector
+                                                value={editData.paymentMethod}
+                                                onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                            />
                                         </div>
                                         <div className="grid grid-cols-3 gap-3">
                                             <Input type="number" value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} />
@@ -486,6 +523,18 @@ export function IncomeTab() {
                                                     <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                     <span className="w-1 h-1 rounded-full bg-gray-300" />
                                                     <span>{income.category}</span>
+                                                    {income.payer && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                            <span>מאת: {income.payer}</span>
+                                                        </>
+                                                    )}
+                                                    {income.paymentMethod && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                            <span>{income.paymentMethod}</span>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
