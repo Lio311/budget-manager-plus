@@ -35,13 +35,27 @@ export default function PlansPage() {
                 'פרופיל עסקי ואישי נפרדים',
                 'ניהול נכסים ופחת'
             ],
+            recommended: false
+        },
+        {
+            id: 'COMBINED',
+            name: 'משולב - פרטי ועסקי',
+            price: 169,
+            description: 'גישה מלאה לשני הממשקים',
+            features: [
+                "כל הפיצ'רים מהתוכנית הפרטית",
+                "כל הפיצ'רים מהתוכנית העסקית",
+                'מעבר חופשי בין ממשק פרטי לעסקי',
+                'ניהול נפרד של תקציב אישי ועסקי',
+                'חיסכון של 49 ₪ לעומת רכישה נפרדת'
+            ],
             recommended: true
         }
     ]
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col justify-center py-4 px-4 sm:px-6 lg:px-8" dir="rtl">
-            <div className="max-w-4xl mx-auto text-center mb-6">
+            <div className="max-w-6xl mx-auto text-center mb-6">
                 <Image
                     src="/K-LOGO.png"
                     alt="KesefFlow"
@@ -57,7 +71,7 @@ export default function PlansPage() {
                 </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto w-full">
+            <div className="grid md:grid-cols-3 gap-4 max-w-6xl mx-auto w-full">
                 {plans.map((plan) => (
                     <div
                         key={plan.id}

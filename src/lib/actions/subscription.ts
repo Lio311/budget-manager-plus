@@ -45,73 +45,83 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
         // Calculate end date for 1 year from now
         const endDate = addYears(new Date(), 1)
 
-        console.log('Creating BOTH PERSONAL and BUSINESS subscriptions in database')
+        // Determine which subscriptions to create based on plan type
+        const createBoth = planType === 'COMBINED'
+        const createPersonal = planType === 'PERSONAL' || createBoth
+        const createBusiness = planType === 'BUSINESS' || createBoth
 
-        // Create or update BOTH subscriptions in a transaction
+        console.log(`Creating subscriptions: PERSONAL=${createPersonal}, BUSINESS=${createBusiness}`)
+
+        // Create or update subscriptions in a transaction
         const result = await prisma.$transaction(async (tx) => {
-            // Create/update PERSONAL subscription
-            const personalSubscription = await tx.subscription.upsert({
-                where: {
-                    userId_planType: {
+            let personalSubscription = null
+            let businessSubscription = null
+
+            // Create/update PERSONAL subscription if needed
+            if (createPersonal) {
+                personalSubscription = await tx.subscription.upsert({
+                    where: {
+                        userId_planType: {
+                            userId,
+                            planType: 'PERSONAL'
+                        }
+                    },
+                    update: {
+                        status: 'active',
+                        startDate: new Date(),
+                        endDate,
+                        paypalOrderId,
+                        lastPaymentDate: new Date(),
+                        lastPaymentAmount: amount,
+                        couponCode: couponCode || null,
+                    },
+                    create: {
                         userId,
-                        planType: 'PERSONAL'
-                    }
-                },
-                update: {
-                    status: 'active',
-                    startDate: new Date(),
-                    endDate,
-                    paypalOrderId,
-                    lastPaymentDate: new Date(),
-                    lastPaymentAmount: amount,
-                    couponCode: couponCode || null, // Updated
-                },
-                create: {
-                    userId,
-                    status: 'active',
-                    planType: 'PERSONAL',
-                    startDate: new Date(),
-                    endDate,
-                    paypalOrderId,
-                    lastPaymentDate: new Date(),
-                    lastPaymentAmount: amount,
-                    couponCode: couponCode || null, // Updated
-                },
-            })
+                        status: 'active',
+                        planType: 'PERSONAL',
+                        startDate: new Date(),
+                        endDate,
+                        paypalOrderId,
+                        lastPaymentDate: new Date(),
+                        lastPaymentAmount: amount,
+                        couponCode: couponCode || null,
+                    },
+                })
+                console.log('PERSONAL subscription created/updated:', personalSubscription.id)
+            }
 
-            console.log('PERSONAL subscription created/updated:', personalSubscription.id)
-
-            // Create/update BUSINESS subscription
-            const businessSubscription = await tx.subscription.upsert({
-                where: {
-                    userId_planType: {
+            // Create/update BUSINESS subscription if needed
+            if (createBusiness) {
+                businessSubscription = await tx.subscription.upsert({
+                    where: {
+                        userId_planType: {
+                            userId,
+                            planType: 'BUSINESS'
+                        }
+                    },
+                    update: {
+                        status: 'active',
+                        startDate: new Date(),
+                        endDate,
+                        paypalOrderId,
+                        lastPaymentDate: new Date(),
+                        lastPaymentAmount: amount,
+                        couponCode: couponCode || null,
+                    },
+                    create: {
                         userId,
-                        planType: 'BUSINESS'
-                    }
-                },
-                update: {
-                    status: 'active',
-                    startDate: new Date(),
-                    endDate,
-                    paypalOrderId,
-                    lastPaymentDate: new Date(),
-                    lastPaymentAmount: amount,
-                    couponCode: couponCode || null, // Updated
-                },
-                create: {
-                    userId,
-                    status: 'active',
-                    planType: 'BUSINESS',
-                    startDate: new Date(),
-                    endDate,
-                    paypalOrderId,
-                    lastPaymentDate: new Date(),
-                    lastPaymentAmount: amount,
-                    couponCode: couponCode || null, // Updated
-                },
-            })
-
-            console.log('BUSINESS subscription created/updated:', businessSubscription.id)
+                        status: 'active',
+                        planType: 'BUSINESS',
+                        startDate: new Date(),
+                        endDate,
+                        paypalOrderId,
+                        lastPaymentDate: new Date(),
+                        lastPaymentAmount: amount,
+                        couponCode: couponCode || null,
+                    },
+                })
+                console.log('BUSINESS subscription created/updated:', businessSubscription.id)
+            }
 
             // Record payment
             const payment = await tx.paymentHistory.create({
@@ -129,7 +139,7 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
             return { personalSubscription, businessSubscription, payment }
         })
 
-        console.log('createSubscription completed successfully - created both subscriptions')
+        console.log('createSubscription completed successfully')
 
         return result
     } catch (error) {
