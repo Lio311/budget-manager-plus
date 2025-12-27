@@ -4,7 +4,7 @@ import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/
 // Define styles with green/black/white theme
 const styles = StyleSheet.create({
     page: {
-        padding: 40,
+        padding: 30, // Reduced from 40
         backgroundColor: '#ffffff',
         fontFamily: 'Alef',
     },
@@ -12,78 +12,78 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: 30,
-        paddingBottom: 20,
+        marginBottom: 20, // Reduced from 30
+        paddingBottom: 15, // Reduced from 20
         borderBottom: '3px solid #10b981'
     },
     logo: {
-        width: 80,
-        height: 80,
+        width: 60, // Reduced from 80
+        height: 60, // Reduced from 80
         objectFit: 'contain'
     },
     invoiceTitle: {
-        fontSize: 28,
+        fontSize: 24, // Reduced from 28
         fontWeight: 'normal',
         color: '#10b981',
     },
     invoiceNumber: {
-        fontSize: 14,
+        fontSize: 12, // Reduced from 14
         color: '#6b7280',
-        marginTop: 5
+        marginTop: 3 // Reduced from 5
     },
     companyInfo: {
         alignItems: 'flex-end',
         textAlign: 'right',
-        marginBottom: 20
+        marginBottom: 15 // Reduced from 20
     },
     companyName: {
-        fontSize: 18,
+        fontSize: 16, // Reduced from 18
         fontWeight: 'normal',
         color: '#1f2937',
-        marginBottom: 5
+        marginBottom: 3 // Reduced from 5
     },
     companyDetails: {
-        fontSize: 10,
+        fontSize: 9, // Reduced from 10
         color: '#6b7280',
-        lineHeight: 1.5
+        lineHeight: 1.4 // Reduced from 1.5
     },
     section: {
-        marginBottom: 20,
-        padding: 15,
+        marginBottom: 15, // Reduced from 20
+        padding: 10, // Reduced from 15
         backgroundColor: '#f9fafb',
         borderRadius: 8,
         borderRight: '4px solid #10b981'
     },
     sectionTitle: {
-        fontSize: 12,
+        fontSize: 11, // Reduced from 12
         fontWeight: 'normal',
         color: '#1f2937',
-        marginBottom: 10,
+        marginBottom: 5, // Reduced from 10
         textAlign: 'right'
     },
     row: {
         flexDirection: 'row-reverse',
         justifyContent: 'space-between',
-        marginBottom: 5
+        marginBottom: 3 // Reduced from 5
     },
     label: {
-        fontSize: 10,
+        fontSize: 9, // Reduced from 10
         color: '#6b7280',
         textAlign: 'right'
     },
     value: {
-        fontSize: 10,
+        fontSize: 9, // Reduced from 10
         color: '#1f2937',
         fontWeight: 'normal',
         textAlign: 'right'
     },
     divider: {
         borderBottom: '1px solid #e5e7eb',
-        marginVertical: 15
+        marginVertical: 10 // Reduced from 15
     },
     totalsSection: {
-        marginTop: 20,
-        padding: 20,
+        marginTop: 15, // Reduced from 20
+        padding: 15, // Reduced from 20
         backgroundColor: '#10b981',
         borderRadius: 8
     },
@@ -91,62 +91,62 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8
+        marginBottom: 5 // Reduced from 8
     },
     totalLabel: {
-        fontSize: 12,
+        fontSize: 11, // Reduced from 12
         color: '#ffffff',
     },
     totalValue: {
-        fontSize: 12,
+        fontSize: 11, // Reduced from 12
         color: '#ffffff',
         fontWeight: 'normal',
     },
     grandTotalRow: {
         flexDirection: 'row-reverse',
         justifyContent: 'space-between',
-        marginTop: 10,
-        paddingTop: 10,
+        marginTop: 8, // Reduced from 10
+        paddingTop: 8, // Reduced from 10
         borderTop: '2px solid #ffffff'
     },
     grandTotalLabel: {
-        fontSize: 18,
+        fontSize: 16, // Reduced from 18
         color: '#ffffff',
         fontWeight: 'normal',
     },
     grandTotalValue: {
-        fontSize: 18,
+        fontSize: 16, // Reduced from 18
         color: '#ffffff',
         fontWeight: 'normal',
     },
     footer: {
         position: 'absolute',
-        bottom: 30,
-        left: 40,
-        right: 40,
+        bottom: 20, // Reduced from 30
+        left: 30, // Reduced from 40
+        right: 30, // Reduced from 40
         textAlign: 'center',
-        paddingTop: 20,
+        paddingTop: 10, // Reduced from 20
         borderTop: '1px solid #e5e7eb'
     },
     footerText: {
-        fontSize: 9,
+        fontSize: 8, // Reduced from 9
         color: '#9ca3af',
-        marginBottom: 5
+        marginBottom: 3 // Reduced from 5
     },
     poweredBy: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 10
+        marginTop: 5 // Reduced from 10
     },
     poweredByText: {
-        fontSize: 8,
+        fontSize: 7, // Reduced from 8
         color: '#6b7280',
         marginLeft: 5
     },
     poweredByLogo: {
-        width: 60,
-        height: 20,
+        width: 50, // Reduced from 60
+        height: 15, // Reduced from 20
         objectFit: 'contain'
     }
 })
