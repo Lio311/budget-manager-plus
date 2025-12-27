@@ -123,11 +123,11 @@ export function BudgetLimitsTab() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card className="flex flex-col justify-center items-center p-6 bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-100">
+                <Card className="flex flex-col justify-center items-center p-6 bg-white/50 border-dashed border-2">
                     <Button
                         onClick={handleSmartRecommendations}
                         disabled={activeDefaults}
-                        className="w-full h-full bg-white hover:bg-yellow-50 text-yellow-700 border border-yellow-200 shadow-sm gap-2"
+                        className="w-full h-full bg-transparent hover:bg-yellow-50 text-yellow-700 border-2 border-yellow-100 hover:border-yellow-200 shadow-none gap-2"
                         variant="outline"
                     >
                         {activeDefaults ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5 text-yellow-500" />}
