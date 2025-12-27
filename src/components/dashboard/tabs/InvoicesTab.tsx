@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle } from 'lucide-react'
+import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getInvoices, createInvoice, updateInvoiceStatus, getNextInvoiceNumber, type InvoiceFormData } from '@/lib/actions/invoices'
 import { getClients } from '@/lib/actions/clients'
@@ -84,6 +84,27 @@ export function InvoicesTab() {
             mutate()
         } else {
             toast.error(result.error || 'שגיאה בעדכון הסטטוס')
+        }
+    }
+
+    const handleDownloadPDF = async (invoiceId: string) => {
+        try {
+            const response = await fetch(`/api/invoices/${invoiceId}/pdf`)
+            if (!response.ok) throw new Error('Failed to download PDF')
+
+            const blob = await response.blob()
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `invoice-${invoiceId}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(a)
+
+            toast.success('PDF הורד בהצלחה')
+        } catch (error) {
+            toast.error('שגיאה בהורדת PDF')
         }
     }
 
@@ -322,17 +343,27 @@ export function InvoicesTab() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <select
-                                            value={invoice.status}
-                                            onChange={(e) => handleStatusChange(invoice.id, e.target.value)}
-                                            className="text-sm border border-gray-300 rounded px-2 py-1"
-                                        >
-                                            <option value="DRAFT">טיוטה</option>
-                                            <option value="SENT">נשלח</option>
-                                            <option value="PAID">שולם</option>
-                                            <option value="OVERDUE">באיחור</option>
-                                            <option value="CANCELLED">בוטל</option>
-                                        </select>
+                                        <div className="flex gap-2">
+                                            <select
+                                                value={invoice.status}
+                                                onChange={(e) => handleStatusChange(invoice.id, e.target.value)}
+                                                className="text-sm border border-gray-300 rounded px-2 py-1"
+                                            >
+                                                <option value="DRAFT">טיוטה</option>
+                                                <option value="SENT">נשלח</option>
+                                                <option value="PAID">שולם</option>
+                                                <option value="OVERDUE">באיחור</option>
+                                                <option value="CANCELLED">בוטל</option>
+                                            </select>
+                                            <Button
+                                                onClick={() => handleDownloadPDF(invoice.id)}
+                                                size="sm"
+                                                variant="outline"
+                                                className="bg-green-50 hover:bg-green-100 border-green-200"
+                                            >
+                                                <Download className="h-4 w-4 text-green-600" />
+                                            </Button>
+                                        </div>
                                     </td>
                                 </tr>
                             )

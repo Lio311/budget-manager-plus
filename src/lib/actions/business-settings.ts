@@ -8,6 +8,9 @@ export interface BusinessProfileData {
     companyName: string
     companyId?: string
     vatStatus: string
+    address?: string
+    phone?: string
+    email?: string
 }
 
 export async function getBusinessProfile() {
@@ -36,13 +39,19 @@ export async function updateBusinessProfile(data: BusinessProfileData) {
             update: {
                 companyName: data.companyName,
                 companyId: data.companyId,
-                vatStatus: data.vatStatus
+                vatStatus: data.vatStatus,
+                address: data.address,
+                phone: data.phone,
+                email: data.email
             },
             create: {
                 userId: user.id,
                 companyName: data.companyName,
                 companyId: data.companyId,
-                vatStatus: data.vatStatus
+                vatStatus: data.vatStatus,
+                address: data.address,
+                phone: data.phone,
+                email: data.email
             }
         })
 

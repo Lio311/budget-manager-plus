@@ -22,7 +22,7 @@ import { toast } from 'sonner'
 import { swrConfig } from '@/lib/swr-config'
 import { FeedbackButton } from '@/components/dashboard/FeedbackButton'
 import { FinancialAdvisorButton } from '@/components/dashboard/FinancialAdvisorButton'
-import { BusinessLogoUpload } from '@/components/settings/BusinessLogoUpload'
+import { BusinessSettings } from '@/components/settings/BusinessSettings'
 
 interface Category {
     id: string
@@ -271,7 +271,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
                                 {budgetType === 'BUSINESS' ? (
-                                    <BusinessLogoUpload />
+                                    <BusinessSettings />
                                 ) : (
                                     <>
                                         <div className="grid grid-cols-4 items-center gap-4">

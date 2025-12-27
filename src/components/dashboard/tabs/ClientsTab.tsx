@@ -191,6 +191,7 @@ export function ClientsTab() {
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                                    dir="rtl"
                                 />
                             </div>
                         </div>
