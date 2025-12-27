@@ -50,7 +50,20 @@ export function InvoicesTab() {
 
     const invoicesFetcher = async () => {
         const result = await getInvoices(budgetType)
-        return result.data || []
+        if (!result.success || !result.data) return []
+
+        return result.data.map((inv: any) => ({
+            id: inv.id,
+            invoiceNumber: inv.invoiceNumber,
+            clientName: inv.client?.name || 'לקוח לא ידוע',
+            clientId: inv.clientId,
+            date: inv.issueDate,
+            dueDate: inv.dueDate,
+            status: inv.status as any,
+            totalAmount: inv.total,
+            vatAmount: inv.vatAmount,
+            items: [] // Items are not currently fetched in the list view
+        }))
     }
 
     const clientsFetcher = async () => {
