@@ -78,6 +78,9 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                         <SparkleIcon className="h-5 w-5" />
                         ייעוץ פיננסי מבוסס AI
                     </DialogTitle>
+                    <div className="sr-only">
+                        ניתוח פיננסי אוטומטי המבוסס על נתוני ההכנסות וההוצאות שלך
+                    </div>
                 </DialogHeader>
 
                 {isCached && expiresIn && (
