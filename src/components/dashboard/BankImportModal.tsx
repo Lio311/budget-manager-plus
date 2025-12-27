@@ -286,7 +286,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                                         {previewData.length > 5 && (
                                             <tr>
                                                 <td colSpan={3} className="p-2 text-center text-gray-400 italic">
-                                                    ...ועוד {previewData.length - 5} רשומות
+                                                    ועוד {previewData.length - 5} רשומות...
                                                 </td>
                                             </tr>
                                         )}
@@ -297,15 +297,15 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                     )}
 
                     <div className="flex justify-end gap-2 pt-2">
-                        <Button variant="outline" onClick={() => setOpen(false)}>ביטול</Button>
                         <Button
                             onClick={handleImport}
                             disabled={previewData.length === 0 || importing}
                             className="bg-green-600 hover:bg-green-700 text-white gap-2"
                         >
                             {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                            אשר וייבא
+                            ייבוא
                         </Button>
+                        <Button variant="outline" onClick={() => setOpen(false)}>ביטול</Button>
                     </div>
                 </div>
             </DialogContent>
