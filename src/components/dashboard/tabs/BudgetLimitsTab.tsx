@@ -160,7 +160,7 @@ export function BudgetLimitsTab() {
                         }}
                         value=""
                     >
-                        <option value="" disabled>+ הוסף תקציב לקטגוריה</option>
+                        <option value="" disabled>הוסף תקציב לקטגוריה</option>
                         {availableCategories.length === 0 && <option disabled>אין קטגוריות נוספות</option>}
                         {availableCategories.map(cat => (
                             <option key={cat.categoryId} value={cat.categoryId}>{cat.categoryName}</option>

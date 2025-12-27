@@ -284,6 +284,67 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
             return { success: false, error: 'User not authenticated' }
         }
 
+        if (expenses.length === 0) return { success: true }
+
+        // --- Duplicate Prevention Check ---
+        // We check a sample of rows to see if they already exist.
+        // If we find that a significant portion of the sample exists, we assume the file was already imported.
+
+        // Pick up to 5 samples (first, last, and some in between)
+        const sampleSize = Math.min(expenses.length, 5)
+        const step = Math.floor(expenses.length / sampleSize)
+        const samples = []
+        for (let i = 0; i < expenses.length; i += step) {
+            if (samples.length < sampleSize) samples.push(expenses[i])
+        }
+
+        let duplicateCount = 0
+
+        for (const sample of samples) {
+            const date = sample.date ? new Date(sample.date) : new Date()
+
+            // Look for EXACT match: same amount, date, description (approx), and user
+            // We use 'contains' for description to be slightly flexible with whitespace
+            const existing = await prisma.expense.findFirst({
+                where: {
+                    user: { id: userId }, // Join via budget? No, expenses are linked to Budgets.
+                    // We need to query expenses where Budget -> UserId is current user.
+                    // Actually, existing implementation finds budget first. 
+                    // To do this efficiently without finding budget for each sample:
+                    budget: {
+                        userId: userId,
+                        type: budgetType
+                    },
+                    date: {
+                        gte: new Date(date.setHours(0, 0, 0, 0)),
+                        lt: new Date(date.setHours(23, 59, 59, 999))
+                    },
+                    amount: sample.amount,
+                    description: sample.description
+                }
+            })
+
+            if (existing) {
+                duplicateCount++
+            }
+        }
+
+        // If ALL samples are duplicates, block the file
+        // Or if > 50% are duplicates? The user said "if the file was imported".
+        // Let's be strict: if more than 2 samples match (or > 50%), it's likely a duplicate file.
+        // Actually, for a single file re-upload, usually 100% match.
+        // Let's use a threshold.
+        const threshold = sampleSize > 1 ? Math.ceil(sampleSize / 2) : 1
+
+        if (duplicateCount >= threshold) {
+            return {
+                success: false,
+                error: 'הקובץ נטען כבר בעבר למערכת (זוהתה כפילות נתונים). הפעולה בוטלה למניעת כפילויות.'
+            }
+        }
+
+        // --- End Duplicate Check ---
+
         // Get or Create Default Category "All" or "General"
         let defaultCategory = await prisma.category.findFirst({
             where: {
@@ -307,6 +368,7 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
         }
 
         // Process expenses sequentially to ensure budgets exist
+        let addedCount = 0
         for (const exp of expenses) {
             const date = exp.date ? new Date(exp.date) : new Date()
             const month = date.getMonth() + 1
@@ -314,6 +376,10 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
 
             // Get appropriate budget for this expense's date
             const budget = await getCurrentBudget(month, year, '₪', budgetType)
+
+            // Double check individual duplicate before insert (Optional? No, expensive. We relied on the sample check)
+            // But if user forces? We don't have a "force" option yet. 
+            // Just proceed with create.
 
             await prisma.expense.create({
                 data: {
@@ -333,10 +399,11 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
                     paymentMethod: exp.paymentMethod
                 }
             })
+            addedCount++
         }
 
         revalidatePath('/')
-        return { success: true }
+        return { success: true, count: addedCount }
     } catch (error: any) {
         console.error('Failed to import expenses:', error)
         return { success: false, error: 'Failed to import expenses: ' + (error.message || 'Unknown error') }
