@@ -59,7 +59,7 @@ export function DebtsTab() {
         onError: (err) => {
             toast({
                 title: 'שגיאה',
-                description: 'לא ניתן לטעון חובות',
+                description: 'לא ניתן לטעון הלוואות',
                 variant: 'destructive',
                 duration: 1000
             })
@@ -127,7 +127,7 @@ export function DebtsTab() {
     const handleAdd = async () => {
         // Validate required fields
         if (!newDebt.creditor || !newDebt.creditor.trim()) {
-            toast({ title: 'שגיאה', description: 'יש למלא שם נושה', variant: 'destructive' })
+            toast({ title: 'שגיאה', description: 'יש למלא שם מלווה', variant: 'destructive' })
             return
         }
 
@@ -182,10 +182,10 @@ export function DebtsTab() {
                 await mutate() // Refresh data
                 toast({
                     title: 'הצלחה',
-                    description: newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'החוב נוסף בהצלחה'
+                    description: newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'ההלוואה נוספה בהצלחה'
                 })
             } else {
-                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חוב', variant: 'destructive' })
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הלוואה', variant: 'destructive' })
             }
         } catch (error) {
             console.error('Add debt failed:', error)
@@ -199,7 +199,7 @@ export function DebtsTab() {
         const result = await deleteDebt(id)
         if (result.success) {
             await mutate() // Refresh data
-            toast({ title: 'הצלחה', description: 'החוב נמחק בהצלחה' })
+            toast({ title: 'הצלחה', description: 'ההלוואה נמחקה בהצלחה' })
         }
     }
 
@@ -265,7 +265,7 @@ export function DebtsTab() {
         if (result.success) {
             toast({
                 title: 'הצלחה',
-                description: 'החוב עודכן בהצלחה',
+                description: 'ההלוואה עודכנה בהצלחה',
                 duration: 1000
             })
             setEditingId(null)
@@ -274,7 +274,7 @@ export function DebtsTab() {
         } else {
             toast({
                 title: 'שגיאה',
-                description: result.error || 'לא ניתן לעדכן חוב',
+                description: result.error || 'לא ניתן לעדכן הלוואה',
                 variant: 'destructive',
                 duration: 1000
             })
@@ -292,7 +292,7 @@ export function DebtsTab() {
                         {loading ? '...' : formatCurrency(Math.abs(stats.netDebtILS), '₪')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                        {loading ? '' : stats.netDebtILS > 0 ? 'חובות שלי' : 'חייבים לי'}
+                        {loading ? '' : stats.netDebtILS > 0 ? 'הלוואות שלי' : 'חייבים לי'}
                     </p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-[#0073ea]">
@@ -319,14 +319,14 @@ export function DebtsTab() {
                 <div className="glass-panel p-5 h-fit">
                     <div className="flex items-center gap-2 mb-6">
                         <Wallet className="h-5 w-5 text-purple-600" />
-                        <h3 className="text-lg font-bold text-[#323338]">הוספת חוב</h3>
+                        <h3 className="text-lg font-bold text-[#323338]">הוספת הלוואה</h3>
                     </div>
 
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-3">
                             {/* Creditor Name */}
                             <div className="w-full">
-                                <label className="text-xs font-medium mb-1.5 block text-[#676879]">שם הנושה / חייב</label>
+                                <label className="text-xs font-medium mb-1.5 block text-[#676879]">שם המלווה / לווה</label>
                                 <Input
                                     placeholder="שם..."
                                     className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
@@ -401,6 +401,36 @@ export function DebtsTab() {
                                     תשלומים
                                 </label>
                             </div>
+
+                            {newDebt.isRecurring && (
+                                <div className="p-4 pt-0 border-t border-gray-100 mt-2 grid gap-6 grid-cols-1 sm:grid-cols-2 animate-in slide-in-from-top-2 duration-200">
+                                    <div className="space-y-1.5 mt-2">
+                                        <label className="text-xs text-[#676879]">מספר תשלומים</label>
+                                        <Input
+                                            type="number"
+                                            placeholder="12"
+                                            min="1"
+                                            className="h-10 w-24 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
+                                            value={newDebt.numberOfInstallments}
+                                            onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
+                                            disabled={submitting}
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                    {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
+                                        <div className="space-y-1.5 mt-2">
+                                            <label className="text-xs text-[#676879]">תשלום חודשי משוער</label>
+                                            <div className="h-10 px-3 py-1.5 border border-gray-200 rounded-lg bg-white text-sm flex items-center w-full font-medium text-[#323338]">
+                                                {formatCurrency(
+                                                    parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
+                                                    getCurrencySymbol(newDebt.currency)
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             <Button
                                 onClick={handleAdd}
                                 className="w-full h-10 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-all hover:shadow-md"
@@ -409,49 +439,20 @@ export function DebtsTab() {
                                 {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
                             </Button>
                         </div>
-
-                        {newDebt.isRecurring && (
-                            <div className="p-4 pt-0 border-t border-gray-100 mt-2 grid gap-6 grid-cols-1 sm:grid-cols-2 animate-in slide-in-from-top-2 duration-200">
-                                <div className="space-y-1.5 mt-2">
-                                    <label className="text-xs text-[#676879]">מספר תשלומים</label>
-                                    <Input
-                                        type="number"
-                                        placeholder="12"
-                                        min="1"
-                                        className="h-10 w-24 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
-                                        value={newDebt.numberOfInstallments}
-                                        onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
-                                        disabled={submitting}
-                                        dir="ltr"
-                                    />
-                                </div>
-                                {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
-                                    <div className="space-y-1.5 mt-2">
-                                        <label className="text-xs text-[#676879]">תשלום חודשי משוער</label>
-                                        <div className="h-10 px-3 py-1.5 border border-gray-200 rounded-lg bg-white text-sm flex items-center w-full font-medium text-[#323338]">
-                                            {formatCurrency(
-                                                parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
-                                                getCurrencySymbol(newDebt.currency)
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </div>
                 </div>
 
                 {/* Debts List */}
                 <div className="glass-panel p-5 block">
                     <div className="flex items-center gap-2 mb-4 px-2">
-                        <h3 className="text-lg font-bold text-[#323338]">רשימת חובות</h3>
+                        <h3 className="text-lg font-bold text-[#323338]">רשימת הלוואות</h3>
                     </div>
 
                     <div className="space-y-3">
                         {loading ? (
                             <div className="text-center py-10 text-gray-400">טוען...</div>
                         ) : debts.length === 0 ? (
-                            <p className="text-center text-muted-foreground py-8 italic">אין חובות רשומים</p>
+                            <p className="text-center text-muted-foreground py-8 italic">אין הלוואות רשומות</p>
                         ) : (
                             <>
                                 {paginatedDebts.map((debt) => (
@@ -463,7 +464,7 @@ export function DebtsTab() {
                                             <div className="flex flex-col gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
                                                 <div className="flex flex-wrap gap-2 w-full">
                                                     <Input
-                                                        placeholder="שם הנושה"
+                                                        placeholder="שם המלווה"
                                                         className="min-w-[120px] flex-1"
                                                         value={editData.creditor}
                                                         onChange={(e) => setEditData({ ...editData, creditor: e.target.value })}
