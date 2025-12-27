@@ -8,6 +8,18 @@ interface PaginationProps {
 }
 
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+    return (
+        <div className="flex items-center justify-center gap-2 mt-6" dir="ltr">
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="h-9 w-9 rounded-full border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all disabled:opacity-50"
+            >
+                <ChevronLeft className="h-4 w-4" />
+            </Button>
+
             <div className="flex items-center gap-1">
                 {(() => {
                     const pages = [];
@@ -70,6 +82,6 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
             >
                 <ChevronRight className="h-4 w-4" />
             </Button>
-        </div >
+        </div>
     )
 }
