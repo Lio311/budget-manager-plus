@@ -313,9 +313,10 @@ export function DebtsTab() {
                     </div>
 
                     <div className="flex flex-col gap-4">
-                        <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                                <label className="text-xs text-[#676879]">שם הנושה / חייב</label>
+                        <div className="flex flex-col gap-3">
+                            {/* Creditor Name */}
+                            <div className="w-full">
+                                <label className="text-xs font-medium mb-1.5 block text-[#676879]">שם הנושה / חייב</label>
                                 <Input
                                     placeholder="שם..."
                                     className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
@@ -324,11 +325,13 @@ export function DebtsTab() {
                                     disabled={submitting}
                                 />
                             </div>
-                            <div className="space-y-1.5 ml-2 col-span-2 sm:col-span-3 grid grid-cols-2 gap-2">
-                                <div>
-                                    <label className="text-xs text-[#676879] block mb-1">מטבע</label>
+
+                            {/* Amount & Currency */}
+                            <div className="grid grid-cols-3 gap-3 w-full">
+                                <div className="col-span-1">
+                                    <label className="text-xs font-medium mb-1.5 block text-[#676879]">מטבע</label>
                                     <select
-                                        className="w-full h-10 border-gray-200 rounded-md text-sm"
+                                        className="w-full p-2 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
                                         value={newDebt.currency}
                                         onChange={(e) => setNewDebt({ ...newDebt, currency: e.target.value })}
                                         disabled={submitting}
@@ -338,8 +341,8 @@ export function DebtsTab() {
                                         ))}
                                     </select>
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs text-[#676879]">סכום כולל</label>
+                                <div className="col-span-2">
+                                    <label className="text-xs font-medium mb-1.5 block text-[#676879]">סכום כולל</label>
                                     <Input
                                         type="number"
                                         placeholder="0.00"
@@ -351,8 +354,10 @@ export function DebtsTab() {
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                                <label className="text-xs text-[#676879]">יום חיוב</label>
+
+                            {/* Due Day */}
+                            <div className="w-full">
+                                <label className="text-xs font-medium mb-1.5 block text-[#676879]">יום חיוב</label>
                                 <Input
                                     type="number"
                                     placeholder="1"
