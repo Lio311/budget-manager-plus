@@ -21,13 +21,25 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     const [month, setMonth] = useState(1) // Default to January
     const [year, setYear] = useState(2025) // Default to 2025
     const [currency, setCurrency] = useState('₪')
-    const [budgetType, setBudgetType] = useState<BudgetType>('PERSONAL')
+    const [budgetType, setBudgetTypeInternal] = useState<BudgetType>('PERSONAL')
 
+    // Initialize from localStorage
     useEffect(() => {
         const now = new Date()
         setMonth(now.getMonth() + 1)
         setYear(now.getFullYear())
+
+        // Load saved budget type
+        const savedType = localStorage.getItem('budgetType')
+        if (savedType === 'PERSONAL' || savedType === 'BUSINESS') {
+            setBudgetTypeInternal(savedType)
+        }
     }, [])
+
+    const setBudgetType = (type: BudgetType) => {
+        setBudgetTypeInternal(type)
+        localStorage.setItem('budgetType', type)
+    }
 
     return (
         <BudgetContext.Provider value={{ month, year, currency, budgetType, setMonth, setYear, setCurrency, setBudgetType }}>

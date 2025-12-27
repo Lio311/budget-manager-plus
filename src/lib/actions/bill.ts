@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache'
 
 export async function getBills(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
-        const budget = await getCurrentBudget(month, year, type)
+        const budget = await getCurrentBudget(month, year, '₪', type)
 
         const bills = await prisma.bill.findMany({
             where: { budgetId: budget.id },
@@ -27,7 +27,7 @@ export async function addBill(
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
-        const budget = await getCurrentBudget(month, year, type)
+        const budget = await getCurrentBudget(month, year, '₪', type)
 
         // Create date object for the specific day in the budget month
         const dueDate = new Date(year, month - 1, data.dueDay)

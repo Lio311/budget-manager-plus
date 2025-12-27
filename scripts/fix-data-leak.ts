@@ -9,7 +9,8 @@ async function fixRecurringLeak() {
     const models = [
         { name: 'Income', model: prisma.income },
         { name: 'Expense', model: prisma.expense },
-        { name: 'Bill', model: prisma.bill }
+        { name: 'Bill', model: prisma.bill },
+        { name: 'Saving', model: prisma.saving }
     ]
 
     let fixedCount = 0

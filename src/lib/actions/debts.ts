@@ -7,7 +7,7 @@ import { addMonths } from 'date-fns'
 
 export async function getDebts(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
-        const budget = await getCurrentBudget(month, year, type)
+        const budget = await getCurrentBudget(month, year, '₪', type)
 
         const debts = await prisma.debt.findMany({
             where: { budgetId: budget.id },
@@ -44,7 +44,7 @@ async function createDebtInstallments(
         const installmentYear = installmentDate.getFullYear()
 
         // Get or create budget for this month
-        const budget = await getCurrentBudget(installmentMonth, installmentYear, type)
+        const budget = await getCurrentBudget(installmentMonth, installmentYear, '₪', type)
 
         installments.push({
             budgetId: budget.id,
@@ -83,7 +83,7 @@ export async function addDebt(
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
-        const budget = await getCurrentBudget(month, year, type)
+        const budget = await getCurrentBudget(month, year, '₪', type)
 
         // Check if this is an installment-based debt
         if (data.isRecurring && data.totalDebtAmount && data.numberOfInstallments) {
