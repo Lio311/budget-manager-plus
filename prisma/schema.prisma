@@ -112,6 +112,8 @@ model Category {
   updatedAt DateTime @updatedAt
   // ... (Relation to CategoryBudget)
   categoryBudgets CategoryBudget[]
+  
+  @@map("categories")
 }
 
 model CategoryBudget {
