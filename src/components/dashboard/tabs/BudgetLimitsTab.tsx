@@ -123,7 +123,7 @@ export function BudgetLimitsTab() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card className="flex flex-col justify-center items-center p-6 bg-white/50 border-dashed border-2">
+                <Card className="flex flex-col justify-center items-center p-6 bg-transparent border-none shadow-none">
                     <Button
                         onClick={handleSmartRecommendations}
                         disabled={activeDefaults}
