@@ -344,6 +344,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                         <TableHead className="text-center">Email</TableHead>
                                         <TableHead className="text-center">Status</TableHead>
                                         <TableHead className="text-center">Plan</TableHead>
+                                        <TableHead className="text-center">Coupon</TableHead>
                                         <TableHead className="text-center">Start Date</TableHead>
                                         <TableHead className="text-center">Renewal/Expiry</TableHead>
                                         <TableHead className="text-center">Actions</TableHead>
@@ -403,6 +404,21 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                                             <span className="text-gray-400 text-xs">-</span>
                                                         );
                                                     })()}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <div className="flex flex-wrap justify-center gap-1">
+                                                    {user.subscriptions && user.subscriptions.length > 0 ? (
+                                                        user.subscriptions
+                                                            .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
+                                                            .map((sub: any) => (
+                                                                <span key={sub.id} className="text-xs font-mono bg-gray-50 px-2 py-0.5 rounded border border-gray-200 text-gray-600">
+                                                                    {sub.couponCode || '-'}
+                                                                </span>
+                                                            ))
+                                                    ) : (
+                                                        <span className="text-gray-400 text-xs">-</span>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-center">

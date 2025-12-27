@@ -64,6 +64,7 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
                     paypalOrderId,
                     lastPaymentDate: new Date(),
                     lastPaymentAmount: amount,
+                    couponCode: couponCode || null, // Updated
                 },
                 create: {
                     userId,
@@ -74,6 +75,7 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
                     paypalOrderId,
                     lastPaymentDate: new Date(),
                     lastPaymentAmount: amount,
+                    couponCode: couponCode || null, // Updated
                 },
             })
 
@@ -94,6 +96,7 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
                     paypalOrderId,
                     lastPaymentDate: new Date(),
                     lastPaymentAmount: amount,
+                    couponCode: couponCode || null, // Updated
                 },
                 create: {
                     userId,
@@ -104,6 +107,7 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
                     paypalOrderId,
                     lastPaymentDate: new Date(),
                     lastPaymentAmount: amount,
+                    couponCode: couponCode || null, // Updated
                 },
             })
 

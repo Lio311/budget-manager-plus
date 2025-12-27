@@ -253,6 +253,7 @@ model Subscription {
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   status            String    @default("inactive") // trial, active, expired, inactive
   planType          PlanType  @default(PERSONAL)   // NEW: PERSONAL vs BUSINESS
+  couponCode        String?   // Tracks which coupon was used (for Admin display)
   startDate         DateTime  @default(now())
   endDate           DateTime?
   paypalOrderId     String?
