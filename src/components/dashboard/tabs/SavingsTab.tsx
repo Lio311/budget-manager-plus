@@ -25,14 +25,12 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
 interface Saving {
     id: string
-    type: string
     category: string
-    description: string
-    monthlyDeposit: number
+    name: string        // Updated from description
+    monthlyDeposit: number | null // Updated to nullable
     currency: string
-    goal: string | null
-    date?: Date
-    targetDate?: Date
+    notes: string | null // Updated from goal
+    targetDate?: Date | null
     createdAt: Date
 }
 
@@ -112,10 +110,10 @@ export function SavingsTab() {
     // Create form state
     const [newSaving, setNewSaving] = useState({
         category: '',
-        description: '',
+        description: '', // Maps to name
         monthlyDeposit: '',
         currency: 'ILS',
-        goal: '',
+        goal: '',        // Maps to notes
         date: new Date(),
         isRecurring: false,
         recurringEndDate: undefined as Date | undefined
@@ -240,16 +238,16 @@ export function SavingsTab() {
         }
     }
 
-    const startEdit = (saving: any) => {
+    const startEdit = (saving: Saving) => {
         setEditingId(saving.id)
-        // Handle both targetDate (DB field) and date (Legacy/Prop)
-        const dateToUse = saving.targetDate ? new Date(saving.targetDate) : (saving.date ? new Date(saving.date) : new Date())
+        // Handle both targetDate (DB field) 
+        const dateToUse = saving.targetDate ? new Date(saving.targetDate) : new Date()
         setEditData({
-            category: saving.category || saving.type || '',
-            description: saving.name || saving.description,
-            monthlyDeposit: saving.monthlyDeposit.toString(),
+            category: saving.category || '',
+            description: saving.name || '',
+            monthlyDeposit: saving.monthlyDeposit ? saving.monthlyDeposit.toString() : '',
             currency: saving.currency || 'ILS', // Default fallback
-            goal: saving.goal || '',
+            goal: saving.notes || '',
             date: dateToUse
         })
     }
@@ -482,7 +480,7 @@ export function SavingsTab() {
                             </div>
                         ) : (
                             <>
-                                {paginatedSavings.map((saving: any) => (
+                                {paginatedSavings.map((saving) => (
                                     <div
                                         key={saving.id}
                                         className="group relative flex flex-col sm:flex-row items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
@@ -553,8 +551,8 @@ export function SavingsTab() {
                                             <>
                                                 <div className="flex items-center gap-3 w-full sm:w-auto overflow-hidden">
                                                     <div className="shrink-0">
-                                                        <span className={`monday-pill ${getCategoryColor(saving.category || saving.type)} opacity-90`}>
-                                                            {saving.category || saving.type}
+                                                        <span className={`monday-pill ${getCategoryColor(saving.category)} opacity-90`}>
+                                                            {saving.category}
                                                         </span>
                                                     </div>
 
@@ -567,17 +565,17 @@ export function SavingsTab() {
                                                                 <span>
                                                                     {(() => {
                                                                         try {
-                                                                            const dateToFormat = saving.targetDate || saving.date
+                                                                            const dateToFormat = saving.targetDate
                                                                             return dateToFormat ? format(new Date(dateToFormat), 'dd/MM/yyyy') : 'תאריך חסר'
                                                                         } catch (e) {
                                                                             return 'תאריך לא תקין'
                                                                         }
                                                                     })()}
                                                                 </span>
-                                                                {saving.goal && (
+                                                                {saving.notes && (
                                                                     <>
                                                                         <span>•</span>
-                                                                        <span>יעד: {formatCurrency(parseFloat(saving.goal), budgetCurrency)}</span>
+                                                                        <span>יעד: {saving.notes}</span>
                                                                     </>
                                                                 )}
                                                             </div>
@@ -587,7 +585,7 @@ export function SavingsTab() {
 
                                                 <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0 pl-1">
                                                     <span className="text-lg font-bold text-[#00c875]">
-                                                        {formatCurrency(saving.monthlyDeposit, getCurrencySymbol(saving.currency))}
+                                                        {formatCurrency(saving.monthlyDeposit || 0, getCurrencySymbol(saving.currency))}
                                                     </span>
                                                     <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <Button

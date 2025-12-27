@@ -225,7 +225,7 @@ export async function updateSaving(
         const saving = await prisma.saving.update({
             where: { id },
             data: {
-                ...(data.category && { type: data.category, category: data.category }),
+                ...(data.category && { category: data.category }),
                 ...(data.description && { name: data.description }),
                 ...(data.monthlyDeposit && { monthlyDeposit: data.monthlyDeposit }),
                 ...(data.currency && { currency: data.currency }),

@@ -1,5 +1,14 @@
+import { useState, useEffect } from 'react'
+import useSWR from 'swr'
+import { CreditCard, Loader2, Pencil, Trash2, Check, X } from 'lucide-react'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { useBudget } from '@/contexts/BudgetContext'
+import { useToast } from '@/hooks/use-toast'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Pagination } from '@/components/ui/Pagination'
+import { addBill, getBills, updateBill, deleteBill, toggleBillPaid } from '@/lib/actions/bill'
+import { formatCurrency } from '@/lib/utils'
 
 interface Bill {
     id: string
