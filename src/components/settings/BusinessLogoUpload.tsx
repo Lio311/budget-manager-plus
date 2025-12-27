@@ -133,8 +133,8 @@ export function BusinessLogoUpload() {
                     disabled={uploading}
                     className="bg-blue-600 hover:bg-blue-700"
                 >
-                    <Upload className="h-4 w-4 ml-2" />
                     {uploading ? 'מעלה...' : 'העלה לוגו'}
+                    <Upload className="h-4 w-4 mr-2" />
                 </Button>
             )}
         </div>
