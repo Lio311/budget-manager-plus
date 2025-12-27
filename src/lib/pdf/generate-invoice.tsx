@@ -1,4 +1,4 @@
-```javascript
+
 // Note: This file requires @react-pdf/renderer to be installed
 // Run: npm install @react-pdf/renderer
 
@@ -101,7 +101,7 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
 
             // Notes
             notes: invoice.notes || undefined,
-            
+
             // System
             poweredByLogoPath: logoPath
         }
