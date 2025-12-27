@@ -33,11 +33,11 @@ export function CalendarTab() {
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
 
     // Fetchers
-    const fetchBills = async () => (await getBills(month, year, budgetType)).data || []
-    const fetchDebts = async () => (await getDebts(month, year, budgetType)).data || []
-    const fetchIncomes = async () => (await getIncomes(month, year, budgetType)).data || []
-    const fetchExpenses = async () => (await getExpenses(month, year, budgetType)).data || []
-    const fetchSavings = async () => (await getSavings(month, year, budgetType)).data || []
+    const fetchBills = async () => (await getBills(month, year, budgetType)).data?.bills || []
+    const fetchDebts = async () => (await getDebts(month, year, budgetType)).data?.debts || []
+    const fetchIncomes = async () => (await getIncomes(month, year, budgetType)).data?.incomes || []
+    const fetchExpenses = async () => (await getExpenses(month, year, budgetType)).data?.expenses || []
+    const fetchSavings = async () => (await getSavings(month, year, budgetType)).data?.savings || []
 
     // SWR Hooks
     const { data: bills = [], isLoading: loadingBills, mutate: mutateBills } = useSWR(['bills', month, year, budgetType], fetchBills)
