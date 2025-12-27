@@ -96,10 +96,21 @@ export function InvoicesTab() {
             if (!response.ok) throw new Error('Failed to download PDF')
 
             const blob = await response.blob()
+
+            // Try to get filename from content-disposition header
+            let filename = `invoice-${invoiceId}.pdf`
+            const contentDisposition = response.headers.get('content-disposition')
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename\*=UTF-8''([^;]+)/) || contentDisposition.match(/filename="?([^"]+)"?/)
+                if (filenameMatch && filenameMatch[1]) {
+                    filename = decodeURIComponent(filenameMatch[1])
+                }
+            }
+
             const url = window.URL.createObjectURL(blob)
             const a = document.createElement('a')
             a.href = url
-            a.download = `invoice-${invoiceId}.pdf`
+            a.download = filename
             document.body.appendChild(a)
             a.click()
             window.URL.revokeObjectURL(url)
