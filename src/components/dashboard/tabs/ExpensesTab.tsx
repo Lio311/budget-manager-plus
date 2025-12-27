@@ -1,12 +1,31 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import useSWR from 'swr'
+import { Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X } from 'lucide-react'
+import { format } from 'date-fns'
+
+import { useBudget } from '@/contexts/BudgetContext'
+import { useToast } from '@/hooks/use-toast'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Checkbox } from '@/components/ui/checkbox'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Pagination } from '@/components/ui/Pagination'
+import { addExpense, getExpenses, updateExpense, deleteExpense } from '@/lib/actions/expense'
+import { getCategories, addCategory } from '@/lib/actions/category'
+import { formatCurrency } from '@/lib/utils'
+import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
 interface Expense {
     id: string
     category: string
-    description: string
+    description: string | null
     amount: number
-    currency: string
-    date: Date
+    currency?: string
+    date: Date | null
 }
 
 interface ExpenseData {
@@ -15,6 +34,12 @@ interface ExpenseData {
 }
 
 // ... imports remain same
+
+interface Category {
+    id: string
+    name: string
+    color: string | null
+}
 
 export function ExpensesTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
@@ -37,8 +62,6 @@ export function ExpensesTab() {
     const expenses = data?.expenses || []
     const totalExpensesILS = data?.totalILS || 0
 
-    // ... fetcherCategories remains same
-
     const fetcherCategories = async () => {
         const result = await getCategories('expense', budgetType)
         if (result.success && result.data) return result.data
@@ -55,6 +78,10 @@ export function ExpensesTab() {
 
     const [submitting, setSubmitting] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
+    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
+    const [newCategoryName, setNewCategoryName] = useState('')
+    const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
+
     const [editData, setEditData] = useState({
         description: '',
         amount: '',

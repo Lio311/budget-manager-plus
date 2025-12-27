@@ -1,3 +1,28 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import useSWR from 'swr'
+import { Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X } from 'lucide-react'
+import { format } from 'date-fns'
+
+import { useBudget } from '@/contexts/BudgetContext'
+import { useToast } from '@/hooks/use-toast'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Checkbox } from '@/components/ui/checkbox'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Pagination } from '@/components/ui/Pagination'
+import { addIncome, getIncomes, updateIncome, deleteIncome } from '@/lib/actions/income'
+import { getCategories, addCategory } from '@/lib/actions/category'
+
+interface Category {
+    id: string
+    name: string
+    color: string | null
+}
+import { formatCurrency } from '@/lib/utils'
+import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
 interface Income {
@@ -5,7 +30,7 @@ interface Income {
     source: string
     category: string
     amount: number
-    currency: string
+    currency?: string
     date: Date | null
 }
 
@@ -37,7 +62,17 @@ export function IncomeTab() {
     const incomes = data?.incomes || []
     const totalIncomeILS = data?.totalILS || 0
 
-    // ... fetcherCategories remains same
+    const fetcherCategories = async () => {
+        const result = await getCategories('income', budgetType)
+        if (result.success && result.data) return result.data
+        return []
+    }
+
+    const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
+        ['categories', 'income', budgetType],
+        fetcherCategories,
+        { revalidateOnFocus: false }
+    )
 
     // --- State ---
 
@@ -55,12 +90,19 @@ export function IncomeTab() {
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ source: '', category: '', amount: '', currency: 'ILS', date: '' })
 
-    // ... other states
+    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
+    const [newCategoryName, setNewCategoryName] = useState('')
+    const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
     const totalPages = Math.ceil(incomes.length / itemsPerPage)
+
+    const paginatedIncomes = incomes.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
 
     // ... useEffects
 
@@ -114,7 +156,45 @@ export function IncomeTab() {
         }
     }
 
-    // ... handleAddCategory remains same
+    async function handleAddCategory() {
+        if (!newCategoryName.trim()) return
+
+        setSubmitting(true)
+        try {
+            const result = await addCategory({
+                name: newCategoryName.trim(),
+                type: 'income',
+                color: newCategoryColor,
+                scope: budgetType
+            })
+
+            if (result.success) {
+                toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
+                setNewCategoryName('')
+                setIsAddCategoryOpen(false)
+                await mutateCategories()
+                const newCatName = newCategoryName.trim()
+                setNewIncome(prev => ({ ...prev, category: newCatName }))
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
+            }
+        } catch (error: any) {
+            console.error('Add category failed:', error)
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשרת', variant: 'destructive' })
+        } finally {
+            setSubmitting(false)
+        }
+    }
+
+    async function handleDelete(id: string) {
+        const result = await deleteIncome(id)
+        if (result.success) {
+            toast({ title: 'הצלחה', description: 'ההכנסה נמחקה בהצלחה' })
+            await mutateIncomes()
+        } else {
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הכנסה', variant: 'destructive' })
+        }
+    }
 
     function handleEdit(income: any) {
         setEditingId(income.id)
@@ -148,7 +228,17 @@ export function IncomeTab() {
         setSubmitting(false)
     }
 
-    // ... getCategoryColor remains same
+    const getCategoryColor = (catName: string) => {
+        const cat = categories.find(c => c.name === catName)
+        let c = cat?.color || 'bg-gray-100 text-gray-700 border-gray-200'
+
+        if (c.includes('bg-') && c.includes('-100')) {
+            c = c.replace(/bg-(\w+)-100/g, 'bg-$1-500')
+                .replace(/text-(\w+)-700/g, 'text-white')
+                .replace(/border-(\w+)-200/g, 'border-transparent')
+        }
+        return c
+    }
 
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10">
