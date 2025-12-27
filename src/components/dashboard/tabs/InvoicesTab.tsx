@@ -36,6 +36,7 @@ interface Invoice {
 export function InvoicesTab() {
     const { budgetType } = useBudget()
     const [searchTerm, setSearchTerm] = useState('')
+    const [currentPage, setCurrentPage] = useState(1)
     const [showForm, setShowForm] = useState(false)
     const [formData, setFormData] = useState<InvoiceFormData>({
         clientId: '',
