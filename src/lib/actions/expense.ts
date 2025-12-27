@@ -307,10 +307,7 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
             // We use 'contains' for description to be slightly flexible with whitespace
             const existing = await prisma.expense.findFirst({
                 where: {
-                    user: { id: userId }, // Join via budget? No, expenses are linked to Budgets.
-                    // We need to query expenses where Budget -> UserId is current user.
-                    // Actually, existing implementation finds budget first. 
-                    // To do this efficiently without finding budget for each sample:
+                    // Budget -> UserId check is sufficient
                     budget: {
                         userId: userId,
                         type: budgetType
