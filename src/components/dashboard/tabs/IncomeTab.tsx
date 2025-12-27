@@ -206,7 +206,7 @@ export function IncomeTab() {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 8
+    const itemsPerPage = 5
     const totalPages = Math.ceil(incomes.length / itemsPerPage)
 
     const paginatedIncomes = incomes.slice(
