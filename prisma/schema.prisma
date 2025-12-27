@@ -33,6 +33,9 @@ model User {
   businessProfile BusinessProfile?
   paymentHistory PaymentHistory[]
   feedbacks    Feedback[]
+  clients    Client[]
+  suppliers  Supplier[]
+  invoices   Invoice[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -133,6 +136,10 @@ model Income {
   recurringEndDate    DateTime?
   
   // Business Fields
+  clientId          String?
+  client            Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  invoiceId         String?
+  invoice           Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
   amountBeforeVat   Float?
   vatRate           Float?   @default(0) // 0.17 etc.
   vatAmount         Float?
@@ -145,6 +152,7 @@ model Income {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   @@index([budgetId])
+  @@index([clientId])
   @@map("incomes")
 }
 
@@ -165,6 +173,8 @@ model Expense {
   recurringEndDate    DateTime?
   
   // Business Fields
+  supplierId        String?
+  supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   amountBeforeVat   Float?
   vatRate           Float?   @default(0) // 0.17 etc.
   vatAmount         Float?
@@ -181,6 +191,7 @@ model Expense {
   updatedAt         DateTime @updatedAt
   @@index([budgetId])
   @@index([budgetId, category])
+  @@index([supplierId])
   @@map("expenses")
 }
 
@@ -350,3 +361,108 @@ model SiteSettings {
   @@map("site_settings")
 }
 
+// Business Models
+
+model Client {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Client details
+  name      String
+  email     String?
+  phone     String?
+  taxId     String?  // ח.פ / ע.מ
+  address   String?
+  notes     String?  @db.Text
+  
+  // Metadata
+  scope     String   @default("BUSINESS")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  incomes   Income[]
+  invoices  Invoice[]
+  
+  @@index([userId, scope])
+  @@unique([userId, name, scope])
+  @@map("clients")
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Supplier details
+  name      String
+  email     String?
+  phone     String?
+  taxId     String?  // ח.פ / ע.מ
+  address   String?
+  notes     String?  @db.Text
+  
+  // Metadata
+  scope     String   @default("BUSINESS")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  expenses  Expense[]
+  
+  @@index([userId, scope])
+  @@unique([userId, name, scope])
+  @@map("suppliers")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // Invoice details
+  invoiceNumber String
+  issueDate     DateTime      @default(now())
+  dueDate       DateTime?
+  status        InvoiceStatus @default(DRAFT)
+  
+  // Amounts
+  subtotal      Float
+  vatRate       Float         @default(0.17)
+  vatAmount     Float
+  total         Float
+  currency      String        @default("ILS")
+  
+  // Payment
+  paidDate      DateTime?
+  paidAmount    Float?
+  
+  // Notes
+  notes         String?       @db.Text
+  
+  // Metadata
+  scope         String        @default("BUSINESS")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  // Relations
+  incomes       Income[]
+  
+  @@index([userId, scope])
+  @@index([clientId])
+  @@unique([userId, invoiceNumber])
+  @@map("invoices")
+}
