@@ -1,13 +1,13 @@
-// Note: This file requires @react-pdf/renderer to be installed
-// Run: npm install @react-pdf/renderer
-
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
+import { join } from 'path'
 
-// Register Hebrew font - Alef is very stable and has great Hebrew support
+// Register Hebrew font - using local file for maximum reliability on Vercel
+const fontPath = join(process.cwd(), 'public', 'fonts', 'Alef-Regular.ttf');
+
 Font.register({
     family: 'Alef',
-    src: 'https://cdn.jsdelivr.net/gh/alif-type/alef/fonts/Alef-Regular.ttf'
+    src: fontPath
 });
 
 // Define styles with green/black/white theme
