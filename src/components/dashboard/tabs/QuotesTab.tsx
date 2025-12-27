@@ -21,6 +21,19 @@ const statusConfig = {
     CANCELLED: { label: 'בוטל', icon: XCircle, color: 'text-gray-600', bg: 'bg-gray-100' }
 }
 
+interface Quote {
+    id: string
+    quoteNumber: string
+    clientName: string
+    clientId: string
+    date: string | Date
+    validUntil?: string | Date
+    status: 'DRAFT' | 'SENT' | 'ACCEPTED' | 'EXPIRED' | 'CANCELLED'
+    totalAmount: number
+    vatAmount: number
+    items: any[]
+}
+
 export function QuotesTab() {
     const { budgetType } = useBudget()
     const [searchTerm, setSearchTerm] = useState('')
@@ -37,7 +50,20 @@ export function QuotesTab() {
 
     const quotesFetcher = async () => {
         const result = await getQuotes(budgetType)
-        return result.data || []
+        if (!result.success || !result.data) return []
+
+        return result.data.map((q: any) => ({
+            id: q.id,
+            quoteNumber: q.quoteNumber,
+            clientName: q.client?.name || 'לקוח לא ידוע',
+            clientId: q.clientId,
+            date: q.issueDate,
+            validUntil: q.validUntil,
+            status: q.status as any,
+            totalAmount: q.total,
+            vatAmount: q.vatAmount,
+            items: []
+        }))
     }
 
     const clientsFetcher = async () => {
@@ -45,7 +71,7 @@ export function QuotesTab() {
         return result.data || []
     }
 
-    const { data: quotes = [], isLoading, mutate } = useSWR(['quotes', budgetType], quotesFetcher, { revalidateOnFocus: false })
+    const { data: quotes = [], isLoading, mutate } = useSWR<Quote[]>(['quotes', budgetType], quotesFetcher, { revalidateOnFocus: false })
     const { data: clients = [] } = useSWR(['clients', budgetType], clientsFetcher)
 
     const filteredQuotes = quotes.filter((q: any) =>
