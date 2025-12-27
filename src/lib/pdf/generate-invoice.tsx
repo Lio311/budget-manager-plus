@@ -7,18 +7,21 @@ import { prisma } from '@/lib/db'
 import fs from 'fs'
 import path from 'path'
 
-// Register Hebrew font - using local file base64 for maximum reliability on Vercel
-try {
-    const fontPath = path.resolve(process.cwd(), 'src/lib/pdf/fonts/Alef-Regular.ttf')
-    if (fs.existsSync(fontPath)) {
-        const fontBase64 = fs.readFileSync(fontPath).toString('base64')
+// Keep track of font registration state
+let isFontRegistered = false
+
+function registerFont() {
+    if (isFontRegistered) return
+
+    try {
         Font.register({
             family: 'Alef',
-            src: `data:font/ttf;base64,${fontBase64}`
+            src: 'https://fonts.gstatic.com/s/alef/v12/6xKxdS9_T593H7S8.ttf'
         })
+        isFontRegistered = true
+    } catch (error) {
+        console.error('Failed to register PDF font:', error)
     }
-} catch (error) {
-    console.error('Failed to register PDF font:', error)
 }
 
 interface GenerateInvoicePDFParams {
@@ -28,6 +31,9 @@ interface GenerateInvoicePDFParams {
 
 export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoicePDFParams): Promise<Buffer> {
     try {
+        // Ensure font is registered
+        registerFont()
+
         // ... (data fetching remains same)
         const invoice = await prisma.invoice.findFirst({
             where: {
