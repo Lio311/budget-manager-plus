@@ -57,15 +57,15 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
 
             // Business info
             businessName: businessProfile?.companyName || 'החברה שלי',
-            businessId: businessProfile?.companyId,
-            businessAddress: businessProfile?.address,
-            businessPhone: businessProfile?.phone,
-            businessEmail: businessProfile?.email,
-            businessLogo: businessProfile?.logoUrl,
+            businessId: businessProfile?.companyId || undefined,
+            businessAddress: businessProfile?.address || undefined,
+            businessPhone: businessProfile?.phone || undefined,
+            businessEmail: businessProfile?.email || undefined,
+            businessLogo: businessProfile?.logoUrl || undefined,
 
             // Client info
             clientName: invoice.client.name,
-            clientId: invoice.client.taxId,
+            clientId: invoice.client.taxId || undefined,
 
             // Financial
             subtotal,
