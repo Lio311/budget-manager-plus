@@ -156,7 +156,9 @@ interface InvoiceData {
     issueDate: string
     dueDate: string
     status: string
-    paymentMethod: string
+    paymentMethod?: string
+    title?: string
+    documentNumberLabel?: string
 
     // Business info
     businessName: string
@@ -201,8 +203,8 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                 {/* Header */}
                 <View style={styles.header}>
                     <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.invoiceTitle}>חשבונית</Text>
-                        <Text style={styles.invoiceNumber}>מספר חשבונית: {data.invoiceNumber}</Text>
+                        <Text style={styles.invoiceTitle}>{data.title || 'חשבונית'}</Text>
+                        <Text style={styles.invoiceNumber}>{data.documentNumberLabel || 'מספר חשבונית'}: {data.invoiceNumber}</Text>
                     </View>
                     {data.businessLogo && (
                         <Image src={data.businessLogo} style={styles.logo} />

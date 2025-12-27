@@ -20,17 +20,16 @@ try {
     console.error('Failed to register PDF font:', error)
 }
 
-interface GenerateInvoicePDFParams {
-    invoiceId: string
+interface GenerateQuotePDFParams {
+    quoteId: string
     userId: string
 }
 
-export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoicePDFParams): Promise<Buffer> {
+export async function generateQuotePDF({ quoteId, userId }: GenerateQuotePDFParams): Promise<Buffer> {
     try {
-        // ... (data fetching remains same)
-        const invoice = await prisma.invoice.findFirst({
+        const quote = await prisma.quote.findFirst({
             where: {
-                id: invoiceId,
+                id: quoteId,
                 userId: userId
             },
             include: {
@@ -49,27 +48,28 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
             }
         })
 
-        if (!invoice) {
-            throw new Error('Invoice not found')
+        if (!quote) {
+            throw new Error('Quote not found')
         }
 
-        const businessProfile = invoice.user.businessProfile
-        const businessBudget = invoice.user.budgets[0]
+        const businessProfile = quote.user.businessProfile
+        const businessBudget = quote.user.budgets[0]
 
-        // Use invoice's own financial data
-        const vatRate = invoice.vatRate * 100 // Convert to percentage
-        const subtotal = invoice.subtotal
-        const vatAmount = invoice.vatAmount
-        const total = invoice.total
+        // Use quote's own financial data
+        const vatRate = quote.vatRate * 100 // Convert to percentage
+        const subtotal = quote.subtotal
+        const vatAmount = quote.vatAmount
+        const total = quote.total
 
-        // Prepare invoice data
-        const invoiceData: any = {
-            title: 'חשבונית',
-            invoiceNumber: invoice.invoiceNumber,
-            issueDate: invoice.issueDate.toISOString(),
-            dueDate: invoice.dueDate?.toISOString() || invoice.issueDate.toISOString(),
-            status: getStatusLabel(invoice.status),
-            paymentMethod: 'העברה בנקאית', // Default payment method
+        // Prepare quote data
+        const quoteData = {
+            title: 'הצעת מחיר',
+            documentNumberLabel: 'מספר הצעה',
+            invoiceNumber: quote.quoteNumber,
+            issueDate: quote.issueDate.toISOString(),
+            dueDate: quote.validUntil?.toISOString() || quote.issueDate.toISOString(),
+            status: getStatusLabel(quote.status),
+            paymentMethod: undefined,
 
             // Business info
             businessName: businessProfile?.companyName || 'החברה שלי',
@@ -81,24 +81,24 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
             businessSignature: businessProfile?.signatureUrl || undefined,
 
             // Client info
-            clientName: invoice.client.name,
-            clientId: invoice.client.taxId || undefined,
+            clientName: quote.client.name,
+            clientId: quote.client.taxId || undefined,
 
             // Financial
             subtotal,
             vatRate,
             vatAmount,
             total,
-            currency: invoice.currency || businessBudget?.currency || 'ILS',
+            currency: quote.currency || businessBudget?.currency || 'ILS',
 
             // Notes
-            notes: invoice.notes || undefined
+            notes: quote.notes || undefined
         }
 
         // Generate PDF
-        return await renderToBuffer(<InvoiceTemplate data={invoiceData} />)
+        return await renderToBuffer(<InvoiceTemplate data={quoteData} />)
     } catch (error) {
-        console.error('generateInvoicePDF error:', error)
+        console.error('generateQuotePDF error:', error)
         throw error
     }
 }
@@ -107,8 +107,8 @@ function getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
         'DRAFT': 'טיוטה',
         'SENT': 'נשלח',
-        'PAID': 'שולם',
-        'OVERDUE': 'באיחור',
+        'ACCEPTED': 'התקבל',
+        'EXPIRED': 'פג תוקף',
         'CANCELLED': 'בוטל'
     }
     return labels[status] || status

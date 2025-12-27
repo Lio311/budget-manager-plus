@@ -472,3 +472,44 @@ model Invoice {
   @@unique([userId, invoiceNumber])
   @@map("invoices")
 }
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+model Quote {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // Quote details
+  quoteNumber   String
+  issueDate     DateTime    @default(now())
+  validUntil    DateTime?
+  status        QuoteStatus @default(DRAFT)
+  
+  // Amounts
+  subtotal      Float
+  vatRate       Float       @default(0.18)
+  vatAmount     Float
+  total         Float
+  currency      String      @default("₪")
+  
+  // Notes
+  notes         String?     @db.Text
+  
+  // Metadata
+  scope         String      @default("BUSINESS")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@index([userId, scope])
+  @@index([clientId])
+  @@unique([userId, quoteNumber])
+  @@map("quotes")
+}

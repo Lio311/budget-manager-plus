@@ -14,6 +14,7 @@ import { SavingsTab } from './tabs/SavingsTab'
 import { ClientsTab } from './tabs/ClientsTab'
 import { SuppliersTab } from './tabs/SuppliersTab'
 import { InvoicesTab } from './tabs/InvoicesTab'
+import { QuotesTab } from './tabs/QuotesTab'
 import { useBudget } from '@/contexts/BudgetContext'
 
 interface DashboardTabsProps {
@@ -39,6 +40,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
         { value: 'clients', label: 'לקוחות', icon: Users, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'suppliers', label: 'ספקים', icon: Building2, activeClass: 'data-[state=active]:bg-blue-600' },
+        { value: 'quotes', label: 'הצעות מחיר', icon: FileText, activeClass: 'data-[state=active]:bg-yellow-500 data-[state=active]:text-black' },
         { value: 'invoices', label: 'חשבוניות', icon: FileText, activeClass: 'data-[state=active]:bg-purple-600' },
         { value: 'income', label: 'מכירות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'expenses', label: 'עלויות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
@@ -130,6 +132,9 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </TabsContent>
                     <TabsContent value="invoices" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <InvoicesTab />
+                    </TabsContent>
+                    <TabsContent value="quotes" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <QuotesTab />
                     </TabsContent>
                 </div>
             </div>
