@@ -312,6 +312,7 @@ export function BillsTab() {
                             <PaymentMethodSelector
                                 value={newBill.paymentMethod}
                                 onChange={(val) => setNewBill({ ...newBill, paymentMethod: val })}
+                                color="orange"
                             />
                         </div>
 
@@ -389,6 +390,7 @@ export function BillsTab() {
                                                         <PaymentMethodSelector
                                                             value={editData.paymentMethod}
                                                             onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                                            color="orange"
                                                         />
                                                     </div>
                                                 </div>

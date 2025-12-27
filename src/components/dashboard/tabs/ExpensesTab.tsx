@@ -407,6 +407,7 @@ export function ExpensesTab() {
                             <PaymentMethodSelector
                                 value={newExpense.paymentMethod}
                                 onChange={(val) => setNewExpense({ ...newExpense, paymentMethod: val })}
+                                color={isBusiness ? 'orange' : 'red'}
                             />
                         </div>
 
@@ -477,6 +478,7 @@ export function ExpensesTab() {
                                             <PaymentMethodSelector
                                                 value={editData.paymentMethod}
                                                 onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                                color={isBusiness ? 'orange' : 'red'}
                                             />
                                         </div>
                                         {isBusiness && (

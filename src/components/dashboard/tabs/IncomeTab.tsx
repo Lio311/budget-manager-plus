@@ -434,6 +434,7 @@ export function IncomeTab() {
                             <PaymentMethodSelector
                                 value={newIncome.paymentMethod}
                                 onChange={(val) => setNewIncome({ ...newIncome, paymentMethod: val })}
+                                color={isBusiness ? 'blue' : 'green'}
                             />
                         </div>
 
@@ -488,6 +489,7 @@ export function IncomeTab() {
                                             <PaymentMethodSelector
                                                 value={editData.paymentMethod}
                                                 onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                                color={isBusiness ? 'blue' : 'green'}
                                             />
                                         </div>
                                         <div className="grid grid-cols-3 gap-3">
