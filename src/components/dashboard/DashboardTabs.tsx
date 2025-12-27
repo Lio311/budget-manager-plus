@@ -13,11 +13,14 @@ import { CalendarTab } from './tabs/CalendarTab'
 import { SavingsTab } from './tabs/SavingsTab'
 import { ClientsTab } from './tabs/ClientsTab'
 import { SuppliersTab } from './tabs/SuppliersTab'
-import { InvoicesTab } from './tabs/InvoicesTab'
+import { QuotesTab } from './tabs/QuotesTab'
 import { BudgetLimitsTab } from './tabs/BudgetLimitsTab'
-// ... (imports)
+import { useBudget } from '@/contexts/BudgetContext'
 
-// ...
+interface DashboardTabsProps {
+    mobileMenuOpen: boolean
+    setMobileMenuOpen: (open: boolean) => void
+}
 
 export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTabsProps) {
     const [activeTab, setActiveTab] = useState('overview')
