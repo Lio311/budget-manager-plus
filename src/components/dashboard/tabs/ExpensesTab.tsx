@@ -344,7 +344,6 @@ export function ExpensesTab() {
                 <div className="lg:col-span-5 glass-panel p-5 h-fit sticky top-4">
                     <div className="mb-4 flex items-center gap-2">
                         <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`} />
-                        <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`} />
                         <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
                         <div className="mr-auto">
                             <BankImportModal onImport={handleImportExpenses} />
