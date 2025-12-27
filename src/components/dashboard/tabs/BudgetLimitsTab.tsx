@@ -7,7 +7,7 @@ import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Sparkles, Info, Save, RefreshCw } from 'lucide-react'
+import { Sparkles, Info, Save, RefreshCw, Loader2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -26,6 +26,7 @@ export function BudgetLimitsTab() {
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
+    const [avgIncome, setAvgIncome] = useState(0)
 
     // Load Data
     useEffect(() => {
@@ -37,6 +38,7 @@ export function BudgetLimitsTab() {
         const res = await getCategoryBudgets(month, year)
         if (res.success && res.data) {
             setBudgets(res.data)
+            if (res.avgIncome) setAvgIncome(res.avgIncome)
         } else {
             toast({ title: 'שגיאה', description: 'לא ניתן לטעון את נתוני התקציב', variant: 'destructive' })
         }
@@ -87,7 +89,13 @@ export function BudgetLimitsTab() {
     const totalPages = Math.ceil(budgets.length / itemsPerPage)
     const paginatedBudgets = budgets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
-    if (loading) return <div className="p-10 text-center">טוען נתוני תקציב...</div>
+    if (loading) {
+        return (
+            <div className="flex h-[50vh] w-full items-center justify-center">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        )
+    }
 
     return (
         <div className="space-y-6 pb-20" dir="rtl">
@@ -135,7 +143,8 @@ export function BudgetLimitsTab() {
                 {paginatedBudgets.map((budget) => {
                     const progress = budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0
                     const isOverLimit = budget.spent > budget.limit && budget.limit > 0
-                    const maxSlider = Math.max(5000, budget.limit * 2, budget.spent * 1.5)
+                    // Dynamic max for slider: Max(5000, Average Income, 2x Limit, 1.5x Spent)
+                    const maxSlider = Math.max(5000, avgIncome, budget.limit * 2, budget.spent * 1.5)
 
                     return (
                         <Card key={budget.categoryId} className={`transition-all ${isOverLimit ? 'border-red-200 bg-red-50/30' : ''}`}>
@@ -165,6 +174,7 @@ export function BudgetLimitsTab() {
                                         min={0}
                                         max={maxSlider}
                                         step={50}
+                                        dir="rtl"
                                         onValueChange={(val) => handleLimitChange(budget.categoryId, val)}
                                         onValueCommit={(val) => handleLimitCommit(budget.categoryId, val)}
                                         className="py-1 cursor-grab active:cursor-grabbing [&>.relative>.bg-primary]:bg-yellow-500 [&>.relative>.border-primary]:border-yellow-500" // Custom yellow styling via utility classes if current slider supports specific targeting, or generic override
