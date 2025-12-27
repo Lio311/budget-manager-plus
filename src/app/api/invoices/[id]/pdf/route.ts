@@ -14,18 +14,11 @@ export async function GET(
 
         const invoiceId = params.id
 
-        // Generate PDF stream
-        const stream = await generateInvoicePDF({
+        // Generate PDF buffer
+        const buffer = await generateInvoicePDF({
             invoiceId,
             userId: user.id
         })
-
-        // Convert stream to buffer
-        const chunks: Buffer[] = []
-        for await (const chunk of stream) {
-            chunks.push(Buffer.from(chunk))
-        }
-        const buffer = Buffer.concat(chunks)
 
         // Return PDF
         return new NextResponse(buffer, {

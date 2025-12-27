@@ -1,7 +1,7 @@
 // Note: This file requires @react-pdf/renderer to be installed
 // Run: npm install @react-pdf/renderer
 
-import { renderToStream } from '@react-pdf/renderer'
+import { renderToBuffer } from '@react-pdf/renderer'
 import { InvoiceTemplate } from './invoice-template'
 import { prisma } from '@/lib/db'
 
@@ -10,9 +10,9 @@ interface GenerateInvoicePDFParams {
     userId: string
 }
 
-export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoicePDFParams) {
+export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoicePDFParams): Promise<Buffer> {
     try {
-        // Fetch invoice data
+        // ... (data fetching remains same)
         const invoice = await prisma.invoice.findFirst({
             where: {
                 id: invoiceId,
@@ -80,9 +80,7 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
         }
 
         // Generate PDF
-        const stream = await renderToStream(<InvoiceTemplate data={invoiceData} />)
-
-        return stream
+        return await renderToBuffer(<InvoiceTemplate data={invoiceData} />)
     } catch (error) {
         console.error('generateInvoicePDF error:', error)
         throw error

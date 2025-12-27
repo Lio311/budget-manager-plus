@@ -4,10 +4,10 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
 
-// Register Hebrew font - using a direct GitHub raw TTF link to ensure it's not a WOFF/WOFF2
+// Register Hebrew font - Alef is very stable and has great Hebrew support
 Font.register({
-    family: 'Assistant',
-    src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/assistant/static/Assistant-Regular.ttf'
+    family: 'Alef',
+    src: 'https://cdn.jsdelivr.net/gh/alif-type/alef/fonts/Alef-Regular.ttf'
 });
 
 // Define styles with green/black/white theme
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     page: {
         padding: 40,
         backgroundColor: '#ffffff',
-        fontFamily: 'Assistant',
+        fontFamily: 'Alef',
     },
     header: {
         flexDirection: 'row-reverse',
