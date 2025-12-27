@@ -314,7 +314,7 @@ export function ExpensesTab() {
             description: row.description,
             amount: parseFloat(row.billingAmount), // Use billing amount as the final expense amount
             category: 'כללי', // Default category
-            currency: 'ILS',
+            currency: 'ILS' as 'ILS' | 'USD' | 'EUR' | 'GBP',
             date: row.date,
             isRecurring: false,
             paymentMethod: row.paymentMethod || 'CREDIT_CARD'
