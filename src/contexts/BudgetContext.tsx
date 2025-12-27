@@ -22,6 +22,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     const [year, setYear] = useState(2025) // Default to 2025
     const [currency, setCurrency] = useState('₪')
     const [budgetType, setBudgetTypeInternal] = useState<BudgetType>('PERSONAL')
+    const [isInitialized, setIsInitialized] = useState(false)
 
     // Initialize from localStorage
     useEffect(() => {
@@ -34,11 +35,16 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
         if (savedType === 'PERSONAL' || savedType === 'BUSINESS') {
             setBudgetTypeInternal(savedType)
         }
+        setIsInitialized(true)
     }, [])
 
     const setBudgetType = (type: BudgetType) => {
         setBudgetTypeInternal(type)
         localStorage.setItem('budgetType', type)
+    }
+
+    if (!isInitialized) {
+        return null // or a loading spinner
     }
 
     return (

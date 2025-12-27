@@ -281,9 +281,9 @@ export function SavingsTab() {
         <div className="space-y-4 p-1" dir="rtl">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="monday-card border-l-4 border-l-[#00c875] p-6 flex flex-col justify-center gap-2">
+                <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2">
                     <h3 className="text-sm font-medium text-gray-500">סך הפקדות חודשיות</h3>
-                    <div className={`text-2xl font-bold text-[#00c875] break-all ${loadingSavings ? 'animate-pulse' : ''}`}>
+                    <div className={`text-2xl font-bold text-[#0073ea] break-all ${loadingSavings ? 'animate-pulse' : ''}`}>
                         {loadingSavings ? '...' : formatCurrency(totalMonthlyDeposit, currency)}
                     </div>
                 </div>

@@ -84,7 +84,7 @@ export function CalendarTab() {
         })),
         ...savings.map((saving: any) => ({
             id: saving.id,
-            name: saving.description,
+            name: saving.name || saving.description || 'חיסכון',
             amount: saving.monthlyDeposit,
             day: saving.date ? new Date(saving.date).getDate() : 1,
             type: 'saving' as const,

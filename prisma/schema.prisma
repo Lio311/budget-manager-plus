@@ -103,6 +103,22 @@ model Category {
 
 // ... (Rest of models)
 
+
+// SMB Enums
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  BANK_TRANSFER
+  CHECK
+  BIT
+  OTHER
+}
+
+enum ExpenseType {
+  OPEX // Operational Expenditure
+  CAPEX // Capital Expenditure (Assets)
+}
+
 model Income {
   id                String   @id @default(cuid())
   budgetId          String
@@ -118,10 +134,12 @@ model Income {
   
   // Business Fields
   amountBeforeVat   Float?
+  vatRate           Float?   @default(0) // 0.17 etc.
   vatAmount         Float?
   invoiceDate       DateTime? // Tax event date
-  paymentDate       DateTime? // Cash flow date
-  paymentMethod     String?
+  paymentDate       DateTime? // Cash flow date (actual payment)
+  paymentMethod     PaymentMethod?
+  paymentTerms      Int?     @default(0) // Net+0, Net+30 etc.
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -146,12 +164,16 @@ model Expense {
   
   // Business Fields
   amountBeforeVat   Float?
+  vatRate           Float?   @default(0) // 0.17 etc.
   vatAmount         Float?
   vatType           VatType? @default(FULL)
   isDeductible      Boolean? @default(true) // For income tax recognition
+  deductibleRate    Float?   @default(1.0) // 1.0 = 100%, 0.45 = 45% etc.
+  expenseType       ExpenseType? @default(OPEX)
   invoiceDate       DateTime? // Tax event date
   paymentDate       DateTime? // Cash flow date
-  paymentMethod     String?
+  paymentMethod     PaymentMethod?
+  paymentTerms      Int?     @default(0)
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
