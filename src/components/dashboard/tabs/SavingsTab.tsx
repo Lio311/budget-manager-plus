@@ -231,7 +231,7 @@ export function SavingsTab() {
         const dateToUse = saving.targetDate ? new Date(saving.targetDate) : (saving.date ? new Date(saving.date) : new Date())
         setEditData({
             category: saving.category || saving.type || '',
-            description: saving.description,
+            description: saving.name || saving.description,
             monthlyDeposit: saving.monthlyDeposit.toString(),
             goal: saving.goal || '',
             date: dateToUse
@@ -519,7 +519,7 @@ export function SavingsTab() {
                                                     <div className="flex flex-col min-w-0">
                                                         {/* Description and Date on the same line, Description right of Date */}
                                                         <div className="flex items-center gap-2 text-[#323338]">
-                                                            <span className="font-bold text-base truncate">{saving.description}</span>
+                                                            <span className="font-bold text-base truncate">{saving.name}</span>
                                                             <span className="text-gray-400">|</span>
                                                             <div className="flex items-center gap-2 text-xs text-[#676879]">
                                                                 <span>

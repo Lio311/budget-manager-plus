@@ -225,7 +225,7 @@ export async function updateSaving(
             where: { id },
             data: {
                 ...(data.category && { type: data.category, category: data.category }),
-                ...(data.description && { description: data.description }),
+                ...(data.description && { name: data.description }),
                 ...(data.monthlyDeposit && { monthlyDeposit: data.monthlyDeposit }),
                 ...(data.goal && { goal: data.goal }),
                 ...(data.date && { targetDate: data.date })
