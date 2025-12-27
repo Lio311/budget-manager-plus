@@ -12,7 +12,14 @@ export interface CategoryBudgetUsage {
     currency: string
 }
 
-export async function getCategoryBudgets(month: number, year: number) {
+export interface GetCategoryBudgetsResponse {
+    success: boolean
+    data?: CategoryBudgetUsage[]
+    avgIncome?: number
+    error?: string
+}
+
+export async function getCategoryBudgets(month: number, year: number): Promise<GetCategoryBudgetsResponse> {
     try {
         const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
         const categories = await prisma.category.findMany({
@@ -50,7 +57,47 @@ export async function getCategoryBudgets(month: number, year: number) {
             }
         })
 
-        return { success: true, data: usage }
+        // Calculate 4-Month Average Income (Current + 3 previous)
+        const incomeStats = await prisma.income.aggregate({
+            _sum: { amount: true },
+            where: {
+                budget: {
+                    userId: budget.userId,
+                    type: 'PERSONAL',
+                    // Logic: Get budgets with (year * 12 + month) >= (currentYear * 12 + currentMonth - 3)
+                    // Simplified: just filter by date? No, budgets structure is month/year.
+                    // Just filtering by createdAt or direct budget link is safer.
+                    // Let's use the explicit logic of selecting last 4 budgets.
+                }
+            }
+        })
+
+        // Better approach: Find last 4 budgets explicitly
+        // We need to handle year wrapping properly (e.g. month 1, year 2025 -> prev is 12/2024)
+        // Let's use a raw query or just fetch budgets sorted by date descending?
+        const lastBudgets = await prisma.budget.findMany({
+            where: {
+                userId: budget.userId,
+                type: 'PERSONAL'
+            },
+            orderBy: [
+                { year: 'desc' },
+                { month: 'desc' }
+            ],
+            take: 4,
+            include: {
+                incomes: true
+            }
+        })
+
+        const totalIncomeLast4 = lastBudgets.reduce((sum, b) => {
+            const monthlyIncome = b.incomes.reduce((acc, i) => acc + i.amount, 0)
+            return sum + monthlyIncome
+        }, 0)
+
+        const avgIncome = lastBudgets.length > 0 ? totalIncomeLast4 / lastBudgets.length : 0
+
+        return { success: true, data: usage, avgIncome }
     } catch (error) {
         console.error('Error fetching category budgets:', error)
         return { success: false, error: 'Failed to fetch budget limits' }
