@@ -59,6 +59,7 @@ model BusinessProfile {
   address     String?  // Business address
   phone       String?  // Business phone
   email       String?  // Business email
+  signatureUrl String? // Digital signature (base64)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   

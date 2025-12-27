@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Upload, X, Image as ImageIcon, Save } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, Save, Pen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { uploadBusinessLogo, deleteBusinessLogo, getBusinessProfile, updateBusinessProfile } from '@/lib/actions/business-settings'
 import { toast } from 'sonner'
 import useSWR from 'swr'
+import { SignaturePad } from './SignaturePad'
 
 export function BusinessSettings() {
     const [uploading, setUploading] = useState(false)
@@ -20,7 +21,8 @@ export function BusinessSettings() {
         companyId: '',
         address: '',
         phone: '',
-        email: ''
+        email: '',
+        signature: ''
     })
 
     const fetcher = async () => {
@@ -36,7 +38,8 @@ export function BusinessSettings() {
                     companyId: data.companyId || '',
                     address: data.address || '',
                     phone: data.phone || '',
-                    email: data.email || ''
+                    email: data.email || '',
+                    signature: data.signatureUrl || ''
                 })
             }
         }
@@ -115,7 +118,8 @@ export function BusinessSettings() {
                 vatStatus: 'EXEMPT', // Default value
                 address: formData.address,
                 phone: formData.phone,
-                email: formData.email
+                email: formData.email,
+                signature: formData.signature
             })
 
             if (result.success) {
@@ -251,6 +255,22 @@ export function BusinessSettings() {
                     {saving ? 'שומר...' : 'שמור פרטים'}
                     <Save className="h-4 w-4 mr-2" />
                 </Button>
+            </div>
+
+            {/* Signature Section */}
+            <div className="border-t pt-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <Pen className="h-5 w-5 text-green-600" />
+                    <h3 className="text-sm font-medium text-gray-700">חתימה דיגיטלית</h3>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">
+                    החתימה תופיע בחשבוניות ובמסמכים רשמיים
+                </p>
+                <SignaturePad
+                    value={formData.signature}
+                    onChange={(sig) => setFormData({ ...formData, signature: sig })}
+                    onClear={() => setFormData({ ...formData, signature: '' })}
+                />
             </div>
         </div>
     )

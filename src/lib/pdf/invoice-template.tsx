@@ -162,6 +162,7 @@ interface InvoiceData {
     businessPhone?: string
     businessEmail?: string
     businessLogo?: string
+    businessSignature?: string
 
     // Client info
     clientName: string
@@ -274,6 +275,12 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
 
                 {/* Footer */}
                 <View style={styles.footer}>
+                    {data.businessSignature && (
+                        <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                            <Image src={data.businessSignature} style={{ width: 120, height: 40, objectFit: 'contain' }} />
+                            <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 5 }}>חתימה</Text>
+                        </View>
+                    )}
                     <Text style={styles.footerText}>
                         תודה על העסקה!
                     </Text>

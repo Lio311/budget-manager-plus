@@ -62,6 +62,7 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
             businessPhone: businessProfile?.phone || undefined,
             businessEmail: businessProfile?.email || undefined,
             businessLogo: businessProfile?.logoUrl || undefined,
+            businessSignature: businessProfile?.signatureUrl || undefined,
 
             // Client info
             clientName: invoice.client.name,

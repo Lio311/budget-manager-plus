@@ -11,6 +11,7 @@ export interface BusinessProfileData {
     address?: string
     phone?: string
     email?: string
+    signature?: string
 }
 
 export async function getBusinessProfile() {
@@ -42,7 +43,8 @@ export async function updateBusinessProfile(data: BusinessProfileData) {
                 vatStatus: data.vatStatus,
                 address: data.address,
                 phone: data.phone,
-                email: data.email
+                email: data.email,
+                signatureUrl: data.signature
             },
             create: {
                 userId: user.id,
@@ -51,7 +53,8 @@ export async function updateBusinessProfile(data: BusinessProfileData) {
                 vatStatus: data.vatStatus,
                 address: data.address,
                 phone: data.phone,
-                email: data.email
+                email: data.email,
+                signatureUrl: data.signature
             }
         })
 
