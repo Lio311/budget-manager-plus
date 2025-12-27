@@ -21,6 +21,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
 interface Saving {
     id: string
@@ -28,10 +29,19 @@ interface Saving {
     category: string
     description: string
     monthlyDeposit: number
+    currency: string
     goal: string | null
     date?: Date
     targetDate?: Date
     createdAt: Date
+}
+
+interface SavingsData {
+    savings: Saving[]
+    stats: {
+        totalMonthlyDepositILS: number
+        count: number
+    }
 }
 
 interface Category {
@@ -41,7 +51,7 @@ interface Category {
 }
 
 export function SavingsTab() {
-    const { month, year, currency, budgetType } = useBudget()
+    const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
 
     // --- Data Fetching ---
@@ -53,11 +63,14 @@ export function SavingsTab() {
         throw new Error(result.error || 'Failed to fetch savings')
     }
 
-    const { data: savings = [], isLoading: loadingSavings, mutate: mutateSavings } = useSWR(
+    const { data: savingsData, isLoading: loadingSavings, mutate: mutateSavings } = useSWR<SavingsData>(
         ['savings', month, year, budgetType],
         fetcherSavings,
         { revalidateOnFocus: false }
     )
+
+    const savings = savingsData?.savings || []
+    const stats = savingsData?.stats || { totalMonthlyDepositILS: 0, count: 0 }
 
     // Categories Fetcher
     const fetcherCategories = async () => {
@@ -101,6 +114,7 @@ export function SavingsTab() {
         category: '',
         description: '',
         monthlyDeposit: '',
+        currency: 'ILS',
         goal: '',
         date: new Date(),
         isRecurring: false,
@@ -113,6 +127,7 @@ export function SavingsTab() {
         category: '',
         description: '',
         monthlyDeposit: '',
+        currency: 'ILS',
         goal: '',
         date: new Date()
     })
@@ -129,8 +144,6 @@ export function SavingsTab() {
         }
     }, [categories, newSaving.category])
 
-    const totalMonthlyDeposit = savings.reduce((sum: number, saving: any) => sum + saving.monthlyDeposit, 0)
-
     // --- Actions ---
 
     async function handleAdd() {
@@ -145,6 +158,7 @@ export function SavingsTab() {
                 category: newSaving.category,
                 description: newSaving.description,
                 monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
+                currency: newSaving.currency,
                 goal: newSaving.goal || undefined,
                 date: newSaving.date, // Server component will handle the conversion
                 isRecurring: newSaving.isRecurring,
@@ -158,6 +172,7 @@ export function SavingsTab() {
                     category: categories.length > 0 ? categories[0].name : '',
                     description: '',
                     monthlyDeposit: '',
+                    currency: 'ILS',
                     goal: '',
                     date: new Date(),
                     isRecurring: false,
@@ -233,6 +248,7 @@ export function SavingsTab() {
             category: saving.category || saving.type || '',
             description: saving.name || saving.description,
             monthlyDeposit: saving.monthlyDeposit.toString(),
+            currency: saving.currency || 'ILS', // Default fallback
             goal: saving.goal || '',
             date: dateToUse
         })
@@ -240,7 +256,7 @@ export function SavingsTab() {
 
     const cancelEdit = () => {
         setEditingId(null)
-        setEditData({ category: '', description: '', monthlyDeposit: '', goal: '', date: new Date() })
+        setEditData({ category: '', description: '', monthlyDeposit: '', currency: 'ILS', goal: '', date: new Date() })
     }
 
     async function handleUpdate(id: string) {
@@ -249,6 +265,7 @@ export function SavingsTab() {
             category: editData.category,
             description: editData.description,
             monthlyDeposit: parseFloat(editData.monthlyDeposit),
+            currency: editData.currency,
             goal: editData.goal || undefined,
             date: editData.date
         })
@@ -284,14 +301,14 @@ export function SavingsTab() {
                 <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2">
                     <h3 className="text-sm font-medium text-gray-500">סך הפקדות חודשיות</h3>
                     <div className={`text-2xl font-bold text-[#0073ea] break-all ${loadingSavings ? 'animate-pulse' : ''}`}>
-                        {loadingSavings ? '...' : formatCurrency(totalMonthlyDeposit, currency)}
+                        {loadingSavings ? '...' : formatCurrency(stats.totalMonthlyDepositILS, '₪')}
                     </div>
                 </div>
 
                 <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2">
                     <h3 className="text-sm font-medium text-gray-500">מספר חסכונות</h3>
                     <div className={`text-2xl font-bold text-[#0073ea] ${loadingSavings ? 'animate-pulse' : ''}`}>
-                        {savings.length}
+                        {loadingSavings ? '...' : stats.count}
                     </div>
                 </div>
             </div>
@@ -361,6 +378,19 @@ export function SavingsTab() {
                                 value={newSaving.description}
                                 onChange={(e) => setNewSaving({ ...newSaving, description: e.target.value })}
                             />
+                        </div>
+
+                        <div className="w-full space-y-2">
+                            <label className="text-sm font-medium text-gray-700">מטבע</label>
+                            <select
+                                className="w-full p-2 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                                value={newSaving.currency}
+                                onChange={(e) => setNewSaving({ ...newSaving, currency: e.target.value })}
+                            >
+                                {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                    <option key={code} value={code}>{code} ({symbol})</option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="w-full grid grid-cols-2 gap-4">
@@ -444,7 +474,9 @@ export function SavingsTab() {
                     </div>
 
                     <div className="space-y-3">
-                        {savings.length === 0 ? (
+                        {loadingSavings ? (
+                            <div className="text-center py-10 text-gray-400">טוען...</div>
+                        ) : savings.length === 0 ? (
                             <div className="text-center py-10 text-gray-400">
                                 אין חסכונות רשומים
                             </div>
@@ -476,6 +508,16 @@ export function SavingsTab() {
                                                     />
                                                 </div>
                                                 <div className="flex gap-2 w-full">
+                                                    <select
+                                                        className="p-2 border rounded-lg h-9 bg-white text-sm w-20"
+                                                        value={editData.currency}
+                                                        onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
+                                                        disabled={submitting}
+                                                    >
+                                                        {Object.keys(SUPPORTED_CURRENCIES).map(code => (
+                                                            <option key={code} value={code}>{code}</option>
+                                                        ))}
+                                                    </select>
                                                     <Input
                                                         type="number"
                                                         className="h-9 w-24"
@@ -535,7 +577,7 @@ export function SavingsTab() {
                                                                 {saving.goal && (
                                                                     <>
                                                                         <span>•</span>
-                                                                        <span>יעד: {formatCurrency(parseFloat(saving.goal), currency)}</span>
+                                                                        <span>יעד: {formatCurrency(parseFloat(saving.goal), budgetCurrency)}</span>
                                                                     </>
                                                                 )}
                                                             </div>
@@ -545,7 +587,7 @@ export function SavingsTab() {
 
                                                 <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0 pl-1">
                                                     <span className="text-lg font-bold text-[#00c875]">
-                                                        {formatCurrency(saving.monthlyDeposit, currency)}
+                                                        {formatCurrency(saving.monthlyDeposit, getCurrencySymbol(saving.currency))}
                                                     </span>
                                                     <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <Button

@@ -4,6 +4,8 @@ import { prisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 
+import { convertToILS } from '@/lib/currency'
+
 export async function getBills(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const budget = await getCurrentBudget(month, year, '₪', type)
@@ -13,7 +15,14 @@ export async function getBills(month: number, year: number, type: 'PERSONAL' | '
             orderBy: { dueDate: 'asc' }
         })
 
-        return { success: true, data: bills }
+        // Calculate total in ILS
+        let totalILS = 0
+        for (const bill of bills) {
+            const amountInILS = await convertToILS(bill.amount, bill.currency)
+            totalILS += amountInILS
+        }
+
+        return { success: true, data: { bills, totalILS } }
     } catch (error) {
         console.error('Error fetching bills:', error)
         return { success: false, error: 'Failed to fetch bills' }
@@ -23,7 +32,7 @@ export async function getBills(month: number, year: number, type: 'PERSONAL' | '
 export async function addBill(
     month: number,
     year: number,
-    data: { name: string; amount: number; dueDay: number },
+    data: { name: string; amount: number; currency: string; dueDay: number },
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
@@ -37,6 +46,7 @@ export async function addBill(
                 budgetId: budget.id,
                 name: data.name,
                 amount: data.amount,
+                currency: data.currency,
                 dueDate: dueDate,
                 isPaid: false
             }
@@ -55,6 +65,7 @@ export async function updateBill(
     data: {
         name?: string
         amount?: number
+        currency?: string
         dueDay?: number
     }
 ) {
@@ -73,6 +84,7 @@ export async function updateBill(
             data: {
                 ...(data.name && { name: data.name }),
                 ...(data.amount && { amount: data.amount }),
+                ...(data.currency && { currency: data.currency }),
                 ...(newDueDate && { dueDate: newDueDate })
             }
         })

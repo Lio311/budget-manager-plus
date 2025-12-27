@@ -14,27 +14,44 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Pagination } from '@/components/ui/Pagination'
 import { DatePicker } from '@/components/ui/date-picker'
 import { DEBT_TYPES, DEBT_TYPE_LABELS, CREDITOR_LABELS } from '@/lib/constants/debt-types'
+import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
 interface Debt {
     id: string
     creditor: string
     debtType: string
     totalAmount: number
+    currency: string
     monthlyPayment: number
     dueDay: number
     isPaid: boolean
 }
 
+interface DebtsData {
+    debts: Debt[]
+    stats: {
+        totalOwedByMeILS: number
+        totalOwedToMeILS: number
+        netDebtILS: number
+        monthlyPaymentOwedByMeILS: number
+        monthlyPaymentOwedToMeILS: number
+        netMonthlyPaymentILS: number
+        paidThisMonthILS: number
+        unpaidThisMonthILS: number
+    }
+}
+
 export function DebtsTab() {
-    const { month, year, currency, budgetType } = useBudget()
+    const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
+
     const fetcher = async () => {
         const result = await getDebts(month, year, budgetType)
         if (result.success && result.data) return result.data
         throw new Error(result.error || 'Failed to fetch debts')
     }
 
-    const { data: debts = [], isLoading: loading, mutate } = useSWR(['debts', month, year, budgetType], fetcher, {
+    const { data: debtsData, isLoading: loading, mutate } = useSWR<DebtsData>(['debts', month, year, budgetType], fetcher, {
         revalidateOnFocus: false,
         onError: (err) => {
             toast({
@@ -45,6 +62,18 @@ export function DebtsTab() {
             })
         }
     })
+
+    const debts = debtsData?.debts || []
+    const stats = debtsData?.stats || {
+        totalOwedByMeILS: 0,
+        totalOwedToMeILS: 0,
+        netDebtILS: 0,
+        monthlyPaymentOwedByMeILS: 0,
+        monthlyPaymentOwedToMeILS: 0,
+        netMonthlyPaymentILS: 0,
+        paidThisMonthILS: 0,
+        unpaidThisMonthILS: 0
+    }
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
@@ -66,6 +95,7 @@ export function DebtsTab() {
         creditor: string
         debtType: string
         totalAmount: string
+        currency: string
         dueDay: string
         isRecurring: boolean
         numberOfInstallments: string
@@ -73,35 +103,20 @@ export function DebtsTab() {
         creditor: '',
         debtType: DEBT_TYPES.OWED_BY_ME,
         totalAmount: '',
+        currency: 'ILS',
         dueDay: '',
         isRecurring: false,
         numberOfInstallments: ''
     })
     const [editingId, setEditingId] = useState<string | null>(null)
-    const [editData, setEditData] = useState<{ creditor: string; debtType: string; totalAmount: string; monthlyPayment: string; dueDay: string }>({
+    const [editData, setEditData] = useState<{ creditor: string; debtType: string; totalAmount: string; currency: string; monthlyPayment: string; dueDay: string }>({
         creditor: '',
         debtType: DEBT_TYPES.OWED_BY_ME,
         totalAmount: '',
+        currency: 'ILS',
         monthlyPayment: '',
         dueDay: ''
     })
-
-    // Calculate debts split by type
-    const debtsOwedByMe = debts.filter((d: Debt) => d.debtType === DEBT_TYPES.OWED_BY_ME)
-    const debtsOwedToMe = debts.filter((d: Debt) => d.debtType === DEBT_TYPES.OWED_TO_ME)
-
-    const totalDebtsOwedByMe = debtsOwedByMe.reduce((sum: number, debt: Debt) => sum + debt.totalAmount, 0)
-    const totalDebtsOwedToMe = debtsOwedToMe.reduce((sum: number, debt: Debt) => sum + debt.totalAmount, 0)
-    const netDebt = totalDebtsOwedByMe - totalDebtsOwedToMe
-
-    const monthlyPaymentsOwedByMe = debtsOwedByMe.reduce((sum: number, debt: Debt) => sum + debt.monthlyPayment, 0)
-    const monthlyPaymentsOwedToMe = debtsOwedToMe.reduce((sum: number, debt: Debt) => sum + debt.monthlyPayment, 0)
-    const netMonthlyPayment = monthlyPaymentsOwedByMe - monthlyPaymentsOwedToMe
-
-    const paidThisMonth = debts.filter((d: Debt) => d.isPaid).reduce((sum: number, debt: Debt) => {
-        return sum + (debt.debtType === DEBT_TYPES.OWED_BY_ME ? debt.monthlyPayment : -debt.monthlyPayment)
-    }, 0)
-    const unpaidThisMonth = netMonthlyPayment - paidThisMonth
 
     const handleAdd = async () => {
         // Validate required fields
@@ -138,6 +153,7 @@ export function DebtsTab() {
                 creditor: newDebt.creditor.trim(),
                 debtType: newDebt.debtType,
                 totalAmount,
+                currency: newDebt.currency,
                 monthlyPayment,
                 dueDay: parseInt(newDebt.dueDay),
                 isRecurring: newDebt.isRecurring,
@@ -150,6 +166,7 @@ export function DebtsTab() {
                     creditor: '',
                     debtType: DEBT_TYPES.OWED_BY_ME,
                     totalAmount: '',
+                    currency: 'ILS',
                     dueDay: '',
                     isRecurring: false,
                     numberOfInstallments: ''
@@ -192,6 +209,7 @@ export function DebtsTab() {
             creditor: debt.creditor,
             debtType: debt.debtType,
             totalAmount: debt.totalAmount.toString(),
+            currency: debt.currency || 'ILS', // Backup default
             monthlyPayment: debt.monthlyPayment.toString(),
             dueDay: debt.dueDay.toString()
         })
@@ -199,7 +217,7 @@ export function DebtsTab() {
 
     function handleCancelEdit() {
         setEditingId(null)
-        setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', monthlyPayment: '', dueDay: '' })
+        setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', currency: 'ILS', monthlyPayment: '', dueDay: '' })
     }
 
     async function handleUpdate() {
@@ -229,6 +247,7 @@ export function DebtsTab() {
             creditor: editData.creditor,
             debtType: editData.debtType,
             totalAmount: parseFloat(editData.totalAmount),
+            currency: editData.currency,
             monthlyPayment: parseFloat(editData.monthlyPayment),
             dueDay
         })
@@ -240,7 +259,7 @@ export function DebtsTab() {
                 duration: 1000
             })
             setEditingId(null)
-            setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', monthlyPayment: '', dueDay: '' })
+            setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', currency: 'ILS', monthlyPayment: '', dueDay: '' })
             await mutate()
         } else {
             toast({
@@ -250,8 +269,8 @@ export function DebtsTab() {
                 duration: 1000
             })
         }
-        setSubmitting(false);
-    };
+        setSubmitting(false)
+    }
 
     return (
         <div className="space-y-4 p-1" dir="rtl">
@@ -259,27 +278,27 @@ export function DebtsTab() {
             <div className="grid gap-3 grid-cols-1 md:grid-cols-3">
                 <div className="monday-card p-4 border-l-4 border-l-[#00c875]">
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">יתרה כוללת (נטו)</h3>
-                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse' : netDebt > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                        {loading ? '...' : formatCurrency(Math.abs(netDebt), currency)}
+                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse' : stats.netDebtILS > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                        {loading ? '...' : formatCurrency(Math.abs(stats.netDebtILS), '₪')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                        {loading ? '' : netDebt > 0 ? 'חובות שלי' : 'חייבים לי'}
+                        {loading ? '' : stats.netDebtILS > 0 ? 'חובות שלי' : 'חייבים לי'}
                     </p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-[#0073ea]">
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">תשלום חודשי (נטו)</h3>
                     <div className={`text-2xl font-bold text-slate-900 ${loading ? 'animate-pulse' : ''}`}>
-                        {loading ? '...' : formatCurrency(netMonthlyPayment, currency)}
+                        {loading ? '...' : formatCurrency(stats.netMonthlyPaymentILS, '₪')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">התחייבות חודשית</p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-red-500">
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">נותר לתשלום החודש</h3>
                     <div className={`text-2xl font-bold text-slate-900 ${loading ? 'animate-pulse' : ''}`}>
-                        {loading ? '...' : formatCurrency(unpaidThisMonth, currency)}
+                        {loading ? '...' : formatCurrency(stats.unpaidThisMonthILS, '₪')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                        {loading ? '' : `${formatCurrency(paidThisMonth, currency)} שולם`}
+                        {loading ? '' : `${formatCurrency(stats.paidThisMonthILS, '₪')} שולם`}
                     </p>
                 </div>
             </div>
@@ -305,19 +324,34 @@ export function DebtsTab() {
                                     disabled={submitting}
                                 />
                             </div>
-                            <div className="space-y-1.5 ml-2">
-                                <label className="text-xs text-[#676879]">סכום כולל</label>
-                                <Input
-                                    type="number"
-                                    placeholder="0.00"
-                                    className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
-                                    value={newDebt.totalAmount}
-                                    onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
-                                    disabled={submitting}
-                                    dir="ltr"
-                                />
+                            <div className="space-y-1.5 ml-2 col-span-2 sm:col-span-3 grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className="text-xs text-[#676879] block mb-1">מטבע</label>
+                                    <select
+                                        className="w-full h-10 border-gray-200 rounded-md text-sm"
+                                        value={newDebt.currency}
+                                        onChange={(e) => setNewDebt({ ...newDebt, currency: e.target.value })}
+                                        disabled={submitting}
+                                    >
+                                        {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                            <option key={code} value={code}>{code} ({symbol})</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs text-[#676879]">סכום כולל</label>
+                                    <Input
+                                        type="number"
+                                        placeholder="0.00"
+                                        className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
+                                        value={newDebt.totalAmount}
+                                        onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
+                                        disabled={submitting}
+                                        dir="ltr"
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5 col-span-2 sm:col-span-1">
                                 <label className="text-xs text-[#676879]">יום חיוב</label>
                                 <Input
                                     type="number"
@@ -375,7 +409,7 @@ export function DebtsTab() {
                                         <div className="h-10 px-3 py-1.5 border border-gray-200 rounded-lg bg-white text-sm flex items-center w-full font-medium text-[#323338]">
                                             {formatCurrency(
                                                 parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
-                                                currency
+                                                getCurrencySymbol(newDebt.currency)
                                             )}
                                         </div>
                                     </div>
@@ -392,7 +426,9 @@ export function DebtsTab() {
                     </div>
 
                     <div className="space-y-3">
-                        {debts.length === 0 ? (
+                        {loading ? (
+                            <div className="text-center py-10 text-gray-400">טוען...</div>
+                        ) : debts.length === 0 ? (
                             <p className="text-center text-muted-foreground py-8 italic">אין חובות רשומים</p>
                         ) : (
                             <>
@@ -411,6 +447,16 @@ export function DebtsTab() {
                                                         onChange={(e) => setEditData({ ...editData, creditor: e.target.value })}
                                                         disabled={submitting}
                                                     />
+                                                    <select
+                                                        className="h-9 border rounded-md text-sm w-20"
+                                                        value={editData.currency}
+                                                        onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
+                                                        disabled={submitting}
+                                                    >
+                                                        {Object.keys(SUPPORTED_CURRENCIES).map(code => (
+                                                            <option key={code} value={code}>{code}</option>
+                                                        ))}
+                                                    </select>
                                                     <Input
                                                         type="number"
                                                         placeholder="סכום כולל"
@@ -475,7 +521,7 @@ export function DebtsTab() {
                                                             </p>
                                                         </div>
                                                         <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
-                                                            <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, currency)}</span>
+                                                            <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, getCurrencySymbol(debt.currency))}</span>
                                                             <span className="text-slate-500">יום חיוב: {debt.dueDay}</span>
                                                         </div>
                                                     </div>
@@ -485,7 +531,7 @@ export function DebtsTab() {
                                                     <div className="text-right sm:text-left">
                                                         <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">תשלום החודש</p>
                                                         <span className={`text-lg font-black ${debt.isPaid ? 'text-green-600' : 'text-purple-600'}`}>
-                                                            {formatCurrency(debt.monthlyPayment, currency)}
+                                                            {formatCurrency(debt.monthlyPayment, getCurrencySymbol(debt.currency))}
                                                         </span>
                                                     </div>
 

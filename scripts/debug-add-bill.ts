@@ -19,6 +19,7 @@ async function testAddBillLeakage() {
     const result = await addBill(month, year, {
         name: billName,
         amount: billAmount,
+        currency: 'ILS',
         dueDay: billDueDay
     }, type);
 

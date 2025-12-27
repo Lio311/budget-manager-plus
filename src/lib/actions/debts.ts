@@ -5,6 +5,9 @@ import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 import { addMonths } from 'date-fns'
 
+import { convertToILS } from '@/lib/currency'
+import { DEBT_TYPES } from '@/lib/constants/debt-types'
+
 export async function getDebts(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const budget = await getCurrentBudget(month, year, '₪', type)
@@ -14,7 +17,44 @@ export async function getDebts(month: number, year: number, type: 'PERSONAL' | '
             orderBy: { dueDay: 'asc' }
         })
 
-        return { success: true, data: debts }
+        // Calculate stats in ILS
+        let totalOwedByMeILS = 0
+        let totalOwedToMeILS = 0
+        let monthlyPaymentOwedByMeILS = 0
+        let monthlyPaymentOwedToMeILS = 0
+        let paidThisMonthILS = 0
+
+        for (const debt of debts) {
+            const totalAmountInILS = await convertToILS(debt.totalAmount, debt.currency)
+            const monthlyPaymentInILS = await convertToILS(debt.monthlyPayment, debt.currency)
+
+            if (debt.debtType === DEBT_TYPES.OWED_BY_ME) {
+                totalOwedByMeILS += totalAmountInILS
+                monthlyPaymentOwedByMeILS += monthlyPaymentInILS
+                if (debt.isPaid) {
+                    paidThisMonthILS += monthlyPaymentInILS
+                }
+            } else if (debt.debtType === DEBT_TYPES.OWED_TO_ME) {
+                totalOwedToMeILS += totalAmountInILS
+                monthlyPaymentOwedToMeILS += monthlyPaymentInILS
+                if (debt.isPaid) {
+                    paidThisMonthILS -= monthlyPaymentInILS
+                }
+            }
+        }
+
+        const stats = {
+            totalOwedByMeILS,
+            totalOwedToMeILS,
+            netDebtILS: totalOwedByMeILS - totalOwedToMeILS,
+            monthlyPaymentOwedByMeILS,
+            monthlyPaymentOwedToMeILS,
+            netMonthlyPaymentILS: monthlyPaymentOwedByMeILS - monthlyPaymentOwedToMeILS,
+            paidThisMonthILS,
+            unpaidThisMonthILS: (monthlyPaymentOwedByMeILS - monthlyPaymentOwedToMeILS) - paidThisMonthILS
+        }
+
+        return { success: true, data: { debts, stats } }
     } catch (error) {
         console.error('Error fetching debts:', error)
         return { success: false, error: 'Failed to fetch debts' }
@@ -22,10 +62,12 @@ export async function getDebts(month: number, year: number, type: 'PERSONAL' | '
 }
 
 // Helper function to create debt installments
+// Helper function to create debt installments
 async function createDebtInstallments(
     creditor: string,
     debtType: string,
     totalDebtAmount: number,
+    currency: string,
     numberOfInstallments: number,
     dueDay: number,
     currentMonth: number,
@@ -51,6 +93,7 @@ async function createDebtInstallments(
             creditor,
             debtType,
             totalAmount: totalDebtAmount,
+            currency,
             monthlyPayment,
             dueDay,
             isPaid: false,
@@ -74,6 +117,7 @@ export async function addDebt(
         creditor: string
         debtType: string
         totalAmount: number
+        currency: string
         monthlyPayment: number
         dueDay: number
         isRecurring?: boolean
@@ -91,6 +135,7 @@ export async function addDebt(
                 data.creditor,
                 data.debtType,
                 data.totalDebtAmount,
+                data.currency,
                 data.numberOfInstallments,
                 data.dueDay,
                 month,
@@ -105,6 +150,7 @@ export async function addDebt(
                     creditor: data.creditor,
                     debtType: data.debtType,
                     totalAmount: data.totalAmount,
+                    currency: data.currency,
                     monthlyPayment: data.monthlyPayment,
                     dueDay: data.dueDay,
                     isPaid: false
@@ -126,6 +172,7 @@ export async function updateDebt(
         creditor: string
         debtType: string
         totalAmount: number
+        currency: string
         monthlyPayment: number
         dueDay: number
     }
@@ -137,6 +184,7 @@ export async function updateDebt(
                 creditor: data.creditor,
                 debtType: data.debtType,
                 totalAmount: data.totalAmount,
+                currency: data.currency,
                 monthlyPayment: data.monthlyPayment,
                 dueDay: data.dueDay
             }

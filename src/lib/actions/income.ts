@@ -4,6 +4,8 @@ import { prisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 
+import { convertToILS } from '@/lib/currency'
+
 export async function getIncomes(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const budget = await getCurrentBudget(month, year, '₪', type)
@@ -13,7 +15,14 @@ export async function getIncomes(month: number, year: number, type: 'PERSONAL' |
             orderBy: { date: 'desc' }
         })
 
-        return { success: true, data: incomes }
+        // Calculate total in ILS
+        let totalILS = 0
+        for (const income of incomes) {
+            const amountInILS = await convertToILS(income.amount, income.currency)
+            totalILS += amountInILS
+        }
+
+        return { success: true, data: { incomes, totalILS } }
     } catch (error) {
         console.error('Error fetching incomes:', error)
         return { success: false, error: 'Failed to fetch incomes' }
@@ -27,6 +36,7 @@ export async function addIncome(
         source: string
         category: string
         amount: number
+        currency: string
         date?: string
         isRecurring?: boolean
         recurringStartDate?: string
@@ -43,6 +53,7 @@ export async function addIncome(
                 source: data.source,
                 category: data.category,
                 amount: data.amount,
+                currency: data.currency,
                 date: data.date ? new Date(data.date) : null,
                 isRecurring: data.isRecurring || false,
                 recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : (data.date ? new Date(data.date) : new Date()),
@@ -53,7 +64,7 @@ export async function addIncome(
         // If recurring, create copies for future months
         if (data.isRecurring && data.recurringEndDate) {
             const startDate = data.recurringStartDate || data.date || new Date().toISOString()
-            await createRecurringIncomes(income.id, data.source, data.category, data.amount, startDate, data.recurringEndDate, type)
+            await createRecurringIncomes(income.id, data.source, data.category, data.amount, data.currency, startDate, data.recurringEndDate, type)
         }
 
         revalidatePath('/dashboard')
@@ -69,6 +80,7 @@ async function createRecurringIncomes(
     source: string,
     category: string,
     amount: number,
+    currency: string,
     startDateStr: string,
     endDateStr: string,
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
@@ -112,6 +124,7 @@ async function createRecurringIncomes(
                     source,
                     category,
                     amount,
+                    currency,
                     date: new Date(currentYear, currentMonth - 1, dayToUse),
                     isRecurring: true,
                     recurringSourceId: sourceId,
@@ -175,6 +188,7 @@ export async function updateIncome(
         source?: string
         category?: string
         amount?: number
+        currency?: string
         date?: string
     }
 ) {
@@ -185,6 +199,7 @@ export async function updateIncome(
                 ...(data.source && { source: data.source }),
                 ...(data.category && { category: data.category }),
                 ...(data.amount && { amount: data.amount }),
+                ...(data.currency && { currency: data.currency }),
                 ...(data.date && { date: new Date(data.date) })
             }
         })

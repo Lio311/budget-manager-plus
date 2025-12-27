@@ -4,6 +4,8 @@ import { prisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 
+import { convertToILS } from '@/lib/currency'
+
 export async function getExpenses(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const budget = await getCurrentBudget(month, year, '₪', type)
@@ -13,7 +15,14 @@ export async function getExpenses(month: number, year: number, type: 'PERSONAL' 
             orderBy: { date: 'desc' }
         })
 
-        return { success: true, data: expenses }
+        // Calculate total in ILS
+        let totalILS = 0
+        for (const expense of expenses) {
+            const amountInILS = await convertToILS(expense.amount, expense.currency)
+            totalILS += amountInILS
+        }
+
+        return { success: true, data: { expenses, totalILS } }
     } catch (error) {
         console.error('Error fetching expenses:', error)
         return { success: false, error: 'Failed to fetch expenses' }
@@ -27,6 +36,7 @@ export async function addExpense(
         category: string
         description: string
         amount: number
+        currency: string
         date: string
         isRecurring?: boolean
         recurringStartDate?: string
@@ -43,6 +53,7 @@ export async function addExpense(
                 category: data.category,
                 description: data.description,
                 amount: data.amount,
+                currency: data.currency,
                 date: new Date(data.date),
                 isRecurring: data.isRecurring || false,
                 recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : (data.date ? new Date(data.date) : new Date()),
@@ -58,6 +69,7 @@ export async function addExpense(
                 data.category,
                 data.description,
                 data.amount,
+                data.currency,
                 startDate,
                 data.recurringEndDate,
                 type // Pass type to recursive function
@@ -77,6 +89,7 @@ async function createRecurringExpenses(
     category: string,
     description: string,
     amount: number,
+    currency: string,
     startDateStr: string,
     endDateStr: string,
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
@@ -120,6 +133,7 @@ async function createRecurringExpenses(
                     category,
                     description,
                     amount,
+                    currency,
                     date: new Date(currentYear, currentMonth - 1, dayToUse),
                     isRecurring: true,
                     recurringSourceId: sourceId,
@@ -183,6 +197,7 @@ export async function updateExpense(
         category?: string
         description?: string
         amount?: number
+        currency?: string
         date?: string
     }
 ) {
@@ -193,6 +208,7 @@ export async function updateExpense(
                 ...(data.category && { category: data.category }),
                 ...(data.description && { description: data.description }),
                 ...(data.amount && { amount: data.amount }),
+                ...(data.currency && { currency: data.currency }),
                 ...(data.date && { date: new Date(data.date) })
             }
         })

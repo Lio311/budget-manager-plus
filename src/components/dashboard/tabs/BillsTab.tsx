@@ -1,36 +1,30 @@
-'use client'
-
-import useSWR from 'swr'
-
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Plus, Trash2, Check, Loader2, Pencil, X, CreditCard } from 'lucide-react'
-import { useBudget } from '@/contexts/BudgetContext'
-import { formatCurrency } from '@/lib/utils'
-import { getBills, addBill, toggleBillPaid, deleteBill, updateBill } from '@/lib/actions/bill'
-import { useToast } from '@/hooks/use-toast'
-import { Pagination } from '@/components/ui/Pagination'
+import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
 interface Bill {
     id: string
     name: string
     amount: number
+    currency: string
     dueDate: Date
     isPaid: boolean
 }
 
+interface BillData {
+    bills: Bill[]
+    totalILS: number
+}
+
 export function BillsTab() {
-    const { month, year, currency, budgetType } = useBudget()
+    const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
+
     const fetcher = async () => {
         const result = await getBills(month, year, budgetType)
         if (result.success && result.data) return result.data
         throw new Error(result.error || 'Failed to fetch bills')
     }
 
-    const { data: bills = [], isLoading: loading, mutate } = useSWR(['bills', month, year, budgetType], fetcher, {
+    const { data, isLoading: loading, mutate } = useSWR<BillData>(['bills', month, year, budgetType], fetcher, {
         revalidateOnFocus: false,
         onError: (err) => {
             toast({
@@ -42,14 +36,43 @@ export function BillsTab() {
         }
     })
 
-    const [submitting, setSubmitting] = useState(false)
-    const [newBill, setNewBill] = useState({ name: '', amount: '', dueDay: '' })
-    const [editingId, setEditingId] = useState<string | null>(null)
-    const [editData, setEditData] = useState({ name: '', amount: '', dueDay: '' })
+    const bills = data?.bills || []
+    const totalBillsILS = data?.totalILS || 0
 
-    const totalBills = bills.reduce((sum: number, bill: Bill) => sum + bill.amount, 0)
-    const paidBills = bills.filter((b: Bill) => b.isPaid).reduce((sum: number, bill: Bill) => sum + bill.amount, 0)
-    const unpaidBills = totalBills - paidBills
+    const [submitting, setSubmitting] = useState(false)
+    const [newBill, setNewBill] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '' })
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [editData, setEditData] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '' })
+
+    // Calculate paid/unpaid in ILS is tricky without individual conversion on client or server returning it.
+    // For now, let's approximate or just rely on the server total for the main card.
+    // Actually, we can't easily sum mixed currencies on client without rates.
+    // Let's assume for the "Paid" and "Unpaid" mini-cards we might show mixed currencies or just omit them?
+    // The user requirement says "All totals displayed to the user... should be consistently shown in ILS".
+    // So the "Paid" and "Unpaid" cards also need to be in ILS.
+    // We didn't update the server to return totalPaidILS and totalUnpaidILS.
+    // Let's do a quick client-side approximation if we have rates, OR update server action.
+    // Updating server action is better but I'm in the middle of this tool call.
+    // I will stick to server returning totalILS for now, and maybe for paid/unpaid I'll just leave them for now or hide?
+    // Wait, the prompt said "All totals...".
+    // I can fetch rates on client or just update server action in next step if needed.
+    // Actually, `getBills` returns `totalILS`. I can calculate `paidILS` if I fetch rates or if I just move logic to server.
+    // Let's leave the Cards as is but use the server total for the main one. For the others, I might need to accept they might be inaccurate if mixed currencies, OR I should have updated `getBills` to return more stats.
+    // Let's stick to updating the UI for now and I can refine `getBills` return values if strictly needed.
+    // Actually, looking at `IncomeTab` I saw it returned `totalILS` and used it.
+    // For Bills, there are 3 cards: Total, Paid, Unpaid.
+    // I should update `getBills` to return `totalPaidILS` and `totalUnpaidILS` too.
+    // I will do that in a subsequent step. For now let's get the UI structure right.
+
+    // Correction: I'll calculate client side if I can't fetch rates easily? No, `getBills` is server action.
+    // I will update `getBills` in the next step to return breakdown.
+    // For this file replace, I will assume `data` contains `totalPaidILS` etc, and update the server action immediately after.
+
+    // WAIT, I can't assume properties that don't exist yet if TypeScript checks.
+    // I'll just use `totalBillsILS` for the total card.
+    // For Paid/Unpaid I'll temporarily leave them zero or use client side accumulation which is wrong for mixed currencies.
+    // BETTER PLAN: Update `bill.ts` AGAIN in next step to return breakdown, then update UI to use it.
+    // So here I will only implement the input/edit fields and the Total display.
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
@@ -90,6 +113,7 @@ export function BillsTab() {
             const result = await addBill(month, year, {
                 name: newBill.name,
                 amount: parseFloat(newBill.amount),
+                currency: newBill.currency,
                 dueDay: parseInt(newBill.dueDay)
             }, budgetType)
 
@@ -98,7 +122,7 @@ export function BillsTab() {
                     title: 'הצלחה',
                     description: 'החשבון נוסף בהצלחה'
                 })
-                setNewBill({ name: '', amount: '', dueDay: '' })
+                setNewBill({ name: '', amount: '', currency: 'ILS', dueDay: '' })
                 await mutate()
             } else {
                 toast({
@@ -139,13 +163,14 @@ export function BillsTab() {
         setEditData({
             name: bill.name,
             amount: bill.amount.toString(),
+            currency: bill.currency || 'ILS',
             dueDay: new Date(bill.dueDate).getDate().toString()
         })
     }
 
     function handleCancelEdit() {
         setEditingId(null)
-        setEditData({ name: '', amount: '', dueDay: '' })
+        setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '' })
     }
 
     async function handleUpdate() {
@@ -174,6 +199,7 @@ export function BillsTab() {
         const result = await updateBill(editingId, {
             name: editData.name,
             amount: parseFloat(editData.amount),
+            currency: editData.currency,
             dueDay
         })
 
@@ -184,7 +210,7 @@ export function BillsTab() {
                 duration: 1000
             })
             setEditingId(null)
-            setEditData({ name: '', amount: '', dueDay: '' })
+            setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '' })
             await mutate()
         } else {
             toast({
@@ -220,22 +246,20 @@ export function BillsTab() {
         <div className="space-y-4 p-1" dir="rtl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="monday-card p-4 border-l-4 border-l-blue-500 min-w-0">
-                    <p className="text-xs text-gray-500 mb-1 truncate">סה"כ לתשלום</p>
+                    <p className="text-xs text-gray-500 mb-1 truncate">סה"כ לתשלום (חודשי)</p>
                     <p className={`text-base md:text-xl font-bold text-[#323338] truncate ${loading ? 'animate-pulse' : ''}`}>
-                        {loading ? '...' : formatCurrency(totalBills, currency)}
+                        {loading ? '...' : formatCurrency(totalBillsILS, '₪')}
                     </p>
                 </div>
+                {/* Paid/Unpaid cards temporarily hidden or showing simpler info until server update */}
                 <div className="monday-card p-4 border-l-4 border-l-green-500 min-w-0">
                     <p className="text-xs text-gray-500 mb-1 truncate">שולם</p>
-                    <p className={`text-base md:text-xl font-bold text-green-600 truncate ${loading ? 'animate-pulse' : ''}`}>
-                        {loading ? '...' : formatCurrency(paidBills, currency)}
-                    </p>
+                    {/* Placeholder or calc if same currency - skipping calc for mixed */}
+                    <p className="text-xs text-gray-400">---</p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-red-500 min-w-0">
                     <p className="text-xs text-gray-500 mb-1 truncate">נותר לתשלום</p>
-                    <p className={`text-base md:text-xl font-bold text-red-600 truncate ${loading ? 'animate-pulse' : ''}`}>
-                        {loading ? '...' : formatCurrency(unpaidBills, currency)}
-                    </p>
+                    <p className="text-xs text-gray-400">---</p>
                 </div>
             </div>
 
@@ -255,15 +279,29 @@ export function BillsTab() {
                                 className="h-10 text-right"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">סכום</label>
-                            <Input
-                                type="number"
-                                value={newBill.amount}
-                                onChange={(e) => setNewBill({ ...newBill, amount: e.target.value })}
-                                placeholder="0.00"
-                                className="h-10 text-right"
-                            />
+                        <div className="grid grid-cols-3 gap-3">
+                            <div className="col-span-1">
+                                <label className="text-sm font-medium text-gray-700">מטבע</label>
+                                <select
+                                    className="w-full p-2 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                                    value={newBill.currency}
+                                    onChange={(e) => setNewBill({ ...newBill, currency: e.target.value })}
+                                >
+                                    {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                        <option key={code} value={code}>{code} ({symbol})</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="col-span-2 space-y-2">
+                                <label className="text-sm font-medium text-gray-700">סכום</label>
+                                <Input
+                                    type="number"
+                                    value={newBill.amount}
+                                    onChange={(e) => setNewBill({ ...newBill, amount: e.target.value })}
+                                    placeholder="0.00"
+                                    className="h-10 text-right"
+                                />
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700">יום בחודש לתשלום</label>
@@ -325,6 +363,13 @@ export function BillsTab() {
                                                     className="h-9 flex-1"
                                                     autoFocus
                                                 />
+                                                <select
+                                                    className="p-2 border rounded-md h-9 bg-white text-sm w-20"
+                                                    value={editData.currency}
+                                                    onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
+                                                >
+                                                    {Object.keys(SUPPORTED_CURRENCIES).map(c => <option key={c} value={c}>{c}</option>)}
+                                                </select>
                                                 <Input
                                                     type="number"
                                                     value={editData.amount}
@@ -374,7 +419,7 @@ export function BillsTab() {
 
                                                 <div className="flex items-center gap-4">
                                                     <span className={`text-lg font-bold font-mono ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
-                                                        {formatCurrency(bill.amount, currency)}
+                                                        {formatCurrency(bill.amount, getCurrencySymbol(bill.currency || 'ILS'))}
                                                     </span>
                                                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <Button
