@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from 'react'
 import { Plus, Check, ChevronDown } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import useSWR from 'swr'
+import { getPaymentMethods, addPaymentMethod } from '@/lib/actions/payment-method'
+import { toast } from 'sonner'
 
 export type PaymentMethodColor = 'purple' | 'blue' | 'green' | 'red' | 'orange'
 
@@ -28,7 +31,6 @@ const VARIANTS = {
         button: 'bg-blue-600 hover:bg-blue-700',
     },
     green: {
-        // Using Monday.com green #00c875
         hoverBorder: 'hover:border-[#00c875]',
         itemSelected: 'bg-[#00c875]/10 text-[#00c875]',
         customItemText: 'text-[#00c875]',
@@ -36,7 +38,6 @@ const VARIANTS = {
         button: 'bg-[#00c875] hover:bg-[#00b268]',
     },
     red: {
-        // Using Monday.com red #e2445c
         hoverBorder: 'hover:border-[#e2445c]',
         itemSelected: 'bg-[#e2445c]/10 text-[#e2445c]',
         customItemText: 'text-[#e2445c]',
@@ -66,9 +67,20 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
     const [isOpen, setIsOpen] = useState(false)
     const [isCustom, setIsCustom] = useState(false)
     const [customValue, setCustomValue] = useState('')
+    const [saving, setSaving] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
 
     const styles = VARIANTS[color]
+
+    // Fetch Custom Methods
+    const { data: customMethodsResult, mutate } = useSWR('payment-methods', getPaymentMethods)
+    const customMethods = customMethodsResult?.success ? customMethodsResult.data : []
+
+    // Combine Methods
+    const allMethods = [
+        ...DEFAULT_METHODS,
+        ...(customMethods || []).map((m: any) => ({ id: m.name, label: m.name }))
+    ]
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -86,17 +98,37 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
         setIsCustom(false)
     }
 
-    const handleCustomSubmit = () => {
-        if (customValue.trim()) {
-            onChange(customValue.trim())
+    const handleCustomSubmit = async () => {
+        if (!customValue.trim()) return
+
+        setSaving(true)
+        const name = customValue.trim()
+
+        try {
+            // Optimistic Update
+            onChange(name)
             setIsOpen(false)
             setIsCustom(false)
             setCustomValue('')
+
+            // Persist
+            const result = await addPaymentMethod(name)
+            if (result.success) {
+                await mutate()
+                toast.success('אמצעי תשלום נשמר')
+            } else {
+                toast.error('שגיאה בשמירת אמצעי תשלום')
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error('שגיאה בשמירה')
+        } finally {
+            setSaving(false)
         }
     }
 
     const getLabel = (val: string) => {
-        const found = DEFAULT_METHODS.find(m => m.id === val || m.label === val)
+        const found = allMethods.find(m => m.id === val || m.label === val)
         return found ? found.label : val
     }
 
@@ -130,7 +162,7 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
                     >
                         {!isCustom ? (
                             <div className="p-1">
-                                {DEFAULT_METHODS.map((method) => (
+                                {allMethods.map((method) => (
                                     <div
                                         key={method.id}
                                         onClick={() => handleSelect(method.label)}
@@ -180,13 +212,13 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
                                 <div className="flex gap-2">
                                     <button
                                         onClick={handleCustomSubmit}
-                                        disabled={!customValue.trim()}
+                                        disabled={!customValue.trim() || saving}
                                         className={cn(
                                             "flex-1 text-white text-xs py-1.5 rounded disabled:opacity-50",
                                             styles.button
                                         )}
                                     >
-                                        הוסף
+                                        {saving ? 'שומר...' : 'הוסף'}
                                     </button>
                                     <button
                                         onClick={() => setIsCustom(false)}

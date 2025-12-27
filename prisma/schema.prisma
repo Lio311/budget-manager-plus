@@ -129,6 +129,22 @@ enum ExpenseType {
   CAPEX // Capital Expenditure (Assets)
 }
 
+
+
+model UserPaymentMethod {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("user_payment_methods")
+}
+
+
 model Income {
   id                String   @id @default(cuid())
   budgetId          String
