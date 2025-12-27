@@ -18,7 +18,7 @@ import {
     TableHeader,
     TableRow
 } from '@/components/ui/table'
-import { createCoupon, deleteCoupon, deleteUser, updateSubscription, updateCoupon, resetRevenue } from '@/lib/actions/admin'
+import { createCoupon, deleteCoupon, deleteUser, updateSubscription, updateCoupon, resetRevenue, fixRecurringLeak } from '@/lib/actions/admin'
 import { toggleMaintenanceMode } from '@/lib/actions/maintenance'
 import { CountdownTimer } from '@/components/admin/CountdownTimer'
 import { toast } from 'sonner'
@@ -279,6 +279,24 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                 <Card>
                     <CardHeader className="relative flex flex-row items-center justify-center space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-12 h-8 w-8 text-gray-400 hover:text-blue-600 transition-colors"
+                            onClick={async () => {
+                                if (confirm('Run data integrity check? This will fix any recurring items appearing in the wrong budget type.')) {
+                                    const res = await fixRecurringLeak()
+                                    if (res.success && res.fixedCount !== undefined) {
+                                        toast.success(`Fixed ${res.fixedCount} items`)
+                                        if (res.fixedCount > 0) console.log(res.details)
+                                    }
+                                    else toast.error('Failed to fix data')
+                                }
+                            }}
+                            title="Fix Data Leak"
+                        >
+                            <ShieldAlert className="h-4 w-4" />
+                        </Button>
                         <Button
                             variant="ghost"
                             size="icon"
