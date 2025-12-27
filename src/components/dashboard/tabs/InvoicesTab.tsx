@@ -29,7 +29,7 @@ export function InvoicesTab() {
         issueDate: new Date(),
         dueDate: undefined,
         subtotal: 0,
-        vatRate: 0.17,
+        vatRate: 0.18,
         notes: ''
     })
 
@@ -66,7 +66,7 @@ export function InvoicesTab() {
                     issueDate: new Date(),
                     dueDate: undefined,
                     subtotal: 0,
-                    vatRate: 0.17,
+                    vatRate: 0.18,
                     notes: ''
                 })
                 mutate()
@@ -251,7 +251,7 @@ export function InvoicesTab() {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
                                 >
                                     <option value="0">ללא מע"מ (0%)</option>
-                                    <option value="0.17">מע"מ רגיל (17%)</option>
+                                    <option value="0.18">מע"מ רגיל (18%)</option>
                                 </select>
                             </div>
                         </div>

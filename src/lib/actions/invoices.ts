@@ -68,7 +68,7 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
         const user = await currentUser()
         if (!user) throw new Error('Unauthorized')
 
-        const vatRate = data.vatRate ?? 0.17
+        const vatRate = data.vatRate ?? 0.18
         const vatAmount = data.subtotal * vatRate
         const total = data.subtotal + vatAmount
 
