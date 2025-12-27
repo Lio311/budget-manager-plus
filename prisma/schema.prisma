@@ -36,6 +36,7 @@ model User {
   clients    Client[]
   suppliers  Supplier[]
   invoices   Invoice[]
+  quotes     Quote[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -391,6 +392,7 @@ model Client {
   // Relations
   incomes   Income[]
   invoices  Invoice[]
+  quotes    Quote[]
   
   @@index([userId, scope])
   @@unique([userId, name, scope])

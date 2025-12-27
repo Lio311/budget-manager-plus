@@ -7,13 +7,14 @@ import { prisma } from '@/lib/db'
 import fs from 'fs'
 import path from 'path'
 
-// Register Hebrew font - using local file buffer for maximum reliability on Vercel
+// Register Hebrew font - using local file base64 for maximum reliability on Vercel
 try {
     const fontPath = path.resolve(process.cwd(), 'src/lib/pdf/fonts/Alef-Regular.ttf')
     if (fs.existsSync(fontPath)) {
+        const fontBase64 = fs.readFileSync(fontPath).toString('base64')
         Font.register({
             family: 'Alef',
-            src: fs.readFileSync(fontPath) as any
+            src: `data:font/ttf;base64,${fontBase64}`
         })
     }
 } catch (error) {
