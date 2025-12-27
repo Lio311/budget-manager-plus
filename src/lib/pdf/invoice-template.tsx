@@ -4,10 +4,10 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
 
-// Register Hebrew font - using Assistant as it's very stable on Vercel
+// Register Hebrew font - using a direct GitHub raw TTF link to ensure it's not a WOFF/WOFF2
 Font.register({
     family: 'Assistant',
-    src: 'https://fonts.gstatic.com/s/assistant/v19/2s7S76TlbPr3i8qQqnclE_E.ttf'
+    src: 'https://raw.githubusercontent.com/google/fonts/main/ofl/assistant/static/Assistant-Regular.ttf'
 });
 
 // Define styles with green/black/white theme
