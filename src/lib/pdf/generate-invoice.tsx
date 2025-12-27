@@ -29,7 +29,7 @@ interface GenerateInvoicePDFParams {
     userId: string
 }
 
-export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoicePDFParams): Promise<Buffer> {
+export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoicePDFParams): Promise<{ buffer: Buffer, filename: string }> {
     try {
         // Ensure font is registered
         registerFont()
@@ -106,8 +106,14 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
             poweredByLogoPath: logoPath
         }
 
+        // Generate filename
+        const sanitizedBusinessName = (businessProfile?.companyName || 'Business').replace(/[^a-zA-Z0-9\u0590-\u05FF\s-]/g, '').trim()
+        const filename = `${invoice.invoiceNumber} Invoice from ${sanitizedBusinessName}.pdf`
+
         // Generate PDF
-        return await renderToBuffer(<InvoiceTemplate data={invoiceData} />)
+        const buffer = await renderToBuffer(<InvoiceTemplate data={invoiceData} />)
+
+        return { buffer, filename }
     } catch (error) {
         console.error('generateInvoicePDF error:', error)
         throw error

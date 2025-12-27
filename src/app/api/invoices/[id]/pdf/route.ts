@@ -15,7 +15,7 @@ export async function GET(
         const invoiceId = params.id
 
         // Generate PDF buffer
-        const buffer = await generateInvoicePDF({
+        const { buffer, filename } = await generateInvoicePDF({
             invoiceId,
             userId: user.id
         })
@@ -24,7 +24,7 @@ export async function GET(
         return new NextResponse(new Uint8Array(buffer), {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename="invoice-${invoiceId}.pdf"`,
+                'Content-Disposition': `attachment; filename="${encodeURIComponent(filename)}"`,
             },
         })
     } catch (error) {
