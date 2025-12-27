@@ -291,8 +291,8 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                 <View style={styles.footer} wrap={false}>
                     {data.businessSignature && (
                         <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                            <Text style={{ fontSize: 8, color: '#6b7280', marginBottom: 5 }}>חתימה</Text>
                             <Image src={data.businessSignature} style={{ width: 120, height: 40, objectFit: 'contain' }} />
-                            <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 5 }}>חתימה</Text>
                         </View>
                     )}
                     <Text style={styles.footerText}>
