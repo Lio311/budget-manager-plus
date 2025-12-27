@@ -40,7 +40,8 @@ export async function getClients(scope: string = 'BUSINESS') {
         // Calculate total revenue per client
         const clientsWithStats = await Promise.all(
             clients.map(async (client) => {
-                const totalRevenue = await prisma.income.aggregate({
+                // Sum from incomes
+                const incomeTotal = await prisma.income.aggregate({
                     where: {
                         clientId: client.id
                     },
@@ -49,9 +50,29 @@ export async function getClients(scope: string = 'BUSINESS') {
                     }
                 })
 
+                // Sum from paid invoices
+                const invoiceTotal = await prisma.invoice.aggregate({
+                    where: {
+                        clientId: client.id,
+                        status: 'PAID'
+                    },
+                    _sum: {
+                        total: true
+                    }
+                })
+
+                const totalRevenue = (incomeTotal._sum.amount || 0) + (invoiceTotal._sum.total || 0)
+                const totalTransactions = client._count.incomes + (await prisma.invoice.count({
+                    where: { clientId: client.id, status: 'PAID' }
+                }))
+
                 return {
                     ...client,
-                    totalRevenue: totalRevenue._sum.amount || 0
+                    totalRevenue,
+                    _count: {
+                        ...client._count,
+                        incomes: totalTransactions
+                    }
                 }
             })
         )
