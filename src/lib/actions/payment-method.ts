@@ -6,8 +6,9 @@ import { revalidatePath } from 'next/cache'
 
 export async function getPaymentMethods() {
     try {
-        const { userId } = auth()
+        const { userId } = await auth()
         if (!userId) return { success: false, error: 'User not authenticated' }
+
 
         const methods = await prisma.userPaymentMethod.findMany({
             where: { userId },
@@ -23,7 +24,7 @@ export async function getPaymentMethods() {
 
 export async function addPaymentMethod(name: string) {
     try {
-        const { userId } = auth()
+        const { userId } = await auth()
         if (!userId) return { success: false, error: 'User not authenticated' }
 
         // Check if exists
