@@ -90,6 +90,7 @@ model Budget {
   bills     Bill[]
   debts     Debt[]
   savings   Saving[]
+  categoryBudgets CategoryBudget[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -109,10 +110,25 @@ model Category {
   color     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  @@map("categories")
+  // ... (Relation to CategoryBudget)
+  categoryBudgets CategoryBudget[]
 }
 
-// ... (Rest of models)
+model CategoryBudget {
+  id        String   @id @default(cuid())
+  budgetId  String
+  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  categoryId String
+  category  Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  limit     Float    @default(0) // The user-defined limit amount
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([budgetId, categoryId])
+  @@map("category_budgets")
+}
 
 
 // SMB Enums

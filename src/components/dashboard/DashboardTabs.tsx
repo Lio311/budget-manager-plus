@@ -14,13 +14,10 @@ import { SavingsTab } from './tabs/SavingsTab'
 import { ClientsTab } from './tabs/ClientsTab'
 import { SuppliersTab } from './tabs/SuppliersTab'
 import { InvoicesTab } from './tabs/InvoicesTab'
-import { QuotesTab } from './tabs/QuotesTab'
-import { useBudget } from '@/contexts/BudgetContext'
+import { BudgetLimitsTab } from './tabs/BudgetLimitsTab'
+// ... (imports)
 
-interface DashboardTabsProps {
-    mobileMenuOpen: boolean
-    setMobileMenuOpen: (open: boolean) => void
-}
+// ...
 
 export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTabsProps) {
     const [activeTab, setActiveTab] = useState('overview')
@@ -32,6 +29,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
     const personalTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
+        { value: 'budget_limits', label: 'הגבלת תקציב', icon: TrendingDown, activeClass: 'data-[state=active]:bg-indigo-600' },
         { value: 'income', label: 'הכנסות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
         { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard, activeClass: 'data-[state=active]:bg-orange-500' },
@@ -109,6 +107,9 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     {/* Content Wrappers - Added strict widths to prevent overflow */}
                     <TabsContent value="overview" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <OverviewTab onNavigateToTab={handleTabChange} />
+                    </TabsContent>
+                    <TabsContent value="budget_limits" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <BudgetLimitsTab />
                     </TabsContent>
                     <TabsContent value="income" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <IncomeTab />
