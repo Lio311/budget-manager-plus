@@ -289,7 +289,7 @@ export function ExpensesTab() {
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 8
+    const itemsPerPage = 5
     const totalPages = Math.ceil(expenses.length / itemsPerPage)
 
     const paginatedExpenses = expenses.slice(

@@ -116,8 +116,13 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                 const amountRaw = amountIdx !== -1 ? row[amountIdx] : 0
                 const billingRaw = row[billingIdx]
 
-                // Validation: Must have date and billing amount
-                if (!dateRaw || !billingRaw) continue
+                console.log(`Processing row ${i}:`, { dateRaw, billingRaw })
+
+                // Validation: Must have date and billing amount (allow 0)
+                if ((!dateRaw && dateRaw !== 0) || (!billingRaw && billingRaw !== 0)) {
+                    console.log('Skipping row due to missing data')
+                    continue
+                }
 
                 // Parse Date (Excel dates are sometimes numbers)
                 let dateStr = ''
@@ -128,17 +133,19 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                 } else {
                     // Try parsing string "DD/MM/YYYY" or similar
                     try {
-                        const parts = String(dateRaw).split('/')
-                        if (parts.length === 3) {
-                            // Assuming DD/MM/YYYY or DD/MM/YY
-                            const day = parts[0].padStart(2, '0')
-                            const month = parts[1].padStart(2, '0')
-                            let year = parts[2]
-                            if (year.length === 2) year = '20' + year
-                            dateStr = `${year}-${month}-${day}`
-                        } else {
-                            // Fallback
-                            const d = new Date(dateRaw)
+                        const dateString = String(dateRaw).trim()
+                        if (dateString.includes('/')) {
+                            const parts = dateString.split('/')
+                            if (parts.length === 3) {
+                                const day = parts[0].trim().padStart(2, '0')
+                                const month = parts[1].trim().padStart(2, '0')
+                                let year = parts[2].trim()
+                                if (year.length === 2) year = '20' + year
+                                dateStr = `${year}-${month}-${day}`
+                            }
+                        } else if (dateString.includes('-')) {
+                            // Assume YYYY-MM-DD or similar
+                            const d = new Date(dateString)
                             if (!isNaN(d.getTime())) dateStr = format(d, 'yyyy-MM-dd')
                         }
                     } catch (e) {
@@ -146,19 +153,26 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                     }
                 }
 
+                if (!dateStr) {
+                    console.log('Skipping row due to date parse failure', dateRaw)
+                    continue
+                }
+
                 // Parse Amount
                 const parseAmount = (val: any) => {
                     if (typeof val === 'number') return val
-                    const str = String(val).replace(/[₪,]/g, '').trim()
+                    if (!val) return 0
+                    // Remove currency, commas, spaces
+                    const str = String(val).replace(/[₪,$\s]/g, '').trim()
                     return parseFloat(str) || 0
                 }
 
                 const billingAmount = parseAmount(billingRaw)
 
-                if (dateStr && billingAmount) {
+                if (dateStr && (billingAmount !== 0 || billingRaw === 0)) {
                     parsedRows.push({
                         date: dateStr,
-                        description: String(descRaw || 'ללא תיאור').trim(),
+                        description: String(descRaw || 'ללא תיאור').replace(/[\r\n]+/g, ' ').trim(),
                         amount: parseAmount(amountRaw),
                         billingAmount: billingAmount,
                         paymentMethod: 'CREDIT_CARD' // Default assumption for bank import
