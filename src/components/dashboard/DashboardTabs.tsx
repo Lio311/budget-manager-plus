@@ -125,3 +125,5 @@ return (
     </Tabs >
 )
 }
+
+// End of component
