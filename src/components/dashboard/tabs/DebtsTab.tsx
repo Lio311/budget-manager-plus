@@ -278,7 +278,7 @@ export function DebtsTab() {
             <div className="grid gap-3 grid-cols-1 md:grid-cols-3">
                 <div className="monday-card p-4 border-l-4 border-l-[#00c875]">
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">יתרה כוללת (נטו)</h3>
-                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse' : stats.netDebtILS > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : stats.netDebtILS > 0 ? 'text-red-500' : 'text-green-500'}`}>
                         {loading ? '...' : formatCurrency(Math.abs(stats.netDebtILS), '₪')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -287,14 +287,14 @@ export function DebtsTab() {
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-[#0073ea]">
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">תשלום חודשי (נטו)</h3>
-                    <div className={`text-2xl font-bold text-slate-900 ${loading ? 'animate-pulse' : ''}`}>
+                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : 'text-slate-900'}`}>
                         {loading ? '...' : formatCurrency(stats.netMonthlyPaymentILS, '₪')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">התחייבות חודשית</p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-red-500">
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">נותר לתשלום החודש</h3>
-                    <div className={`text-2xl font-bold text-slate-900 ${loading ? 'animate-pulse' : ''}`}>
+                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : 'text-slate-900'}`}>
                         {loading ? '...' : formatCurrency(stats.unpaidThisMonthILS, '₪')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">

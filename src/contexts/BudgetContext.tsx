@@ -30,17 +30,17 @@ export function BudgetProvider({ children, initialPlan }: { children: React.Reac
         setMonth(now.getMonth() + 1)
         setYear(now.getFullYear())
 
-        // If initialPlan is provided, use it and save to localStorage
-        if (initialPlan) {
+        // Load saved budget type from localStorage first (user's last choice)
+        const savedType = localStorage.getItem('budgetType')
+
+        if (savedType === 'PERSONAL' || savedType === 'BUSINESS') {
+            // User has a saved preference, use it
+            setBudgetTypeInternal(savedType)
+        } else if (initialPlan) {
+            // No saved preference, use server default but don't save it yet
             setBudgetTypeInternal(initialPlan)
-            localStorage.setItem('budgetType', initialPlan)
-        } else {
-            // Load saved budget type only if no initialPlan provided
-            const savedType = localStorage.getItem('budgetType')
-            if (savedType === 'PERSONAL' || savedType === 'BUSINESS') {
-                setBudgetTypeInternal(savedType)
-            }
         }
+
         setIsInitialized(true)
     }, [initialPlan])
 
