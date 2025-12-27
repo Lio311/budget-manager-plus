@@ -85,8 +85,7 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
                 vatRate,
                 vatAmount,
                 total,
-                vatAmount,
-                total,
+
                 notes: data.notes,
                 paymentMethod: data.paymentMethod,
                 status: 'DRAFT'
