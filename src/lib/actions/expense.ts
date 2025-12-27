@@ -276,6 +276,7 @@ export async function deleteExpense(id: string) {
     }
 }
 
+
 export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const { userId } = await auth()
@@ -305,17 +306,25 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
             })
         }
 
-        const operations = expenses.map(exp => {
-            return prisma.expense.create({
+        // Process expenses sequentially to ensure budgets exist
+        for (const exp of expenses) {
+            const date = exp.date ? new Date(exp.date) : new Date()
+            const month = date.getMonth() + 1
+            const year = date.getFullYear()
+
+            // Get appropriate budget for this expense's date
+            const budget = await getCurrentBudget(month, year, '₪', budgetType)
+
+            await prisma.expense.create({
                 data: {
-                    userId,
+                    budgetId: budget.id,
                     description: exp.description,
                     amount: exp.amount,
                     currency: exp.currency || 'ILS',
-                    date: exp.date ? new Date(exp.date) : new Date(),
+                    date: date,
                     category: exp.category || defaultCategory!.name,
                     isRecurring: false,
-                    scope: budgetType,
+                    // Business Fields
                     amountBeforeVat: exp.amountBeforeVat,
                     vatRate: exp.vatRate,
                     vatAmount: exp.vatAmount,
@@ -324,13 +333,12 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
                     paymentMethod: exp.paymentMethod
                 }
             })
-        })
+        }
 
-        await prisma.$transaction(operations)
         revalidatePath('/')
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Failed to import expenses:', error)
-        return { success: false, error: 'Failed to import expenses' }
+        return { success: false, error: 'Failed to import expenses: ' + (error.message || 'Unknown error') }
     }
 }
