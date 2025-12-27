@@ -257,3 +257,62 @@ export async function deleteExpense(id: string) {
         return { success: false, error: 'Failed to delete expense' }
     }
 }
+
+export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
+    try {
+        const { userId } = auth()
+        if (!userId) {
+            return { success: false, error: 'User not authenticated' }
+        }
+
+        // Get or Create Default Category "All" or "General"
+        let defaultCategory = await prisma.category.findFirst({
+            where: {
+                userId,
+                type: 'expense',
+                name: 'כללי',
+                scope: budgetType
+            }
+        })
+
+        if (!defaultCategory) {
+            defaultCategory = await prisma.category.create({
+                data: {
+                    userId,
+                    name: 'כללי',
+                    type: 'expense',
+                    color: 'bg-gray-500',
+                    scope: budgetType
+                }
+            })
+        }
+
+        const operations = expenses.map(exp => {
+            return prisma.expense.create({
+                data: {
+                    userId,
+                    description: exp.description,
+                    amount: exp.amount,
+                    currency: exp.currency || 'ILS',
+                    date: exp.date ? new Date(exp.date) : new Date(),
+                    category: exp.category || defaultCategory!.name,
+                    isRecurring: false,
+                    scope: budgetType,
+                    amountBeforeVat: exp.amountBeforeVat,
+                    vatRate: exp.vatRate,
+                    vatAmount: exp.vatAmount,
+                    isDeductible: exp.isDeductible,
+                    deductibleRate: exp.deductibleRate,
+                    paymentMethod: exp.paymentMethod
+                }
+            })
+        })
+
+        await prisma.$transaction(operations)
+        revalidatePath('/')
+        return { success: true }
+    } catch (error) {
+        console.error('Failed to import expenses:', error)
+        return { success: false, error: 'Failed to import expenses' }
+    }
+}

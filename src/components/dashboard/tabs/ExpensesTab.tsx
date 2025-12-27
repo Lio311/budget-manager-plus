@@ -17,9 +17,10 @@ import { formatCurrency } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
-import { getExpenses, addExpense, updateExpense, deleteExpense } from '@/lib/actions/expense'
+import { getExpenses, addExpense, updateExpense, deleteExpense, importExpenses } from '@/lib/actions/expense'
 import { getSuppliers } from '@/lib/actions/suppliers'
 import { getCategories, addCategory } from '@/lib/actions/category'
+import { BankImportModal } from '../../BankImportModal'
 
 interface Category {
     id: string
@@ -308,6 +309,25 @@ export function ExpensesTab() {
         return c
     }
 
+    const handleImportExpenses = async (data: any[]) => {
+        const expensesToImport = data.map(row => ({
+            description: row.description,
+            amount: parseFloat(row.billingAmount), // Use billing amount as the final expense amount
+            category: 'כללי', // Default category
+            currency: 'ILS',
+            date: row.date,
+            isRecurring: false,
+            paymentMethod: row.paymentMethod || 'CREDIT_CARD'
+        }))
+
+        const result = await importExpenses(expensesToImport, budgetType)
+        if (result.success) {
+            await mutateExpenses()
+        } else {
+            throw new Error(result.error)
+        }
+    }
+
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10">
             {/* Summary Card */}
@@ -324,7 +344,11 @@ export function ExpensesTab() {
                 <div className="lg:col-span-5 glass-panel p-5 h-fit sticky top-4">
                     <div className="mb-4 flex items-center gap-2">
                         <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`} />
+                        <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`} />
                         <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
+                        <div className="mr-auto">
+                            <BankImportModal onImport={handleImportExpenses} />
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-4">
