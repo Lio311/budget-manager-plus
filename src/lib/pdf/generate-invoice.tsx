@@ -110,7 +110,6 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
     }
 }
 
-}
 
 function getPaymentMethodLabel(method?: string | null): string {
     if (!method) return 'העברה בנקאית'
