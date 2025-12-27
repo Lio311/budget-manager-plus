@@ -13,7 +13,12 @@ interface NetWorthData {
 }
 
 export function NetWorthChart({ data, loading }: { data: NetWorthData[], loading?: boolean }) {
-    const { currency } = useBudget()
+    const { currency, budgetType } = useBudget()
+
+    // Different colors and titles for business vs personal
+    const isBusiness = budgetType === 'BUSINESS'
+    const chartColor = isBusiness ? '#10b981' : '#8b5cf6' // green for business, purple for personal
+    const chartTitle = isBusiness ? 'שווי העסק נטו' : 'הון עצמי'
 
     const translatedData = data.map(item => ({
         ...item,
@@ -25,7 +30,7 @@ export function NetWorthChart({ data, loading }: { data: NetWorthData[], loading
             return (
                 <div className="bg-white p-3 border rounded-lg shadow-lg text-right dir-rtl">
                     <p className="font-bold mb-1">{label}</p>
-                    <p className="text-purple-600 font-bold text-lg">
+                    <p className={`font-bold text-lg ${isBusiness ? 'text-green-600' : 'text-purple-600'}`}>
                         {formatCurrency(payload[0].value, currency)}
                     </p>
                 </div>
@@ -37,12 +42,12 @@ export function NetWorthChart({ data, loading }: { data: NetWorthData[], loading
     return (
         <Card className="h-full border-0 shadow-sm glass-panel bg-white/60">
             <CardHeader className="p-4 pb-2">
-                <CardTitle className="text-base">הון עצמי</CardTitle>
+                <CardTitle className="text-base">{chartTitle}</CardTitle>
             </CardHeader>
             <CardContent className="p-4 pt-0">
                 {loading ? (
                     <div className="h-[300px] w-full flex items-center justify-center">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <Loader2 className={`h-8 w-8 animate-spin ${isBusiness ? 'text-green-600' : 'text-purple-600'}`} />
                     </div>
                 ) : data.length === 0 || data.length < 2 || data.every(d => d.accumulatedNetWorth === 0) ? (
                     <div className="h-[300px] w-full flex flex-col items-center justify-center text-center px-4" dir="rtl">
@@ -60,8 +65,8 @@ export function NetWorthChart({ data, loading }: { data: NetWorthData[], loading
                             <AreaChart data={translatedData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorNetWorth" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.01} />
+                                        <stop offset="5%" stopColor={chartColor} stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor={chartColor} stopOpacity={0.01} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -77,11 +82,11 @@ export function NetWorthChart({ data, loading }: { data: NetWorthData[], loading
                                     axisLine={false}
                                     tickLine={false}
                                 />
-                                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#8b5cf6', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                                <Tooltip content={<CustomTooltip />} cursor={{ stroke: chartColor, strokeWidth: 1, strokeDasharray: '4 4' }} />
                                 <Area
                                     type="monotone"
                                     dataKey="accumulatedNetWorth"
-                                    stroke="#8b5cf6"
+                                    stroke={chartColor}
                                     strokeWidth={3}
                                     fillOpacity={1}
                                     fill="url(#colorNetWorth)"

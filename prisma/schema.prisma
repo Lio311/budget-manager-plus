@@ -54,6 +54,8 @@ model BusinessProfile {
   companyName String
   companyId   String?  // H.P. / Osek Murshe
   vatStatus   String   // EXEMPT (Ptor), AUTHORIZED (Murshe), LTD (Baam)
+  logoUrl     String?  // URL to company logo
+  logoPublicId String? // Cloudinary public ID for deletion
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   

@@ -22,6 +22,7 @@ import { toast } from 'sonner'
 import { swrConfig } from '@/lib/swr-config'
 import { FeedbackButton } from '@/components/dashboard/FeedbackButton'
 import { FinancialAdvisorButton } from '@/components/dashboard/FinancialAdvisorButton'
+import { BusinessLogoUpload } from '@/components/settings/BusinessLogoUpload'
 
 interface Category {
     id: string
@@ -256,46 +257,59 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <Settings className="h-4 w-4" />
                             </Button>
                         </DialogTrigger>
-                        <DialogContent dir="rtl">
+                        <DialogContent dir="rtl" className="max-w-2xl">
                             <DialogHeader>
-                                <DialogTitle className="text-right">הון עצמי</DialogTitle>
+                                <DialogTitle className="text-right">
+                                    {budgetType === 'BUSINESS' ? 'הגדרות עסק' : 'הון עצמי'}
+                                </DialogTitle>
                                 <DialogDescription className="text-right">
-                                    הגדר את היתרה ההתחלתית עבור חישוב השווי הנקי
+                                    {budgetType === 'BUSINESS'
+                                        ? 'נהל את פרטי העסק והלוגו שלך'
+                                        : 'הגדר את היתרה ההתחלתית עבור חישוב השווי הנקי'
+                                    }
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="initialBalance" className="text-right">יתרת עו"ש התחלתית</Label>
-                                    <Input
-                                        id="initialBalance"
-                                        value={initialBalance}
-                                        onChange={(e) => setInitialBalance(e.target.value)}
-                                        className="col-span-3 text-right"
-                                        type="number"
-                                        dir="ltr"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="initialSavings" className="text-right">חיסכון התחלתי</Label>
-                                    <Input
-                                        id="initialSavings"
-                                        value={initialSavings}
-                                        onChange={(e) => {
-                                            const val = parseFloat(e.target.value);
-                                            if (!isNaN(val) && val < 0) return; // Prevent negative
-                                            setInitialSavings(e.target.value)
-                                        }}
-                                        className="col-span-3 text-right"
-                                        type="number"
-                                        min={0}
-                                        dir="ltr"
-                                    />
-                                </div>
+                                {budgetType === 'BUSINESS' ? (
+                                    <BusinessLogoUpload />
+                                ) : (
+                                    <>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="initialBalance" className="text-right">יתרת עו"ש התחלתית</Label>
+                                            <Input
+                                                id="initialBalance"
+                                                value={initialBalance}
+                                                onChange={(e) => setInitialBalance(e.target.value)}
+                                                className="col-span-3 text-right"
+                                                type="number"
+                                                dir="ltr"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="initialSavings" className="text-right">חיסכון התחלתי</Label>
+                                            <Input
+                                                id="initialSavings"
+                                                value={initialSavings}
+                                                onChange={(e) => {
+                                                    const val = parseFloat(e.target.value);
+                                                    if (!isNaN(val) && val < 0) return; // Prevent negative
+                                                    setInitialSavings(e.target.value)
+                                                }}
+                                                className="col-span-3 text-right"
+                                                type="number"
+                                                min={0}
+                                                dir="ltr"
+                                            />
+                                        </div>
+                                    </>
+                                )}
                             </div>
                             <DialogFooter>
-                                <Button onClick={handleSaveSettings}>
-                                    שמור שינויים
-                                </Button>
+                                {budgetType !== 'BUSINESS' && (
+                                    <Button onClick={handleSaveSettings}>
+                                        שמור שינויים
+                                    </Button>
+                                )}
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
