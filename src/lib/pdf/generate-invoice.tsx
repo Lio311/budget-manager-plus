@@ -62,6 +62,7 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
 
         const businessProfile = invoice.user.businessProfile
         const businessBudget = invoice.user.budgets[0]
+        const logoPath = path.join(process.cwd(), 'public', 'K-LOGO.png')
 
         // Use invoice's own financial data
         const vatRate = invoice.vatRate * 100 // Convert to percentage
