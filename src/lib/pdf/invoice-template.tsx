@@ -1,14 +1,5 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
-import { join } from 'path'
-
-// Register Hebrew font - using local file for maximum reliability on Vercel
-const fontPath = join(process.cwd(), 'public', 'fonts', 'Alef-Regular.ttf');
-
-Font.register({
-    family: 'Alef',
-    src: fontPath
-});
 
 // Define styles with green/black/white theme
 const styles = StyleSheet.create({

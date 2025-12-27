@@ -1,9 +1,24 @@
 // Note: This file requires @react-pdf/renderer to be installed
 // Run: npm install @react-pdf/renderer
 
-import { renderToBuffer } from '@react-pdf/renderer'
+import { Font, renderToBuffer } from '@react-pdf/renderer'
 import { InvoiceTemplate } from './invoice-template'
 import { prisma } from '@/lib/db'
+import fs from 'fs'
+import path from 'path'
+
+// Register Hebrew font - using local file buffer for maximum reliability on Vercel
+try {
+    const fontPath = path.resolve(process.cwd(), 'src/lib/pdf/fonts/Alef-Regular.ttf')
+    if (fs.existsSync(fontPath)) {
+        Font.register({
+            family: 'Alef',
+            src: fs.readFileSync(fontPath) as any
+        })
+    }
+} catch (error) {
+    console.error('Failed to register PDF font:', error)
+}
 
 interface GenerateInvoicePDFParams {
     invoiceId: string
