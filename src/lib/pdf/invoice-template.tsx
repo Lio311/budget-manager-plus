@@ -4,11 +4,12 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer'
 
+// Register Hebrew font
 Font.register({
-    family: 'Rubik',
+    family: 'Heebo',
     fonts: [
-        { src: 'https://fonts.gstatic.com/s/rubik/v21/iJWKBXyifDnIV7nFrXw.ttf', fontWeight: 'normal' },
-        { src: 'https://fonts.gstatic.com/s/rubik/v21/iJWKBXyifDnIV7nFrXw.ttf', fontWeight: 'bold' }
+        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/heebo/Heebo-Regular.ttf', fontWeight: 'normal' },
+        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/heebo/Heebo-Bold.ttf', fontWeight: 'bold' }
     ]
 });
 
@@ -17,7 +18,7 @@ const styles = StyleSheet.create({
     page: {
         padding: 40,
         backgroundColor: '#ffffff',
-        fontFamily: 'Rubik',
+        fontFamily: 'Heebo',
     },
     header: {
         flexDirection: 'row-reverse',
