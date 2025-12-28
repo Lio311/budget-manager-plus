@@ -233,55 +233,61 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                 )}
 
                 {userId ? (
-                    <PayPalScriptProvider options={{
-                        clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-                        currency: 'ILS'
-                    }}>
-                        <PayPalButtons
-                            createOrder={(data, actions) => {
-                                return actions.order.create({
-                                    intent: 'CAPTURE',
-                                    purchase_units: [
-                                        {
-                                            amount: {
-                                                currency_code: 'ILS',
-                                                value: price.toFixed(2),
+                    process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ? (
+                        <PayPalScriptProvider options={{
+                            clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+                            currency: 'ILS'
+                        }}>
+                            <PayPalButtons
+                                createOrder={(data, actions) => {
+                                    return actions.order.create({
+                                        intent: 'CAPTURE',
+                                        purchase_units: [
+                                            {
+                                                amount: {
+                                                    currency_code: 'ILS',
+                                                    value: price.toFixed(2),
+                                                },
+                                                description: `מנוי שנתי - ${title}`,
+                                                custom_id: JSON.stringify({ coupon: couponCode || undefined, plan: initialPlan })
                                             },
-                                            description: `מנוי שנתי - ${title}`,
-                                            custom_id: JSON.stringify({ coupon: couponCode || undefined, plan: initialPlan })
-                                        },
-                                    ],
-                                })
-                            }}
-                            onApprove={async (data, actions) => {
-                                if (actions.order) {
-                                    const details = await actions.order.capture()
-                                    try {
-                                        const response = await fetch('/api/subscription/create', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                            },
-                                            body: JSON.stringify({
-                                                orderId: details.id,
-                                                amount: price,
-                                                planType: initialPlan,
-                                                couponCode: couponCode || undefined
-                                            }),
-                                        })
+                                        ],
+                                    })
+                                }}
+                                onApprove={async (data, actions) => {
+                                    if (actions.order) {
+                                        const details = await actions.order.capture()
+                                        try {
+                                            const response = await fetch('/api/subscription/create', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                                body: JSON.stringify({
+                                                    orderId: details.id,
+                                                    amount: price,
+                                                    planType: initialPlan,
+                                                    couponCode: couponCode || undefined
+                                                }),
+                                            })
 
-                                        if (response.ok) {
-                                            window.location.href = '/dashboard'
+                                            if (response.ok) {
+                                                window.location.href = '/dashboard'
+                                            }
+                                        } catch (error) {
+                                            console.error('Payment error:', error)
+                                            toast.error('התשלום עבר אך הייתה שגיאה בעדכון המנוי. אנא צור קשר.')
                                         }
-                                    } catch (error) {
-                                        console.error('Payment error:', error)
-                                        toast.error('התשלום עבר אך הייתה שגיאה בעדכון המנוי. אנא צור קשר.')
                                     }
-                                }
-                            }}
-                            style={{ layout: 'vertical' }}
-                        />
-                    </PayPalScriptProvider>
+                                }}
+                                style={{ layout: 'vertical' }}
+                            />
+                        </PayPalScriptProvider>
+                    ) : (
+                        <div className="text-center p-4 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
+                            שגיאת קונפיגורציה: PayPal Client ID חסר.
+                        </div>
+                    )
                 ) : (
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
                         <p className="text-gray-600 mb-2">יש להרשם למערכת כדי לרכוש מנוי</p>
