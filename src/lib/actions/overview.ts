@@ -84,10 +84,10 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
         // Calculate net worth history - using ILS amounts for multi-currency support
         let accumulatedNetWorth = (user.initialBalance || 0) + (user.initialSavings || 0)
         const netWorthHistory = allBudgets.map(budget => {
-            const totalIncome = budget.incomes.reduce((sum, item) => sum + item.amount, 0)
-            const totalExpenses = budget.expenses.reduce((sum, item) => sum + item.amount, 0)
-            const totalBills = budget.bills.reduce((sum, item) => sum + item.amount, 0)
-            const totalDebtPayments = budget.debts.reduce((sum, item) => sum + item.monthlyPayment, 0)
+            const totalIncome = budget.incomes.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.amount : item.amount * 3.7), 0)
+            const totalExpenses = budget.expenses.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.amount : item.amount * 3.7), 0)
+            const totalBills = budget.bills.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.amount : item.amount * 3.7), 0)
+            const totalDebtPayments = budget.debts.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.monthlyPayment : item.monthlyPayment * 3.7), 0)
             const totalOutflow = totalExpenses + totalBills + totalDebtPayments
             const netChange = totalIncome - totalOutflow
             accumulatedNetWorth += netChange

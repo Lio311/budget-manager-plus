@@ -179,7 +179,17 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                     // Try simplistic parsing
                     try {
                         let d: Date | null = null
-                        if (dStr.includes('/')) {
+                        if (dStr.includes('.')) {
+                            // DD.MM.YY or DD.MM.YYYY format (Isracard)
+                            const [d1, m1, y1] = dStr.split('.')
+                            if (y1?.length === 2) {
+                                // YY format - assume 20YY
+                                d = new Date(`20${y1}-${m1.padStart(2, '0')}-${d1.padStart(2, '0')}`)
+                            } else if (y1?.length === 4) {
+                                // YYYY format
+                                d = new Date(`${y1}-${m1.padStart(2, '0')}-${d1.padStart(2, '0')}`)
+                            }
+                        } else if (dStr.includes('/')) {
                             const [d1, m1, y1] = dStr.split('/')
                             if (y1?.length === 4) d = new Date(`${y1}-${m1}-${d1}`)
                             else if (y1?.length === 2) d = new Date(`20${y1}-${m1}-${d1}`)
