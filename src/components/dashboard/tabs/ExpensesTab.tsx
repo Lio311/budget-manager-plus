@@ -74,8 +74,6 @@ const getCategoryIcon = (name: string) => {
         case 'משכורת': return <Briefcase className="h-4 w-4" />
         case 'חשמל': return <Zap className="h-4 w-4" />
         case 'שכירות': return <Home className="h-4 w-4" />
-        case 'חשמל': return <Zap className="h-4 w-4" />
-        case 'שכירות': return <Home className="h-4 w-4" />
         case 'חופשה': return <Plane className="h-4 w-4" />
         case 'ביטוחים': return <Shield className="h-4 w-4" />
         case 'ספורט': return <Dumbbell className="h-4 w-4" />
@@ -319,6 +317,20 @@ export function ExpensesTab() {
 
     async function handleUpdate() {
         if (!editingId) return
+
+        const expense = expenses.find(e => e.id === editingId)
+        if (expense && expense.isRecurring) {
+            setPendingAction({ type: 'edit', id: editingId })
+            setRecurrenceDialogOpen(true)
+            return
+        }
+
+        await executeUpdate('SINGLE')
+    }
+
+    async function executeUpdate(mode: 'SINGLE' | 'FUTURE') {
+        if (!editingId) return
+
         setSubmitting(true)
         const result = await updateExpense(editingId, {
             description: editData.description,
@@ -333,7 +345,7 @@ export function ExpensesTab() {
         }, mode)
 
         if (result.success) {
-            toast({ title: 'הצלחה', description: 'הוצאה עודכנה בהצלחה' })
+            toast({ title: 'הצלחה', description: 'ההוצאה עודכנה בהצלחה' })
             setEditingId(null)
             await mutateExpenses()
         } else {
@@ -341,6 +353,8 @@ export function ExpensesTab() {
         }
         setSubmitting(false)
     }
+
+
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1)
@@ -410,6 +424,9 @@ export function ExpensesTab() {
         }
     }
 
+
+
+
     const handleRecurrenceConfirm = async (mode: 'SINGLE' | 'FUTURE') => {
         setRecurrenceDialogOpen(false)
         if (!pendingAction) return
@@ -426,10 +443,9 @@ export function ExpensesTab() {
             await executeUpdate(mode)
         }
         setPendingAction(null)
-    };
+    }
 
-
-    const content = (
+    return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             {/* Summary Card */}
             <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'}`}>
@@ -625,7 +641,7 @@ export function ExpensesTab() {
                                             </div>
                                             <div className="flex justify-end gap-2">
                                                 <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                                <Button size="sm" onClick={handleUpdate} className="bg-orange-600 text-white">שמור שינויים</Button>
+                                                <Button size="sm" onClick={() => handleUpdate()} className="bg-orange-600 text-white">שמור שינויים</Button>
                                             </div>
                                         </div>
                                     ) : (
@@ -644,50 +660,62 @@ export function ExpensesTab() {
                                                         <span className="truncate">{exp.category}</span>
                                                         {exp.paymentMethod && (
                                                             <>
-                                                            </div>
-                                                    )}
+                                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                                <span className="truncate">{exp.paymentMethod}</span>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
-
-                                                <div className="flex items-center gap-6">
-                                                    {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
-                                                        <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
-                                                            <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
-                                                            <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
-                                                        </div>
-                                                    ) : null}
-                                                    <div className="text-right shrink-0">
-                                                        <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
-                                                            {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => handleDelete(exp)}>
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                    )}
                                             </div>
-                                            )
-                                    })
+
+                                            <div className="flex items-center gap-6">
+                                                {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
+                                                    <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
+                                                        <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
+                                                        <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
+                                                    </div>
+                                                ) : null}
+                                                <div className="text-right shrink-0">
+                                                    <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
+                                                        {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
+                                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => handleDelete(exp)}>
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        })
                     )}
 
-                                            {totalPages > 1 && (
-                                                <div className="mt-4 flex justify-center direction-ltr">
-                                                    <Pagination
-                                                        currentPage={currentPage}
-                                                        totalPages={totalPages}
-                                                        onPageChange={setCurrentPage}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
+                    {totalPages > 1 && (
+                        <div className="mt-4 flex justify-center direction-ltr">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
-            </div>
-            </div>
+
+            <RecurrenceActionDialog
+                isOpen={recurrenceDialogOpen}
+                onClose={() => {
+                    setRecurrenceDialogOpen(false)
+                    setPendingAction(null)
+                }}
+                onConfirm={handleRecurrenceConfirm}
+                action={pendingAction?.type || 'delete'}
+                entityName="הוצאה"
+            />
         </div>
     )
-    return content
 }

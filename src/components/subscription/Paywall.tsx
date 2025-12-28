@@ -50,7 +50,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
         const checkStatus = async () => {
             if (userId) {
                 const status = await getSubscriptionStatus(userId)
-                setIsTrialExpired(status.isTrialExpired)
+                setIsTrialExpired((status as any).isTrialExpired)
             }
         }
         checkStatus()

@@ -44,7 +44,6 @@ interface Income {
     invoice?: any | null
     vatAmount?: number | null
     payer?: string | null
-    payer?: string | null
     paymentMethod?: string | null
     isRecurring?: boolean | null
 }
@@ -134,8 +133,6 @@ export function IncomeTab() {
 
     const [recurrenceDialogOpen, setRecurrenceDialogOpen] = useState(false)
     const [pendingAction, setPendingAction] = useState<{ type: 'delete' | 'edit', id: string } | null>(null)
-
-    // ... (rest of the logic)
 
     // Handle VAT Calculations
     const calculateFromTotal = (total: string, rate: string) => {
@@ -349,16 +346,14 @@ export function IncomeTab() {
                 .replace(/border-(\w+)-200/g, 'border-transparent')
         }
         return c
-    };
+    }
 
-
-    const content = (
+    return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-blue-600' : 'border-l-[#00c875]'}`}>
                 <h3 className="text-sm font-medium text-gray-500">{isBusiness ? 'סך מכירות/הכנסות חודשיות' : 'סך הכנסות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-blue-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
                     {loadingIncomes ? '...' : formatCurrency(totalIncomeILS, '₪')}
-
                 </div>
             </div>
 
@@ -623,18 +618,17 @@ export function IncomeTab() {
                     )}
                 </div>
             </div>
-        </div >
-            </div >
 
-        <RecurrenceActionDialog
-            isOpen={recurrenceDialogOpen}
-            onClose={() => {
-                setRecurrenceDialogOpen(false)
-                setPendingAction(null)
-            }}
-            onConfirm={handleRecurrenceConfirm}
-            action={pendingAction?.type || 'delete'}
-            entityName="הכנסה"
-        />
-        </div >
+            <RecurrenceActionDialog
+                isOpen={recurrenceDialogOpen}
+                onClose={() => {
+                    setRecurrenceDialogOpen(false)
+                    setPendingAction(null)
+                }}
+                onConfirm={handleRecurrenceConfirm}
+                action={pendingAction?.type || 'delete'}
+                entityName="הכנסה"
+            />
+        </div>
+    )
 }
