@@ -460,17 +460,22 @@ export function DebtsTab() {
                                         className={`group relative flex flex-col sm:flex-row items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 ${debt.isPaid ? 'bg-green-50/50 border-green-200' : ''}`}
                                     >
                                         {editingId === debt.id ? (
-                                            <div className="flex flex-col gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
-                                                <div className="flex flex-wrap gap-2 w-full">
+                                            <div className="flex flex-col gap-3 w-full animate-in fade-in zoom-in-95 duration-200">
+                                                {/* Row 1: Creditor Name - Full Width */}
+                                                <div className="w-full">
                                                     <Input
                                                         placeholder="שם המלווה"
-                                                        className="min-w-[120px] flex-1"
+                                                        className="h-9"
                                                         value={editData.creditor}
                                                         onChange={(e) => setEditData({ ...editData, creditor: e.target.value })}
                                                         disabled={submitting}
                                                     />
+                                                </div>
+
+                                                {/* Row 2: Currency, Total Amount, Monthly Payment, Due Day */}
+                                                <div className="flex flex-wrap gap-2 w-full">
                                                     <select
-                                                        className="h-9 border rounded-md text-sm w-20"
+                                                        className="p-2 border rounded-lg h-9 bg-white text-sm min-w-[80px] flex-1"
                                                         value={editData.currency}
                                                         onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
                                                         disabled={submitting}
@@ -482,47 +487,50 @@ export function DebtsTab() {
                                                     <Input
                                                         type="number"
                                                         placeholder="סכום כולל"
-                                                        className="w-24 sm:w-32"
+                                                        className="h-9 min-w-[80px] flex-1"
                                                         value={editData.totalAmount}
                                                         onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
                                                         disabled={submitting}
+                                                        dir="ltr"
                                                     />
                                                     <Input
                                                         type="number"
                                                         placeholder="תשלום חודשי"
-                                                        className="w-24 sm:w-32"
+                                                        className="h-9 min-w-[80px] flex-1"
                                                         value={editData.monthlyPayment}
                                                         onChange={(e) => setEditData({ ...editData, monthlyPayment: e.target.value })}
                                                         disabled={submitting}
+                                                        dir="ltr"
+                                                    />
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="יום חיוב"
+                                                        min="1"
+                                                        max="31"
+                                                        className="h-9 min-w-[60px] flex-1"
+                                                        value={editData.dueDay}
+                                                        onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
+                                                        disabled={submitting}
+                                                        dir="ltr"
                                                     />
                                                 </div>
-                                                <div className="flex gap-2 justify-between items-center">
-                                                    <div className="flex gap-2 flex-1">
-                                                        <Input
-                                                            type="number"
-                                                            placeholder="יום חיוב"
-                                                            min="1"
-                                                            max="31"
-                                                            className="w-16 sm:w-20"
-                                                            value={editData.dueDay}
-                                                            onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
-                                                            disabled={submitting}
-                                                        />
-                                                        <div className="flex-1">
-                                                            <PaymentMethodSelector
-                                                                value={editData.paymentMethod}
-                                                                onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <Button size="sm" variant="outline" onClick={handleCancelEdit}>
-                                                            ביטול
-                                                        </Button>
-                                                        <Button size="sm" onClick={handleUpdate} className="bg-purple-600 hover:bg-purple-700 text-white">
-                                                            שמור שינויים
-                                                        </Button>
-                                                    </div>
+
+                                                {/* Row 3: Payment Method - Full Width */}
+                                                <div className="w-full">
+                                                    <PaymentMethodSelector
+                                                        value={editData.paymentMethod}
+                                                        onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                                    />
+                                                </div>
+
+                                                {/* Row 4: Buttons */}
+                                                <div className="flex justify-end gap-2">
+                                                    <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                                                        ביטול
+                                                    </Button>
+                                                    <Button size="sm" onClick={handleUpdate} className="bg-purple-600 hover:bg-purple-700 text-white">
+                                                        שמור שינויים
+                                                    </Button>
                                                 </div>
                                             </div>
                                         ) : (
