@@ -1,6 +1,6 @@
 'use client'
 
-import useSWR from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -47,6 +47,7 @@ interface DebtsData {
 export function DebtsTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
+    const { mutate: globalMutate } = useSWRConfig()
 
     const fetcher = async () => {
         const result = await getDebts(month, year, budgetType)
@@ -180,7 +181,7 @@ export function DebtsTab() {
                     paymentMethod: ''
                 })
                 await mutate() // Refresh data
-                mutate(key => Array.isArray(key) && key[0] === 'overview')
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
                 toast({
                     title: 'הצלחה',
                     description: newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'ההלוואה נוספה בהצלחה'
@@ -200,7 +201,7 @@ export function DebtsTab() {
         const result = await deleteDebt(id)
         if (result.success) {
             await mutate() // Refresh data
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             toast({ title: 'הצלחה', description: 'ההלוואה נמחקה בהצלחה' })
         }
     }
@@ -210,7 +211,7 @@ export function DebtsTab() {
         const result = await toggleDebtPaid(id, !currentStatus)
         if (result.success) {
             await mutate() // Refresh data
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         }
     }
 
@@ -274,7 +275,7 @@ export function DebtsTab() {
             setEditingId(null)
             setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', currency: 'ILS', monthlyPayment: '', dueDay: '', paymentMethod: '' })
             await mutate()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({
                 title: 'שגיאה',

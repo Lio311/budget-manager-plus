@@ -1,6 +1,6 @@
 'use client'
 
-import useSWR from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -55,6 +55,7 @@ interface Category {
 export function SavingsTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
+    const { mutate: globalMutate } = useSWRConfig()
 
     // --- Data Fetching ---
 
@@ -202,7 +203,7 @@ export function SavingsTab() {
                     paymentMethod: ''
                 })
                 await mutateSavings()
-                mutate(key => Array.isArray(key) && key[0] === 'overview')
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             } else {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חיסכון', variant: 'destructive' })
             }
@@ -334,7 +335,7 @@ export function SavingsTab() {
             if (result.success) {
                 toast({ title: 'הצלחה', description: 'החיסכון נמחק בהצלחה' })
                 await mutateSavings()
-                mutate(key => Array.isArray(key) && key[0] === 'overview')
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             } else {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק חיסכון', variant: 'destructive' })
             }

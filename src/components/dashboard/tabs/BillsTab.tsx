@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import useSWR from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 import { CreditCard, Loader2, Pencil, Trash2, Check, X } from 'lucide-react'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -32,6 +32,7 @@ interface BillData {
 export function BillsTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
+    const { mutate: globalMutate } = useSWRConfig()
 
     const fetcher = async () => {
         const result = await getBills(month, year, budgetType)
@@ -112,7 +113,7 @@ export function BillsTab() {
                 })
                 setNewBill({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
                 await mutate()
-                mutate(key => Array.isArray(key) && key[0] === 'overview')
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             } else {
                 toast({
                     title: 'שגיאה',
@@ -137,7 +138,7 @@ export function BillsTab() {
 
         if (result.success) {
             await mutate()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({
                 title: 'שגיאה',
@@ -204,7 +205,7 @@ export function BillsTab() {
             setEditingId(null)
             setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
             await mutate()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({
                 title: 'שגיאה',
@@ -225,7 +226,7 @@ export function BillsTab() {
                 description: 'החשבון נמחק בהצלחה'
             })
             await mutate()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({
                 title: 'שגיאה',
