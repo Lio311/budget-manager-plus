@@ -375,7 +375,29 @@ export function ExpensesTab() {
 
     const getCategoryColor = (catName: string) => {
         const cat = categories.find(c => c.name === catName)
-        let c = cat?.color || 'bg-gray-500 text-white border-gray-600'
+
+        // If no color in DB, use smart fallbacks based on category name
+        let c = cat?.color
+
+        if (!c) {
+            // Smart fallbacks for common categories
+            const trimmed = catName?.trim() || '';
+            if (trimmed.includes('ספורט')) {
+                c = 'bg-green-500 text-white border-green-600'
+            } else if (trimmed.includes('ביטוח')) {
+                c = 'bg-blue-500 text-white border-blue-600'
+            } else if (trimmed.includes('אפליקציות') || trimmed.includes('מינוי')) {
+                c = 'bg-purple-500 text-white border-purple-600'
+            } else if (trimmed.includes('מזון') || trimmed.includes('אוכל')) {
+                c = 'bg-orange-500 text-white border-orange-600'
+            } else if (trimmed.includes('תחבורה')) {
+                c = 'bg-cyan-500 text-white border-cyan-600'
+            } else if (trimmed.includes('בילוי')) {
+                c = 'bg-pink-500 text-white border-pink-600'
+            } else {
+                c = 'bg-gray-500 text-white border-gray-600'
+            }
+        }
 
         if (c.includes('bg-') && c.includes('-100')) {
             c = c.replace(/bg-(\w+)-100/g, 'bg-$1-500')
