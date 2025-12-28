@@ -45,7 +45,8 @@ export function useOptimisticMutation<TData, TInput>(
             if (options?.getOptimisticData) {
                 await mutate(
                     key,
-                    async (current: TData) => {
+                    async (current: TData | undefined) => {
+                        if (!current) return current
                         previousData = current
                         return options.getOptimisticData!(current, input)
                     },
@@ -112,7 +113,8 @@ export function useOptimisticToggle<TData>(
             // Optimistic update
             await mutate(
                 key,
-                async (current: TData) => {
+                async (current: TData | undefined) => {
+                    if (!current) return current
                     previousData = current
                     return options?.getOptimisticData(current, id, newValue)
                 },
@@ -165,7 +167,8 @@ export function useOptimisticDelete<TData>(
             // Optimistic update
             await mutate(
                 key,
-                async (current: TData) => {
+                async (current: TData | undefined) => {
+                    if (!current) return current
                     previousData = current
                     return options?.getOptimisticData(current, id)
                 },
