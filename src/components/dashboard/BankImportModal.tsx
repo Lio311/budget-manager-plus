@@ -68,26 +68,32 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
             // Convert to array of arrays to find header
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][]
 
-            // Find header row index
+            // AUTO FIX: Smart Header Detection
             let headerRowIndex = -1
 
-            // Define possible headers for each column
-            const dateHeaders = ["תאריך עסקה", "תאריך"]
-            const descHeaders = ["שם בית עסק", "שם בית העסק", "בית עסק"]
-            const amountHeaders = ["סכום חיוב", "סכום", "סכום עסקה"]
-            const categoryHeaders = ["ענף", "קטגוריה"] // Support both
+            // Expanded keywords mapping
+            const keywords = {
+                date: ["תאריך", "date", "יום", "time"],
+                desc: ["שם בית עסק", "שם בית העסק", "בית עסק", "תיאור", "desc", "merchant", "details", "פרטים", "שם"],
+                amount: ["סכום חיוב", "סכום", "amount", "total", "מחיר", "debit", "חיוב"],
+                billingAmount: ["סכום חיוב", "חיוב בפועל", "billing", "charge"],
+                branch: ["ענף", "קטגוריה", "category", "branch", "סוג"],
+                paymentMethod: ["אמצעי תשלום", "card", "method", "type", "כרטיס"]
+            }
 
-            console.log('Searching for headers in first 20 rows...')
+            // Search for header row
+            console.log('Searching for headers...')
             for (let i = 0; i < Math.min(jsonData.length, 20); i++) {
                 const row = jsonData[i]
                 if (Array.isArray(row)) {
-                    const rowStr = row.map(cell => String(cell).replace(/[\r\n]+/g, ' ').trim())
+                    const rowStr = row.map(cell => String(cell).toLowerCase().replace(/[\r\n]+/g, ' ').trim())
 
-                    const hasDate = dateHeaders.some(h => rowStr.includes(h))
-                    const hasDesc = descHeaders.some(h => rowStr.includes(h))
-                    const hasAmount = amountHeaders.some(h => rowStr.includes(h))
+                    // Count matches for critical fields
+                    const hasDate = keywords.date.some(k => rowStr.some(c => c.includes(k)))
+                    const hasAmount = keywords.amount.some(k => rowStr.some(c => c.includes(k)))
 
-                    if (hasDate && hasDesc && hasAmount) {
+                    // If we found at least date and amount headers, we assume this is the header row
+                    if (hasDate && hasAmount) {
                         headerRowIndex = i
                         console.log('Found headers at row:', i)
                         break
@@ -97,25 +103,35 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
 
             if (headerRowIndex === -1) {
                 console.error('Headers not found')
-                toast.error("מבנה קובץ לא תקין", {
-                    description: "לא נמצאו כותרות מתאימות (תאריך, בית עסק, סכום)"
-                })
+                const msg = "מבנה הקובץ לא נתמך. המערכת לא הצליחה לזהות עמודות תאריך וסכום באופן אוטומטי."
+                setError(msg)
+                toast.error("ייבוא נכשל", { description: msg })
                 setFile(null)
                 setLoading(false)
                 return
             }
 
             // Parse data starting from the row after header
-            const headers = jsonData[headerRowIndex].map((h: any) => String(h).replace(/[\r\n]+/g, ' ').trim())
+            const headers = jsonData[headerRowIndex].map((h: any) => String(h).toLowerCase().replace(/[\r\n]+/g, ' ').trim())
 
-            // Helper to find index of any matching header
-            const findIndex = (possibleHeaders: string[]) => headers.findIndex(h => possibleHeaders.includes(h))
+            // Helper to find index using fuzzy search
+            const findIdx = (keys: string[]) => headers.findIndex(h => keys.some(k => h.includes(k)))
 
-            const dateIdx = findIndex(dateHeaders)
-            const descIdx = findIndex(descHeaders)
-            const billingIdx = findIndex(["סכום חיוב", "סכום עסקה", "סכום"]) // Prioritize billing amount
-            const amountIdx = findIndex(["סכום עסקה מקורי", "סכום מקורי"]) // Optional original amount
-            const branchIdx = findIndex(categoryHeaders) // Look for branch OR category
+            const dateIdx = findIdx(keywords.date)
+            const descIdx = findIdx(keywords.desc) // Might be -1
+            const amountIdx = findIdx(keywords.amount)
+            const billingIdx = findIdx(keywords.billingAmount)
+            const branchIdx = findIdx(keywords.branch)
+            const methodIdx = findIdx(keywords.paymentMethod)
+
+            const finalAmountIdx = billingIdx !== -1 ? billingIdx : amountIdx
+
+            if (dateIdx === -1 || finalAmountIdx === -1) {
+                const msg = "חסרות עמודות חובה (תאריך או סכום) בקובץ."
+                setError(msg)
+                setLoading(false)
+                return
+            }
 
             const parsedRows: ParsedExpense[] = []
 
@@ -123,96 +139,72 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                 const row = jsonData[i]
                 if (!row || row.length === 0) continue
 
-                // Get values using indices
-                const dateRaw = dateIdx !== -1 ? row[dateIdx] : null
-                const descRaw = descIdx !== -1 ? row[descIdx] : null
-                const billingRaw = billingIdx !== -1 ? row[billingIdx] : null
-                const amountRaw = amountIdx !== -1 ? row[amountIdx] : 0
-                const branchRaw = branchIdx !== -1 ? row[branchIdx] : '' // Can be from "ענף" or "קטגוריה"
+                // Get values
+                const dateRaw = row[dateIdx]
+                const descRaw = descIdx !== -1 ? row[descIdx] : 'הוצאה כללית'
+                // Prefer billing amount, fallback to general amount
+                const amountRaw = row[finalAmountIdx]
+                const branchRaw = branchIdx !== -1 ? row[branchIdx] : ''
+                const methodRaw = methodIdx !== -1 ? row[methodIdx] : ''
 
-                console.log(`Processing row ${i}:`, { dateRaw, billingRaw })
+                // Skip empty rows
+                if (!dateRaw && !amountRaw) continue
 
-                // Validation: Must have date and billing amount (allow 0)
-                if ((!dateRaw && dateRaw !== 0) || (!billingRaw && billingRaw !== 0)) {
-                    console.log('Skipping row due to missing data')
-                    continue
-                }
-
-                // Parse Date (Excel dates are sometimes numbers)
+                // Parse Date
                 let dateStr = ''
                 if (typeof dateRaw === 'number') {
                     // Excel serial date
                     const dateObj = new Date(Math.round((dateRaw - 25569) * 86400 * 1000))
-                    dateStr = format(dateObj, 'yyyy-MM-dd')
+                    if (!isNaN(dateObj.getTime())) dateStr = format(dateObj, 'yyyy-MM-dd')
                 } else {
-                    // Try parsing string "DD/MM/YYYY" or similar
+                    const dStr = String(dateRaw).trim()
+                    // Try simplistic parsing
                     try {
-                        const dateString = String(dateRaw).trim()
-                        if (dateString.includes('/')) {
-                            const parts = dateString.split('/')
-                            if (parts.length === 3) {
-                                const day = parts[0].trim().padStart(2, '0')
-                                const month = parts[1].trim().padStart(2, '0')
-                                let year = parts[2].trim()
-                                if (year.length === 2) year = '20' + year
-                                dateStr = `${year}-${month}-${day}`
-                            }
-                        } else if (dateString.includes('-')) {
-                            // Handle DD-MM-YYYY or YYYY-MM-DD
-                            const parts = dateString.split('-')
-                            if (parts.length === 3) {
-                                // Check if first part is year (YYYY-MM-DD)
-                                if (parts[0].length === 4) {
-                                    const d = new Date(dateString)
-                                    if (!isNaN(d.getTime())) dateStr = format(d, 'yyyy-MM-dd')
-                                } else {
-                                    // Assume DD-MM-YYYY or DD-MM-YY
-                                    const day = parts[0].trim().padStart(2, '0')
-                                    const month = parts[1].trim().padStart(2, '0')
-                                    let year = parts[2].trim()
-                                    if (year.length === 2) year = '20' + year
-                                    dateStr = `${year}-${month}-${day}`
-                                }
-                            } else {
-                                // Fallback native parse
-                                const d = new Date(dateString)
-                                if (!isNaN(d.getTime())) dateStr = format(d, 'yyyy-MM-dd')
-                            }
+                        let d: Date | null = null
+                        if (dStr.includes('/')) {
+                            const [d1, m1, y1] = dStr.split('/')
+                            if (y1?.length === 4) d = new Date(`${y1}-${m1}-${d1}`)
+                            else if (y1?.length === 2) d = new Date(`20${y1}-${m1}-${d1}`)
+                        } else if (dStr.includes('-')) {
+                            const parts = dStr.split('-')
+                            if (parts[0].length === 4) d = new Date(dStr) // YYYY-MM-DD
+                            else if (parts[2].length === 4) d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`) // DD-MM-YYYY
+                        } else {
+                            d = new Date(dStr)
                         }
-                    } catch (e) {
-                        console.error("Date parse error", dateRaw)
-                    }
+
+                        if (d && !isNaN(d.getTime())) dateStr = format(d, 'yyyy-MM-dd')
+                    } catch (e) { console.log('Date parse failed', dStr) }
                 }
 
-                if (!dateStr) {
-                    console.log('Skipping row due to date parse failure', dateRaw)
-                    continue
-                }
+                if (!dateStr) continue
 
                 // Parse Amount
-                const parseAmount = (val: any) => {
+                const parseVal = (val: any) => {
                     if (typeof val === 'number') return val
                     if (!val) return 0
-                    // Remove currency, commas, spaces
-                    const str = String(val).replace(/[₪,$\s]/g, '').trim()
-                    return parseFloat(str) || 0
+                    const clean = String(val).replace(/[₪,$\s]/g, '')
+                    return parseFloat(clean) || 0
                 }
 
-                const billingAmount = parseAmount(billingRaw)
+                const amount = parseVal(amountRaw)
+                if (amount === 0 && amountRaw !== 0) continue
 
-                if (dateStr && (billingAmount !== 0 || billingRaw === 0)) {
-                    parsedRows.push({
-                        date: dateStr,
-                        description: String(descRaw || 'ללא תיאור').replace(/[\r\n]+/g, ' ').trim(),
-                        amount: parseAmount(amountRaw),
-                        billingAmount: billingAmount,
-                        paymentMethod: 'כרטיס אשראי', // Default assumption
-                        branchName: branchRaw ? String(branchRaw).trim() : undefined
-                    })
-                }
+                parsedRows.push({
+                    date: dateStr,
+                    description: String(descRaw).trim(),
+                    amount: amount,
+                    billingAmount: amount, // Normalize to same field
+                    paymentMethod: methodRaw || 'כרטיס אשראי',
+                    branchName: branchRaw ? String(branchRaw).trim() : undefined
+                })
             }
 
-            setPreviewData(parsedRows)
+            if (parsedRows.length === 0) {
+                setError("לא נמצאו רשומות תקינות לייבוא.")
+            } else {
+                setPreviewData(parsedRows)
+            }
 
         } catch (error) {
             console.error(error)
