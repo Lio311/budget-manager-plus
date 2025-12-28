@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import useSWR from 'swr'
-import { Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X } from 'lucide-react'
+import {
+    Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X,
+    ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn,
+    Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane
+} from 'lucide-react'
 import { format } from 'date-fns'
 
 import { useBudget } from '@/contexts/BudgetContext'
@@ -13,7 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Pagination } from '@/components/ui/Pagination'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, cn } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
@@ -21,6 +25,7 @@ import { getExpenses, addExpense, updateExpense, deleteExpense, importExpenses }
 import { getSuppliers } from '@/lib/actions/suppliers'
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { BankImportModal } from '../BankImportModal'
+import { getCategoryBudgets, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
 
 interface Category {
     id: string
@@ -48,6 +53,26 @@ interface Expense {
 interface ExpenseData {
     expenses: Expense[]
     totalILS: number
+}
+
+const getCategoryIcon = (name: string) => {
+    switch (name) {
+        case 'מזון': return <Utensils className="h-4 w-4" />
+        case 'תחבורה': return <Bus className="h-4 w-4" />
+        case 'בילויים': return <Popcorn className="h-4 w-4" />
+        case 'קניות': return <ShoppingCart className="h-4 w-4" />
+        case 'בריאות': return <Heart className="h-4 w-4" />
+        case 'חינוך': return <GraduationCap className="h-4 w-4" />
+        case 'דלק': return <Fuel className="h-4 w-4" />
+        case 'חנייה': return <Car className="h-4 w-4" />
+        case 'תקשורת': return <Phone className="h-4 w-4" />
+        case 'אפליקציות ומינויים': return <Smartphone className="h-4 w-4" />
+        case 'משכורת': return <Briefcase className="h-4 w-4" />
+        case 'חשמל': return <Zap className="h-4 w-4" />
+        case 'שכירות': return <Home className="h-4 w-4" />
+        case 'חופשה': return <Plane className="h-4 w-4" />
+        default: return <span className="text-xs font-bold">{name.charAt(0)}</span>
+    }
 }
 
 export function ExpensesTab() {
@@ -94,6 +119,18 @@ export function ExpensesTab() {
         ['categories', 'expense', budgetType],
         fetcherCategories,
         { revalidateOnFocus: false }
+    )
+
+    // Fetch Budget Usage
+    const fetcherCategoryBudgets = async () => {
+        const result = await getCategoryBudgets(month, year)
+        if (result.success && result.data) return result.data
+        return []
+    }
+
+    const { data: categoryBudgets = [] } = useSWR<CategoryBudgetUsage[]>(
+        ['categoryBudgets', month, year],
+        fetcherCategoryBudgets
     )
 
     // --- State ---
@@ -309,6 +346,14 @@ export function ExpensesTab() {
         return c
     }
 
+    // Helper to get usage for a category
+    const getUsage = (categoryName: string) => {
+        const budget = categoryBudgets.find(b => b.categoryName === categoryName)
+        if (!budget || budget.limit === 0) return null
+        const percentage = Math.min(100, (budget.spent / budget.limit) * 100)
+        return { percentage, spent: budget.spent, limit: budget.limit, currency: budget.currency }
+    }
+
     const handleImportExpenses = async (data: any[]) => {
         const expensesToImport = data.map(row => ({
             description: row.description,
@@ -329,7 +374,7 @@ export function ExpensesTab() {
     }
 
     return (
-        <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10">
+        <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10">
             {/* Summary Card */}
             <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'}`}>
                 <h3 className="text-sm font-medium text-gray-500">{isBusiness ? 'סך עלויות / הוצאות חודשיות' : 'סך הוצאות חודשיות'}</h3>
@@ -492,101 +537,78 @@ export function ExpensesTab() {
                             לא נמצאו נתונים לחודש זה
                         </div>
                     ) : (
-                        paginatedExpenses.map((exp: any) => (
-                            <div key={exp.id} className="glass-panel p-4 group relative hover:border-orange-200 transition-all border-l-4 border-l-orange-100">
-                                {editingId === exp.id ? (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Input placeholder="תיאור" value={editData.description} onChange={e => setEditData({ ...editData, description: e.target.value })} />
-                                            <PaymentMethodSelector
-                                                value={editData.paymentMethod}
-                                                onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
-                                                color={isBusiness ? 'orange' : 'red'}
-                                            />
                                         </div>
-                                        {isBusiness && (
-                                            <div className="w-full">
-                                                <select className="w-full p-2 border rounded-lg bg-white text-sm" value={editData.supplierId} onChange={e => setEditData({ ...editData, supplierId: e.target.value })}>
-                                                    <option value="">ללא ספק</option>
-                                                    {suppliersData.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                                </select>
-                                            </div>
-                                        )}
-                                        <div className="grid grid-cols-3 gap-3">
-                                            <Input type="number" value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} />
-                                            <select className="p-2 border rounded-lg bg-white text-sm" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
-                                                {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                                            </select>
-                                            <Input type="date" value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} />
-                                        </div>
-                                        <div className="flex justify-end gap-2">
-                                            <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                            <Button size="sm" onClick={handleUpdate} className="bg-orange-600 text-white">שמור שינויים</Button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-4 flex-1 min-w-0">
-                                            <div className="shrink-0">
-                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} text-white font-bold text-xs`}>
-                                                    {exp.category?.[0] || 'ה'}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col min-w-0">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-[#323338] truncate">{exp.description}</span>
-                                                    {exp.supplier && (
-                                                        <span className="text-[10px] px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded border border-orange-100 font-bold">
-                                                            {exp.supplier.name}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-3 text-[11px] text-[#676879]">
-                                                    <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                    <span>{exp.category}</span>
-                                                    {exp.paymentMethod && (
-                                                        <>
-                                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                            <span>{exp.paymentMethod}</span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
+                <div className="flex justify-end gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
+                    <Button size="sm" onClick={handleUpdate} className="bg-orange-600 text-white">שמור שינויים</Button>
+                </div>
+            </div>
+            ) : (
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="shrink-0">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} text-white font-bold text-xs`}>
+                            {exp.category?.[0] || 'ה'}
+                        </div>
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                        <div className="flex items-center gap-2">
+                            <span className="font-bold text-[#323338] truncate">{exp.description}</span>
+                            {exp.supplier && (
+                                <span className="text-[10px] px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded border border-orange-100 font-bold">
+                                    {exp.supplier.name}
+                                </span>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px] text-[#676879]">
+                            <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                            <span className="w-1 h-1 rounded-full bg-gray-300" />
+                            <span>{exp.category}</span>
+                            {exp.paymentMethod && (
+                                <>
+                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                    <span>{exp.paymentMethod}</span>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
 
-                                        <div className="flex items-center gap-6">
-                                            {isBusiness && exp.vatAmount > 0 && (
-                                                <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
-                                                    <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
-                                                    <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
-                                                </div>
-                                            )}
-                                            <div className="text-right shrink-0">
-                                                <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
-                                                    {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
-                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-4 w-4" /></Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ))
-                    )}
-
-                    {totalPages > 1 && (
-                        <div className="mt-4 flex justify-center direction-ltr">
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={setCurrentPage}
-                            />
+                <div className="flex items-center gap-6">
+                    {isBusiness && exp.vatAmount > 0 && (
+                        <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
+                            <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
+                            <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
                         </div>
                     )}
+                    <div className="text-right shrink-0">
+                        <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
+                            {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
+                        </div>
+                    </div>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                </div>
+            </div>
+                                )}
+        </div>
+    ))
+                    )
+}
+
+{
+    totalPages > 1 && (
+        <div className="mt-4 flex justify-center direction-ltr">
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
+        </div>
+    )
+}
                 </div >
             </div >
         </div >

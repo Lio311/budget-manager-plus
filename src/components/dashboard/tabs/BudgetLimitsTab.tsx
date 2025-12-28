@@ -7,13 +7,63 @@ import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Sparkles, Info, Save, RefreshCw, Loader2 } from 'lucide-react'
-import { formatCurrency } from '@/lib/utils'
+import { Sparkles, Info, Save, RefreshCw, Loader2, Pencil, Trash2 } from 'lucide-react'
+import { formatCurrency, cn } from '@/lib/utils'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { getCategoryBudgets, updateCategoryLimit, getSmartRecommendations, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
 
+import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Pagination } from '@/components/ui/Pagination'
+
+function BudgetEditPopover({
+    initialLimit,
+    onCommit
+}: {
+    initialLimit: number,
+    onCommit: (val: number) => void
+}) {
+    const [open, setOpen] = useState(false)
+    const [val, setVal] = useState(String(initialLimit))
+
+    const handleSave = () => {
+        const num = parseFloat(val)
+        if (!isNaN(num)) {
+            onCommit(num)
+            setOpen(false)
+        }
+    }
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-400 hover:text-blue-600">
+                    <Pencil className="h-4 w-4" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" dir="rtl">
+                <div className="space-y-2">
+                    <div className="font-medium text-xs text-center">ערוך תקציב</div>
+                    <div className="flex gap-1">
+                        <Input
+                            type="number"
+                            value={val}
+                            onChange={(e) => setVal(e.target.value)}
+                            className="h-8 text-sm"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSave()
+                            }}
+                        />
+                        <Button size="sm" className="h-8 w-8 p-0" onClick={handleSave}>
+                            <Save className="h-3 w-3" />
+                        </Button>
+                    </div>
+                </div>
+            </PopoverContent>
+        </Popover>
+    )
+}
 
 export function BudgetLimitsTab() {
     const { month, year } = useBudget()
@@ -170,83 +220,110 @@ export function BudgetLimitsTab() {
             </div>
 
             <div className="grid gap-3">
-                {paginatedBudgets.map((budget) => {
-                    const progress = budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0
-                    const isOverLimit = budget.spent > budget.limit && budget.limit > 0
-                    // Dynamic max for slider: Max(5000, Average Income, Current Limit)
-                    // We include 'budget.limit' to ensure the handle doesn't disappear if value > max, but we don't multiply it.
-                    const maxSlider = Math.max(5000, avgIncome, budget.limit)
+                {paginatedBudgets.map(budget => {
+                    const percentage = budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0
+                    const isOverBudget = percentage > 100
 
                     return (
-                        <Card key={budget.categoryId} className={`transition-all ${isOverLimit ? 'border-red-200 bg-red-50/30' : ''}`}>
-                            <CardContent className="p-3 sm:p-4">
-                                <div className="flex flex-col sm:flex-row justify-between gap-2 mb-2">
+                        <div key={budget.categoryId} className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
+                            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0 text-xl">
+                                {budget.categoryName.charAt(0)}
+                            </div>
+
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <div className="font-semibold text-gray-900 text-lg">{budget.categoryName}</div>
                                     <div className="flex items-center gap-2">
-                                        <div className="font-bold text-base text-gray-800">{budget.categoryName}</div>
-                                        {isOverLimit && (
-                                            <Badge variant="destructive" className="text-[10px] h-4 px-1">חריגה!</Badge>
-                                        )}
-                                        {saving === budget.categoryId && (
-                                            <span className="text-[10px] text-yellow-500 animate-pulse">שומר...</span>
-                                        )}
-                                    </div>
-                                    <div className="text-left">
-                                        <div className="text-xs text-gray-500">
-                                            נוצל: <span className={`font-bold ${isOverLimit ? 'text-red-600' : 'text-gray-900'}`}>{formatCurrency(budget.spent)}</span>
-                                            {' / '}
-                                            <span className="text-gray-400">{formatCurrency(budget.limit)}</span>
+                                        <div className="text-sm font-medium text-gray-500">
+                                            {formatCurrency(budget.spent)} / {formatCurrency(budget.limit)}
                                         </div>
+
+                                        {/* Edit Button */}
+                                        <BudgetEditPopover
+                                            initialLimit={budget.limit}
+                                            onCommit={(val) => handleLimitCommit(budget.categoryId, [val])}
+                                        />
+
+                                        {/* Delete Button */}
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-7 w-7 text-gray-400 hover:text-red-500"
+                                                        onClick={() => {
+                                                            if (confirm('האם לבטל את הגבלת התקציב לקטגוריה זו?')) {
+                                                                handleLimitCommit(budget.categoryId, [0])
+                                                                setNewlyAddedIds(prev => prev.filter(id => id !== budget.categoryId))
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>מחק תקציב</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+
                                     </div>
                                 </div>
 
-                                <div className="space-y-3">
-                                    <Slider
-                                        value={[budget.limit]}
-                                        min={0}
-                                        max={maxSlider}
-                                        step={50}
-                                        dir="rtl"
-                                        onValueChange={(val) => handleLimitChange(budget.categoryId, val)}
-                                        onValueCommit={(val) => handleLimitCommit(budget.categoryId, val)}
-                                        className="py-1 cursor-grab active:cursor-grabbing [&>.relative>.bg-primary]:bg-yellow-500 [&>.relative>.border-primary]:border-yellow-500" // Custom yellow styling via utility classes if current slider supports specific targeting, or generic override
-                                    />
-                                    {/* Note: ShadCN slider usually uses 'bg-primary'. To force yellow we might need explicit class overrides or inline styles if standard props don't reach. 
-                                        Assuming standard slider structure:
-                                        We can try to wrap or apply global styles, but let's try direct class override if permitted.
-                                    */}
+                                <Slider
+                                    value={[budget.limit]}
+                                    max={Math.max(budget.limit * 1.5, 5000, avgIncome || 0)}
+                                    step={50}
+                                    onValueChange={(val) => handleLimitChange(budget.categoryId, val)}
+                                    onValueCommit={(val) => handleLimitCommit(budget.categoryId, val)}
+                                    className="py-2 cursor-pointer"
+                                    dir="ltr"
+                                />
 
-                                    <div className="flex items-center gap-2">
-                                        <Progress
-                                            value={Math.min(progress, 100)}
-                                            className={`h-1.5 flex-1 [&>div]:${isOverLimit ? 'bg-red-500' : 'bg-yellow-500'}`}
-                                        />
-                                        <span className={`text-[10px] w-8 text-left font-mono ${isOverLimit ? 'text-red-600 font-bold' : ''}`}>
-                                            {progress.toFixed(0)}%
+                                <div className="relative pt-1">
+                                    <div className="flex items-center justify-between text-xs mb-1">
+                                        <span className={cn(
+                                            "font-medium",
+                                            isOverBudget ? "text-red-600" : "text-gray-600"
+                                        )}>
+                                            {Math.round(percentage)}% נוצל
+                                        </span>
+                                        <span className="text-gray-400">
+                                            נותרו {formatCurrency(Math.max(0, budget.limit - budget.spent))}
                                         </span>
                                     </div>
+                                    <Progress
+                                        value={Math.min(100, percentage)}
+                                        className={cn("h-2", isOverBudget ? "bg-red-100" : "bg-gray-100")}
+                                        indicatorClassName={cn(
+                                            isOverBudget ? "bg-red-500" :
+                                                percentage > 85 ? "bg-orange-500" : "bg-blue-600"
+                                        )}
+                                    />
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
                     )
                 })}
+
+                {activeBudgets.length === 0 && (
+                    <div className="text-center py-10 text-gray-400 border-2 border-dashed border-gray-100 rounded-xl">
+                        <p>אין תקציבים פעילים לחודש זה.</p>
+                        <p className="text-sm mt-1">בחר קטגוריה מהתפריט למעלה כדי להגדיר לה תקציב.</p>
+                    </div>
+                )}
+
+                {totalPages > 1 && (
+                    <div className="mt-4 flex justify-center">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </div>
+                )}
             </div>
-
-            {activeBudgets.length === 0 && (
-                <div className="text-center py-10 text-gray-400 border-2 border-dashed border-gray-100 rounded-xl">
-                    <p>אין תקציבים פעילים לחודש זה.</p>
-                    <p className="text-sm mt-1">בחר קטגוריה מהתפריט למעלה כדי להגדיר לה תקציב.</p>
-                </div>
-            )}
-
-            {totalPages > 1 && (
-                <div className="mt-4 flex justify-center">
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
-                    />
-                </div>
-            )}
         </div>
     )
 }
