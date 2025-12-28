@@ -479,7 +479,7 @@ export function ExpensesTab() {
                     <div className="flex flex-col gap-4">
                         <div className="w-full">
                             <label className="text-xs font-bold mb-1.5 block text-[#676879]">תיאור ההוצאה</label>
-                            <Input className="h-10 border-gray-200 focus:ring-orange-500/20" placeholder="מה קנית / שילמת?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
+                            <Input className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} placeholder="מה קנית / שילמת?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
                         </div>
 
                         {isBusiness && (
@@ -502,7 +502,7 @@ export function ExpensesTab() {
                             <div className="flex-1">
                                 <label className="text-xs font-bold mb-1.5 block text-[#676879]">קטגוריה</label>
                                 <select
-                                    className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 focus:ring-orange-500/20 outline-none"
+                                    className={`w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'} outline-none`}
                                     value={newExpense.category}
                                     onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
                                 >
@@ -526,7 +526,7 @@ export function ExpensesTab() {
                                                     <div key={color.name} className={`h-8 w-8 rounded-full cursor-pointer transition-transform hover:scale-110 border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-[#323338] scale-110' : 'border-transparent'}`} onClick={() => setNewCategoryColor(color.class)} />
                                                 ))}
                                             </div>
-                                            <Button onClick={handleAddCategory} className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-lg h-10" disabled={!newCategoryName || submitting}>שמור</Button>
+                                            <Button onClick={handleAddCategory} className={`w-full ${isBusiness ? 'bg-orange-600 hover:bg-orange-700' : 'bg-[#e2445c] hover:bg-[#d43f55]'} text-white rounded-lg h-10`} disabled={!newCategoryName || submitting}>שמור</Button>
                                         </div>
                                     </PopoverContent>
                                 </Popover>
@@ -548,7 +548,7 @@ export function ExpensesTab() {
                             </div>
                             <div className="col-span-2">
                                 <label className="text-xs font-bold mb-1.5 block text-[#676879]">סכום כולל</label>
-                                <Input className="h-10 border-gray-200 focus:ring-orange-500/20" type="number" placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
+                                <Input className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} type="number" placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
                             </div>
                         </div>
 
@@ -587,7 +587,7 @@ export function ExpensesTab() {
 
                         <div className="flex items-start gap-4 p-4 border border-gray-100 rounded-xl bg-gray-50/50 w-full">
                             <div className="flex items-center gap-2">
-                                <Checkbox id="recurring-expense" checked={newExpense.isRecurring} onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })} className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600" />
+                                <Checkbox id="recurring-expense" checked={newExpense.isRecurring} onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })} className={`data-[state=checked]:${isBusiness ? 'bg-orange-600 border-orange-600' : 'bg-[#e2445c] border-[#e2445c]'}`} />
                                 <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338]">הוצאה קבועה</label>
                             </div>
                             {newExpense.isRecurring && (

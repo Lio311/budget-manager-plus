@@ -344,16 +344,16 @@ export function SavingsTab() {
         <div className="space-y-6 w-full pb-10 px-2 md:px-0" dir="rtl">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2">
+                <div className="monday-card border-l-4 border-l-[#00c875] p-6 flex flex-col justify-center gap-2">
                     <h3 className="text-sm font-medium text-gray-500">סך הפקדות חודשיות</h3>
-                    <div className={`text-2xl font-bold text-[#0073ea] break-all ${loadingSavings ? 'animate-pulse' : ''}`}>
+                    <div className={`text-2xl font-bold text-[#00c875] break-all ${loadingSavings ? 'animate-pulse' : ''}`}>
                         {loadingSavings ? '...' : formatCurrency(stats.totalMonthlyDepositILS, '₪')}
                     </div>
                 </div>
 
-                <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2">
+                <div className="monday-card border-l-4 border-l-[#00c875] p-6 flex flex-col justify-center gap-2">
                     <h3 className="text-sm font-medium text-gray-500">מספר חסכונות</h3>
-                    <div className={`text-2xl font-bold text-[#0073ea] ${loadingSavings ? 'animate-pulse' : ''}`}>
+                    <div className={`text-2xl font-bold text-[#00c875] ${loadingSavings ? 'animate-pulse' : ''}`}>
                         {loadingSavings ? '...' : stats.count}
                     </div>
                 </div>
@@ -364,7 +364,7 @@ export function SavingsTab() {
                 {/* Add New Saving */}
                 <div className="glass-panel p-5 h-fit">
                     <div className="mb-6 flex items-center gap-2">
-                        <PiggyBank className="h-5 w-5 text-blue-600" />
+                        <PiggyBank className="h-5 w-5 text-[#00c875]" />
                         <h3 className="text-lg font-bold text-[#323338]">הוספת חיסכון</h3>
                     </div>
 
@@ -485,7 +485,7 @@ export function SavingsTab() {
                                     id="recurring-saving"
                                     checked={newSaving.isRecurring}
                                     onCheckedChange={(checked) => setNewSaving({ ...newSaving, isRecurring: checked as boolean })}
-                                    className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                    className="data-[state=checked]:bg-[#00c875] data-[state=checked]:border-[#00c875]"
                                 />
                                 <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer text-[#323338]">
                                     חיסכון קבוע
@@ -508,7 +508,7 @@ export function SavingsTab() {
 
                         <Button
                             onClick={handleAdd}
-                            className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-all hover:shadow-md mt-2"
+                            className="w-full h-10 rounded-lg bg-[#00c875] hover:bg-[#00b065] text-white font-medium shadow-sm transition-all hover:shadow-md mt-2"
                             disabled={submitting}
                         >
                             {submitting ? (
