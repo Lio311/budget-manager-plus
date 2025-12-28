@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(req: Request) {
     try {
-        const { userId } = auth()
+        const { userId } = await auth()
         // Optional: specific admin check if needed, or just allow logged-in users to trigger it (safe enough for now)
         if (!userId) {
             return new NextResponse('Unauthorized', { status: 401 })
