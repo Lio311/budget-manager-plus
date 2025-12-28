@@ -323,70 +323,69 @@ export function DebtsTab() {
                     </div>
 
                     <div className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-3">
-                            {/* Creditor Name */}
-                            <div className="w-full">
-                                <label className="text-xs font-medium mb-1.5 block text-[#676879]">שם המלווה / לווה</label>
-                                <Input
-                                    placeholder="שם..."
-                                    className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
-                                    value={newDebt.creditor}
-                                    onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
+                        {/* Creditor Name */}
+                        <div className="w-full">
+                            <label className="text-xs font-medium mb-1.5 block text-[#676879]">שם המלווה / לווה</label>
+                            <Input
+                                placeholder="שם..."
+                                className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
+                                value={newDebt.creditor}
+                                onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
+                                disabled={submitting}
+                            />
+                        </div>
+
+                        {/* Amount & Currency in one row */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+                            <div>
+                                <label className="text-xs font-medium mb-1.5 block text-[#676879]">מטבע</label>
+                                <select
+                                    className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                                    value={newDebt.currency}
+                                    onChange={(e) => setNewDebt({ ...newDebt, currency: e.target.value })}
                                     disabled={submitting}
-                                />
+                                >
+                                    {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                        <option key={code} value={code}>{code}</option>
+                                    ))}
+                                </select>
                             </div>
-
-                            {/* Amount & Currency */}
-                            <div className="grid grid-cols-3 gap-3 w-full">
-                                <div className="col-span-1">
-                                    <label className="text-xs font-medium mb-1.5 block text-[#676879]">מטבע</label>
-                                    <select
-                                        className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
-                                        value={newDebt.currency}
-                                        onChange={(e) => setNewDebt({ ...newDebt, currency: e.target.value })}
-                                        disabled={submitting}
-                                    >
-                                        {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
-                                            <option key={code} value={code}>{code} ({symbol})</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="col-span-2">
-                                    <label className="text-xs font-medium mb-1.5 block text-[#676879]">סכום כולל</label>
-                                    <Input
-                                        type="number"
-                                        placeholder="0.00"
-                                        className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
-                                        value={newDebt.totalAmount}
-                                        onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
-                                        disabled={submitting}
-                                        dir="ltr"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Due Day */}
-                            <div className="w-full">
-                                <label className="text-xs font-medium mb-1.5 block text-[#676879]">יום חיוב</label>
+                            <div className="sm:col-span-2">
+                                <label className="text-xs font-medium mb-1.5 block text-[#676879]">סכום כולל</label>
                                 <Input
                                     type="number"
-                                    placeholder="1"
-                                    min="1"
-                                    max="31"
+                                    placeholder="0.00"
                                     className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
-                                    value={newDebt.dueDay}
-                                    onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
+                                    value={newDebt.totalAmount}
+                                    onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
                                     disabled={submitting}
                                     dir="ltr"
                                 />
                             </div>
+                        </div>
 
-                            <div className="w-full">
-                                <PaymentMethodSelector
-                                    value={newDebt.paymentMethod}
-                                    onChange={(val) => setNewDebt({ ...newDebt, paymentMethod: val })}
-                                />
-                            </div>
+                        {/* Due Day */}
+                        <div className="w-full">
+                            <label className="text-xs font-medium mb-1.5 block text-[#676879]">יום חיוב (1-31)</label>
+                            <Input
+                                type="number"
+                                placeholder="1"
+                                min="1"
+                                max="31"
+                                className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
+                                value={newDebt.dueDay}
+                                onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
+                                disabled={submitting}
+                                dir="ltr"
+                            />
+                        </div>
+
+                        {/* Payment Method */}
+                        <div className="w-full">
+                            <PaymentMethodSelector
+                                value={newDebt.paymentMethod}
+                                onChange={(val) => setNewDebt({ ...newDebt, paymentMethod: val })}
+                            />
                         </div>
 
                         <div className="flex flex-col gap-4"> {/* Container for Checkbox and Button */}
