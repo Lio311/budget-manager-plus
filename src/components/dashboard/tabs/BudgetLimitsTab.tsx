@@ -115,6 +115,10 @@ export function BudgetLimitsTab() {
     const [saving, setSaving] = useState<string | null>(null) // categoryId currently saving
     const [activeDefaults, setActiveDefaults] = useState(false)
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 5
+
     async function handleLimitChange(categoryId: string, newValue: number[]) {
         const value = newValue[0]
         // Optimistic UI update via mutate
