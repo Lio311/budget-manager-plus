@@ -5,7 +5,8 @@ import useSWR from 'swr'
 import {
     Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X,
     ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn,
-    Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane, RefreshCw
+    Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane, RefreshCw,
+    Umbrella, Dumbbell, Shield
 } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -72,7 +73,11 @@ const getCategoryIcon = (name: string) => {
         case 'משכורת': return <Briefcase className="h-4 w-4" />
         case 'חשמל': return <Zap className="h-4 w-4" />
         case 'שכירות': return <Home className="h-4 w-4" />
+        case 'חשמל': return <Zap className="h-4 w-4" />
+        case 'שכירות': return <Home className="h-4 w-4" />
         case 'חופשה': return <Plane className="h-4 w-4" />
+        case 'ביטוחים': return <Shield className="h-4 w-4" />
+        case 'ספורט': return <Dumbbell className="h-4 w-4" />
         default: return <span className="text-xs font-bold">{name.charAt(0)}</span>
     }
 }
@@ -395,7 +400,7 @@ export function ExpensesTab() {
     }
 
     return (
-        <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10">
+        <div className="space-y-6 w-full pb-10 px-1 md:px-0">
             {/* Summary Card */}
             <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'}`}>
                 <h3 className="text-sm font-medium text-gray-500">{isBusiness ? 'סך עלויות / הוצאות חודשיות' : 'סך הוצאות חודשיות'}</h3>

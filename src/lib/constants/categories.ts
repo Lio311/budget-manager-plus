@@ -10,6 +10,8 @@ export const DEFAULT_EXPENSE_CATEGORIES = [
     { name: 'קניות', color: 'bg-pink-100 text-pink-700 border-pink-200' },
     { name: 'בריאות', color: 'bg-red-100 text-red-700 border-red-200' },
     { name: 'חינוך', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+    { name: 'ביטוחים', color: 'bg-teal-100 text-teal-700 border-teal-200' },
+    { name: 'ספורט', color: 'bg-lime-100 text-lime-700 border-lime-200' },
 ]
 
 export const DEFAULT_INCOME_CATEGORIES = [

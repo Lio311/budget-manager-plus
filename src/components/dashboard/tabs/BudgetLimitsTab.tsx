@@ -7,7 +7,7 @@ import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Sparkles, Info, Save, RefreshCw, Loader2, Pencil, Trash2, ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn, Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane } from 'lucide-react'
+import { Umbrella, Shield, Dumbbell, Sparkles, Info, Save, RefreshCw, Loader2, Pencil, Trash2, ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn, Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane } from 'lucide-react'
 import { formatCurrency, cn } from '@/lib/utils'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -33,6 +33,8 @@ const getCategoryIcon = (name: string) => {
         case 'חשמל': return <Zap className="h-6 w-6" />
         case 'שכירות': return <Home className="h-6 w-6" />
         case 'חופשה': return <Plane className="h-6 w-6" />
+        case 'ביטוחים': return <Shield className="h-6 w-6" />
+        case 'ספורט': return <Dumbbell className="h-6 w-6" />
         default: return <span className="text-xl font-bold">{name.charAt(0)}</span>
     }
 }
