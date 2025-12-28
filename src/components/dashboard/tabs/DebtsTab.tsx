@@ -323,7 +323,7 @@ export function DebtsTab() {
                     </div>
 
                     <div className="flex flex-col gap-4">
-                        {/* Creditor Name */}
+                        {/* Creditor Name - Full Width */}
                         <div className="w-full">
                             <label className="text-xs font-medium mb-1.5 block text-[#676879]">שם המלווה / לווה</label>
                             <Input
@@ -335,8 +335,8 @@ export function DebtsTab() {
                             />
                         </div>
 
-                        {/* Amount & Currency in one row */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+                        {/* Currency, Amount, Due Day - 2 columns on desktop */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
                             <div>
                                 <label className="text-xs font-medium mb-1.5 block text-[#676879]">מטבע</label>
                                 <select
@@ -350,7 +350,7 @@ export function DebtsTab() {
                                     ))}
                                 </select>
                             </div>
-                            <div className="sm:col-span-2">
+                            <div>
                                 <label className="text-xs font-medium mb-1.5 block text-[#676879]">סכום כולל</label>
                                 <Input
                                     type="number"
@@ -364,7 +364,7 @@ export function DebtsTab() {
                             </div>
                         </div>
 
-                        {/* Due Day */}
+                        {/* Due Day - Full Width */}
                         <div className="w-full">
                             <label className="text-xs font-medium mb-1.5 block text-[#676879]">יום חיוב (1-31)</label>
                             <Input
@@ -380,7 +380,7 @@ export function DebtsTab() {
                             />
                         </div>
 
-                        {/* Payment Method */}
+                        {/* Payment Method - Full Width */}
                         <div className="w-full">
                             <PaymentMethodSelector
                                 value={newDebt.paymentMethod}
