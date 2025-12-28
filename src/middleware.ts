@@ -32,7 +32,7 @@ export default clerkMiddleware(async (auth, req) => {
         const maintenanceUrl = new URL('/api/maintenance/status', req.url);
 
         // Pass userId if available so the API can check admin status
-        const { userId } = auth();
+        const { userId } = await auth();
         if (userId) {
             maintenanceUrl.searchParams.set('userId', userId);
         }
