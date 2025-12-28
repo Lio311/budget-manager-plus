@@ -578,20 +578,20 @@ export function IncomeTab() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="flex flex-wrap sm:flex-nowrap items-center gap-x-1.5 sm:gap-3 text-[11px] text-[#676879] overflow-hidden">
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#676879] mt-0.5">
                                                     <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                     <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                    <span className="truncate">{income.category}</span>
+                                                    <span className="">{income.category}</span>
                                                     {income.payer && (
                                                         <>
                                                             <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                            <span className="truncate">מאת: {income.payer}</span>
+                                                            <span className="">מאת: {income.payer}</span>
                                                         </>
                                                     )}
                                                     {income.paymentMethod && (
                                                         <>
                                                             <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                            <span className="truncate">{income.paymentMethod}</span>
+                                                            <span className="">{income.paymentMethod}</span>
                                                         </>
                                                     )}
                                                 </div>
