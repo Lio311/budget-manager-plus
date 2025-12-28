@@ -283,13 +283,13 @@ export function ExpensesTab() {
     }
 
     async function handleDelete(exp: Expense) {
-        if (!confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) return
-
         if (exp.isRecurring) {
             setPendingAction({ type: 'delete', id: exp.id })
             setRecurrenceDialogOpen(true)
             return
         }
+
+        if (!confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) return
 
         const result = await deleteExpense(exp.id, 'SINGLE')
         if (result.success) {
@@ -641,7 +641,7 @@ export function ExpensesTab() {
                                             </div>
                                             <div className="flex justify-end gap-2">
                                                 <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                                <Button size="sm" onClick={() => handleUpdate()} className="bg-orange-600 text-white">שמור שינויים</Button>
+                                                <Button size="sm" onClick={() => handleUpdate()} className={`${isBusiness ? 'bg-orange-600' : 'bg-[#e2445c] hover:bg-[#d43f55]'} text-white`}>שמור שינויים</Button>
                                             </div>
                                         </div>
                                     ) : (
