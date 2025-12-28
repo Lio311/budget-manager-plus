@@ -295,12 +295,12 @@ export function BudgetLimitsTab() {
 
                                 <Slider
                                     value={[budget.limit]}
-                                    max={Math.max(budget.limit * 1.5, 5000, avgIncome || 0)}
+                                    max={Math.max(5000, avgIncome || 0)}
                                     step={50}
                                     onValueChange={(val) => handleLimitChange(budget.categoryId, val)}
                                     onValueCommit={(val) => handleLimitCommit(budget.categoryId, val)}
                                     className="py-2 cursor-pointer"
-                                    dir="ltr"
+                                    dir="rtl"
                                 />
 
                                 <div className="relative pt-1">
@@ -317,7 +317,7 @@ export function BudgetLimitsTab() {
                                     </div>
                                     <Progress
                                         value={Math.min(100, percentage)}
-                                        className={cn("h-2", isOverBudget ? "bg-red-100" : "bg-gray-100")}
+                                        className={cn("h-2 rotate-180", isOverBudget ? "bg-red-100" : "bg-gray-100")}
                                         indicatorClassName={cn(
                                             isOverBudget ? "bg-red-500" :
                                                 percentage > 85 ? "bg-orange-500" : "bg-blue-600"
