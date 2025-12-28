@@ -204,10 +204,16 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                 })
             }
 
+            console.log('Parsed rows count:', parsedRows.length)
+            console.log('Sample parsed row:', parsedRows[0])
+
             if (parsedRows.length === 0) {
-                setError("לא נמצאו רשומות תקינות לייבוא.")
+                const msg = "לא נמצאו רשומות תקינות לייבוא.\n\nנמצאו כותרות אבל לא נמצאו שורות עם נתונים תקינים."
+                setError(msg)
+                toast.error("ייבוא נכשל", { description: msg })
             } else {
                 setPreviewData(parsedRows)
+                console.log('Preview data set successfully')
             }
 
         } catch (error) {
