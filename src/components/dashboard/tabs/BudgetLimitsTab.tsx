@@ -7,7 +7,7 @@ import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Sparkles, Info, Save, RefreshCw, Loader2, Pencil, Trash2 } from 'lucide-react'
+import { Sparkles, Info, Save, RefreshCw, Loader2, Pencil, Trash2, ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn, Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane } from 'lucide-react'
 import { formatCurrency, cn } from '@/lib/utils'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -16,6 +16,26 @@ import { getCategoryBudgets, updateCategoryLimit, getSmartRecommendations, Categ
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Pagination } from '@/components/ui/Pagination'
+
+const getCategoryIcon = (name: string) => {
+    switch (name) {
+        case 'מזון': return <Utensils className="h-6 w-6" />
+        case 'תחבורה': return <Bus className="h-6 w-6" />
+        case 'בילויים': return <Popcorn className="h-6 w-6" />
+        case 'קניות': return <ShoppingCart className="h-6 w-6" />
+        case 'בריאות': return <Heart className="h-6 w-6" />
+        case 'חינוך': return <GraduationCap className="h-6 w-6" />
+        case 'דלק': return <Fuel className="h-6 w-6" />
+        case 'חנייה': return <Car className="h-6 w-6" />
+        case 'תקשורת': return <Phone className="h-6 w-6" />
+        case 'אפליקציות ומינויים': return <Smartphone className="h-6 w-6" />
+        case 'משכורת': return <Briefcase className="h-6 w-6" />
+        case 'חשמל': return <Zap className="h-6 w-6" />
+        case 'שכירות': return <Home className="h-6 w-6" />
+        case 'חופשה': return <Plane className="h-6 w-6" />
+        default: return <span className="text-xl font-bold">{name.charAt(0)}</span>
+    }
+}
 
 function BudgetEditPopover({
     initialLimit,
@@ -226,8 +246,8 @@ export function BudgetLimitsTab() {
 
                     return (
                         <div key={budget.categoryId} className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
-                            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0 text-xl">
-                                {budget.categoryName.charAt(0)}
+                            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                                {getCategoryIcon(budget.categoryName)}
                             </div>
 
                             <div className="flex-1 space-y-2">
