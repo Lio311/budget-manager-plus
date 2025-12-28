@@ -139,9 +139,14 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
 
             const parsedRows: ParsedExpense[] = []
 
+            console.log('Starting to parse rows from index:', headerRowIndex + 1, 'to', jsonData.length)
+
             for (let i = headerRowIndex + 1; i < jsonData.length; i++) {
                 const row = jsonData[i]
-                if (!row || row.length === 0) continue
+                if (!row || row.length === 0) {
+                    console.log(`Row ${i}: Empty, skipping`)
+                    continue
+                }
 
                 // Get values
                 const dateRaw = row[dateIdx]
@@ -151,8 +156,13 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                 const branchRaw = branchIdx !== -1 ? row[branchIdx] : ''
                 const methodRaw = methodIdx !== -1 ? row[methodIdx] : ''
 
+                console.log(`Row ${i}:`, { dateRaw, descRaw, amountRaw, branchRaw })
+
                 // Skip empty rows
-                if (!dateRaw && !amountRaw) continue
+                if (!dateRaw && !amountRaw) {
+                    console.log(`Row ${i}: No date and no amount, skipping`)
+                    continue
+                }
 
                 // Parse Date
                 let dateStr = ''
@@ -181,7 +191,10 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                     } catch (e) { console.log('Date parse failed', dStr) }
                 }
 
-                if (!dateStr) continue
+                if (!dateStr) {
+                    console.log(`Row ${i}: Failed to parse date, skipping`)
+                    continue
+                }
 
                 // Parse Amount
                 const parseVal = (val: any) => {
