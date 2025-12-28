@@ -475,10 +475,43 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                         <XAxis
                                             dataKey="name"
                                             interval={0}
-                                            height={60}
+                                            height={70}
                                             tick={({ x, y, payload }) => {
                                                 const val = payload.value || '';
-                                                const truncated = val.length > 8 ? val.substring(0, 8) + '...' : val;
+
+                                                // Split into two lines if longer than 5 characters
+                                                if (val.length > 5) {
+                                                    const mid = Math.ceil(val.length / 2);
+                                                    const line1 = val.substring(0, mid);
+                                                    const line2 = val.substring(mid);
+
+                                                    return (
+                                                        <g transform={`translate(${x},${y})`}>
+                                                            <text
+                                                                x={0}
+                                                                y={0}
+                                                                dy={8}
+                                                                textAnchor="middle"
+                                                                fill="#374151"
+                                                                style={{ fontSize: '11px', direction: 'rtl' }}
+                                                            >
+                                                                {line1}
+                                                            </text>
+                                                            <text
+                                                                x={0}
+                                                                y={0}
+                                                                dy={20}
+                                                                textAnchor="middle"
+                                                                fill="#374151"
+                                                                style={{ fontSize: '11px', direction: 'rtl' }}
+                                                            >
+                                                                {line2}
+                                                            </text>
+                                                        </g>
+                                                    );
+                                                }
+
+                                                // Single line for short text
                                                 return (
                                                     <g transform={`translate(${x},${y})`}>
                                                         <text
@@ -487,12 +520,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                             dy={16}
                                                             textAnchor="middle"
                                                             fill="#374151"
-                                                            style={{ fontSize: '12px', direction: 'rtl' }}
+                                                            style={{ fontSize: '11px', direction: 'rtl' }}
                                                         >
-                                                            {truncated}
+                                                            {val}
                                                         </text>
                                                     </g>
-                                                )
+                                                );
                                             }}
                                         />
                                         <YAxis
