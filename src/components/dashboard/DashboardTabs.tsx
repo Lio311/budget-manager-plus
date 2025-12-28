@@ -39,11 +39,16 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         setActiveTab(urlTab)
     }, [urlTab])
 
-    // Reset to overview when budget type changes
+    // Reset to overview ONLY when budget type changes (and it's not the initial load)
+    const [prevBudgetType, setPrevBudgetType] = useState(budgetType)
+
     useEffect(() => {
-        setActiveTab('overview')
-        router.push('/dashboard?tab=overview', { scroll: false })
-    }, [budgetType, router])
+        if (budgetType !== prevBudgetType) {
+            setActiveTab('overview')
+            router.push('/dashboard?tab=overview', { scroll: false })
+            setPrevBudgetType(budgetType)
+        }
+    }, [budgetType, prevBudgetType, router])
 
     const personalTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },

@@ -210,6 +210,15 @@ export function ExpensesTab() {
             return
         }
 
+        if (newExpense.isRecurring && newExpense.recurringEndDate) {
+            const start = new Date(newExpense.date)
+            const end = new Date(newExpense.recurringEndDate)
+            if (end <= start) {
+                toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר מתאריך ההוצאה', variant: 'destructive' })
+                return
+            }
+        }
+
         setSubmitting(true)
         try {
             const result = await addExpense(month, year, {
@@ -647,7 +656,7 @@ export function ExpensesTab() {
                                     id="recurring-expense"
                                     checked={newExpense.isRecurring}
                                     onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })}
-                                    className={isBusiness ? 'data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600' : 'data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600'}
+                                    className={isBusiness ? 'data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600' : 'data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]'}
                                 />
                                 <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338]">הוצאה קבועה</label>
                             </div>
@@ -692,7 +701,7 @@ export function ExpensesTab() {
                                             </div>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <select
-                                                    className="w-full p-2 border border-gray-200 rounded-lg text-sm"
+                                                    className="w-full p-2 border border-blue-100 bg-blue-50/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                                     value={editData.category}
                                                     onChange={(e) => setEditData({ ...editData, category: e.target.value })}
                                                 >
@@ -706,16 +715,24 @@ export function ExpensesTab() {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="flex items-center gap-3 flex-1 min-w-0">
                                                 <div className="shrink-0">
                                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} shadow-sm`}>
                                                         {getCategoryIcon(exp.category)}
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-col min-w-0">
-                                                    <span className="font-bold text-[#323338] truncate text-sm sm:text-base">{exp.description}</span>
-                                                    <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] overflow-hidden">
+                                                <div className="flex flex-col min-w-0 gap-0.5">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-[#323338] truncate text-sm sm:text-base">{exp.description}</span>
+                                                        {exp.isRecurring && (
+                                                            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${isBusiness ? 'bg-orange-100 text-orange-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                                                                <span className="w-1 h-1 rounded-full bg-current" />
+                                                                קבועה
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] overflow-hidden whitespace-nowrap">
                                                         <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                         <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
                                                         <span className="truncate">{exp.category}</span>
@@ -729,19 +746,19 @@ export function ExpensesTab() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-6">
+                                            <div className="flex items-center gap-3 sm:gap-6 pl-1 shrink-0">
                                                 {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
                                                     <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
                                                         <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
                                                         <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
                                                     </div>
                                                 ) : null}
-                                                <div className="text-right shrink-0">
+                                                <div className="text-right">
                                                     <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
                                                         {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                                     <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
                                                     <Button size="icon" variant="ghost" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(exp)}>
                                                         <Trash2 className="h-4 w-4" />
