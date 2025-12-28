@@ -61,29 +61,29 @@ interface ExpenseData {
 
 const getCategoryIcon = (name: string) => {
     const trimmed = name?.trim() || '';
-    if (trimmed.includes('אפליקציות')) return <Smartphone className="h-4 w-4" />
+    const lower = trimmed.toLowerCase();
+
+    // Fuzzy matching for common variations
+    if (trimmed.includes('אפליקציות') || trimmed.includes('מינוי')) return <Smartphone className="h-4 w-4" />
+    if (trimmed.includes('ביטוח')) return <Shield className="h-4 w-4" />
+    if (trimmed.includes('ביגוד') || trimmed.includes('בגדים')) return <ShoppingCart className="h-4 w-4" />
+    if (trimmed.includes('אוכל') || trimmed.includes('מזון')) return <Utensils className="h-4 w-4" />
+    if (trimmed.includes('מסיבה') || trimmed.includes('בילוי')) return <Popcorn className="h-4 w-4" />
+    if (trimmed.includes('קבוע')) return <RefreshCw className="h-4 w-4" />
 
     switch (trimmed) {
-        case 'מזון': return <Utensils className="h-4 w-4" />
         case 'תחבורה': return <Bus className="h-4 w-4" />
-        case 'בילויים': return <Popcorn className="h-4 w-4" />
         case 'קניות': return <ShoppingCart className="h-4 w-4" />
         case 'בריאות': return <Heart className="h-4 w-4" />
         case 'חינוך': return <GraduationCap className="h-4 w-4" />
         case 'דלק': return <Fuel className="h-4 w-4" />
         case 'חנייה': return <Car className="h-4 w-4" />
         case 'תקשורת': return <Phone className="h-4 w-4" />
-        case 'אפליקציות ומינויים': return <Smartphone className="h-4 w-4" />
         case 'משכורת': return <Briefcase className="h-4 w-4" />
         case 'חשמל': return <Zap className="h-4 w-4" />
         case 'שכירות': return <Home className="h-4 w-4" />
         case 'חופשה': return <Plane className="h-4 w-4" />
-        case 'ביטוחים':
-        case 'ביטוח': return <Shield className="h-4 w-4" />
         case 'ספורט': return <Dumbbell className="h-4 w-4" />
-        case 'הוצאה קבועה': return <RefreshCw className="h-4 w-4" />
-        case 'ביגוד':
-        case 'בגדים': return <ShoppingCart className="h-4 w-4" />
         default: return <span className="text-xs font-bold">{typeof name === 'string' ? name.charAt(0) : '?'}</span>
     }
 }
