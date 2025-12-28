@@ -203,7 +203,7 @@ export function QuotesTab() {
                 </div>
                 <Button
                     onClick={handleNewQuote}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-black"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
                 >
                     <Plus className="h-4 w-4 ml-2" />
                     הצעת מחיר חדשה
@@ -331,7 +331,7 @@ export function QuotesTab() {
                         </div>
 
                         <div className="flex gap-2">
-                            <Button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-black">
+                            <Button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white">
                                 צור הצעת מחיר
                             </Button>
                             <Button

@@ -279,7 +279,7 @@ export function IncomeTab() {
     }
 
     // Optimistic delete for instant UI feedback
-    const { deleteItem: optimisticDeleteIncome } = useOptimisticDelete<IncomesData>(
+    const { deleteItem: optimisticDeleteIncome } = useOptimisticDelete<IncomeData>(
         ['incomes', month, year, budgetType],
         (id) => deleteIncome(id, 'SINGLE'),
         {

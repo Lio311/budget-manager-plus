@@ -319,7 +319,7 @@ export function ExpensesTab() {
     }
 
     // Optimistic delete for instant UI feedback
-    const { deleteItem: optimisticDeleteExpense } = useOptimisticDelete<ExpensesData>(
+    const { deleteItem: optimisticDeleteExpense } = useOptimisticDelete<ExpenseData>(
         ['expenses', month, year, budgetType],
         (id) => deleteExpense(id, 'SINGLE'),
         {
