@@ -548,7 +548,7 @@ export function IncomeTab() {
                                             <select className="p-2 border rounded-lg bg-white text-sm" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
                                                 {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                             </select>
-                                            <Input type="date" value={editData.date} onChange={e => setEditData({ ...editData, date: e.target.value })} />
+                                            <DatePicker date={editData.date ? new Date(editData.date) : undefined} setDate={(d) => setEditData({ ...editData, date: d ? format(d, 'yyyy-MM-dd') : '' })} />
                                         </div>
                                         <div className="flex justify-end gap-2">
                                             <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
