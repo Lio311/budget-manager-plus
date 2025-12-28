@@ -328,8 +328,7 @@ export function BudgetLimitsTab() {
                                 </div>
                             </div>
                         )
-                    })}
-                )}
+                    }))}
                 {activeBudgets.length === 0 && (
                     <div className="text-center py-10 text-gray-400 border-2 border-dashed border-gray-100 rounded-xl">
                         <p>אין תקציבים פעילים לחודש זה.</p>
