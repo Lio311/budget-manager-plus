@@ -2,6 +2,7 @@
 
 import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
+import { convertToILS } from '@/lib/currency'
 
 /**
  * Optimized Server Action to fetch ALL overview data in a single request
@@ -56,6 +57,41 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
             })
         ])
 
+        // Convert all amounts to ILS for consistency
+        const convertBudgetItems = async (budget: any) => {
+            if (!budget) return null
+
+            const [incomes, expenses, bills, debts, savings] = await Promise.all([
+                Promise.all(budget.incomes?.map(async (item: any) => ({
+                    ...item,
+                    amountILS: await convertToILS(item.amount, item.currency)
+                })) || []),
+                Promise.all(budget.expenses?.map(async (item: any) => ({
+                    ...item,
+                    amountILS: await convertToILS(item.amount, item.currency)
+                })) || []),
+                Promise.all(budget.bills?.map(async (item: any) => ({
+                    ...item,
+                    amountILS: await convertToILS(item.amount, item.currency)
+                })) || []),
+                Promise.all(budget.debts?.map(async (item: any) => ({
+                    ...item,
+                    monthlyPaymentILS: await convertToILS(item.monthlyPayment, item.currency)
+                })) || []),
+                Promise.all(budget.savings?.map(async (item: any) => ({
+                    ...item,
+                    monthlyDepositILS: await convertToILS(item.monthlyDeposit, item.currency)
+                })) || [])
+            ])
+
+            return { ...budget, incomes, expenses, bills, debts, savings }
+        }
+
+        const [currentBudgetConverted, previousBudgetConverted] = await Promise.all([
+            convertBudgetItems(currentBudget),
+            convertBudgetItems(previousBudget)
+        ])
+
         // Get categories (only expense categories for the overview)
         // @ts-ignore
         const categories = await db.category.findMany({
@@ -81,13 +117,27 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
             ]
         })
 
-        // Calculate net worth history - using ILS amounts for multi-currency support
+        // Calculate net worth history - using real-time API conversion for accuracy
         let accumulatedNetWorth = (user.initialBalance || 0) + (user.initialSavings || 0)
-        const netWorthHistory = allBudgets.map(budget => {
-            const totalIncome = budget.incomes.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.amount : item.amount * 3.7), 0)
-            const totalExpenses = budget.expenses.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.amount : item.amount * 3.7), 0)
-            const totalBills = budget.bills.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.amount : item.amount * 3.7), 0)
-            const totalDebtPayments = budget.debts.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.monthlyPayment : item.monthlyPayment * 3.7), 0)
+        const netWorthHistory = await Promise.all(allBudgets.map(async (budget) => {
+            // Convert all amounts to ILS using real API rates
+            const incomePromises = budget.incomes.map(item => convertToILS(item.amount, item.currency))
+            const expensePromises = budget.expenses.map(item => convertToILS(item.amount, item.currency))
+            const billPromises = budget.bills.map(item => convertToILS(item.amount, item.currency))
+            const debtPromises = budget.debts.map(item => convertToILS(item.monthlyPayment, item.currency))
+
+            const [incomeAmounts, expenseAmounts, billAmounts, debtAmounts] = await Promise.all([
+                Promise.all(incomePromises),
+                Promise.all(expensePromises),
+                Promise.all(billPromises),
+                Promise.all(debtPromises)
+            ])
+
+            const totalIncome = incomeAmounts.reduce((sum, amount) => sum + amount, 0)
+            const totalExpenses = expenseAmounts.reduce((sum, amount) => sum + amount, 0)
+            const totalBills = billAmounts.reduce((sum, amount) => sum + amount, 0)
+            const totalDebtPayments = debtAmounts.reduce((sum, amount) => sum + amount, 0)
+
             const totalOutflow = totalExpenses + totalBills + totalDebtPayments
             const netChange = totalIncome - totalOutflow
             accumulatedNetWorth += netChange
@@ -100,30 +150,30 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 netChange,
                 accumulatedNetWorth
             }
-        })
+        }))
 
         return {
             success: true,
             data: {
                 current: {
-                    incomes: currentBudget?.incomes || [],
-                    expenses: currentBudget?.expenses || [],
-                    bills: currentBudget?.bills || [],
-                    debts: currentBudget?.debts || [],
-                    savings: currentBudget?.savings || []
+                    incomes: currentBudgetConverted?.incomes || [],
+                    expenses: currentBudgetConverted?.expenses || [],
+                    bills: currentBudgetConverted?.bills || [],
+                    debts: currentBudgetConverted?.debts || [],
+                    savings: currentBudgetConverted?.savings || []
                 },
                 previous: {
-                    incomes: previousBudget?.incomes || [],
-                    expenses: previousBudget?.expenses || [],
-                    bills: previousBudget?.bills || [],
-                    debts: previousBudget?.debts || [],
-                    savings: previousBudget?.savings || []
+                    incomes: previousBudgetConverted?.incomes || [],
+                    expenses: previousBudgetConverted?.expenses || [],
+                    bills: previousBudgetConverted?.bills || [],
+                    debts: previousBudgetConverted?.debts || [],
+                    savings: previousBudgetConverted?.savings || []
                 },
                 categories,
                 netWorthHistory,
-                userSettings: {
-                    initialBalance: user.initialBalance || 0,
-                    initialSavings: user.initialSavings || 0
+                user: {
+                    initialBalance: user.initialBalance,
+                    initialSavings: user.initialSavings
                 }
             }
         }
