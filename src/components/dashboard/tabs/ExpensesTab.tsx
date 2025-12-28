@@ -375,6 +375,25 @@ export function ExpensesTab() {
         }
     }
 
+    const handleRefreshCategories = async () => {
+        try {
+            const res = await fetch('/api/admin/backfill-categories')
+            if (res.ok) {
+                toast({
+                    title: 'קטגוריות עודכנו',
+                    description: 'רשימת הקטגוריות רועננה בהצלחה',
+                    variant: 'default',
+                    className: "bg-green-500 text-white border-none"
+                })
+                // Force a reload to ensure all lists are updated
+                window.location.reload()
+            }
+        } catch (err) {
+            console.error(err)
+            toast({ title: 'שגיאה', description: 'רענון קטגוריות נכשל', variant: 'destructive' })
+        }
+    }
+
     return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10">
             {/* Summary Card */}
@@ -392,7 +411,16 @@ export function ExpensesTab() {
                     <div className="mb-4 flex items-center gap-2">
                         <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`} />
                         <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
-                        <div className="mr-auto">
+                        <div className="mr-auto flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={handleRefreshCategories}
+                                title="רענן קטגוריות (הוסף חסרות)"
+                                className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                            >
+                                <RefreshCw className="h-4 w-4" />
+                            </Button>
                             <BankImportModal onImport={handleImportExpenses} />
                         </div>
                     </div>
