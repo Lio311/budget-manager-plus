@@ -48,8 +48,8 @@ interface Expense {
     supplier?: Supplier | null
     vatAmount?: number | null
     paymentMethod?: string | null
-    isDeductible?: boolean
-    isRecurring?: boolean
+    isDeductible?: boolean | null
+    isRecurring?: boolean | null
 }
 
 interface ExpenseData {
