@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowDown, ArrowUp, PiggyBank, TrendingUp, Wallet, Loader2, PieChart as PieChartIcon } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Label as RechartsLabel } from 'recharts'
@@ -89,9 +89,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     )
 
     // Force refresh when entering the tab
-    useState(() => {
+    useEffect(() => {
         mutateOverview()
-    })
+    }, [mutateOverview])
 
     // Default empty data if loading
     const defaultData = {
