@@ -340,6 +340,7 @@ export function SavingsTab() {
         return colorClass
     }
 
+    // Render component
     return (
         <div className="space-y-6 w-full pb-10 px-2 md:px-0" dir="rtl">
             {/* Summary Cards */}

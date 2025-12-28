@@ -428,6 +428,7 @@ export function ExpensesTab() {
         setPendingAction(null)
     }
 
+    // Render component
     return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             {/* Summary Card */}

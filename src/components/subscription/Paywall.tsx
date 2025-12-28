@@ -19,13 +19,42 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
     const [discount, setDiscount] = useState(0)
 
     // Set base price based on plan
-    const basePrice = initialPlan === 'BUSINESS' ? 129 : 89
+    let basePrice = 89
+    let title = 'מנוי פרטי'
+    if (initialPlan === 'BUSINESS') {
+        basePrice = 129
+        title = 'מנוי עסקי (SMB)'
+    } else if (initialPlan === 'COMBINED') {
+        basePrice = 169
+        title = 'משולב - פרטי ועסקי'
+    }
+
     const [price, setPrice] = useState(basePrice)
 
     const [couponMessage, setCouponMessage] = useState('')
     const [isTrialExpired, setIsTrialExpired] = useState(false)
 
-    // ... (useEffect for status check)
+    useEffect(() => {
+        // Reset price if initialPlan changes
+        let newBase = 89
+        if (initialPlan === 'BUSINESS') newBase = 129
+        else if (initialPlan === 'COMBINED') newBase = 169
+
+        setPrice(newBase)
+        setDiscount(0)
+        setCouponCode('')
+        setCouponMessage('')
+    }, [initialPlan])
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            if (userId) {
+                const status = await getSubscriptionStatus(userId)
+                setIsTrialExpired(status.isTrialExpired)
+            }
+        }
+        checkStatus()
+    }, [userId])
 
     const handleApplyCoupon = async () => {
         if (!couponCode || !user?.emailAddresses[0]?.emailAddress) return
@@ -48,7 +77,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-2 sm:p-4">
             <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-4 overflow-y-auto max-h-[95vh]">
-                {/* ... Header Image ... */}
+                {/* Logo */}
                 <div className="flex justify-center mb-1">
                     <Image
                         src="/K-LOGO.png"
@@ -61,11 +90,11 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
 
                 <div className="flex items-center justify-center gap-2 mb-2">
                     <h1 className="text-lg font-bold text-center text-gray-800">
-                        {isTrialExpired ? 'תקופת הניסיון הסתיימה' : initialPlan === 'BUSINESS' ? 'מנוי עסקי (SMB)' : 'מנוי פרטי'}
+                        {isTrialExpired ? 'תקופת הניסיון הסתיימה' : title}
                     </h1>
                 </div>
 
-                {/* ... Trial Expired Msg ... */}
+                {/* Trial Expired Msg */}
                 {isTrialExpired && (
                     <p className="text-center text-gray-600 mb-2 text-xs">
                         כדי להמשיך להשתמש במערכת ולשמור על הנתונים שלך, יש להסדיר תשלום.
@@ -122,7 +151,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                     </a>
                 </div>
 
-                {/* ... Warning Msg ... */}
+                {/* Warning Msg */}
                 <div className="bg-red-50 border border-red-200 rounded-lg p-1 mb-2 flex items-center justify-center">
                     <p className="text-[10px] text-red-800 font-medium text-center whitespace-nowrap overflow-hidden text-ellipsis px-1">
                         <strong>חשוב:</strong> ללא חידוש המנוי בזמן, הנתונים שלך ימחקו לצמיתות.
@@ -131,7 +160,14 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
 
                 {/* Features List */}
                 <ul className="grid grid-cols-2 gap-2 mb-3 text-xs">
-                    {initialPlan === 'BUSINESS' ? (
+                    {initialPlan === 'COMBINED' ? (
+                        <>
+                            <li className="flex items-start gap-1.5"><Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" /><span>גישה לכל הממשקים</span></li>
+                            <li className="flex items-start gap-1.5"><Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" /><span>ניהול נפרד אישי/עסקי</span></li>
+                            <li className="flex items-start gap-1.5"><Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" /><span>כל הפיצ'רים כולל מע"מ</span></li>
+                            <li className="flex items-start gap-1.5"><Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" /><span>חיסכון של 49 ₪</span></li>
+                        </>
+                    ) : initialPlan === 'BUSINESS' ? (
                         <>
                             <li className="flex items-start gap-1.5"><Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" /><span>ניהול מע"מ ודיווחים</span></li>
                             <li className="flex items-start gap-1.5"><Check className="text-green-500 mt-0.5 h-3 w-3 flex-shrink-0" /><span>תזרים מזומנים עסקי</span></li>
@@ -147,7 +183,6 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                         </>
                     )}
                 </ul>
-
 
                 {!isTrialExpired && (
                     <Button
@@ -172,7 +207,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
 
                             const toastId = toast.loading('מפעיל תקופת ניסיון...');
                             try {
-                                const result = await startTrial(user.id, user.emailAddresses[0].emailAddress, initialPlan); // Pass plan type
+                                const result = await startTrial(user.id, user.emailAddresses[0].emailAddress, initialPlan);
 
                                 if (result.success) {
                                     toast.dismiss(toastId);
@@ -193,8 +228,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                             }
                         }}
                     >
-
-                        התנסות בתוכנית ה-{initialPlan === 'BUSINESS' ? 'עסקית' : 'פרטית'} לחודשיים
+                        התנסות בתוכנית ה-{initialPlan === 'COMBINED' ? 'משולבת' : initialPlan === 'BUSINESS' ? 'עסקית' : 'פרטית'} לחודשיים
                     </Button>
                 )}
 
@@ -213,8 +247,8 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                                                 currency_code: 'ILS',
                                                 value: price.toFixed(2),
                                             },
-                                            description: `מנוי שנתי - ${initialPlan === 'BUSINESS' ? 'עסקי' : 'פרטי'}`,
-                                            custom_id: JSON.stringify({ coupon: couponCode || undefined, plan: initialPlan }) // Pass plan in custom_id
+                                            description: `מנוי שנתי - ${title}`,
+                                            custom_id: JSON.stringify({ coupon: couponCode || undefined, plan: initialPlan })
                                         },
                                     ],
                                 })
@@ -231,8 +265,8 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                                             body: JSON.stringify({
                                                 orderId: details.id,
                                                 amount: price,
-                                                planType: initialPlan, // Pass plan type to API
-                                                couponCode: couponCode || undefined // Pass coupon code to API
+                                                planType: initialPlan,
+                                                couponCode: couponCode || undefined
                                             }),
                                         })
 
