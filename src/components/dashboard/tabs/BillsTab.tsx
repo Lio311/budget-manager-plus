@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/ui/Pagination'
 import { addBill, getBills, updateBill, deleteBill, toggleBillPaid } from '@/lib/actions/bill'
 import { formatCurrency } from '@/lib/utils'
+import { useOptimisticToggle, useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
 
@@ -133,19 +134,39 @@ export function BillsTab() {
         }
     }
 
-    async function handleTogglePaid(id: string, currentStatus: boolean) {
-        const result = await toggleBillPaid(id, !currentStatus)
+    // Optimistic toggle for instant UI feedback
+    const { toggle: optimisticTogglePaid } = useOptimisticToggle<BillData>(
+        ['bills', month, year, budgetType],
+        toggleBillPaid,
+        {
+            getOptimisticData: (current, id, newValue) => {
+                const updatedBills = current.bills.map(bill =>
+                    bill.id === id ? { ...bill, isPaid: newValue } : bill
+                )
 
-        if (result.success) {
-            await mutate()
+                // Recalculate totals
+                const paidBills = updatedBills.filter(b => b.isPaid)
+                const unpaidBills = updatedBills.filter(b => !b.isPaid)
+
+                return {
+                    ...current,
+                    bills: updatedBills,
+                    totalPaidILS: paidBills.reduce((sum, b) => sum + b.amount, 0),
+                    totalUnpaidILS: unpaidBills.reduce((sum, b) => sum + b.amount, 0)
+                }
+            },
+            successMessage: undefined, // Silent success for better UX
+            errorMessage: 'שגיאה בעדכון סטטוס החשבון'
+        }
+    )
+
+    async function handleTogglePaid(id: string, currentStatus: boolean) {
+        try {
+            await optimisticTogglePaid(id, currentStatus)
+            // Also update overview data
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לעדכן סטטוס',
-                variant: 'destructive',
-                duration: 1000
-            })
+        } catch (error) {
+            // Error already handled by hook
         }
     }
 
@@ -217,22 +238,36 @@ export function BillsTab() {
         setSubmitting(false)
     }
 
-    async function handleDelete(id: string) {
-        const result = await deleteBill(id)
+    // Optimistic delete for instant UI feedback
+    const { deleteItem: optimisticDeleteBill } = useOptimisticDelete<BillData>(
+        ['bills', month, year, budgetType],
+        deleteBill,
+        {
+            getOptimisticData: (current, id) => {
+                const updatedBills = current.bills.filter(bill => bill.id !== id)
+                const paidBills = updatedBills.filter(b => b.isPaid)
+                const unpaidBills = updatedBills.filter(b => !b.isPaid)
 
-        if (result.success) {
-            toast({
-                title: 'הצלחה',
-                description: 'החשבון נמחק בהצלחה'
-            })
-            await mutate()
+                return {
+                    ...current,
+                    bills: updatedBills,
+                    totalILS: updatedBills.reduce((sum, b) => sum + b.amount, 0),
+                    totalPaidILS: paidBills.reduce((sum, b) => sum + b.amount, 0),
+                    totalUnpaidILS: unpaidBills.reduce((sum, b) => sum + b.amount, 0)
+                }
+            },
+            successMessage: 'החשבון נמחק בהצלחה',
+            errorMessage: 'שגיאה במחיקת החשבון'
+        }
+    )
+
+    async function handleDelete(id: string) {
+        try {
+            await optimisticDeleteBill(id)
+            // Also update overview data
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן למחוק חשבון',
-                variant: 'destructive'
-            })
+        } catch (error) {
+            // Error already handled by hook
         }
     }
 

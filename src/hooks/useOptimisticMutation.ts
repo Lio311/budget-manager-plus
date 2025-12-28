@@ -1,0 +1,195 @@
+import { useSWRConfig } from 'swr'
+import { toast } from 'sonner'
+
+/**
+ * Custom hook for optimistic mutations with automatic rollback on error
+ * 
+ * @example
+ * const { execute } = useOptimisticMutation(
+ *   '/api/incomes',
+ *   addIncome,
+ *   {
+ *     getOptimisticData: (current, newIncome) => ({
+ *       ...current,
+ *       incomes: [...current.incomes, newIncome]
+ *     }),
+ *     successMessage: 'הכנסה נוספה בהצלחה!',
+ *     errorMessage: 'שגיאה בהוספת הכנסה'
+ *   }
+ * )
+ */
+export function useOptimisticMutation<TData, TInput>(
+    key: string | string[],
+    mutationFn: (data: TInput) => Promise<any>,
+    options?: {
+        onSuccess?: (result: any) => void
+        onError?: (error: any) => void
+        getOptimisticData?: (current: TData, input: TInput) => TData
+        successMessage?: string
+        errorMessage?: string
+        loadingMessage?: string
+    }
+) {
+    const { mutate } = useSWRConfig()
+
+    const execute = async (input: TInput) => {
+        const toastId = options?.loadingMessage
+            ? toast.loading(options.loadingMessage)
+            : undefined
+
+        // Store current data for rollback
+        let previousData: TData | undefined
+
+        try {
+            // Optimistic update
+            if (options?.getOptimisticData) {
+                await mutate(
+                    key,
+                    async (current: TData) => {
+                        previousData = current
+                        return options.getOptimisticData!(current, input)
+                    },
+                    { revalidate: false }
+                )
+            }
+
+            // Execute mutation
+            const result = await mutationFn(input)
+
+            // Revalidate from server
+            await mutate(key)
+
+            // Success notification
+            if (toastId) {
+                toast.success(options?.successMessage || 'הפעולה בוצעה בהצלחה!', { id: toastId })
+            } else if (options?.successMessage) {
+                toast.success(options.successMessage)
+            }
+
+            options?.onSuccess?.(result)
+            return result
+
+        } catch (error) {
+            // Rollback on error
+            if (previousData) {
+                await mutate(key, previousData, { revalidate: false })
+            }
+
+            // Error notification
+            if (toastId) {
+                toast.error(options?.errorMessage || 'אירעה שגיאה', { id: toastId })
+            } else if (options?.errorMessage) {
+                toast.error(options.errorMessage)
+            }
+
+            options?.onError?.(error)
+            throw error
+        }
+    }
+
+    return { execute }
+}
+
+/**
+ * Simpler version for toggle operations (like marking bills as paid)
+ */
+export function useOptimisticToggle<TData>(
+    key: string | string[],
+    mutationFn: (id: string, newValue: boolean) => Promise<any>,
+    options?: {
+        getOptimisticData: (current: TData, id: string, newValue: boolean) => TData
+        successMessage?: string
+        errorMessage?: string
+    }
+) {
+    const { mutate } = useSWRConfig()
+
+    const toggle = async (id: string, currentValue: boolean) => {
+        const newValue = !currentValue
+        let previousData: TData | undefined
+
+        try {
+            // Optimistic update
+            await mutate(
+                key,
+                async (current: TData) => {
+                    previousData = current
+                    return options?.getOptimisticData(current, id, newValue)
+                },
+                { revalidate: false }
+            )
+
+            // Execute mutation
+            await mutationFn(id, newValue)
+
+            // Revalidate from server
+            await mutate(key)
+
+            if (options?.successMessage) {
+                toast.success(options.successMessage)
+            }
+
+        } catch (error) {
+            // Rollback on error
+            if (previousData) {
+                await mutate(key, previousData, { revalidate: false })
+            }
+
+            toast.error(options?.errorMessage || 'אירעה שגיאה')
+            throw error
+        }
+    }
+
+    return { toggle }
+}
+
+/**
+ * Hook for optimistic delete operations
+ */
+export function useOptimisticDelete<TData>(
+    key: string | string[],
+    deleteFn: (id: string) => Promise<any>,
+    options?: {
+        getOptimisticData: (current: TData, id: string) => TData
+        successMessage?: string
+        errorMessage?: string
+    }
+) {
+    const { mutate } = useSWRConfig()
+
+    const deleteItem = async (id: string) => {
+        const toastId = toast.loading('מוחק...')
+        let previousData: TData | undefined
+
+        try {
+            // Optimistic update
+            await mutate(
+                key,
+                async (current: TData) => {
+                    previousData = current
+                    return options?.getOptimisticData(current, id)
+                },
+                { revalidate: false }
+            )
+
+            // Execute deletion
+            await deleteFn(id)
+
+            // Revalidate from server
+            await mutate(key)
+
+            toast.success(options?.successMessage || 'נמחק בהצלחה!', { id: toastId })
+
+        } catch (error) {
+            // Rollback on error
+            if (previousData) {
+                await mutate(key, previousData, { revalidate: false })
+            }
+
+            toast.error(options?.errorMessage || 'שגיאה במחיקה', { id: toastId })
+            throw error
+        }
+    }
+
+    return { deleteItem }
+}
