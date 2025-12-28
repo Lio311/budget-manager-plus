@@ -87,10 +87,24 @@ export async function addIncome(
             }
         })
 
-        // If recurring, create copies for future months
         if (data.isRecurring && data.recurringEndDate) {
             const startDate = data.recurringStartDate || data.date || new Date().toISOString()
-            await createRecurringIncomes(income.id, data.source, data.category, data.amount, data.currency, startDate, data.recurringEndDate, type)
+            await createRecurringIncomes(
+                income.id,
+                data.source,
+                data.category,
+                data.amount,
+                data.currency,
+                startDate,
+                data.recurringEndDate,
+                type,
+                // Pass Business Fields
+                data.clientId,
+                data.paymentMethod,
+                data.payer,
+                data.vatRate,
+                data.paymentTerms
+            )
         }
 
         revalidatePath('/dashboard')
@@ -109,7 +123,13 @@ async function createRecurringIncomes(
     currency: string,
     startDateStr: string,
     endDateStr: string,
-    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL',
+    // Business Fields
+    clientId?: string,
+    paymentMethod?: any,
+    payer?: string,
+    vatRate?: number,
+    paymentTerms?: number
 ) {
     const startDate = new Date(startDateStr)
     const endDate = new Date(endDateStr)
@@ -155,7 +175,13 @@ async function createRecurringIncomes(
                     isRecurring: true,
                     recurringSourceId: sourceId,
                     recurringStartDate: startDate,
-                    recurringEndDate: endDate
+                    recurringEndDate: endDate,
+                    // Business Fields Copy
+                    clientId,
+                    paymentMethod,
+                    payer,
+                    vatRate,
+                    paymentTerms
                 }
             })
         } catch (error) {

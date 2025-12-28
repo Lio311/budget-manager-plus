@@ -44,22 +44,22 @@ export function RecurrenceActionDialog({
 
                 <div className="py-4">
                     <RadioGroup value={mode} onValueChange={(v) => setMode(v as 'SINGLE' | 'FUTURE')} className="gap-4">
-                        <div className={`flex items-center space-x-2 space-x-reverse p-3 rounded-lg border cursor-pointer hover:bg-gray-50 ${mode === 'SINGLE' ? 'border-primary bg-primary/5' : 'border-gray-200'}`} onClick={() => setMode('SINGLE')}>
-                            <RadioGroupItem value="SINGLE" id="single" />
-                            <Label htmlFor="single" className="flex items-center gap-3 cursor-pointer flex-1">
-                                <CalendarDays className="h-5 w-5 text-gray-500" />
-                                <div className="flex flex-col gap-0.5">
+                        <div className={`flex items-center space-x-2 space-x-reverse p-3 rounded-lg border cursor-pointer hover:bg-gray-50 text-right justify-start ${mode === 'SINGLE' ? 'border-primary bg-primary/5' : 'border-gray-200'}`} onClick={() => setMode('SINGLE')}>
+                            <RadioGroupItem value="SINGLE" id="single" className="mt-1" />
+                            <Label htmlFor="single" className="flex items-start gap-3 cursor-pointer flex-1 justify-start w-full">
+                                <CalendarDays className="h-5 w-5 text-gray-500 mt-1 shrink-0" />
+                                <div className="flex flex-col gap-0.5 items-start text-right w-full">
                                     <span className="font-medium text-sm">חודש זה בלבד</span>
                                     <span className="text-xs text-gray-500">השינוי יחול רק על ה{entityName} של החודש הנוכחי</span>
                                 </div>
                             </Label>
                         </div>
 
-                        <div className={`flex items-center space-x-2 space-x-reverse p-3 rounded-lg border cursor-pointer hover:bg-gray-50 ${mode === 'FUTURE' ? 'border-primary bg-primary/5' : 'border-gray-200'}`} onClick={() => setMode('FUTURE')}>
-                            <RadioGroupItem value="FUTURE" id="future" />
-                            <Label htmlFor="future" className="flex items-center gap-3 cursor-pointer flex-1">
-                                <CalendarClock className="h-5 w-5 text-gray-500" />
-                                <div className="flex flex-col gap-0.5">
+                        <div className={`flex items-center space-x-2 space-x-reverse p-3 rounded-lg border cursor-pointer hover:bg-gray-50 text-right justify-start ${mode === 'FUTURE' ? 'border-primary bg-primary/5' : 'border-gray-200'}`} onClick={() => setMode('FUTURE')}>
+                            <RadioGroupItem value="FUTURE" id="future" className="mt-1" />
+                            <Label htmlFor="future" className="flex items-start gap-3 cursor-pointer flex-1 justify-start w-full">
+                                <CalendarClock className="h-5 w-5 text-gray-500 mt-1 shrink-0" />
+                                <div className="flex flex-col gap-0.5 items-start text-right w-full">
                                     <span className="font-medium text-sm">חודש זה והלאה</span>
                                     <span className="text-xs text-gray-500">השינוי יחול על החודש הנוכחי וכל החודשים הבאים</span>
                                 </div>
