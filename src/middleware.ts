@@ -25,9 +25,6 @@ export default clerkMiddleware(async (auth, req) => {
     let isAdmin = false;
 
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 800); // 800ms timeout
-
         // We must reach out to the full URL because this is running on the server/edge
         const maintenanceUrl = new URL('/api/maintenance/status', req.url);
 
@@ -37,28 +34,19 @@ export default clerkMiddleware(async (auth, req) => {
             maintenanceUrl.searchParams.set('userId', userId);
         }
 
-        // Pass the user ID cookie if available to check admin status
-        // Note: We can't easily access the full auth session in middleware without expensive calls,
-        // so we might need to rely on the API to verify the user from the request headers/cookies forward
-        // However, standard fetch from middleware might not forward cookies automatically.
-        // Let's try to forward headers.
-
-        const response = await fetch(maintenanceUrl, {
+        const response = await fetch(maintenanceUrl.toString(), {
             headers: {
                 cookie: req.headers.get('cookie') || ''
             },
-            signal: controller.signal
+            signal: AbortSignal.timeout(2000)
         });
-
-        clearTimeout(timeoutId);
 
         if (response.ok) {
             const data = await response.json();
-            isMaintenance = data.enabled || isMaintenance; // DB takes precedence if true, or keeps Env true
+            isMaintenance = data.enabled || isMaintenance;
             isAdmin = data.isAdmin || false;
         }
     } catch (error) {
-        // Fallback to environment variable if fetch fails (timeout or error)
         console.error('Maintenance check failed, using fallback:', error);
     }
 
