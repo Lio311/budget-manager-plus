@@ -31,14 +31,12 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     const { budgetType } = useBudget()
 
     // Get tab from URL or default to 'overview'
-    const urlTab = searchParams.get('tab')
-    const [activeTab, setActiveTab] = useState(urlTab || 'overview')
+    const urlTab = searchParams.get('tab') || 'overview'
+    const [activeTab, setActiveTab] = useState(urlTab)
 
-    // Update active tab when URL changes (e.g., browser back/forward)
+    // Sync active tab with URL (handles refresh, back/forward)
     useEffect(() => {
-        if (urlTab && urlTab !== activeTab) {
-            setActiveTab(urlTab)
-        }
+        setActiveTab(urlTab)
     }, [urlTab])
 
     // Reset to overview when budget type changes
