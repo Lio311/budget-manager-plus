@@ -20,7 +20,7 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { addIncome, getIncomes, updateIncome, deleteIncome } from '@/lib/actions/income'
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { getClients } from '@/lib/actions/clients'
-import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
+import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
 import { Briefcase, DollarSign, TrendingUp, Gift, Home, Landmark, PiggyBank, Wallet } from 'lucide-react'
@@ -169,6 +169,35 @@ export function IncomeTab() {
         }
     }, [newIncome.amount, newIncome.vatRate, isBusiness])
 
+    // Optimistic add for instant UI feedback
+    const { execute: optimisticAddIncome } = useOptimisticMutation<IncomeData, any>(
+        ['incomes', month, year, budgetType],
+        (input) => addIncome(month, year, input, budgetType),
+        {
+            getOptimisticData: (current, input) => ({
+                ...current,
+                incomes: [
+                    {
+                        id: 'temp-' + Date.now(),
+                        source: input.source,
+                        category: input.category,
+                        amount: input.amount,
+                        currency: input.currency || budgetCurrency,
+                        date: input.date ? new Date(input.date) : new Date(),
+                        client: isBusiness && input.clientId ? { id: input.clientId, name: '...' } : null,
+                        vatAmount: input.vatAmount || 0,
+                        payer: input.payer || '',
+                        paymentMethod: input.paymentMethod || '',
+                        isRecurring: input.isRecurring || false
+                    },
+                    ...current.incomes
+                ]
+            }),
+            successMessage: 'ההכנסה נוספה בהצלחה',
+            errorMessage: 'שגיאה בהוספת ההכנסה'
+        }
+    )
+
     async function handleAdd() {
         if (!newIncome.source || !newIncome.amount || !newIncome.category) {
             toast({ title: 'שגיאה', description: 'נא למלא את כל השדות', variant: 'destructive' })
@@ -186,9 +215,8 @@ export function IncomeTab() {
             }
         }
 
-        setSubmitting(true)
         try {
-            const result = await addIncome(month, year, {
+            await optimisticAddIncome({
                 source: newIncome.source,
                 category: newIncome.category,
                 amount: parseFloat(newIncome.amount),
@@ -202,35 +230,28 @@ export function IncomeTab() {
                 vatAmount: isBusiness ? parseFloat(newIncome.vatAmount) : undefined,
                 paymentMethod: newIncome.paymentMethod || undefined,
                 payer: newIncome.payer || undefined
-            }, budgetType)
+            })
 
-            if (result.success) {
-                toast({ title: 'הצלחה', description: 'ההכנסה נוספה בהצלחה' })
-                setNewIncome({
-                    source: '',
-                    category: categories.length > 0 ? categories[0].name : '',
-                    amount: '',
-                    currency: 'ILS',
-                    date: format(new Date(), 'yyyy-MM-dd'),
-                    isRecurring: false,
-                    recurringEndDate: '',
-                    clientId: '',
-                    amountBeforeVat: '',
-                    vatRate: '0.18',
-                    vatAmount: '',
-                    paymentMethod: '',
-                    payer: ''
-                })
-                await mutateIncomes()
-                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            } else {
-                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הכנסה', variant: 'destructive' })
-            }
+            // Reset form
+            setNewIncome({
+                source: '',
+                category: categories.length > 0 ? categories[0].name : '',
+                amount: '',
+                currency: budgetCurrency,
+                date: format(new Date(), 'yyyy-MM-dd'),
+                isRecurring: false,
+                recurringEndDate: '',
+                clientId: '',
+                amountBeforeVat: '',
+                vatRate: '0.18',
+                vatAmount: '',
+                paymentMethod: '',
+                payer: ''
+            })
+
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } catch (error) {
-            console.error('Add income failed:', error)
-            toast({ title: 'שגיאה', description: 'אירעה שגיאה בלתי צפויה', variant: 'destructive' })
-        } finally {
-            setSubmitting(false)
+            // Error managed by hook
         }
     }
 

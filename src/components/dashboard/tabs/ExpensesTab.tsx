@@ -23,9 +23,9 @@ import { formatCurrency, cn } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
-import { getExpenses, addExpense, updateExpense, deleteExpense, importExpenses } from '@/lib/actions/expense'
+import { deleteExpense, getExpenses, updateExpense, addExpense, importExpenses } from '@/lib/actions/expense'
 import { getSuppliers } from '@/lib/actions/suppliers'
-import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
+import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { BankImportModal } from '../BankImportModal'
 import { getCategoryBudgets, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
@@ -221,6 +221,35 @@ export function ExpensesTab() {
 
     // --- Actions ---
 
+    // Optimistic add for instant UI feedback
+    const { execute: optimisticAddExpense } = useOptimisticMutation<ExpenseData, any>(
+        ['expenses', month, year, budgetType],
+        (input) => addExpense(month, year, input, budgetType),
+        {
+            getOptimisticData: (current, input) => ({
+                ...current,
+                expenses: [
+                    {
+                        id: 'temp-' + Date.now(),
+                        description: input.description,
+                        amount: input.amount,
+                        category: input.category,
+                        currency: input.currency || budgetCurrency,
+                        date: input.date ? new Date(input.date) : new Date(),
+                        supplier: isBusiness && input.supplierId ? { id: input.supplierId, name: '...' } : null,
+                        vatAmount: input.vatAmount || 0,
+                        isDeductible: input.isDeductible ?? true,
+                        paymentMethod: input.paymentMethod || '',
+                        isRecurring: input.isRecurring || false
+                    },
+                    ...current.expenses
+                ]
+            }),
+            successMessage: 'הוצאה נוספה בהצלחה',
+            errorMessage: 'שגיאה בהוספת ההוצאה'
+        }
+    )
+
     async function handleAdd() {
         if (!newExpense.amount || !newExpense.category) {
             toast({ title: 'שגיאה', description: 'נא למלא סכום וקטגוריה', variant: 'destructive' })
@@ -238,9 +267,8 @@ export function ExpensesTab() {
             }
         }
 
-        setSubmitting(true)
         try {
-            const result = await addExpense(month, year, {
+            await optimisticAddExpense({
                 description: newExpense.description || 'הוצאה ללא תיאור',
                 amount: parseFloat(newExpense.amount),
                 category: newExpense.category,
@@ -255,36 +283,29 @@ export function ExpensesTab() {
                 isDeductible: isBusiness ? newExpense.isDeductible : undefined,
                 deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
                 paymentMethod: newExpense.paymentMethod || undefined
-            }, budgetType)
+            })
 
-            if (result.success) {
-                toast({ title: 'הצלחה', description: 'הוצאה נוספה בהצלחה' })
-                setNewExpense({
-                    description: '',
-                    amount: '',
-                    category: categories.length > 0 ? categories[0].name : '',
-                    currency: 'ILS',
-                    date: format(new Date(), 'yyyy-MM-dd'),
-                    isRecurring: false,
-                    recurringEndDate: undefined,
-                    supplierId: '',
-                    amountBeforeVat: '',
-                    vatRate: '0.18',
-                    vatAmount: '',
-                    isDeductible: true,
-                    deductibleRate: '1.0',
-                    paymentMethod: ''
-                })
-                await mutateExpenses()
-                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            } else {
-                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הוצאה', variant: 'destructive' })
-            }
+            // Reset form
+            setNewExpense({
+                description: '',
+                amount: '',
+                category: categories.length > 0 ? categories[0].name : '',
+                currency: budgetCurrency,
+                date: format(new Date(), 'yyyy-MM-dd'),
+                isRecurring: false,
+                recurringEndDate: undefined,
+                supplierId: '',
+                amountBeforeVat: '',
+                vatRate: '0.18',
+                vatAmount: '',
+                isDeductible: true,
+                deductibleRate: '1.0',
+                paymentMethod: ''
+            })
+
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } catch (error) {
-            console.error('Add expense failed:', error)
-            toast({ title: 'שגיאה', description: 'אירעה שגיאה בלתי צפויה', variant: 'destructive' })
-        } finally {
-            setSubmitting(false)
+            // Error managed by hook
         }
     }
 

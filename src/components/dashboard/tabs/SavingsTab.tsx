@@ -13,6 +13,7 @@ import { formatCurrency } from '@/lib/utils'
 import { getSavings, addSaving, deleteSaving, updateSaving } from '@/lib/actions/savings'
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { useToast } from '@/hooks/use-toast'
+import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { DatePicker } from '@/components/ui/date-picker'
 import { format } from 'date-fns'
 import { PRESET_COLORS } from '@/lib/constants'
@@ -156,6 +157,34 @@ export function SavingsTab() {
 
     // --- Actions ---
 
+    // Optimistic add for instant UI feedback
+    const { execute: optimisticAddSaving } = useOptimisticMutation<SavingsData, any>(
+        ['savings', month, year, budgetType],
+        (input) => addSaving(month, year, input, budgetType),
+        {
+            getOptimisticData: (current, input) => {
+                const newSavingItem: Saving = {
+                    id: 'temp-' + Date.now(),
+                    category: input.category,
+                    name: input.description,
+                    monthlyDeposit: input.monthlyDeposit,
+                    currency: input.currency || budgetCurrency,
+                    notes: input.goal || '',
+                    targetDate: input.date ? new Date(input.date) : null,
+                    createdAt: new Date(),
+                    paymentMethod: input.paymentMethod || '',
+                    isRecurring: input.isRecurring || false
+                }
+                return {
+                    ...current,
+                    savings: [newSavingItem, ...current.savings]
+                }
+            },
+            successMessage: 'החיסכון נוסף בהצלחה',
+            errorMessage: 'שגיאה בהוספת החיסכון'
+        }
+    )
+
     async function handleAdd() {
         if (!newSaving.category || !newSaving.description || !newSaving.monthlyDeposit) {
             toast({ title: 'שגיאה', description: 'נא למלא את כל השדות החובה', variant: 'destructive' })
@@ -166,54 +195,44 @@ export function SavingsTab() {
             const start = new Date(newSaving.date)
             // Reset time part to ensure purely date comparison
             start.setHours(0, 0, 0, 0)
-
             const end = new Date(newSaving.recurringEndDate)
             end.setHours(0, 0, 0, 0)
-
             if (end < start) {
                 toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההתחלה', variant: 'destructive' })
                 return
             }
         }
 
-        setSubmitting(true)
         try {
-            const result = await addSaving(month, year, {
+            await optimisticAddSaving({
                 category: newSaving.category,
                 description: newSaving.description,
                 monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
                 currency: newSaving.currency,
                 goal: newSaving.goal || undefined,
-                date: newSaving.date, // Server component will handle the conversion
+                date: newSaving.date,
                 isRecurring: newSaving.isRecurring,
                 recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
                 recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined,
                 paymentMethod: newSaving.paymentMethod || undefined
-            }, budgetType)
+            })
 
-            if (result.success) {
-                toast({ title: 'הצלחה', description: 'החיסכון נוסף בהצלחה' })
-                setNewSaving({
-                    category: categories.length > 0 ? categories[0].name : '',
-                    description: '',
-                    monthlyDeposit: '',
-                    currency: 'ILS',
-                    goal: '',
-                    date: new Date(),
-                    isRecurring: false,
-                    recurringEndDate: undefined,
-                    paymentMethod: ''
-                })
-                await mutateSavings()
-                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            } else {
-                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף חיסכון', variant: 'destructive' })
-            }
+            // Reset form
+            setNewSaving({
+                category: categories.length > 0 ? categories[0].name : '',
+                description: '',
+                monthlyDeposit: '',
+                currency: budgetCurrency,
+                goal: '',
+                date: new Date(),
+                isRecurring: false,
+                recurringEndDate: undefined,
+                paymentMethod: ''
+            })
+
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } catch (error) {
-            console.error('Add saving failed:', error)
-            toast({ title: 'שגיאה', description: 'אירעה שגיאה בלתי צפויה', variant: 'destructive' })
-        } finally {
-            setSubmitting(false)
+            // Error managed by hook
         }
     }
 
@@ -257,6 +276,20 @@ export function SavingsTab() {
         }
     }
 
+    // Optimistic delete for instant UI feedback
+    const { deleteItem: optimisticDeleteSaving } = useOptimisticDelete<SavingsData>(
+        ['savings', month, year, budgetType],
+        (id) => deleteSaving(id, 'SINGLE'),
+        {
+            getOptimisticData: (current, id) => ({
+                ...current,
+                savings: current.savings.filter(saving => saving.id !== id)
+            }),
+            successMessage: 'החיסכון נמחק בהצלחה',
+            errorMessage: 'שגיאה במחיקת החיסכון'
+        }
+    )
+
     async function handleDelete(saving: Saving) {
         if (saving.isRecurring) {
             setPendingAction({ type: 'delete', id: saving.id })
@@ -264,13 +297,11 @@ export function SavingsTab() {
             return
         }
 
-        const result = await deleteSaving(saving.id, 'SINGLE')
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'החיסכון נמחק בהצלחה' })
-            await mutateSavings()
+        try {
+            await optimisticDeleteSaving(saving.id)
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק חיסכון', variant: 'destructive' })
+        } catch (error) {
+            // Error handled by hook
         }
     }
 
