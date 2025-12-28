@@ -541,7 +541,7 @@ export function IncomeTab() {
                                         </div>
                                         <div className="flex justify-end gap-2">
                                             <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                            <Button size="sm" onClick={handleUpdate} className="bg-blue-600 text-white">שמור שינויים</Button>
+                                            <Button size="sm" onClick={handleUpdate} className={`${isBusiness ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#00c875] hover:bg-[#00b268]'} text-white`}>שמור שינויים</Button>
                                         </div>
                                     </div>
                                 ) : (
