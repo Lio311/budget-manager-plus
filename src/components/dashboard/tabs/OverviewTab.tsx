@@ -475,20 +475,19 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                         <XAxis
                                             dataKey="name"
                                             interval={0}
-                                            height={80}
+                                            height={60}
                                             tick={({ x, y, payload }) => {
                                                 const val = payload.value || '';
-                                                const truncated = val.length > 10 ? val.substring(0, 10) + '...' : val;
+                                                const truncated = val.length > 8 ? val.substring(0, 8) + '...' : val;
                                                 return (
                                                     <g transform={`translate(${x},${y})`}>
                                                         <text
                                                             x={0}
                                                             y={0}
                                                             dy={16}
-                                                            textAnchor="end"
+                                                            textAnchor="middle"
                                                             fill="#374151"
-                                                            transform="rotate(-45)"
-                                                            style={{ fontSize: '11px', direction: 'rtl', unicodeBidi: 'plaintext' }}
+                                                            style={{ fontSize: '12px', direction: 'rtl' }}
                                                         >
                                                             {truncated}
                                                         </text>
