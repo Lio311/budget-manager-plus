@@ -124,10 +124,14 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
             const branchIdx = findIdx(keywords.branch)
             const methodIdx = findIdx(keywords.paymentMethod)
 
+            console.log('Detected headers:', headers)
+            console.log('Date index:', dateIdx, 'Amount index:', amountIdx, 'Billing index:', billingIdx)
+
             const finalAmountIdx = billingIdx !== -1 ? billingIdx : amountIdx
 
             if (dateIdx === -1 || finalAmountIdx === -1) {
-                const msg = "חסרות עמודות חובה (תאריך או סכום) בקובץ."
+                const msg = `חסרות עמודות חובה בקובץ.\n\nעמודות שזוהו: ${headers.join(', ')}\n\nהמערכת מחפשת עמודות עם המילים: תאריך, date, סכום, amount, חיוב`
+                console.error('Column detection failed:', { dateIdx, finalAmountIdx, headers })
                 setError(msg)
                 setLoading(false)
                 return
