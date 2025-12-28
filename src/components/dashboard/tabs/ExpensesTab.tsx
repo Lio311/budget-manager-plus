@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import useSWR, { mutate } from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 
 import {
     Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X,
@@ -104,6 +104,7 @@ const getCategoryIcon = (name: string) => {
 export function ExpensesTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
+    const { mutate: globalMutate } = useSWRConfig()
 
     const isBusiness = budgetType === 'BUSINESS'
 
@@ -272,7 +273,7 @@ export function ExpensesTab() {
                     paymentMethod: ''
                 })
                 await mutateExpenses()
-                mutate(key => Array.isArray(key) && key[0] === 'overview')
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             } else {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הוצאה', variant: 'destructive' })
             }
@@ -327,7 +328,7 @@ export function ExpensesTab() {
         if (result.success) {
             toast({ title: 'הצלחה', description: 'הוצאה נמחקה בהצלחה' })
             await mutateExpenses()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הוצאה', variant: 'destructive' })
         }
@@ -381,7 +382,7 @@ export function ExpensesTab() {
             toast({ title: 'הצלחה', description: 'ההוצאה עודכנה בהצלחה' })
             setEditingId(null)
             await mutateExpenses()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן הוצאה', variant: 'destructive' })
         }
@@ -482,7 +483,7 @@ export function ExpensesTab() {
         const result = await importExpenses(expensesToImport, budgetType)
         if (result.success) {
             await mutateExpenses()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             throw new Error(result.error)
         }
@@ -519,7 +520,7 @@ export function ExpensesTab() {
             if (result.success) {
                 toast({ title: 'הצלחה', description: 'הוצאה נמחקה בהצלחה' })
                 await mutateExpenses()
-                mutate(key => Array.isArray(key) && key[0] === 'overview')
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             } else {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הוצאה', variant: 'destructive' })
             }

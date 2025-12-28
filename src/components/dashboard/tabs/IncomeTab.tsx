@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import useSWR, { mutate } from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 
 import { Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X } from 'lucide-react'
 import { format } from 'date-fns'
@@ -58,6 +58,7 @@ interface IncomeData {
 export function IncomeTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
+    const { mutate: globalMutate } = useSWRConfig()
 
     const isBusiness = budgetType === 'BUSINESS'
 
@@ -205,7 +206,7 @@ export function IncomeTab() {
                     payer: ''
                 })
                 await mutateIncomes()
-                mutate(key => Array.isArray(key) && key[0] === 'overview')
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             } else {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הכנסה', variant: 'destructive' })
             }
@@ -273,7 +274,7 @@ export function IncomeTab() {
         if (result.success) {
             toast({ title: 'הצלחה', description: 'ההכנסה נמחקה בהצלחה' })
             await mutateIncomes()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הכנסה', variant: 'destructive' })
         }
@@ -327,7 +328,7 @@ export function IncomeTab() {
             toast({ title: 'הצלחה', description: 'ההכנסה עודכנה בהצלחה' })
             setEditingId(null)
             await mutateIncomes()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן הכנסה', variant: 'destructive' })
         }
@@ -343,7 +344,7 @@ export function IncomeTab() {
             if (result.success) {
                 toast({ title: 'הצלחה', description: 'ההכנסה נמחקה בהצלחה' })
                 await mutateIncomes()
-                mutate(key => Array.isArray(key) && key[0] === 'overview')
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             } else {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הכנסה', variant: 'destructive' })
             }

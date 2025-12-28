@@ -266,7 +266,7 @@ export function SavingsTab() {
         if (result.success) {
             toast({ title: 'הצלחה', description: 'החיסכון נמחק בהצלחה' })
             await mutateSavings()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק חיסכון', variant: 'destructive' })
         }
@@ -319,7 +319,7 @@ export function SavingsTab() {
             toast({ title: 'הצלחה', description: 'החיסכון עודכן בהצלחה' })
             setEditingId(null)
             await mutateSavings()
-            mutate(key => Array.isArray(key) && key[0] === 'overview')
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן חיסכון', variant: 'destructive' })
         }
