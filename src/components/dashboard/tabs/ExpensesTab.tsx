@@ -395,9 +395,8 @@ export function ExpensesTab() {
                 c = 'bg-cyan-500 text-white border-cyan-600'
             } else if (trimmed.includes('בילוי')) {
                 c = 'bg-pink-500 text-white border-pink-600'
-            } else if (c) {
-                // Keep existing non-gray color from DB
             } else {
+                // Default fallback for any category with gray/no color
                 c = 'bg-gray-500 text-white border-gray-600'
             }
         }
