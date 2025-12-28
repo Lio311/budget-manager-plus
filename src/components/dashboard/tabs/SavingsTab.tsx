@@ -159,6 +159,20 @@ export function SavingsTab() {
             return
         }
 
+        if (newSaving.isRecurring && newSaving.recurringEndDate) {
+            const start = new Date(newSaving.date)
+            // Reset time part to ensure purely date comparison
+            start.setHours(0, 0, 0, 0)
+
+            const end = new Date(newSaving.recurringEndDate)
+            end.setHours(0, 0, 0, 0)
+
+            if (end < start) {
+                toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההתחלה', variant: 'destructive' })
+                return
+            }
+        }
+
         setSubmitting(true)
         try {
             const result = await addSaving(month, year, {

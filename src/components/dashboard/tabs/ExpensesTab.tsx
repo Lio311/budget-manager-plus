@@ -212,9 +212,11 @@ export function ExpensesTab() {
 
         if (newExpense.isRecurring && newExpense.recurringEndDate) {
             const start = new Date(newExpense.date)
+            start.setHours(0, 0, 0, 0)
             const end = new Date(newExpense.recurringEndDate)
-            if (end <= start) {
-                toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר מתאריך ההוצאה', variant: 'destructive' })
+            end.setHours(0, 0, 0, 0)
+            if (end < start) {
+                toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההוצאה', variant: 'destructive' })
                 return
             }
         }

@@ -158,9 +158,11 @@ export function IncomeTab() {
 
         if (newIncome.isRecurring && newIncome.recurringEndDate) {
             const start = new Date(newIncome.date || new Date())
+            start.setHours(0, 0, 0, 0)
             const end = new Date(newIncome.recurringEndDate)
-            if (end <= start) {
-                toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר מתאריך ההכנסה', variant: 'destructive' })
+            end.setHours(0, 0, 0, 0)
+            if (end < start) {
+                toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההכנסה', variant: 'destructive' })
                 return
             }
         }
