@@ -277,7 +277,7 @@ export function BudgetLimitsTab() {
 
                         return (
                             <div key={budget.categoryId} className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
-                                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                                <div className="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 font-bold shrink-0">
                                     {getCategoryIcon(budget.categoryName)}
                                 </div>
 
@@ -351,7 +351,9 @@ export function BudgetLimitsTab() {
                                             className={cn("h-2 rotate-180", isOverBudget ? "bg-red-100" : "bg-gray-100")}
                                             indicatorClassName={cn(
                                                 isOverBudget ? "bg-red-500" :
-                                                    percentage > 85 ? "bg-orange-500" : "bg-blue-600"
+                                                    percentage >= 75 ? "bg-red-500" :
+                                                        percentage >= 50 ? "bg-orange-500" :
+                                                            percentage >= 25 ? "bg-yellow-500" : "bg-green-500"
                                             )}
                                         />
                                     </div>
