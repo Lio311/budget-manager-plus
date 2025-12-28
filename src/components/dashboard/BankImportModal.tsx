@@ -158,9 +158,26 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                                 dateStr = `${year}-${month}-${day}`
                             }
                         } else if (dateString.includes('-')) {
-                            // Assume YYYY-MM-DD or similar
-                            const d = new Date(dateString)
-                            if (!isNaN(d.getTime())) dateStr = format(d, 'yyyy-MM-dd')
+                            // Handle DD-MM-YYYY or YYYY-MM-DD
+                            const parts = dateString.split('-')
+                            if (parts.length === 3) {
+                                // Check if first part is year (YYYY-MM-DD)
+                                if (parts[0].length === 4) {
+                                    const d = new Date(dateString)
+                                    if (!isNaN(d.getTime())) dateStr = format(d, 'yyyy-MM-dd')
+                                } else {
+                                    // Assume DD-MM-YYYY or DD-MM-YY
+                                    const day = parts[0].trim().padStart(2, '0')
+                                    const month = parts[1].trim().padStart(2, '0')
+                                    let year = parts[2].trim()
+                                    if (year.length === 2) year = '20' + year
+                                    dateStr = `${year}-${month}-${day}`
+                                }
+                            } else {
+                                // Fallback native parse
+                                const d = new Date(dateString)
+                                if (!isNaN(d.getTime())) dateStr = format(d, 'yyyy-MM-dd')
+                            }
                         }
                     } catch (e) {
                         console.error("Date parse error", dateRaw)
