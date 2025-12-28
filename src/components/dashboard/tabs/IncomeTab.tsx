@@ -556,7 +556,7 @@ export function IncomeTab() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between gap-2 sm:gap-3">
                                         <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
                                             <div className="shrink-0">
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} text-white font-bold text-xs`}>
