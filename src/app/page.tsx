@@ -61,36 +61,38 @@ export default function HomePage() {
                                     </div>
                                     <div className="text-xs font-bold text-gray-400">PERSONAL DASHBOARD</div>
                                 </div>
-                                <div className="space-y-3">
-                                    <div className="bg-gray-50 p-3 rounded-xl flex justify-between items-center">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-blue-100 rounded-full text-blue-600">
-                                                <PieChart className="w-4 h-4" />
-                                            </div>
-                                            <span className="font-bold text-gray-700">הוצאות החודש</span>
-                                        </div>
-                                        <span className="font-bold text-lg">₪12,450</span>
-                                    </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        <div className="bg-purple-50 p-3 rounded-xl border border-purple-100 text-center">
-                                            <div className="text-purple-600 text-[10px] font-bold mb-1">חסכונות</div>
-                                            <div className="text-lg font-bold text-gray-800">₪45k</div>
-                                        </div>
-                                        <div className="bg-orange-50 p-3 rounded-xl border border-orange-100 text-center">
-                                            <div className="text-orange-600 text-[10px] font-bold mb-1">חובות</div>
-                                            <div className="text-lg font-bold text-gray-800">₪12k</div>
+                                {/* Total Balance Card */}
+                                <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm text-blue-700 font-medium">הוצאות החודש</span>
+                                        <div className="p-1.5 bg-blue-200 rounded-lg">
+                                            <PieChart className="w-4 h-4 text-blue-700" />
                                         </div>
                                     </div>
+                                    <div className="text-2xl font-bold text-gray-900">₪12,450</div>
+                                </div>
 
-                                    <div className="bg-white border rounded-xl p-3">
-                                        <div className="flex justify-between text-xs mb-1">
-                                            <span className="text-gray-500">תקציב סופר ופארם</span>
-                                            <span className="font-bold text-red-500">חרגת ב-₪200</span>
-                                        </div>
-                                        <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                                            <div className="bg-red-500 w-[110%] h-full rounded-full"></div>
-                                        </div>
+                                {/* Income and Savings Cards */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-3 rounded-xl border border-orange-200">
+                                        <div className="text-orange-700 text-xs font-bold mb-1">הכנסות</div>
+                                        <div className="text-lg font-bold text-gray-900">₪12k</div>
+                                    </div>
+                                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-xl border border-purple-200">
+                                        <div className="text-purple-700 text-xs font-bold mb-1">חסכונות</div>
+                                        <div className="text-lg font-bold text-gray-900">₪45k</div>
+                                    </div>
+                                </div>
+
+                                {/* Budget Progress */}
+                                <div className="bg-white border border-gray-200 rounded-xl p-3">
+                                    <div className="flex justify-between text-xs mb-2">
+                                        <span className="text-gray-600">תקציב סופר ופארם</span>
+                                        <span className="font-bold text-red-500">חרגת ב-₪200</span>
+                                    </div>
+                                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                        <div className="bg-gradient-to-r from-red-400 to-red-500 w-[110%] h-full rounded-full"></div>
                                     </div>
                                 </div>
                             </div>
@@ -179,29 +181,34 @@ export default function HomePage() {
                                     </div>
                                     <div className="text-xs font-bold text-gray-400">BUSINESS DASHBOARD</div>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                                        <div className="text-green-600 text-[10px] font-bold mb-1">הכנסות החודש</div>
-                                        <div className="text-xl font-bold text-gray-800">₪42,500</div>
-                                        <div className="text-[10px] text-green-600 mt-1 flex items-center justify-end gap-1">
-                                            מחודש שעבר
+
+                                {/* Revenue and VAT Cards */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
+                                        <div className="text-green-700 text-xs font-bold mb-1">הכנסות החודש</div>
+                                        <div className="text-xl font-bold text-gray-900">₪42,500</div>
+                                        <div className="text-xs text-green-600 mt-2 flex items-center gap-1">
+                                            <TrendingUp className="w-3 h-3" />
                                             <span dir="ltr" className="font-bold">+12%</span>
+                                            <span>מחודש שעבר</span>
                                         </div>
                                     </div>
-                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                        <div className="text-blue-600 text-[10px] font-bold mb-1">מע"מ לתשלום</div>
-                                        <div className="text-xl font-bold text-gray-800">₪6,120</div>
-                                        <div className="text-[10px] text-blue-600 mt-1">עד ה-15 לחודש</div>
+                                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+                                        <div className="text-blue-700 text-xs font-bold mb-1">מע״מ לדיווח</div>
+                                        <div className="text-xl font-bold text-gray-900">₪6,120</div>
+                                        <div className="text-xs text-blue-600 mt-2">עד ה-15 לחודש</div>
                                     </div>
                                 </div>
-                                <div className="space-y-2 pt-2">
-                                    <div className="flex justify-between items-center text-sm p-3 bg-gray-50 rounded-lg">
-                                        <span className="font-medium">הוצאות מוכרות</span>
-                                        <span className="font-bold">₪12,800</span>
+
+                                {/* Summary Cards */}
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center text-sm p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                        <span className="font-medium text-gray-700">הוצאות מוכרות</span>
+                                        <span className="font-bold text-gray-900">₪12,800</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm p-3 bg-gray-50 rounded-lg">
-                                        <span className="font-medium">רווח נקי משוער</span>
-                                        <span className="font-bold text-green-600">₪23,580</span>
+                                    <div className="flex justify-between items-center text-sm p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+                                        <span className="font-medium text-green-800">רווח נקי משוער</span>
+                                        <span className="font-bold text-green-700">₪23,580</span>
                                     </div>
                                 </div>
                             </div>
