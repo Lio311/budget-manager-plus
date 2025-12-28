@@ -214,7 +214,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     const expensesByCategory = Array.from(categoryMap.entries())
         .map(([name, value]) => {
-            const category = categories.find(c => c.name === name)
+            const category = Array.isArray(categories) ? categories.find(c => c.name === name) : null
             // Ensure we use the bold version of the color
             const colorClass = getBoldColor(category?.color || null)
             // For hex, we might need to map the bold class back to hex or just use a lookup if available
@@ -222,7 +222,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             let colorHex = '#64748B' // slate-500
             const match = colorClass.match(/bg-(\w+)-500/)
             if (match && match[1]) {
-                const preset = PRESET_COLORS.find(p => p.name.toLowerCase() === match[1])
+                const preset = Array.isArray(PRESET_COLORS) ? PRESET_COLORS.find(p => p.name.toLowerCase() === match[1]) : null
                 if (preset) colorHex = preset.hex
             } else {
                 colorHex = getHexFromClass(category?.color || null)

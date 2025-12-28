@@ -128,7 +128,7 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
     }
 
     const getLabel = (val: string) => {
-        const found = allMethods.find(m => m.id === val || m.label === val)
+        const found = Array.isArray(allMethods) ? allMethods.find(m => m.id === val || m.label === val) : null
         return found ? found.label : val
     }
 

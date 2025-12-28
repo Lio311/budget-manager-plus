@@ -465,7 +465,7 @@ export function ExpensesTab() {
 
     // Helper to get usage for a category
     const getUsage = (categoryName: string) => {
-        const budget = categoryBudgets.find(b => b.categoryName === categoryName)
+        const budget = Array.isArray(categoryBudgets) ? categoryBudgets.find(b => b.categoryName === categoryName) : null
         if (!budget || budget.limit === 0) return null
         const percentage = Math.min(100, (budget.spent / budget.limit) * 100)
         return { percentage, spent: budget.spent, limit: budget.limit, currency: budget.currency }
