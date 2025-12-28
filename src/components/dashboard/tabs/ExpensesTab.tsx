@@ -375,13 +375,14 @@ export function ExpensesTab() {
 
     const getCategoryColor = (catName: string) => {
         const cat = categories.find(c => c.name === catName)
-
-        // If no color in DB, use smart fallbacks based on category name
         let c = cat?.color
 
-        if (!c) {
+        // Apply smart fallbacks if no color OR if color is gray (default)
+        const trimmed = catName?.trim() || '';
+        const needsFallback = !c || c.includes('bg-gray') || c.includes('text-gray-700')
+
+        if (needsFallback) {
             // Smart fallbacks for common categories
-            const trimmed = catName?.trim() || '';
             if (trimmed.includes('ספורט')) {
                 c = 'bg-green-500 text-white border-green-600'
             } else if (trimmed.includes('ביטוח')) {
@@ -394,23 +395,25 @@ export function ExpensesTab() {
                 c = 'bg-cyan-500 text-white border-cyan-600'
             } else if (trimmed.includes('בילוי')) {
                 c = 'bg-pink-500 text-white border-pink-600'
+            } else if (c) {
+                // Keep existing non-gray color from DB
             } else {
                 c = 'bg-gray-500 text-white border-gray-600'
             }
         }
 
-        if (c.includes('bg-') && c.includes('-100')) {
+        if (c && c.includes('bg-') && c.includes('-100')) {
             c = c.replace(/bg-(\w+)-100/g, 'bg-$1-500')
                 .replace(/text-(\w+)-700/g, 'text-white')
                 .replace(/border-(\w+)-200/g, 'border-transparent')
         }
 
         // Ensure text-white is always present for icon visibility
-        if (!c.includes('text-white')) {
+        if (c && !c.includes('text-white')) {
             c += ' text-white'
         }
 
-        return c
+        return c || 'bg-gray-500 text-white border-gray-600'
     }
 
     // Helper to get usage for a category
