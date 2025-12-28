@@ -36,22 +36,22 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 where: { userId, month, year, type },
                 select: {
                     id: true,
-                    incomes: { select: { id: true, source: true, category: true, amount: true, date: true } },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, date: true } },
-                    bills: { select: { id: true, name: true, amount: true, isPaid: true } },
-                    debts: { select: { id: true, creditor: true, monthlyPayment: true, isPaid: true } },
-                    savings: { select: { id: true, category: true, monthlyDeposit: true } }
+                    incomes: { select: { id: true, source: true, category: true, amount: true, amountILS: true, currency: true, date: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, amountILS: true, currency: true, date: true } },
+                    bills: { select: { id: true, name: true, amount: true, amountILS: true, currency: true, isPaid: true } },
+                    debts: { select: { id: true, creditor: true, monthlyPayment: true, monthlyPaymentILS: true, currency: true, isPaid: true } },
+                    savings: { select: { id: true, category: true, monthlyDeposit: true, monthlyDepositILS: true, currency: true } }
                 }
             }),
             db.budget.findFirst({
                 where: { userId, month: prevMonth, year: prevYear, type },
                 select: {
                     id: true,
-                    incomes: { select: { id: true, source: true, category: true, amount: true, date: true } },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, date: true } },
-                    bills: { select: { id: true, name: true, amount: true, isPaid: true } },
-                    debts: { select: { id: true, creditor: true, monthlyPayment: true, isPaid: true } },
-                    savings: { select: { id: true, category: true, monthlyDeposit: true } }
+                    incomes: { select: { id: true, source: true, category: true, amount: true, amountILS: true, currency: true, date: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, amountILS: true, currency: true, date: true } },
+                    bills: { select: { id: true, name: true, amount: true, amountILS: true, currency: true, isPaid: true } },
+                    debts: { select: { id: true, creditor: true, monthlyPayment: true, monthlyPaymentILS: true, currency: true, isPaid: true } },
+                    savings: { select: { id: true, category: true, monthlyDeposit: true, monthlyDepositILS: true, currency: true } }
                 }
             })
         ])
@@ -70,10 +70,10 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
             select: {
                 month: true,
                 year: true,
-                incomes: { select: { amount: true } },
-                expenses: { select: { amount: true } },
-                bills: { select: { amount: true } },
-                debts: { select: { monthlyPayment: true } }
+                incomes: { select: { amount: true, amountILS: true, currency: true } },
+                expenses: { select: { amount: true, amountILS: true, currency: true } },
+                bills: { select: { amount: true, amountILS: true, currency: true } },
+                debts: { select: { monthlyPayment: true, monthlyPaymentILS: true, currency: true } }
             },
             orderBy: [
                 { year: 'asc' },
@@ -81,13 +81,13 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
             ]
         })
 
-        // Calculate net worth history
+        // Calculate net worth history - using ILS amounts for multi-currency support
         let accumulatedNetWorth = (user.initialBalance || 0) + (user.initialSavings || 0)
         const netWorthHistory = allBudgets.map(budget => {
-            const totalIncome = budget.incomes.reduce((sum, item) => sum + item.amount, 0)
-            const totalExpenses = budget.expenses.reduce((sum, item) => sum + item.amount, 0)
-            const totalBills = budget.bills.reduce((sum, item) => sum + item.amount, 0)
-            const totalDebtPayments = budget.debts.reduce((sum, item) => sum + item.monthlyPayment, 0)
+            const totalIncome = budget.incomes.reduce((sum, item) => sum + (item.amountILS || item.amount), 0)
+            const totalExpenses = budget.expenses.reduce((sum, item) => sum + (item.amountILS || item.amount), 0)
+            const totalBills = budget.bills.reduce((sum, item) => sum + (item.amountILS || item.amount), 0)
+            const totalDebtPayments = budget.debts.reduce((sum, item) => sum + (item.monthlyPaymentILS || item.monthlyPayment), 0)
             const totalOutflow = totalExpenses + totalBills + totalDebtPayments
             const netChange = totalIncome - totalOutflow
             accumulatedNetWorth += netChange
