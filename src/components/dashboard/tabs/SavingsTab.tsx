@@ -603,11 +603,11 @@ export function SavingsTab() {
                                             </div>
 
                                             <div className="flex justify-end gap-2 mt-2">
-                                                <Button size="sm" onClick={() => handleUpdate(saving.id)} className="bg-green-600 hover:bg-green-700 text-white">
-                                                    <Check className="h-4 w-4 ml-1" /> שמור
-                                                </Button>
                                                 <Button size="sm" variant="outline" onClick={cancelEdit}>
-                                                    <X className="h-4 w-4 ml-1" /> ביטול
+                                                    ביטול
+                                                </Button>
+                                                <Button size="sm" onClick={() => handleUpdate(saving.id)} className="bg-blue-600 hover:bg-blue-700 text-white">
+                                                    שמור שינויים
                                                 </Button>
                                             </div>
                                         </div>
