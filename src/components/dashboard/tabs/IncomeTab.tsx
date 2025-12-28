@@ -557,13 +557,13 @@ export function IncomeTab() {
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-between gap-2 sm:gap-3">
-                                        <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                                             <div className="shrink-0">
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} text-white font-bold text-xs`}>
                                                     {income.category?.[0] || 'כ'}
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col min-w-0">
+                                            <div className="flex flex-col min-w-0 gap-0.5">
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-bold text-[#323338] truncate text-sm sm:text-base">{income.source}</span>
                                                     {income.isRecurring && (
@@ -578,7 +578,7 @@ export function IncomeTab() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-1.5 sm:gap-3 text-[11px] text-[#676879] overflow-hidden">
+                                                <div className="flex items-center gap-1.5 sm:gap-3 text-[11px] text-[#676879] overflow-hidden whitespace-nowrap">
                                                     <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                     <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
                                                     <span className="truncate">{income.category}</span>
