@@ -3,6 +3,7 @@ import { SignInButton, SignUpButton, SignedIn, SignedOut } from '@clerk/nextjs'
 import { ArrowLeft, Calendar, PieChart, TrendingUp, Wallet } from 'lucide-react'
 import Image from 'next/image'
 import type { Metadata } from 'next'
+import SecurityBadge from '@/components/SecurityBadge'
 
 export const metadata: Metadata = {
     title: 'דף הבית',
@@ -252,6 +253,9 @@ export default function HomePage() {
                     </div>
                 </div>
             </div>
+
+            {/* Security Badge */}
+            <SecurityBadge />
         </div>
     )
 }
