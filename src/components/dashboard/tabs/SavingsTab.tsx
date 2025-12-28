@@ -338,10 +338,10 @@ export function SavingsTab() {
                 .replace(/border-(\w+)-200/g, 'border-transparent')
         }
         return colorClass
-    }
+    };
 
-    // Render component
-    return <div className="space-y-6 w-full pb-10 px-2 md:px-0" dir="rtl">
+    return (
+        <div className="space-y-6 w-full pb-10 px-2 md:px-0" dir="rtl">
             {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2">
