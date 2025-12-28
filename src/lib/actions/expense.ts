@@ -39,7 +39,6 @@ export async function getExpenses(month: number, year: number, type: 'PERSONAL' 
 
 import { expenseSchema } from '@/lib/validations/expense'
 import { z } from 'zod'
-import { auth } from '@clerk/nextjs/server'
 
 export interface ExpenseInput {
     description: string
