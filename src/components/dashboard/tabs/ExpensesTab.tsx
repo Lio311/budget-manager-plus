@@ -611,7 +611,7 @@ export function ExpensesTab() {
                                                                 />
                                                             </div>
                                                             <div className="text-[10px] text-gray-400 mt-0.5 text-left" dir="ltr">
-                                                                {formatCurrency(usage.spent)} / {formatCurrency(usage.limit)}
+                                                                {formatCurrency(usage.limit)} / {formatCurrency(usage.spent)}
                                                             </div>
                                                         </div>
                                                     )}
