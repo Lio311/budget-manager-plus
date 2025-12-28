@@ -96,11 +96,13 @@ export function IncomeTab() {
         return []
     }
 
-    const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
+    const { data: categoriesRaw, mutate: mutateCategories } = useSWR<Category[]>(
         ['categories', 'income', budgetType],
         fetcherCategories,
         { revalidateOnFocus: false }
     )
+
+    const categories = Array.isArray(categoriesRaw) ? categoriesRaw : []
 
     // --- State ---
 

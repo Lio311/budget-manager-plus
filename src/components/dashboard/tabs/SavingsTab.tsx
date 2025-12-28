@@ -82,7 +82,7 @@ export function SavingsTab() {
         return []
     }
 
-    const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
+    const { data: categoriesRaw, mutate: mutateCategories } = useSWR<Category[]>(
         ['categories', 'saving', budgetType],
         async () => {
             const data = await fetcherCategories()

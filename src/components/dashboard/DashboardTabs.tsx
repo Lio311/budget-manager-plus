@@ -18,7 +18,7 @@ import { InvoicesTab } from './tabs/InvoicesTab'
 import { QuotesTab } from './tabs/QuotesTab'
 import { BudgetLimitsTab } from './tabs/BudgetLimitsTab'
 import { useBudget } from '@/contexts/BudgetContext'
-import { mutate } from 'swr'
+import { useSWRConfig } from 'swr'
 
 interface DashboardTabsProps {
     mobileMenuOpen: boolean
@@ -29,6 +29,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     const router = useRouter()
     const searchParams = useSearchParams()
     const { budgetType } = useBudget()
+    const { mutate: globalMutate } = useSWRConfig()
 
     // Get tab from URL or default to 'overview'
     const urlTab = searchParams.get('tab') || 'overview'
@@ -82,7 +83,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         router.push(`/dashboard?tab=${value}`, { scroll: false })
 
         // Refresh SWR data for the new tab
-        mutate(key => typeof key === 'string' && key.includes(value))
+        globalMutate(key => typeof key === 'string' && key.includes(value))
     }
 
     return (

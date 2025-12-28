@@ -142,11 +142,13 @@ export function ExpensesTab() {
         return []
     }
 
-    const { data: categories = [], mutate: mutateCategories } = useSWR<Category[]>(
+    const { data: categoriesRaw, mutate: mutateCategories } = useSWR<Category[]>(
         ['categories', 'expense', budgetType],
         fetcherCategories,
         { revalidateOnFocus: false }
     )
+
+    const categories = Array.isArray(categoriesRaw) ? categoriesRaw : []
 
     // Fetch Budget Usage
     const fetcherCategoryBudgets = async () => {
