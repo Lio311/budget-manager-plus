@@ -195,17 +195,29 @@ export function BudgetLimitsTab() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card className="flex flex-col justify-center items-center p-6 bg-transparent border-none shadow-none">
+                <Card className="flex flex-col justify-center items-center p-0 bg-transparent border-none shadow-none h-full">
                     <Button
                         onClick={handleSmartRecommendations}
                         disabled={activeDefaults}
-                        className="w-full h-full bg-transparent hover:bg-yellow-50 text-yellow-700 border-2 border-yellow-100 hover:border-yellow-200 shadow-none gap-2"
-                        variant="outline"
+                        className="relative w-full h-full min-h-[140px] p-0 overflow-hidden border-0 rounded-2xl bg-gradient-to-br from-yellow-50/50 to-orange-50/50 hover:from-yellow-100/50 hover:to-orange-100/50 shadow-sm hover:shadow-md transition-all duration-300 group ring-1 ring-yellow-100 hover:ring-yellow-200"
+                        variant="ghost"
                     >
-                        {activeDefaults ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5 text-yellow-500" />}
-                        <div className="flex flex-col items-start gap-1">
-                            <span className="font-bold">המלץ לי על תקציב</span>
-                            <span className="text-[10px] text-muted-foreground font-normal">מבוסס על היסטוריית ההוצאות שלך</span>
+                        {/* Decorative background sparkles */}
+                        <Sparkles className="absolute -top-6 -left-6 w-32 h-32 text-yellow-200/20 rotate-12 transition-transform duration-700 group-hover:rotate-45" />
+                        <Sparkles className="absolute -bottom-8 -right-8 w-24 h-24 text-orange-200/10 -rotate-12 transition-transform duration-700 group-hover:-rotate-45" />
+
+                        <div className="relative flex flex-col items-center justify-center gap-3 w-full h-full py-4 z-10">
+                            <div className="p-3 bg-white rounded-full shadow-sm ring-1 ring-yellow-100 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
+                                {activeDefaults ? <RefreshCw className="h-6 w-6 text-yellow-600 animate-spin" /> : <Sparkles className="h-6 w-6 text-yellow-500 fill-yellow-200" />}
+                            </div>
+                            <div className="flex flex-col items-center text-center gap-1 px-2">
+                                <span className="text-base font-bold text-gray-800 group-hover:text-yellow-800 transition-colors">
+                                    {activeDefaults ? 'מעדכן תקציב...' : 'המלץ לי על תקציב'}
+                                </span>
+                                <span className="text-[11px] text-gray-500 font-normal max-w-[180px] leading-tight group-hover:text-gray-600">
+                                    ה-AI ינתח את ההיסטוריה שלך ויציע תקציב חכם
+                                </span>
+                            </div>
                         </div>
                     </Button>
                 </Card>
