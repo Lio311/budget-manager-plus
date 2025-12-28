@@ -24,7 +24,8 @@ export async function getCategoryBudgets(month: number, year: number): Promise<G
         const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
         const categories = await prisma.category.findMany({
             where: {
-                userId: budget.userId
+                userId: budget.userId,
+                type: { in: ['expense'] }, // Explicitly only expense
             }
         })
 
