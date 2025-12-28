@@ -180,6 +180,7 @@ export function DebtsTab() {
                     paymentMethod: ''
                 })
                 await mutate() // Refresh data
+                mutate(key => Array.isArray(key) && key[0] === 'overview')
                 toast({
                     title: 'הצלחה',
                     description: newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'ההלוואה נוספה בהצלחה'
@@ -199,6 +200,7 @@ export function DebtsTab() {
         const result = await deleteDebt(id)
         if (result.success) {
             await mutate() // Refresh data
+            mutate(key => Array.isArray(key) && key[0] === 'overview')
             toast({ title: 'הצלחה', description: 'ההלוואה נמחקה בהצלחה' })
         }
     }
@@ -208,6 +210,7 @@ export function DebtsTab() {
         const result = await toggleDebtPaid(id, !currentStatus)
         if (result.success) {
             await mutate() // Refresh data
+            mutate(key => Array.isArray(key) && key[0] === 'overview')
         }
     }
 
@@ -271,6 +274,7 @@ export function DebtsTab() {
             setEditingId(null)
             setEditData({ creditor: '', debtType: DEBT_TYPES.OWED_BY_ME, totalAmount: '', currency: 'ILS', monthlyPayment: '', dueDay: '', paymentMethod: '' })
             await mutate()
+            mutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({
                 title: 'שגיאה',

@@ -112,6 +112,7 @@ export function BillsTab() {
                 })
                 setNewBill({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
                 await mutate()
+                mutate(key => Array.isArray(key) && key[0] === 'overview')
             } else {
                 toast({
                     title: 'שגיאה',
@@ -136,6 +137,7 @@ export function BillsTab() {
 
         if (result.success) {
             await mutate()
+            mutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({
                 title: 'שגיאה',
@@ -202,6 +204,7 @@ export function BillsTab() {
             setEditingId(null)
             setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
             await mutate()
+            mutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({
                 title: 'שגיאה',
@@ -222,6 +225,7 @@ export function BillsTab() {
                 description: 'החשבון נמחק בהצלחה'
             })
             await mutate()
+            mutate(key => Array.isArray(key) && key[0] === 'overview')
         } else {
             toast({
                 title: 'שגיאה',

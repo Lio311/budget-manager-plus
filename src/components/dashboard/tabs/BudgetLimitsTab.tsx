@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import useSWR, { useSWRConfig } from 'swr'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
@@ -91,46 +92,49 @@ function BudgetEditPopover({
 export function BudgetLimitsTab() {
     const { month, year } = useBudget()
     const { toast } = useToast()
-    const [loading, setLoading] = useState(true)
+    const { mutate } = useSWRConfig()
+
+    // Load Data with SWR
+    const { data: budgetsData, isLoading: loading, mutate: mutateThis } = useSWR(
+        ['categoryBudgets', month, year],
+        async () => {
+            const res = await getCategoryBudgets(month, year)
+            if (res.success && res.data) {
+                return {
+                    budgets: res.data,
+                    avgIncome: res.avgIncome || 0
+                }
+            }
+            throw new Error(res.error || 'Failed to fetch budgets')
+        }
+    )
+
+    const budgets = budgetsData?.budgets || []
+    const avgIncome = budgetsData?.avgIncome || 0
+
     const [saving, setSaving] = useState<string | null>(null) // categoryId currently saving
     const [activeDefaults, setActiveDefaults] = useState(false)
-    const [budgets, setBudgets] = useState<CategoryBudgetUsage[]>([])
-
-    // Pagination state
-    const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 5
-    const [avgIncome, setAvgIncome] = useState(0)
-
-    // Load Data
-    useEffect(() => {
-        loadBudgets()
-    }, [month, year])
-
-    async function loadBudgets() {
-        setLoading(true)
-        const res = await getCategoryBudgets(month, year)
-        if (res.success && res.data) {
-            setBudgets(res.data)
-            if (res.avgIncome) setAvgIncome(res.avgIncome)
-        } else {
-            toast({ title: 'שגיאה', description: 'לא ניתן לטעון את נתוני התקציב', variant: 'destructive' })
-        }
-        setLoading(false)
-    }
 
     async function handleLimitChange(categoryId: string, newValue: number[]) {
         const value = newValue[0]
-        // Optimistic UI update
-        setBudgets(prev => prev.map(b => b.categoryId === categoryId ? { ...b, limit: value } : b))
+        // Optimistic UI update via mutate
+        mutateThis({
+            ...budgetsData!,
+            budgets: budgets.map(b => b.categoryId === categoryId ? { ...b, limit: value } : b)
+        }, false)
     }
 
     async function handleLimitCommit(categoryId: string, newValue: number[]) {
         const value = newValue[0]
         setSaving(categoryId)
         const res = await updateCategoryLimit(month, year, categoryId, value)
-        if (!res.success) {
+        if (res.success) {
+            await mutateThis()
+            // Also refresh overview
+            mutate(key => Array.isArray(key) && key[0] === 'overview')
+        } else {
             toast({ title: 'שגיאה', description: 'שמירת התקציב נכשלה', variant: 'destructive' })
-            loadBudgets() // Revert
+            await mutateThis() // Revert
         }
         setSaving(null)
     }
@@ -140,10 +144,14 @@ export function BudgetLimitsTab() {
         const res = await getSmartRecommendations(month, year)
         if (res.success && res.data) {
             const recommended = res.data
-            setBudgets(prev => prev.map(b => ({
-                ...b,
-                limit: recommended[b.categoryId] || b.limit // Change only if recommendation exists
-            })))
+            // Update local state optimistically or just wait for mutate
+            mutateThis({
+                ...budgetsData!,
+                budgets: budgets.map(b => ({
+                    ...b,
+                    limit: recommended[b.categoryId] !== undefined ? recommended[b.categoryId] : b.limit
+                }))
+            }, false)
 
             toast({
                 title: 'המלצות חכמות יושמו',
@@ -153,7 +161,6 @@ export function BudgetLimitsTab() {
         setActiveDefaults(false)
     }
 
-    // Calculate total
     const totalLimit = budgets.reduce((acc, b) => acc + b.limit, 0)
     const totalSpent = budgets.reduce((acc, b) => acc + b.spent, 0)
     const totalProgress = totalLimit > 0 ? (totalSpent / totalLimit) * 100 : 0

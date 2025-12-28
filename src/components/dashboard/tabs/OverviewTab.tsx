@@ -88,6 +88,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         swrConfig
     )
 
+    // Force refresh when entering the tab
+    useState(() => {
+        mutateOverview()
+    })
+
     // Default empty data if loading
     const defaultData = {
         current: { incomes: [], expenses: [], bills: [], debts: [], savings: [] },
