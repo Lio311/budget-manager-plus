@@ -10,6 +10,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib/actions/debts'
 import { useToast } from '@/hooks/use-toast'
+import { useOptimisticToggle, useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Pagination } from '@/components/ui/Pagination'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -197,21 +198,51 @@ export function DebtsTab() {
         }
     }
 
+    // Optimistic delete for instant UI feedback
+    const { deleteItem: optimisticDeleteDebt } = useOptimisticDelete<DebtsData>(
+        ['debts', month, year, budgetType],
+        deleteDebt,
+        {
+            getOptimisticData: (current, id) => ({
+                ...current,
+                debts: current.debts.filter(debt => debt.id !== id)
+            }),
+            successMessage: 'ההלוואה נמחקה בהצלחה',
+            errorMessage: 'שגיאה במחיקת ההלוואה'
+        }
+    )
+
     const handleDelete = async (id: string) => {
-        const result = await deleteDebt(id)
-        if (result.success) {
-            await mutate() // Refresh data
+        try {
+            await optimisticDeleteDebt(id)
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            toast({ title: 'הצלחה', description: 'ההלוואה נמחקה בהצלחה' })
+        } catch (error) {
+            // Error already handled by hook
         }
     }
 
+    // Optimistic toggle for instant UI feedback
+    const { toggle: optimisticTogglePaid } = useOptimisticToggle<DebtsData>(
+        ['debts', month, year, budgetType],
+        toggleDebtPaid,
+        {
+            getOptimisticData: (current, id, newValue) => ({
+                ...current,
+                debts: current.debts.map(debt =>
+                    debt.id === id ? { ...debt, isPaid: newValue } : debt
+                )
+            }),
+            successMessage: undefined,
+            errorMessage: 'שגיאה בעדכון סטטוס החוב'
+        }
+    )
+
     const togglePaid = async (id: string, currentStatus: boolean) => {
-        // Optimistic update could be done here, but simple revalidation is safer for now
-        const result = await toggleDebtPaid(id, !currentStatus)
-        if (result.success) {
-            await mutate() // Refresh data
+        try {
+            await optimisticTogglePaid(id, currentStatus)
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
+        } catch (error) {
+            // Error already handled by hook
         }
     }
 
