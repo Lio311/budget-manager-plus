@@ -564,8 +564,8 @@ export function IncomeTab() {
                                                 </div>
                                             </div>
                                             <div className="flex flex-col min-w-0 gap-0.5">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-[#323338] truncate text-sm sm:text-base">{income.source}</span>
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                    <span className="font-bold text-[#323338] truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
                                                     {income.isRecurring && (
                                                         <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-green-50 text-green-600 border border-green-100">
                                                             <span className="w-1 h-1 rounded-full bg-current" />
@@ -573,7 +573,7 @@ export function IncomeTab() {
                                                         </div>
                                                     )}
                                                     {income.client && (
-                                                        <span className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100 font-bold hidden sm:inline-block">
+                                                        <span className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100 font-bold hidden sm:inline-block shrink-0">
                                                             {income.client.name}
                                                         </span>
                                                     )}
