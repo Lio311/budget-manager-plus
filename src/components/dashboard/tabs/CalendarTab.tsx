@@ -350,7 +350,7 @@ export function CalendarTab() {
                     <DialogHeader>
                         <DialogTitle className="text-right">תשלומים ליום {selectedDay}</DialogTitle>
                     </DialogHeader>
-                    <div className="space-y-3 mt-4">
+                    <div className="space-y-3 mt-4 max-h-[60vh] overflow-y-auto pr-2">
                         {selectedDay && getPaymentsForDay(selectedDay).map((payment) => (
                             <div
                                 key={payment.id}
