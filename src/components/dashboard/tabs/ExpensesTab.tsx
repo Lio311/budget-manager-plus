@@ -27,6 +27,7 @@ import { getSuppliers } from '@/lib/actions/suppliers'
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { BankImportModal } from '../BankImportModal'
 import { getCategoryBudgets, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
+import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
 
 interface Category {
     id: string
@@ -177,6 +178,9 @@ export function ExpensesTab() {
         paymentMethod: ''
     })
 
+    const [recurrenceDialogOpen, setRecurrenceDialogOpen] = useState(false)
+    const [pendingAction, setPendingAction] = useState<{ type: 'delete' | 'edit', id: string } | null>(null)
+
     // Handle VAT Calculations
     const calculateFromTotal = (total: string, rate: string) => {
         const t = parseFloat(total) || 0
@@ -280,9 +284,16 @@ export function ExpensesTab() {
         }
     }
 
-    async function handleDelete(id: string) {
+    async function handleDelete(exp: Expense) {
         if (!confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) return
-        const result = await deleteExpense(id)
+
+        if (exp.isRecurring) {
+            setPendingAction({ type: 'delete', id: exp.id })
+            setRecurrenceDialogOpen(true)
+            return
+        }
+
+        const result = await deleteExpense(exp.id, 'SINGLE')
         if (result.success) {
             toast({ title: 'הצלחה', description: 'הוצאה נמחקה בהצלחה' })
             await mutateExpenses()
@@ -319,7 +330,7 @@ export function ExpensesTab() {
             vatAmount: isBusiness ? parseFloat(editData.vatAmount) || undefined : undefined,
             isDeductible: isBusiness ? editData.isDeductible : undefined,
             paymentMethod: editData.paymentMethod || undefined
-        })
+        }, mode)
 
         if (result.success) {
             toast({ title: 'הצלחה', description: 'הוצאה עודכנה בהצלחה' })
@@ -397,6 +408,24 @@ export function ExpensesTab() {
             console.error(err)
             toast({ title: 'שגיאה', description: 'רענון קטגוריות נכשל', variant: 'destructive' })
         }
+    }
+
+    const handleRecurrenceConfirm = async (mode: 'SINGLE' | 'FUTURE') => {
+        setRecurrenceDialogOpen(false)
+        if (!pendingAction) return
+
+        if (pendingAction.type === 'delete') {
+            const result = await deleteExpense(pendingAction.id, mode)
+            if (result.success) {
+                toast({ title: 'הצלחה', description: 'הוצאה נמחקה בהצלחה' })
+                await mutateExpenses()
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הוצאה', variant: 'destructive' })
+            }
+        } else if (pendingAction.type === 'edit') {
+            await executeUpdate(mode)
+        }
+        setPendingAction(null)
     }
 
     return (
@@ -669,27 +698,28 @@ export function ExpensesTab() {
                                                 </div>
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
-                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-4 w-4" /></Button>
+                                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => handleDelete(exp)}>
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
                                                 </div>
                                             </div>
+                                    )}
+                                        </div>
+                                    )
+                                    })
+                    )}
+
+                                    {totalPages > 1 && (
+                                        <div className="mt-4 flex justify-center direction-ltr">
+                                            <Pagination
+                                                currentPage={currentPage}
+                                                totalPages={totalPages}
+                                                onPageChange={setCurrentPage}
+                                            />
                                         </div>
                                     )}
                                 </div>
-                            )
-                        })
-                    )}
-
-                    {totalPages > 1 && (
-                        <div className="mt-4 flex justify-center direction-ltr">
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={setCurrentPage}
-                            />
-                        </div>
-                    )}
-                </div>
             </div>
-        </div>
-    )
+            </div>
+            )
 }

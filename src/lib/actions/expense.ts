@@ -224,49 +224,100 @@ export async function cancelRecurringExpense(expenseId: string, fromMonth: numbe
 
 export async function updateExpense(
     id: string,
-    data: Partial<z.infer<typeof expenseSchema>>
+    data: Partial<z.infer<typeof expenseSchema>>,
+    mode: 'SINGLE' | 'FUTURE' = 'SINGLE'
 ) {
     try {
         // Validate partial input
         const validatedData = expenseSchema.partial().parse(data)
 
-        const expense = await prisma.expense.update({
-            where: { id },
-            data: {
-                ...(validatedData.category && { category: validatedData.category }),
-                ...(validatedData.description && { description: validatedData.description }),
-                ...(validatedData.amount && { amount: validatedData.amount }),
-                ...(validatedData.currency && { currency: validatedData.currency }),
-                ...(validatedData.date && { date: new Date(validatedData.date) }),
-                // Business Fields
-                supplierId: validatedData.supplierId,
-                amountBeforeVat: validatedData.amountBeforeVat,
-                vatRate: validatedData.vatRate,
-                vatAmount: validatedData.vatAmount,
-                vatType: validatedData.vatType,
-                isDeductible: validatedData.isDeductible,
-                deductibleRate: validatedData.deductibleRate,
-                expenseType: validatedData.expenseType,
-                invoiceDate: validatedData.invoiceDate ? new Date(validatedData.invoiceDate) : undefined,
-                paymentDate: validatedData.paymentDate ? new Date(validatedData.paymentDate) : undefined,
-                paymentMethod: validatedData.paymentMethod,
-                paymentTerms: validatedData.paymentTerms
-            }
-        })
+        if (mode === 'SINGLE') {
+            const expense = await prisma.expense.update({
+                where: { id },
+                data: formatExpenseDataForUpdate(validatedData)
+            })
+            revalidatePath('/dashboard')
+            return { success: true, data: expense }
+        } else {
+            // FUTURE Mode
+            const currentExpense = await prisma.expense.findUnique({ where: { id } })
+            if (!currentExpense) return { success: false, error: 'Expense not found' }
 
-        revalidatePath('/dashboard')
-        return { success: true, data: expense }
+            const sourceId = currentExpense.recurringSourceId || currentExpense.id
+            const fromDate = currentExpense.date || new Date()
+
+            // Update this and future
+            const updateResult = await prisma.expense.updateMany({
+                where: {
+                    OR: [
+                        { id: sourceId },
+                        { recurringSourceId: sourceId }
+                    ],
+                    date: {
+                        gte: fromDate
+                    }
+                },
+                data: formatExpenseDataForUpdate(validatedData)
+            })
+
+            revalidatePath('/dashboard')
+            return { success: true, count: updateResult.count }
+        }
     } catch (error) {
         console.error('Error updating expense:', error)
         return { success: false, error: 'Failed to update expense' }
     }
 }
 
-export async function deleteExpense(id: string) {
+function formatExpenseDataForUpdate(validatedData: any) {
+    return {
+        ...(validatedData.category && { category: validatedData.category }),
+        ...(validatedData.description && { description: validatedData.description }),
+        ...(validatedData.amount && { amount: validatedData.amount }),
+        ...(validatedData.currency && { currency: validatedData.currency }),
+        ...(validatedData.date && { date: new Date(validatedData.date) }),
+        // Business Fields
+        supplierId: validatedData.supplierId,
+        amountBeforeVat: validatedData.amountBeforeVat,
+        vatRate: validatedData.vatRate,
+        vatAmount: validatedData.vatAmount,
+        vatType: validatedData.vatType,
+        isDeductible: validatedData.isDeductible,
+        deductibleRate: validatedData.deductibleRate,
+        expenseType: validatedData.expenseType,
+        invoiceDate: validatedData.invoiceDate ? new Date(validatedData.invoiceDate) : undefined,
+        paymentDate: validatedData.paymentDate ? new Date(validatedData.paymentDate) : undefined,
+        paymentMethod: validatedData.paymentMethod,
+        paymentTerms: validatedData.paymentTerms
+    }
+}
+
+export async function deleteExpense(id: string, mode: 'SINGLE' | 'FUTURE' = 'SINGLE') {
     try {
-        await prisma.expense.delete({
-            where: { id }
-        })
+        if (mode === 'SINGLE') {
+            await prisma.expense.delete({
+                where: { id }
+            })
+        } else {
+            // FUTURE Mode
+            const currentExpense = await prisma.expense.findUnique({ where: { id } })
+            if (!currentExpense) return { success: false, error: 'Expense not found' }
+
+            const sourceId = currentExpense.recurringSourceId || currentExpense.id
+            const fromDate = currentExpense.date || new Date()
+
+            await prisma.expense.deleteMany({
+                where: {
+                    OR: [
+                        { id: sourceId },
+                        { recurringSourceId: sourceId }
+                    ],
+                    date: {
+                        gte: fromDate
+                    }
+                }
+            })
+        }
 
         revalidatePath('/dashboard')
         return { success: true }

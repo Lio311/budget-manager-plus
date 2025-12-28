@@ -227,44 +227,94 @@ export async function updateIncome(
         paymentMethod?: any
         paymentTerms?: number
         payer?: string
-    }
+    },
+    mode: 'SINGLE' | 'FUTURE' = 'SINGLE'
 ) {
     try {
-        const income = await prisma.income.update({
-            where: { id },
-            data: {
-                ...(data.source && { source: data.source }),
-                ...(data.category && { category: data.category }),
-                ...(data.amount && { amount: data.amount }),
-                ...(data.currency && { currency: data.currency }),
-                ...(data.date && { date: new Date(data.date) }),
-                // Business Fields
-                clientId: data.clientId,
-                invoiceId: data.invoiceId,
-                amountBeforeVat: data.amountBeforeVat,
-                vatRate: data.vatRate,
-                vatAmount: data.vatAmount,
-                invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : undefined,
-                paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
-                paymentMethod: data.paymentMethod,
-                paymentTerms: data.paymentTerms,
-                payer: data.payer
-            }
-        })
+        if (mode === 'SINGLE') {
+            const income = await prisma.income.update({
+                where: { id },
+                data: formatIncomeDataForUpdate(data)
+            })
+            revalidatePath('/dashboard')
+            return { success: true, data: income }
+        } else {
+            // FUTURE Mode
+            const currentIncome = await prisma.income.findUnique({ where: { id } })
+            if (!currentIncome) return { success: false, error: 'Income not found' }
 
-        revalidatePath('/dashboard')
-        return { success: true, data: income }
+            const sourceId = currentIncome.recurringSourceId || currentIncome.id
+            const fromDate = currentIncome.date || new Date()
+
+            const updateResult = await prisma.income.updateMany({
+                where: {
+                    OR: [
+                        { id: sourceId },
+                        { recurringSourceId: sourceId }
+                    ],
+                    date: {
+                        gte: fromDate
+                    }
+                },
+                data: formatIncomeDataForUpdate(data)
+            })
+
+            revalidatePath('/dashboard')
+            return { success: true, count: updateResult.count }
+        }
     } catch (error) {
         console.error('Error updating income:', error)
         return { success: false, error: 'Failed to update income' }
     }
 }
 
-export async function deleteIncome(id: string) {
+function formatIncomeDataForUpdate(data: any) {
+    return {
+        ...(data.source && { source: data.source }),
+        ...(data.category && { category: data.category }),
+        ...(data.amount && { amount: data.amount }),
+        ...(data.currency && { currency: data.currency }),
+        ...(data.date && { date: new Date(data.date) }),
+        // Business Fields
+        clientId: data.clientId,
+        invoiceId: data.invoiceId,
+        amountBeforeVat: data.amountBeforeVat,
+        vatRate: data.vatRate,
+        vatAmount: data.vatAmount,
+        invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : undefined,
+        paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
+        paymentMethod: data.paymentMethod,
+        paymentTerms: data.paymentTerms,
+        payer: data.payer
+    }
+}
+
+export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SINGLE') {
     try {
-        await prisma.income.delete({
-            where: { id }
-        })
+        if (mode === 'SINGLE') {
+            await prisma.income.delete({
+                where: { id }
+            })
+        } else {
+            // FUTURE Mode
+            const currentIncome = await prisma.income.findUnique({ where: { id } })
+            if (!currentIncome) return { success: false, error: 'Income not found' }
+
+            const sourceId = currentIncome.recurringSourceId || currentIncome.id
+            const fromDate = currentIncome.date || new Date()
+
+            await prisma.income.deleteMany({
+                where: {
+                    OR: [
+                        { id: sourceId },
+                        { recurringSourceId: sourceId }
+                    ],
+                    date: {
+                        gte: fromDate
+                    }
+                }
+            })
+        }
 
         revalidatePath('/dashboard')
         return { success: true }
