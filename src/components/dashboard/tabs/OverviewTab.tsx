@@ -479,11 +479,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                             tick={({ x, y, payload }) => {
                                                 const val = payload.value || '';
 
-                                                // Split into two lines if longer than 5 characters
-                                                if (val.length > 5) {
-                                                    const mid = Math.ceil(val.length / 2);
-                                                    const line1 = val.substring(0, mid);
-                                                    const line2 = val.substring(mid);
+                                                // Split into two lines only if there's a space (multi-word)
+                                                if (val.includes(' ')) {
+                                                    const words = val.split(' ');
+                                                    const mid = Math.ceil(words.length / 2);
+                                                    const line1 = words.slice(0, mid).join(' ');
+                                                    const line2 = words.slice(mid).join(' ');
 
                                                     return (
                                                         <g transform={`translate(${x},${y})`}>
