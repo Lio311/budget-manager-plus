@@ -19,7 +19,7 @@ import { toast } from 'sonner'
  * )
  */
 export function useOptimisticMutation<TData, TInput>(
-    key: string | string[],
+    key: string | any[],
     mutationFn: (data: TInput) => Promise<any>,
     options?: {
         onSuccess?: (result: any) => void
@@ -94,7 +94,7 @@ export function useOptimisticMutation<TData, TInput>(
  * Simpler version for toggle operations (like marking bills as paid)
  */
 export function useOptimisticToggle<TData>(
-    key: string | string[],
+    key: string | any[],
     mutationFn: (id: string, newValue: boolean) => Promise<any>,
     options?: {
         getOptimisticData: (current: TData, id: string, newValue: boolean) => TData
@@ -147,7 +147,7 @@ export function useOptimisticToggle<TData>(
  * Hook for optimistic delete operations
  */
 export function useOptimisticDelete<TData>(
-    key: string | string[],
+    key: string | any[],
     deleteFn: (id: string) => Promise<any>,
     options?: {
         getOptimisticData: (current: TData, id: string) => TData
