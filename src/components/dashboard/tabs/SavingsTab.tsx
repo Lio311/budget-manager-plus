@@ -637,7 +637,15 @@ export function SavingsTab() {
 
                                                 <div className="flex flex-col gap-1 min-w-0 flex-1">
                                                     {/* Name - full width, no truncate */}
-                                                    <span className="font-bold text-sm sm:text-base text-[#323338]">{saving.name}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-sm sm:text-base text-[#323338]">{saving.name}</span>
+                                                        {saving.isRecurring && (
+                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
+                                                                <span className="w-1 h-1 rounded-full bg-current" />
+                                                                קבוע
+                                                            </div>
+                                                        )}
+                                                    </div>
 
                                                     {/* Date and details in separate line */}
                                                     <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#676879]">
