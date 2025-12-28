@@ -25,6 +25,7 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
 import { getExpenses, addExpense, updateExpense, deleteExpense, importExpenses } from '@/lib/actions/expense'
 import { getSuppliers } from '@/lib/actions/suppliers'
+import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { BankImportModal } from '../BankImportModal'
 import { getCategoryBudgets, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
@@ -317,6 +318,20 @@ export function ExpensesTab() {
         }
     }
 
+    // Optimistic delete for instant UI feedback
+    const { deleteItem: optimisticDeleteExpense } = useOptimisticDelete<ExpensesData>(
+        ['expenses', month, year, budgetType],
+        (id) => deleteExpense(id, 'SINGLE'),
+        {
+            getOptimisticData: (current, id) => ({
+                ...current,
+                expenses: current.expenses.filter(expense => expense.id !== id)
+            }),
+            successMessage: 'הוצאה נמחקה בהצלחה',
+            errorMessage: 'שגיאה במחיקת ההוצאה'
+        }
+    )
+
     async function handleDelete(exp: Expense) {
         if (exp.isRecurring) {
             setPendingAction({ type: 'delete', id: exp.id })
@@ -326,13 +341,11 @@ export function ExpensesTab() {
 
         if (!confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) return
 
-        const result = await deleteExpense(exp.id, 'SINGLE')
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'הוצאה נמחקה בהצלחה' })
-            await mutateExpenses()
+        try {
+            await optimisticDeleteExpense(exp.id)
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הוצאה', variant: 'destructive' })
+        } catch (error) {
+            // Error already handled by hook
         }
     }
 

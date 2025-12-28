@@ -20,6 +20,7 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { addIncome, getIncomes, updateIncome, deleteIncome } from '@/lib/actions/income'
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { getClients } from '@/lib/actions/clients'
+import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
 import { Briefcase, DollarSign, TrendingUp, Gift, Home, Landmark, PiggyBank, Wallet } from 'lucide-react'
@@ -277,6 +278,20 @@ export function IncomeTab() {
         }
     }
 
+    // Optimistic delete for instant UI feedback
+    const { deleteItem: optimisticDeleteIncome } = useOptimisticDelete<IncomesData>(
+        ['incomes', month, year, budgetType],
+        (id) => deleteIncome(id, 'SINGLE'),
+        {
+            getOptimisticData: (current, id) => ({
+                ...current,
+                incomes: current.incomes.filter(income => income.id !== id)
+            }),
+            successMessage: 'ההכנסה נמחקה בהצלחה',
+            errorMessage: 'שגיאה במחיקת ההכנסה'
+        }
+    )
+
     async function handleDelete(income: Income) {
         if (income.isRecurring) {
             setPendingAction({ type: 'delete', id: income.id })
@@ -285,13 +300,12 @@ export function IncomeTab() {
         }
 
         if (!confirm('האם אתה בטוח שברצונך למחוק הכנסה זו?')) return
-        const result = await deleteIncome(income.id, 'SINGLE')
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'ההכנסה נמחקה בהצלחה' })
-            await mutateIncomes()
+
+        try {
+            await optimisticDeleteIncome(income.id)
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הכנסה', variant: 'destructive' })
+        } catch (error) {
+            // Error already handled by hook
         }
     }
 
