@@ -78,7 +78,8 @@ const getCategoryIcon = (name: string) => {
         case 'חשמל': return <Zap className="h-4 w-4" />
         case 'שכירות': return <Home className="h-4 w-4" />
         case 'חופשה': return <Plane className="h-4 w-4" />
-        case 'ביטוחים': return <Shield className="h-4 w-4" />
+        case 'ביטוחים':
+        case 'ביטוח': return <Shield className="h-4 w-4" />
         case 'ספורט': return <Dumbbell className="h-4 w-4" />
         case 'הוצאה קבועה': return <RefreshCw className="h-4 w-4" />
         case 'ביגוד':

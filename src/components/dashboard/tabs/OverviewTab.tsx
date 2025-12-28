@@ -474,9 +474,27 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                         <XAxis
                                             dataKey="name"
-                                            tick={{ fill: '#374151', fontSize: 12 }}
                                             interval={0}
-                                            height={60}
+                                            height={80}
+                                            tick={({ x, y, payload }) => {
+                                                const val = payload.value || '';
+                                                const truncated = val.length > 10 ? val.substring(0, 10) + '...' : val;
+                                                return (
+                                                    <g transform={`translate(${x},${y})`}>
+                                                        <text
+                                                            x={0}
+                                                            y={0}
+                                                            dy={16}
+                                                            textAnchor="end"
+                                                            fill="#374151"
+                                                            transform="rotate(-45)"
+                                                            style={{ fontSize: '11px', direction: 'rtl', unicodeBidi: 'plaintext' }}
+                                                        >
+                                                            {truncated}
+                                                        </text>
+                                                    </g>
+                                                )
+                                            }}
                                         />
                                         <YAxis
                                             tick={{ fill: '#374151', fontSize: 12 }}
