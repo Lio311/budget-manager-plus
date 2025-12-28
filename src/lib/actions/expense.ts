@@ -246,7 +246,10 @@ export async function updateExpense(
             const sourceId = currentExpense.recurringSourceId || currentExpense.id
             const fromDate = currentExpense.date || new Date()
 
-            // Update this and future
+            // Prepared Data
+            const updateData = formatExpenseDataForUpdate(validatedData)
+            delete updateData.date // Important: Don't collapse dates for future recurring series
+
             const updateResult = await prisma.expense.updateMany({
                 where: {
                     OR: [
@@ -257,7 +260,7 @@ export async function updateExpense(
                         gte: fromDate
                     }
                 },
-                data: formatExpenseDataForUpdate(validatedData)
+                data: updateData
             })
 
             revalidatePath('/dashboard')
@@ -289,7 +292,7 @@ function formatExpenseDataForUpdate(validatedData: any) {
         paymentDate: validatedData.paymentDate ? new Date(validatedData.paymentDate) : undefined,
         paymentMethod: validatedData.paymentMethod,
         paymentTerms: validatedData.paymentTerms
-    }
+    } as any // Cast to any to allow property deletion upstream
 }
 
 export async function deleteExpense(id: string, mode: 'SINGLE' | 'FUTURE' = 'SINGLE') {
