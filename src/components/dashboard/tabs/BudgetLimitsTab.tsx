@@ -234,8 +234,10 @@ export function BudgetLimitsTab() {
                                 <div className="flex items-center justify-between">
                                     <div className="font-semibold text-gray-900 text-lg">{budget.categoryName}</div>
                                     <div className="flex items-center gap-2">
-                                        <div className="text-sm font-medium text-gray-500">
-                                            {formatCurrency(budget.spent)} / {formatCurrency(budget.limit)}
+                                        <div className="text-sm font-medium text-gray-500 font-mono flex items-center gap-1" dir="ltr">
+                                            <span>₪{budget.spent.toLocaleString()}</span>
+                                            <span>/</span>
+                                            <span>₪{budget.limit.toLocaleString()}</span>
                                         </div>
 
                                         {/* Edit Button */}
