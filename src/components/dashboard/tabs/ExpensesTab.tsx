@@ -610,8 +610,8 @@ export function ExpensesTab() {
                                                                     style={{ width: `${Math.min(usage.percentage, 100)}%` }}
                                                                 />
                                                             </div>
-                                                            <div className="text-[10px] text-gray-400 mt-0.5 text-left direction-ltr font-mono">
-                                                                <span className="flex items-center gap-1 justify-end">
+                                                            <div className="text-[10px] text-gray-400 mt-0.5 text-left font-mono" dir="ltr">
+                                                                <span className="flex items-center gap-1 justify-start">
                                                                     <span>₪{usage.spent.toLocaleString()}</span>
                                                                     <span>/</span>
                                                                     <span>₪{usage.limit.toLocaleString()}</span>
