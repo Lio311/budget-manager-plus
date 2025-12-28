@@ -479,7 +479,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                             tick={(props) => {
                                                 // Hide labels on mobile to prevent overlap
                                                 if (typeof window !== 'undefined' && window.innerWidth < 640) {
-                                                    return null;
+                                                    return <g />; // Return empty SVG element instead of null
                                                 }
 
                                                 const { x, y, payload } = props;
