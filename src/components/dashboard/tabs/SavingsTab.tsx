@@ -560,9 +560,9 @@ export function SavingsTab() {
                                                     disabled={submitting}
                                                 />
                                             </div>
-                                            <div className="flex gap-2 w-full">
+                                            <div className="flex flex-wrap gap-2 w-full">
                                                 <select
-                                                    className="p-2 border rounded-lg h-9 bg-white text-sm w-20"
+                                                    className="p-2 border rounded-lg h-9 bg-white text-sm min-w-[80px] flex-1"
                                                     value={editData.currency}
                                                     onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
                                                     disabled={submitting}
@@ -573,20 +573,21 @@ export function SavingsTab() {
                                                 </select>
                                                 <Input
                                                     type="number"
-                                                    className="h-9 w-24"
+                                                    className="h-9 min-w-[80px] flex-1"
+                                                    placeholder="סכום"
                                                     value={editData.monthlyDeposit}
                                                     onChange={(e) => setEditData({ ...editData, monthlyDeposit: e.target.value })}
                                                     disabled={submitting}
                                                 />
                                                 <Input
                                                     type="number"
-                                                    className="h-9 w-24"
+                                                    className="h-9 min-w-[80px] flex-1"
                                                     placeholder="יעד"
                                                     value={editData.goal}
                                                     onChange={(e) => setEditData({ ...editData, goal: e.target.value })}
                                                     disabled={submitting}
                                                 />
-                                                <div className="flex-1">
+                                                <div className="min-w-[120px] flex-1">
                                                     <DatePicker
                                                         date={editData.date}
                                                         setDate={(date) => setEditData({ ...editData, date: date || new Date() })}

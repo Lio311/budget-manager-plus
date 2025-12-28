@@ -517,11 +517,11 @@ export function DebtsTab() {
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <Button size="sm" onClick={handleUpdate} className="bg-green-600 hover:bg-green-700 text-white">
-                                                            <Check className="h-4 w-4 ml-1" /> שמור
-                                                        </Button>
                                                         <Button size="sm" variant="outline" onClick={handleCancelEdit}>
-                                                            <X className="h-4 w-4 ml-1" /> ביטול
+                                                            ביטול
+                                                        </Button>
+                                                        <Button size="sm" onClick={handleUpdate} className="bg-purple-600 hover:bg-purple-700 text-white">
+                                                            שמור שינויים
                                                         </Button>
                                                     </div>
                                                 </div>

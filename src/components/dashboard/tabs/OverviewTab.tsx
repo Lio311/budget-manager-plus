@@ -476,7 +476,13 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                             dataKey="name"
                                             interval={0}
                                             height={70}
-                                            tick={({ x, y, payload }) => {
+                                            tick={(props) => {
+                                                // Hide labels on mobile to prevent overlap
+                                                if (typeof window !== 'undefined' && window.innerWidth < 640) {
+                                                    return null;
+                                                }
+
+                                                const { x, y, payload } = props;
                                                 const val = payload.value || '';
 
                                                 // Split into two lines only if there's a space (multi-word)
