@@ -156,6 +156,15 @@ export function IncomeTab() {
             return
         }
 
+        if (newIncome.isRecurring && newIncome.recurringEndDate) {
+            const start = new Date(newIncome.date || new Date())
+            const end = new Date(newIncome.recurringEndDate)
+            if (end <= start) {
+                toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר מתאריך ההכנסה', variant: 'destructive' })
+                return
+            }
+        }
+
         setSubmitting(true)
         try {
             const result = await addIncome(month, year, {
@@ -486,7 +495,7 @@ export function IncomeTab() {
                         {/* Recurring Checkbox */}
                         <div className="flex items-start gap-4 p-4 border border-gray-100 rounded-xl bg-gray-50/50 w-full">
                             <div className="flex items-center gap-2">
-                                <Checkbox id="recurring-income" checked={newIncome.isRecurring} onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })} className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" />
+                                <Checkbox id="recurring-income" checked={newIncome.isRecurring} onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })} className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" />
                                 <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338]">הכנסה קבועה</label>
                             </div>
                             {newIncome.isRecurring && (

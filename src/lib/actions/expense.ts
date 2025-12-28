@@ -418,6 +418,33 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
             })
         }
 
+        // Create missing categories from 'branchName' (mapped to category field)
+        const uniqueCategories = Array.from(new Set(expenses.map(e => e.category).filter(c => c && c !== 'כללי')))
+
+        for (const catName of uniqueCategories) {
+            const existingCat = await prisma.category.findFirst({
+                where: {
+                    userId,
+                    name: catName,
+                    type: 'expense', // Assuming excel imports are expenses
+                    scope: budgetType
+                }
+            })
+
+            if (!existingCat) {
+                console.log(`Creating new category from import: ${catName}`)
+                await prisma.category.create({
+                    data: {
+                        userId,
+                        name: catName,
+                        type: 'expense',
+                        color: 'bg-gray-500', // Default color for auto-created categories
+                        scope: budgetType
+                    }
+                })
+            }
+        }
+
         // Process expenses sequentially to ensure budgets exist
         let addedCount = 0
         for (const exp of expenses) {
@@ -428,9 +455,9 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
             // Get appropriate budget for this expense's date
             const budget = await getCurrentBudget(month, year, '₪', budgetType)
 
-            // Double check individual duplicate before insert (Optional? No, expensive. We relied on the sample check)
-            // But if user forces? We don't have a "force" option yet. 
-            // Just proceed with create.
+            // If category was just created, it exists now.
+            // If it was 'כללי', we use the defaultCategory we fetched earlier.
+            // Actually, we can just use the string.
 
             await prisma.expense.create({
                 data: {

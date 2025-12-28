@@ -55,25 +55,40 @@ export const getExchangeRates = unstable_cache(
  * The API gives us ILS -> USD (e.g. 0.27). So 1 ILS = 0.27 USD.
  * To convert USD to ILS: Amount / Rate.
  */
+const FALLBACK_RATES: Record<string, number> = {
+    'USD': 0.27, // ~3.70 ILS
+    'EUR': 0.25, // ~4.00 ILS
+    'GBP': 0.21  // ~4.76 ILS
+};
+
 export async function convertToILS(amount: number, fromCurrency: string): Promise<number> {
     if (fromCurrency === 'ILS') return amount;
 
     try {
         const ratesData = await getExchangeRates();
 
-        if (!ratesData || !ratesData.rates[fromCurrency]) {
-            // Fallback: If API fails, return original amount (better than 0) but log error
-            console.error(`Conversion failed for ${fromCurrency} to ILS. Rates missing.`);
-            return amount;
+        // Use API rate if available
+        if (ratesData && ratesData.rates[fromCurrency]) {
+            const rate = ratesData.rates[fromCurrency];
+            return amount / rate;
         }
 
-        const rate = ratesData.rates[fromCurrency];
-        // ILS -> Currency rate (e.g. 0.27). 
-        // X USD / 0.27 = Y ILS
-        return amount / rate;
+        // Fallback if API fails
+        if (FALLBACK_RATES[fromCurrency]) {
+            console.warn(`Using fallback rate for ${fromCurrency}`);
+            return amount / FALLBACK_RATES[fromCurrency];
+        }
+
+        // Last resort
+        console.error(`No rate found for ${fromCurrency}, returning original amount.`);
+        return amount;
 
     } catch (error) {
         console.error('Conversion error:', error);
+        // Fallback on error
+        if (FALLBACK_RATES[fromCurrency]) {
+            return amount / FALLBACK_RATES[fromCurrency];
+        }
         return amount;
     }
 }
