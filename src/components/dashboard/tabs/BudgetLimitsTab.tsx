@@ -187,7 +187,7 @@ export function BudgetLimitsTab() {
                         <div className={`text-2xl font-bold ${totalSpent > totalLimit && totalLimit > 0 ? 'text-red-600' : 'text-green-600'}`}>
                             {formatCurrency(totalSpent)}
                         </div>
-                        <Progress value={Math.min(totalProgress, 100)} className={`h-2 mt-2 ${totalProgress > 100 ? 'bg-red-100' : ''}`} />
+                        <Progress value={Math.min(totalProgress, 100)} className={`h-2 mt-2 rotate-180 ${totalProgress > 100 ? 'bg-red-100' : ''}`} />
                         <p className="text-xs text-muted-foreground mt-1">
                             {totalProgress.toFixed(0)}% מנוצל
                         </p>
