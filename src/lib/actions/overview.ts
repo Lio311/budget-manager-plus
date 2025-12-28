@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 
 /**
@@ -14,12 +14,14 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
             return { success: false, error: 'Unauthorized' }
         }
 
+        const db = await authenticatedPrisma(userId)
+
         // Calculate previous month
         const prevMonth = month === 1 ? 12 : month - 1
         const prevYear = month === 1 ? year - 1 : year
 
         // Fetch user for initial balance/savings
-        const user = await prisma.user.findUnique({
+        const user = await db.user.findUnique({
             where: { id: userId },
             select: { id: true, initialBalance: true, initialSavings: true }
         })
@@ -29,9 +31,8 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
         }
 
         // Get current and previous budgets with optimized field selection
-        // @ts-ignore - Prisma types might be stale
         const [currentBudget, previousBudget] = await Promise.all([
-            prisma.budget.findFirst({
+            db.budget.findFirst({
                 where: { userId, month, year, type },
                 select: {
                     id: true,
@@ -42,7 +43,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     savings: { select: { id: true, category: true, monthlyDeposit: true } }
                 }
             }),
-            prisma.budget.findFirst({
+            db.budget.findFirst({
                 where: { userId, month: prevMonth, year: prevYear, type },
                 select: {
                     id: true,
@@ -57,14 +58,14 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
 
         // Get categories (only expense categories for the overview)
         // @ts-ignore
-        const categories = await prisma.category.findMany({
+        const categories = await db.category.findMany({
             where: { userId, type: 'expense', scope: type },
             select: { id: true, name: true, color: true }
         })
 
         // Get net worth history (all budgets for this user and type)
         // @ts-ignore
-        const allBudgets = await prisma.budget.findMany({
+        const allBudgets = await db.budget.findMany({
             where: { userId, type },
             select: {
                 month: true,

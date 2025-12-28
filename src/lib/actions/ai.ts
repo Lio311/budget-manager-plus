@@ -2,7 +2,7 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { auth } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/prisma'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 
 const apiKey = process.env.GEMINI_API_KEY
 if (!apiKey) {
@@ -34,9 +34,10 @@ export async function getFinancialAdvice(data: FinancialData) {
             }
         }
 
+        const db = await authenticatedPrisma(userId)
 
         // Check cache first - enforce 24-hour limit
-        const cachedAdvice = await prisma.aIAdviceCache.findUnique({
+        const cachedAdvice = await db.aIAdviceCache.findUnique({
             where: {
                 userId_month_year: {
                     userId,
@@ -132,7 +133,7 @@ ${data.savings.map((sav: any) => `  - ${sav.description}: ${sav.monthlyDeposit} 
         // Store in cache with 24-hour expiry
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours from now
 
-        await prisma.aIAdviceCache.upsert({
+        await db.aIAdviceCache.upsert({
             where: {
                 userId_month_year: {
                     userId,

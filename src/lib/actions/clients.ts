@@ -1,7 +1,7 @@
 'use server'
 
-import { prisma } from '@/lib/db'
-import { currentUser } from '@clerk/nextjs/server'
+import { prisma, authenticatedPrisma } from '@/lib/db'
+import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 
 export interface ClientFormData {
@@ -16,12 +16,14 @@ export interface ClientFormData {
 
 export async function getClients(scope: string = 'BUSINESS') {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const clients = await prisma.client.findMany({
+        const db = await authenticatedPrisma(userId)
+
+        const clients = await db.client.findMany({
             where: {
-                userId: user.id,
+                userId,
                 scope
             },
             include: {
@@ -41,7 +43,7 @@ export async function getClients(scope: string = 'BUSINESS') {
         const clientsWithStats = await Promise.all(
             clients.map(async (client) => {
                 // Sum from incomes
-                const incomeTotal = await prisma.income.aggregate({
+                const incomeTotal = await db.income.aggregate({
                     where: {
                         clientId: client.id
                     },
@@ -51,7 +53,7 @@ export async function getClients(scope: string = 'BUSINESS') {
                 })
 
                 // Sum from paid invoices only
-                const invoiceTotal = await prisma.invoice.aggregate({
+                const invoiceTotal = await db.invoice.aggregate({
                     where: {
                         clientId: client.id,
                         status: 'PAID'
@@ -62,7 +64,7 @@ export async function getClients(scope: string = 'BUSINESS') {
                 })
 
                 // Count all invoices (including drafts) for transaction count
-                const allInvoicesCount = await prisma.invoice.count({
+                const allInvoicesCount = await db.invoice.count({
                     where: { clientId: client.id }
                 })
 
@@ -89,10 +91,12 @@ export async function getClients(scope: string = 'BUSINESS') {
 
 export async function getClient(id: string) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const client = await prisma.client.findUnique({
+        const db = await authenticatedPrisma(userId)
+
+        const client = await db.client.findUnique({
             where: { id },
             include: {
                 incomes: {
@@ -106,7 +110,7 @@ export async function getClient(id: string) {
             }
         })
 
-        if (!client || client.userId !== user.id) {
+        if (!client || client.userId !== userId) {
             throw new Error('Client not found')
         }
 
@@ -119,12 +123,14 @@ export async function getClient(id: string) {
 
 export async function createClient(data: ClientFormData, scope: string = 'BUSINESS') {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const client = await prisma.client.create({
+        const db = await authenticatedPrisma(userId)
+
+        const client = await db.client.create({
             data: {
-                userId: user.id,
+                userId,
                 scope,
                 name: data.name,
                 email: data.email,
@@ -149,16 +155,18 @@ export async function createClient(data: ClientFormData, scope: string = 'BUSINE
 
 export async function updateClient(id: string, data: ClientFormData) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.client.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.client.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Client not found')
         }
 
-        const client = await prisma.client.update({
+        const client = await db.client.update({
             where: { id },
             data: {
                 name: data.name,
@@ -184,18 +192,20 @@ export async function updateClient(id: string, data: ClientFormData) {
 
 export async function deleteClient(id: string) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.client.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.client.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Client not found')
         }
 
         // Check if client has associated incomes or invoices
-        const hasIncomes = await prisma.income.count({ where: { clientId: id } })
-        const hasInvoices = await prisma.invoice.count({ where: { clientId: id } })
+        const hasIncomes = await db.income.count({ where: { clientId: id } })
+        const hasInvoices = await db.invoice.count({ where: { clientId: id } })
 
         if (hasIncomes > 0 || hasInvoices > 0) {
             return {
@@ -204,7 +214,7 @@ export async function deleteClient(id: string) {
             }
         }
 
-        await prisma.client.delete({ where: { id } })
+        await db.client.delete({ where: { id } })
 
         revalidatePath('/dashboard')
         return { success: true }
@@ -216,12 +226,14 @@ export async function deleteClient(id: string) {
 
 export async function getClientStats(clientId: string, year: number) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const client = await prisma.client.findUnique({ where: { id: clientId } })
-        if (!client || client.userId !== user.id) {
+        const client = await db.client.findUnique({ where: { id: clientId } })
+        if (!client || client.userId !== userId) {
             throw new Error('Client not found')
         }
 
@@ -229,7 +241,7 @@ export async function getClientStats(clientId: string, year: number) {
         const monthlyRevenue = await Promise.all(
             Array.from({ length: 12 }, async (_, i) => {
                 const month = i + 1
-                const result = await prisma.income.aggregate({
+                const result = await db.income.aggregate({
                     where: {
                         clientId,
                         date: {
@@ -249,13 +261,13 @@ export async function getClientStats(clientId: string, year: number) {
         )
 
         // Get total stats
-        const totalRevenue = await prisma.income.aggregate({
+        const totalRevenue = await db.income.aggregate({
             where: { clientId },
             _sum: { amount: true },
             _count: true
         })
 
-        const openInvoices = await prisma.invoice.count({
+        const openInvoices = await db.invoice.count({
             where: {
                 clientId,
                 status: { in: ['SENT', 'OVERDUE'] }

@@ -1,31 +1,39 @@
 'use server'
 
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
+import { auth } from '@clerk/nextjs/server'
 
 export async function getCalendarPayments(month: number, year: number) {
     try {
+        const { userId } = await auth()
+        if (!userId) {
+            return { success: false, error: 'Unauthorized' }
+        }
+
+        const db = await authenticatedPrisma(userId)
+
         const budget = await getCurrentBudget(month, year)
 
         // Get bills, debts, income, expenses, and savings for the month
         const [bills, debts, incomes, expenses, savings] = await Promise.all([
-            prisma.bill.findMany({
+            db.bill.findMany({
                 where: { budgetId: budget.id },
                 orderBy: { dueDate: 'asc' }
             }),
-            prisma.debt.findMany({
+            db.debt.findMany({
                 where: { budgetId: budget.id },
                 orderBy: { dueDay: 'asc' }
             }),
-            prisma.income.findMany({
+            db.income.findMany({
                 where: { budgetId: budget.id },
                 orderBy: { date: 'asc' }
             }),
-            prisma.expense.findMany({
+            db.expense.findMany({
                 where: { budgetId: budget.id },
                 orderBy: { date: 'asc' }
             }),
-            prisma.saving.findMany({
+            db.saving.findMany({
                 where: { budgetId: budget.id },
                 orderBy: { createdAt: 'asc' }
             })

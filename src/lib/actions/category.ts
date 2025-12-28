@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { ensureUserExists } from './budget'
@@ -19,8 +19,9 @@ function serializeCategory(cat: any) {
 export async function getCategories(type: string = 'expense', scope: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const user = await ensureUserExists()
+        const db = await authenticatedPrisma(user.id)
 
-        let categories = await prisma.category.findMany({
+        let categories = await db.category.findMany({
             where: {
                 userId: user.id,
                 type,
@@ -40,7 +41,7 @@ export async function getCategories(type: string = 'expense', scope: 'PERSONAL' 
             if (defaults.length > 0) {
                 console.log(`[getCategories] Seeding ${defaults.length} categories for user ${user.id} type ${type} scope ${scope}`)
                 try {
-                    await prisma.category.createMany({
+                    await db.category.createMany({
                         data: defaults.map(c => ({
                             userId: user.id,
                             name: c.name,
@@ -52,7 +53,7 @@ export async function getCategories(type: string = 'expense', scope: 'PERSONAL' 
                     })
 
                     // Fetch again after seeding
-                    categories = await prisma.category.findMany({
+                    categories = await db.category.findMany({
                         where: {
                             userId: user.id,
                             type,
@@ -78,9 +79,10 @@ export async function getCategories(type: string = 'expense', scope: 'PERSONAL' 
 export async function addCategory(data: { name: string; type: string; color?: string; scope?: 'PERSONAL' | 'BUSINESS' }) {
     try {
         const user = await ensureUserExists()
+        const db = await authenticatedPrisma(user.id)
         const scope = data.scope || 'PERSONAL'
 
-        const existing = await prisma.category.findFirst({
+        const existing = await db.category.findFirst({
             where: {
                 userId: user.id,
                 name: data.name,
@@ -93,7 +95,7 @@ export async function addCategory(data: { name: string; type: string; color?: st
             return { success: false, error: 'Category already exists' }
         }
 
-        const category = await prisma.category.create({
+        const category = await db.category.create({
             data: {
                 userId: user.id,
                 name: data.name,
@@ -122,8 +124,9 @@ export async function addCategory(data: { name: string; type: string; color?: st
 export async function updateCategory(id: string, data: { name?: string; color?: string }) {
     try {
         const user = await ensureUserExists()
+        const db = await authenticatedPrisma(user.id)
 
-        const category = await prisma.category.update({
+        const category = await db.category.update({
             where: { id },
             data: {
                 ...(data.name && { name: data.name }),
@@ -143,8 +146,9 @@ export async function updateCategory(id: string, data: { name?: string; color?: 
 export async function deleteCategory(id: string) {
     try {
         const user = await ensureUserExists()
+        const db = await authenticatedPrisma(user.id)
 
-        await prisma.category.delete({
+        await db.category.delete({
             where: { id }
         })
 

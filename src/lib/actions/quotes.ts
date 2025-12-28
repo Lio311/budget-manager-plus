@@ -1,7 +1,7 @@
 'use server'
 
-import { prisma } from '@/lib/db'
-import { currentUser } from '@clerk/nextjs/server'
+import { prisma, authenticatedPrisma } from '@/lib/db'
+import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 
 export interface QuoteFormData {
@@ -16,12 +16,14 @@ export interface QuoteFormData {
 
 export async function getQuotes(scope: string = 'BUSINESS') {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const quotes = await prisma.quote.findMany({
+        const db = await authenticatedPrisma(userId)
+
+        const quotes = await db.quote.findMany({
             where: {
-                userId: user.id,
+                userId,
                 scope
             },
             include: {
@@ -41,17 +43,19 @@ export async function getQuotes(scope: string = 'BUSINESS') {
 
 export async function getQuote(id: string) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const quote = await prisma.quote.findUnique({
+        const db = await authenticatedPrisma(userId)
+
+        const quote = await db.quote.findUnique({
             where: { id },
             include: {
                 client: true
             }
         })
 
-        if (!quote || quote.userId !== user.id) {
+        if (!quote || quote.userId !== userId) {
             throw new Error('Quote not found')
         }
 
@@ -64,16 +68,18 @@ export async function getQuote(id: string) {
 
 export async function createQuote(data: QuoteFormData, scope: string = 'BUSINESS') {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         const vatRate = data.vatRate ?? 0.18
         const vatAmount = data.subtotal * vatRate
         const total = data.subtotal + vatAmount
 
-        const quote = await prisma.quote.create({
+        const quote = await db.quote.create({
             data: {
-                userId: user.id,
+                userId,
                 clientId: data.clientId,
                 scope,
                 quoteNumber: data.quoteNumber,
@@ -104,12 +110,14 @@ export async function createQuote(data: QuoteFormData, scope: string = 'BUSINESS
 
 export async function updateQuote(id: string, data: Partial<QuoteFormData>) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.quote.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.quote.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Quote not found')
         }
 
@@ -131,7 +139,7 @@ export async function updateQuote(id: string, data: Partial<QuoteFormData>) {
             updateData.total = total
         }
 
-        const quote = await prisma.quote.update({
+        const quote = await db.quote.update({
             where: { id },
             data: updateData,
             include: {
@@ -152,16 +160,18 @@ export async function updateQuote(id: string, data: Partial<QuoteFormData>) {
 
 export async function updateQuoteStatus(id: string, status: 'DRAFT' | 'SENT' | 'ACCEPTED' | 'EXPIRED' | 'CANCELLED') {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.quote.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.quote.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Quote not found')
         }
 
-        const quote = await prisma.quote.update({
+        const quote = await db.quote.update({
             where: { id },
             data: { status },
             include: {
@@ -179,16 +189,18 @@ export async function updateQuoteStatus(id: string, status: 'DRAFT' | 'SENT' | '
 
 export async function deleteQuote(id: string) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.quote.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.quote.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Quote not found')
         }
 
-        await prisma.quote.delete({ where: { id } })
+        await db.quote.delete({ where: { id } })
 
         revalidatePath('/dashboard')
         return { success: true }
@@ -200,11 +212,13 @@ export async function deleteQuote(id: string) {
 
 export async function getNextQuoteNumber() {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const lastQuote = await prisma.quote.findFirst({
-            where: { userId: user.id },
+        const db = await authenticatedPrisma(userId)
+
+        const lastQuote = await db.quote.findFirst({
+            where: { userId },
             orderBy: { createdAt: 'desc' },
             select: { quoteNumber: true }
         })

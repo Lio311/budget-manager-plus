@@ -1,18 +1,23 @@
 'use server'
 
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 import { addMonths } from 'date-fns'
+import { auth } from '@clerk/nextjs/server'
 
 import { convertToILS } from '@/lib/currency'
 import { DEBT_TYPES } from '@/lib/constants/debt-types'
 
 export async function getDebts(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+
+        const db = await authenticatedPrisma(userId);
         const budget = await getCurrentBudget(month, year, '₪', type)
 
-        const debts = await prisma.debt.findMany({
+        const debts = await db.debt.findMany({
             where: { budgetId: budget.id },
             orderBy: { dueDay: 'asc' }
         })
@@ -107,7 +112,13 @@ async function createDebtInstallments(
         })
     }
 
-    await prisma.debt.createMany({
+    // Note: This helper is called from addDebt which handles auth.
+    // Ideally we should pass the db instance here.
+    const { userId } = await auth();
+    if (!userId) return;
+    const db = await authenticatedPrisma(userId);
+
+    await db.debt.createMany({
         data: installments
     })
 }
@@ -132,6 +143,10 @@ export async function addDebt(
     try {
         const budget = await getCurrentBudget(month, year, '₪', type)
 
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
         // Check if this is an installment-based debt
         if (data.isRecurring && data.totalDebtAmount && data.numberOfInstallments) {
             await createDebtInstallments(
@@ -148,7 +163,7 @@ export async function addDebt(
             )
         } else {
             // Regular single debt
-            await prisma.debt.create({
+            await db.debt.create({
                 data: {
                     budgetId: budget.id,
                     creditor: data.creditor,
@@ -184,7 +199,11 @@ export async function updateDebt(
     }
 ) {
     try {
-        await prisma.debt.update({
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
+        await db.debt.update({
             where: { id },
             data: {
                 creditor: data.creditor,
@@ -207,7 +226,11 @@ export async function updateDebt(
 
 export async function deleteDebt(id: string) {
     try {
-        await prisma.debt.delete({
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
+        await db.debt.delete({
             where: { id }
         })
 
@@ -221,7 +244,11 @@ export async function deleteDebt(id: string) {
 
 export async function toggleDebtPaid(id: string, isPaid: boolean) {
     try {
-        await prisma.debt.update({
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
+        await db.debt.update({
             where: { id },
             data: {
                 isPaid,

@@ -1,8 +1,9 @@
 'use server'
 
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@clerk/nextjs/server'
 
 export interface CategoryBudgetUsage {
     categoryId: string
@@ -21,20 +22,25 @@ export interface GetCategoryBudgetsResponse {
 
 export async function getCategoryBudgets(month: number, year: number): Promise<GetCategoryBudgetsResponse> {
     try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+
         const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
-        const categories = await prisma.category.findMany({
+        const categories = await db.category.findMany({
             where: {
                 userId: budget.userId,
                 type: { in: ['expense'] }, // Explicitly only expense
             }
         })
 
-        const categoryBudgets = await prisma.categoryBudget.findMany({
+        const categoryBudgets = await db.categoryBudget.findMany({
             where: { budgetId: budget.id }
         })
 
         // Calculate actual spending for each category
-        const expenses = await prisma.expense.groupBy({
+        const expenses = await db.expense.groupBy({
             by: ['category'],
             where: {
                 budgetId: budget.id
@@ -59,7 +65,7 @@ export async function getCategoryBudgets(month: number, year: number): Promise<G
         })
 
         // Calculate 4-Month Average Income (Current + 3 previous)
-        const incomeStats = await prisma.income.aggregate({
+        const incomeStats = await db.income.aggregate({
             _sum: { amount: true },
             where: {
                 budget: {
@@ -76,7 +82,7 @@ export async function getCategoryBudgets(month: number, year: number): Promise<G
         // Better approach: Find last 4 budgets explicitly
         // We need to handle year wrapping properly (e.g. month 1, year 2025 -> prev is 12/2024)
         // Let's use a raw query or just fetch budgets sorted by date descending?
-        const lastBudgets = await prisma.budget.findMany({
+        const lastBudgets = await db.budget.findMany({
             where: {
                 userId: budget.userId,
                 type: 'PERSONAL'
@@ -107,9 +113,14 @@ export async function getCategoryBudgets(month: number, year: number): Promise<G
 
 export async function updateCategoryLimit(month: number, year: number, categoryId: string, limit: number) {
     try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+
         const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
 
-        await prisma.categoryBudget.upsert({
+        await db.categoryBudget.upsert({
             where: {
                 budgetId_categoryId: {
                     budgetId: budget.id,
@@ -134,6 +145,11 @@ export async function updateCategoryLimit(month: number, year: number, categoryI
 
 export async function getSmartRecommendations(month: number, year: number) {
     try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+
         const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
 
         // 1. Get average spending for last 3 months
@@ -142,7 +158,7 @@ export async function getSmartRecommendations(month: number, year: number) {
         // Better: Fetch last 3 budgets and average their expenses per category.
 
         // Get categories first
-        const categories = await prisma.category.findMany({
+        const categories = await db.category.findMany({
             where: {
                 userId: budget.userId,
                 type: 'expense',
@@ -162,7 +178,7 @@ export async function getSmartRecommendations(month: number, year: number) {
             // Find stats for this category in previous months
             // This is a bit heavy, strictly speaking we should use raw SQL or optimized queries
             // But for MVP:
-            const stats = await prisma.expense.aggregate({
+            const stats = await db.expense.aggregate({
                 _avg: { amount: true },
                 _count: { id: true },
                 where: {
@@ -197,7 +213,7 @@ export async function getSmartRecommendations(month: number, year: number) {
         }
 
         // Try to improve: Get last 3 months sums
-        const last3Budgets = await prisma.budget.findMany({
+        const last3Budgets = await db.budget.findMany({
             where: {
                 userId: budget.userId,
                 type: 'PERSONAL',

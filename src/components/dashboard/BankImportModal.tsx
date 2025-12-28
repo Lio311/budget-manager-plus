@@ -73,9 +73,9 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
 
             // Expanded keywords mapping
             const keywords = {
-                date: ["תאריך", "date", "יום", "time"],
+                date: ["תאריך", "date", "יום", "time", "תאריך רכישה"],
                 desc: ["שם בית עסק", "שם בית העסק", "בית עסק", "תיאור", "desc", "merchant", "details", "פרטים", "שם"],
-                amount: ["סכום חיוב", "סכום", "amount", "total", "מחיר", "debit", "חיוב"],
+                amount: ["סכום חיוב", "סכום", "amount", "total", "מחיר", "debit", "חיוב", "סכום לחיוב", "סכום החיוב"],
                 billingAmount: ["סכום חיוב", "חיוב בפועל", "billing", "charge"],
                 branch: ["ענף", "קטגוריה", "category", "branch", "סוג"],
                 paymentMethod: ["אמצעי תשלום", "card", "method", "type", "כרטיס"]

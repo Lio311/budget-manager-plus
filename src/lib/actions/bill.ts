@@ -1,16 +1,21 @@
 'use server'
 
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@clerk/nextjs/server'
 
 import { convertToILS } from '@/lib/currency'
 
 export async function getBills(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+
+        const db = await authenticatedPrisma(userId);
         const budget = await getCurrentBudget(month, year, '₪', type)
 
-        const bills = await prisma.bill.findMany({
+        const bills = await db.bill.findMany({
             where: { budgetId: budget.id },
             orderBy: { dueDate: 'asc' }
         })
@@ -50,7 +55,11 @@ export async function addBill(
         // Create date object for the specific day in the budget month
         const dueDate = new Date(year, month - 1, data.dueDay)
 
-        const bill = await prisma.bill.create({
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
+        const bill = await db.bill.create({
             data: {
                 budgetId: budget.id,
                 name: data.name,
@@ -81,7 +90,11 @@ export async function updateBill(
     }
 ) {
     try {
-        const existingBill = await prisma.bill.findUnique({ where: { id } })
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
+        const existingBill = await db.bill.findUnique({ where: { id } })
         if (!existingBill) return { success: false, error: 'Bill not found' }
 
         let newDueDate = undefined
@@ -90,7 +103,7 @@ export async function updateBill(
             newDueDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), data.dueDay)
         }
 
-        const bill = await prisma.bill.update({
+        const bill = await db.bill.update({
             where: { id },
             data: {
                 ...(data.name && { name: data.name }),
@@ -111,7 +124,11 @@ export async function updateBill(
 
 export async function toggleBillPaid(id: string, isPaid: boolean) {
     try {
-        const bill = await prisma.bill.update({
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
+        const bill = await db.bill.update({
             where: { id },
             data: {
                 isPaid,
@@ -129,7 +146,11 @@ export async function toggleBillPaid(id: string, isPaid: boolean) {
 
 export async function deleteBill(id: string) {
     try {
-        await prisma.bill.delete({
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
+        await db.bill.delete({
             where: { id }
         })
 

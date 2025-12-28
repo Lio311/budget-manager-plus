@@ -1,16 +1,21 @@
 'use server'
 
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@clerk/nextjs/server'
 
 import { convertToILS } from '@/lib/currency'
 
 export async function getIncomes(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+
+        const db = await authenticatedPrisma(userId);
         const budget = await getCurrentBudget(month, year, '₪', type)
 
-        const incomes = await prisma.income.findMany({
+        const incomes = await db.income.findMany({
             where: { budgetId: budget.id },
             include: {
                 client: true,
@@ -62,7 +67,11 @@ export async function addIncome(
     try {
         const budget = await getCurrentBudget(month, year, '₪', type)
 
-        const income = await prisma.income.create({
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
+        const income = await db.income.create({
             data: {
                 budgetId: budget.id,
                 source: data.source,
@@ -164,26 +173,31 @@ async function createRecurringIncomes(
             const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate()
             const dayToUse = Math.min(dayOfMonth, lastDayOfMonth)
 
-            await prisma.income.create({
-                data: {
-                    budgetId: budget.id,
-                    source,
-                    category,
-                    amount,
-                    currency,
-                    date: new Date(currentYear, currentMonth - 1, dayToUse),
-                    isRecurring: true,
-                    recurringSourceId: sourceId,
-                    recurringStartDate: startDate,
-                    recurringEndDate: endDate,
-                    // Business Fields Copy
-                    clientId,
-                    paymentMethod,
-                    payer,
-                    vatRate,
-                    paymentTerms
-                }
-            })
+            // Fetch auth inside loop if not passed, but we should refactor.
+            const { userId } = await auth();
+            if (userId) {
+                const db = await authenticatedPrisma(userId);
+                await db.income.create({
+                    data: {
+                        budgetId: budget.id,
+                        source,
+                        category,
+                        amount,
+                        currency,
+                        date: new Date(currentYear, currentMonth - 1, dayToUse),
+                        isRecurring: true,
+                        recurringSourceId: sourceId,
+                        recurringStartDate: startDate,
+                        recurringEndDate: endDate,
+                        // Business Fields Copy
+                        clientId,
+                        paymentMethod,
+                        payer,
+                        vatRate,
+                        paymentTerms
+                    }
+                })
+            }
         } catch (error) {
             console.error(`Error creating recurring income for ${currentMonth}/${currentYear}:`, error)
         }
@@ -199,8 +213,13 @@ async function createRecurringIncomes(
 
 export async function cancelRecurringIncome(incomeId: string, fromMonth: number, fromYear: number) {
     try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
         // Get the income to find its recurringSourceId
-        const income = await prisma.income.findUnique({
+        // Use db to ensure RLS
+        const income = await db.income.findUnique({
             where: { id: incomeId }
         })
 
@@ -214,7 +233,7 @@ export async function cancelRecurringIncome(incomeId: string, fromMonth: number,
         // Delete all future recurring incomes with the same source
         const fromDate = new Date(fromYear, fromMonth - 1, 1)
 
-        await prisma.income.deleteMany({
+        await db.income.deleteMany({
             where: {
                 OR: [
                     { id: sourceId },
@@ -257,8 +276,12 @@ export async function updateIncome(
     mode: 'SINGLE' | 'FUTURE' = 'SINGLE'
 ) {
     try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
         if (mode === 'SINGLE') {
-            const income = await prisma.income.update({
+            const income = await db.income.update({
                 where: { id },
                 data: formatIncomeDataForUpdate(data)
             })
@@ -266,7 +289,7 @@ export async function updateIncome(
             return { success: true, data: income }
         } else {
             // FUTURE Mode
-            const currentIncome = await prisma.income.findUnique({ where: { id } })
+            const currentIncome = await db.income.findUnique({ where: { id } })
             if (!currentIncome) return { success: false, error: 'Income not found' }
 
             const sourceId = currentIncome.recurringSourceId || currentIncome.id
@@ -277,7 +300,7 @@ export async function updateIncome(
             const updateData = formatIncomeDataForUpdate(data)
             delete updateData.date
 
-            const updateResult = await prisma.income.updateMany({
+            const updateResult = await db.income.updateMany({
                 where: {
                     OR: [
                         { id: sourceId },
@@ -322,19 +345,23 @@ function formatIncomeDataForUpdate(data: any) {
 
 export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SINGLE') {
     try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
         if (mode === 'SINGLE') {
-            await prisma.income.delete({
+            await db.income.delete({
                 where: { id }
             })
         } else {
             // FUTURE Mode
-            const currentIncome = await prisma.income.findUnique({ where: { id } })
+            const currentIncome = await db.income.findUnique({ where: { id } })
             if (!currentIncome) return { success: false, error: 'Income not found' }
 
             const sourceId = currentIncome.recurringSourceId || currentIncome.id
             const fromDate = currentIncome.date || new Date()
 
-            await prisma.income.deleteMany({
+            await db.income.deleteMany({
                 where: {
                     OR: [
                         { id: sourceId },

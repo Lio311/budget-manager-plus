@@ -476,64 +476,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                             dataKey="name"
                                             interval={0}
                                             height={70}
-                                            tick={(props) => {
-                                                // Hide labels on mobile to prevent overlap
-                                                if (typeof window !== 'undefined' && window.innerWidth < 640) {
-                                                    return <g />; // Return empty SVG element instead of null
-                                                }
-
-                                                const { x, y, payload } = props;
-                                                const val = payload.value || '';
-
-                                                // Split into two lines only if there's a space (multi-word)
-                                                if (val.includes(' ')) {
-                                                    const words = val.split(' ');
-                                                    const mid = Math.ceil(words.length / 2);
-                                                    const line1 = words.slice(0, mid).join(' ');
-                                                    const line2 = words.slice(mid).join(' ');
-
-                                                    return (
-                                                        <g transform={`translate(${x},${y})`}>
-                                                            <text
-                                                                x={0}
-                                                                y={0}
-                                                                dy={8}
-                                                                textAnchor="middle"
-                                                                fill="#374151"
-                                                                style={{ fontSize: '11px', direction: 'rtl' }}
-                                                            >
-                                                                {line1}
-                                                            </text>
-                                                            <text
-                                                                x={0}
-                                                                y={0}
-                                                                dy={20}
-                                                                textAnchor="middle"
-                                                                fill="#374151"
-                                                                style={{ fontSize: '11px', direction: 'rtl' }}
-                                                            >
-                                                                {line2}
-                                                            </text>
-                                                        </g>
-                                                    );
-                                                }
-
-                                                // Single line for short text
-                                                return (
-                                                    <g transform={`translate(${x},${y})`}>
-                                                        <text
-                                                            x={0}
-                                                            y={0}
-                                                            dy={16}
-                                                            textAnchor="middle"
-                                                            fill="#374151"
-                                                            style={{ fontSize: '11px', direction: 'rtl' }}
-                                                        >
-                                                            {val}
-                                                        </text>
-                                                    </g>
-                                                );
-                                            }}
+                                            tick={() => <g />}
                                         />
                                         <YAxis
                                             tick={{ fill: '#374151', fontSize: 12 }}

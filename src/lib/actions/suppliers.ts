@@ -1,7 +1,7 @@
 'use server'
 
-import { prisma } from '@/lib/db'
-import { currentUser } from '@clerk/nextjs/server'
+import { prisma, authenticatedPrisma } from '@/lib/db'
+import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 
 export interface SupplierFormData {
@@ -16,12 +16,14 @@ export interface SupplierFormData {
 
 export async function getSuppliers(scope: string = 'BUSINESS') {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const suppliers = await prisma.supplier.findMany({
+        const db = await authenticatedPrisma(userId)
+
+        const suppliers = await db.supplier.findMany({
             where: {
-                userId: user.id,
+                userId,
                 scope
             },
             include: {
@@ -39,7 +41,7 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
         // Calculate total expenses per supplier
         const suppliersWithStats = await Promise.all(
             suppliers.map(async (supplier) => {
-                const totalExpenses = await prisma.expense.aggregate({
+                const totalExpenses = await db.expense.aggregate({
                     where: {
                         supplierId: supplier.id
                     },
@@ -64,10 +66,12 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
 
 export async function getSupplier(id: string) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const supplier = await prisma.supplier.findUnique({
+        const db = await authenticatedPrisma(userId)
+
+        const supplier = await db.supplier.findUnique({
             where: { id },
             include: {
                 expenses: {
@@ -77,7 +81,7 @@ export async function getSupplier(id: string) {
             }
         })
 
-        if (!supplier || supplier.userId !== user.id) {
+        if (!supplier || supplier.userId !== userId) {
             throw new Error('Supplier not found')
         }
 
@@ -90,12 +94,14 @@ export async function getSupplier(id: string) {
 
 export async function createSupplier(data: SupplierFormData, scope: string = 'BUSINESS') {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const supplier = await prisma.supplier.create({
+        const db = await authenticatedPrisma(userId)
+
+        const supplier = await db.supplier.create({
             data: {
-                userId: user.id,
+                userId,
                 scope,
                 name: data.name,
                 email: data.email,
@@ -120,16 +126,18 @@ export async function createSupplier(data: SupplierFormData, scope: string = 'BU
 
 export async function updateSupplier(id: string, data: SupplierFormData) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.supplier.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.supplier.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Supplier not found')
         }
 
-        const supplier = await prisma.supplier.update({
+        const supplier = await db.supplier.update({
             where: { id },
             data: {
                 name: data.name,
@@ -155,17 +163,19 @@ export async function updateSupplier(id: string, data: SupplierFormData) {
 
 export async function deleteSupplier(id: string) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.supplier.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.supplier.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Supplier not found')
         }
 
         // Check if supplier has associated expenses
-        const hasExpenses = await prisma.expense.count({ where: { supplierId: id } })
+        const hasExpenses = await db.expense.count({ where: { supplierId: id } })
 
         if (hasExpenses > 0) {
             return {
@@ -174,7 +184,7 @@ export async function deleteSupplier(id: string) {
             }
         }
 
-        await prisma.supplier.delete({ where: { id } })
+        await db.supplier.delete({ where: { id } })
 
         revalidatePath('/dashboard')
         return { success: true }
@@ -186,12 +196,14 @@ export async function deleteSupplier(id: string) {
 
 export async function getSupplierStats(supplierId: string, year: number) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const supplier = await prisma.supplier.findUnique({ where: { id: supplierId } })
-        if (!supplier || supplier.userId !== user.id) {
+        const supplier = await db.supplier.findUnique({ where: { id: supplierId } })
+        if (!supplier || supplier.userId !== userId) {
             throw new Error('Supplier not found')
         }
 
@@ -199,7 +211,7 @@ export async function getSupplierStats(supplierId: string, year: number) {
         const monthlyExpenses = await Promise.all(
             Array.from({ length: 12 }, async (_, i) => {
                 const month = i + 1
-                const result = await prisma.expense.aggregate({
+                const result = await db.expense.aggregate({
                     where: {
                         supplierId,
                         date: {
@@ -219,7 +231,7 @@ export async function getSupplierStats(supplierId: string, year: number) {
         )
 
         // Get total stats
-        const totalExpenses = await prisma.expense.aggregate({
+        const totalExpenses = await db.expense.aggregate({
             where: { supplierId },
             _sum: { amount: true },
             _count: true

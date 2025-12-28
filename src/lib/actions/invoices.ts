@@ -1,7 +1,7 @@
 'use server'
 
-import { prisma } from '@/lib/db'
-import { currentUser } from '@clerk/nextjs/server'
+import { prisma, authenticatedPrisma } from '@/lib/db'
+import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 
 export interface InvoiceFormData {
@@ -17,12 +17,14 @@ export interface InvoiceFormData {
 
 export async function getInvoices(scope: string = 'BUSINESS') {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const invoices = await prisma.invoice.findMany({
+        const db = await authenticatedPrisma(userId)
+
+        const invoices = await db.invoice.findMany({
             where: {
-                userId: user.id,
+                userId,
                 scope
             },
             include: {
@@ -42,10 +44,12 @@ export async function getInvoices(scope: string = 'BUSINESS') {
 
 export async function getInvoice(id: string) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const invoice = await prisma.invoice.findUnique({
+        const db = await authenticatedPrisma(userId)
+
+        const invoice = await db.invoice.findUnique({
             where: { id },
             include: {
                 client: true,
@@ -53,7 +57,7 @@ export async function getInvoice(id: string) {
             }
         })
 
-        if (!invoice || invoice.userId !== user.id) {
+        if (!invoice || invoice.userId !== userId) {
             throw new Error('Invoice not found')
         }
 
@@ -66,16 +70,18 @@ export async function getInvoice(id: string) {
 
 export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSINESS') {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         const vatRate = data.vatRate ?? 0.18
         const vatAmount = data.subtotal * vatRate
         const total = data.subtotal + vatAmount
 
-        const invoice = await prisma.invoice.create({
+        const invoice = await db.invoice.create({
             data: {
-                userId: user.id,
+                userId,
                 clientId: data.clientId,
                 scope,
                 invoiceNumber: data.invoiceNumber,
@@ -108,12 +114,14 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
 
 export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.invoice.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.invoice.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Invoice not found')
         }
 
@@ -137,7 +145,7 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
             updateData.total = total
         }
 
-        const invoice = await prisma.invoice.update({
+        const invoice = await db.invoice.update({
             where: { id },
             data: updateData,
             include: {
@@ -158,16 +166,18 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
 
 export async function updateInvoiceStatus(id: string, status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED', paidDate?: Date, paidAmount?: number) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.invoice.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.invoice.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Invoice not found')
         }
 
-        const invoice = await prisma.invoice.update({
+        const invoice = await db.invoice.update({
             where: { id },
             data: {
                 status,
@@ -189,17 +199,19 @@ export async function updateInvoiceStatus(id: string, status: 'DRAFT' | 'SENT' |
 
 export async function deleteInvoice(id: string) {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
 
         // Verify ownership
-        const existing = await prisma.invoice.findUnique({ where: { id } })
-        if (!existing || existing.userId !== user.id) {
+        const existing = await db.invoice.findUnique({ where: { id } })
+        if (!existing || existing.userId !== userId) {
             throw new Error('Invoice not found')
         }
 
         // Check if invoice has associated incomes
-        const hasIncomes = await prisma.income.count({ where: { invoiceId: id } })
+        const hasIncomes = await db.income.count({ where: { invoiceId: id } })
 
         if (hasIncomes > 0) {
             return {
@@ -208,7 +220,7 @@ export async function deleteInvoice(id: string) {
             }
         }
 
-        await prisma.invoice.delete({ where: { id } })
+        await db.invoice.delete({ where: { id } })
 
         revalidatePath('/dashboard')
         return { success: true }
@@ -220,11 +232,13 @@ export async function deleteInvoice(id: string) {
 
 export async function getNextInvoiceNumber() {
     try {
-        const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
 
-        const lastInvoice = await prisma.invoice.findFirst({
-            where: { userId: user.id },
+        const db = await authenticatedPrisma(userId)
+
+        const lastInvoice = await db.invoice.findFirst({
+            where: { userId },
             orderBy: { createdAt: 'desc' },
             select: { invoiceNumber: true }
         })

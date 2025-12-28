@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 
 interface MonthlyData {
@@ -17,7 +17,9 @@ export async function getNetWorthHistory(type: 'PERSONAL' | 'BUSINESS' = 'PERSON
         const { userId } = await auth()
         if (!userId) throw new Error('Unauthorized')
 
-        const user = await prisma.user.findUnique({
+        const db = await authenticatedPrisma(userId)
+
+        const user = await db.user.findUnique({
             where: { id: userId },
             select: { id: true, initialBalance: true, initialSavings: true }
         })
@@ -26,7 +28,7 @@ export async function getNetWorthHistory(type: 'PERSONAL' | 'BUSINESS' = 'PERSON
             return { success: true, data: [] } // No user found, return empty history
         }
 
-        const budgets = await prisma.budget.findMany({
+        const budgets = await db.budget.findMany({
             where: { userId: user.id, type } as any,
             select: {
                 month: true,

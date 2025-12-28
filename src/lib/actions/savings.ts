@@ -1,8 +1,9 @@
 'use server'
 
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@clerk/nextjs/server'
 import { startOfMonth, endOfMonth, addMonths, isBefore, isAfter } from 'date-fns'
 import { convertToILS } from '@/lib/currency'
 
@@ -45,8 +46,9 @@ async function createRecurringSavings(
     if (dates.length === 0) return []
 
     // 2. Fetch existing budgets for these months
+    const db = await authenticatedPrisma(userId);
     const years = Array.from(new Set(dates.map(d => d.getFullYear())))
-    const existingBudgets = await prisma.budget.findMany({
+    const existingBudgets = await db.budget.findMany({
         where: {
             userId: userId,
             year: { in: years },
@@ -74,13 +76,13 @@ async function createRecurringSavings(
     }
 
     if (budgetsToCreate.length > 0) {
-        await prisma.budget.createMany({
+        await db.budget.createMany({
             data: budgetsToCreate,
             skipDuplicates: true
         })
 
         // Re-fetch to get all IDs including new ones
-        const allBudgets = await prisma.budget.findMany({
+        const allBudgets = await db.budget.findMany({
             where: {
                 userId: userId,
                 year: { in: years },
@@ -116,7 +118,7 @@ async function createRecurringSavings(
     }).filter(s => s !== null)
 
     if (savingsData.length > 0) {
-        await prisma.saving.createMany({
+        await db.saving.createMany({
             data: savingsData as any // Type assertion needed sometimes if optional fields differ
         })
     }
@@ -126,9 +128,13 @@ async function createRecurringSavings(
 
 export async function getSavings(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+
+        const db = await authenticatedPrisma(userId);
         const budget = await getCurrentBudget(month, year, '₪', type)
 
-        const savings = await prisma.saving.findMany({
+        const savings = await db.saving.findMany({
             where: { budgetId: budget.id },
             orderBy: { createdAt: 'desc' }
         })
@@ -194,7 +200,11 @@ export async function addSaving(
             return { success: true, data: savings }
         }
 
-        const saving = await prisma.saving.create({
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
+        const saving = await db.saving.create({
             data: {
                 budgetId: budget.id,
                 category: data.category,
@@ -229,8 +239,12 @@ export async function updateSaving(
     mode: 'SINGLE' | 'FUTURE' = 'SINGLE'
 ) {
     try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
         if (mode === 'SINGLE') {
-            const saving = await prisma.saving.update({
+            const saving = await db.saving.update({
                 where: { id },
                 data: {
                     ...(data.category && { category: data.category }),
@@ -246,13 +260,13 @@ export async function updateSaving(
             return { success: true, data: saving }
         } else {
             // FUTURE Mode
-            const currentSaving = await prisma.saving.findUnique({ where: { id } })
+            const currentSaving = await db.saving.findUnique({ where: { id } })
             if (!currentSaving) return { success: false, error: 'Saving not found' }
 
             const sourceId = currentSaving.recurringSourceId || currentSaving.id
             const fromDate = currentSaving.targetDate || new Date()
 
-            const updateResult = await prisma.saving.updateMany({
+            const updateResult = await db.saving.updateMany({
                 where: {
                     OR: [
                         { id: sourceId },
@@ -283,19 +297,23 @@ export async function updateSaving(
 
 export async function deleteSaving(id: string, mode: 'SINGLE' | 'FUTURE' = 'SINGLE') {
     try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+        const db = await authenticatedPrisma(userId);
+
         if (mode === 'SINGLE') {
-            await prisma.saving.delete({
+            await db.saving.delete({
                 where: { id }
             })
         } else {
             // FUTURE Mode
-            const currentSaving = await prisma.saving.findUnique({ where: { id } })
+            const currentSaving = await db.saving.findUnique({ where: { id } })
             if (!currentSaving) return { success: false, error: 'Saving not found' }
 
             const sourceId = currentSaving.recurringSourceId || currentSaving.id
             const fromDate = currentSaving.targetDate || new Date()
 
-            await prisma.saving.deleteMany({
+            await db.saving.deleteMany({
                 where: {
                     OR: [
                         { id: sourceId },

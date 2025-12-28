@@ -1,7 +1,7 @@
 'use server'
 
 import { auth, currentUser } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 
 // Helper to serialize user for safe transport
 function serializeUser(user: any) {
@@ -72,9 +72,12 @@ export async function getCurrentBudget(month: number, year: number, currency: st
         console.log(`Getting budget for ${month}/${year} type: ${type}`)
         const user = await ensureUserExists()
 
+        // RLS: Get authenticated client
+        const db = await authenticatedPrisma(user.id)
+
         // Find or create budget using new compound key
         // @ts-ignore - Prisma types might be stale in dev environment
-        let budget = await prisma.budget.findUnique({
+        let budget = await db.budget.findUnique({
             where: {
                 userId_month_year_type: {
                     userId: user.id,
@@ -88,7 +91,7 @@ export async function getCurrentBudget(month: number, year: number, currency: st
         if (!budget) {
             console.log('Creating new budget for user:', user.id, 'month:', month, 'year:', year, 'type:', type)
             // @ts-ignore
-            budget = await prisma.budget.create({
+            budget = await db.budget.create({
                 data: {
                     userId: user.id,
                     month,

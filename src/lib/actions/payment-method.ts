@@ -1,7 +1,7 @@
 'use server'
 
 import { auth } from '@clerk/nextjs/server'
-import { prisma } from '@/lib/db'
+import { prisma, authenticatedPrisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 
 export async function getPaymentMethods() {
@@ -9,8 +9,9 @@ export async function getPaymentMethods() {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'User not authenticated' }
 
+        const db = await authenticatedPrisma(userId)
 
-        const methods = await prisma.userPaymentMethod.findMany({
+        const methods = await db.userPaymentMethod.findMany({
             where: { userId },
             orderBy: { name: 'asc' }
         })
@@ -27,8 +28,10 @@ export async function addPaymentMethod(name: string) {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'User not authenticated' }
 
+        const db = await authenticatedPrisma(userId)
+
         // Check if exists
-        const existing = await prisma.userPaymentMethod.findFirst({
+        const existing = await db.userPaymentMethod.findFirst({
             where: { userId, name }
         })
 
@@ -36,7 +39,7 @@ export async function addPaymentMethod(name: string) {
             return { success: true, data: existing }
         }
 
-        const method = await prisma.userPaymentMethod.create({
+        const method = await db.userPaymentMethod.create({
             data: {
                 userId,
                 name: name.trim()
