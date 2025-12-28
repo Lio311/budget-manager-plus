@@ -532,7 +532,7 @@ export function IncomeTab() {
                             <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-blue-200 transition-all border-l-4 border-l-blue-100">
                                 {editingId === income.id ? (
                                     <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             <Input placeholder="תיאור" value={editData.source} onChange={e => setEditData({ ...editData, source: e.target.value })} />
                                             <Input placeholder="התקבל מ..." value={editData.payer} onChange={e => setEditData({ ...editData, payer: e.target.value })} />
                                         </div>
@@ -543,7 +543,7 @@ export function IncomeTab() {
                                                 color={isBusiness ? 'blue' : 'green'}
                                             />
                                         </div>
-                                        <div className="grid grid-cols-3 gap-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                             <Input type="number" value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} />
                                             <select className="p-2 border rounded-lg bg-white text-sm" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
                                                 {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
@@ -578,7 +578,7 @@ export function IncomeTab() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-1.5 sm:gap-3 text-[11px] text-[#676879] overflow-hidden whitespace-nowrap">
+                                                <div className="flex flex-wrap sm:flex-nowrap items-center gap-x-1.5 sm:gap-3 text-[11px] text-[#676879] overflow-hidden">
                                                     <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                     <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
                                                     <span className="truncate">{income.category}</span>

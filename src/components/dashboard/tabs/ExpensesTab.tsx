@@ -59,6 +59,17 @@ interface ExpenseData {
     totalILS: number
 }
 
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+    'CASH': 'מזומן',
+    'CREDIT_CARD': 'כרטיס אשראי',
+    'BANK_TRANSFER': 'העברה בנקאית',
+    'CHECK': 'צ׳ק',
+    'BIT': 'ביט',
+    'OTHER': 'אחר',
+    'PAYPAL': 'PayPal'
+}
+
+
 const getCategoryIcon = (name: string) => {
     const trimmed = name?.trim() || '';
     const lower = trimmed.toLowerCase();
@@ -741,7 +752,7 @@ export function ExpensesTab() {
                                                         {exp.paymentMethod && (
                                                             <>
                                                                 <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                                <span className="truncate">{exp.paymentMethod}</span>
+                                                                <span className="truncate">{PAYMENT_METHOD_LABELS[exp.paymentMethod] || exp.paymentMethod}</span>
                                                             </>
                                                         )}
                                                     </div>

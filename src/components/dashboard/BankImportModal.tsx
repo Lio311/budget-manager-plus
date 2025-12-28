@@ -206,7 +206,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                         description: String(descRaw || 'ללא תיאור').replace(/[\r\n]+/g, ' ').trim(),
                         amount: parseAmount(amountRaw),
                         billingAmount: billingAmount,
-                        paymentMethod: 'CREDIT_CARD', // Default assumption
+                        paymentMethod: 'כרטיס אשראי', // Default assumption
                         branchName: branchRaw ? String(branchRaw).trim() : undefined
                     })
                 }
