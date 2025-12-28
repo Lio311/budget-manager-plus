@@ -474,10 +474,22 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                         <XAxis
                                             dataKey="name"
-                                            tick={{ fill: '#374151', fontSize: 12 }}
+                                            tick={({ x, y, payload }) => (
+                                                <g transform={`translate(${x},${y})`}>
+                                                    <text
+                                                        x={0}
+                                                        y={0}
+                                                        dy={16}
+                                                        textAnchor="end"
+                                                        fill="#374151"
+                                                        transform="rotate(-45)"
+                                                        style={{ direction: 'rtl', unicodeBidi: 'plaintext' }} // Force RTL rendering
+                                                    >
+                                                        {payload.value.split('').reverse().join('')}
+                                                    </text>
+                                                </g>
+                                            )}
                                             interval={0}
-                                            angle={-45}
-                                            textAnchor="end"
                                             height={60}
                                         />
                                         <YAxis

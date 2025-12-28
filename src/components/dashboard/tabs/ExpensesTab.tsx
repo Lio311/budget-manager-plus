@@ -60,7 +60,7 @@ interface ExpenseData {
 }
 
 const getCategoryIcon = (name: string) => {
-    switch (name) {
+    switch (name?.trim()) {
         case 'מזון': return <Utensils className="h-4 w-4" />
         case 'תחבורה': return <Bus className="h-4 w-4" />
         case 'בילויים': return <Popcorn className="h-4 w-4" />
@@ -77,7 +77,10 @@ const getCategoryIcon = (name: string) => {
         case 'חופשה': return <Plane className="h-4 w-4" />
         case 'ביטוחים': return <Shield className="h-4 w-4" />
         case 'ספורט': return <Dumbbell className="h-4 w-4" />
-        default: return <span className="text-xs font-bold">{name.charAt(0)}</span>
+        case 'הוצאה קבועה': return <RefreshCw className="h-4 w-4" />
+        case 'ביגוד':
+        case 'בגדים': return <ShoppingCart className="h-4 w-4" />
+        default: return <span className="text-xs font-bold">{typeof name === 'string' ? name.charAt(0) : '?'}</span>
     }
 }
 
