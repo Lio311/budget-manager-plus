@@ -590,14 +590,14 @@ export function IncomeTab() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-2 sm:gap-6">
+                                        <div className="flex items-center gap-2 sm:gap-6 shrink-0 pl-1">
                                             {isBusiness && income.vatAmount > 0 && (
                                                 <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
                                                     <span>מע"מ: {formatCurrency(income.vatAmount, getCurrencySymbol(income.currency))}</span>
                                                     <span>נקי: {formatCurrency(income.amount - income.vatAmount, getCurrencySymbol(income.currency))}</span>
                                                 </div>
                                             )}
-                                            <div className="text-right shrink-0">
+                                            <div className="text-right">
                                                 <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-blue-600' : 'text-[#00c875]'}`}>
                                                     {formatCurrency(income.amount, getCurrencySymbol(income.currency || 'ILS'))}
                                                 </div>
