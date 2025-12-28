@@ -268,13 +268,7 @@ export async function updateSaving(
                     ...(data.monthlyDeposit && { monthlyDeposit: data.monthlyDeposit }),
                     ...(data.currency && { currency: data.currency }),
                     ...(data.goal && { notes: data.goal }),
-                    ...(data.date && { targetDate: data.date }), // This might be tricky for batch updates if date changes, but assuming relative change logic is not requested yet.
-                    // Wait, if I change the date of one, do I change the date of all future ones?
-                    // Typically "Edit Series" implies modifying attributes like Amount/Category/Description.
-                    // Modifying DATE in a recurring series usually implies a shift, which is complex.
-                    // For now, I will EXCLUDE date from batch update to avoid collapsing all future recursion into a single date.
-                    // But if the user corrects the date of THIS month, maybe they want to shift all?
-                    // Let's safe-guard: do NOT update dates in batch mode.
+                    // Exclude targetDate to prevent collapsing recurring dates to a single date
                     ...(data.paymentMethod && { paymentMethod: data.paymentMethod })
                 }
             })
