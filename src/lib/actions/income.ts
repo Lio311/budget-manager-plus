@@ -272,6 +272,11 @@ export async function updateIncome(
             const sourceId = currentIncome.recurringSourceId || currentIncome.id
             const fromDate = currentIncome.date || new Date()
 
+            // Prepare data but REMOVE date to prevent collapsing all future records to the same single date
+            // Unless we implement complex shifting logic, date should not be updated in bulk for recurrence
+            const updateData = formatIncomeDataForUpdate(data)
+            delete updateData.date
+
             const updateResult = await prisma.income.updateMany({
                 where: {
                     OR: [
@@ -282,7 +287,7 @@ export async function updateIncome(
                         gte: fromDate
                     }
                 },
-                data: formatIncomeDataForUpdate(data)
+                data: updateData
             })
 
             revalidatePath('/dashboard')
@@ -312,7 +317,7 @@ function formatIncomeDataForUpdate(data: any) {
         paymentMethod: data.paymentMethod,
         paymentTerms: data.paymentTerms,
         payer: data.payer
-    }
+    } as any // Cast to any to allow property deletion upstream
 }
 
 export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SINGLE') {
