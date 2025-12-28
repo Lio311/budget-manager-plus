@@ -352,8 +352,6 @@ export function IncomeTab() {
             }
         } else if (pendingAction.type === 'edit') {
             await executeUpdate(mode)
-                ```
-            }
         }
         setPendingAction(null)
     }
