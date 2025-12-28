@@ -165,13 +165,7 @@ export function BudgetLimitsTab() {
     const totalPages = Math.ceil(activeBudgets.length / itemsPerPage)
     const paginatedBudgets = activeBudgets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
-    if (loading) {
-        return (
-            <div className="flex h-[50vh] w-full items-center justify-center">
-                <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            </div>
-        )
-    }
+
 
     return (
         <div className="space-y-6 pb-20" dir="rtl">
@@ -240,95 +234,102 @@ export function BudgetLimitsTab() {
             </div>
 
             <div className="grid gap-3">
-                {paginatedBudgets.map(budget => {
-                    const percentage = budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0
-                    const isOverBudget = percentage > 100
+                {loading ? (
+                    <div className="flex flex-col gap-3">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="h-24 bg-gray-100 rounded-xl animate-pulse" />
+                        ))}
+                    </div>
+                ) : (
+                    paginatedBudgets.map(budget => {
+                        const percentage = budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0
+                        const isOverBudget = percentage > 100
 
-                    return (
-                        <div key={budget.categoryId} className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
-                            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
-                                {getCategoryIcon(budget.categoryName)}
-                            </div>
+                        return (
+                            <div key={budget.categoryId} className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
+                                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                                    {getCategoryIcon(budget.categoryName)}
+                                </div>
 
-                            <div className="flex-1 space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <div className="font-semibold text-gray-900 text-lg">{budget.categoryName}</div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="text-sm font-medium text-gray-500 font-mono flex items-center gap-1" dir="ltr">
-                                            <span>₪{budget.spent.toLocaleString()}</span>
-                                            <span>/</span>
-                                            <span>₪{budget.limit.toLocaleString()}</span>
+                                <div className="flex-1 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <div className="font-semibold text-gray-900 text-lg">{budget.categoryName}</div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="text-sm font-medium text-gray-500 font-mono flex items-center gap-1" dir="ltr">
+                                                <span>₪{budget.spent.toLocaleString()}</span>
+                                                <span>/</span>
+                                                <span>₪{budget.limit.toLocaleString()}</span>
+                                            </div>
+
+                                            {/* Edit Button */}
+                                            <BudgetEditPopover
+                                                initialLimit={budget.limit}
+                                                onCommit={(val) => handleLimitCommit(budget.categoryId, [val])}
+                                            />
+
+                                            {/* Delete Button */}
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-7 w-7 text-gray-400 hover:text-red-500"
+                                                            onClick={() => {
+                                                                if (confirm('האם לבטל את הגבלת התקציב לקטגוריה זו?')) {
+                                                                    handleLimitCommit(budget.categoryId, [0])
+                                                                    setNewlyAddedIds(prev => prev.filter(id => id !== budget.categoryId))
+                                                                }
+                                                            }}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>מחק תקציב</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+
                                         </div>
-
-                                        {/* Edit Button */}
-                                        <BudgetEditPopover
-                                            initialLimit={budget.limit}
-                                            onCommit={(val) => handleLimitCommit(budget.categoryId, [val])}
-                                        />
-
-                                        {/* Delete Button */}
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-7 w-7 text-gray-400 hover:text-red-500"
-                                                        onClick={() => {
-                                                            if (confirm('האם לבטל את הגבלת התקציב לקטגוריה זו?')) {
-                                                                handleLimitCommit(budget.categoryId, [0])
-                                                                setNewlyAddedIds(prev => prev.filter(id => id !== budget.categoryId))
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>מחק תקציב</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-
                                     </div>
-                                </div>
 
-                                <Slider
-                                    value={[budget.limit]}
-                                    max={Math.max(5000, avgIncome || 0)}
-                                    step={50}
-                                    onValueChange={(val) => handleLimitChange(budget.categoryId, val)}
-                                    onValueCommit={(val) => handleLimitCommit(budget.categoryId, val)}
-                                    className="py-2 cursor-pointer"
-                                    dir="rtl"
-                                />
-
-                                <div className="relative pt-1">
-                                    <div className="flex items-center justify-between text-xs mb-1">
-                                        <span className={cn(
-                                            "font-medium",
-                                            isOverBudget ? "text-red-600" : "text-gray-600"
-                                        )}>
-                                            {Math.round(percentage)}% נוצל
-                                        </span>
-                                        <span className="text-gray-400">
-                                            נותרו {formatCurrency(Math.max(0, budget.limit - budget.spent))}
-                                        </span>
-                                    </div>
-                                    <Progress
-                                        value={Math.min(100, percentage)}
-                                        className={cn("h-2 rotate-180", isOverBudget ? "bg-red-100" : "bg-gray-100")}
-                                        indicatorClassName={cn(
-                                            isOverBudget ? "bg-red-500" :
-                                                percentage > 85 ? "bg-orange-500" : "bg-blue-600"
-                                        )}
+                                    <Slider
+                                        value={[budget.limit]}
+                                        max={Math.max(5000, avgIncome || 0)}
+                                        step={50}
+                                        onValueChange={(val) => handleLimitChange(budget.categoryId, val)}
+                                        onValueCommit={(val) => handleLimitCommit(budget.categoryId, val)}
+                                        className="py-2 cursor-pointer"
+                                        dir="rtl"
                                     />
+
+                                    <div className="relative pt-1">
+                                        <div className="flex items-center justify-between text-xs mb-1">
+                                            <span className={cn(
+                                                "font-medium",
+                                                isOverBudget ? "text-red-600" : "text-gray-600"
+                                            )}>
+                                                {Math.round(percentage)}% נוצל
+                                            </span>
+                                            <span className="text-gray-400">
+                                                נותרו {formatCurrency(Math.max(0, budget.limit - budget.spent))}
+                                            </span>
+                                        </div>
+                                        <Progress
+                                            value={Math.min(100, percentage)}
+                                            className={cn("h-2 rotate-180", isOverBudget ? "bg-red-100" : "bg-gray-100")}
+                                            indicatorClassName={cn(
+                                                isOverBudget ? "bg-red-500" :
+                                                    percentage > 85 ? "bg-orange-500" : "bg-blue-600"
+                                            )}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )
-                })}
-
+                        )
+                    })}
+                )}
                 {activeBudgets.length === 0 && (
                     <div className="text-center py-10 text-gray-400 border-2 border-dashed border-gray-100 rounded-xl">
                         <p>אין תקציבים פעילים לחודש זה.</p>
