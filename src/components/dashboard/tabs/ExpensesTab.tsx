@@ -658,7 +658,7 @@ export function ExpensesTab() {
                             const usage = getUsage(exp.category)
 
                             return (
-                                <div key={exp.id} className="glass-panel p-3 sm:p-4 hover:shadow-md transition-all group relative overflow-hidden">
+                                <div key={exp.id} className="glass-panel p-3 sm:p-4 hover:shadow-md transition-all group relative">
                                     {editingId === exp.id ? (
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-2 gap-3">
