@@ -381,6 +381,17 @@ export function ExpensesTab() {
         const trimmed = catName?.trim() || '';
         const needsFallback = !c || c.includes('bg-gray') || c.includes('text-gray-700')
 
+        // Debug logging for problematic categories
+        if (trimmed.includes('ספורט') || trimmed.includes('ביטוח') || trimmed.includes('אפליקציות') || trimmed.includes('מינוי')) {
+            console.log('🔍 Category Debug:', {
+                name: catName,
+                trimmed,
+                foundInDB: !!cat,
+                colorFromDB: c,
+                needsFallback
+            })
+        }
+
         if (needsFallback) {
             // Smart fallbacks for common categories
             if (trimmed.includes('ספורט')) {
