@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,7 @@ import { InvoicesTab } from './tabs/InvoicesTab'
 import { QuotesTab } from './tabs/QuotesTab'
 import { BudgetLimitsTab } from './tabs/BudgetLimitsTab'
 import { useBudget } from '@/contexts/BudgetContext'
+import { mutate } from 'swr'
 
 interface DashboardTabsProps {
     mobileMenuOpen: boolean
@@ -24,12 +26,26 @@ interface DashboardTabsProps {
 }
 
 export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTabsProps) {
-    const [activeTab, setActiveTab] = useState('overview')
+    const router = useRouter()
+    const searchParams = useSearchParams()
     const { budgetType } = useBudget()
 
+    // Get tab from URL or default to 'overview'
+    const urlTab = searchParams.get('tab')
+    const [activeTab, setActiveTab] = useState(urlTab || 'overview')
+
+    // Update active tab when URL changes (e.g., browser back/forward)
+    useEffect(() => {
+        if (urlTab && urlTab !== activeTab) {
+            setActiveTab(urlTab)
+        }
+    }, [urlTab])
+
+    // Reset to overview when budget type changes
     useEffect(() => {
         setActiveTab('overview')
-    }, [budgetType])
+        router.push('/dashboard?tab=overview', { scroll: false })
+    }, [budgetType, router])
 
     const personalTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
@@ -58,6 +74,12 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     const handleTabChange = (value: string) => {
         setActiveTab(value)
         setMobileMenuOpen(false)
+
+        // Update URL without page reload
+        router.push(`/dashboard?tab=${value}`, { scroll: false })
+
+        // Refresh SWR data for the new tab
+        mutate(key => typeof key === 'string' && key.includes(value))
     }
 
     return (
