@@ -374,11 +374,24 @@ export function ExpensesTab() {
     )
 
     const getCategoryColor = (catName: string) => {
+        const trimmed = catName?.trim() || '';
+
+        // FORCE specific colors for known categories (override DB)
+        if (trimmed.includes('ספורט')) {
+            return 'bg-green-500 text-white border-green-600'
+        }
+        if (trimmed.includes('ביטוח')) {
+            return 'bg-blue-500 text-white border-blue-600'
+        }
+        if (trimmed.includes('אפליקציות') || trimmed.includes('מינוי')) {
+            return 'bg-purple-500 text-white border-purple-600'
+        }
+
+        // For other categories, use DB color or fallbacks
         const cat = categories.find(c => c.name === catName)
         let c = cat?.color
 
         // Apply smart fallbacks if no color OR if color is gray (default)
-        const trimmed = catName?.trim() || '';
         const needsFallback = !c || c.includes('bg-gray') || c.includes('text-gray-700')
 
         // Debug logging for problematic categories
@@ -394,13 +407,7 @@ export function ExpensesTab() {
 
         if (needsFallback) {
             // Smart fallbacks for common categories
-            if (trimmed.includes('ספורט')) {
-                c = 'bg-green-500 text-white border-green-600'
-            } else if (trimmed.includes('ביטוח')) {
-                c = 'bg-blue-500 text-white border-blue-600'
-            } else if (trimmed.includes('אפליקציות') || trimmed.includes('מינוי')) {
-                c = 'bg-purple-500 text-white border-purple-600'
-            } else if (trimmed.includes('מזון') || trimmed.includes('אוכל')) {
+            if (trimmed.includes('מזון') || trimmed.includes('אוכל')) {
                 c = 'bg-orange-500 text-white border-orange-600'
             } else if (trimmed.includes('תחבורה')) {
                 c = 'bg-cyan-500 text-white border-cyan-600'
