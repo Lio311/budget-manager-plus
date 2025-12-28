@@ -471,7 +471,7 @@ export function ExpensesTab() {
             {/* Split View */}
             <div className="grid gap-4 lg:grid-cols-12">
                 {/* Add Form */}
-                <div className="lg:col-span-5 glass-panel p-5 h-fit sticky top-4">
+                <div className="lg:col-span-5 glass-panel p-5 h-fit lg:sticky lg:top-4">
                     <div className="mb-4 flex items-center gap-2">
                         <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`} />
                         <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
@@ -518,6 +518,7 @@ export function ExpensesTab() {
                                     className={`w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'} outline-none`}
                                     value={newExpense.category}
                                     onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+                                    style={{ position: 'relative' }}
                                 >
                                     <option value="" disabled>בחר קטגוריה</option>
                                     {categories.map(cat => (
