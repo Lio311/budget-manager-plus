@@ -375,13 +375,19 @@ export function ExpensesTab() {
 
     const getCategoryColor = (catName: string) => {
         const cat = categories.find(c => c.name === catName)
-        let c = cat?.color || 'bg-gray-100 text-gray-700 border-gray-200'
+        let c = cat?.color || 'bg-gray-500 text-white border-gray-600'
 
         if (c.includes('bg-') && c.includes('-100')) {
             c = c.replace(/bg-(\w+)-100/g, 'bg-$1-500')
                 .replace(/text-(\w+)-700/g, 'text-white')
                 .replace(/border-(\w+)-200/g, 'border-transparent')
         }
+
+        // Ensure text-white is always present for icon visibility
+        if (!c.includes('text-white')) {
+            c += ' text-white'
+        }
+
         return c
     }
 
