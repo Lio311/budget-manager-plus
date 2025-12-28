@@ -643,7 +643,12 @@ export function ExpensesTab() {
 
                         <div className="flex items-start gap-4 p-4 border border-gray-100 rounded-xl bg-gray-50/50 w-full">
                             <div className="flex items-center gap-2">
-                                <Checkbox id="recurring-expense" checked={newExpense.isRecurring} onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })} className={`data-[state=checked]:${isBusiness ? 'bg-orange-600 border-orange-600' : 'bg-[#e2445c] border-[#e2445c]'}`} />
+                                <Checkbox
+                                    id="recurring-expense"
+                                    checked={newExpense.isRecurring}
+                                    onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })}
+                                    className={isBusiness ? 'data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600' : 'data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600'}
+                                />
                                 <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338]">הוצאה קבועה</label>
                             </div>
                             {newExpense.isRecurring && (
