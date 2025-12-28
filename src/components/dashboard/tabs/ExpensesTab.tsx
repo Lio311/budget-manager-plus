@@ -60,7 +60,10 @@ interface ExpenseData {
 }
 
 const getCategoryIcon = (name: string) => {
-    switch (name?.trim()) {
+    const trimmed = name?.trim() || '';
+    if (trimmed.includes('אפליקציות')) return <Smartphone className="h-4 w-4" />
+
+    switch (trimmed) {
         case 'מזון': return <Utensils className="h-4 w-4" />
         case 'תחבורה': return <Bus className="h-4 w-4" />
         case 'בילויים': return <Popcorn className="h-4 w-4" />

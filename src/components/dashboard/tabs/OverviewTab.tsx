@@ -452,7 +452,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <div className="mb-2">
                             <h3 className="text-base font-bold text-[#323338]">הוצאות לפי קטגוריה</h3>
                         </div>
-                        <div className="h-[300px] w-full" dir="ltr">
+                        <div className="h-[300px] w-full" style={{ direction: 'ltr' }}>
                             {loading ? (
                                 <div className="h-full flex items-center justify-center">
                                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -474,21 +474,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                         <XAxis
                                             dataKey="name"
-                                            tick={({ x, y, payload }) => (
-                                                <g transform={`translate(${x},${y})`}>
-                                                    <text
-                                                        x={0}
-                                                        y={0}
-                                                        dy={16}
-                                                        textAnchor="end"
-                                                        fill="#374151"
-                                                        transform="rotate(-45)"
-                                                        style={{ direction: 'rtl', unicodeBidi: 'plaintext' }} // Force RTL rendering
-                                                    >
-                                                        {payload.value.split('').reverse().join('')}
-                                                    </text>
-                                                </g>
-                                            )}
+                                            tick={{ fill: '#374151', fontSize: 12 }}
                                             interval={0}
                                             height={60}
                                         />

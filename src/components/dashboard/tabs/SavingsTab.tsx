@@ -467,6 +467,7 @@ export function SavingsTab() {
                             <PaymentMethodSelector
                                 value={newSaving.paymentMethod}
                                 onChange={(val) => setNewSaving({ ...newSaving, paymentMethod: val })}
+                                color="blue"
                             />
                         </div>
 
@@ -597,6 +598,7 @@ export function SavingsTab() {
                                                 <PaymentMethodSelector
                                                     value={editData.paymentMethod}
                                                     onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
+                                                    color="blue"
                                                 />
                                             </div>
 
