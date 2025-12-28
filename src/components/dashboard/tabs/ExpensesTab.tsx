@@ -511,7 +511,7 @@ export function ExpensesTab() {
             </div>
 
             {/* Split View */}
-            <div className="grid gap-4 lg:grid-cols-12 max-w-full overflow-hidden">
+            <div className="grid gap-4 lg:grid-cols-12">
                 {/* Add Form */}
                 <div className="lg:col-span-5 glass-panel p-5 h-fit lg:sticky lg:top-4">
                     <div className="mb-4 flex items-center gap-2">
