@@ -340,14 +340,7 @@ export function SavingsTab() {
         return colorClass
     };
 
-};
 
-return (
-    <div className="p-4">
-        Test Savings Tab
-    </div>
-)
-    /*
     return (
         <div className="space-y-6 w-full pb-10 px-2 md:px-0" dir="rtl">
              {/* Summary Cards */}
