@@ -19,17 +19,51 @@ export default clerkMiddleware(async (auth, req) => {
         return;
     }
 
-    // Check maintenance mode from environment variable
-    // Note: We removed the dynamic DB check via fetch because it causes instability in Vercel Edge Runtime (fetch failures)
-    // To enable maintenance mode, set MAINTENANCE_MODE=true in Vercel Environment Variables.
-    const isMaintenance = process.env.MAINTENANCE_MODE === 'true';
+    // Check maintenance mode from environment variable AND database via API
+    // We use fetch with a timeout to prevent blocking the edge function for too long
+    let isMaintenance = process.env.MAINTENANCE_MODE === 'true';
+    let isAdmin = false;
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 800); // 800ms timeout
+
+        // We must reach out to the full URL because this is running on the server/edge
+        const maintenanceUrl = new URL('/api/maintenance/status', req.url);
+
+        // Pass the user ID cookie if available to check admin status
+        // Note: We can't easily access the full auth session in middleware without expensive calls,
+        // so we might need to rely on the API to verify the user from the request headers/cookies forward
+        // However, standard fetch from middleware might not forward cookies automatically.
+        // Let's try to forward headers.
+
+        const response = await fetch(maintenanceUrl, {
+            headers: {
+                cookie: req.headers.get('cookie') || ''
+            },
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+            const data = await response.json();
+            isMaintenance = data.enabled || isMaintenance; // DB takes precedence if true, or keeps Env true
+            isAdmin = data.isAdmin || false;
+        }
+    } catch (error) {
+        // Fallback to environment variable if fetch fails (timeout or error)
+        console.error('Maintenance check failed, using fallback:', error);
+    }
 
     if (isMaintenance) {
-        // Allow admins to bypass maintenance mode for ALL routes if we could check it,
-        // but since we removed the fetch, we can only rely on the path or maybe a cookie?
-        // For now, simple logic: All users blocked if Env Var is true.
-        // Or maybe check if path starts with /admin to allow access to admin panel at least?
-        if (pathname.startsWith('/admin') || pathname.startsWith('/sign-in')) {
+        // Allow admins to bypass
+        if (isAdmin) {
+            return;
+        }
+
+        // Allow sign-in routes explicitly so admins can login
+        if (pathname.startsWith('/sign-in') || pathname.startsWith('/admin')) {
             return;
         }
 
