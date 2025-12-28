@@ -395,13 +395,9 @@ export function BillsTab() {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex justify-end gap-1 mt-1">
-                                                    <Button size="icon" variant="ghost" onClick={handleUpdate} className="h-8 w-8 text-green-600 hover:bg-green-50 hover:text-green-700 rounded-full">
-                                                        <Check className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button size="icon" variant="ghost" onClick={handleCancelEdit} className="h-8 w-8 text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-full">
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
+                                                <div className="flex justify-end gap-2 mt-2">
+                                                    <Button size="sm" variant="outline" onClick={handleCancelEdit}>ביטול</Button>
+                                                    <Button size="sm" onClick={handleUpdate} className="bg-orange-500 hover:bg-orange-600 text-white">שמור שינויים</Button>
                                                 </div>
                                             </div>
                                         ) : (
