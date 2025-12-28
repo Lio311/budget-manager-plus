@@ -755,7 +755,7 @@ export function ExpensesTab() {
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] overflow-hidden whitespace-nowrap">
+                                                    <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] flex-wrap">
                                                         <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                         <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
                                                         <span className="truncate">{exp.category}</span>
