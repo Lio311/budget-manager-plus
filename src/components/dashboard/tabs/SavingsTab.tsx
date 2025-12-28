@@ -613,42 +613,41 @@ export function SavingsTab() {
                                         </div>
                                     ) : (
                                         <>
-                                            <div className="flex items-center gap-3 w-full sm:w-auto overflow-hidden">
+                                            <div className="flex items-start gap-3 w-full sm:w-auto">
                                                 <div className="shrink-0">
                                                     <span className={`monday-pill ${getCategoryColor(saving.category)} opacity-90 text-xs sm:text-sm`}>
                                                         {saving.category}
                                                     </span>
                                                 </div>
 
-                                                <div className="flex flex-col min-w-0">
-                                                    {/* Description and Date on the same line, Description right of Date */}
-                                                    <div className="flex items-center gap-2 text-[#323338]">
-                                                        <span className="font-bold text-sm sm:text-base truncate">{saving.name}</span>
-                                                        <span className="text-gray-400">|</span>
-                                                        <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-[#676879] overflow-hidden">
-                                                            <span>
-                                                                {(() => {
-                                                                    try {
-                                                                        const dateToFormat = saving.targetDate
-                                                                        return dateToFormat ? format(new Date(dateToFormat), 'dd/MM/yyyy') : 'תאריך חסר'
-                                                                    } catch (e) {
-                                                                        return 'תאריך לא תקין'
-                                                                    }
-                                                                })()}
-                                                            </span>
-                                                            {saving.notes && (
-                                                                <>
-                                                                    <span className="shrink-0">•</span>
-                                                                    <span className="truncate">יעד: {saving.notes}</span>
-                                                                </>
-                                                            )}
-                                                            {saving.paymentMethod && (
-                                                                <>
-                                                                    <span className="shrink-0">•</span>
-                                                                    <span className="truncate">{saving.paymentMethod}</span>
-                                                                </>
-                                                            )}
-                                                        </div>
+                                                <div className="flex flex-col gap-1 min-w-0 flex-1">
+                                                    {/* Name - full width, no truncate */}
+                                                    <span className="font-bold text-sm sm:text-base text-[#323338]">{saving.name}</span>
+
+                                                    {/* Date and details in separate line */}
+                                                    <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#676879]">
+                                                        <span>
+                                                            {(() => {
+                                                                try {
+                                                                    const dateToFormat = saving.targetDate
+                                                                    return dateToFormat ? format(new Date(dateToFormat), 'dd/MM/yyyy') : 'תאריך חסר'
+                                                                } catch (e) {
+                                                                    return 'תאריך לא תקין'
+                                                                }
+                                                            })()}
+                                                        </span>
+                                                        {saving.notes && (
+                                                            <>
+                                                                <span className="shrink-0">•</span>
+                                                                <span>יעד: {saving.notes}</span>
+                                                            </>
+                                                        )}
+                                                        {saving.paymentMethod && (
+                                                            <>
+                                                                <span className="shrink-0">•</span>
+                                                                <span>{saving.paymentMethod}</span>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -689,7 +688,7 @@ export function SavingsTab() {
                         )}
                     </div>
                 </div>
-            </div>
+            </div >
 
             <RecurrenceActionDialog
                 isOpen={recurrenceDialogOpen}
@@ -701,6 +700,6 @@ export function SavingsTab() {
                 action={pendingAction?.type || 'delete'}
                 entityName="חיסכון"
             />
-        </div>
+        </div >
     )
 }
