@@ -120,32 +120,40 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const categories = Array.isArray(data.categories) ? data.categories : []
     const netWorthHistory = Array.isArray(data.netWorthHistory) ? data.netWorthHistory : []
 
-    // Calculations - using ILS amounts for proper multi-currency support
-    const totalIncome = incomes.reduce((sum: number, i: any) => sum + (i.amountILS || i.amount), 0)
-    const standardExpenses = expenses.reduce((sum: number, e: any) => sum + (e.amountILS || e.amount), 0)
+    // Helper function for currency conversion
+    const toILS = (amount: number, currency?: string) => {
+        if (!currency || currency === 'ILS') return amount
+        // Simple conversion rates (fallback if no real-time rates)
+        const rates: Record<string, number> = { 'USD': 3.7, 'EUR': 4.0, 'GBP': 4.7 }
+        return amount * (rates[currency] || 1)
+    }
+
+    // Calculations - using ILS conversion for proper multi-currency support
+    const totalIncome = incomes.reduce((sum: number, i: any) => sum + toILS(i.amount, i.currency), 0)
+    const standardExpenses = expenses.reduce((sum: number, e: any) => sum + toILS(e.amount, e.currency), 0)
 
     // Bills splitting
-    const totalPaidBills = bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || b.amount), 0)
-    const totalRemainingBills = bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || b.amount), 0)
+    const totalPaidBills = bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + toILS(b.amount, b.currency), 0)
+    const totalRemainingBills = bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + toILS(b.amount, b.currency), 0)
     const combinedTotalBills = totalPaidBills + totalRemainingBills
     const currentBillsDisplay = totalRemainingBills // We will show remaining bills in the "Bills" card
 
-    const totalPaidDebts = debts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + (d.monthlyPaymentILS || d.monthlyPayment), 0)
-    const totalDebtsPlanned = debts.reduce((sum: number, d: any) => sum + (d.monthlyPaymentILS || d.monthlyPayment), 0)
-    const totalSavingsDeposits = savingsItems.reduce((sum: number, s: any) => sum + (s.monthlyDepositILS || s.monthlyDeposit), 0)
+    const totalPaidDebts = debts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + toILS(d.monthlyPayment, d.currency), 0)
+    const totalDebtsPlanned = debts.reduce((sum: number, d: any) => sum + toILS(d.monthlyPayment, d.currency), 0)
+    const totalSavingsDeposits = savingsItems.reduce((sum: number, s: any) => sum + toILS(s.monthlyDeposit, s.currency), 0)
 
     // Combined Outflows (everything that leaves the account)
     const totalExpenses = standardExpenses + totalPaidDebts + totalSavingsDeposits + totalPaidBills
 
-    const prevTotalIncome = prevIncomes.reduce((sum: number, i: any) => sum + (i.amountILS || i.amount), 0)
-    const prevStandardExpenses = prevExpenses.reduce((sum: number, e: any) => sum + (e.amountILS || e.amount), 0)
+    const prevTotalIncome = prevIncomes.reduce((sum: number, i: any) => sum + toILS(i.amount, i.currency), 0)
+    const prevStandardExpenses = prevExpenses.reduce((sum: number, e: any) => sum + toILS(e.amount, e.currency), 0)
 
-    const prevPaidBills = prevBills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || b.amount), 0)
-    const prevRemainingBills = prevBills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || b.amount), 0)
+    const prevPaidBills = prevBills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + toILS(b.amount, b.currency), 0)
+    const prevRemainingBills = prevBills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + toILS(b.amount, b.currency), 0)
     const prevCombinedBills = prevPaidBills + prevRemainingBills
 
-    const prevTotalPaidDebts = prevDebts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + (d.monthlyPaymentILS || d.monthlyPayment), 0)
-    const prevTotalSavingsDeposits = prevSavingsItems.reduce((sum: number, s: any) => sum + (s.monthlyDepositILS || s.monthlyDeposit), 0)
+    const prevTotalPaidDebts = prevDebts.filter((d: any) => d.isPaid).reduce((sum: number, d: any) => sum + toILS(d.monthlyPayment, d.currency), 0)
+    const prevTotalSavingsDeposits = prevSavingsItems.reduce((sum: number, s: any) => sum + toILS(s.monthlyDeposit, s.currency), 0)
 
     const prevTotalExpenses = prevStandardExpenses + prevTotalPaidDebts + prevTotalSavingsDeposits + prevPaidBills
 

@@ -36,22 +36,22 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 where: { userId, month, year, type },
                 select: {
                     id: true,
-                    incomes: { select: { id: true, source: true, category: true, amount: true, amountILS: true, currency: true, date: true } },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, amountILS: true, currency: true, date: true } },
-                    bills: { select: { id: true, name: true, amount: true, amountILS: true, currency: true, isPaid: true } },
-                    debts: { select: { id: true, creditor: true, monthlyPayment: true, monthlyPaymentILS: true, currency: true, isPaid: true } },
-                    savings: { select: { id: true, category: true, monthlyDeposit: true, monthlyDepositILS: true, currency: true } }
+                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true } },
+                    bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
+                    debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
+                    savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } }
                 }
             }),
             db.budget.findFirst({
                 where: { userId, month: prevMonth, year: prevYear, type },
                 select: {
                     id: true,
-                    incomes: { select: { id: true, source: true, category: true, amount: true, amountILS: true, currency: true, date: true } },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, amountILS: true, currency: true, date: true } },
-                    bills: { select: { id: true, name: true, amount: true, amountILS: true, currency: true, isPaid: true } },
-                    debts: { select: { id: true, creditor: true, monthlyPayment: true, monthlyPaymentILS: true, currency: true, isPaid: true } },
-                    savings: { select: { id: true, category: true, monthlyDeposit: true, monthlyDepositILS: true, currency: true } }
+                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true } },
+                    bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
+                    debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
+                    savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } }
                 }
             })
         ])
@@ -70,10 +70,10 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
             select: {
                 month: true,
                 year: true,
-                incomes: { select: { amount: true, amountILS: true, currency: true } },
-                expenses: { select: { amount: true, amountILS: true, currency: true } },
-                bills: { select: { amount: true, amountILS: true, currency: true } },
-                debts: { select: { monthlyPayment: true, monthlyPaymentILS: true, currency: true } }
+                incomes: { select: { amount: true, currency: true } },
+                expenses: { select: { amount: true, currency: true } },
+                bills: { select: { amount: true, currency: true } },
+                debts: { select: { monthlyPayment: true, currency: true } }
             },
             orderBy: [
                 { year: 'asc' },
@@ -84,10 +84,10 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
         // Calculate net worth history - using ILS amounts for multi-currency support
         let accumulatedNetWorth = (user.initialBalance || 0) + (user.initialSavings || 0)
         const netWorthHistory = allBudgets.map(budget => {
-            const totalIncome = budget.incomes.reduce((sum, item) => sum + (item.amountILS || item.amount), 0)
-            const totalExpenses = budget.expenses.reduce((sum, item) => sum + (item.amountILS || item.amount), 0)
-            const totalBills = budget.bills.reduce((sum, item) => sum + (item.amountILS || item.amount), 0)
-            const totalDebtPayments = budget.debts.reduce((sum, item) => sum + (item.monthlyPaymentILS || item.monthlyPayment), 0)
+            const totalIncome = budget.incomes.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.amount : item.amount * 3.7), 0)
+            const totalExpenses = budget.expenses.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.amount : item.amount * 3.7), 0)
+            const totalBills = budget.bills.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.amount : item.amount * 3.7), 0)
+            const totalDebtPayments = budget.debts.reduce((sum, item) => sum + (item.currency === 'ILS' ? item.monthlyPayment : item.monthlyPayment * 3.7), 0)
             const totalOutflow = totalExpenses + totalBills + totalDebtPayments
             const netChange = totalIncome - totalOutflow
             accumulatedNetWorth += netChange
