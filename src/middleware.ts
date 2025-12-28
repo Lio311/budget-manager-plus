@@ -31,6 +31,11 @@ export default clerkMiddleware(async (auth, req) => {
         // We must reach out to the full URL because this is running on the server/edge
         const maintenanceUrl = new URL('/api/maintenance/status', req.url);
 
+        // Pass userId if available so the API can check admin status
+        if (auth.userId) {
+            maintenanceUrl.searchParams.set('userId', auth.userId);
+        }
+
         // Pass the user ID cookie if available to check admin status
         // Note: We can't easily access the full auth session in middleware without expensive calls,
         // so we might need to rely on the API to verify the user from the request headers/cookies forward
