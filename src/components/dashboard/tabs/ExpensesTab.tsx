@@ -48,6 +48,8 @@ interface Expense {
     supplier?: Supplier | null
     vatAmount?: number | null
     paymentMethod?: string | null
+    isDeductible?: boolean
+    isRecurring?: boolean
 }
 
 interface ExpenseData {
@@ -537,80 +539,120 @@ export function ExpensesTab() {
                             לא נמצאו נתונים לחודש זה
                         </div>
                     ) : (
-                                        </div>
-                <div className="flex justify-end gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                    <Button size="sm" onClick={handleUpdate} className="bg-orange-600 text-white">שמור שינויים</Button>
-                </div>
-            </div>
-            ) : (
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 flex-1 min-w-0">
-                    <div className="shrink-0">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} text-white font-bold text-xs`}>
-                            {exp.category?.[0] || 'ה'}
-                        </div>
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                        <div className="flex items-center gap-2">
-                            <span className="font-bold text-[#323338] truncate">{exp.description}</span>
-                            {exp.supplier && (
-                                <span className="text-[10px] px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded border border-orange-100 font-bold">
-                                    {exp.supplier.name}
-                                </span>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-3 text-[11px] text-[#676879]">
-                            <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                            <span className="w-1 h-1 rounded-full bg-gray-300" />
-                            <span>{exp.category}</span>
-                            {exp.paymentMethod && (
-                                <>
-                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                    <span>{exp.paymentMethod}</span>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                        paginatedExpenses.map(exp => {
+                            const usage = getUsage(exp.category)
 
-                <div className="flex items-center gap-6">
-                    {isBusiness && exp.vatAmount > 0 && (
-                        <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
-                            <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
-                            <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
+                            return (
+                                <div key={exp.id} className="glass-panel p-4 hover:shadow-md transition-all group relative overflow-hidden">
+                                    {editingId === exp.id ? (
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <Input value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="תיאור" />
+                                                <Input value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} type="number" placeholder="סכום" />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <select
+                                                    className="w-full p-2 border border-gray-200 rounded-lg text-sm"
+                                                    value={editData.category}
+                                                    onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                                                >
+                                                    {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+                                                </select>
+                                                <DatePicker date={editData.date ? new Date(editData.date) : undefined} setDate={(d) => setEditData({ ...editData, date: d ? format(d, 'yyyy-MM-dd') : '' })} />
+                                            </div>
+                                            <div className="flex justify-end gap-2">
+                                                <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
+                                                <Button size="sm" onClick={handleUpdate} className="bg-orange-600 text-white">שמור שינויים</Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                <div className="shrink-0">
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} text-white font-bold text-xs`}>
+                                                        {getCategoryIcon(exp.category)}
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-[#323338] truncate">{exp.description}</span>
+                                                        {exp.supplier && (
+                                                            <span className="text-[10px] px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded border border-orange-100 font-bold">
+                                                                {exp.supplier.name}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-3 text-[11px] text-[#676879]">
+                                                        <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                        <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                        <span>{exp.category}</span>
+                                                        {exp.paymentMethod && (
+                                                            <>
+                                                                <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                                <span>{exp.paymentMethod}</span>
+                                                            </>
+                                                        )}
+                                                    </div>
+
+                                                    {usage && (
+                                                        <div className="mt-1.5 w-full max-w-[200px]">
+                                                            <div className="flex items-center justify-between text-[10px] text-gray-500 mb-0.5">
+                                                                <span>ניצול תקציב</span>
+                                                                <span>{Math.round(usage.percentage)}%</span>
+                                                            </div>
+                                                            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                                                <div
+                                                                    className={cn(
+                                                                        "h-full rounded-full",
+                                                                        usage.percentage > 100 ? "bg-red-500" :
+                                                                            usage.percentage > 85 ? "bg-orange-500" : "bg-green-500"
+                                                                    )}
+                                                                    style={{ width: `${Math.min(usage.percentage, 100)}%` }}
+                                                                />
+                                                            </div>
+                                                            <div className="text-[10px] text-gray-400 mt-0.5 text-left" dir="ltr">
+                                                                {formatCurrency(usage.spent)} / {formatCurrency(usage.limit)}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-6">
+                                                {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
+                                                    <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
+                                                        <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
+                                                        <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency))}</span>
+                                                    </div>
+                                                ) : null}
+                                                <div className="text-right shrink-0">
+                                                    <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
+                                                        {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-4 w-4" /></Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )
+                        })
+                    )}
+
+                    {totalPages > 1 && (
+                        <div className="mt-4 flex justify-center direction-ltr">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
                         </div>
                     )}
-                    <div className="text-right shrink-0">
-                        <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
-                            {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
-                        </div>
-                    </div>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)} className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-4 w-4" /></Button>
-                    </div>
                 </div>
             </div>
-                                )}
         </div>
-    ))
-                    )
-}
-
-{
-    totalPages > 1 && (
-        <div className="mt-4 flex justify-center direction-ltr">
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-            />
-        </div>
-    )
-}
-                </div >
-            </div >
-        </div >
     )
 }
