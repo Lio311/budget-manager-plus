@@ -43,10 +43,19 @@ export function RecurrenceActionDialog({
                 </DialogHeader>
 
                 <div className="py-4">
-                    <RadioGroup value={mode} onValueChange={(v) => setMode(v as 'SINGLE' | 'FUTURE')} className="gap-4">
-                        <div className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-gray-50 text-right justify-start ${mode === 'SINGLE' ? 'border-primary bg-primary/5' : 'border-gray-200'}`} onClick={() => setMode('SINGLE')}>
+                    <RadioGroup
+                        value={mode}
+                        onValueChange={(v) => setMode(v as 'SINGLE' | 'FUTURE')}
+                        className="gap-4"
+                        dir="rtl"
+                        style={{ direction: 'rtl' }}
+                    >
+                        <div
+                            className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-gray-50 text-right ${mode === 'SINGLE' ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                            onClick={() => setMode('SINGLE')}
+                        >
                             <RadioGroupItem value="SINGLE" id="single" className="mt-1 shrink-0" />
-                            <Label htmlFor="single" className="flex items-start gap-3 cursor-pointer flex-1 justify-start w-full">
+                            <Label htmlFor="single" className="flex items-start gap-3 cursor-pointer flex-1 w-full">
                                 <CalendarDays className="h-5 w-5 text-gray-500 mt-1 shrink-0" />
                                 <div className="flex flex-col gap-1 items-start text-right w-full">
                                     <span className="font-medium text-sm">חודש זה בלבד</span>
@@ -55,9 +64,12 @@ export function RecurrenceActionDialog({
                             </Label>
                         </div>
 
-                        <div className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-gray-50 text-right justify-start ${mode === 'FUTURE' ? 'border-primary bg-primary/5' : 'border-gray-200'}`} onClick={() => setMode('FUTURE')}>
+                        <div
+                            className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:bg-gray-50 text-right ${mode === 'FUTURE' ? 'border-primary bg-primary/5' : 'border-gray-200'}`}
+                            onClick={() => setMode('FUTURE')}
+                        >
                             <RadioGroupItem value="FUTURE" id="future" className="mt-1 shrink-0" />
-                            <Label htmlFor="future" className="flex items-start gap-3 cursor-pointer flex-1 justify-start w-full">
+                            <Label htmlFor="future" className="flex items-start gap-3 cursor-pointer flex-1 w-full">
                                 <CalendarClock className="h-5 w-5 text-gray-500 mt-1 shrink-0" />
                                 <div className="flex flex-col gap-1 items-start text-right w-full">
                                     <span className="font-medium text-sm">חודש זה והלאה</span>
