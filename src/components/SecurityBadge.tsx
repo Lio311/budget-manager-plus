@@ -11,7 +11,7 @@ export default function SecurityBadge() {
             {/* Security Badge - Fixed position in bottom left */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 left-6 z-40 p-4 bg-gradient-to-br from-green-600 to-green-700 text-white rounded-full shadow-2xl hover:shadow-green-500/50 hover:scale-110 transition-all duration-300 group"
+                className="fixed top-6 left-6 z-40 p-4 bg-gradient-to-br from-green-600 to-green-700 text-white rounded-full shadow-2xl hover:shadow-green-500/50 hover:scale-110 transition-all duration-300 group"
                 aria-label="אבטחת מידע"
             >
                 <Shield className="w-6 h-6 group-hover:rotate-12 transition-transform" />
@@ -40,7 +40,7 @@ export default function SecurityBadge() {
                                     <Shield className="w-12 h-12" />
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl font-bold mb-2">אבטחת המידע ב-KeseFlow</h2>
+                                    <h2 className="text-3xl font-bold mb-2">אבטחת המידע ב-Keseflow</h2>
                                     <p className="text-green-100">7 שכבות הגנה מתקדמות לנתונים הפיננסיים שלך</p>
                                 </div>
                             </div>
@@ -105,14 +105,14 @@ export default function SecurityBadge() {
                                 <div className="grid md:grid-cols-2 gap-3">
                                     <SummaryPoint text="אימות חזק - רק אתה יכול להיכנס" />
                                     <SummaryPoint text="הצפנה כפולה - בתעבורה ובאחסון" />
-                                    <SummaryPoint text="הפרדת נתונים - כל משתמש רואה רק את שלו" />
+                                    <SummaryPoint text="הפרדת נתונים - כל משתמש רואה רק את הנתונים שלו" />
                                     <SummaryPoint text="בדיקות אבטחה - בכל פעולה ופעולה" />
                                     <SummaryPoint text="גיבויים אוטומטיים - הנתונים לא יאבדו" />
                                     <SummaryPoint text="ניטור 24/7 - אנחנו תמיד ערים" />
                                     <SummaryPoint text="תקני GDPR - עומדים בתקנים הגבוהים באירופה" />
                                 </div>
                                 <p className="mt-4 text-center text-green-900 font-bold">
-                                    הנתונים הפיננסיים שלך מוגנים יותר מאשר בבנק רגיל!
+                                    הנתונים הפיננסיים שלך מוגנים!
                                 </p>
                             </div>
                         </div>
