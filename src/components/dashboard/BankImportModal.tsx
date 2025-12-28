@@ -166,12 +166,16 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
 
                 // Parse Date
                 let dateStr = ''
+                console.log(`Row ${i}: dateRaw value:`, dateRaw, 'type:', typeof dateRaw)
+
                 if (typeof dateRaw === 'number') {
                     // Excel serial date
                     const dateObj = new Date(Math.round((dateRaw - 25569) * 86400 * 1000))
                     if (!isNaN(dateObj.getTime())) dateStr = format(dateObj, 'yyyy-MM-dd')
+                    console.log(`Row ${i}: Parsed Excel date ${dateRaw} to ${dateStr}`)
                 } else {
                     const dStr = String(dateRaw).trim()
+                    console.log(`Row ${i}: Trying to parse date string:`, dStr)
                     // Try simplistic parsing
                     try {
                         let d: Date | null = null
@@ -187,8 +191,15 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                             d = new Date(dStr)
                         }
 
-                        if (d && !isNaN(d.getTime())) dateStr = format(d, 'yyyy-MM-dd')
-                    } catch (e) { console.log('Date parse failed', dStr) }
+                        if (d && !isNaN(d.getTime())) {
+                            dateStr = format(d, 'yyyy-MM-dd')
+                            console.log(`Row ${i}: Successfully parsed to ${dateStr}`)
+                        } else {
+                            console.log(`Row ${i}: Date parsing resulted in invalid date`)
+                        }
+                    } catch (e) {
+                        console.log(`Row ${i}: Date parse exception:`, e, 'for value:', dStr)
+                    }
                 }
 
                 if (!dateStr) {
