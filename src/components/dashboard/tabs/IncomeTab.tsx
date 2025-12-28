@@ -22,6 +22,19 @@ import { getCategories, addCategory } from '@/lib/actions/category'
 import { getClients } from '@/lib/actions/clients'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
+import { Briefcase, DollarSign, TrendingUp, Gift, Home, Landmark, PiggyBank, Wallet } from 'lucide-react'
+
+const getCategoryIcon = (categoryName: string) => {
+    const name = categoryName.toLowerCase()
+    if (name.includes('משכורת') || name.includes('שכר')) return <Briefcase className="h-5 w-5" />
+    if (name.includes('עסק') || name.includes('פרילנס')) return <DollarSign className="h-5 w-5" />
+    if (name.includes('השקעות') || name.includes('דיבידנד')) return <TrendingUp className="h-5 w-5" />
+    if (name.includes('מתנה') || name.includes('פרס')) return <Gift className="h-5 w-5" />
+    if (name.includes('שכירות') || name.includes('דירה')) return <Home className="h-5 w-5" />
+    if (name.includes('ריבית') || name.includes('בנק')) return <Landmark className="h-5 w-5" />
+    if (name.includes('חיסכון')) return <PiggyBank className="h-5 w-5" />
+    return <Wallet className="h-5 w-5" />
+}
 
 
 interface Category {
@@ -519,7 +532,7 @@ export function IncomeTab() {
                             )}
                         </div>
 
-                        <Button onClick={handleAdd} className={`w - full h - 11 rounded - lg text - white font - bold shadow - sm transition - all hover: shadow - md ${isBusiness ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#00c875] hover:bg-[#00b268]'} `} disabled={submitting}>
+                        <Button onClick={handleAdd} className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md ${isBusiness ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#00c875] hover:bg-[#00b268]'}`} disabled={submitting}>
                             {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הכנסה' : 'הוסף')}
                         </Button>
                     </div>
@@ -561,15 +574,15 @@ export function IncomeTab() {
                                         </div>
                                         <div className="flex justify-end gap-2">
                                             <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                            <Button size="sm" onClick={handleUpdate} className={`${isBusiness ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#00c875] hover:bg-[#00b268]'} text - white`}>שמור שינויים</Button>
+                                            <Button size="sm" onClick={handleUpdate} className={`${isBusiness ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#00c875] hover:bg-[#00b268]'} text-white`}>שמור שינויים</Button>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-between gap-2 sm:gap-3">
                                         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                                             <div className="shrink-0">
-                                                <div className={`w - 10 h - 10 rounded - full flex items - center justify - center ${getCategoryColor(income.category)} text - white font - bold text - xs`}>
-                                                    {income.category?.[0] || 'כ'}
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
+                                                    {getCategoryIcon(income.category)}
                                                 </div>
                                             </div>
                                             <div className="flex flex-col min-w-0 gap-0.5">
