@@ -8,14 +8,13 @@ export default function SecurityBadge() {
 
     return (
         <>
-            {/* Security Badge - Fixed position in bottom left */}
+            {/* Security Badge - Fixed position in top left */}
             <button
                 onClick={() => setIsOpen(true)}
                 className="fixed top-6 left-6 z-40 p-4 bg-gradient-to-br from-green-600 to-green-700 text-white rounded-full shadow-2xl hover:shadow-green-500/50 hover:scale-110 transition-all duration-300 group"
                 aria-label="אבטחת מידע"
             >
                 <Shield className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
             </button>
 
             {/* Modal Overlay */}
