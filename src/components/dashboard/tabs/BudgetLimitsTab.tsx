@@ -16,6 +16,7 @@ import { getCategoryBudgets, updateCategoryLimit, getSmartRecommendations, Categ
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Pagination } from '@/components/ui/Pagination'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const getCategoryIcon = (name: string) => {
     switch (name) {
@@ -228,22 +229,26 @@ export function BudgetLimitsTab() {
                 <h3 className="text-lg font-bold text-gray-800">תקציבים פעילים</h3>
 
                 <div className="w-64">
-                    <select
-                        className="w-full h-10 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/20"
-                        onChange={(e) => {
-                            if (e.target.value) {
-                                setNewlyAddedIds(prev => [...prev, e.target.value])
-                                e.target.value = '' // Reset
-                            }
+                    <Select
+                        onValueChange={(val) => {
+                            setNewlyAddedIds(prev => [...prev, val])
                         }}
-                        value=""
                     >
-                        <option value="" disabled>הוסף תקציב לקטגוריה</option>
-                        {availableCategories.length === 0 && <option disabled>אין קטגוריות נוספות</option>}
-                        {availableCategories.map(cat => (
-                            <option key={cat.categoryId} value={cat.categoryId}>{cat.categoryName}</option>
-                        ))}
-                    </select>
+                        <SelectTrigger className="w-full h-10 bg-white border-gray-200 text-right direction-rtl">
+                            <SelectValue placeholder="הוסף תקציב לקטגוריה" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[200px]" dir="rtl">
+                            {availableCategories.length === 0 ? (
+                                <div className="p-2 text-sm text-gray-500 text-center">אין קטגוריות נוספות</div>
+                            ) : (
+                                availableCategories.map(cat => (
+                                    <SelectItem key={cat.categoryId} value={cat.categoryId}>
+                                        {cat.categoryName}
+                                    </SelectItem>
+                                ))
+                            )}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
