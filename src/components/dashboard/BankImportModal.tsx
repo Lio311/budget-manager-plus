@@ -174,8 +174,18 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                     if (!isNaN(dateObj.getTime())) dateStr = format(dateObj, 'yyyy-MM-dd')
                     console.log(`Row ${i}: Parsed Excel date ${dateRaw} to ${dateStr}`)
                 } else {
-                    const dStr = String(dateRaw).trim()
+                    let dStr = String(dateRaw).trim()
                     console.log(`Row ${i}: Trying to parse date string:`, dStr)
+
+                    // Try to extract date from text using regex
+                    // Match DD.MM.YY, DD.MM.YYYY, DD/MM/YY, DD/MM/YYYY, DD-MM-YY, DD-MM-YYYY
+                    const datePattern = /(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})/
+                    const match = dStr.match(datePattern)
+                    if (match) {
+                        dStr = match[0] // Extract just the date part
+                        console.log(`Row ${i}: Extracted date from text:`, dStr)
+                    }
+
                     // Try simplistic parsing
                     try {
                         let d: Date | null = null
@@ -191,12 +201,13 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                             }
                         } else if (dStr.includes('/')) {
                             const [d1, m1, y1] = dStr.split('/')
-                            if (y1?.length === 4) d = new Date(`${y1}-${m1}-${d1}`)
-                            else if (y1?.length === 2) d = new Date(`20${y1}-${m1}-${d1}`)
+                            if (y1?.length === 4) d = new Date(`${y1}-${m1.padStart(2, '0')}-${d1.padStart(2, '0')}`)
+                            else if (y1?.length === 2) d = new Date(`20${y1}-${m1.padStart(2, '0')}-${d1.padStart(2, '0')}`)
                         } else if (dStr.includes('-')) {
                             const parts = dStr.split('-')
                             if (parts[0].length === 4) d = new Date(dStr) // YYYY-MM-DD
-                            else if (parts[2].length === 4) d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`) // DD-MM-YYYY
+                            else if (parts[2].length === 4) d = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`) // DD-MM-YYYY
+                            else if (parts[2].length === 2) d = new Date(`20${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`) // DD-MM-YY
                         } else {
                             d = new Date(dStr)
                         }
