@@ -275,74 +275,72 @@ export function SavingsTab() {
         setEditData({ category: '', description: '', monthlyDeposit: '', currency: 'ILS', goal: '', date: new Date(), paymentMethod: '' })
     }
 
-}
+    async function handleUpdate(id: string) {
+        const saving = savings.find(s => s.id === id)
+        if (saving && saving.isRecurring) {
+            setPendingAction({ type: 'edit', id: id })
+            setRecurrenceDialogOpen(true)
+            return
+        }
 
-async function handleUpdate(id: string) {
-    const saving = savings.find(s => s.id === id)
-    if (saving && saving.isRecurring) {
-        setPendingAction({ type: 'edit', id: id })
-        setRecurrenceDialogOpen(true)
-        return
+        await executeUpdate(id, 'SINGLE')
     }
 
-    await executeUpdate(id, 'SINGLE')
-}
+    async function executeUpdate(id: string, mode: 'SINGLE' | 'FUTURE') {
+        setSubmitting(true)
+        const result = await updateSaving(id, {
+            category: editData.category,
+            description: editData.description,
+            monthlyDeposit: parseFloat(editData.monthlyDeposit),
+            currency: editData.currency,
+            goal: editData.goal || undefined,
+            date: editData.date,
+            paymentMethod: editData.paymentMethod || undefined
+        }, mode)
 
-async function executeUpdate(id: string, mode: 'SINGLE' | 'FUTURE') {
-    setSubmitting(true)
-    const result = await updateSaving(id, {
-        category: editData.category,
-        description: editData.description,
-        monthlyDeposit: parseFloat(editData.monthlyDeposit),
-        currency: editData.currency,
-        goal: editData.goal || undefined,
-        date: editData.date,
-        paymentMethod: editData.paymentMethod || undefined
-    }, mode)
-
-    if (result.success) {
-        toast({ title: 'הצלחה', description: 'החיסכון עודכן בהצלחה' })
-        setEditingId(null)
-        await mutateSavings()
-    } else {
-        toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן חיסכון', variant: 'destructive' })
-    }
-    setSubmitting(false)
-}
-
-const handleRecurrenceConfirm = async (mode: 'SINGLE' | 'FUTURE') => {
-    setRecurrenceDialogOpen(false)
-    if (!pendingAction) return
-
-    if (pendingAction.type === 'delete') {
-        const result = await deleteSaving(pendingAction.id, mode)
         if (result.success) {
-            toast({ title: 'הצלחה', description: 'החיסכון נמחק בהצלחה' })
+            toast({ title: 'הצלחה', description: 'החיסכון עודכן בהצלחה' })
+            setEditingId(null)
             await mutateSavings()
         } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק חיסכון', variant: 'destructive' })
+            toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן חיסכון', variant: 'destructive' })
         }
-    } else if (pendingAction.type === 'edit') {
-        await executeUpdate(pendingAction.id, mode)
+        setSubmitting(false)
     }
-    setPendingAction(null)
-}
 
-const getCategoryColor = (catName: string) => {
-    const cat = categories.find(c => c.name === catName)
-    let colorClass = cat?.color || 'bg-gray-500 text-white border-gray-600'
+    const handleRecurrenceConfirm = async (mode: 'SINGLE' | 'FUTURE') => {
+        setRecurrenceDialogOpen(false)
+        if (!pendingAction) return
 
-    // Force upgrade legacy pale colors to bold colors
-    if (colorClass.includes('bg-') && colorClass.includes('-100')) {
-        colorClass = colorClass
-            .replace(/bg-(\w+)-100/g, 'bg-$1-500')
-            .replace(/text-(\w+)-700/g, 'text-white')
-            .replace(/border-(\w+)-200/g, 'border-transparent')
+        if (pendingAction.type === 'delete') {
+            const result = await deleteSaving(pendingAction.id, mode)
+            if (result.success) {
+                toast({ title: 'הצלחה', description: 'החיסכון נמחק בהצלחה' })
+                await mutateSavings()
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק חיסכון', variant: 'destructive' })
+            }
+        } else if (pendingAction.type === 'edit') {
+            await executeUpdate(pendingAction.id, mode)
+        }
+        setPendingAction(null)
     }
-    return colorClass
-}
 
-return (
+    const getCategoryColor = (catName: string) => {
+        const cat = categories.find(c => c.name === catName)
+        let colorClass = cat?.color || 'bg-gray-500 text-white border-gray-600'
+
+        // Force upgrade legacy pale colors to bold colors
+        if (colorClass.includes('bg-') && colorClass.includes('-100')) {
+            colorClass = colorClass
+                .replace(/bg-(\w+)-100/g, 'bg-$1-500')
+                .replace(/text-(\w+)-700/g, 'text-white')
+                .replace(/border-(\w+)-200/g, 'border-transparent')
+        }
+        return colorClass
+    }
+
+    return (
         <div className="space-y-6 w-full pb-10 px-2 md:px-0" dir="rtl">
             {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -429,7 +429,7 @@ export function ExpensesTab() {
     }
 
     return (
-        <div className="space-y-6 w-full pb-10 px-1 md:px-0">
+        <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             {/* Summary Card */}
             <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'}`}>
                 <h3 className="text-sm font-medium text-gray-500">{isBusiness ? 'סך עלויות / הוצאות חודשיות' : 'סך הוצאות חודשיות'}</h3>
@@ -605,7 +605,7 @@ export function ExpensesTab() {
                             const usage = getUsage(exp.category)
 
                             return (
-                                <div key={exp.id} className="glass-panel p-4 hover:shadow-md transition-all group relative overflow-hidden">
+                                <div key={exp.id} className="glass-panel p-3 sm:p-4 hover:shadow-md transition-all group relative overflow-hidden">
                                     {editingId === exp.id ? (
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-2 gap-3">
@@ -629,97 +629,61 @@ export function ExpensesTab() {
                                         </div>
                                     ) : (
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
                                                 <div className="shrink-0">
-                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} text-white font-bold text-xs`}>
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} text-white shadow-sm`}>
                                                         {getCategoryIcon(exp.category)}
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-[#323338] truncate">{exp.description}</span>
-                                                        {exp.supplier && (
-                                                            <span className="text-[10px] px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded border border-orange-100 font-bold">
-                                                                {exp.supplier.name}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-3 text-[11px] text-[#676879]">
+                                                    <span className="font-bold text-[#323338] truncate text-sm sm:text-base">{exp.description}</span>
+                                                    <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] overflow-hidden">
                                                         <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                                                        <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                        <span>{exp.category}</span>
+                                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                        <span className="truncate">{exp.category}</span>
                                                         {exp.paymentMethod && (
                                                             <>
-                                                                <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                                <span>{exp.paymentMethod}</span>
-                                                            </>
-                                                        )}
-                                                    </div>
-
-                                                    {usage && (
-                                                        <div className="mt-1.5 w-full max-w-[200px]">
-                                                            <div className="flex items-center justify-between text-[10px] text-gray-500 mb-0.5">
-                                                                <span>ניצול תקציב</span>
-                                                                <span>{Math.round(usage.percentage)}%</span>
                                                             </div>
-                                                            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                                                <div
-                                                                    className={cn(
-                                                                        "h-full rounded-full",
-                                                                        usage.percentage > 100 ? "bg-red-500" :
-                                                                            usage.percentage > 85 ? "bg-orange-500" : "bg-green-500"
-                                                                    )}
-                                                                    style={{ width: `${Math.min(usage.percentage, 100)}%` }}
-                                                                />
-                                                            </div>
-                                                            <div className="text-[10px] text-gray-400 mt-0.5 text-left font-mono" dir="ltr">
-                                                                <span className="flex items-center gap-1 justify-start">
-                                                                    <span>₪{usage.spent.toLocaleString()}</span>
-                                                                    <span>/</span>
-                                                                    <span>₪{usage.limit.toLocaleString()}</span>
-                                                                </span>
-                                                            </div>
-                                                        </div>
                                                     )}
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div className="flex items-center gap-6">
-                                                {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
-                                                    <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
-                                                        <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
-                                                        <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
+                                                <div className="flex items-center gap-6">
+                                                    {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
+                                                        <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
+                                                            <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
+                                                            <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
+                                                        </div>
+                                                    ) : null}
+                                                    <div className="text-right shrink-0">
+                                                        <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
+                                                            {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
+                                                        </div>
                                                     </div>
-                                                ) : null}
-                                                <div className="text-right shrink-0">
-                                                    <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
-                                                        {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
+                                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => handleDelete(exp)}>
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-4 w-4" /></Button>
-                                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => handleDelete(exp)}>
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
                                     )}
-                                        </div>
-                                    )
+                                            </div>
+                                            )
                                     })
                     )}
 
-                                    {totalPages > 1 && (
-                                        <div className="mt-4 flex justify-center direction-ltr">
-                                            <Pagination
-                                                currentPage={currentPage}
-                                                totalPages={totalPages}
-                                                onPageChange={setCurrentPage}
-                                            />
+                                            {totalPages > 1 && (
+                                                <div className="mt-4 flex justify-center direction-ltr">
+                                                    <Pagination
+                                                        currentPage={currentPage}
+                                                        totalPages={totalPages}
+                                                        onPageChange={setCurrentPage}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
             </div>
             </div>
-            )
+                )
 }
