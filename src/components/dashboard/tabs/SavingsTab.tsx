@@ -96,6 +96,8 @@ export function SavingsTab() {
         { revalidateOnFocus: false }
     )
 
+    const categories = Array.isArray(categoriesRaw) ? categoriesRaw : []
+
     // --- State ---
 
     const [submitting, setSubmitting] = useState(false)
