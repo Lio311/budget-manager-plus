@@ -331,53 +331,50 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     <CardContent>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <div className="h-[300px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={expensesByCategoryData} barSize={40}>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
-                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} />
-                                            <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#6b7280', fontSize: 11 }} />
-                                            <Tooltip
-                                                cursor={{ fill: 'transparent' }}
-                                                content={({ active, payload, label }) => {
-                                                    if (active && payload && payload.length) {
-                                                        return (
-                                                            <div className="glass-panel px-3 py-2 border border-white/50 shadow-xl rounded-xl backdrop-blur-xl text-right">
-                                                                <p className="font-bold text-[#323338] text-sm mb-0.5">{label}</p>
-                                                                <p className="font-mono text-gray-600 font-medium text-xs">
-                                                                    ₪{Number(payload[0].value).toLocaleString()}
-                                                                </p>
-                                                            </div>
-                                                        )
-                                                    }
-                                                    return null
-                                                }}
-                                            />
-                                            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                                                {expensesByCategoryData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} />
-                                                ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
+                                <BarChart data={expensesByCategoryData} barSize={40}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} />
+                                    <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#6b7280', fontSize: 11 }} />
+                                    <Tooltip
+                                        cursor={{ fill: 'transparent' }}
+                                        content={({ active, payload, label }) => {
+                                            if (active && payload && payload.length) {
+                                                return (
+                                                    <div className="glass-panel px-3 py-2 border border-white/50 shadow-xl rounded-xl backdrop-blur-xl text-right">
+                                                        <p className="font-bold text-[#323338] text-sm mb-0.5">{label}</p>
+                                                        <p className="font-mono text-gray-600 font-medium text-xs">
+                                                            ₪{Number(payload[0].value).toLocaleString()}
+                                                        </p>
+                                                    </div>
+                                                )
+                                            }
+                                            return null
+                                        }}
+                                    />
+                                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                        {expensesByCategoryData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+
                             </ResponsiveContainer>
                         </div>
                     </CardContent>
-                </Card>
+                </Card >
 
                 {/* 4. Net Worth (Green Area Chart) (Visually Right in RTL) */}
-                <Card className="glass-panel shadow-sm min-h-[350px]">
+                < Card className="glass-panel shadow-sm min-h-[350px]" >
                     <CardHeader>
                         <CardTitle>הון עצמי</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px] -ml-4">
                         <NetWorthChart data={netWorthHistory} loading={loading} />
                     </CardContent>
-                </Card>
+                </Card >
 
                 {/* 3. Budget Status (Progress Bars) (Visually Left in RTL) */}
-                <Card className="glass-panel shadow-sm col-span-1 md:col-span-1 min-h-[350px]">
+                < Card className="glass-panel shadow-sm col-span-1 md:col-span-1 min-h-[350px]" >
                     <CardHeader>
                         <CardTitle>מצב תקציב חודשי</CardTitle>
                     </CardHeader>
@@ -426,11 +423,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             </div>
                         </div>
                     </CardContent>
-                </Card>
-            </div>
+                </Card >
+            </div >
 
             {/* Settings Dialog */}
-            <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+            < Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} >
                 <DialogContent dir="rtl" className="sm:max-w-[425px]">
                     <DialogHeader className="text-right sm:text-right">
                         <DialogTitle className="text-right">הגדרות תצוגה</DialogTitle>
@@ -472,7 +469,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <Button onClick={handleSaveSettings} className="bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
                     </DialogFooter>
                 </DialogContent>
-            </Dialog>
-        </div>
+            </Dialog >
+        </div >
     )
 }
