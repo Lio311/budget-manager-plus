@@ -56,105 +56,101 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
     }
 
     return (
-        <div className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-[60]">
-            <div className="w-full flex h-[65px] items-center">
+    return (
+        <div className="sticky top-4 z-[40] mx-4 mb-6">
+            <div className="glass-panel w-full flex h-[72px] items-center px-6 justify-between gap-4 transition-all duration-300 hover:shadow-2xl hover:border-white/60">
 
-                {/* Right Section - Aligned with Sidebar */}
-                <div className="w-72 h-full hidden md:flex items-center justify-center border-l border-gray-200 bg-[#f9f9fa]/50">
-                    <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 hover:bg-white/50">
+                {/* Right Section - Date Navigation */}
+                <div className="hidden md:flex items-center gap-4">
+                    <div className="flex bg-gray-100/50 rounded-full p-1 border border-white/50 backdrop-blur-sm">
+                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 hover:bg-white rounded-full">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
-                        <div className="text-center min-w-[120px]">
-                            <h2 className="text-lg font-bold whitespace-nowrap text-[#323338]">
+                        <div className="min-w-[140px] flex flex-col items-center justify-center px-2">
+                            <span className="text-sm font-bold text-[#323338] leading-none">
                                 {getMonthName(month)} {year}
-                            </h2>
+                            </span>
+                            <span className="text-[10px] text-gray-500 font-medium">סקירה חודשית</span>
                         </div>
-                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 hover:bg-white/50">
+                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 hover:bg-white rounded-full">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
                     </div>
                 </div>
 
                 {/* Mobile Layout - Compressed */}
-                <div className="flex md:hidden items-center justify-between w-full px-2">
+                <div className="flex md:hidden items-center justify-between w-full px-1">
                     {/* Menu Button */}
                     <Button
                         size="icon"
                         onClick={onMenuToggle}
-                        className={`h-9 w-9 rounded-full flex-shrink-0 transition-all duration-200 border-0 ${menuOpen
-                            ? 'bg-white hover:bg-gray-100 text-black'
-                            : 'bg-black hover:bg-gray-800 text-white'
+                        className={`h-10 w-10 rounded-full flex-shrink-0 transition-all duration-300 border shadow-sm ${menuOpen
+                            ? 'bg-white hover:bg-gray-100 text-black border-gray-200'
+                            : 'bg-black hover:bg-gray-800 text-white border-transparent'
                             }`}
                     >
                         <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                     </Button>
 
                     {/* Date Selector */}
-                    <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-7 w-7">
-                            <ChevronRight className="h-3 w-3" />
+                    <div className="flex items-center gap-1 bg-white/50 rounded-full p-1 border border-white/40 shadow-sm mx-2">
+                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 rounded-full">
+                            <ChevronRight className="h-4 w-4" />
                         </Button>
-                        <div className="text-center min-w-[85px]">
-                            <h2 className="text-xs font-bold whitespace-nowrap">
+                        <div className="text-center min-w-[90px]">
+                            <h2 className="text-sm font-bold whitespace-nowrap text-[#323338]">
                                 {getMonthName(month)} {year}
                             </h2>
                         </div>
-                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-7 w-7">
-                            <ChevronLeft className="h-3 w-3" />
+                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 rounded-full">
+                            <ChevronLeft className="h-4 w-4" />
                         </Button>
                     </div>
 
                     {/* User Button */}
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => handleToggle(budgetType === 'PERSONAL' ? 'BUSINESS' : 'PERSONAL')}
-                            className={`px-2 py-1 text-xs font-bold rounded-md border transition-all ${budgetType === 'PERSONAL'
-                                ? 'bg-blue-50 text-blue-600 border-blue-200'
-                                : 'bg-green-50 text-green-600 border-green-200'
-                                }`}
-                        >
-                            {budgetType === 'PERSONAL' ? 'פרטי' : 'עסקי'}
-                        </button>
                         <UserButton />
                     </div>
                 </div>
 
                 {/* Center Section - Logo */}
-                <div className="flex-1 flex justify-center items-center">
+                <div className="hidden md:flex flex-1 justify-center items-center opacity-80 hover:opacity-100 transition-opacity">
                     <Image
                         src="/K-LOGO.png"
                         alt="Keseflow"
                         width={120}
                         height={40}
-                        className="h-8 w-auto object-contain"
+                        className="h-8 w-auto object-contain drop-shadow-sm"
                         priority
                     />
                 </div>
 
-                {/* Left Section - User Profile (Desktop only) */}
-                <div className="hidden md:flex w-72 h-full items-center justify-end px-8 gap-4">
-                    <div className="flex bg-gray-100 rounded-lg p-1">
+                {/* Left Section - Mode Switcher & Profile */}
+                <div className="hidden md:flex items-center justify-end gap-6">
+                    <div className="flex bg-gray-100/50 p-1.5 rounded-full border border-white/50 shadow-inner">
                         <button
                             onClick={() => handleToggle('PERSONAL')}
-                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'PERSONAL'
-                                ? 'bg-white text-gray-900 shadow-sm'
-                                : 'text-gray-500 hover:text-gray-900'
+                            className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'PERSONAL'
+                                ? 'bg-white text-emerald-600 shadow-md transform scale-105'
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'
                                 }`}
                         >
                             פרטי
                         </button>
                         <button
                             onClick={() => handleToggle('BUSINESS')}
-                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${budgetType === 'BUSINESS'
-                                ? 'bg-white text-gray-900 shadow-sm'
-                                : 'text-gray-500 hover:text-gray-900'
+                            className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'BUSINESS'
+                                ? 'bg-white text-blue-600 shadow-md transform scale-105'
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'
                                 }`}
                         >
                             עסקי
                         </button>
                     </div>
-                    <UserButton />
+
+                    <div className="pl-2 border-l border-gray-200">
+                        <UserButton />
+                    </div>
                 </div>
             </div>
         </div>

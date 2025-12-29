@@ -87,43 +87,52 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     }
 
     return (
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex min-h-[calc(100vh-65px)] bg-[#F5F5F7]" dir="rtl">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex min-h-screen bg-transparent gap-4" dir="rtl">
 
             {/* Mobile Sidebar Overlay */}
             {mobileMenuOpen && (
-                <div className="fixed inset-0 bg-black/30 z-40 md:hidden backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+                <div className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-all" onClick={() => setMobileMenuOpen(false)} />
             )}
 
-            {/* Sidebar Navigation - Shared Desktop/Mobile Structure */}
+            {/* Sidebar Navigation - Floating Dock */}
             <aside className={`
-                fixed md:sticky md:top-[65px] h-[calc(100vh-65px)] right-0 z-50
-                w-72 bg-[#f2f2f7] border-l border-gray-200
-                transition-transform duration-300 ease-in-out shadow-xl md:shadow-none
-                ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+                fixed md:sticky md:top-4 h-[calc(100vh-2rem)] z-50
+                transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                 flex flex-col
+                ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
+                md:w-20 md:hover:w-64 group
+                m-4 rounded-3xl
+                glass-panel border-white/50 shadow-2xl
             `}>
-                <div className="p-4 md:hidden flex justify-between items-center border-b border-gray-200 bg-[#f2f2f7]">
-                    <span className="font-bold text-lg">תפריט</span>
-                    <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+                <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10">
+                    <span className="font-bold text-lg text-white">תפריט</span>
+                    <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-white hover:bg-white/10">
                         <X className="h-5 w-5" />
                     </Button>
                 </div>
 
-                <div className="p-3 overflow-y-auto flex-1">
-                    <TabsList className="flex flex-col h-auto bg-transparent gap-1 p-0 w-full text-right">
+                <div className="p-3 overflow-y-auto flex-1 scrollbar-hide">
+                    <TabsList className="flex flex-col h-auto bg-transparent gap-2 p-0 w-full text-right">
                         {tabs.map((tab) => {
                             const Icon = tab.icon
                             return (
                                 <TabsTrigger
                                     key={tab.value}
                                     value={tab.value}
-                                    className={`w-full justify-start gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
-                                             ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-sm
-                                             hover:bg-white/50
-                                             text-gray-700 outline-none ring-0 focus:ring-0`}
+                                    className={`w-full relative group/item justify-start gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                                             ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
+                                             hover:bg-white/40
+                                             text-gray-700 outline-none ring-0 focus:ring-0 overflow-hidden whitespace-nowrap`}
                                 >
-                                    <Icon className={`h-4 w-4 ${tab.rotate ? 'rotate-180' : ''}`} />
-                                    {tab.label}
+                                    <div className="relative z-10 flex items-center gap-4 shrink-0 transition-all duration-300 group-hover/item:scale-110">
+                                        <Icon className={`h-5 w-5 ${tab.rotate ? 'rotate-180' : ''}`} />
+                                        <span className="opacity-100 md:opacity-0 md:group-hover:opacity-100 md:w-0 md:group-hover:w-auto transition-all duration-500 delay-75 origin-right">
+                                            {tab.label}
+                                        </span>
+                                    </div>
+
+                                    {/* Active Indicator Glow */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/item:animate-[shimmer_1.5s_infinite] z-0" />
                                 </TabsTrigger>
                             )
                         })}

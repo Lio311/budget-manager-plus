@@ -4,49 +4,52 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    /* Soft off-white #f5f7f9 */
-    --foreground: 240 10% 20%;
-    /* #323338 Monday Black */
+    /* Base Backgrounds */
+    --background: 220 33% 98%;
+    /* Deeper, cooler gray-blue #f4f6f9 */
+    --foreground: 222 47% 11%;
+    /* #0F172A Obsidian */
 
+    /* Cards & Glass */
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 20%;
+    --card-foreground: 222 47% 11%;
+    --glass-border: 255 255 255;
 
+    /* Popovers */
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 20%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 142 76% 36%;
-    /* Kept original primary for now, or switch to #00c875 for full conversion? keeping conservative for brand continuity unless requested */
-    --primary-foreground: 0 0% 98%;
+    /* Brand Colors (Personal) */
+    --primary: 153 96% 30%;
+    /* Rich Emerald #00c875 base */
+    --primary-foreground: 0 0% 100%;
+    --primary-gradient-start: 142 76% 45%;
+    --primary-gradient-end: 160 84% 35%;
 
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 240 5.9% 10%;
+    /* Brand Colors (Business) */
+    --business: 217 91% 60%;
+    --business-foreground: 0 0% 100%;
+    --business-gradient-start: 221 83% 60%;
+    --business-gradient-end: 224 76% 48%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 240 5% 40%;
-    /* #676879 Monday Dark Gray */
+    /* Functional Colors */
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 222 47% 11%;
 
-    --accent: 210 20% 96%;
-    --accent-foreground: 240 5.9% 10%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 215 16% 47%;
 
-    --destructive: 0 84.2% 60.2%;
+    --accent: 220 14% 94%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 142 76% 36%;
+    --border: 220 13% 92%;
+    --input: 220 13% 92%;
+    --ring: 153 96% 30%;
 
-    --radius: 0.75rem;
-    /* Larger radius (12px) for Apple feel */
-
-    /* Custom budget colors */
-    --budget-income: 142 76% 36%;
-    --budget-expense: 0 84% 60%;
-    --budget-food: 142 76% 36%;
-    --budget-transport: 217 91% 60%;
-    --budget-entertainment: 262 50% 60%;
-    --budget-bills: 45 93% 47%;
-    --budget-debt: 0 84% 60%;
+    --radius: 0.85rem;
   }
 }
 
@@ -56,61 +59,87 @@
   }
 
   body {
-    @apply bg-[hsl(var(--background))] text-foreground;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
     font-family: var(--font-rubik), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     direction: rtl;
+    background-image:
+      radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 0) 0, transparent 50%),
+      radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 0) 0, transparent 50%);
   }
 }
 
 @layer utilities {
-  .budget-card {
-    @apply rounded-xl border bg-card/80 backdrop-blur-md shadow-lg p-6 transition-all hover:shadow-xl;
-  }
 
+  /* 🌈 Premium Glass Panels */
   .glass-panel {
-    @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-xl rounded-2xl;
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl rounded-2xl transition-all duration-300;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.05),
+      0 10px 15px -3px rgba(0, 0, 0, 0.05),
+      inset 0 0 20px rgba(255, 255, 255, 0.5);
   }
 
+  .glass-panel:hover {
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.1),
+      0 8px 10px -6px rgba(0, 0, 0, 0.1),
+      inset 0 0 20px rgba(255, 255, 255, 0.8);
+    @apply border-white/60;
+  }
+
+  /* 🃏 Card Styles */
   .monday-card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200;
+    @apply bg-white/90 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1;
   }
 
   .monday-pill {
-    @apply px-3 py-1 rounded-full text-white text-xs font-medium text-center shadow-sm w-fit inline-block;
+    @apply px-4 py-1.5 rounded-full text-white text-xs font-bold text-center shadow-sm w-fit inline-block tracking-wide transition-transform hover:scale-105;
   }
 
-  /* Status Colors for Pills */
-  .pill-done {
-    @apply bg-[#00c875];
-  }
-
-  .pill-stuck {
-    @apply bg-[#e2445c];
-  }
-
-  .pill-working {
-    @apply bg-[#fdab3d];
-  }
-
-  .pill-future {
-    @apply bg-[#a25ddc];
-  }
-
-  .pill-info {
-    @apply bg-[#0086c0];
-  }
-
+  /* 📊 Budget Stats */
   .budget-stat {
-    @apply text-2xl font-bold text-[#323338];
+    @apply text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-gray-900 to-gray-600;
   }
 
   .budget-label {
-    @apply text-sm text-[#676879];
+    @apply text-xs font-medium uppercase tracking-wider text-muted-foreground;
+  }
+
+  /* ✨ Text Gradients */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r;
+  }
+
+  .text-gradient-primary {
+    @apply from-emerald-500 to-green-700;
+  }
+
+  .text-gradient-business {
+    @apply from-blue-500 to-indigo-600;
+  }
+
+  /* 🌊 Animations */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
   }
 }
 
 /* Clerk Overrides */
-/* OTP Inputs & Container */
 .cl-otpCodeField,
 div:has(> input[name="code"]),
 div:has(> input[autocomplete="one-time-code"]) {
