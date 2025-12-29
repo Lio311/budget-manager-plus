@@ -105,8 +105,8 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 glass-panel border-white/50 shadow-2xl
             `}>
                 <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10">
-                    <span className="font-bold text-lg text-white">תפריט</span>
-                    <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-white hover:bg-white/10">
+                    <span className="font-bold text-lg text-[#323338]">תפריט</span>
+                    <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-[#323338] hover:bg-black/5">
                         <X className="h-5 w-5" />
                     </Button>
                 </div>
