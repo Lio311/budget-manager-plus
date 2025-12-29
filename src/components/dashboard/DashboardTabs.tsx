@@ -98,10 +98,9 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
             <aside className={`
                 fixed md:sticky 
                 top-[110px] md:top-[100px] 
-                bottom-4 md:bottom-auto
-                h-auto md:h-fit md:max-h-[calc(100vh-120px)]
+                h-fit max-h-[calc(100dvh-130px)] md:h-fit md:max-h-[calc(100vh-120px)]
                 overflow-y-auto
-                pb-[env(safe-area-inset-bottom)]
+                pb-0
                 z-50
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                 flex flex-col
