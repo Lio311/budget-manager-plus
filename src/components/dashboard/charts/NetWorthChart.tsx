@@ -5,6 +5,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tool
 import { formatCurrency, getMonthName } from '@/lib/utils'
 import { useBudget } from '@/contexts/BudgetContext'
 import { Loader2, TrendingUp } from 'lucide-react'
+import { CustomTooltip } from './CustomTooltip'
 
 interface NetWorthData {
     month: number
