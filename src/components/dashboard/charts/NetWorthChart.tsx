@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 import { formatCurrency, getMonthName } from '@/lib/utils'
 import { useBudget } from '@/contexts/BudgetContext'
-import { Loader2 } from 'lucide-react'
+import { Loader2, TrendingUp } from 'lucide-react'
 
 interface NetWorthData {
     month: number
