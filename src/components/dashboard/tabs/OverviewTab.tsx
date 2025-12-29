@@ -339,7 +339,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
             {/* Floating Settings Button - Bottom Left */}
             <div className="fixed bottom-6 left-6 z-50 flex flex-col gap-3">
-                <div className="hidden md:block"> <FinancialAdvisorButton /> </div>
+                <div className="hidden md:block"> <FinancialAdvisorButton financialData={overviewData?.current} /> </div>
                 <Button
                     size="icon"
                     className="rounded-full shadow-xl bg-slate-900 hover:bg-slate-800 text-white w-12 h-12"
