@@ -54,6 +54,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [initialBalance, setInitialBalance] = useState('')
     const [initialSavings, setInitialSavings] = useState('')
+    const [showProgress, setShowProgress] = useState(false)
+
+    useEffect(() => {
+        const timer = setTimeout(() => setShowProgress(true), 100)
+        return () => clearTimeout(timer)
+    }, [])
 
     const fetchOverviewData = useCallback(async () => {
         const result = await getOverviewData(month, year, budgetType)
@@ -118,11 +124,18 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     // Formula: Income - Expenses - PaidBills - Savings(Observed) - PaidDebts
     const monthlySavingsCalculated = totalIncome - totalExpenses - paidBills - totalSavingsObserved - paidDebts
 
-    // Data for "Expenses by Category" (Actually Total Comparison per user screenshot)
-    const expensesComparisonData = [
-        { name: 'נוכחי', value: totalExpenses },
-        { name: 'קודם', value: prevTotalExpenses }
-    ]
+    // Data for "Expenses by Category" (True Category Breakdown)
+    const expensesByCategoryMap = current.expenses.reduce((acc: any, item: any) => {
+        const cat = item.category || 'שונות'
+        acc[cat] = (acc[cat] || 0) + (item.amountILS || 0)
+        return acc
+    }, {})
+
+    // Top 6 categories
+    const expensesByCategoryData = Object.entries(expensesByCategoryMap)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a: any, b: any) => b.value - a.value)
+        .slice(0, 6)
 
     const handleSaveSettings = async () => {
         const result = await updateUserSettings({
@@ -286,7 +299,15 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                         iconType="circle"
                                         iconSize={8} // Small dots
                                         formatter={(value) => <span className="text-black mx-2 text-xs font-medium">{value}</span>}
-                                        wrapperStyle={{ paddingTop: '20px', display: 'flex', justifyContent: 'center', width: '100%' }}
+                                        wrapperStyle={{
+                                            paddingTop: '20px',
+                                            display: 'flex',
+                                            width: '100%',
+                                            overflowX: 'auto',
+                                            justifyContent: 'center',
+                                            flexWrap: 'nowrap',
+                                            whiteSpace: 'nowrap'
+                                        }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -294,7 +315,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     </CardContent>
                 </Card>
 
-                {/* 1. Expenses By Category Comparison Chart (Visually Left in RTL) */}
+                {/* 1. Expenses By Category Chart (Visually Left in RTL) */}
                 <Card className="glass-panel shadow-sm min-h-[400px]">
                     <CardHeader>
                         <CardTitle>הוצאות לפי קטגוריה</CardTitle>
@@ -302,10 +323,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     <CardContent>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={expensesComparisonData} barSize={40}>
+                                <BarChart data={expensesByCategoryData} barSize={40}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
-                                    <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val / 1000}k`} tick={{ fill: '#6b7280', fontSize: 11 }} />
+                                    <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#6b7280', fontSize: 11 }} />
                                     <Tooltip cursor={{ fill: 'transparent' }} content={<CustomTooltip currency="₪" />} />
                                     <Bar dataKey="value" fill="#64748B" radius={[4, 4, 0, 0]} />
                                 </BarChart>
@@ -337,7 +358,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-900">{formatCurrency(totalExpenses)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-red-500 rounded-full" style={{ width: `${Math.min((totalExpenses / (totalIncome || 1)) * 100, 100)}%` }} />
+                                <div className={`h-full bg-red-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalExpenses / (totalIncome || 1)) * 100, 100)}%` : '0%' }} />
                             </div>
                         </div>
 
@@ -348,7 +369,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-900">{formatCurrency(paidBills)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-orange-500 rounded-full" style={{ width: `${Math.min((paidBills / (totalBills || 1)) * 100, 100)}%` }} />
+                                <div className={`h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((paidBills / (totalBills || 1)) * 100, 100)}%` : '0%' }} />
                             </div>
                         </div>
 
@@ -359,7 +380,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-900">{formatCurrency(paidDebts)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-purple-500 rounded-full" style={{ width: '100%' }} />
+                                <div className={`h-full bg-purple-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? '100%' : '0%' }} />
                             </div>
                         </div>
 
@@ -370,7 +391,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-900">{formatCurrency(totalSavingsObserved)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-blue-500 rounded-full" style={{ width: '20%' }} />
+                                <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? '20%' : '0%' }} />
                             </div>
                         </div>
                     </CardContent>
@@ -380,18 +401,30 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             {/* Settings Dialog */}
             <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogContent dir="rtl" className="sm:max-w-[425px]">
-                    <DialogHeader className="text-right">
-                        <DialogTitle>הגדרות תצוגה</DialogTitle>
+                    <DialogHeader className="text-right sm:text-right">
+                        <DialogTitle className="text-right">הגדרות תצוגה</DialogTitle>
                     </DialogHeader>
                     {/* Settings Form Content */}
                     <div className="space-y-4 py-4 text-right">
                         <div className="space-y-2">
                             <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
-                            <Input value={initialBalance} onChange={(e) => setInitialBalance(e.target.value)} type="number" className="text-right" />
+                            <Input
+                                value={initialBalance}
+                                onChange={(e) => setInitialBalance(e.target.value)}
+                                type="number"
+                                dir="ltr"
+                                className="text-right"
+                            />
                         </div>
                         <div className="space-y-2">
                             <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
-                            <Input value={initialSavings} onChange={(e) => setInitialSavings(e.target.value)} type="number" className="text-right" />
+                            <Input
+                                value={initialSavings}
+                                onChange={(e) => setInitialSavings(e.target.value)}
+                                type="number"
+                                dir="ltr"
+                                className="text-right"
+                            />
                         </div>
                     </div>
                     <DialogFooter className="sm:justify-end gap-2">

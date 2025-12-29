@@ -96,12 +96,16 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
             {/* Sidebar Navigation - Floating Dock */}
             <aside className={`
-                fixed md:sticky md:top-4 h-fit max-h-[calc(100vh-2rem)] z-50
+                fixed md:sticky 
+                top-[90px] md:top-4 
+                h-[calc(100vh-110px)] md:h-fit md:max-h-[calc(100vh-2rem)]
+                pb-[env(safe-area-inset-bottom)]
+                z-50
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                 flex flex-col
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
                 md:w-20 md:hover:w-64 group
-                m-4 rounded-3xl
+                mx-4 mb-4 md:m-4 rounded-3xl
                 glass-panel border-white/50 shadow-2xl
             `}>
                 <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10">
