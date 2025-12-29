@@ -5,6 +5,8 @@ import { Font, renderToBuffer } from '@react-pdf/renderer'
 import { InvoiceTemplate } from './invoice-template'
 import { prisma } from '@/lib/db'
 
+import { ALEF_FONT_BASE64 } from './font-data'
+
 // Keep track of font registration state
 let isFontRegistered = false
 
@@ -14,7 +16,7 @@ function registerFont() {
     try {
         Font.register({
             family: 'Alef',
-            src: 'https://fonts.gstatic.com/s/alef/v12/6xKxdS9_T593H7S8.ttf'
+            src: `data:font/ttf;base64,${ALEF_FONT_BASE64}`
         })
         isFontRegistered = true
     } catch (error) {
@@ -29,22 +31,8 @@ interface GenerateQuotePDFParams {
 
 export async function generateQuotePDF({ quoteId, userId }: GenerateQuotePDFParams): Promise<{ buffer: Buffer, filename: string }> {
     try {
-        // Ensure font is registered with explicit buffer fetch for Vercel
-        if (!isFontRegistered) {
-            try {
-                const fontResponse = await fetch('https://fonts.gstatic.com/s/alef/v12/6xKxdS9_T593H7S8.ttf')
-                if (!fontResponse.ok) throw new Error('Failed to fetch font')
-                const fontBuffer = await fontResponse.arrayBuffer()
-
-                Font.register({
-                    family: 'Alef',
-                    src: `data:font/ttf;base64,${Buffer.from(fontBuffer).toString('base64')}`
-                })
-                isFontRegistered = true
-            } catch (fontError) {
-                console.error('Font registration failed, PDF might not render correctly:', fontError)
-            }
-        }
+        // Ensure font is registered
+        registerFont()
 
         const quote = await prisma.quote.findFirst({
             where: {

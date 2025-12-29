@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil } from 'lucide-react'
+import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
 import { Switch } from '@/components/ui/switch'
@@ -414,13 +414,16 @@ export function QuotesTab() {
                                                     value={quote.status}
                                                     onValueChange={(value) => handleStatusChange(quote.id, value)}
                                                 >
-                                                    <SelectTrigger className={`h-6 text-xs px-2 gap-1 border-0 ${quote.status === 'DRAFT' ? 'bg-gray-100 text-gray-600' :
-                                                            quote.status === 'SENT' ? 'bg-blue-50 text-blue-600' :
-                                                                quote.status === 'ACCEPTED' ? 'bg-green-50 text-green-600' :
-                                                                    quote.status === 'EXPIRED' ? 'bg-orange-50 text-orange-600' :
-                                                                        'bg-gray-100 text-gray-600'
+                                                    <SelectTrigger className={`h-7 min-w-[100px] text-xs px-2 gap-1 border border-gray-200 shadow-sm ${quote.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
+                                                            quote.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
+                                                                quote.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
+                                                                    quote.status === 'EXPIRED' ? 'bg-orange-50 text-orange-700' :
+                                                                        'bg-gray-50 text-gray-700'
                                                         }`}>
-                                                        <SelectValue />
+                                                        <div className="flex items-center justify-between w-full">
+                                                            <SelectValue />
+                                                            <ChevronDown className="h-3 w-3 opacity-50" />
+                                                        </div>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value="DRAFT">טיוטה</SelectItem>
