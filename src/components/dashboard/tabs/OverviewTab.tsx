@@ -253,11 +253,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 {/* 1. Income (Rightmost) */}
                 <Card className="glass-panel border-r-4 border-r-green-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('income')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'מכירות' : 'סך הכנסות'}</CardTitle>
+                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'מכירות' : 'סך הכנסות'}</CardTitle>
                         <TrendingUp className="h-4 w-4 text-green-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-[#323338]">
+                        <div className="text-xl md:text-2xl font-bold text-[#323338]">
                             {loading ? '...' : <AnimatedNumber value={totalIncome} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
@@ -269,11 +269,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 {/* 2. Expenses */}
                 <Card className="glass-panel border-r-4 border-r-red-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('expenses')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'הוצאות תפעול' : 'סך הוצאות'}</CardTitle>
+                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'הוצאות תפעול' : 'סך הוצאות'}</CardTitle>
                         <TrendingDown className="h-4 w-4 text-red-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-[#323338]">
+                        <div className="text-xl md:text-2xl font-bold text-[#323338]">
                             {loading ? '...' : <AnimatedNumber value={totalExpenses} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
@@ -285,11 +285,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 {/* 3. Month Savings (Calculated) */}
                 <Card className="glass-panel border-r-4 border-r-blue-500 shadow-sm transition-all">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'רווח נקי' : 'חיסכון חודשי'}</CardTitle>
+                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'רווח נקי' : 'חיסכון חודשי'}</CardTitle>
                         <PiggyBank className="h-4 w-4 text-blue-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-[#323338]">
+                        <div className="text-xl md:text-2xl font-bold text-[#323338]">
                             {loading ? '...' : <AnimatedNumber value={monthlySavingsCalculated} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
@@ -301,11 +301,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 {/* 4. Equity / Bills (Leftmost) */}
                 <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('bills')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'הון עצמי' : 'יתרת חשבונות'}</CardTitle>
+                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'הון עצמי' : 'יתרת חשבונות'}</CardTitle>
                         <Wallet className="h-4 w-4 text-orange-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-[#323338]">
+                        <div className="text-xl md:text-2xl font-bold text-[#323338]">
                             {/* If Business -> Net Worth. If Personal -> Bills to Pay (Unpaid) */}
                             {loading ? '...' : <AnimatedNumber value={isBusiness ? currentNetWorth : currentBillsDisplay} currency="₪" />}
                         </div>
