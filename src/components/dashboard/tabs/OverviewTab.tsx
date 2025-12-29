@@ -348,14 +348,14 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     <CardHeader>
                         <CardTitle>הוצאות לפי קטגוריה</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="px-2 pb-6">
                         {expensesByCategoryData.length > 0 ? (
                             <div className="h-[300px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={expensesByCategoryData} barSize={32} margin={{ top: 10, right: 10, left: 20, bottom: 0 }}>
+                                    <BarChart data={expensesByCategoryData} barSize={32} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
-                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} padding={{ left: 10, right: 10 }} />
-                                        <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#6b7280', fontSize: 11 }} />
+                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} />
+                                        <YAxis axisLine={false} tickLine={false} width={45} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#6b7280', fontSize: 11 }} />
                                         <Tooltip
                                             cursor={{ fill: 'transparent' }}
                                             content={({ active, payload, label }) => {
