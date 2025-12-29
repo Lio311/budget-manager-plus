@@ -21,6 +21,7 @@ import { toast } from 'sonner'
 import { swrConfig } from '@/lib/swr-config'
 import { FinancialAdvisorButton } from '@/components/dashboard/FinancialAdvisorButton'
 import { BusinessSettings } from '@/components/settings/BusinessSettings'
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 
 interface Category {
     id: string
