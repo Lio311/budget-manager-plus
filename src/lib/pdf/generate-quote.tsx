@@ -4,8 +4,6 @@
 import { Font, renderToBuffer } from '@react-pdf/renderer'
 import { InvoiceTemplate } from './invoice-template'
 import { prisma } from '@/lib/db'
-import fs from 'fs'
-import path from 'path'
 
 // Keep track of font registration state
 let isFontRegistered = false

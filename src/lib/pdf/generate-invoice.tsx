@@ -16,7 +16,7 @@ function registerFont() {
     try {
         Font.register({
             family: 'Alef',
-            src: path.join(process.cwd(), 'public', 'fonts', 'Alef-Regular.ttf')
+            src: 'https://fonts.gstatic.com/s/alef/v12/6xKxdS9_T593H7S8.ttf'
         })
         isFontRegistered = true
     } catch (error) {
@@ -62,7 +62,10 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
 
         const businessProfile = invoice.user.businessProfile
         const businessBudget = invoice.user.budgets[0]
-        const logoPath = path.join(process.cwd(), 'public', 'K-LOGO.png')
+
+        // Construct logo URL using Vercel URL or fallback
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') || 'https://budget-manager-plus.vercel.app'
+        const logoPath = `${baseUrl}/K-LOGO.png`
 
         // Use invoice's own financial data
         const vatRate = invoice.vatRate * 100 // Convert to percentage
