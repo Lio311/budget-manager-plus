@@ -98,7 +98,8 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
             <aside className={`
                 fixed md:sticky 
                 top-[110px] md:top-[100px] 
-                h-fit max-h-[calc(100vh-130px)] md:h-fit md:max-h-[calc(100vh-120px)]
+                bottom-4 md:bottom-auto
+                h-auto md:h-fit md:max-h-[calc(100vh-120px)]
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
                 z-50
@@ -106,7 +107,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 flex flex-col
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
                 md:w-20 md:hover:w-64 group
-                mx-4 mb-4 md:m-4 rounded-3xl
+                mx-4 md:m-4 rounded-3xl
                 glass-panel border-white/50 shadow-2xl
             `}>
                 <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10">
