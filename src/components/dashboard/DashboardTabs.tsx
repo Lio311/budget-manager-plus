@@ -97,17 +97,17 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
             {/* Sidebar Navigation - Floating Dock */}
             <aside className={`
                 fixed md:sticky 
-                top-[120px] md:top-[100px] 
-                h-fit max-h-[calc(100dvh-130px)] md:h-fit md:max-h-[calc(100vh-120px)]
+                top-0 md:top-[100px] 
+                h-[100dvh] md:h-fit md:max-h-[calc(100vh-120px)]
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
-                z-50
+                z-[100] md:z-50
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                 flex flex-col
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
                 md:w-20 md:hover:w-64 group
-                mx-4 md:m-4 rounded-3xl
-                glass-panel border-white/50 shadow-2xl
+                m-0 md:m-4 md:rounded-3xl
+                bg-white/95 backdrop-blur-xl md:bg-white/40 md:backdrop-blur-md border-l md:border border-white/50 shadow-2xl
             `}>
                 <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10">
                     <span className="font-bold text-lg text-[#323338]">תפריט</span>
