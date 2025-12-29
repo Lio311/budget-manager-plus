@@ -440,15 +440,14 @@ export function InvoicesTab() {
                                                     onValueChange={(value) => handleStatusChange(inv.id, value)}
                                                 >
                                                     <SelectTrigger className={`h-7 min-w-[100px] text-xs px-2 gap-1 border border-gray-200 shadow-sm ${inv.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
-                                                            inv.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
-                                                                inv.status === 'PAID' ? 'bg-green-50 text-green-700' :
-                                                                    inv.status === 'OVERDUE' ? 'bg-red-50 text-red-700' :
-                                                                        'bg-gray-50 text-gray-700'
+                                                        inv.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
+                                                            inv.status === 'PAID' ? 'bg-green-50 text-green-700' :
+                                                                inv.status === 'OVERDUE' ? 'bg-red-50 text-red-700' :
+                                                                    'bg-gray-50 text-gray-700'
                                                         }`}>
-                                                        <div className="flex items-center justify-between w-full">
+                                                        <span className="w-full text-center font-medium">
                                                             <SelectValue />
-                                                            <ChevronDown className="h-3 w-3 opacity-50" />
-                                                        </div>
+                                                        </span>
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value="DRAFT">טיוטה</SelectItem>
