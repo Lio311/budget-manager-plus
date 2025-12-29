@@ -267,7 +267,7 @@ export default function LandingPage() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
                     variants={containerVariants}
-                    className="mt-32 max-w-6xl mx-auto"
+                    className="mt-12 max-w-6xl mx-auto"
                 >
                     <motion.h3 variants={itemVariants} className="text-3xl font-bold text-center mb-16 text-gray-900">
                         כל מה שאתם צריכים כדי להצליח
