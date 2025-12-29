@@ -5,6 +5,7 @@ import useSWR, { useSWRConfig } from 'swr'
 
 import { Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X } from 'lucide-react'
 import { format } from 'date-fns'
+import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -259,11 +260,7 @@ export function IncomeTab() {
     const [newCategoryName, setNewCategoryName] = useState('')
     const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
 
-    import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 
-    // ... (existing imports)
-
-    // ...
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)

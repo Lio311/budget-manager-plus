@@ -10,6 +10,7 @@ import {
     Umbrella, Dumbbell, Shield
 } from 'lucide-react'
 import { format } from 'date-fns'
+import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -427,9 +428,7 @@ export function ExpensesTab() {
 
 
 
-    import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 
-    // ...
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1)
