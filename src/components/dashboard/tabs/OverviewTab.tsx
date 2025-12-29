@@ -279,52 +279,51 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <CardTitle>התפלגות תקציב</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <CardContent>
-                            {incomeVsExpenses.length > 0 ? (
-                                <div className="h-[300px] w-full relative" style={{ fontFamily: 'var(--font-sans), system-ui, sans-serif' }}>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                data={incomeVsExpenses}
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={80} // Large inner radius
-                                                outerRadius={110} // Large outer radius
-                                                paddingAngle={4}
-                                                dataKey="value"
-                                                stroke="none"
-                                                style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.15))' }}
-                                                animationBegin={0}
-                                                animationDuration={1500}
-                                                animationEasing="ease-out"
-                                            >
-                                                {incomeVsExpenses.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip content={<CustomTooltip currency="₪" />} itemStyle={{ fontFamily: 'inherit' }} />
-                                            <Legend
-                                                verticalAlign="bottom"
-                                                height={36}
-                                                iconType="circle"
-                                                iconSize={8} // Small dots
-                                                className="scrollbar-hide"
-                                                formatter={(value) => <span className="text-black mx-2 text-xs font-medium">{value}</span>}
-                                                wrapperStyle={{
-                                                    paddingTop: '20px',
-                                                    display: 'flex',
-                                                    width: '100%',
-                                                    justifyContent: 'center',
-                                                    flexWrap: 'wrap',
-                                                    gap: '10px'
-                                                }}
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </div>
-                        </div>
+                        {incomeVsExpenses.length > 0 ? (
+                            <div className="h-[300px] w-full relative" style={{ fontFamily: 'var(--font-sans), system-ui, sans-serif' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={incomeVsExpenses}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={80} // Large inner radius
+                                            outerRadius={110} // Large outer radius
+                                            paddingAngle={4}
+                                            dataKey="value"
+                                            stroke="none"
+                                            style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.15))' }}
+                                            animationBegin={0}
+                                            animationDuration={1500}
+                                            animationEasing="ease-out"
+                                        >
+                                            {incomeVsExpenses.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip currency="₪" />} itemStyle={{ fontFamily: 'inherit' }} />
+                                        <Legend
+                                            verticalAlign="bottom"
+                                            height={36}
+                                            iconType="circle"
+                                            iconSize={8} // Small dots
+                                            className="scrollbar-hide"
+                                            formatter={(value) => <span className="text-black mx-2 text-xs font-medium">{value}</span>}
+                                            wrapperStyle={{
+                                                paddingTop: '20px',
+                                                display: 'flex',
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                                flexWrap: 'wrap',
+                                                gap: '10px'
+                                            }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+
                         ) : (
-                        <EmptyChartState title="התפלגות תקציב" />
+                            <EmptyChartState title="התפלגות תקציב" />
                         )}
                     </CardContent>
                 </Card>
@@ -338,7 +337,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         {expensesByCategoryData.length > 0 ? (
                             <div className="h-[300px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={expensesByCategoryData} barSize={40}>
+                                    <BarChart data={expensesByCategoryData} barSize={32} margin={{ top: 10, right: 10, left: 20, bottom: 0 }}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} />
                                         <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#6b7280', fontSize: 11 }} />
