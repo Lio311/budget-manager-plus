@@ -38,7 +38,7 @@ export async function generateQuotePDF({ quoteId, userId }: GenerateQuotePDFPara
 
                 Font.register({
                     family: 'Alef',
-                    src: Buffer.from(fontBuffer)
+                    src: `data:font/ttf;base64,${Buffer.from(fontBuffer).toString('base64')}`
                 })
                 isFontRegistered = true
             } catch (fontError) {

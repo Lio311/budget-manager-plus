@@ -40,7 +40,7 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
 
                 Font.register({
                     family: 'Alef',
-                    src: Buffer.from(fontBuffer)
+                    src: `data:font/ttf;base64,${Buffer.from(fontBuffer).toString('base64')}`
                 })
                 isFontRegistered = true
             } catch (fontError) {
