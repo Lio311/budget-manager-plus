@@ -427,9 +427,15 @@ export function ExpensesTab() {
 
 
 
+    import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
+
+    // ...
+
     // Pagination
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
+
+    useAutoPaginationCorrection(currentPage, expenses.length, itemsPerPage, setCurrentPage)
     const totalPages = Math.ceil(expenses.length / itemsPerPage)
 
     const paginatedExpenses = expenses.slice(

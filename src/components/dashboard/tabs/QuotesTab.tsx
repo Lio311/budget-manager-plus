@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch'
 import { getQuotes, createQuote, updateQuoteStatus, getNextQuoteNumber, type QuoteFormData } from '@/lib/actions/quotes'
 import { getClients } from '@/lib/actions/clients'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
+import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -83,6 +84,8 @@ export function QuotesTab() {
     )
 
     const itemsPerPage = 5
+
+    useAutoPaginationCorrection(currentPage, filteredQuotes.length, itemsPerPage, setCurrentPage)
     const totalPages = Math.ceil(filteredQuotes.length / itemsPerPage)
     const paginatedQuotes = filteredQuotes.slice(
         (currentPage - 1) * itemsPerPage,

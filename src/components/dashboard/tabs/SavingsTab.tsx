@@ -14,6 +14,7 @@ import { getSavings, addSaving, deleteSaving, updateSaving } from '@/lib/actions
 import { getCategories, addCategory } from '@/lib/actions/category'
 import { useToast } from '@/hooks/use-toast'
 import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
+import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 import { DatePicker } from '@/components/ui/date-picker'
 import { format } from 'date-fns'
 import { PRESET_COLORS } from '@/lib/constants'
@@ -104,6 +105,8 @@ export function SavingsTab() {
     const [submitting, setSubmitting] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
+
+    useAutoPaginationCorrection(currentPage, savings.length, itemsPerPage, setCurrentPage)
     const totalPages = Math.ceil(savings.length / itemsPerPage)
 
     useEffect(() => {

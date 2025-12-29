@@ -10,6 +10,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { addBill, getBills, updateBill, deleteBill, toggleBillPaid } from '@/lib/actions/bill'
 import { formatCurrency } from '@/lib/utils'
 import { useOptimisticToggle, useOptimisticDelete } from '@/hooks/useOptimisticMutation'
+import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
 
@@ -66,6 +67,8 @@ export function BillsTab() {
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
+
+    useAutoPaginationCorrection(currentPage, bills.length, itemsPerPage, setCurrentPage)
     const totalPages = Math.ceil(bills.length / itemsPerPage)
 
     useEffect(() => {

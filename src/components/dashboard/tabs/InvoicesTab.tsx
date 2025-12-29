@@ -7,6 +7,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { getInvoices, createInvoice, updateInvoiceStatus, getNextInvoiceNumber, type InvoiceFormData } from '@/lib/actions/invoices'
 import { getClients } from '@/lib/actions/clients'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
+import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -87,6 +88,8 @@ export function InvoicesTab() {
     )
 
     const itemsPerPage = 5
+
+    useAutoPaginationCorrection(currentPage, filteredInvoices.length, itemsPerPage, setCurrentPage)
     const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage)
     const paginatedInvoices = filteredInvoices.slice(
         (currentPage - 1) * itemsPerPage,

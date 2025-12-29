@@ -259,9 +259,17 @@ export function IncomeTab() {
     const [newCategoryName, setNewCategoryName] = useState('')
     const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
 
+    import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
+
+    // ... (existing imports)
+
+    // ...
+
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
+
+    useAutoPaginationCorrection(currentPage, incomes.length, itemsPerPage, setCurrentPage)
     const totalPages = Math.ceil(incomes.length / itemsPerPage)
 
     const paginatedIncomes = incomes.slice(

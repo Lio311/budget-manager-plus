@@ -11,6 +11,7 @@ import { formatCurrency } from '@/lib/utils'
 import { getDebts, addDebt, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib/actions/debts'
 import { useToast } from '@/hooks/use-toast'
 import { useOptimisticToggle, useOptimisticDelete } from '@/hooks/useOptimisticMutation'
+import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Pagination } from '@/components/ui/Pagination'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -83,6 +84,8 @@ export function DebtsTab() {
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
+
+    useAutoPaginationCorrection(currentPage, debts.length, itemsPerPage, setCurrentPage)
     const totalPages = Math.ceil(debts.length / itemsPerPage)
 
     const paginatedDebts = debts.slice(
