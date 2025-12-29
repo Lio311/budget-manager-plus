@@ -223,7 +223,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 {/* 4. Account Balance (Leftmost in visual RTL) */}
                 <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'שווי נקי' : 'יתרת חשבונות'}</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'הון עצמי' : 'יתרת חשבונות'}</CardTitle>
                         <Wallet className="h-4 w-4 text-orange-500" />
                     </CardHeader>
                     <CardContent>
