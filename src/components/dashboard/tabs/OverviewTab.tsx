@@ -237,7 +237,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card>
 
                 {/* 3. Month Savings (Calculated) */}
-                <Card className="glass-panel border-r-4 border-r-blue-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('savings')}>
+                <Card className="glass-panel border-r-4 border-r-blue-500 shadow-sm transition-all">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'רווח נקי' : 'חיסכון חודשי'}</CardTitle>
                         <PiggyBank className="h-4 w-4 text-blue-500" />
@@ -253,7 +253,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card>
 
                 {/* 4. Equity / Bills (Leftmost) */}
-                <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all">
+                <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('bills')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'הון עצמי' : 'יתרת חשבונות'}</CardTitle>
                         <Wallet className="h-4 w-4 text-orange-500" />
