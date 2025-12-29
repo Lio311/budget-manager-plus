@@ -57,6 +57,11 @@ export function useOptimisticMutation<TData, TInput>(
             // Execute mutation
             const result = await mutationFn(input)
 
+            // Check for server action error convention
+            if (result && typeof result === 'object' && 'success' in result && !result.success) {
+                throw new Error(result.error || 'Server action failed')
+            }
+
             // Revalidate from server
             await mutate(key)
 
