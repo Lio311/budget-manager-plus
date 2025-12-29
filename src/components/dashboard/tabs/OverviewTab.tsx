@@ -140,7 +140,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             return { name, value, color }
         })
         .sort((a: any, b: any) => b.value - a.value)
-        .slice(0, 6)
+
 
     const handleSaveSettings = async () => {
         const result = await updateUserSettings({
