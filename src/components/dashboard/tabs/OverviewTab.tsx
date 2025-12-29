@@ -111,6 +111,19 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         { name: 'חיסכון', value: totalSavingsObserved, color: COLORS.savings },
     ].filter(item => item.value > 0)
 
+    // Monthly Savings Calculation (User Requested Formula)
+    const paidBills = current.bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
+    const paidDebts = current.debts.reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
+
+    // Formula: Income - Expenses - PaidBills - Savings(Observed) - PaidDebts
+    const monthlySavingsCalculated = totalIncome - totalExpenses - paidBills - totalSavingsObserved - paidDebts
+
+    // Data for "Expenses by Category" (Actually Total Comparison per user screenshot)
+    const expensesComparisonData = [
+        { name: 'נוכחי', value: totalExpenses },
+        { name: 'קודם', value: prevTotalExpenses }
+    ]
+
     const handleSaveSettings = async () => {
         const result = await updateUserSettings({
             initialBalance: parseFloat(initialBalance) || 0,
@@ -128,21 +141,33 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     const currentBillsDisplay = current.bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
 
+    // Prepare data for AI Advisor (injecting month/year)
+    const aiFinancialData = {
+        ...current,
+        totalIncome,
+        totalExpenses,
+        savingsRemainder: monthlySavingsCalculated,
+        month,
+        year,
+        currency,
+        initialBalance: overviewData?.user?.initialBalance,
+        initialSavings: overviewData?.user?.initialSavings
+    }
+
     return (
         <div className="space-y-6 pb-20 animate-in fade-in-50 duration-500 font-sans" dir="rtl">
 
             {/* Header & Action Buttons Row */}
-            <div className="flex flex-col-reverse md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
 
-                {/* Visual Title (Desktop) - Matches screenshot "Scan Overview" */}
-                {/* Actually user screenshot has title on RIGHT. Buttons on LEFT. */}
-                {/* Because dir="rtl", Left is flex-end. */}
-                {/* We want buttons on LEFT (visually). In RTL flex-start is Right. flex-end is Left. */}
+                {/* Title - First in DOM -> Right in RTL */}
+                <div className="flex items-center gap-2">
+                    <PieChartIcon className="w-6 h-6 text-[#323338]" />
+                    <h1 className="text-2xl font-bold text-[#323338]">סקירה כללית</h1>
+                </div>
 
-                {/* Buttons Group - Visually Left */}
+                {/* Buttons Group - Second in DOM -> Left in RTL */}
                 <div className="flex gap-2 items-center w-full md:w-auto justify-end md:justify-end">
-                    {/* Wait, in RTL: justify-start is Right. justify-end is Left. */}
-                    {/* User wants buttons on Left. So justify-end. */}
                     <Button
                         variant="outline"
                         size="icon"
@@ -152,27 +177,16 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     >
                         <Settings className="w-4 h-4" />
                     </Button>
-                    <FinancialAdvisorButton financialData={overviewData?.current} />
+                    <FinancialAdvisorButton financialData={aiFinancialData} />
                     <FeedbackButton />
-                </div>
-
-                {/* Title - Visually Right */}
-                <div className="flex items-center gap-2">
-                    <PieChartIcon className="w-6 h-6 text-[#323338]" />
-                    <h1 className="text-2xl font-bold text-[#323338]">סקירה כללית</h1>
                 </div>
 
             </div>
 
-            {/* Top Row: Key Metrics - ORDER for RTL (Right to Left): 
-               1. Income (Rightmost)
-               2. Expenses
-               3. Savings
-               4. Balance (Leftmost)
-            */}
+            {/* Top Row: Key Metrics - ORDER for RTL (Visual Right to Left) */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
-                {/* 1. Income (Rightmost in visual RTL) */}
+                {/* 1. Income (Rightmost) */}
                 <Card className="glass-panel border-r-4 border-r-green-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('income')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'מכירות' : 'סך הכנסות'}</CardTitle>
@@ -204,7 +218,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     </CardContent>
                 </Card>
 
-                {/* 3. Month Savings */}
+                {/* 3. Month Savings (Calculated) */}
                 <Card className="glass-panel border-r-4 border-r-blue-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('savings')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'רווח נקי' : 'חיסכון חודשי'}</CardTitle>
@@ -212,7 +226,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-[#323338]">
-                            {loading ? '...' : <AnimatedNumber value={isBusiness ? (totalIncome - totalOutflow) : Math.max(0, totalIncome - totalOutflow)} currency="₪" />}
+                            {loading ? '...' : <AnimatedNumber value={monthlySavingsCalculated} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
                             <span className="text-emerald-500 flex items-center gap-1"><ArrowUp className="w-3 h-3" /> 320% חודש שעבר</span>
@@ -220,7 +234,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     </CardContent>
                 </Card>
 
-                {/* 4. Account Balance (Leftmost in visual RTL) */}
+                {/* 4. Equity / Bills (Leftmost) */}
                 <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'הון עצמי' : 'יתרת חשבונות'}</CardTitle>
@@ -228,7 +242,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-[#323338]">
-                            {loading ? '...' : <AnimatedNumber value={currentNetWorth} currency="₪" />}
+                            {/* If Business -> Net Worth. If Personal -> Bills to Pay (Unpaid) */}
+                            {loading ? '...' : <AnimatedNumber value={isBusiness ? currentNetWorth : currentBillsDisplay} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
                             <span className="text-emerald-500 flex items-center gap-1"><ArrowUp className="w-3 h-3" /> 100% חודש שעבר</span>
@@ -240,68 +255,76 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             {/* Charts Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
 
-                {/* 2. Distribution Pie Chart (Visually Right in RTL -> Code Item 1) */}
-                <Card className="glass-panel shadow-sm min-h-[350px]">
+                {/* 2. Distribution Pie Chart (Visually Right in RTL) */}
+                <Card className="glass-panel shadow-sm min-h-[400px]">
                     <CardHeader>
                         <CardTitle>התפלגות תקציב</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[250px] w-full relative" style={{ fontFamily: 'var(--font-sans), system-ui, sans-serif' }}>
+                        <div className="h-[300px] w-full relative" style={{ fontFamily: 'var(--font-sans), system-ui, sans-serif' }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
                                         data={incomeVsExpenses}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
+                                        innerRadius={80} // Large inner radius
+                                        outerRadius={110} // Large outer radius
+                                        paddingAngle={4}
                                         dataKey="value"
+                                        stroke="none"
+                                        style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.15))' }}
                                     >
                                         {incomeVsExpenses.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                                         ))}
                                     </Pie>
                                     <Tooltip content={<CustomTooltip currency="₪" />} itemStyle={{ fontFamily: 'inherit' }} />
-                                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
+                                    <Legend
+                                        verticalAlign="bottom"
+                                        height={36}
+                                        iconType="circle"
+                                        iconSize={8} // Small dots
+                                        formatter={(value) => <span className="text-black mx-2 text-xs font-medium">{value}</span>}
+                                        wrapperStyle={{ paddingTop: '20px', display: 'flex', justifyContent: 'center', width: '100%' }}
+                                    />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* 1. Cash Flow Bar Chart (Visually Left in RTL -> Code Item 2) */}
-                <Card className="glass-panel shadow-sm min-h-[350px]">
+                {/* 1. Expenses By Category Comparison Chart (Visually Left in RTL) */}
+                <Card className="glass-panel shadow-sm min-h-[400px]">
                     <CardHeader>
                         <CardTitle>הוצאות לפי קטגוריה</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[250px] w-full">
+                        <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={[{ name: 'נוכחי', income: totalIncome, expenses: totalExpenses }, { name: 'קודם', income: prevTotalIncome, expenses: prevTotalExpenses }]}>
+                                <BarChart data={expensesComparisonData} barSize={40}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} />
-                                    <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val / 1000}k`} tick={{ fill: '#6b7280' }} />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
+                                    <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val / 1000}k`} tick={{ fill: '#6b7280', fontSize: 11 }} />
                                     <Tooltip cursor={{ fill: 'transparent' }} content={<CustomTooltip currency="₪" />} />
-                                    <Bar dataKey="expenses" name={isBusiness ? 'הוצאות' : 'הוצאות'} fill="#64748B" radius={[4, 4, 0, 0]} barSize={20} />
+                                    <Bar dataKey="value" fill="#64748B" radius={[4, 4, 0, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* 3. Budget Status (Progress Bars) (Left) - Wait, User said "Row 2: Left = Progress, Right = Net Worth". 
-                    In RTL: Right is Item 1, Left is Item 2.
-                    So Item 1 should be Net Worth (Right).
-                    Item 2 should be Progress (Left).
-                 */}
+                {/* 4. Net Worth (Green Area Chart) (Visually Right in RTL) */}
+                <Card className="glass-panel shadow-sm min-h-[350px]">
+                    <CardHeader>
+                        <CardTitle>הון עצמי</CardTitle>
+                    </CardHeader>
+                    <CardContent className="h-[300px] -ml-4">
+                        <NetWorthChart data={netWorthHistory} loading={loading} />
+                    </CardContent>
+                </Card>
 
-                {/* 4. Net Worth (Area Chart) (Visually Right in RTL -> Code Item 1) */}
-                <div className="min-h-[350px]">
-                    <NetWorthChart data={netWorthHistory} loading={loading} />
-                </div>
-
-                {/* 3. Budget Status (Progress Bars) (Visually Left in RTL -> Code Item 2) */}
+                {/* 3. Budget Status (Progress Bars) (Visually Left in RTL) */}
                 <Card className="glass-panel shadow-sm col-span-1 md:col-span-1 min-h-[350px]">
                     <CardHeader>
                         <CardTitle>מצב תקציב חודשי</CardTitle>
@@ -322,10 +345,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="font-medium text-gray-700">חשבונות (שולם)</span>
-                                <span className="font-medium text-gray-900">{formatCurrency(totalBills)}</span>
+                                <span className="font-medium text-gray-900">{formatCurrency(paidBills)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-orange-500 rounded-full" style={{ width: '45%' }} />
+                                <div className="h-full bg-orange-500 rounded-full" style={{ width: `${Math.min((paidBills / (totalBills || 1)) * 100, 100)}%` }} />
                             </div>
                         </div>
 
@@ -333,7 +356,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="font-medium text-gray-700">חובות ששולמו</span>
-                                <span className="font-medium text-gray-900">{formatCurrency(totalDebts)}</span>
+                                <span className="font-medium text-gray-900">{formatCurrency(paidDebts)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                                 <div className="h-full bg-purple-500 rounded-full" style={{ width: '100%' }} />
@@ -364,15 +387,15 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     <div className="space-y-4 py-4 text-right">
                         <div className="space-y-2">
                             <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
-                            <Input value={initialBalance} onChange={(e) => setInitialBalance(e.target.value)} type="number" className="text-left" />
+                            <Input value={initialBalance} onChange={(e) => setInitialBalance(e.target.value)} type="number" className="text-right" />
                         </div>
                         <div className="space-y-2">
                             <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
-                            <Input value={initialSavings} onChange={(e) => setInitialSavings(e.target.value)} type="number" className="text-left" />
+                            <Input value={initialSavings} onChange={(e) => setInitialSavings(e.target.value)} type="number" className="text-right" />
                         </div>
                     </div>
-                    <DialogFooter className="sm:justify-start gap-2">
-                        <Button onClick={handleSaveSettings}>שמור הגדרות</Button>
+                    <DialogFooter className="sm:justify-end gap-2">
+                        <Button onClick={handleSaveSettings} className="bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
