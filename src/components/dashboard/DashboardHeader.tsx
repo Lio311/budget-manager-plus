@@ -80,35 +80,42 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                 {/* Mobile Layout - Compressed */}
                 <div className="flex md:hidden items-center justify-between w-full px-1">
                     {/* Menu Button */}
-                    <Button
-                        size="icon"
-                        onClick={onMenuToggle}
-                        className={`h-10 w-10 rounded-full flex-shrink-0 transition-all duration-300 border shadow-sm ${menuOpen
-                            ? 'bg-white hover:bg-gray-100 text-black border-gray-200'
-                            : 'bg-black hover:bg-gray-800 text-white border-transparent'
-                            }`}
-                    >
-                        <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            size="icon"
+                            onClick={onMenuToggle}
+                            className={`h-10 w-10 rounded-full flex-shrink-0 transition-all duration-300 border shadow-sm ${menuOpen
+                                ? 'bg-white hover:bg-gray-100 text-black border-gray-200'
+                                : 'bg-black hover:bg-gray-800 text-white border-transparent'
+                                }`}
+                        >
+                            <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
+                        </Button>
+                        <UserButton />
+                    </div>
 
                     {/* Date Selector */}
-                    <div className="flex items-center gap-1 bg-white/50 rounded-full p-1 border border-white/40 shadow-sm mx-2">
+                    <div className="flex items-center gap-1 bg-white/50 rounded-full p-1 border border-white/40 shadow-sm">
                         <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 rounded-full">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
-                        <div className="text-center min-w-[90px]">
-                            <h2 className="text-sm font-bold whitespace-nowrap text-[#323338]">
-                                {getMonthName(month)} {year}
-                            </h2>
+                        <div className="text-center min-w-[80px]" onClick={() => {
+                            // Simple toggle for mobile if space is tight, or just render the full switcher below
+                            const nextType = budgetType === 'PERSONAL' ? 'BUSINESS' : 'PERSONAL'
+                            handleToggle(nextType)
+                        }}>
+                            <div className="flex flex-col items-center">
+                                <h2 className="text-sm font-bold whitespace-nowrap text-[#323338] leading-none">
+                                    {getMonthName(month)} {year}
+                                </h2>
+                                <span className={`text-[10px] font-bold ${budgetType === 'BUSINESS' ? 'text-blue-600' : 'text-emerald-600'}`}>
+                                    {budgetType === 'BUSINESS' ? 'עסקי' : 'פרטי'}
+                                </span>
+                            </div>
                         </div>
                         <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 rounded-full">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
-                    </div>
-
-                    {/* User Button */}
-                    <div className="flex items-center gap-2">
-                        <UserButton />
                     </div>
                 </div>
 
