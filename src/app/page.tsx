@@ -19,18 +19,18 @@ export default function HomePage() {
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100">
             <div className="container mx-auto px-4 py-16">
                 {/* Header */}
-                <div className="text-center mb-16">
+                <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-backwards">
                     <div className="flex items-center justify-center gap-3 mb-2">
                         <Image
                             src="/K-LOGO.png"
                             alt="Keseflow"
                             width={600}
                             height={180}
-                            className="h-20 md:h-32 w-auto"
+                            className="h-20 md:h-32 w-auto hover:scale-105 transition-transform duration-500"
                             priority
                         />
                     </div>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto delay-200 animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-backwards">
                         שליטה מלאה בתזרים המזומנים שלך – כל הכלים לצמיחה כלכלית במקום אחד.
                         מערכת מקיפה לניהול תקציב, מעקב הוצאות, תכנון חובות וחיסכון. קבל תמונת מצב מדויקת וכלים חכמים לקבלת החלטות נכונות.
                     </p>
@@ -38,9 +38,9 @@ export default function HomePage() {
 
 
                 {/* Personal Solution Section */}
-                <div className="mb-20 bg-blue-50 p-8 md:p-12 rounded-3xl border border-blue-200 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mt-32"></div>
-                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-200 rounded-full blur-3xl opacity-20 -mr-32 -mb-32"></div>
+                <div className="mb-20 bg-blue-50 p-8 md:p-12 rounded-3xl border border-blue-200 relative overflow-hidden animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300 fill-mode-backwards">
+                    <div className="absolute top-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mt-32 animate-pulse duration-[3000ms]"></div>
+                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-200 rounded-full blur-3xl opacity-20 -mr-32 -mb-32 animate-pulse duration-[4000ms]"></div>
 
                     <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
                         {/* Visual Side (Appears Right in RTL due to order, Wait... Primary Column is Right in RTL. So this is Right Column) */}
@@ -133,9 +133,9 @@ export default function HomePage() {
                 </div>
 
                 {/* Business Solution Section */}
-                <div className="mb-20 bg-green-50 p-8 md:p-12 rounded-3xl border border-green-200 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-green-200 rounded-full blur-3xl opacity-20 -mr-32 -mt-32"></div>
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mb-32"></div>
+                <div className="mb-20 bg-green-50 p-8 md:p-12 rounded-3xl border border-green-200 relative overflow-hidden animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-500 fill-mode-backwards">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-green-200 rounded-full blur-3xl opacity-20 -mr-32 -mt-32 animate-pulse duration-[3000ms]"></div>
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mb-32 animate-pulse duration-[4000ms]"></div>
 
                     <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
                         <div>
@@ -249,7 +249,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Features List */}
-                <div className="mt-20 max-w-4xl mx-auto">
+                <div className="mt-20 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-700 fill-mode-backwards">
                     <h3 className="text-2xl font-bold text-center mb-10">מה כוללת המערכת?</h3>
                     <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
                         <BenefitItem text="מעקב אחר הכנסות והוצאות לפי קטגוריות" />
