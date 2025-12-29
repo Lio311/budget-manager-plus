@@ -301,7 +301,22 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                 <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                                             ))}
                                         </Pie>
-                                        <Tooltip content={<CustomTooltip currency="₪" />} itemStyle={{ fontFamily: 'inherit' }} />
+                                        <Tooltip
+                                            content={({ active, payload }) => {
+                                                if (active && payload && payload.length) {
+                                                    const data = payload[0];
+                                                    return (
+                                                        <div className="glass-panel px-3 py-2 border border-white/50 shadow-xl rounded-xl backdrop-blur-xl text-right">
+                                                            <p className="font-bold text-[#323338] text-sm mb-0.5">{data.name}</p>
+                                                            <p className="font-mono text-gray-600 font-medium text-xs">
+                                                                ₪{Number(data.value).toLocaleString()}
+                                                            </p>
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            }}
+                                        />
                                         <Legend
                                             verticalAlign="bottom"
                                             height={36}
