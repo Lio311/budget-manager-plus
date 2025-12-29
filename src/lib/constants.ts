@@ -14,6 +14,15 @@ export const PRESET_COLORS = [
 
 export function getHexFromClass(className: string | null) {
     if (!className) return '#94A3B8' // Default gray
+
+    // 1. Try exact match
     const preset = PRESET_COLORS.find(c => c.class === className)
-    return preset ? preset.hex : '#94A3B8'
+    if (preset) return preset.hex
+
+    // 2. Try parsing the color name from the class string (e.g. "bg-green-500")
+    for (const p of PRESET_COLORS) {
+        if (className.includes(p.name.toLowerCase())) return p.hex
+    }
+
+    return '#94A3B8'
 }
