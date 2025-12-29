@@ -441,36 +441,66 @@ export function InvoicesTab() {
                                                 <span>{format(new Date(inv.date), 'dd/MM/yyyy')}</span>
                                                 <span className="w-1 h-1 rounded-full bg-gray-300" />
                                                 <span>{inv.items?.length || 0} פריטים</span>
-                                                {inv.dueDate && (
-                                                    <>
-                                                        <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                        <span className={new Date(inv.dueDate) < new Date() && inv.status !== 'PAID' ? 'text-red-500' : ''}>
-                                                            לתשלום עד {format(new Date(inv.dueDate), 'dd/MM/yyyy')}
-                                                        </span>
-                                                        Wait, handleDelete usage was in the viewed code but definition is missing in the file I viewed?
-                                                        Let's check Step 1261.
-                                                        I DON'T see handleDelete defined in lines 1-146.
-                                                        But line 406 uses it.
-                                                        This is another error. I should remove the Delete button or add the function.
-                                                        I'll hide it for now to be safe.
-                                        */}
-                                                    </div>
-                                            </div>
+                                            </>
+                                                )}
                                         </div>
-                                        ))
-                    )}
                                     </div>
+                                </div>
 
-                                    {totalPages > 1 && (
-                                        <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
-                                            <Pagination
-                                                currentPage={currentPage}
-                                                totalPages={totalPages}
-                                                onPageChange={setCurrentPage}
-                                            />
-                                        </div>
-                                    )}
+                                {/* Center: Dropdown */}
+                                <div className="flex items-center justify-center flex-1" onClick={(e) => e.stopPropagation()}>
+                                    <Select
+                                        value={inv.status}
+                                        onValueChange={(value) => handleStatusChange(inv.id, value)}
+                                    >
+                                        <SelectTrigger className={`h-7 w-[110px] text-xs px-2 border border-gray-200 shadow-sm ${inv.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
+                                            inv.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
+                                                inv.status === 'PAID' ? 'bg-green-50 text-green-700' :
+                                                    inv.status === 'OVERDUE' ? 'bg-red-50 text-red-700' :
+                                                        'bg-gray-50 text-gray-700'
+                                            }`}>
+                                            <span className="w-full text-center font-medium">
+                                                <SelectValue />
+                                            </span>
+                                        </SelectTrigger>
+                                        <SelectContent dir="rtl">
+                                            <SelectItem value="DRAFT">טיוטה</SelectItem>
+                                            <SelectItem value="SENT">נשלח</SelectItem>
+                                            <SelectItem value="PAID">שולם</SelectItem>
+                                            <SelectItem value="OVERDUE">באיחור</SelectItem>
+                                            <SelectItem value="CANCELLED">בוטל</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Left Side: Amount + Download */}
+                                <div className="flex items-center gap-6 flex-1 justify-end">
+                                    <div className="text-left">
+                                        <div className="font-bold text-[#323338] text-lg">{formatCurrency(inv.totalAmount)}</div>
+                                        <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(inv.totalAmount - (inv.vatAmount || 0))}</div>
+                                    </div>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Button variant="ghost" size="icon" onClick={() => handleDownloadPDF(inv.id)}>
+                                            <Download className="h-4 w-4 text-gray-500" />
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
+                            </div>
+                ))
+                    )}
+            </div>
+
+            {totalPages > 1 && (
+                <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
+            )}
+        </div>
+                            </div >
                         )
 }
