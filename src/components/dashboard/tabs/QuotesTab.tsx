@@ -399,65 +399,72 @@ export function QuotesTab() {
                     ) : (
                         paginatedQuotes.map((quote) => (
                             <div key={quote.id} className="bg-white p-4 hover:bg-gray-50 transition-all flex items-center justify-between group">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold">
-                                        {quote.clientName?.[0] || '?'}
-                                    </div>
-                                    <div>
-                                        <div className="font-bold text-[#323338] flex items-center gap-2">
-                                            {quote.clientName}
-                                            <span className="text-xs font-normal text-gray-400">
-                                                #{quote.quoteNumber}
-                                            </span>
-                                            <div onClick={(e) => e.stopPropagation()}>
-                                                <Select
-                                                    value={quote.status}
-                                                    onValueChange={(value) => handleStatusChange(quote.id, value)}
-                                                >
-                                                    <SelectTrigger className={`h-7 min-w-[100px] text-xs px-2 gap-1 border border-gray-200 shadow-sm ${quote.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
-                                                        quote.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
-                                                            quote.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
-                                                                quote.status === 'EXPIRED' ? 'bg-orange-50 text-orange-700' :
-                                                                    'bg-gray-50 text-gray-700'
-                                                        }`}>
-                                                        <span className="w-full text-center font-medium">
-                                                            <SelectValue />
+                                <div className="flex items-center justify-between w-full">
+                                    {/* Right Side: Avatar + Name + Date */}
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                                            {quote.clientName?.[0] || '?'}
+                                        </div>
+                                        <div>
+                                            <div className="font-bold text-[#323338] flex items-center gap-2">
+                                                {quote.clientName}
+                                                <span className="text-xs font-normal text-gray-400">
+                                                    #{quote.quoteNumber}
+                                                </span>
+                                            </div>
+                                            <div className="text-xs text-[#676879] flex items-center gap-2">
+                                                <span>{format(new Date(quote.date), 'dd/MM/yyyy')}</span>
+                                                <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                <span>{quote.items?.length || 0} פריטים</span>
+                                                {quote.validUntil && (
+                                                    <>
+                                                        <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                        <span className={new Date(quote.validUntil) < new Date() && quote.status !== 'ACCEPTED' ? 'text-red-500' : ''}>
+                                                            בתוקף עד {format(new Date(quote.validUntil), 'dd/MM/yyyy')}
                                                         </span>
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="DRAFT">טיוטה</SelectItem>
-                                                        <SelectItem value="SENT">נשלח</SelectItem>
-                                                        <SelectItem value="ACCEPTED">התקבל</SelectItem>
-                                                        <SelectItem value="EXPIRED">פג תוקף</SelectItem>
-                                                        <SelectItem value="CANCELLED">בוטל</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
-                                        <div className="text-xs text-[#676879] flex items-center gap-2">
-                                            <span>{format(new Date(quote.date), 'dd/MM/yyyy')}</span>
-                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                            <span>{quote.items?.length || 0} פריטים</span>
-                                            {quote.validUntil && (
-                                                <>
-                                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                    <span className={new Date(quote.validUntil) < new Date() ? 'text-red-500' : ''}>
-                                                        בתוקף עד {format(new Date(quote.validUntil), 'dd/MM/yyyy')}
-                                                    </span>
-                                                </>
-                                            )}
+                                    </div>
+
+                                    {/* Center: Dropdown */}
+                                    <div className="flex items-center justify-center flex-1" onClick={(e) => e.stopPropagation()}>
+                                        <Select
+                                            value={quote.status}
+                                            onValueChange={(value) => handleStatusChange(quote.id, value)}
+                                        >
+                                            <SelectTrigger className={`h-7 w-[110px] text-xs px-2 border border-gray-200 shadow-sm ${quote.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
+                                                quote.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
+                                                    quote.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
+                                                        quote.status === 'EXPIRED' ? 'bg-orange-50 text-orange-700' :
+                                                            'bg-gray-50 text-gray-700'
+                                                }`}>
+                                                <span className="w-full text-center font-medium">
+                                                    <SelectValue />
+                                                </span>
+                                            </SelectTrigger>
+                                            <SelectContent dir="rtl">
+                                                <SelectItem value="DRAFT">טיוטה</SelectItem>
+                                                <SelectItem value="SENT">נשלח</SelectItem>
+                                                <SelectItem value="ACCEPTED">אושר</SelectItem>
+                                                <SelectItem value="EXPIRED">פג תוקף</SelectItem>
+                                                <SelectItem value="REJECTED">נדחה</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {/* Left Side: Amount + Download */}
+                                    <div className="flex items-center gap-6 flex-1 justify-end">
+                                        <div className="text-left">
+                                            <div className="font-bold text-[#323338] text-lg">{formatCurrency(quote.totalAmount)}</div>
+                                            <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-6">
-                                    <div className="text-left">
-                                        <div className="font-bold text-[#323338]">{formatCurrency(quote.totalAmount)}</div>
-                                        <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
-                                    </div>
-                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button variant="ghost" size="icon" onClick={() => handleDownloadPDF(quote.id)}>
-                                            <Download className="h-4 w-4 text-gray-500" />
-                                        </Button>
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button variant="ghost" size="icon" onClick={() => handleDownloadPDF(quote.id)}>
+                                                <Download className="h-4 w-4 text-gray-500" />
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
