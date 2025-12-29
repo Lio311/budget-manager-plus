@@ -15,6 +15,13 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { format } from 'date-fns'
 import { formatCurrency } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const statusConfig = {
     DRAFT: { label: 'טיוטה', icon: FileText, color: 'text-gray-600', bg: 'bg-gray-100' },
@@ -402,11 +409,28 @@ export function QuotesTab() {
                                             <span className="text-xs font-normal text-gray-400">
                                                 #{quote.quoteNumber}
                                             </span>
-                                            {quote.status === 'DRAFT' && <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">טיוטה</span>}
-                                            {quote.status === 'SENT' && <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">נשלח</span>}
-                                            {quote.status === 'ACCEPTED' && <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded">התקבל</span>}
-                                            {quote.status === 'EXPIRED' && <span className="text-[10px] bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded">פג תוקף</span>}
-                                            {quote.status === 'CANCELLED' && <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">בוטל</span>}
+                                            <div onClick={(e) => e.stopPropagation()}>
+                                                <Select
+                                                    value={quote.status}
+                                                    onValueChange={(value) => handleStatusChange(quote.id, value)}
+                                                >
+                                                    <SelectTrigger className={`h-6 text-xs px-2 gap-1 border-0 ${quote.status === 'DRAFT' ? 'bg-gray-100 text-gray-600' :
+                                                            quote.status === 'SENT' ? 'bg-blue-50 text-blue-600' :
+                                                                quote.status === 'ACCEPTED' ? 'bg-green-50 text-green-600' :
+                                                                    quote.status === 'EXPIRED' ? 'bg-orange-50 text-orange-600' :
+                                                                        'bg-gray-100 text-gray-600'
+                                                        }`}>
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="DRAFT">טיוטה</SelectItem>
+                                                        <SelectItem value="SENT">נשלח</SelectItem>
+                                                        <SelectItem value="ACCEPTED">התקבל</SelectItem>
+                                                        <SelectItem value="EXPIRED">פג תוקף</SelectItem>
+                                                        <SelectItem value="CANCELLED">בוטל</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
                                         </div>
                                         <div className="text-xs text-[#676879] flex items-center gap-2">
                                             <span>{format(new Date(quote.date), 'dd/MM/yyyy')}</span>

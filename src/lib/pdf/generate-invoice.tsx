@@ -31,8 +31,23 @@ interface GenerateInvoicePDFParams {
 
 export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoicePDFParams): Promise<{ buffer: Buffer, filename: string }> {
     try {
-        // Ensure font is registered
-        registerFont()
+        // Ensure font is registered with explicit buffer fetch for Vercel
+        if (!isFontRegistered) {
+            try {
+                const fontResponse = await fetch('https://fonts.gstatic.com/s/alef/v12/6xKxdS9_T593H7S8.ttf')
+                if (!fontResponse.ok) throw new Error('Failed to fetch font')
+                const fontBuffer = await fontResponse.arrayBuffer()
+
+                Font.register({
+                    family: 'Alef',
+                    src: Buffer.from(fontBuffer)
+                })
+                isFontRegistered = true
+            } catch (fontError) {
+                console.error('Font registration failed, PDF might not render correctly:', fontError)
+                // Fallback to standard font if custom fails, though Hebrew might break
+            }
+        }
 
         // ... (data fetching remains same)
         const invoice = await prisma.invoice.findFirst({

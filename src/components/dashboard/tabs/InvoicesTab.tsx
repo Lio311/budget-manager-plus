@@ -14,6 +14,13 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { format } from 'date-fns'
 import { formatCurrency } from '@/lib/utils'
 import { DatePicker } from '@/components/ui/date-picker'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const statusConfig = {
     DRAFT: { label: 'טיוטה', icon: FileText, color: 'text-gray-600', bg: 'bg-gray-100' },
@@ -427,11 +434,28 @@ export function InvoicesTab() {
                                             <span className="text-xs font-normal text-gray-400">
                                                 #{inv.invoiceNumber}
                                             </span>
-                                            {inv.status === 'DRAFT' && <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">טיוטה</span>}
-                                            {inv.status === 'SENT' && <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">נשלח</span>}
-                                            {inv.status === 'PAID' && <span className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded">שולם</span>}
-                                            {inv.status === 'OVERDUE' && <span className="text-[10px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded">באיחור</span>}
-                                            {inv.status === 'CANCELLED' && <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">בוטל</span>}
+                                            <div onClick={(e) => e.stopPropagation()}>
+                                                <Select
+                                                    value={inv.status}
+                                                    onValueChange={(value) => handleStatusChange(inv.id, value)}
+                                                >
+                                                    <SelectTrigger className={`h-6 text-xs px-2 gap-1 border-0 ${inv.status === 'DRAFT' ? 'bg-gray-100 text-gray-600' :
+                                                            inv.status === 'SENT' ? 'bg-blue-50 text-blue-600' :
+                                                                inv.status === 'PAID' ? 'bg-green-50 text-green-600' :
+                                                                    inv.status === 'OVERDUE' ? 'bg-red-50 text-red-600' :
+                                                                        'bg-gray-100 text-gray-600'
+                                                        }`}>
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="DRAFT">טיוטה</SelectItem>
+                                                        <SelectItem value="SENT">נשלח</SelectItem>
+                                                        <SelectItem value="PAID">שולם</SelectItem>
+                                                        <SelectItem value="OVERDUE">באיחור</SelectItem>
+                                                        <SelectItem value="CANCELLED">בוטל</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
                                         </div>
                                         <div className="text-xs text-[#676879] flex items-center gap-2">
                                             <span>{format(new Date(inv.date), 'dd/MM/yyyy')}</span>
