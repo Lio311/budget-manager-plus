@@ -119,6 +119,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     // The card displays "isBusiness ? currentNetWorth : currentBillsDisplay" (Unpaid Bills)
     const prevBillsDisplay = previous.bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
 
+    // Current Month Calculations (Moved up for dependencies)
+    const paidBills = current.bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
+    const paidDebts = current.debts.reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
+    const monthlySavingsCalculated = totalIncome - totalExpenses - paidBills - totalSavingsObserved - paidDebts
+    const currentBillsDisplay = current.bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
 
     const incomeChange = prevTotalIncome > 0 ? ((totalIncome - prevTotalIncome) / prevTotalIncome) * 100 : 0
     const expensesChange = prevTotalExpenses > 0 ? ((totalExpenses - prevTotalExpenses) / prevTotalExpenses) * 100 : 0
@@ -156,13 +161,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         )
     }
 
-    // Monthly Savings Calculation (User Requested Formula)
-    const paidBills = current.bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
-    const paidDebts = current.debts.reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
-
-    // Formula: Income - Expenses - PaidBills - Savings(Observed) - PaidDebts
-    const monthlySavingsCalculated = totalIncome - totalExpenses - paidBills - totalSavingsObserved - paidDebts
-
     // Data for "Expenses by Category" (True Category Breakdown)
     const expensesByCategoryMap = current.expenses.reduce((acc: any, item: any) => {
         const cat = item.category || 'שונות'
@@ -194,8 +192,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             toast.error('שגיאה בעדכון הגדרות')
         }
     }
-
-    const currentBillsDisplay = current.bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
 
     // Prepare data for AI Advisor (injecting month/year)
     const aiFinancialData = {
