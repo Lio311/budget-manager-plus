@@ -204,12 +204,14 @@ export default function LandingPage() {
 
                         <motion.div
                             variants={itemVariants}
-                            className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100"
+                            whileHover={{ y: -5 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                            className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform"
                         >
                             {/* Visual representation of business dashboard */}
-                            <div className="space-y-6">
+                            <div className="space-y-3">
                                 {/* Header with Traffic Lights */}
-                                <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+                                <div className="flex justify-between items-center border-b border-gray-100 pb-3">
                                     <div className="text-xs font-bold text-gray-400 tracking-wider">BUSINESS DASHBOARD</div>
                                     <div className="flex gap-1.5">
                                         <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
@@ -219,25 +221,25 @@ export default function LandingPage() {
                                 </div>
 
                                 {/* KPI Cards */}
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-3">
                                     {/* Revenue - Green */}
-                                    <div className="bg-green-50 p-4 rounded-xl border border-green-100">
-                                        <div className="flex justify-between items-start mb-2">
+                                    <div className="bg-green-50 p-3 rounded-xl border border-green-100">
+                                        <div className="flex justify-between items-start mb-1">
                                             <div className="text-green-700 text-xs font-bold">הכנסות החודש</div>
                                         </div>
-                                        <div className="text-2xl font-black text-gray-900 mb-1">₪42,500</div>
-                                        <div className="text-[10px] font-bold text-green-600 flex items-center justify-end gap-1">
-                                            <span>מחודש שעבר</span>
+                                        <div className="text-2xl font-black text-gray-900 mb-0.5">₪42,500</div>
+                                        <div className="text-[10px] font-bold text-green-600 flex items-center justify-start gap-0.5">
                                             <span dir="ltr">+12%</span>
+                                            <span>מחודש שעבר</span>
                                         </div>
                                     </div>
 
                                     {/* VAT - Blue */}
-                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                        <div className="flex justify-between items-start mb-2">
+                                    <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                                        <div className="flex justify-between items-start mb-1">
                                             <div className="text-blue-700 text-xs font-bold">מע״מ לתשלום</div>
                                         </div>
-                                        <div className="text-2xl font-black text-gray-900 mb-1">₪6,120</div>
+                                        <div className="text-2xl font-black text-gray-900 mb-0.5">₪6,120</div>
                                         <div className="text-[10px] font-bold text-blue-500">עד ה-15 לחודש</div>
                                     </div>
                                 </div>
