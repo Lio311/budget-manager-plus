@@ -204,7 +204,7 @@ export default function LandingPage() {
 
                         <motion.div
                             variants={itemVariants}
-                            className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 transform rotate-1 hover:rotate-0 transition-transform duration-500"
+                            className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100"
                         >
                             {/* Visual representation of business dashboard */}
                             <div className="space-y-4">
@@ -289,7 +289,7 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="text-center mt-32"
+                    className="text-center mt-12"
                 >
                     <SignedOut>
                         <div className="space-y-6">
@@ -347,10 +347,10 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
             whileHover={{ y: -5, transition: { duration: 0.2 } }}
             className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 transition-all duration-300 text-center group cursor-pointer"
         >
-            <div className="mb-4 inline-flex p-3 rounded-2xl bg-gray-50 group-hover:bg-blue-50 transition-colors">
+            <div className="mb-4 inline-flex p-3 rounded-2xl bg-gray-50 group-hover:bg-green-50 transition-colors">
                 {icon}
             </div>
-            <h3 className="font-bold text-lg mb-2 text-gray-900 group-hover:text-blue-600 transition-colors">{title}</h3>
+            <h3 className="font-bold text-lg mb-2 text-gray-900 group-hover:text-green-600 transition-colors">{title}</h3>
             <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
         </motion.div>
     )
