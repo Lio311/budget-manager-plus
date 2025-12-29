@@ -133,7 +133,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     // Top 6 categories
     const expensesByCategoryData = Object.entries(expensesByCategoryMap)
-        .map(([name, value]) => ({ name, value }))
+        .map(([name, value]) => {
+            const cat = overviewData?.categories?.find((c: any) => c.name === name)
+            const color = cat ? getHexFromClass(cat.color) : '#64748B'
+            return { name, value, color }
+        })
         .sort((a: any, b: any) => b.value - a.value)
         .slice(0, 6)
 
@@ -287,6 +291,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                         dataKey="value"
                                         stroke="none"
                                         style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.15))' }}
+                                        animationBegin={0}
+                                        animationDuration={1500}
+                                        animationEasing="ease-out"
                                     >
                                         {incomeVsExpenses.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
@@ -298,6 +305,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                         height={36}
                                         iconType="circle"
                                         iconSize={8} // Small dots
+                                        className="scrollbar-hide"
                                         formatter={(value) => <span className="text-black mx-2 text-xs font-medium">{value}</span>}
                                         wrapperStyle={{
                                             paddingTop: '20px',
@@ -323,13 +331,36 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     <CardContent>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={expensesByCategoryData} barSize={40}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
-                                    <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#6b7280', fontSize: 11 }} />
-                                    <Tooltip cursor={{ fill: 'transparent' }} content={<CustomTooltip currency="₪" />} />
-                                    <Bar dataKey="value" fill="#64748B" radius={[4, 4, 0, 0]} />
-                                </BarChart>
+                                <div className="h-[300px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={expensesByCategoryData} barSize={40}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} />
+                                            <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#6b7280', fontSize: 11 }} />
+                                            <Tooltip
+                                                cursor={{ fill: 'transparent' }}
+                                                content={({ active, payload, label }) => {
+                                                    if (active && payload && payload.length) {
+                                                        return (
+                                                            <div className="glass-panel px-3 py-2 border border-white/50 shadow-xl rounded-xl backdrop-blur-xl text-right">
+                                                                <p className="font-bold text-[#323338] text-sm mb-0.5">{label}</p>
+                                                                <p className="font-mono text-gray-600 font-medium text-xs">
+                                                                    ₪{Number(payload[0].value).toLocaleString()}
+                                                                </p>
+                                                            </div>
+                                                        )
+                                                    }
+                                                    return null
+                                                }}
+                                            />
+                                            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                                {expensesByCategoryData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </ResponsiveContainer>
                         </div>
                     </CardContent>

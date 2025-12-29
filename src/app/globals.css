@@ -139,6 +139,19 @@
   }
 }
 
+/* Hide Scrollbar but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+}
+
 /* Clerk Overrides */
 .cl-otpCodeField,
 div:has(> input[name="code"]),
