@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import { useState, useCallback, useMemo } from 'react' // React imports
+import { useState, useCallback, useMemo, useEffect } from 'react' // React imports
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowDown, ArrowUp, TrendingUp, Wallet, Loader2, PieChart as PieChartIcon, TrendingDown, CreditCard, Settings, Save } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
