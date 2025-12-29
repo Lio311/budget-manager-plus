@@ -105,6 +105,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const currentNetWorth = netWorthHistory.length > 0 ? netWorthHistory[netWorthHistory.length - 1].accumulatedNetWorth : 0
 
     // Calculate previous month's metrics for trends
+    const prevTotalIncome = previous.incomes.reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
+    const prevTotalExpenses = previous.expenses.reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
+
     const prevPaidBills = previous.bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
     const prevPaidDebts = previous.debts.reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
     const prevSavingsObserved = previous.savings.reduce((sum: number, item: any) => sum + (item.monthlyDepositILS || 0), 0)
