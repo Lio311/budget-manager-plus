@@ -409,7 +409,7 @@ export function IncomeTab() {
 
         // Use theme-aware fallback instead of gray
         let c = cat?.color || (isBusiness
-            ? 'bg-blue-500 text-white border-transparent'
+            ? 'bg-green-500 text-white border-transparent'
             : 'bg-[#00c875] text-white border-transparent')
 
         if (c.includes('bg-') && c.includes('-100')) {
@@ -424,7 +424,7 @@ export function IncomeTab() {
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-blue-600' : 'border-l-[#00c875]'}`}>
                 <h3 className="text-sm font-medium text-gray-500">{isBusiness ? 'סך מכירות/הכנסות חודשיות' : 'סך הכנסות חודשיות'}</h3>
-                <div className={`text-3xl font-bold ${isBusiness ? 'text-blue-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
+                <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
                     {loadingIncomes ? '...' : formatCurrency(totalIncomeILS, '₪')}
                 </div>
             </div>
@@ -434,7 +434,7 @@ export function IncomeTab() {
                 {/* Add Form */}
                 <div className="lg:col-span-5 glass-panel p-5 h-fit sticky top-4">
                     <div className="mb-4 flex items-center gap-2">
-                        <TrendingDown className={`h-5 w-5 rotate-180 ${isBusiness ? 'text-blue-600' : 'text-[#00c875]'}`} />
+                        <TrendingDown className={`h-5 w-5 rotate-180 ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`} />
                         <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד מכירה / הכנסה' : 'הוספת הכנסה'}</h3>
                     </div>
 
@@ -491,7 +491,7 @@ export function IncomeTab() {
                                                     <div key={color.name} className={`h - 8 w - 8 rounded - full cursor - pointer transition - transform hover: scale - 110 border - 2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-[#323338] scale-110' : 'border-transparent'} `} onClick={() => setNewCategoryColor(color.class)} />
                                                 ))}
                                             </div>
-                                            <Button onClick={handleAddCategory} className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg h-10" disabled={!newCategoryName || submitting}>שמור</Button>
+                                            <Button onClick={handleAddCategory} className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg h-10" disabled={!newCategoryName || submitting}>שמור</Button>
                                         </div>
                                     </PopoverContent>
                                 </Popover>
@@ -518,14 +518,14 @@ export function IncomeTab() {
                         </div>
 
                         {isBusiness && (
-                            <div className="grid grid-cols-2 gap-3 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
+                            <div className="grid grid-cols-2 gap-3 p-3 bg-green-50/50 rounded-lg border border-green-100">
                                 <div>
-                                    <label className="text-[10px] font-bold text-blue-800 uppercase mb-1 block">מע"מ (18%)</label>
-                                    <div className="text-sm font-bold text-blue-900">{formatCurrency(parseFloat(newIncome.vatAmount) || 0, getCurrencySymbol(newIncome.currency))}</div>
+                                    <label className="text-[10px] font-bold text-green-800 uppercase mb-1 block">מע"מ (18%)</label>
+                                    <div className="text-sm font-bold text-green-900">{formatCurrency(parseFloat(newIncome.vatAmount) || 0, getCurrencySymbol(newIncome.currency))}</div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-blue-800 uppercase mb-1 block">לפני מע"מ</label>
-                                    <div className="text-sm font-bold text-blue-900">{formatCurrency(parseFloat(newIncome.amountBeforeVat) || 0, getCurrencySymbol(newIncome.currency))}</div>
+                                    <label className="text-[10px] font-bold text-green-800 uppercase mb-1 block">לפני מע"מ</label>
+                                    <div className="text-sm font-bold text-green-900">{formatCurrency(parseFloat(newIncome.amountBeforeVat) || 0, getCurrencySymbol(newIncome.currency))}</div>
                                 </div>
                             </div>
                         )}
@@ -571,7 +571,7 @@ export function IncomeTab() {
                             )}
                         </div>
 
-                        <Button onClick={handleAdd} className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md ${isBusiness ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#00c875] hover:bg-[#00b268]'}`} disabled={submitting}>
+                        <Button onClick={handleAdd} className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md ${isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-[#00c875] hover:bg-[#00b268]'}`} disabled={submitting}>
                             {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הכנסה' : 'הוסף')}
                         </Button>
                     </div>
@@ -590,7 +590,7 @@ export function IncomeTab() {
                         </div>
                     ) : (
                         paginatedIncomes.map((income: any) => (
-                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-blue-200 transition-all border-l-4 border-l-blue-100">
+                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-l-4 border-l-blue-100">
                                 {editingId === income.id ? (
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -613,7 +613,7 @@ export function IncomeTab() {
                                         </div>
                                         <div className="flex justify-end gap-2">
                                             <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                            <Button size="sm" onClick={handleUpdate} className={`${isBusiness ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#00c875] hover:bg-[#00b268]'} text-white`}>שמור שינויים</Button>
+                                            <Button size="sm" onClick={handleUpdate} className={`${isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-[#00c875] hover:bg-[#00b268]'} text-white`}>שמור שינויים</Button>
                                         </div>
                                     </div>
                                 ) : (
@@ -634,7 +634,7 @@ export function IncomeTab() {
                                                         </div>
                                                     )}
                                                     {income.client && (
-                                                        <span className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded border border-blue-100 font-bold hidden sm:inline-block shrink-0">
+                                                        <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100 font-bold hidden sm:inline-block shrink-0">
                                                             {income.client.name}
                                                         </span>
                                                     )}
@@ -667,7 +667,7 @@ export function IncomeTab() {
                                                 </div>
                                             )}
                                             <div className="text-right">
-                                                <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-blue-600' : 'text-[#00c875]'}`}>
+                                                <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`}>
                                                     {formatCurrency(income.amount, getCurrencySymbol(income.currency || 'ILS'))}
                                                 </div>
                                                 {income.invoice && (
@@ -675,7 +675,7 @@ export function IncomeTab() {
                                                 )}
                                             </div>
                                             <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
+                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-green-500 hover:bg-green-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
                                                 <Button variant="ghost" size="icon" onClick={() => handleDelete(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
                                             </div>
                                         </div>

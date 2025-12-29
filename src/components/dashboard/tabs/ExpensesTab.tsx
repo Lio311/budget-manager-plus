@@ -472,7 +472,7 @@ export function ExpensesTab() {
         if (needsFallback) {
             // Smart fallbacks for common categories
             if (trimmed.includes('מזון') || trimmed.includes('אוכל')) {
-                c = 'bg-orange-500 text-white border-orange-600'
+                c = 'bg-red-500 text-white border-red-600'
             } else if (trimmed.includes('תחבורה')) {
                 c = 'bg-cyan-500 text-white border-cyan-600'
             } else if (trimmed.includes('בילוי')) {
@@ -481,7 +481,7 @@ export function ExpensesTab() {
                 // Default fallback for any category with gray/no color
                 // Use theme-aware colors: red for personal, orange for business
                 c = isBusiness
-                    ? 'bg-orange-500 text-white border-orange-600'
+                    ? 'bg-red-500 text-white border-red-600'
                     : 'bg-[#e2445c] text-white border-[#d43f55]'
             }
         }
@@ -574,7 +574,7 @@ export function ExpensesTab() {
             {/* Summary Card */}
             <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'}`}>
                 <h3 className="text-sm font-medium text-gray-500">{isBusiness ? 'סך עלויות / הוצאות חודשיות' : 'סך הוצאות חודשיות'}</h3>
-                <div className={`text-3xl font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'} ${loadingExpenses ? 'animate-pulse' : ''}`}>
+                <div className={`text-3xl font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'} ${loadingExpenses ? 'animate-pulse' : ''}`}>
                     {loadingExpenses ? '...' : formatCurrency(totalExpensesILS, '₪')}
                 </div>
             </div>
@@ -584,7 +584,7 @@ export function ExpensesTab() {
                 {/* Add Form */}
                 <div className="lg:col-span-5 glass-panel p-5 h-fit lg:sticky lg:top-4">
                     <div className="mb-4 flex items-center gap-2">
-                        <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`} />
+                        <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`} />
                         <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
                         <div className="mr-auto flex items-center gap-2">
                             <Button
@@ -651,7 +651,7 @@ export function ExpensesTab() {
                                                     <div key={color.name} className={`h-8 w-8 rounded-full cursor-pointer transition-transform hover:scale-110 border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-[#323338] scale-110' : 'border-transparent'}`} onClick={() => setNewCategoryColor(color.class)} />
                                                 ))}
                                             </div>
-                                            <Button onClick={handleAddCategory} className={`w-full ${isBusiness ? 'bg-orange-600 hover:bg-orange-700' : 'bg-[#e2445c] hover:bg-[#d43f55]'} text-white rounded-lg h-10`} disabled={!newCategoryName || submitting}>שמור</Button>
+                                            <Button onClick={handleAddCategory} className={`w-full ${isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d43f55]'} text-white rounded-lg h-10`} disabled={!newCategoryName || submitting}>שמור</Button>
                                         </div>
                                     </PopoverContent>
                                 </Popover>
@@ -686,14 +686,14 @@ export function ExpensesTab() {
                         </div>
 
                         {isBusiness && (
-                            <div className="grid grid-cols-2 gap-3 p-3 bg-orange-50/50 rounded-lg border border-orange-100">
+                            <div className="grid grid-cols-2 gap-3 p-3 bg-red-50/50 rounded-lg border border-red-100">
                                 <div>
-                                    <label className="text-[10px] font-bold text-orange-800 uppercase mb-1 block">מע"מ מוכר (18%)</label>
-                                    <div className="text-sm font-bold text-orange-900">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
+                                    <label className="text-[10px] font-bold text-red-800 uppercase mb-1 block">מע"מ מוכר (18%)</label>
+                                    <div className="text-sm font-bold text-red-900">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-orange-800 uppercase mb-1 block">סכום נקי</label>
-                                    <div className="text-sm font-bold text-orange-900">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</div>
+                                    <label className="text-[10px] font-bold text-red-800 uppercase mb-1 block">סכום נקי</label>
+                                    <div className="text-sm font-bold text-red-900">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</div>
                                 </div>
                             </div>
                         )}
@@ -705,7 +705,7 @@ export function ExpensesTab() {
 
                         {isBusiness && (
                             <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                <Checkbox id="is-deductible" checked={newExpense.isDeductible} onCheckedChange={(checked) => setNewExpense({ ...newExpense, isDeductible: checked as boolean })} className="data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600" />
+                                <Checkbox id="is-deductible" checked={newExpense.isDeductible} onCheckedChange={(checked) => setNewExpense({ ...newExpense, isDeductible: checked as boolean })} className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600" />
                                 <label htmlFor="is-deductible" className="text-xs font-bold text-[#323338] cursor-pointer">הוצאה מוכרת לצורכי מס</label>
                             </div>
                         )}
@@ -716,7 +716,7 @@ export function ExpensesTab() {
                                     id="recurring-expense"
                                     checked={newExpense.isRecurring}
                                     onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })}
-                                    className={isBusiness ? 'data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600' : 'data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]'}
+                                    className={isBusiness ? 'data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600' : 'data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]'}
                                 />
                                 <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338]">הוצאה קבועה</label>
                             </div>
@@ -730,7 +730,7 @@ export function ExpensesTab() {
                             )}
                         </div>
 
-                        <Button onClick={handleAdd} className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md ${isBusiness ? 'bg-orange-600 hover:bg-orange-700' : 'bg-[#e2445c] hover:bg-[#d43f55]'}`} disabled={submitting}>
+                        <Button onClick={handleAdd} className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md ${isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d43f55]'}`} disabled={submitting}>
                             {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הוצאה' : 'הוסף')}
                         </Button>
                     </div>
@@ -771,7 +771,7 @@ export function ExpensesTab() {
                                             </div>
                                             <div className="flex justify-end gap-2">
                                                 <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                                <Button size="sm" onClick={() => handleUpdate()} className={`${isBusiness ? 'bg-orange-600' : 'bg-[#e2445c] hover:bg-[#d43f55]'} text-white`}>שמור שינויים</Button>
+                                                <Button size="sm" onClick={() => handleUpdate()} className={`${isBusiness ? 'bg-red-600' : 'bg-[#e2445c] hover:bg-[#d43f55]'} text-white`}>שמור שינויים</Button>
                                             </div>
                                         </div>
                                     ) : (
@@ -786,7 +786,7 @@ export function ExpensesTab() {
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-bold text-[#323338] truncate text-sm sm:text-base">{exp.description}</span>
                                                         {exp.isRecurring && (
-                                                            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${isBusiness ? 'bg-orange-100 text-orange-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                                                            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${isBusiness ? 'bg-red-100 text-red-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
                                                                 <span className="w-1 h-1 rounded-full bg-current" />
                                                                 קבועה
                                                             </div>
@@ -814,7 +814,7 @@ export function ExpensesTab() {
                                                     </div>
                                                 ) : null}
                                                 <div className="text-right">
-                                                    <div className={`text-lg font-bold ${isBusiness ? 'text-orange-600' : 'text-[#e2445c]'}`}>
+                                                    <div className={`text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
                                                         {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
                                                     </div>
                                                 </div>

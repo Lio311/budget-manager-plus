@@ -226,7 +226,10 @@ export default function LandingPage() {
                                             <div className="text-green-700 text-xs font-bold">הכנסות החודש</div>
                                         </div>
                                         <div className="text-2xl font-black text-gray-900 mb-1">₪42,500</div>
-                                        <div className="text-[10px] font-bold text-green-600">+12% מחודש שעבר</div>
+                                        <div className="text-[10px] font-bold text-green-600 flex items-center justify-end gap-1">
+                                            <span>מחודש שעבר</span>
+                                            <span dir="ltr">+12%</span>
+                                        </div>
                                     </div>
 
                                     {/* VAT - Blue */}
