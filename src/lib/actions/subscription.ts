@@ -150,7 +150,7 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
 }
 
 export async function startTrial(userId: string, email: string, planType: string = 'PERSONAL') {
-    // Fixed: Now supports separate trials for PERSONAL and BUSINESS plans
+    // Fixed: Now supports separate trials for PERSONAL and BUSINESS plans, and COMBINED (creates both)
     console.log('[startTrial] Starting trial for user:', userId, email, planType)
 
     // Sync user to DB to handle webhook race condition
@@ -163,70 +163,68 @@ export async function startTrial(userId: string, email: string, planType: string
         }
     })
 
-    // Check if already tracked
-    const validPlanType = planType === 'BUSINESS' ? 'BUSINESS' : 'PERSONAL'
+    // Determine which plans to activate
+    const plansToActivate = planType === 'COMBINED' ? ['PERSONAL', 'BUSINESS'] : [planType]
 
-    // Check if already tracked for this specific plan
-    // @ts-ignore - Prisma types update lag
-    const existingTracker = await prisma.trialTracker.findUnique({
-        where: {
-            email_planType: {
-                email,
-                planType: validPlanType as any
+    // 1. Check if ANY of the requested plans have already been used
+    for (const plan of plansToActivate) {
+        // @ts-ignore - Prisma types update lag
+        const existingTracker = await prisma.trialTracker.findUnique({
+            where: {
+                email_planType: {
+                    email,
+                    planType: plan as any
+                }
             }
-        }
-    })
+        })
 
-    if (existingTracker) {
-        console.log(`[startTrial] Trial already used for email: ${email} on plan: ${validPlanType}`)
-        return { success: false, reason: 'Trial already used for this plan' }
+        if (existingTracker) {
+            console.log(`[startTrial] Trial already used for email: ${email} on plan: ${plan}`)
+            return { success: false, reason: `תקופת הניסיון לתוכנית ${plan === 'BUSINESS' ? 'עסקית' : 'פרטית'} כבר נוצלה` }
+        }
     }
 
-    // Create tracker
-    console.log(`[startTrial] About to create trial tracker with:`, {
-        email,
-        planType: validPlanType,
-        rawPlanType: planType
-    })
-
-    // @ts-ignore
-    await prisma.trialTracker.create({
-        data: {
-            email,
-            planType: validPlanType as any
-        }
-    })
-    console.log(`[startTrial] Trial tracker created for ${validPlanType}`)
-
-    // Create trial subscription
+    // 2. Activate all requested plans
     const startDate = new Date()
     const endDate = addDays(startDate, 60) // 2 months trial period
-    // validPlanType is already defined above
 
-    // @ts-ignore - planType issue with Prisma types in dev
-    const subscription = await prisma.subscription.upsert({
-        where: {
-            userId_planType: {
-                userId,
-                planType: validPlanType as any
+    for (const plan of plansToActivate) {
+        // Create tracker
+        // @ts-ignore
+        await prisma.trialTracker.create({
+            data: {
+                email,
+                planType: plan as any
             }
-        },
-        create: {
-            userId,
-            status: 'trial',
-            planType: validPlanType as any,
-            startDate,
-            endDate,
-        },
-        update: {
-            status: 'trial',
-            planType: validPlanType as any,
-            startDate,
-            endDate,
-        }
-    })
+        })
+        console.log(`[startTrial] Trial tracker created for ${plan}`)
 
-    console.log('[startTrial] Subscription created/updated:', subscription)
+        // Create trial subscription
+        // @ts-ignore - planType issue with Prisma types in dev
+        await prisma.subscription.upsert({
+            where: {
+                userId_planType: {
+                    userId,
+                    planType: plan as any
+                }
+            },
+            create: {
+                userId,
+                status: 'trial',
+                planType: plan as any,
+                startDate,
+                endDate,
+            },
+            update: {
+                status: 'trial',
+                planType: plan as any,
+                startDate,
+                endDate,
+            }
+        })
+        console.log(`[startTrial] Subscription created/updated for ${plan}`)
+    }
+
     revalidatePath('/dashboard')
     return { success: true }
 }

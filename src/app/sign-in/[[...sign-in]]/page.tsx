@@ -2,26 +2,25 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function SignInPage() {
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <div className="flex justify-center items-center min-h-screen bg-gray-50" dir="rtl">
             <SignIn appearance={{
                 layout: {
                     socialButtonsPlacement: 'bottom',
                     socialButtonsVariant: 'blockButton'
                 },
                 elements: {
-                    rootBox: "mx-auto w-full",
-                    card: "shadow-xl border border-gray-100 w-full",
+                    rootBox: "mx-auto",
+                    card: "shadow-xl border border-gray-100",
                     alert: "flex-row-reverse",
                     alertText: "text-right mr-2",
                     formFieldLabel: "text-right",
                     formFieldInput: "text-right",
-                    formFieldErrorText: "text-right direction-rtl will-change-transform",
+                    formFieldErrorText: "text-right",
                     footer: "flex-row-reverse",
-                    headerTitle: "text-right",
-                    headerSubtitle: "text-right",
+                    headerTitle: "text-center",
+                    headerSubtitle: "text-center",
                     socialButtonsBlockButton: "flex-row-reverse gap-2",
                     socialButtonsBlockButtonText: "mr-2",
-                    dividerLine: "bg-gray-200",
                     dividerText: "px-2"
                 }
             }} />
