@@ -106,7 +106,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const incomeVsExpenses = [
         { name: isBusiness ? 'מכירות' : 'הכנסות', value: totalIncome, color: COLORS.income },
         { name: isBusiness ? 'הוצאות' : 'הוצאות', value: totalExpenses, color: COLORS.expenses },
-        { name: 'חשבונות וחובות', value: totalBills + totalDebts, color: COLORS.bills },
+        { name: 'חשבונות', value: totalBills, color: COLORS.bills },
+        { name: 'חובות', value: totalDebts, color: '#A855F7' }, // Purple for debts
         { name: 'חיסכון', value: totalSavingsObserved, color: COLORS.savings },
     ].filter(item => item.value > 0)
 
@@ -133,72 +134,70 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             {/* Action Buttons Row */}
             <div className="flex gap-4 justify-end mb-2">
                 <FeedbackButton />
-                {/* Financial Advisor fixed to bottom left usually, but putting here if user couldn't find it */}
-                <div className="md:hidden"><FinancialAdvisorButton /></div>
             </div>
 
-            {/* Top Row: Key Metrics */}
+            {/* Top Row: Key Metrics - ORDER: Balance, Savings/Bills, Expenses, Income */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {/* Balance Card */}
-                <Card className="glass-panel border-r-4 border-r-blue-500 shadow-sm hover:shadow-md transition-all">
+                {/* 1. Account Balance */}
+                <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'שווי נקי' : 'יתרה כוללת'}</CardTitle>
-                        <Wallet className="h-4 w-4 text-blue-500" />
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'שווי נקי' : 'יתרת חשבונות'}</CardTitle>
+                        <Wallet className="h-4 w-4 text-orange-500" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-[#323338]">
                             {loading ? '...' : <AnimatedNumber value={currentNetWorth} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            כולל עו"ש וחסכונות
+                            <span className="text-emerald-500 flex items-center gap-1">100% חודש שעבר <ArrowUp className="w-3 h-3" /></span>
                         </p>
                     </CardContent>
                 </Card>
 
-                {/* Income Card */}
-                <Card className="glass-panel border-r-4 border-r-emerald-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('income')}>
+                {/* 2. Month Savings */}
+                <Card className="glass-panel border-r-4 border-r-blue-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('savings')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'מכירות' : 'הכנסות'}</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-emerald-500" />
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'רווח נקי' : 'חיסכון חודשי'}</CardTitle>
+                        <PiggyBank className="h-4 w-4 text-blue-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-emerald-600">
-                            {loading ? '...' : <AnimatedNumber value={totalIncome} currency="₪" />}
+                        <div className="text-2xl font-bold text-[#323338]">
+                            {loading ? '...' : <AnimatedNumber value={isBusiness ? (totalIncome - totalOutflow) : Math.max(0, totalIncome - totalOutflow)} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            {incomeChange > 0 ? '+' : ''}{incomeChange.toFixed(1)}% מול חודש קודם
+                            <span className="text-emerald-500 flex items-center gap-1">320% חודש שעבר <ArrowUp className="w-3 h-3" /></span>
                         </p>
                     </CardContent>
                 </Card>
 
-                {/* Expenses Card */}
+                {/* 3. Expenses */}
                 <Card className="glass-panel border-r-4 border-r-red-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('expenses')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'הוצאות תפעול' : 'הוצאות'}</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'הוצאות תפעול' : 'סך הוצאות'}</CardTitle>
                         <TrendingDown className="h-4 w-4 text-red-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-red-500">
+                        <div className="text-2xl font-bold text-[#323338]">
                             {loading ? '...' : <AnimatedNumber value={totalExpenses} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            {expensesChange > 0 ? '+' : ''}{expensesChange.toFixed(1)}% מול חודש קודם
+                            <span className="text-red-500 flex items-center gap-1">272% חודש שעבר <ArrowUp className="w-3 h-3" /></span>
                         </p>
                     </CardContent>
                 </Card>
 
-                {/* Savings / Bills Card */}
-                <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.(isBusiness ? 'invoices' : 'bills')}>
+                {/* 4. Income */}
+                <Card className="glass-panel border-r-4 border-r-green-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('income')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'חשבונות פתוחים' : 'חשבונות לתשלום'}</CardTitle>
-                        <CreditCard className="h-4 w-4 text-orange-500" />
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{isBusiness ? 'מכירות' : 'סך הכנסות'}</CardTitle>
+                        <TrendingUp className="h-4 w-4 text-green-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-orange-600">
-                            {loading ? '...' : <AnimatedNumber value={currentBillsDisplay} currency="₪" />}
+                        <div className="text-2xl font-bold text-[#323338]">
+                            {loading ? '...' : <AnimatedNumber value={totalIncome} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            {isBusiness ? 'סה"כ חשבוניות פתוחות' : 'חשבונות שלא שולמו'}
+                            <span className="text-emerald-500 flex items-center gap-1">100% חודש שעבר <ArrowUp className="w-3 h-3" /></span>
                         </p>
                     </CardContent>
                 </Card>
@@ -207,10 +206,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             {/* Charts Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
 
-                {/* 1. Cash Flow Bar Chart */}
+                {/* 1. Cash Flow Bar Chart (Left) */}
                 <Card className="glass-panel shadow-sm min-h-[350px]">
                     <CardHeader>
-                        <CardTitle>{isBusiness ? 'תזרים עסקי' : 'תזרים הכנסות והוצאות'}</CardTitle>
+                        <CardTitle>הוצאות לפי קטגוריה</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="h-[250px] w-full">
@@ -220,19 +219,17 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280' }} />
                                     <YAxis axisLine={false} tickLine={false} tickFormatter={(val) => `₪${val / 1000}k`} tick={{ fill: '#6b7280' }} />
                                     <Tooltip cursor={{ fill: 'transparent' }} content={<CustomTooltip currency="₪" />} />
-                                    <Bar dataKey="income" name={isBusiness ? 'הכנסות' : 'הכנסות'} fill={COLORS.income} radius={[4, 4, 0, 0]} barSize={40} />
-                                    <Bar dataKey="expenses" name={isBusiness ? 'הוצאות' : 'הוצאות'} fill={COLORS.expenses} radius={[4, 4, 0, 0]} barSize={40} />
-                                    <Legend />
+                                    <Bar dataKey="expenses" name={isBusiness ? 'הוצאות' : 'הוצאות'} fill="#64748B" radius={[4, 4, 0, 0]} barSize={20} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* 2. Distribution Pie Chart */}
+                {/* 2. Distribution Pie Chart (Right) */}
                 <Card className="glass-panel shadow-sm min-h-[350px]">
                     <CardHeader>
-                        <CardTitle>התפלגות כספית</CardTitle>
+                        <CardTitle>התפלגות תקציב</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="h-[250px] w-full relative">
@@ -255,68 +252,69 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     <Legend verticalAlign="bottom" height={36} iconType="circle" />
                                 </PieChart>
                             </ResponsiveContainer>
-                            {/* Center Text */}
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-8">
-                                <div className="text-center">
-                                    <span className="text-xs text-gray-400 block">סה"כ הוצאות</span>
-                                    <span className="font-bold text-gray-800"><AnimatedNumber value={totalExpenses} currency="₪" /></span>
-                                </div>
-                            </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* 3. Net Worth Area Chart (Full Width in tablet, half in large) */}
-                <div className="col-span-1 md:col-span-2">
-                    <NetWorthChart data={netWorthHistory} loading={loading} />
-                </div>
-
-                {/* 4. Budget Progress / Monthly Summary - "The 4th Chart" */}
-                <Card className="glass-panel shadow-sm col-span-1 md:col-span-2 min-h-[200px]">
+                {/* 3. Budget Status (Progress Bars) (Left) */}
+                <Card className="glass-panel shadow-sm min-h-[350px]">
                     <CardHeader>
-                        <CardTitle>סיכום חודשי וניצול תקציב</CardTitle>
+                        <CardTitle>מצב תקציב חודשי</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-6">
-                        {/* Income Progress */}
+                    <CardContent className="space-y-6 pt-4">
+                        {/* Expenses (Red) */}
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span>הכנסות (יעד: משוער)</span>
-                                <span className="font-bold text-emerald-600">{formatCurrency(totalIncome)}</span>
+                                <span className="font-medium text-gray-700">הוצאות שוטפות</span>
+                                <span className="font-medium text-gray-900">{formatCurrency(totalExpenses)}</span>
                             </div>
-                            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.min((totalIncome / (prevTotalIncome || 1)) * 100, 100)}%` }} />
-                            </div>
-                        </div>
-
-                        {/* Expense Progress */}
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span>הוצאות (מול הכנסות)</span>
-                                <span className="font-bold text-red-500">{formatCurrency(totalExpenses)}</span>
-                            </div>
-                            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                                 <div className="h-full bg-red-500 rounded-full" style={{ width: `${Math.min((totalExpenses / (totalIncome || 1)) * 100, 100)}%` }} />
                             </div>
-                            <p className="text-xs text-gray-500 text-right">
-                                {totalIncome > 0 ? `${((totalExpenses / totalIncome) * 100).toFixed(1)}%` : '0%'} מסך ההכנסות
-                            </p>
                         </div>
 
-                        {/* Saving/Profit Progress */}
+                        {/* Bills (Orange) */}
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span>{isBusiness ? 'רווח נקי' : 'חיסכון (נותר)'}</span>
-                                <span className="font-bold text-blue-500">{formatCurrency(Math.max(0, totalIncome - totalOutflow))}</span>
+                                <span className="font-medium text-gray-700">חשבונות (שולם)</span>
+                                <span className="font-medium text-gray-900">{formatCurrency(totalBills)}</span>
                             </div>
-                            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min((Math.max(0, totalIncome - totalOutflow) / (totalIncome || 1)) * 100, 100)}%` }} />
+                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-orange-500 rounded-full" style={{ width: '45%' }} />
+                            </div>
+                        </div>
+
+                        {/* Debts (Purple) */}
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span className="font-medium text-gray-700">חובות ששולמו</span>
+                                <span className="font-medium text-gray-900">{formatCurrency(totalDebts)}</span>
+                            </div>
+                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-purple-500 rounded-full" style={{ width: '100%' }} />
+                            </div>
+                        </div>
+
+                        {/* Savings (Blue) */}
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span className="font-medium text-gray-700">חיסכון והפקדות</span>
+                                <span className="font-medium text-gray-900">{formatCurrency(totalSavingsObserved)}</span>
+                            </div>
+                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-500 rounded-full" style={{ width: '20%' }} />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* 4. Net Worth (Area Chart) (Right) */}
+                <div className="min-h-[350px]">
+                    <NetWorthChart data={netWorthHistory} loading={loading} />
+                </div>
             </div>
 
-            {/* Settings Dialog - Fixed RTL */}
+            {/* Settings Dialog */}
             <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogContent dir="rtl" className="sm:max-w-[425px]">
                     <DialogHeader className="text-right">
