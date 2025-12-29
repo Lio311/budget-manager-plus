@@ -20,9 +20,10 @@ export function NetWorthChart({ data, loading }: { data: NetWorthData[], loading
     const chartColor = isBusiness ? '#10b981' : '#8b5cf6' // green for business, purple for personal
     const chartTitle = isBusiness ? 'שווי העסק נטו' : 'הון עצמי'
 
-    const translatedData = data.map(item => ({
+    const dataWithFormattedDate = data.map(item => ({
         ...item,
-        formattedDate: new Date(item.date).toLocaleDateString('he-IL', { month: 'short', year: '2-digit' })
+        netWorth: item.accumulatedNetWorth,
+        formattedDate: new Date(item.year, item.month - 1).toLocaleDateString('he-IL', { month: 'short', year: '2-digit' })
     }))
 
     return (
