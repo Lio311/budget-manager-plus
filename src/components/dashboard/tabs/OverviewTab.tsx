@@ -104,11 +104,28 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     // Net Worth / Balance Logic
     const currentNetWorth = netWorthHistory.length > 0 ? netWorthHistory[netWorthHistory.length - 1].accumulatedNetWorth : 0
 
-    const prevTotalIncome = previous.incomes.reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
-    const prevTotalExpenses = previous.expenses.reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
+    // Calculate previous month's metrics for trends
+    const prevPaidBills = previous.bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
+    const prevPaidDebts = previous.debts.reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
+    const prevSavingsObserved = previous.savings.reduce((sum: number, item: any) => sum + (item.monthlyDepositILS || 0), 0)
+    const prevMonthlySavings = prevTotalIncome - prevTotalExpenses - prevPaidBills - prevSavingsObserved - prevPaidDebts
+
+    // Net Worth (Business) or Bills Balance (Personal)
+    const prevNetWorth = netWorthHistory.length > 1 ? netWorthHistory[netWorthHistory.length - 2].accumulatedNetWorth : 0
+    // For personal "Bills Balance", let's compare current bills total vs prev bills total (or unpaid?)
+    // The card displays "isBusiness ? currentNetWorth : currentBillsDisplay" (Unpaid Bills)
+    const prevBillsDisplay = previous.bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
+
 
     const incomeChange = prevTotalIncome > 0 ? ((totalIncome - prevTotalIncome) / prevTotalIncome) * 100 : 0
     const expensesChange = prevTotalExpenses > 0 ? ((totalExpenses - prevTotalExpenses) / prevTotalExpenses) * 100 : 0
+    // If prev savings was 0 or negative (loss), calculation gets weird. If 0 -> 0.
+    const savingsChange = prevMonthlySavings !== 0 ? ((monthlySavingsCalculated - prevMonthlySavings) / Math.abs(prevMonthlySavings)) * 100 : 0
+
+    // For 4th card
+    const fourthMetricCurrent = isBusiness ? currentNetWorth : currentBillsDisplay
+    const fourthMetricPrev = isBusiness ? prevNetWorth : prevBillsDisplay
+    const fourthMetricChange = fourthMetricPrev !== 0 ? ((fourthMetricCurrent - fourthMetricPrev) / Math.abs(fourthMetricPrev)) * 100 : 0
 
     const incomeVsExpenses = [
         { name: isBusiness ? 'מכירות' : 'הכנסות', value: totalIncome, color: COLORS.income },
@@ -117,6 +134,24 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         { name: 'חובות', value: totalDebts, color: '#A855F7' }, // Purple for debts
         { name: 'חיסכון', value: totalSavingsObserved, color: COLORS.savings },
     ].filter(item => item.value > 0)
+
+    // Helper for rendering trend
+    const renderTrend = (change: number, label: string, inverse: boolean = false) => {
+        if (change === 0) return <span className="text-gray-400 flex items-center gap-1 justify-end text-xs"><ArrowUp className="w-3 h-3 rotate-90" /> ללא שינוי</span>
+
+        const isPositive = change > 0
+        // If inverse (like expenses), Positive change (More expenses) is Bad (Red)
+        const isGood = inverse ? !isPositive : isPositive
+
+        const colorClass = isGood ? 'text-emerald-500' : 'text-red-500'
+        const Icon = isPositive ? ArrowUp : ArrowDown
+
+        return (
+            <span className={`${colorClass} flex items-center gap-1 justify-end text-xs`}>
+                <Icon className="w-3 h-3" /> {Math.abs(change).toFixed(0)}% {label}
+            </span>
+        )
+    }
 
     // Monthly Savings Calculation (User Requested Formula)
     const paidBills = current.bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
@@ -215,7 +250,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             {loading ? '...' : <AnimatedNumber value={totalIncome} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
-                            <span className="text-emerald-500 flex items-center gap-1"><ArrowUp className="w-3 h-3" /> 100% חודש שעבר</span>
+                            {renderTrend(incomeChange, 'חודש שעבר', false)}
                         </p>
                     </CardContent>
                 </Card>
@@ -231,7 +266,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             {loading ? '...' : <AnimatedNumber value={totalExpenses} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
-                            <span className="text-red-500 flex items-center gap-1"><ArrowUp className="w-3 h-3" /> 272% חודש שעבר</span>
+                            {renderTrend(expensesChange, 'חודש שעבר', true)}
                         </p>
                     </CardContent>
                 </Card>
@@ -247,7 +282,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             {loading ? '...' : <AnimatedNumber value={monthlySavingsCalculated} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
-                            <span className="text-emerald-500 flex items-center gap-1"><ArrowUp className="w-3 h-3" /> 320% חודש שעבר</span>
+                            {renderTrend(savingsChange, 'חודש שעבר', false)}
                         </p>
                     </CardContent>
                 </Card>
@@ -264,7 +299,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             {loading ? '...' : <AnimatedNumber value={isBusiness ? currentNetWorth : currentBillsDisplay} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
-                            <span className="text-emerald-500 flex items-center gap-1"><ArrowUp className="w-3 h-3" /> 100% חודש שעבר</span>
+                            {renderTrend(fourthMetricChange, 'חודש שעבר', isBusiness ? false : true)}
                         </p>
                     </CardContent>
                 </Card>
