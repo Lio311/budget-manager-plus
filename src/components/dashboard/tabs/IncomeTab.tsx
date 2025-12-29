@@ -11,7 +11,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { IncomeForm } from '@/components/dashboard/forms/IncomeForm'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -306,6 +306,7 @@ export function IncomeTab() {
                             <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-green-600' : 'bg-[#00c875]'} label="הוסף הכנסה" />
                         </DialogTrigger>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                            <DialogTitle className="sr-only">הוספת הכנסה</DialogTitle>
                             <IncomeForm
                                 categories={categories}
                                 clients={clientsData}

@@ -16,7 +16,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { ExpenseForm } from '@/components/dashboard/forms/ExpenseForm'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -447,6 +447,7 @@ export function ExpensesTab() {
                             <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-red-600' : 'bg-[#e2445c]'} label="הוסף הוצאה" />
                         </DialogTrigger>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                            <DialogTitle className="sr-only">הוספת הוצאה</DialogTitle>
                             <ExpenseForm
                                 categories={categories}
                                 suppliers={suppliersData}

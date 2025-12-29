@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
-import { getInvoices, createInvoice, updateInvoiceStatus, getNextInvoiceNumber, type InvoiceFormData } from '@/lib/actions/invoices'
+import { getInvoices, updateInvoiceStatus, type InvoiceFormData } from '@/lib/actions/invoices'
 import { getClients } from '@/lib/actions/clients'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
@@ -12,8 +12,7 @@ import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
 import { format } from 'date-fns'
-import { formatCurrency } from '@/lib/utils'
-import { DatePicker } from '@/components/ui/date-picker'
+import { formatCurrency, cn } from '@/lib/utils'
 import {
     Select,
     SelectContent,
@@ -21,6 +20,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
+import { FloatingActionButton } from '@/components/ui/floating-action-button'
+import { InvoiceForm } from '@/components/dashboard/forms/InvoiceForm'
 
 const statusConfig = {
     DRAFT: { label: 'טיוטה', icon: FileText, color: 'text-gray-600', bg: 'bg-gray-100' },
@@ -47,17 +49,16 @@ export function InvoicesTab() {
     const { budgetType } = useBudget()
     const [searchTerm, setSearchTerm] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
-    const [showForm, setShowForm] = useState(false)
-    const [formData, setFormData] = useState<InvoiceFormData>({
-        clientId: '',
-        invoiceNumber: '',
-        issueDate: new Date(),
-        dueDate: undefined,
-        subtotal: 0,
-        vatRate: 0.18,
-        paymentMethod: '',
-        notes: ''
-    })
+
+    // Desktop form state (if we keep it or replace completely? User asked for mobile FAB, usually implies keeping desktop inline OR modal for both. 
+    // The previous patterns (Expenses/Income) kept desktop inline forms but this tab had a "New Invoice" button that toggled a form.
+    // I will switch to using the Dialog for both mobile and desktop to simplify, OR keep the inline toggle for desktop.
+    // Given the complexity of the form, a Dialog is often better. Let's stick to the FAB for mobile and keep the button for desktop but make IT open the dialog too for consistency?
+    // Actually, distinct UX is fine. Let's keep the desktop "New Invoice" button behavior but make it open the Dialog too to reuse the component?
+    // User asked: "Create invoice... that it will also be with the floating button and popup that opens like you did before?".
+    // This implies the popup (Dialog) should be used.
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     const invoicesFetcher = async () => {
         const result = await getInvoices(budgetType)
@@ -73,7 +74,7 @@ export function InvoicesTab() {
             status: inv.status as any,
             totalAmount: inv.total,
             vatAmount: inv.vatAmount,
-            items: [] // Items are not currently fetched in the list view
+            items: []
         }))
     }
 
@@ -103,36 +104,6 @@ export function InvoicesTab() {
         currentPage * itemsPerPage
     )
 
-    // Optimistic create for instant UI feedback
-    const { execute: optimisticCreateInvoice } = useOptimisticMutation<Invoice[], InvoiceFormData>(
-        ['invoices', budgetType],
-        (input) => createInvoice(input, budgetType),
-        {
-            getOptimisticData: (current, input) => {
-                const client = clients.find((c: any) => c.id === input.clientId)
-                const vatRate = input.vatRate || 0.18
-                const total = input.subtotal * (1 + vatRate)
-                return [
-                    {
-                        id: 'temp-' + Date.now(),
-                        invoiceNumber: input.invoiceNumber,
-                        clientName: client?.name || 'לקוח לא ידוע',
-                        clientId: input.clientId,
-                        date: input.issueDate,
-                        dueDate: input.dueDate,
-                        status: 'DRAFT',
-                        totalAmount: total,
-                        vatAmount: input.subtotal * vatRate,
-                        items: []
-                    },
-                    ...current
-                ]
-            },
-            successMessage: 'חשבונית נוצרה בהצלחה',
-            errorMessage: 'שגיאה ביצירת החשבונית'
-        }
-    )
-
     // Optimistic status update for instant UI feedback
     const { execute: optimisticUpdateStatus } = useOptimisticMutation<Invoice[], { id: string, status: any }>(
         ['invoices', budgetType],
@@ -143,27 +114,6 @@ export function InvoicesTab() {
             errorMessage: 'שגיאה בעדכון הסטטוס'
         }
     )
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-
-        try {
-            await optimisticCreateInvoice(formData)
-            setShowForm(false)
-            setFormData({
-                clientId: '',
-                invoiceNumber: '',
-                issueDate: new Date(),
-                dueDate: undefined,
-                subtotal: 0,
-                vatRate: 0.18,
-                paymentMethod: '',
-                notes: ''
-            })
-        } catch (error) {
-            // Error managed by hook
-        }
-    }
 
     const handleStatusChange = async (invoiceId: string, newStatus: any) => {
         try {
@@ -205,17 +155,6 @@ export function InvoicesTab() {
         }
     }
 
-    const handleNewInvoice = async () => {
-        // Get next invoice number
-        const nextNum = await getNextInvoiceNumber()
-
-        setFormData({
-            ...formData,
-            invoiceNumber: nextNum.data || '1001'
-        })
-        setShowForm(true)
-    }
-
     if (isLoading) {
         return (
             <div className="space-y-6">
@@ -240,215 +179,117 @@ export function InvoicesTab() {
         )
     }
 
-    const total = formData.subtotal + (formData.subtotal * (formData.vatRate || 0))
-
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">חשבוניות</h2>
                     <p className="text-sm text-gray-500 mt-1">ניהול חשבוניות ללקוחות</p>
                 </div>
-                <Button
-                    onClick={handleNewInvoice}
-                    className="bg-purple-600 hover:bg-purple-700"
-                >
-                    <Plus className="h-4 w-4 ml-2" />
-                    חשבונית חדשה
-                </Button>
+
+                {/* Desktop Button */}
+                <div className="hidden md:block">
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-purple-600 hover:bg-purple-700">
+                                <Plus className="h-4 w-4 ml-2" />
+                                חשבונית חדשה
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-3xl rounded-xl" dir="rtl">
+                            <DialogTitle className="sr-only">הוספת חשבונית</DialogTitle>
+                            <div className="p-2">
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת חשבונית חדשה</h3>
+                                <InvoiceForm
+                                    clients={clients}
+                                    onSuccess={() => {
+                                        setIsDialogOpen(false)
+                                        mutate()
+                                    }}
+                                />
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
 
-            {/* Create Invoice Form */}
-            {showForm && (
-                <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת חשבונית חדשה</h3>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    מספר חשבונית *
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.invoiceNumber}
-                                    onChange={(e) => setFormData({ ...formData, invoiceNumber: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    לקוח *
-                                </label>
-                                <select
-                                    required
-                                    value={formData.clientId}
-                                    onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
-                                >
-                                    <option value="">בחר לקוח</option>
-                                    {clients.map((client: any) => (
-                                        <option key={client.id} value={client.id}>{client.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    תאריך הנפקה *
-                                </label>
-                                <DatePicker
-                                    date={formData.issueDate}
-                                    setDate={(date) => date && setFormData({ ...formData, issueDate: date })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    תאריך תשלום
-                                </label>
-                                <DatePicker
-                                    date={formData.dueDate}
-                                    setDate={(date) => setFormData({ ...formData, dueDate: date })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    סכום לפני מע"מ *
-                                </label>
-                                <input
-                                    type="number"
-                                    required
-                                    min="0"
-                                    step="0.01"
-                                    value={formData.subtotal}
-                                    onChange={(e) => setFormData({ ...formData, subtotal: parseFloat(e.target.value) || 0 })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    שיעור מע"מ
-                                </label>
-                                <select
-                                    value={formData.vatRate}
-                                    onChange={(e) => setFormData({ ...formData, vatRate: parseFloat(e.target.value) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
-                                >
-                                    <option value="0">ללא מע"מ (0%)</option>
-                                    <option value="0.18">מע"מ רגיל (18%)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    אמצעי תשלום
-                                </label>
-                                <select
-                                    value={formData.paymentMethod}
-                                    onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
-                                >
-                                    <option value="">בחר אמצעי תשלום</option>
-                                    <option value="BANK_TRANSFER">העברה בנקאית</option>
-                                    <option value="CREDIT_CARD">כרטיס אשראי</option>
-                                    <option value="BIT">ביט</option>
-                                    <option value="PAYBOX">פייבוקס</option>
-                                    <option value="CASH">מזומן</option>
-                                    <option value="CHECK">צ'ק</option>
-                                    <option value="OTHER">אחר</option>
-                                </select>
-                            </div>
-                        </div>
+            {/* Search */}
+            <div className="relative">
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                    type="text"
+                    placeholder="חיפוש לפי שם לקוח או מספר חשבונית..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                />
+            </div>
 
-                        <div className="bg-gray-50 p-4 rounded-md">
-                            <div className="flex justify-between text-sm mb-2">
-                                <span>סכום לפני מע"מ:</span>
-                                <span>₪{formData.subtotal.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between text-sm mb-2">
-                                <span>מע"מ ({(formData.vatRate || 0) * 100}%):</span>
-                                <span>₪{(formData.subtotal * (formData.vatRate || 0)).toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between text-lg font-bold border-t pt-2">
-                                <span>סה"כ לתשלום:</span>
-                                <span className="text-purple-600">₪{total.toLocaleString()}</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                הערות
-                            </label>
-                            <textarea
-                                value={formData.notes}
-                                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+            {/* Mobile FAB */}
+            <div className="md:hidden">
+                <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                    <DialogTrigger asChild>
+                        <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass="bg-purple-600" label="הוסף חשבונית" />
+                    </DialogTrigger>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                        <DialogTitle className="sr-only">הוספת חשבונית</DialogTitle>
+                        <div className="mt-4">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת חשבונית חדשה</h3>
+                            <InvoiceForm
+                                clients={clients}
+                                onSuccess={() => {
+                                    setIsMobileOpen(false)
+                                    mutate()
+                                }}
                             />
                         </div>
-
-                        <div className="flex gap-2">
-                            <Button type="submit" className="bg-purple-600 hover:bg-purple-700">
-                                צור חשבונית
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setShowForm(false)}
-                            >
-                                ביטול
-                            </Button>
-                        </div>
-                    </form>
-                </div>
-            )}
+                    </DialogContent>
+                </Dialog>
+            </div>
 
             {/* Invoices List */}
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-                <div className="divide-y divide-gray-200">
-                    {paginatedInvoices.length === 0 ? (
-                        <div className="text-center py-10 text-gray-500">
-                            {searchTerm ? 'לא נמצאו חשבוניות' : 'אין חשבוניות עדיין. צור חשבונית חדשה כדי להתחיל.'}
-                        </div>
-                    ) : (
-                        paginatedInvoices.map((inv) => (
-                            <div key={inv.id} className="bg-white p-4 hover:bg-gray-50 transition-all flex items-center justify-between group">
-                                <div className="flex items-center justify-between w-full">
-                                    {/* Right Side: Avatar + Name + Date */}
-                                    <div className="flex items-center gap-4 flex-1">
-                                        <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
-                                            {inv.clientName?.[0] || '?'}
+            <div className="flex flex-col gap-3">
+                {paginatedInvoices.length === 0 ? (
+                    <div className="text-center py-10 bg-white rounded-lg border border-gray-200 text-gray-500">
+                        {searchTerm ? 'לא נמצאו חשבוניות' : 'אין חשבוניות עדיין. צור חשבונית חדשה כדי להתחיל.'}
+                    </div>
+                ) : (
+                    paginatedInvoices.map((inv) => (
+                        <div key={inv.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group">
+                            {/* Mobile Layout: Stacked */}
+                            {/* Top: Client + Status */}
+                            <div className="flex items-start justify-between w-full md:w-auto md:flex-1">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                                        {inv.clientName?.[0] || '?'}
+                                    </div>
+                                    <div>
+                                        <div className="font-bold text-gray-900 flex items-center gap-2">
+                                            {inv.clientName}
                                         </div>
-                                        <div>
-                                            <div className="font-bold text-[#323338] flex items-center gap-2">
-                                                {inv.clientName}
-                                                <span className="text-xs font-normal text-gray-400">
-                                                    #{inv.invoiceNumber}
-                                                </span>
-                                            </div>
-                                            <div className="text-xs text-[#676879] flex items-center gap-2">
-                                                <span>{format(new Date(inv.date), 'dd/MM/yyyy')}</span>
-                                                <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                <span>{inv.items?.length || 0} פריטים</span>
-                                            </div>
+                                        <div className="text-xs text-gray-500">
+                                            #{inv.invoiceNumber} • {format(new Date(inv.date), 'dd/MM/yyyy')}
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Center: Dropdown */}
-                                <div className="flex items-center justify-center flex-1" onClick={(e) => e.stopPropagation()}>
+                                {/* Status Badge - Visible on Mobile Top Right, Desktop Center */}
+                                <div className="md:hidden" onClick={(e) => e.stopPropagation()}>
                                     <Select
                                         value={inv.status}
                                         onValueChange={(value) => handleStatusChange(inv.id, value)}
                                     >
-                                        <SelectTrigger className={`h-7 w-[110px] text-xs px-2 border border-gray-200 shadow-sm ${inv.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
-                                            inv.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
-                                                inv.status === 'PAID' ? 'bg-green-50 text-green-700' :
-                                                    inv.status === 'OVERDUE' ? 'bg-red-50 text-red-700' :
-                                                        'bg-gray-50 text-gray-700'
-                                            }`}>
-                                            <span className="w-full text-center font-medium">
-                                                <SelectValue />
-                                            </span>
+                                        <SelectTrigger className={cn("h-7 text-xs px-2 border-0 shadow-none font-medium",
+                                            inv.status === 'DRAFT' ? 'bg-gray-100 text-gray-700' :
+                                                inv.status === 'SENT' ? 'bg-blue-100 text-blue-700' :
+                                                    inv.status === 'PAID' ? 'bg-green-100 text-green-700' :
+                                                        inv.status === 'OVERDUE' ? 'bg-red-100 text-red-700' :
+                                                            'bg-gray-100 text-gray-700'
+                                        )}>
+                                            <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent dir="rtl">
                                             <SelectItem value="DRAFT">טיוטה</SelectItem>
@@ -459,23 +300,49 @@ export function InvoicesTab() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-
-                                {/* Left Side: Amount + Download */}
-                                <div className="flex items-center gap-6 flex-1 justify-end">
-                                    <div className="text-left">
-                                        <div className="font-bold text-[#323338] text-lg">{formatCurrency(inv.totalAmount)}</div>
-                                        <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(inv.totalAmount - (inv.vatAmount || 0))}</div>
-                                    </div>
-                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button variant="ghost" size="icon" onClick={() => handleDownloadPDF(inv.id)}>
-                                            <Download className="h-4 w-4 text-gray-500" />
-                                        </Button>
-                                    </div>
-                                </div>
                             </div>
-                        ))
-                    )}
-                </div>
+
+                            {/* Desktop: Status Center */}
+                            <div className="hidden md:flex items-center justify-center flex-1" onClick={(e) => e.stopPropagation()}>
+                                <Select
+                                    value={inv.status}
+                                    onValueChange={(value) => handleStatusChange(inv.id, value)}
+                                >
+                                    <SelectTrigger className={cn("h-8 w-[120px] text-xs px-2 border border-gray-200 shadow-sm",
+                                        inv.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
+                                            inv.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
+                                                inv.status === 'PAID' ? 'bg-green-50 text-green-700' :
+                                                    inv.status === 'OVERDUE' ? 'bg-red-50 text-red-700' :
+                                                        'bg-gray-50 text-gray-700'
+                                    )}>
+                                        <span className="w-full text-center font-medium">
+                                            <SelectValue />
+                                        </span>
+                                    </SelectTrigger>
+                                    <SelectContent dir="rtl">
+                                        <SelectItem value="DRAFT">טיוטה</SelectItem>
+                                        <SelectItem value="SENT">נשלח</SelectItem>
+                                        <SelectItem value="PAID">שולם</SelectItem>
+                                        <SelectItem value="OVERDUE">באיחור</SelectItem>
+                                        <SelectItem value="CANCELLED">בוטל</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Bottom/Right: Amount + Actions */}
+                            <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto md:flex-1 mt-2 md:mt-0 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100">
+                                <div className="text-right md:text-left">
+                                    <div className="font-bold text-gray-900 text-lg">{formatCurrency(inv.totalAmount)}</div>
+                                    <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(inv.totalAmount - (inv.vatAmount || 0))}</div>
+                                </div>
+                                <Button variant="outline" size="sm" onClick={() => handleDownloadPDF(inv.id)} className="gap-2">
+                                    <Download className="h-4 w-4" />
+                                    <span className="md:hidden">הורד PDF</span>
+                                </Button>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
 
             {totalPages > 1 && (

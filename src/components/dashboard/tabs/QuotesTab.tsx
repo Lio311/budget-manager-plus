@@ -4,8 +4,7 @@ import { useState } from 'react'
 import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
-import { Switch } from '@/components/ui/switch'
-import { getQuotes, createQuote, updateQuoteStatus, getNextQuoteNumber, type QuoteFormData } from '@/lib/actions/quotes'
+import { getQuotes, updateQuoteStatus, type QuoteFormData } from '@/lib/actions/quotes'
 import { getClients } from '@/lib/actions/clients'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
@@ -13,8 +12,7 @@ import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
 import { format } from 'date-fns'
-import { formatCurrency } from '@/lib/utils'
-import { DatePicker } from '@/components/ui/date-picker'
+import { formatCurrency, cn } from '@/lib/utils'
 import {
     Select,
     SelectContent,
@@ -22,6 +20,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
+import { FloatingActionButton } from '@/components/ui/floating-action-button'
+import { QuoteForm } from '@/components/dashboard/forms/QuoteForm'
 
 const statusConfig = {
     DRAFT: { label: 'טיוטה', icon: FileText, color: 'text-gray-600', bg: 'bg-gray-100' },
@@ -48,16 +49,10 @@ export function QuotesTab() {
     const { budgetType } = useBudget()
     const [searchTerm, setSearchTerm] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
-    const [showForm, setShowForm] = useState(false)
-    const [formData, setFormData] = useState<QuoteFormData>({
-        clientId: '',
-        quoteNumber: '',
-        issueDate: new Date(),
-        validUntil: undefined,
-        subtotal: 0,
-        vatRate: 0.18,
-        notes: ''
-    })
+
+    // Dialog states for desktop and mobile
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     const quotesFetcher = async () => {
         const result = await getQuotes(budgetType)
@@ -86,7 +81,7 @@ export function QuotesTab() {
     const { data: clients = [] } = useSWR(['clients', budgetType], clientsFetcher)
 
     const filteredQuotes = quotes.filter((q: any) =>
-        q.client?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        q.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         q.quoteNumber.toString().includes(searchTerm)
     )
 
@@ -99,36 +94,6 @@ export function QuotesTab() {
         currentPage * itemsPerPage
     )
 
-    // Optimistic create for instant UI feedback
-    const { execute: optimisticCreateQuote } = useOptimisticMutation<Quote[], QuoteFormData>(
-        ['quotes', budgetType],
-        (input) => createQuote(input, budgetType),
-        {
-            getOptimisticData: (current, input) => {
-                const client = clients.find((c: any) => c.id === input.clientId)
-                const vatRate = input.vatRate || 0.18
-                const total = input.subtotal * (1 + vatRate)
-                return [
-                    {
-                        id: 'temp-' + Date.now(),
-                        quoteNumber: input.quoteNumber,
-                        clientName: client?.name || 'לקוח לא ידוע',
-                        clientId: input.clientId,
-                        date: input.issueDate,
-                        validUntil: input.validUntil,
-                        status: 'DRAFT',
-                        totalAmount: total,
-                        vatAmount: input.subtotal * vatRate,
-                        items: []
-                    },
-                    ...current
-                ]
-            },
-            successMessage: 'הצעת מחיר נוצרה בהצלחה',
-            errorMessage: 'שגיאה ביצירת הצעת המחיר'
-        }
-    )
-
     // Optimistic status update for instant UI feedback
     const { execute: optimisticUpdateStatus } = useOptimisticMutation<Quote[], { id: string, status: any }>(
         ['quotes', budgetType],
@@ -139,26 +104,6 @@ export function QuotesTab() {
             errorMessage: 'שגיאה בעדכון הסטטוס'
         }
     )
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-
-        try {
-            await optimisticCreateQuote(formData)
-            setShowForm(false)
-            setFormData({
-                clientId: '',
-                quoteNumber: '',
-                issueDate: new Date(),
-                validUntil: undefined,
-                subtotal: 0,
-                vatRate: 0.18,
-                notes: ''
-            })
-        } catch (error) {
-            // Error managed by hook
-        }
-    }
 
     const handleStatusChange = async (quoteId: string, newStatus: any) => {
         try {
@@ -200,16 +145,6 @@ export function QuotesTab() {
         }
     }
 
-    const handleNewQuote = async () => {
-        const nextNum = await getNextQuoteNumber()
-
-        setFormData({
-            ...formData,
-            quoteNumber: nextNum.data || '2001'
-        })
-        setShowForm(true)
-    }
-
     if (isLoading) {
         return (
             <div className="space-y-6">
@@ -234,23 +169,39 @@ export function QuotesTab() {
         )
     }
 
-    const total = formData.subtotal + (formData.subtotal * (formData.vatRate || 0))
-
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">הצעות מחיר</h2>
                     <p className="text-sm text-gray-500 mt-1">ניהול הצעות מחיר ללקוחות</p>
                 </div>
-                <Button
-                    onClick={handleNewQuote}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
-                >
-                    <Plus className="h-4 w-4 ml-2" />
-                    הצעת מחיר חדשה
-                </Button>
+
+                {/* Desktop Button */}
+                <div className="hidden md:block">
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                                <Plus className="h-4 w-4 ml-2" />
+                                הצעת מחיר חדשה
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-3xl rounded-xl" dir="rtl">
+                            <DialogTitle className="sr-only">הוספת הצעת מחיר</DialogTitle>
+                            <div className="p-2">
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת הצעת מחיר חדשה</h3>
+                                <QuoteForm
+                                    clients={clients}
+                                    onSuccess={() => {
+                                        setIsDialogOpen(false)
+                                        mutate()
+                                    }}
+                                />
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
 
             {/* Search */}
@@ -258,230 +209,146 @@ export function QuotesTab() {
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                     type="text"
-                    placeholder="חיפוש הצעת מחיר..."
+                    placeholder="חיפוש לפי שם לקוח או מספר הצעה..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                 />
             </div>
 
-            {/* Form */}
-            {showForm && (
-                <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h3 className="text-lg font-semibold mb-4 text-yellow-700">הצעת מחיר חדשה</h3>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    מספר הצעת מחיר *
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.quoteNumber}
-                                    onChange={(e) => setFormData({ ...formData, quoteNumber: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    לקוח *
-                                </label>
-                                <select
-                                    required
-                                    value={formData.clientId}
-                                    onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
-                                >
-                                    <option value="">בחר לקוח</option>
-                                    {clients.map((client: any) => (
-                                        <option key={client.id} value={client.id}>{client.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    תאריך הנפקה *
-                                </label>
-                                <DatePicker
-                                    date={formData.issueDate}
-                                    setDate={(date) => date && setFormData({ ...formData, issueDate: date })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    בתוקף עד
-                                </label>
-                                <DatePicker
-                                    date={formData.validUntil}
-                                    setDate={(date) => setFormData({ ...formData, validUntil: date })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    סכום לפני מע"מ *
-                                </label>
-                                <input
-                                    type="number"
-                                    required
-                                    min="0"
-                                    step="0.01"
-                                    value={formData.subtotal}
-                                    onChange={(e) => setFormData({ ...formData, subtotal: parseFloat(e.target.value) || 0 })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    שיעור מע"מ
-                                </label>
-                                <select
-                                    value={formData.vatRate}
-                                    onChange={(e) => setFormData({ ...formData, vatRate: parseFloat(e.target.value) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
-                                >
-                                    <option value="0">ללא מע"מ (0%)</option>
-                                    <option value="0.18">מע"מ רגיל (18%)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="bg-yellow-50 p-4 rounded-md border border-yellow-100">
-                            <div className="flex justify-between text-sm mb-2">
-                                <span>סכום לפני מע"מ:</span>
-                                <span>₪{formData.subtotal.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between text-sm mb-2">
-                                <span>מע"מ ({(formData.vatRate || 0) * 100}%):</span>
-                                <span>₪{(formData.subtotal * (formData.vatRate || 0)).toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between text-lg font-bold border-t border-yellow-200 pt-2">
-                                <span>סה"כ לתשלום:</span>
-                                <span className="text-yellow-700">₪{total.toLocaleString()}</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                הערות
-                            </label>
-                            <textarea
-                                value={formData.notes}
-                                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            {/* Mobile FAB */}
+            <div className="md:hidden">
+                <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                    <DialogTrigger asChild>
+                        <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass="bg-yellow-500" label="הוסף הצעה" />
+                    </DialogTrigger>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                        <DialogTitle className="sr-only">הוספת הצעת מחיר</DialogTitle>
+                        <div className="mt-4">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת הצעת מחיר חדשה</h3>
+                            <QuoteForm
+                                clients={clients}
+                                onSuccess={() => {
+                                    setIsMobileOpen(false)
+                                    mutate()
+                                }}
                             />
                         </div>
-
-                        <div className="flex gap-2">
-                            <Button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white">
-                                צור הצעת מחיר
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setShowForm(false)}
-                            >
-                                ביטול
-                            </Button>
-                        </div>
-                    </form>
-                </div>
-            )}
+                    </DialogContent>
+                </Dialog>
+            </div>
 
             {/* List */}
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-                <div className="divide-y divide-gray-200">
-                    {paginatedQuotes.length === 0 ? (
-                        <div className="text-center py-10 text-gray-500">
-                            {searchTerm ? 'לא נמצאו הצעות מחיר' : 'אין הצעות מחיר עדיין. צור הצעת מחיר חדשה כדי להתחיל.'}
-                        </div>
-                    ) : (
-                        paginatedQuotes.map((quote) => (
-                            <div key={quote.id} className="bg-white p-4 hover:bg-gray-50 transition-all flex items-center justify-between group">
-                                <div className="flex items-center justify-between w-full">
-                                    {/* Right Side: Avatar + Name + Date */}
-                                    <div className="flex items-center gap-4 flex-1">
-                                        <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
-                                            {quote.clientName?.[0] || '?'}
-                                        </div>
-                                        <div>
-                                            <div className="font-bold text-[#323338] flex items-center gap-2">
-                                                {quote.clientName}
-                                                <span className="text-xs font-normal text-gray-400">
-                                                    #{quote.quoteNumber}
-                                                </span>
-                                            </div>
-                                            <div className="text-xs text-[#676879] flex items-center gap-2">
-                                                <span>{format(new Date(quote.date), 'dd/MM/yyyy')}</span>
-                                                <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                <span>{quote.items?.length || 0} פריטים</span>
-                                                {quote.validUntil && (
-                                                    <>
-                                                        <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                        <span className={new Date(quote.validUntil) < new Date() && quote.status !== 'ACCEPTED' ? 'text-red-500' : ''}>
-                                                            בתוקף עד {format(new Date(quote.validUntil), 'dd/MM/yyyy')}
-                                                        </span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
+            <div className="flex flex-col gap-3">
+                {paginatedQuotes.length === 0 ? (
+                    <div className="text-center py-10 bg-white rounded-lg border border-gray-200 text-gray-500">
+                        {searchTerm ? 'לא נמצאו הצעות מחיר' : 'אין הצעות מחיר עדיין. צור הצעת מחיר חדשה כדי להתחיל.'}
+                    </div>
+                ) : (
+                    paginatedQuotes.map((quote) => (
+                        <div key={quote.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group">
+                            {/* Mobile Layout: Stacked */}
+                            {/* Top: Client + Status */}
+                            <div className="flex items-start justify-between w-full md:w-auto md:flex-1">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                                        {quote.clientName?.[0] || '?'}
                                     </div>
-
-                                    {/* Center: Dropdown */}
-                                    <div className="flex items-center justify-center flex-1" onClick={(e) => e.stopPropagation()}>
-                                        <Select
-                                            value={quote.status}
-                                            onValueChange={(value) => handleStatusChange(quote.id, value)}
-                                        >
-                                            <SelectTrigger className={`h-7 w-[110px] text-xs px-2 border border-gray-200 shadow-sm ${quote.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
-                                                quote.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
-                                                    quote.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
-                                                        quote.status === 'EXPIRED' ? 'bg-orange-50 text-orange-700' :
-                                                            'bg-gray-50 text-gray-700'
-                                                }`}>
-                                                <span className="w-full text-center font-medium">
-                                                    <SelectValue />
-                                                </span>
-                                            </SelectTrigger>
-                                            <SelectContent dir="rtl">
-                                                <SelectItem value="DRAFT">טיוטה</SelectItem>
-                                                <SelectItem value="SENT">נשלח</SelectItem>
-                                                <SelectItem value="ACCEPTED">אושר</SelectItem>
-                                                <SelectItem value="EXPIRED">פג תוקף</SelectItem>
-                                                <SelectItem value="REJECTED">נדחה</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Left Side: Amount + Download */}
-                                    <div className="flex items-center gap-6 flex-1 justify-end">
-                                        <div className="text-left">
-                                            <div className="font-bold text-[#323338] text-lg">{formatCurrency(quote.totalAmount)}</div>
-                                            <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
+                                    <div>
+                                        <div className="font-bold text-gray-900 flex items-center gap-2">
+                                            {quote.clientName}
                                         </div>
-                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <Button variant="ghost" size="icon" onClick={() => handleDownloadPDF(quote.id)}>
-                                                <Download className="h-4 w-4 text-gray-500" />
-                                            </Button>
+                                        <div className="text-xs text-gray-500">
+                                            #{quote.quoteNumber} • {format(new Date(quote.date), 'dd/MM/yyyy')}
                                         </div>
+                                        {quote.validUntil && (
+                                            <div className={cn("text-xs mt-1",
+                                                new Date(quote.validUntil) < new Date() && quote.status !== 'ACCEPTED' ? 'text-red-500' : 'text-gray-400'
+                                            )}>
+                                                בתוקף עד {format(new Date(quote.validUntil), 'dd/MM/yyyy')}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
-                        ))
-                    )}
-                </div>
 
-                {totalPages > 1 && (
-                    <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={setCurrentPage}
-                        />
-                    </div>
+                                {/* Status Badge - Visible on Mobile Top Right, Desktop Center */}
+                                <div className="md:hidden" onClick={(e) => e.stopPropagation()}>
+                                    <Select
+                                        value={quote.status}
+                                        onValueChange={(value) => handleStatusChange(quote.id, value)}
+                                    >
+                                        <SelectTrigger className={cn("h-7 text-xs px-2 border-0 shadow-none font-medium",
+                                            quote.status === 'DRAFT' ? 'bg-gray-100 text-gray-700' :
+                                                quote.status === 'SENT' ? 'bg-blue-100 text-blue-700' :
+                                                    quote.status === 'ACCEPTED' ? 'bg-green-100 text-green-700' :
+                                                        quote.status === 'EXPIRED' ? 'bg-orange-100 text-orange-700' :
+                                                            'bg-gray-100 text-gray-700'
+                                        )}>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent dir="rtl">
+                                            <SelectItem value="DRAFT">טיוטה</SelectItem>
+                                            <SelectItem value="SENT">נשלח</SelectItem>
+                                            <SelectItem value="ACCEPTED">התקבל</SelectItem>
+                                            <SelectItem value="EXPIRED">פג תוקף</SelectItem>
+                                            <SelectItem value="CANCELLED">בוטל</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            {/* Desktop: Status Center */}
+                            <div className="hidden md:flex items-center justify-center flex-1" onClick={(e) => e.stopPropagation()}>
+                                <Select
+                                    value={quote.status}
+                                    onValueChange={(value) => handleStatusChange(quote.id, value)}
+                                >
+                                    <SelectTrigger className={cn("h-8 w-[120px] text-xs px-2 border border-gray-200 shadow-sm",
+                                        quote.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
+                                            quote.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
+                                                quote.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
+                                                    quote.status === 'EXPIRED' ? 'bg-orange-50 text-orange-700' :
+                                                        'bg-gray-50 text-gray-700'
+                                    )}>
+                                        <span className="w-full text-center font-medium">
+                                            <SelectValue />
+                                        </span>
+                                    </SelectTrigger>
+                                    <SelectContent dir="rtl">
+                                        <SelectItem value="DRAFT">טיוטה</SelectItem>
+                                        <SelectItem value="SENT">נשלח</SelectItem>
+                                        <SelectItem value="ACCEPTED">התקבל</SelectItem>
+                                        <SelectItem value="EXPIRED">פג תוקף</SelectItem>
+                                        <SelectItem value="CANCELLED">בוטל</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Bottom/Right: Amount + Actions */}
+                            <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto md:flex-1 mt-2 md:mt-0 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100">
+                                <div className="text-right md:text-left">
+                                    <div className="font-bold text-gray-900 text-lg">{formatCurrency(quote.totalAmount)}</div>
+                                    <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
+                                </div>
+                                <Button variant="outline" size="sm" onClick={() => handleDownloadPDF(quote.id)} className="gap-2">
+                                    <Download className="h-4 w-4" />
+                                    <span className="md:hidden">הורד PDF</span>
+                                </Button>
+                            </div>
+                        </div>
+                    ))
                 )}
             </div>
+
+            {totalPages > 1 && (
+                <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
+            )}
         </div>
     )
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import useSWR, { useSWRConfig } from 'swr'
 import { CreditCard, Loader2, Pencil, Trash2, Check, X } from 'lucide-react'
@@ -7,12 +9,14 @@ import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/ui/Pagination'
-import { addBill, getBills, updateBill, deleteBill, toggleBillPaid } from '@/lib/actions/bill'
+import { getBills, updateBill, deleteBill, toggleBillPaid } from '@/lib/actions/bill'
 import { formatCurrency } from '@/lib/utils'
 import { useOptimisticToggle, useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
-
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
+import { FloatingActionButton } from '@/components/ui/floating-action-button'
+import { BillForm } from '@/components/dashboard/forms/BillForm'
 
 interface Bill {
     id: string
@@ -35,6 +39,9 @@ export function BillsTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
+
+    // Mobile Dialog State
+    const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     const fetcher = async () => {
         const result = await getBills(month, year, budgetType)
@@ -59,10 +66,9 @@ export function BillsTab() {
     const totalPaidILS = data?.totalPaidILS || 0
     const totalUnpaidILS = data?.totalUnpaidILS || 0
 
-    const [submitting, setSubmitting] = useState(false)
-    const [newBill, setNewBill] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
+    const [submitting, setSubmitting] = useState(false)
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
@@ -79,63 +85,6 @@ export function BillsTab() {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
-
-    async function handleAdd() {
-        if (!newBill.name || !newBill.amount || !newBill.dueDay) {
-            toast({
-                title: 'שגיאה',
-                description: 'נא למלא את כל השדות',
-                variant: 'destructive'
-            })
-            return
-        }
-
-        const dueDay = parseInt(newBill.dueDay)
-        if (dueDay < 1 || dueDay > 31) {
-            toast({
-                title: 'שגיאה',
-                description: 'יום תשלום חייב להיות בין 1 ל-31',
-                variant: 'destructive'
-            })
-            return
-        }
-
-        setSubmitting(true)
-        try {
-            const result = await addBill(month, year, {
-                name: newBill.name,
-                amount: parseFloat(newBill.amount),
-                currency: newBill.currency,
-                dueDay: parseInt(newBill.dueDay),
-                paymentMethod: newBill.paymentMethod || undefined
-            }, budgetType)
-
-            if (result.success) {
-                toast({
-                    title: 'הצלחה',
-                    description: 'החשבון נוסף בהצלחה'
-                })
-                setNewBill({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
-                await mutate()
-                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            } else {
-                toast({
-                    title: 'שגיאה',
-                    description: result.error || 'לא ניתן להוסיף חשבון',
-                    variant: 'destructive'
-                })
-            }
-        } catch (error) {
-            console.error('Add bill failed:', error)
-            toast({
-                title: 'שגיאה',
-                description: 'אירעה שגיאה בלתי צפויה',
-                variant: 'destructive'
-            })
-        } finally {
-            setSubmitting(false)
-        }
-    }
 
     // Optimistic toggle for instant UI feedback
     const { toggle: optimisticTogglePaid } = useOptimisticToggle<BillData>(
@@ -299,75 +248,31 @@ export function BillsTab() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-                <div className="glass-panel p-5 h-fit">
+                {/* Desktop Form */}
+                <div className="glass-panel p-5 h-fit hidden md:block">
                     <div className="flex items-center gap-2 mb-4 min-w-0">
                         <CreditCard className="h-5 w-5 text-orange-500 flex-shrink-0" />
                         <h3 className="text-base md:text-lg font-bold text-[#323338] truncate flex-1 min-w-0">הוספת חשבון חדש</h3>
                     </div>
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">שם החשבון</label>
-                            <Input
-                                value={newBill.name}
-                                onChange={(e) => setNewBill({ ...newBill, name: e.target.value })}
-                                placeholder="לדוגמה: ארנונה"
-                                className="h-10 text-right"
-                            />
-                        </div>
-                        <div className="grid grid-cols-3 gap-3">
-                            <div className="col-span-1">
-                                <label className="text-sm font-medium text-gray-700">מטבע</label>
-                                <select
-                                    className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
-                                    value={newBill.currency}
-                                    onChange={(e) => setNewBill({ ...newBill, currency: e.target.value })}
-                                >
-                                    {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
-                                        <option key={code} value={code}>{code} ({symbol})</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="col-span-2 space-y-2">
-                                <label className="text-sm font-medium text-gray-700">סכום</label>
-                                <Input
-                                    type="number"
-                                    value={newBill.amount}
-                                    onChange={(e) => setNewBill({ ...newBill, amount: e.target.value })}
-                                    placeholder="0.00"
-                                    className="h-10 text-right"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">יום בחודש לתשלום</label>
-                            <Input
-                                type="number"
-                                min="1"
-                                max="31"
-                                value={newBill.dueDay}
-                                onChange={(e) => setNewBill({ ...newBill, dueDay: e.target.value })}
-                                placeholder="1-31"
-                                className="h-10 text-right"
-                            />
-                        </div>
-
-                        <div className="w-full">
-                            <PaymentMethodSelector
-                                value={newBill.paymentMethod}
-                                onChange={(val) => setNewBill({ ...newBill, paymentMethod: val })}
-                                color="orange"
-                            />
-                        </div>
-
-                        <Button
-                            className="w-full bg-orange-500 hover:bg-orange-600 h-10 shadow-sm mt-2 font-medium"
-                            onClick={handleAdd}
-                            disabled={submitting}
-                        >
-                            {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : "הוסף"}
-                        </Button>
-                    </div>
+                    <BillForm />
                 </div>
+
+                {/* Mobile FAB */}
+                <div className="md:hidden">
+                    <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                        <DialogTrigger asChild>
+                            <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass="bg-orange-500" label="הוסף חשבון" />
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                            <DialogTitle className="sr-only">הוספת חשבון חדש</DialogTitle>
+                            <div className="mt-4">
+                                <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת חשבון חדש</h3>
+                                <BillForm onSuccess={() => setIsMobileOpen(false)} isMobile={true} />
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+
 
                 <div className="glass-panel p-5 block">
                     <h3 className="text-lg font-bold text-[#323338] mb-4">רשימת חשבונות</h3>
@@ -397,7 +302,7 @@ export function BillsTab() {
                                 {paginatedBills.map((bill: Bill) => (
                                     <div
                                         key={bill.id}
-                                        className="group relative flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                                        className="group relative flex flex-col md:flex-row items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 gap-3"
                                     >
                                         {editingId === bill.id ? (
                                             <div className="flex flex-col gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
@@ -444,63 +349,67 @@ export function BillsTab() {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <>
-                                                <div className="flex items-center gap-4">
-                                                    <button
-                                                        onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
-                                                        className={`
-                                                            w-16 h-7 rounded-full text-xs font-medium transition-all duration-200 flex items-center justify-center
-                                                            ${bill.isPaid
-                                                                ? 'bg-[#00c875] text-white hover:bg-[#00b065] shadow-sm'
-                                                                : 'bg-[#ffcb00] text-[#323338] hover:bg-[#eabb00]'
-                                                            }
-                                                        `}
-                                                    >
-                                                        {bill.isPaid ? 'שולם' : 'ממתין'}
-                                                    </button>
+                                            <div className="w-full">
+                                                <div className="flex items-center justify-between w-full">
+                                                    {/* Left side (RTL: actually Right): Checkbox + Name + Date */}
+                                                    <div className="flex items-center gap-4">
+                                                        <button
+                                                            onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
+                                                            className={`
+                                                                w-16 h-7 rounded-full text-xs font-medium transition-all duration-200 flex items-center justify-center shrink-0
+                                                                ${bill.isPaid
+                                                                    ? 'bg-[#00c875] text-white hover:bg-[#00b065] shadow-sm'
+                                                                    : 'bg-[#ffcb00] text-[#323338] hover:bg-[#eabb00]'
+                                                                }
+                                                            `}
+                                                        >
+                                                            {bill.isPaid ? 'שולם' : 'ממתין'}
+                                                        </button>
 
-                                                    <div className="flex flex-col">
-                                                        <span className={`font-bold text-base transition-colors ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338]'}`}>
-                                                            {bill.name}
-                                                        </span>
-                                                        <div className="flex items-center gap-2 text-xs text-[#676879]">
-                                                            <span>
-                                                                תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
+                                                        <div className="flex flex-col overflow-hidden">
+                                                            <span className={`font-bold text-base transition-colors truncate ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338]'}`}>
+                                                                {bill.name}
                                                             </span>
-                                                            {bill.paymentMethod && (
-                                                                <>
-                                                                    <span>•</span>
-                                                                    <span>{bill.paymentMethod}</span>
-                                                                </>
-                                                            )}
+                                                            <div className="flex items-center gap-2 text-xs text-[#676879]">
+                                                                <span className="shrink-0">
+                                                                    תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
+                                                                </span>
+                                                                {bill.paymentMethod && (
+                                                                    <>
+                                                                        <span className="hidden sm:inline">•</span>
+                                                                        <span className="truncate hidden sm:inline">{bill.paymentMethod}</span>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Right side (RTL: actually Left): Amount + Actions */}
+                                                    <div className="flex items-center gap-4">
+                                                        <span className={`text-lg font-bold font-mono ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
+                                                            {formatCurrency(bill.amount, getCurrencySymbol(bill.currency || 'ILS'))}
+                                                        </span>
+                                                        <div className="flex gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleEdit(bill)}
+                                                                className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleDelete(bill.id)}
+                                                                className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                <div className="flex items-center gap-4">
-                                                    <span className={`text-lg font-bold font-mono ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
-                                                        {formatCurrency(bill.amount, getCurrencySymbol(bill.currency || 'ILS'))}
-                                                    </span>
-                                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleEdit(bill)}
-                                                            className="h-8 w-8 text-blue-500 hover:bg-blue-50 rounded-full"
-                                                        >
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleDelete(bill.id)}
-                                                            className="h-8 w-8 text-red-500 hover:bg-red-50 rounded-full"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </>
+                                            </div>
                                         )}
                                     </div>
                                 ))}

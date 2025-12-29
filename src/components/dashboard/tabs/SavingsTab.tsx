@@ -26,7 +26,7 @@ import {
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { SavingForm } from '@/components/dashboard/forms/SavingForm'
 
@@ -298,6 +298,7 @@ export function SavingsTab() {
                             />
                         </DialogTrigger>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                            <DialogTitle className="sr-only">הוספת חיסכון</DialogTitle>
                             <SavingForm
                                 categories={categories}
                                 onCategoriesChange={mutateCategories}

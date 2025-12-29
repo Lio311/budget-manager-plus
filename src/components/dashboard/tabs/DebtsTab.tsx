@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useOptimisticToggle, useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { DebtForm } from '@/components/dashboard/forms/DebtForm'
 import { Pagination } from '@/components/ui/Pagination'
@@ -283,6 +283,7 @@ export function DebtsTab() {
                             />
                         </DialogTrigger>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                            <DialogTitle className="sr-only">הוספת הלוואה</DialogTitle>
                             <DebtForm isMobile={true} onSuccess={() => setIsMobileOpen(false)} />
                         </DialogContent>
                     </Dialog>
