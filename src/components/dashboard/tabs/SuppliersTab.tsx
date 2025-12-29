@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getSuppliers, createSupplier, updateSupplier, deleteSupplier, type SupplierFormData } from '@/lib/actions/suppliers'
+import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -35,28 +36,58 @@ export function SuppliersTab() {
         supplier.phone?.includes(searchTerm)
     )
 
+    // Optimistic create for instant UI feedback
+    const { execute: optimisticCreateSupplier } = useOptimisticMutation<any[], SupplierFormData>(
+        ['suppliers', budgetType],
+        (input) => createSupplier(input, budgetType),
+        {
+            getOptimisticData: (current, input) => [
+                {
+                    id: 'temp-' + Date.now(),
+                    ...input,
+                    totalExpenses: 0,
+                    _count: { expenses: 0 }
+                },
+                ...current
+            ],
+            successMessage: 'ספק נוסף בהצלחה',
+            errorMessage: 'שגיאה בהוספת הספק'
+        }
+    )
+
+    // Optimistic delete for instant UI feedback
+    const { deleteItem: optimisticDeleteSupplier } = useOptimisticDelete<any[]>(
+        ['suppliers', budgetType],
+        deleteSupplier,
+        {
+            getOptimisticData: (current, id) => current.filter(supplier => supplier.id !== id),
+            successMessage: 'ספק נמחק בהצלחה',
+            errorMessage: 'שגיאה במחיקת הספק'
+        }
+    )
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         try {
-            let result
             if (editingSupplier) {
-                result = await updateSupplier(editingSupplier.id, formData)
+                const result = await updateSupplier(editingSupplier.id, formData)
+                if (result.success) {
+                    toast.success('ספק עודכן בהצלחה')
+                    setShowForm(false)
+                    setEditingSupplier(null)
+                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '' })
+                    mutate()
+                } else {
+                    toast.error(result.error || 'שגיאה')
+                }
             } else {
-                result = await createSupplier(formData, budgetType)
-            }
-
-            if (result.success) {
-                toast.success(editingSupplier ? 'ספק עודכן בהצלחה' : 'ספק נוסף בהצלחה')
+                await optimisticCreateSupplier(formData)
                 setShowForm(false)
-                setEditingSupplier(null)
                 setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '' })
-                mutate()
-            } else {
-                toast.error(result.error || 'שגיאה')
             }
         } catch (error) {
-            toast.error('שגיאה בשמירת הספק')
+            // Error handled by hook or update logic
         }
     }
 
@@ -76,12 +107,10 @@ export function SuppliersTab() {
     const handleDelete = async (id: string) => {
         if (!confirm('האם אתה בטוח שברצונך למחוק ספק זה?')) return
 
-        const result = await deleteSupplier(id)
-        if (result.success) {
-            toast.success('ספק נמחק בהצלחה')
-            mutate()
-        } else {
-            toast.error(result.error || 'שגיאה במחיקת הספק')
+        try {
+            await optimisticDeleteSupplier(id)
+        } catch (error) {
+            // Error handled by hook
         }
     }
 

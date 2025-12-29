@@ -7,6 +7,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Switch } from '@/components/ui/switch'
 import { getQuotes, createQuote, updateQuoteStatus, getNextQuoteNumber, type QuoteFormData } from '@/lib/actions/quotes'
 import { getClients } from '@/lib/actions/clients'
+import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -88,40 +89,72 @@ export function QuotesTab() {
         currentPage * itemsPerPage
     )
 
+    // Optimistic create for instant UI feedback
+    const { execute: optimisticCreateQuote } = useOptimisticMutation<Quote[], QuoteFormData>(
+        ['quotes', budgetType],
+        (input) => createQuote(input, budgetType),
+        {
+            getOptimisticData: (current, input) => {
+                const client = clients.find((c: any) => c.id === input.clientId)
+                const vatRate = input.vatRate || 0.18
+                const total = input.subtotal * (1 + vatRate)
+                return [
+                    {
+                        id: 'temp-' + Date.now(),
+                        quoteNumber: input.quoteNumber,
+                        clientName: client?.name || 'לקוח לא ידוע',
+                        clientId: input.clientId,
+                        date: input.issueDate,
+                        validUntil: input.validUntil,
+                        status: 'DRAFT',
+                        totalAmount: total,
+                        vatAmount: input.subtotal * vatRate,
+                        items: []
+                    },
+                    ...current
+                ]
+            },
+            successMessage: 'הצעת מחיר נוצרה בהצלחה',
+            errorMessage: 'שגיאה ביצירת הצעת המחיר'
+        }
+    )
+
+    // Optimistic status update for instant UI feedback
+    const { execute: optimisticUpdateStatus } = useOptimisticMutation<Quote[], { id: string, status: any }>(
+        ['quotes', budgetType],
+        ({ id, status }) => updateQuoteStatus(id, status),
+        {
+            getOptimisticData: (current, { id, status }) => current.map(q => q.id === id ? { ...q, status } : q),
+            successMessage: 'סטטוס עודכן בהצלחה',
+            errorMessage: 'שגיאה בעדכון הסטטוס'
+        }
+    )
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         try {
-            const result = await createQuote(formData, budgetType)
-
-            if (result.success) {
-                toast.success('הצעת מחיר נוצרה בהצלחה')
-                setShowForm(false)
-                setFormData({
-                    clientId: '',
-                    quoteNumber: '',
-                    issueDate: new Date(),
-                    validUntil: undefined,
-                    subtotal: 0,
-                    vatRate: 0.18,
-                    notes: ''
-                })
-                mutate()
-            } else {
-                toast.error(result.error || 'שגיאה')
-            }
+            await optimisticCreateQuote(formData)
+            setShowForm(false)
+            setFormData({
+                clientId: '',
+                quoteNumber: '',
+                issueDate: new Date(),
+                validUntil: undefined,
+                subtotal: 0,
+                vatRate: 0.18,
+                notes: ''
+            })
         } catch (error) {
-            toast.error('שגיאה ביצירת הצעת המחיר')
+            // Error managed by hook
         }
     }
 
     const handleStatusChange = async (quoteId: string, newStatus: any) => {
-        const result = await updateQuoteStatus(quoteId, newStatus)
-        if (result.success) {
-            toast.success('סטטוס עודכן בהצלחה')
-            mutate()
-        } else {
-            toast.error(result.error || 'שגיאה בעדכון הסטטוס')
+        try {
+            await optimisticUpdateStatus({ id: quoteId, status: newStatus })
+        } catch (error) {
+            // Error managed by hook
         }
     }
 

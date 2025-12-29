@@ -479,7 +479,10 @@ export function ExpensesTab() {
                 c = 'bg-pink-500 text-white border-pink-600'
             } else {
                 // Default fallback for any category with gray/no color
-                c = 'bg-gray-500 text-white border-gray-600'
+                // Use theme-aware colors: red for personal, orange for business
+                c = isBusiness
+                    ? 'bg-orange-500 text-white border-orange-600'
+                    : 'bg-[#e2445c] text-white border-[#d43f55]'
             }
         }
 

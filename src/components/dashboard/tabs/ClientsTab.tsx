@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, type ClientFormData } from '@/lib/actions/clients'
+import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -35,28 +36,58 @@ export function ClientsTab() {
         client.phone?.includes(searchTerm)
     )
 
+    // Optimistic create for instant UI feedback
+    const { execute: optimisticCreateClient } = useOptimisticMutation<any[], ClientFormData>(
+        ['clients', budgetType],
+        (input) => createClient(input, budgetType),
+        {
+            getOptimisticData: (current, input) => [
+                {
+                    id: 'temp-' + Date.now(),
+                    ...input,
+                    totalRevenue: 0,
+                    _count: { incomes: 0 }
+                },
+                ...current
+            ],
+            successMessage: 'לקוח נוסף בהצלחה',
+            errorMessage: 'שגיאה בהוספת הלקוח'
+        }
+    )
+
+    // Optimistic delete for instant UI feedback
+    const { deleteItem: optimisticDeleteClient } = useOptimisticDelete<any[]>(
+        ['clients', budgetType],
+        deleteClient,
+        {
+            getOptimisticData: (current, id) => current.filter(client => client.id !== id),
+            successMessage: 'לקוח נמחק בהצלחה',
+            errorMessage: 'שגיאה במחיקת הלקוח'
+        }
+    )
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         try {
-            let result
             if (editingClient) {
-                result = await updateClient(editingClient.id, formData)
+                const result = await updateClient(editingClient.id, formData)
+                if (result.success) {
+                    toast.success('לקוח עודכן בהצלחה')
+                    setShowForm(false)
+                    setEditingClient(null)
+                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '' })
+                    mutate()
+                } else {
+                    toast.error(result.error || 'שגיאה')
+                }
             } else {
-                result = await createClient(formData, budgetType)
-            }
-
-            if (result.success) {
-                toast.success(editingClient ? 'לקוח עודכן בהצלחה' : 'לקוח נוסף בהצלחה')
+                await optimisticCreateClient(formData)
                 setShowForm(false)
-                setEditingClient(null)
                 setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '' })
-                mutate()
-            } else {
-                toast.error(result.error || 'שגיאה')
             }
         } catch (error) {
-            toast.error('שגיאה בשמירת הלקוח')
+            // Error handled by hook or update logic
         }
     }
 
@@ -76,12 +107,10 @@ export function ClientsTab() {
     const handleDelete = async (id: string) => {
         if (!confirm('האם אתה בטוח שברצונך למחוק לקוח זה?')) return
 
-        const result = await deleteClient(id)
-        if (result.success) {
-            toast.success('לקוח נמחק בהצלחה')
-            mutate()
-        } else {
-            toast.error(result.error || 'שגיאה במחיקת הלקוח')
+        try {
+            await optimisticDeleteClient(id)
+        } catch (error) {
+            // Error handled by hook
         }
     }
 

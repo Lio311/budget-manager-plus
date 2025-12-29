@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
 import { getInvoices, createInvoice, updateInvoiceStatus, getNextInvoiceNumber, type InvoiceFormData } from '@/lib/actions/invoices'
 import { getClients } from '@/lib/actions/clients'
+import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -92,41 +93,73 @@ export function InvoicesTab() {
         currentPage * itemsPerPage
     )
 
+    // Optimistic create for instant UI feedback
+    const { execute: optimisticCreateInvoice } = useOptimisticMutation<Invoice[], InvoiceFormData>(
+        ['invoices', budgetType],
+        (input) => createInvoice(input, budgetType),
+        {
+            getOptimisticData: (current, input) => {
+                const client = clients.find((c: any) => c.id === input.clientId)
+                const vatRate = input.vatRate || 0.18
+                const total = input.subtotal * (1 + vatRate)
+                return [
+                    {
+                        id: 'temp-' + Date.now(),
+                        invoiceNumber: input.invoiceNumber,
+                        clientName: client?.name || 'לקוח לא ידוע',
+                        clientId: input.clientId,
+                        date: input.issueDate,
+                        dueDate: input.dueDate,
+                        status: 'DRAFT',
+                        totalAmount: total,
+                        vatAmount: input.subtotal * vatRate,
+                        items: []
+                    },
+                    ...current
+                ]
+            },
+            successMessage: 'חשבונית נוצרה בהצלחה',
+            errorMessage: 'שגיאה ביצירת החשבונית'
+        }
+    )
+
+    // Optimistic status update for instant UI feedback
+    const { execute: optimisticUpdateStatus } = useOptimisticMutation<Invoice[], { id: string, status: any }>(
+        ['invoices', budgetType],
+        ({ id, status }) => updateInvoiceStatus(id, status),
+        {
+            getOptimisticData: (current, { id, status }) => current.map(inv => inv.id === id ? { ...inv, status } : inv),
+            successMessage: 'סטטוס עודכן בהצלחה',
+            errorMessage: 'שגיאה בעדכון הסטטוס'
+        }
+    )
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
         try {
-            const result = await createInvoice(formData, budgetType)
-
-            if (result.success) {
-                toast.success('חשבונית נוצרה בהצלחה')
-                setShowForm(false)
-                setFormData({
-                    clientId: '',
-                    invoiceNumber: '',
-                    issueDate: new Date(),
-                    dueDate: undefined,
-                    subtotal: 0,
-                    vatRate: 0.18,
-                    paymentMethod: '',
-                    notes: ''
-                })
-                mutate()
-            } else {
-                toast.error(result.error || 'שגיאה')
-            }
+            await optimisticCreateInvoice(formData)
+            setShowForm(false)
+            setFormData({
+                clientId: '',
+                invoiceNumber: '',
+                issueDate: new Date(),
+                dueDate: undefined,
+                subtotal: 0,
+                vatRate: 0.18,
+                paymentMethod: '',
+                notes: ''
+            })
         } catch (error) {
-            toast.error('שגיאה ביצירת החשבונית')
+            // Error managed by hook
         }
     }
 
     const handleStatusChange = async (invoiceId: string, newStatus: any) => {
-        const result = await updateInvoiceStatus(invoiceId, newStatus)
-        if (result.success) {
-            toast.success('סטטוס עודכן בהצלחה')
-            mutate()
-        } else {
-            toast.error(result.error || 'שגיאה בעדכון הסטטוס')
+        try {
+            await optimisticUpdateStatus({ id: invoiceId, status: newStatus })
+        } catch (error) {
+            // Error managed by hook
         }
     }
 

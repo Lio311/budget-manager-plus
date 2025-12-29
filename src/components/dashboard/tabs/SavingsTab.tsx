@@ -380,7 +380,9 @@ export function SavingsTab() {
 
     const getCategoryColor = (catName: string) => {
         const cat = Array.isArray(categories) ? categories.find(c => c.name === catName) : null
-        let colorClass = cat?.color || 'bg-gray-100 text-gray-600 border-gray-200'
+
+        // Use theme-aware fallback instead of gray
+        let colorClass = cat?.color || 'bg-blue-500 text-white border-transparent'
 
         // Force upgrade legacy pale colors to bold colors
         if (colorClass.includes('bg-') && colorClass.includes('-100')) {

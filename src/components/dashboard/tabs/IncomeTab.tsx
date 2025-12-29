@@ -406,7 +406,11 @@ export function IncomeTab() {
 
     const getCategoryColor = (catName: string) => {
         const cat = Array.isArray(categories) ? categories.find(c => c.name === catName) : null
-        let c = cat?.color || 'bg-gray-100 text-gray-600 border-gray-200'
+
+        // Use theme-aware fallback instead of gray
+        let c = cat?.color || (isBusiness
+            ? 'bg-blue-500 text-white border-transparent'
+            : 'bg-[#00c875] text-white border-transparent')
 
         if (c.includes('bg-') && c.includes('-100')) {
             c = c.replace(/bg-(\w+)-100/g, 'bg-$1-500')
@@ -663,7 +667,7 @@ export function IncomeTab() {
                                                 </div>
                                             )}
                                             <div className="text-right">
-                                                <div className={`text - base sm: text - lg font - bold ${isBusiness ? 'text-blue-600' : 'text-[#00c875]'} `}>
+                                                <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-blue-600' : 'text-[#00c875]'}`}>
                                                     {formatCurrency(income.amount, getCurrencySymbol(income.currency || 'ILS'))}
                                                 </div>
                                                 {income.invoice && (
