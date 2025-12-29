@@ -323,14 +323,15 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                             iconType="circle"
                                             iconSize={8} // Small dots
                                             className="scrollbar-hide"
-                                            formatter={(value) => <span className="text-black mx-2 text-xs font-medium">{value}</span>}
+                                            formatter={(value) => <span className="text-black mx-1 text-xs font-medium whitespace-nowrap">{value}</span>}
                                             wrapperStyle={{
-                                                paddingTop: '20px',
+                                                paddingTop: '10px',
                                                 display: 'flex',
                                                 width: '100%',
                                                 justifyContent: 'center',
-                                                flexWrap: 'wrap',
-                                                gap: '10px'
+                                                flexWrap: 'nowrap',
+                                                gap: '5px',
+                                                overflowX: 'auto'
                                             }}
                                         />
                                     </PieChart>
