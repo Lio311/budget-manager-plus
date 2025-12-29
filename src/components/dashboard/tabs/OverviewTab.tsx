@@ -134,6 +134,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             {/* Action Buttons Row */}
             <div className="flex gap-4 justify-end mb-2">
                 <FeedbackButton />
+                <div className="md:hidden"><FinancialAdvisorButton financialData={overviewData?.current} /></div>
             </div>
 
             {/* Top Row: Key Metrics - ORDER: Balance, Savings/Bills, Expenses, Income */}
