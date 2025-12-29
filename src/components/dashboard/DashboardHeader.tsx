@@ -56,7 +56,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
     }
 
     return (
-    return (
         <div className="sticky top-4 z-[40] mx-4 mb-6">
             <div className="glass-panel w-full flex h-[72px] items-center px-6 justify-between gap-4 transition-all duration-300 hover:shadow-2xl hover:border-white/60">
 
