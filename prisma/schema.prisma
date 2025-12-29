@@ -41,6 +41,8 @@ model User {
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
+  businessInitialBalance Float @default(0)
+  businessInitialSavings Float @default(0) 
   
   // Trial period
   trialEndsAt    DateTime?

@@ -4,7 +4,12 @@ import { prisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 
-export async function updateUserSettings(data: { initialBalance?: number; initialSavings?: number }) {
+export async function updateUserSettings(data: {
+    initialBalance?: number;
+    initialSavings?: number;
+    businessInitialBalance?: number;
+    businessInitialSavings?: number;
+}) {
     try {
         const { userId } = await auth()
         if (!userId) {
@@ -37,7 +42,9 @@ export async function getUserSettings() {
             where: { id: userId },
             select: {
                 initialBalance: true,
-                initialSavings: true
+                initialSavings: true,
+                businessInitialBalance: true,
+                businessInitialSavings: true
             }
         })
 

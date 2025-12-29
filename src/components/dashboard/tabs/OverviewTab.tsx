@@ -82,10 +82,15 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     useEffect(() => {
         if (overviewData?.user) {
-            setInitialBalance(overviewData.user.initialBalance?.toString() || '')
-            setInitialSavings(overviewData.user.initialSavings?.toString() || '')
+            if (budgetType === 'BUSINESS') {
+                setInitialBalance(overviewData.user.businessInitialBalance?.toString() || '')
+                setInitialSavings(overviewData.user.businessInitialSavings?.toString() || '')
+            } else {
+                setInitialBalance(overviewData.user.initialBalance?.toString() || '')
+                setInitialSavings(overviewData.user.initialSavings?.toString() || '')
+            }
         }
-    }, [overviewData])
+    }, [overviewData, budgetType])
 
     const isBusiness = budgetType === 'BUSINESS'
     const current = overviewData?.current || { incomes: [], expenses: [], bills: [], debts: [], savings: [] }
@@ -179,10 +184,17 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
 
     const handleSaveSettings = async () => {
-        const result = await updateUserSettings({
-            initialBalance: parseFloat(initialBalance) || 0,
-            initialSavings: parseFloat(initialSavings) || 0
-        })
+        const payload = isBusiness
+            ? {
+                businessInitialBalance: parseFloat(initialBalance) || 0,
+                businessInitialSavings: parseFloat(initialSavings) || 0
+            }
+            : {
+                initialBalance: parseFloat(initialBalance) || 0,
+                initialSavings: parseFloat(initialSavings) || 0
+            }
+
+        const result = await updateUserSettings(payload)
 
         if (result.success) {
             toast.success('הגדרות עודכנו בהצלחה')
@@ -202,8 +214,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         month,
         year,
         currency,
-        initialBalance: overviewData?.user?.initialBalance,
-        initialSavings: overviewData?.user?.initialSavings
+        initialBalance: isBusiness ? overviewData?.user?.businessInitialBalance : overviewData?.user?.initialBalance,
+        initialSavings: isBusiness ? overviewData?.user?.businessInitialSavings : overviewData?.user?.initialSavings
     }
 
     return (

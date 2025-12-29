@@ -24,7 +24,13 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
         // Fetch user for initial balance/savings
         const user = await db.user.findUnique({
             where: { id: userId },
-            select: { id: true, initialBalance: true, initialSavings: true }
+            select: {
+                id: true,
+                initialBalance: true,
+                initialSavings: true,
+                businessInitialBalance: true,
+                businessInitialSavings: true
+            }
         })
 
         if (!user) {
