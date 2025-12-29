@@ -757,7 +757,7 @@ export function ExpensesTab() {
                             const usage = getUsage(exp.category)
 
                             return (
-                                <div key={exp.id} className="glass-panel p-3 sm:p-4 hover:shadow-md transition-all group relative">
+                                <div key={exp.id} className="glass-panel p-2.5 sm:p-4 hover:shadow-md transition-all group relative">
                                     {editingId === exp.id ? (
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-2 gap-3">
@@ -780,7 +780,7 @@ export function ExpensesTab() {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="flex items-center justify-between gap-2 sm:gap-3">
+                                        <div className="flex items-center justify-between gap-1.5 sm:gap-3">
                                             <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                                                 <div className="shrink-0">
                                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} shadow-sm`}>
@@ -800,18 +800,18 @@ export function ExpensesTab() {
                                                     <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] flex-wrap">
                                                         <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                         <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                        <span className="truncate">{exp.category}</span>
+                                                        <span className="truncate max-w-[80px] sm:max-w-none">{exp.category}</span>
                                                         {exp.paymentMethod && (
                                                             <>
                                                                 <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                                <span className="truncate">{PAYMENT_METHOD_LABELS[exp.paymentMethod] || exp.paymentMethod}</span>
+                                                                <span className="truncate max-w-[60px] sm:max-w-none">{PAYMENT_METHOD_LABELS[exp.paymentMethod] || exp.paymentMethod}</span>
                                                             </>
                                                         )}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2 sm:gap-6 pl-1 shrink-0">
+                                            <div className="flex items-center gap-1.5 sm:gap-6 pl-1 shrink-0">
                                                 {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
                                                     <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
                                                         <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
@@ -819,7 +819,7 @@ export function ExpensesTab() {
                                                     </div>
                                                 ) : null}
                                                 <div className="text-right">
-                                                    <div className={`text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
+                                                    <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
                                                         {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
                                                     </div>
                                                 </div>

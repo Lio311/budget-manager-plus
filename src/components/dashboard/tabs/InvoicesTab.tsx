@@ -486,21 +486,23 @@ export function InvoicesTab() {
                                     </div>
                                 </div>
                             </div>
-                            </div>
-                ))
-                    )}
+                                </div>
             </div>
-
-            {totalPages > 1 && (
-                <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
-                    />
-                </div>
-            )}
+            ))
+                    )}
         </div>
-                            </div >
-                        )
+            </div >
+
+        { totalPages > 1 && (
+            <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+            </div>
+        )
+}
+        </div >
+    )
 }
