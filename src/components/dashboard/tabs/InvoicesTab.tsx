@@ -50,13 +50,7 @@ export function InvoicesTab() {
     const [searchTerm, setSearchTerm] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
 
-    // Desktop form state (if we keep it or replace completely? User asked for mobile FAB, usually implies keeping desktop inline OR modal for both. 
-    // The previous patterns (Expenses/Income) kept desktop inline forms but this tab had a "New Invoice" button that toggled a form.
-    // I will switch to using the Dialog for both mobile and desktop to simplify, OR keep the inline toggle for desktop.
-    // Given the complexity of the form, a Dialog is often better. Let's stick to the FAB for mobile and keep the button for desktop but make IT open the dialog too for consistency?
-    // Actually, distinct UX is fine. Let's keep the desktop "New Invoice" button behavior but make it open the Dialog too to reuse the component?
-    // User asked: "Create invoice... that it will also be with the floating button and popup that opens like you did before?".
-    // This implies the popup (Dialog) should be used.
+    // Dialog states for desktop and mobile
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
 
@@ -216,9 +210,7 @@ export function InvoicesTab() {
 
             {/* Search */}
             <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-gray-400" />
-                </div>
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                     type="text"
                     placeholder="חיפוש לפי שם לקוח או מספר חשבונית..."
@@ -261,7 +253,7 @@ export function InvoicesTab() {
                         <div key={inv.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group">
                             {/* Mobile Layout: Stacked */}
                             {/* Top: Client + Status */}
-                            <div className="flex items-start justify-between w-full md:w-auto md:flex-1">
+                            <div className="flex items-start justify-between w-full md:w-auto md:flex-1 gap-4">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold shrink-0">
                                         {inv.clientName?.[0] || '?'}
