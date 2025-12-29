@@ -16,19 +16,18 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { FloatingActionButton } from '@/components/ui/floating-action-button'
+import { ExpenseForm } from '@/components/dashboard/forms/ExpenseForm'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Pagination } from '@/components/ui/Pagination'
 import { formatCurrency, cn } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
-import { PaymentMethodSelector } from '../PaymentMethodSelector'
-import { deleteExpense, getExpenses, updateExpense, addExpense, importExpenses } from '@/lib/actions/expense'
+import { deleteExpense, getExpenses, updateExpense, importExpenses } from '@/lib/actions/expense'
 import { getSuppliers } from '@/lib/actions/suppliers'
-import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
-import { getCategories, addCategory } from '@/lib/actions/category'
-import { BankImportModal } from '../BankImportModal'
+import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
+import { getCategories } from '@/lib/actions/category'
 import { getCategoryBudgets, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
 
@@ -166,29 +165,7 @@ export function ExpensesTab() {
 
     // --- State ---
 
-    const [submitting, setSubmitting] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
-    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
-    const [newCategoryName, setNewCategoryName] = useState('')
-    const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
-
-    const [newExpense, setNewExpense] = useState({
-        description: '',
-        amount: '',
-        category: '',
-        currency: 'ILS',
-        date: format(new Date(), 'yyyy-MM-dd'),
-        isRecurring: false,
-        recurringEndDate: undefined as string | undefined,
-        supplierId: '',
-        amountBeforeVat: '',
-        vatRate: '0.18',
-        vatAmount: '',
-        isDeductible: true,
-        deductibleRate: '1.0',
-        paymentMethod: ''
-    })
-
     const [editData, setEditData] = useState({
         description: '',
         amount: '',
@@ -201,144 +178,11 @@ export function ExpensesTab() {
         paymentMethod: ''
     })
 
+    const [submitting, setSubmitting] = useState(false)
+
     const [recurrenceDialogOpen, setRecurrenceDialogOpen] = useState(false)
     const [pendingAction, setPendingAction] = useState<{ type: 'delete' | 'edit', id: string } | null>(null)
-
-    // Handle VAT Calculations
-    const calculateFromTotal = (total: string, rate: string) => {
-        const t = parseFloat(total) || 0
-        const r = parseFloat(rate) || 0
-        const before = t / (1 + r)
-        const vat = t - before
-        return { before: before.toFixed(2), vat: vat.toFixed(2) }
-    }
-
-    useEffect(() => {
-        if (isBusiness && newExpense.amount && newExpense.vatRate) {
-            const { before, vat } = calculateFromTotal(newExpense.amount, newExpense.vatRate)
-            setNewExpense(prev => ({ ...prev, amountBeforeVat: before, vatAmount: vat }))
-        }
-    }, [newExpense.amount, newExpense.vatRate, isBusiness])
-
-    // --- Actions ---
-
-    // Optimistic add for instant UI feedback
-    const { execute: optimisticAddExpense } = useOptimisticMutation<ExpenseData, any>(
-        ['expenses', month, year, budgetType],
-        (input) => addExpense(month, year, input, budgetType),
-        {
-            getOptimisticData: (current, input) => ({
-                ...current,
-                expenses: [
-                    {
-                        id: 'temp-' + Date.now(),
-                        description: input.description,
-                        amount: input.amount,
-                        category: input.category,
-                        currency: input.currency || budgetCurrency,
-                        date: input.date ? new Date(input.date) : new Date(),
-                        supplier: isBusiness && input.supplierId ? { id: input.supplierId, name: '...' } : null,
-                        vatAmount: input.vatAmount || 0,
-                        isDeductible: input.isDeductible ?? true,
-                        paymentMethod: input.paymentMethod || '',
-                        isRecurring: input.isRecurring || false
-                    },
-                    ...current.expenses
-                ]
-            }),
-            successMessage: 'הוצאה נוספה בהצלחה',
-            errorMessage: 'שגיאה בהוספת ההוצאה'
-        }
-    )
-
-    async function handleAdd() {
-        if (!newExpense.amount || !newExpense.category) {
-            toast({ title: 'שגיאה', description: 'נא למלא סכום וקטגוריה', variant: 'destructive' })
-            return
-        }
-
-        if (newExpense.isRecurring && newExpense.recurringEndDate) {
-            const start = new Date(newExpense.date)
-            start.setHours(0, 0, 0, 0)
-            const end = new Date(newExpense.recurringEndDate)
-            end.setHours(0, 0, 0, 0)
-            if (end < start) {
-                toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההוצאה', variant: 'destructive' })
-                return
-            }
-        }
-
-        try {
-            await optimisticAddExpense({
-                description: newExpense.description || 'הוצאה ללא תיאור',
-                amount: parseFloat(newExpense.amount),
-                category: newExpense.category,
-                currency: newExpense.currency as "ILS" | "USD" | "EUR" | "GBP",
-                date: newExpense.date,
-                isRecurring: newExpense.isRecurring,
-                recurringEndDate: newExpense.recurringEndDate,
-                supplierId: isBusiness ? newExpense.supplierId || undefined : undefined,
-                amountBeforeVat: isBusiness ? parseFloat(newExpense.amountBeforeVat) : undefined,
-                vatRate: isBusiness ? parseFloat(newExpense.vatRate) : undefined,
-                vatAmount: isBusiness ? parseFloat(newExpense.vatAmount) : undefined,
-                isDeductible: isBusiness ? newExpense.isDeductible : undefined,
-                deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
-                paymentMethod: newExpense.paymentMethod || undefined
-            })
-
-            // Reset form
-            setNewExpense({
-                description: '',
-                amount: '',
-                category: categories.length > 0 ? categories[0].name : '',
-                currency: budgetCurrency,
-                date: format(new Date(), 'yyyy-MM-dd'),
-                isRecurring: false,
-                recurringEndDate: undefined,
-                supplierId: '',
-                amountBeforeVat: '',
-                vatRate: '0.18',
-                vatAmount: '',
-                isDeductible: true,
-                deductibleRate: '1.0',
-                paymentMethod: ''
-            })
-
-            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } catch (error) {
-            // Error managed by hook
-        }
-    }
-
-    async function handleAddCategory() {
-        if (!newCategoryName.trim()) return
-
-        setSubmitting(true)
-        try {
-            const result = await addCategory({
-                name: newCategoryName.trim(),
-                type: 'expense',
-                color: newCategoryColor,
-                scope: budgetType
-            })
-
-            if (result.success) {
-                toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
-                setNewCategoryName('')
-                setIsAddCategoryOpen(false)
-                await mutateCategories()
-                const newCatName = newCategoryName.trim()
-                setNewExpense(prev => ({ ...prev, category: newCatName }))
-            } else {
-                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
-            }
-        } catch (error: any) {
-            console.error('Add category failed:', error)
-            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשרת', variant: 'destructive' })
-        } finally {
-            setSubmitting(false)
-        }
-    }
+    const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     // Optimistic delete for instant UI feedback
     const { deleteItem: optimisticDeleteExpense } = useOptimisticDelete<ExpenseData>(
@@ -587,158 +431,31 @@ export function ExpensesTab() {
             {/* Split View */}
             <div className="grid gap-4 lg:grid-cols-12">
                 {/* Add Form */}
-                <div className="lg:col-span-5 glass-panel p-5 h-fit lg:sticky lg:top-4">
-                    <div className="mb-4 flex items-center gap-2">
-                        <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`} />
-                        <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
-                        <div className="mr-auto flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={handleRefreshCategories}
-                                title="רענן קטגוריות (הוסף חסרות)"
-                                className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50"
-                            >
-                                <RefreshCw className="h-4 w-4" />
-                            </Button>
-                            <BankImportModal onImport={handleImportExpenses} />
-                        </div>
-                    </div>
+                {/* Add Form - Desktop Only */}
+                <div className="hidden lg:block lg:col-span-5 glass-panel p-5 h-fit lg:sticky lg:top-4">
+                    <ExpenseForm
+                        categories={categories}
+                        suppliers={suppliersData}
+                        onCategoriesChange={mutateCategories}
+                    />
+                </div>
 
-                    <div className="flex flex-col gap-4">
-                        <div className="w-full">
-                            <label className="text-xs font-bold mb-1.5 block text-[#676879]">תיאור ההוצאה</label>
-                            <Input className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} placeholder="מה קנית / שילמת?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
-                        </div>
-
-                        {isBusiness && (
-                            <div className="w-full">
-                                <label className="text-xs font-bold mb-1.5 block text-[#676879]">ספק</label>
-                                <select
-                                    className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 focus:ring-orange-500/20 outline-none"
-                                    value={newExpense.supplierId}
-                                    onChange={(e) => setNewExpense({ ...newExpense, supplierId: e.target.value })}
-                                >
-                                    <option value="">ללא ספק ספציפי</option>
-                                    {suppliersData.map(s => (
-                                        <option key={s.id} value={s.id}>{s.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
-
-                        <div className="flex gap-2 w-full">
-                            <div className="flex-1">
-                                <label className="text-xs font-bold mb-1.5 block text-[#676879]">קטגוריה</label>
-                                <select
-                                    className={`w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'} outline-none`}
-                                    value={newExpense.category}
-                                    onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
-                                    style={{ position: 'relative' }}
-                                >
-                                    <option value="" disabled>בחר קטגוריה</option>
-                                    {categories.map(cat => (
-                                        <option key={cat.id} value={cat.name}>{cat.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="pt-6">
-                                <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-                                    <PopoverTrigger asChild>
-                                        <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 hover:bg-gray-50"><Plus className="h-4 w-4" /></Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-80 p-4 z-50 rounded-xl shadow-xl" dir="rtl">
-                                        <div className="space-y-4">
-                                            <h4 className="font-medium mb-4 text-[#323338]">קטגוריה חדשה</h4>
-                                            <Input className="h-10" placeholder="שם הקטגוריה" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
-                                            <div className="grid grid-cols-5 gap-2">
-                                                {PRESET_COLORS.map(color => (
-                                                    <div key={color.name} className={`h-8 w-8 rounded-full cursor-pointer transition-transform hover:scale-110 border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-[#323338] scale-110' : 'border-transparent'}`} onClick={() => setNewCategoryColor(color.class)} />
-                                                ))}
-                                            </div>
-                                            <Button onClick={handleAddCategory} className={`w-full ${isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d43f55]'} text-white rounded-lg h-10`} disabled={!newCategoryName || submitting}>שמור</Button>
-                                        </div>
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-3 w-full">
-                            <div className="col-span-1">
-                                <label className="text-xs font-bold mb-1.5 block text-[#676879]">מטבע</label>
-                                <select
-                                    className="w-full p-2 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
-                                    value={newExpense.currency}
-                                    onChange={(e) => setNewExpense({ ...newExpense, currency: e.target.value })}
-                                >
-                                    {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
-                                        <option key={code} value={code}>{code} ({symbol})</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="col-span-2">
-                                <label className="text-xs font-bold mb-1.5 block text-[#676879]">סכום כולל</label>
-                                <Input className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} type="number" placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
-                            </div>
-                        </div>
-
-                        <div className="w-full">
-                            <PaymentMethodSelector
-                                value={newExpense.paymentMethod}
-                                onChange={(val) => setNewExpense({ ...newExpense, paymentMethod: val })}
-                                color={isBusiness ? 'orange' : 'red'}
+                {/* Mobile FAB and Dialog */}
+                <div className="lg:hidden">
+                    <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                        <DialogTrigger asChild>
+                            <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-red-600' : 'bg-[#e2445c]'} label="הוסף הוצאה" />
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                            <ExpenseForm
+                                categories={categories}
+                                suppliers={suppliersData}
+                                onCategoriesChange={mutateCategories}
+                                isMobile={true}
+                                onSuccess={() => setIsMobileOpen(false)}
                             />
-                        </div>
-
-                        {isBusiness && (
-                            <div className="grid grid-cols-2 gap-3 p-3 bg-red-50/50 rounded-lg border border-red-100">
-                                <div>
-                                    <label className="text-[10px] font-bold text-red-800 uppercase mb-1 block">מע"מ מוכר (18%)</label>
-                                    <div className="text-sm font-bold text-red-900">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
-                                </div>
-                                <div>
-                                    <label className="text-[10px] font-bold text-red-800 uppercase mb-1 block">סכום נקי</label>
-                                    <div className="text-sm font-bold text-red-900">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</div>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="w-full">
-                            <label className="text-xs font-bold mb-1.5 block text-[#676879]">תאריך</label>
-                            <DatePicker date={newExpense.date ? new Date(newExpense.date) : undefined} setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
-                        </div>
-
-                        {isBusiness && (
-                            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                <Checkbox id="is-deductible" checked={newExpense.isDeductible} onCheckedChange={(checked) => setNewExpense({ ...newExpense, isDeductible: checked as boolean })} className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600" />
-                                <label htmlFor="is-deductible" className="text-xs font-bold text-[#323338] cursor-pointer">הוצאה מוכרת לצורכי מס</label>
-                            </div>
-                        )}
-
-                        <div className="flex items-start gap-4 p-4 border border-gray-100 rounded-xl bg-gray-50/50 w-full">
-                            <div className="flex items-center gap-2">
-                                <Checkbox
-                                    id="recurring-expense"
-                                    checked={newExpense.isRecurring}
-                                    onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })}
-                                    className={isBusiness ? 'data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600' : 'data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]'}
-                                />
-                                <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338]">הוצאה קבועה</label>
-                            </div>
-                            {newExpense.isRecurring && (
-                                <div className="flex gap-4 flex-1">
-                                    <div className="space-y-2 w-full">
-                                        <label className="text-xs font-medium text-[#676879]">תאריך סיום</label>
-                                        <DatePicker date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined} setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        <Button onClick={handleAdd} className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md ${isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d43f55]'}`} disabled={submitting}>
-                            {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הוצאה' : 'הוסף')}
-                        </Button>
-                    </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
 
                 {/* List View */}

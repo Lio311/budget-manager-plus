@@ -259,22 +259,10 @@ export function InvoicesTab() {
                 </Button>
             </div>
 
-            {/* Search */}
-            <div className="relative">
-                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                    type="text"
-                    placeholder="חיפוש חשבונית..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-            </div>
-
-            {/* Form */}
+            {/* Create Invoice Form */}
             {showForm && (
                 <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h3 className="text-lg font-semibold mb-4">חשבונית חדשה</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת חשבונית חדשה</h3>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -441,8 +429,7 @@ export function InvoicesTab() {
                                                 <span>{format(new Date(inv.date), 'dd/MM/yyyy')}</span>
                                                 <span className="w-1 h-1 rounded-full bg-gray-300" />
                                                 <span>{inv.items?.length || 0} פריטים</span>
-                                            </>
-                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -486,23 +473,20 @@ export function InvoicesTab() {
                                     </div>
                                 </div>
                             </div>
-                                </div>
-            </div>
-            ))
+                        ))
                     )}
-        </div>
-            </div >
-
-        { totalPages > 1 && (
-            <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
+                </div>
             </div>
-        )
-}
-        </div >
+
+            {totalPages > 1 && (
+                <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
+            )}
+        </div>
     )
 }
