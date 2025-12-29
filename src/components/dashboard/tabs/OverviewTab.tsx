@@ -410,8 +410,13 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
                             <Input
                                 value={initialBalance}
-                                onChange={(e) => setInitialBalance(e.target.value)}
+                                onChange={(e) => {
+                                    const val = parseFloat(e.target.value)
+                                    if (val < 0) return
+                                    setInitialBalance(e.target.value)
+                                }}
                                 type="number"
+                                min="0"
                                 dir="ltr"
                                 className="text-right"
                             />
@@ -420,8 +425,13 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
                             <Input
                                 value={initialSavings}
-                                onChange={(e) => setInitialSavings(e.target.value)}
+                                onChange={(e) => {
+                                    const val = parseFloat(e.target.value)
+                                    if (val < 0) return
+                                    setInitialSavings(e.target.value)
+                                }}
                                 type="number"
+                                min="0"
                                 dir="ltr"
                                 className="text-right"
                             />

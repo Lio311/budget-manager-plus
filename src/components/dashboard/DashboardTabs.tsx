@@ -97,8 +97,8 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
             {/* Sidebar Navigation - Floating Dock */}
             <aside className={`
                 fixed md:sticky 
-                top-[90px] md:top-4 
-                h-[calc(100vh-110px)] md:h-fit md:max-h-[calc(100vh-2rem)]
+                top-[110px] md:top-4 
+                h-[calc(100vh-130px)] md:h-fit md:max-h-[calc(100vh-2rem)]
                 pb-[env(safe-area-inset-bottom)]
                 z-50
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
