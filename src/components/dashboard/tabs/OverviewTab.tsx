@@ -83,8 +83,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     useEffect(() => {
         if (overviewData?.user) {
             if (budgetType === 'BUSINESS') {
-                setInitialBalance(overviewData.user.businessInitialBalance?.toString() || '')
-                setInitialSavings(overviewData.user.businessInitialSavings?.toString() || '')
+                setInitialBalance((overviewData.user as any).businessInitialBalance?.toString() || '')
+                setInitialSavings((overviewData.user as any).businessInitialSavings?.toString() || '')
             } else {
                 setInitialBalance(overviewData.user.initialBalance?.toString() || '')
                 setInitialSavings(overviewData.user.initialSavings?.toString() || '')
@@ -214,8 +214,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         month,
         year,
         currency,
-        initialBalance: isBusiness ? overviewData?.user?.businessInitialBalance : overviewData?.user?.initialBalance,
-        initialSavings: isBusiness ? overviewData?.user?.businessInitialSavings : overviewData?.user?.initialSavings
+        initialBalance: isBusiness ? (overviewData?.user as any)?.businessInitialBalance : overviewData?.user?.initialBalance,
+        initialSavings: isBusiness ? (overviewData?.user as any)?.businessInitialSavings : overviewData?.user?.initialSavings
     }
 
     return (
