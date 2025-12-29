@@ -389,17 +389,23 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card >
 
                 {/* 4. Net Worth (Green Area Chart) (Visually Right in RTL) */}
-                < Card className="glass-panel shadow-sm min-h-[350px]" >
+                <Card className="glass-panel shadow-sm min-h-[350px]">
                     <CardHeader>
                         <CardTitle>הון עצמי</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px] -ml-4">
-                        <NetWorthChart data={netWorthHistory} loading={loading} />
+                        {netWorthHistory && netWorthHistory.length > 0 ? (
+                            <NetWorthChart data={netWorthHistory} loading={loading} />
+                        ) : (
+                            <div className="pl-4 h-full">
+                                <EmptyChartState title="הון עצמי" />
+                            </div>
+                        )}
                     </CardContent>
-                </Card >
+                </Card>
 
                 {/* 3. Budget Status (Progress Bars) (Visually Left in RTL) */}
-                < Card className="glass-panel shadow-sm col-span-1 md:col-span-1 min-h-[350px]" >
+                <Card className="glass-panel shadow-sm col-span-1 md:col-span-1 min-h-[350px]">
                     <CardHeader>
                         <CardTitle>מצב תקציב חודשי</CardTitle>
                     </CardHeader>
@@ -433,7 +439,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-900">{formatCurrency(paidDebts)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div className={`h-full bg-purple-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? '100%' : '0%' }} />
+                                <div className={`h-full bg-purple-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((paidDebts / (totalDebts || 1)) * 100, 100)}%` : '0%' }} />
                             </div>
                         </div>
 
@@ -444,7 +450,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-900">{formatCurrency(totalSavingsObserved)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? '20%' : '0%' }} />
+                                <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalSavingsObserved / (totalIncome * 0.2 || 1)) * 100, 100)}%` : '0%' }} />
                             </div>
                         </div>
                     </CardContent>
