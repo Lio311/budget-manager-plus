@@ -448,46 +448,56 @@ button.cl-modalCloseButton,
   background-color: #1e293b !important;
 }
 
-/* Make Clerk modals MUCH more compact - fit to content (BOTH MODES) */
+/* Make Clerk modals MUCH more compact - AGGRESSIVE (BOTH MODES) */
 .cl-userProfile-root,
 .cl-modal,
 .cl-modalContent,
-.cl-userButtonPopoverCard {
-  max-width: 480px !important;
-  width: auto !important;
-  min-width: 380px !important;
+.cl-userButtonPopoverCard,
+.cl-card {
+  max-width: 450px !important;
+  width: 450px !important;
+  min-width: 350px !important;
 }
 
 .dark .cl-userProfile-root,
 .dark .cl-modal,
-.dark .cl-modalContent {
-  max-width: 480px !important;
-  width: auto !important;
-  min-width: 380px !important;
+.dark .cl-modalContent,
+.dark .cl-card {
+  max-width: 450px !important;
+  width: 450px !important;
+  min-width: 350px !important;
 }
 
 .cl-pageScrollBox,
-.cl-scrollBox {
+.cl-scrollBox,
+.cl-rootBox,
+.cl-main {
   min-height: auto !important;
   max-height: 70vh !important;
   padding: 1rem !important;
   width: 100% !important;
+  max-width: 100% !important;
 }
 
 .dark .cl-pageScrollBox,
-.dark .cl-scrollBox {
+.dark .cl-scrollBox,
+.dark .cl-rootBox,
+.dark .cl-main {
   min-height: auto !important;
   max-height: 70vh !important;
   padding: 1rem !important;
   width: 100% !important;
+  max-width: 100% !important;
 }
 
-.cl-profileSection {
+.cl-profileSection,
+.cl-profileSectionContent {
   padding: 0.75rem !important;
   max-width: 100% !important;
 }
 
-.dark .cl-profileSection {
+.dark .cl-profileSection,
+.dark .cl-profileSectionContent {
   padding: 0.75rem !important;
   max-width: 100% !important;
 }
