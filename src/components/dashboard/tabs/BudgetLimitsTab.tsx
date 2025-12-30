@@ -73,7 +73,7 @@ function BudgetEditPopover({
                     <div className="flex gap-1">
                         <FormattedNumberInput
                             value={val}
-                            onValueChange={(value) => setVal(value)}
+                            onChange={(e) => setVal(e.target.value)}
                             placeholder="סכום"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') handleSave()
