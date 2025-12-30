@@ -8,6 +8,16 @@ import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisti
 import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
+import { z } from 'zod'
+
+const ClientSchema = z.object({
+    name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
+    email: z.string().email('כתובת אימייל לא תקינה').max(100).optional().or(z.literal('')),
+    phone: z.string().regex(/^[\d-]*$/, 'מספר טלפון לא תקין').max(20).optional().or(z.literal('')),
+    taxId: z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional().or(z.literal('')),
+    address: z.string().max(200, 'הכתובת ארוכה מדי').optional().or(z.literal('')),
+    notes: z.string().max(500, 'הערות ארוכות מדי').optional().or(z.literal('')),
+})
 
 export function ClientsTab() {
     const { budgetType } = useBudget()
@@ -22,6 +32,23 @@ export function ClientsTab() {
         address: '',
         notes: ''
     })
+    const [errors, setErrors] = useState<Record<string, string>>({})
+
+    const validateForm = () => {
+        const result = ClientSchema.safeParse(formData)
+        if (!result.success) {
+            const newErrors: Record<string, string> = {}
+            result.error.errors.forEach(err => {
+                if (err.path[0]) {
+                    newErrors[err.path[0].toString()] = err.message
+                }
+            })
+            setErrors(newErrors)
+            return false
+        }
+        setErrors({})
+        return true
+    }
 
     const fetcher = async () => {
         const result = await getClients(budgetType)
@@ -69,6 +96,11 @@ export function ClientsTab() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        if (!validateForm()) {
+            toast.error('אנא דאג לתקן את השגיאות בטופס')
+            return
+        }
+
         try {
             if (editingClient) {
                 const result = await updateClient(editingClient.id, formData)
@@ -93,6 +125,7 @@ export function ClientsTab() {
 
     const handleEdit = (client: any) => {
         setEditingClient(client)
+        setErrors({})
         setFormData({
             name: client.name,
             email: client.email || '',
@@ -148,6 +181,7 @@ export function ClientsTab() {
                     onClick={() => {
                         setShowForm(true)
                         setEditingClient(null)
+                        setErrors({})
                         setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '' })
                     }}
                     className="bg-green-600 hover:bg-green-700"
@@ -186,8 +220,9 @@ export function ClientsTab() {
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                                 />
+                                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -197,8 +232,9 @@ export function ClientsTab() {
                                     type="text"
                                     value={formData.taxId}
                                     onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.taxId ? 'border-red-500' : 'border-gray-300'}`}
                                 />
+                                {errors.taxId && <p className="text-red-500 text-xs mt-1">{errors.taxId}</p>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -208,8 +244,9 @@ export function ClientsTab() {
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                                 />
+                                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -219,9 +256,10 @@ export function ClientsTab() {
                                     type="tel"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
                                     dir="rtl"
                                 />
+                                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                             </div>
                         </div>
                         <div>
@@ -232,8 +270,9 @@ export function ClientsTab() {
                                 type="text"
                                 value={formData.address}
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                             />
+                            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -243,8 +282,9 @@ export function ClientsTab() {
                                 value={formData.notes}
                                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                 rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.notes ? 'border-red-500' : 'border-gray-300'}`}
                             />
+                            {errors.notes && <p className="text-red-500 text-xs mt-1">{errors.notes}</p>}
                         </div>
                         <div className="flex gap-2">
                             <Button type="submit" className="bg-green-600 hover:bg-green-700">
@@ -256,6 +296,7 @@ export function ClientsTab() {
                                 onClick={() => {
                                     setShowForm(false)
                                     setEditingClient(null)
+                                    setErrors({})
                                 }}
                             >
                                 ביטול
