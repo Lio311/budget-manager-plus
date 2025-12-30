@@ -158,7 +158,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                     <FormattedNumberInput
                         placeholder="0.00"
                         value={formData.amount}
-                        onValueChange={(values) => setFormData({ ...formData, amount: values.value })}
+                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                         className="h-10 text-right"
                     />
                 </div>
