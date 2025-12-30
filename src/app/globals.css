@@ -409,6 +409,43 @@ button.cl-modalCloseButton,
   background-color: transparent !important;
 }
 
+/* 🔢 Fixed OTP Input Styling for Dark Mode */
+.dark .cl-otpCodeFieldInput,
+.dark input[name="code"],
+.dark input[autocomplete="one-time-code"] {
+  background-color: #1e293b !important;
+  /* Lighter background for inputs */
+  border: 1px solid #475569 !important;
+  border-radius: 8px !important;
+  color: white !important;
+  width: 40px !important;
+  height: 40px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark .cl-otpCodeFieldInput:focus,
+.dark input[name="code"]:focus,
+.dark input[autocomplete="one-time-code"]:focus {
+  border-color: #3b82f6 !important;
+  /* Blue focus ring */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Ensure branding footer blends perfectly */
+.cl-modalContent>.cl-footer,
+.cl-modalContent>div:last-child {
+  background: transparent !important;
+  border-top: none !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Hide the weird separator line in footer if it exists */
+.cl-footer::before,
+.cl-branding::before {
+  display: none !important;
+}
+
 /* Specific fix for the icon box container which might have its own background */
 .dark .cl-userButtonPopoverActionButtonIconBox,
 .dark .cl-userButtonPopoverActionButtonIcon {
