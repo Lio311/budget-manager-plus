@@ -132,12 +132,10 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         סכום לפני מע"מ *
                     </label>
-                    <input
-                        type="number"
+                    <FormattedNumberInput
                         required
                         min="0"
-                        step="0.01"
-                        value={formData.subtotal}
+                        value={formData.subtotal.toString()}
                         onChange={(e) => setFormData({ ...formData, subtotal: parseFloat(e.target.value) || 0 })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                     />
