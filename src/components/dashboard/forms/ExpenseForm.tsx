@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
 import {
-    Loader2, Plus, TrendingDown, RefreshCw
+    Loader2, Plus, TrendingDown, RefreshCw, Settings
 } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -220,6 +220,19 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
                 {!isMobile && (
                     <div className="mr-auto flex items-center gap-2">
+                        <CategoryManagementDialog
+                            categories={categories}
+                            type="expense"
+                            scope={budgetType}
+                            onChange={() => {
+                                if (onCategoriesChange) onCategoriesChange()
+                            }}
+                            trigger={
+                                <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
+                                    <Settings className="h-4 w-4" />
+                                </Button>
+                            }
+                        />
                         <Button
                             variant="outline"
                             size="icon"
