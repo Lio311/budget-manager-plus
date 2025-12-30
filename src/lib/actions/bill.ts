@@ -83,7 +83,12 @@ export async function addBill(
         })
 
         // Handle Recurrence
-        if (data.isRecurring && data.recurringEndDate) {
+        if (data.isRecurring) {
+            // Default to 5 years if no end date provided
+            const endDate = data.recurringEndDate
+                ? new Date(data.recurringEndDate)
+                : new Date(new Date().setFullYear(new Date().getFullYear() + 5));
+
             await createRecurringBills(
                 bill.id,
                 data.name,
@@ -91,7 +96,7 @@ export async function addBill(
                 data.currency,
                 data.dueDay,
                 dueDate,
-                new Date(data.recurringEndDate),
+                endDate,
                 data.frequency || 'MONTHLY',
                 type,
                 data.paymentMethod
