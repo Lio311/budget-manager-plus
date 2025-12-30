@@ -448,7 +448,7 @@ button.cl-modalCloseButton,
   background-color: #1e293b !important;
 }
 
-/* Make Clerk modals MUCH more compact - ULTRA AGGRESSIVE (BOTH MODES) */
+/* Make Clerk modals proper size - FINAL FIX */
 .cl-userProfile-root,
 .cl-modal,
 .cl-modalContent,
@@ -456,10 +456,13 @@ button.cl-modalCloseButton,
 .cl-card,
 div[data-clerk-modal],
 .cl-internal-b3fm6y {
-  max-width: 500px !important;
-  width: 500px !important;
-  min-width: 450px !important;
-  max-height: 75vh !important;
+  max-width: 40vw !important;
+  width: 40vw !important;
+  min-width: 600px !important;
+  max-height: 70vh !important;
+  height: 70vh !important;
+  display: flex !important;
+  flex-direction: row !important;
 }
 
 .dark .cl-userProfile-root,
@@ -468,10 +471,13 @@ div[data-clerk-modal],
 .dark .cl-card,
 .dark div[data-clerk-modal],
 .dark .cl-internal-b3fm6y {
-  max-width: 500px !important;
-  width: 500px !important;
-  min-width: 450px !important;
-  max-height: 75vh !important;
+  max-width: 40vw !important;
+  width: 40vw !important;
+  min-width: 600px !important;
+  max-height: 70vh !important;
+  height: 70vh !important;
+  display: flex !important;
+  flex-direction: row !important;
 }
 
 /* Force all Clerk containers to be compact */
@@ -481,49 +487,58 @@ div[data-clerk-modal],
   max-width: 100% !important;
 }
 
-/* Reduce sidebar width */
+/* Sidebar - EXACT same height as main content */
 .cl-navbar,
 .cl-userProfile-navbar {
-  width: 140px !important;
-  min-width: 140px !important;
-  max-width: 140px !important;
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
   flex-shrink: 0 !important;
-  height: 100% !important;
-  min-height: 100% !important;
+  height: 70vh !important;
+  min-height: 70vh !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
 }
 
 .dark .cl-navbar,
 .dark .cl-userProfile-navbar {
-  width: 140px !important;
-  min-width: 140px !important;
-  max-width: 140px !important;
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
   flex-shrink: 0 !important;
-  height: 100% !important;
-  min-height: 100% !important;
+  height: 70vh !important;
+  min-height: 70vh !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
 }
 
+/* Main content - EXACT same height as sidebar */
 .cl-pageScrollBox,
 .cl-scrollBox,
 .cl-rootBox,
 .cl-main {
-  min-height: auto !important;
+  height: 70vh !important;
+  min-height: 70vh !important;
   max-height: 70vh !important;
-  padding: 0.75rem !important;
+  padding: 1rem !important;
   width: 100% !important;
   max-width: 100% !important;
   overflow-y: auto !important;
+  flex: 1 !important;
 }
 
 .dark .cl-pageScrollBox,
 .dark .cl-scrollBox,
 .dark .cl-rootBox,
 .dark .cl-main {
-  min-height: auto !important;
+  height: 70vh !important;
+  min-height: 70vh !important;
   max-height: 70vh !important;
-  padding: 0.75rem !important;
+  padding: 1rem !important;
   width: 100% !important;
   max-width: 100% !important;
   overflow-y: auto !important;
+  flex: 1 !important;
 }
 
 .cl-profileSection,
