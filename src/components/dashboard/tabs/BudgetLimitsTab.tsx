@@ -227,7 +227,7 @@ export function BudgetLimitsTab() {
                                     {activeDefaults ? 'מעדכן תקציב...' : 'המלץ לי על תקציב'}
                                 </span>
                                 <span className="text-[11px] text-gray-500 dark:text-gray-400 font-normal max-w-[180px] leading-tight group-hover:text-gray-600 dark:group-hover:text-gray-300">
-                                    ה-AI ינתח את ההיסטוריה שלך ויציע תקציב חכם
+                                    הבוט החכם שלנו ינתח את ההיסטוריה שלך ויציע תקציב
                                 </span>
                                 <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-2 italic">
                                     * המידע אינו מהווה ייעוץ פיננסי
