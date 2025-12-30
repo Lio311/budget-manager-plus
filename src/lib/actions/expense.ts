@@ -504,3 +504,25 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
         return { success: false, error: 'Failed to import expenses: ' + (error.message || 'Unknown error') }
     }
 }
+
+export async function deleteAllMonthlyExpenses(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+        const budget = await getCurrentBudget(month, year, '₪', type)
+
+        const result = await db.expense.deleteMany({
+            where: {
+                budgetId: budget.id
+            }
+        })
+
+        revalidatePath('/')
+        return { success: true, count: result.count }
+    } catch (error: any) {
+        console.error('Failed to delete all expenses:', error)
+        return { success: false, error: 'Failed to delete expenses' }
+    }
+}
