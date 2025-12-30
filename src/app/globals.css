@@ -663,6 +663,20 @@ div[class*="cl-branding"] {
   .dark .cl-card {
     background-color: #0f172a !important;
     background: #0f172a !important;
+
+    /* Force Dark Mode to be identical to Light Mode (Compact) */
+    width: 90vw !important;
+    max-width: 400px !important;
+  }
+
+  /* Remove border/shadow on hover for Profile Buttons */
+  .cl-profileSectionPrimaryButton:hover,
+  .cl-button:hover {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background-color: transparent !important;
+    /* Keep transparent if needed */
   }
 
   /* Hide "Manage Account" (ניהול חשבון) button in UserButton Popover on Mobile */
