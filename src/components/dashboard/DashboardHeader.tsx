@@ -107,7 +107,17 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                 appearance: {
                                     elements: {
                                         profileSection__emailAddresses: "hidden",
-                                        profileSection__connectedAccounts: "hidden"
+                                        profileSection__connectedAccounts: "hidden",
+                                        cardBox: {
+                                            width: "fit-content",
+                                            height: "auto",
+                                            maxWidth: "100vw",
+                                            minWidth: "300px"
+                                        },
+                                        scrollBox: {
+                                            height: "auto",
+                                            maxHeight: "80vh"
+                                        }
                                     }
                                 }
                             }}
@@ -195,7 +205,17 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                 appearance: {
                                     elements: {
                                         profileSection__emailAddresses: "hidden",
-                                        profileSection__connectedAccounts: "hidden"
+                                        profileSection__connectedAccounts: "hidden",
+                                        cardBox: {
+                                            width: "fit-content",
+                                            height: "auto",
+                                            maxWidth: "100vw",
+                                            minWidth: "300px"
+                                        },
+                                        scrollBox: {
+                                            height: "auto",
+                                            maxHeight: "80vh"
+                                        }
                                     }
                                 }
                             }}
