@@ -3,6 +3,22 @@
 import { prisma } from '@/lib/db'
 import { currentUser } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+
+// Validation Schemas
+const BusinessProfileSchema = z.object({
+    companyName: z.string().min(2, 'שם העסק חייב להכיל לפחות 2 תווים').max(100, 'שם העסק ארוך מדי'),
+    companyId: z.string().regex(/^\d*$/, 'מספר עוסק חייב להכיל ספרות בלבד').max(20, 'מספר עוסק ארוך מדי').optional(),
+    vatStatus: z.enum(['EXEMPT', 'AUTHORIZED', 'LTD', 'NONE', 'FULL', 'PARTIAL']).optional().default('EXEMPT'), // Wider acceptance for enum or string
+    address: z.string().max(200, 'הכתובת ארוכה מדי').optional().nullable(),
+    phone: z.string().regex(/^[\d-]*$/, 'מספר טלפון לא תקין').max(20, 'מספר טלפון ארוך מדי').optional().nullable(),
+    email: z.string().email('כתובת אימייל לא תקינה').max(100, 'כתובת אימייל ארוכה מדי').optional().nullable(),
+    signature: z.string().optional().nullable() // Base64 signature
+})
+
+const LogoSchema = z.string()
+    .startsWith('data:image/', 'פורמט תמונה לא תקין')
+    .max(7 * 1024 * 1024, 'קובץ הלוגו גדול מדי (מקסימום 5MB)') // Base64 inflation approx 33%
 
 export interface BusinessProfileData {
     companyName: string
@@ -35,30 +51,40 @@ export async function updateBusinessProfile(data: BusinessProfileData) {
         const user = await currentUser()
         if (!user) throw new Error('Unauthorized')
 
+        // Validate Input
+        const result = BusinessProfileSchema.safeParse(data)
+        if (!result.success) {
+            const errorMessage = result.error.errors[0]?.message || 'נתונים לא תקינים'
+            return { success: false, error: errorMessage }
+        }
+
+        const validData = result.data
+
         const profile = await prisma.businessProfile.upsert({
             where: { userId: user.id },
             update: {
-                companyName: data.companyName,
-                companyId: data.companyId,
-                vatStatus: data.vatStatus,
-                address: data.address,
-                phone: data.phone,
-                email: data.email,
-                signatureUrl: data.signature
+                companyName: validData.companyName,
+                companyId: validData.companyId || null,
+                vatStatus: validData.vatStatus || 'EXEMPT',
+                address: validData.address || null,
+                phone: validData.phone || null,
+                email: validData.email || null,
+                signatureUrl: validData.signature || null
             },
             create: {
                 userId: user.id,
-                companyName: data.companyName,
-                companyId: data.companyId,
-                vatStatus: data.vatStatus,
-                address: data.address,
-                phone: data.phone,
-                email: data.email,
-                signatureUrl: data.signature
+                companyName: validData.companyName,
+                companyId: validData.companyId || null,
+                vatStatus: validData.vatStatus || 'EXEMPT',
+                address: validData.address || null,
+                phone: validData.phone || null,
+                email: validData.email || null,
+                signatureUrl: validData.signature || null
             }
         })
 
         revalidatePath('/dashboard')
+        revalidatePath('/settings')
         return { success: true, data: profile }
     } catch (error) {
         console.error('updateBusinessProfile error:', error)
@@ -71,27 +97,24 @@ export async function uploadBusinessLogo(logoData: string) {
         const user = await currentUser()
         if (!user) throw new Error('Unauthorized')
 
-        // Validate base64 image
-        if (!logoData.startsWith('data:image/')) {
-            throw new Error('Invalid image format')
+        // Validate Logo Input
+        const result = LogoSchema.safeParse(logoData)
+        if (!result.success) {
+            return { success: false, error: result.error.errors[0]?.message }
         }
 
-        // Check size (max 5MB in base64)
-        const sizeInBytes = (logoData.length * 3) / 4
-        if (sizeInBytes > 5 * 1024 * 1024) {
-            throw new Error('Image too large (max 5MB)')
-        }
+        const validLogo = result.data
 
         const profile = await prisma.businessProfile.upsert({
             where: { userId: user.id },
             update: {
-                logoUrl: logoData
+                logoUrl: validLogo
             },
             create: {
                 userId: user.id,
-                companyName: 'החברה שלי',
+                companyName: 'החברה שלי', // Placeholder if creating just for logo
                 vatStatus: 'EXEMPT',
-                logoUrl: logoData
+                logoUrl: validLogo
             }
         })
 
