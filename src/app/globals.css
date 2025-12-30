@@ -359,6 +359,37 @@ button.cl-modalCloseButton,
   border-color: #334155 !important;
 }
 
+/* User Button Popover - Special styling for the small menu */
+.dark .cl-userButtonPopoverCard {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  border: 1px solid #475569 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 12px !important;
+}
+
+.dark .cl-userButtonPopoverCard .cl-userPreviewMainIdentifier,
+.dark .cl-userButtonPopoverCard .cl-userPreviewSecondaryIdentifier {
+  color: #f8fafc !important;
+}
+
+.dark .cl-userButtonPopoverCard .cl-userPreviewSecondaryIdentifier {
+  color: #94a3b8 !important;
+}
+
+/* Menu items in popover */
+.dark .cl-userButtonPopoverCard .cl-userButtonPopoverActionButton,
+.dark .cl-userButtonPopoverCard button {
+  color: #e2e8f0 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.dark .cl-userButtonPopoverCard .cl-userButtonPopoverActionButton:hover,
+.dark .cl-userButtonPopoverCard button:hover {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+}
+
 /* Sidebar specifically - lighter background for better contrast */
 .dark .cl-navbar,
 .dark .cl-userProfile-navbar {
