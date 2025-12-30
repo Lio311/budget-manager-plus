@@ -406,11 +406,14 @@ button.cl-modalCloseButton,
 
 /* Sidebar specifically - lighter background for better contrast */
 .dark .cl-navbar,
-.dark .cl-userProfile-navbar {
+.dark .cl-userProfile-navbar,
+.dark .cl-navbarMobileMenuButton,
+.dark .cl-navbarMobileMenuRow {
   background-color: #0f172a !important;
   /* Match main modal background for seamless look */
   border-left: 1px solid #334155 !important;
   /* Softer border */
+  color: #f8fafc !important;
 }
 
 /* Sidebar menu items */
