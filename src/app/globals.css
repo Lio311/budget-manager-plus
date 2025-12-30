@@ -461,16 +461,23 @@ button.cl-modalCloseButton,
   color: white !important;
 }
 
-/* Fix Avatar "Stripe" in Dark Mode */
+/* Fix Avatar "Stripe" in Dark Mode - Comprehensive Fix */
 .dark .cl-avatarBox,
-.dark .cl-userButtonAvatarBox {
+.dark .cl-userButtonAvatarBox,
+.dark .cl-userPreviewAvatarContainer,
+.dark .cl-userPreviewAvatarBox,
+.dark .cl-avatarImage,
+.dark .cl-userButtonAvatarImage {
   border: none !important;
   background-color: transparent !important;
   box-shadow: none !important;
+  background-image: none !important;
+  /* Ensure no gradients */
 }
 
-.dark .cl-avatarImage {
-  border: none !important;
+/* Ensure parent containers don't leak background */
+.dark .cl-userPreviewSecondaryIdentifier,
+.dark .cl-userPreviewMainIdentifier {
   background-color: transparent !important;
 }
 
