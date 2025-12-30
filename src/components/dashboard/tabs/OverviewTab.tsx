@@ -490,7 +490,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         {/* Bills (Orange) */}
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700">חשבונות (שולם)</span>
+                                <span className="font-medium text-gray-700">חשבונות ששולמו</span>
                                 <span className="font-medium text-gray-900">{formatCurrency(paidBills)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
@@ -501,7 +501,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         {/* Debts (Purple) */}
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700">חובות ששולמו</span>
+                                <span className="font-medium text-gray-700">הלוואות ששולמו</span>
                                 <span className="font-medium text-gray-900">{formatCurrency(paidDebts)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
