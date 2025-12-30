@@ -451,8 +451,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         setIsSettingsOpen(true)
                     }}
                 >
-                    <CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                         <CardTitle>{isBusiness ? 'שווי העסק' : 'הון עצמי'}</CardTitle>
+                        {isBusiness && <Settings className="h-4 w-4 text-muted-foreground opacity-70" />}
                     </CardHeader>
                     <CardContent className="h-[300px] -ml-4">
                         {netWorthHistory && netWorthHistory.length > 0 && (parseFloat(initialBalance) > 0 || parseFloat(initialSavings) > 0) ? (
