@@ -368,6 +368,9 @@ button.cl-modalCloseButton,
   background: #0f172a !important;
   color: #f8fafc !important;
   border-color: #334155 !important;
+  /* Fix layout expansion in dark mode */
+  width: fit-content !important;
+  max-width: 95vw !important;
 }
 
 /* User Button Popover - Special styling for the small menu */
