@@ -481,6 +481,30 @@ button.cl-modalCloseButton,
   background-color: transparent !important;
 }
 
+/* Fix Sidebar Gap/Shape - Join Sidebar and Content */
+.cl-userProfile-root .cl-navbar,
+.cl-userProfile-root .cl-userProfile-navbar {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.cl-userProfile-root .cl-navbar+div,
+.cl-userProfile-root .cl-userProfile-navbar+div,
+.cl-pageScrollBox,
+.cl-scrollBox {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Force container to have no gap */
+.cl-userProfile-root div[class*="cl-"] {
+  gap: 0 !important;
+}
+
 /* Footer */
 .dark .cl-footer,
 .dark .cl-userButtonPopoverFooter {
