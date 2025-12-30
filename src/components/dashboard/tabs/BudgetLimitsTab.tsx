@@ -207,7 +207,7 @@ export function BudgetLimitsTab() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card className="flex flex-col justify-center p-0 bg-transparent border-none shadow-none h-full w-full">
+                <Card className="flex flex-col justify-center items-center p-0 bg-transparent border-none shadow-none h-full w-full">
                     <Button
                         onClick={handleSmartRecommendations}
                         disabled={activeDefaults}
@@ -218,15 +218,15 @@ export function BudgetLimitsTab() {
                         <Sparkles className="absolute -top-6 -left-6 w-32 h-32 text-yellow-200/20 rotate-12 transition-transform duration-700 group-hover:rotate-45" />
                         <Sparkles className="absolute -bottom-8 -right-8 w-24 h-24 text-orange-200/10 -rotate-12 transition-transform duration-700 group-hover:-rotate-45" />
 
-                        <div className="relative flex flex-col items-center justify-center gap-3 w-full h-full py-4 px-6 z-10">
+                        <div className="relative flex flex-col items-center justify-center gap-3 w-full h-full py-4 px-6 z-10 text-center">
                             <div className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm ring-1 ring-yellow-100 dark:ring-yellow-900/30 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
                                 {activeDefaults ? <RefreshCw className="h-6 w-6 text-yellow-600 dark:text-yellow-400 animate-spin" /> : <Sparkles className="h-6 w-6 text-yellow-500 fill-yellow-200 dark:text-yellow-400 dark:fill-yellow-900/50" />}
                             </div>
-                            <div className="flex flex-col items-center text-center gap-1 px-2">
+                            <div className="flex flex-col items-center text-center gap-1 px-2 w-full">
                                 <span className="text-base font-bold text-gray-800 dark:text-gray-100 group-hover:text-yellow-800 dark:group-hover:text-yellow-200 transition-colors">
                                     {activeDefaults ? 'מעדכן תקציב...' : 'המלץ לי על תקציב'}
                                 </span>
-                                <span className="text-[11px] text-gray-500 dark:text-gray-400 font-normal max-w-[180px] leading-tight group-hover:text-gray-600 dark:group-hover:text-gray-300">
+                                <span className="text-[11px] text-gray-500 dark:text-gray-400 font-normal max-w-[260px] leading-tight group-hover:text-gray-600 dark:group-hover:text-gray-300">
                                     הבוט החכם שלנו ינתח את ההיסטוריה שלך ויציע תקציב
                                 </span>
                                 <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-2 italic">
