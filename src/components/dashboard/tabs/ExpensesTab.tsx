@@ -16,6 +16,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { ExpenseForm } from '@/components/dashboard/forms/ExpenseForm'
@@ -483,7 +484,7 @@ export function ExpensesTab() {
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-2 gap-3">
                                                 <Input value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="תיאור" />
-                                                <Input value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} type="number" placeholder="סכום" />
+                                                <FormattedNumberInput value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} placeholder="סכום" />
                                             </div>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <select

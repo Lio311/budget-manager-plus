@@ -8,6 +8,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Pagination } from '@/components/ui/Pagination'
 import { getBills, updateBill, deleteBill, toggleBillPaid } from '@/lib/actions/bill'
 import { formatCurrency } from '@/lib/utils'
@@ -322,11 +323,10 @@ export function BillsTab() {
                                                     </select>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Input
-                                                        type="number"
+                                                    <FormattedNumberInput
                                                         value={editData.amount}
                                                         onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
-                                                        className="w-24 h-9"
+                                                        placeholder="סכום"
                                                     />
                                                     <Input
                                                         type="number"

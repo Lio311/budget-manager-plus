@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Plus, Trash2, Check, Loader2, Pencil, X, TrendingDown, Wallet } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
@@ -319,6 +320,13 @@ export function DebtsTab() {
                                                         disabled={submitting}
                                                     />
                                                 </div>
+                                                <div className="w-full">
+                                                    <FormattedNumberInput
+                                                        value={editData.paidAmount}
+                                                        onChange={(e) => setEditData({ ...editData, paidAmount: e.target.value })}
+                                                        placeholder="שולם"
+                                                    />
+                                                </div>
 
                                                 {/* Row 2: Currency, Total Amount, Monthly Payment, Due Day */}
                                                 <div className="flex flex-wrap gap-2 w-full">
@@ -332,21 +340,19 @@ export function DebtsTab() {
                                                             <option key={code} value={code}>{code}</option>
                                                         ))}
                                                     </select>
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="סכום כולל"
-                                                        className="h-9 min-w-[80px] flex-1"
+                                                    <FormattedNumberInput
                                                         value={editData.totalAmount}
                                                         onChange={(e) => setEditData({ ...editData, totalAmount: e.target.value })}
+                                                        placeholder="סכום כולל"
+                                                        className="h-9 min-w-[80px] flex-1"
                                                         disabled={submitting}
                                                         dir="ltr"
                                                     />
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="תשלום חודשי"
-                                                        className="h-9 min-w-[80px] flex-1"
+                                                    <FormattedNumberInput
                                                         value={editData.monthlyPayment}
                                                         onChange={(e) => setEditData({ ...editData, monthlyPayment: e.target.value })}
+                                                        placeholder="תשלום חודשי"
+                                                        className="h-9 min-w-[80px] flex-1"
                                                         disabled={submitting}
                                                         dir="ltr"
                                                     />

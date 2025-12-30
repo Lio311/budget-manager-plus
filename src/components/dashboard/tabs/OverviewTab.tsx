@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { getUserSettings, updateUserSettings } from '@/lib/actions/user'
 import { CategoryManager } from '@/components/dashboard/CategoryManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -594,17 +595,16 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <div className="space-y-4 py-4 text-right">
                             <div className="space-y-2">
                                 <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
-                                <Input
-                                    value={initialBalance}
-                                    onChange={(e) => {
-                                        const val = parseFloat(e.target.value)
-                                        if (val < 0) return
-                                        setInitialBalance(e.target.value)
+                                <FormattedNumberInput
+                                    value={quickAddData.amount}
+                                    onChange={(e) => setQuickAddData({ ...quickAddData, amount: e.target.value })}
+                                    placeholder="סכום"
+                                />    setInitialBalance(e.target.value)
                                     }}
-                                    type="number"
-                                    min="0"
-                                    dir="ltr"
-                                    className="text-right"
+                                type="number"
+                                min="0"
+                                dir="ltr"
+                                className="text-right"
                                 />
                             </div>
                             <div className="space-y-2">

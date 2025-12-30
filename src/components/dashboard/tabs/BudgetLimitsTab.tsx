@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast'
 import { getCategoryBudgets, updateCategoryLimit, getSmartRecommendations, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
 
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Pagination } from '@/components/ui/Pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -70,11 +71,10 @@ function BudgetEditPopover({
                 <div className="space-y-2">
                     <div className="font-medium text-xs text-center">ערוך תקציב</div>
                     <div className="flex gap-1">
-                        <Input
-                            type="number"
+                        <FormattedNumberInput
                             value={val}
-                            onChange={(e) => setVal(e.target.value)}
-                            className="h-8 text-sm"
+                            onValueChange={(value) => setVal(value)}
+                            placeholder="סכום"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') handleSave()
                             }}
