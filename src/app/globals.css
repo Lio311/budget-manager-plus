@@ -359,11 +359,29 @@ button.cl-modalCloseButton,
   border-color: #334155 !important;
 }
 
-/* Sidebar specifically */
+/* Sidebar specifically - lighter background for better contrast */
 .dark .cl-navbar,
 .dark .cl-userProfile-navbar {
   background-color: #1e293b !important;
-  border-left: 1px solid #334155 !important;
+  border-left: 1px solid #475569 !important;
+}
+
+/* Sidebar menu items */
+.dark .cl-navbarButton,
+.dark .cl-profileSection__emailAddresses,
+.dark .cl-profileSection__connectedAccounts {
+  color: #e2e8f0 !important;
+  background-color: transparent !important;
+}
+
+.dark .cl-navbarButton:hover {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+.dark .cl-navbarButton[data-active="true"] {
+  background-color: #475569 !important;
+  color: #ffffff !important;
 }
 
 /* Inputs */
@@ -397,4 +415,16 @@ button.cl-modalCloseButton,
   color: #f8fafc !important;
   border: 1px solid #334155 !important;
   background-color: #1e293b !important;
+}
+
+/* User Avatar Border - Make it white in dark mode */
+.dark .cl-userButtonTrigger,
+.dark .cl-avatarBox,
+.dark .cl-userButtonBox {
+  border-color: #ffffff !important;
+}
+
+.dark .cl-userButtonTrigger img,
+.dark .cl-avatarBox img {
+  border: 2px solid #ffffff !important;
 }
