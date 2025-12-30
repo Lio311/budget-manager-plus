@@ -430,6 +430,12 @@ button.cl-modalCloseButton,
   /* Green accent line for active state instead of full heavy background */
 }
 
+/* Fix "Box" around text in sidebar active state */
+.dark .cl-navbarButton *,
+.dark .cl-navbarButton[data-active="true"] * {
+  background-color: transparent !important;
+}
+
 /* Inputs */
 .dark .cl-formFieldInput,
 .dark .cl-selectButton,
