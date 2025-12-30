@@ -82,10 +82,13 @@ export function useOptimisticMutation<TData, TInput>(
             }
 
             // Error notification
+            // Error notification
+            const errorMsg = error instanceof Error && error.message ? error.message : (options?.errorMessage || 'אירעה שגיאה')
+
             if (toastId) {
-                toast.error(options?.errorMessage || 'אירעה שגיאה', { id: toastId })
-            } else if (options?.errorMessage) {
-                toast.error(options.errorMessage)
+                toast.error(errorMsg, { id: toastId })
+            } else {
+                toast.error(errorMsg)
             }
 
             options?.onError?.(error)
@@ -181,20 +184,25 @@ export function useOptimisticDelete<TData>(
             )
 
             // Execute deletion
-            await deleteFn(id)
+            const result = await deleteFn(id)
+
+            if (result && typeof result === 'object' && 'success' in result && !result.success) {
+                throw new Error(result.error || 'Failed to delete')
+            }
 
             // Revalidate from server
             await mutate(key)
 
             toast.success(options?.successMessage || 'נמחק בהצלחה!', { id: toastId })
 
-        } catch (error) {
+        } catch (error: any) {
             // Rollback on error
             if (previousData) {
                 await mutate(key, previousData, { revalidate: false })
             }
 
-            toast.error(options?.errorMessage || 'שגיאה במחיקה', { id: toastId })
+            const errorMsg = error instanceof Error && error.message ? error.message : (options?.errorMessage || 'שגיאה במחיקה')
+            toast.error(errorMsg, { id: toastId })
             throw error
         }
     }
