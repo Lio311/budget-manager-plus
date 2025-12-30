@@ -621,8 +621,14 @@ div[class*="cl-branding"] {
 /* Mobile Fixes for Clerk User Profile */
 @media (max-width: 768px) {
 
-  /* Hide Mobile Navigation Bar/Drawer */
-  .cl-navbarMobileMenuRow,
+  /* Show Mobile Navigation Bar/Drawer */
+  .cl-navbarMobileMenuRow {
+    display: flex !important;
+    visibility: visible !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Hide the full sidebar, keep the mobile menu row */
   .cl-navbar {
     display: none !important;
   }
@@ -632,6 +638,8 @@ div[class*="cl-branding"] {
   .cl-scrollBox {
     display: block !important;
     width: 100% !important;
+    background-color: inherit !important;
+    /* Inherit solid background from parent */
   }
 
   /* Make the card centered and sized like a card, not full screen */
@@ -644,6 +652,17 @@ div[class*="cl-branding"] {
     margin: 0 auto !important;
     border-radius: 1.5rem !important;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+
+    /* Fix Transparency Issue */
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+
+  /* Dark Mode Override for Mobile Card Background */
+  .dark .cl-userProfile-root,
+  .dark .cl-card {
+    background-color: #0f172a !important;
+    background: #0f172a !important;
   }
 
   /* Ensure the internal layout is vertical and centered */
