@@ -314,7 +314,7 @@ button.cl-modalCloseButton,
   background-color: transparent !important;
 }
 
-/* 🌑 Dark Mode for Clerk Components - FIXED & AGGRESSIVE */
+/* 🌑 Dark Mode for Clerk Components - ULTRA AGGRESSIVE FIX */
 .dark .cl-userButtonPopoverCard,
 .dark .cl-userProfile-root,
 .dark .cl-card,
@@ -325,21 +325,47 @@ button.cl-modalCloseButton,
 .dark .cl-navbarSidebar,
 .dark .cl-userProfile-navbar,
 .dark .cl-scrollBox,
-.dark .cl-pageScrollBox {
+.dark .cl-pageScrollBox,
+.dark .cl-actionCard,
+.dark .cl-menu,
+.dark .cl-popoverBox,
+.dark .cl-componentBox {
   background-color: #0f172a !important;
-  /* slate-950 for deep contrast */
+  /* slate-950 */
   background: #0f172a !important;
   color: #f8fafc !important;
   /* slate-50 */
   border-color: #334155 !important;
 }
 
-/* Sidebar fix specifically */
+/* Specific fix for the User Button Popover (small menu) */
+.dark .cl-userButtonPopoverCard * {
+  color: #f8fafc !important;
+}
+
+.dark .cl-userButtonPopoverCard .cl-userPreviewSecondaryIdentifier {
+  color: #94a3b8 !important;
+  /* keep secondary text slightly dimmer */
+}
+
+.dark .cl-userButtonPopoverCard .cl-userButtonPopoverFooter {
+  background-color: #1e293b !important;
+  display: none !important;
+  /* Hide footer if requested or keep dark */
+}
+
+/* Sidebar specifically */
 .dark .cl-navbar,
 .dark .cl-userProfile-navbar {
   background-color: #1e293b !important;
-  /* Slightly lighter for sidebar */
   border-left: 1px solid #334155 !important;
+}
+
+/* Dialogs / Alerts (Delete Confirmation) */
+.dark .cl-dialog,
+.dark .cl-alert {
+  background-color: #0f172a !important;
+  border: 1px solid #334155 !important;
 }
 
 /* Main Content Area */
@@ -348,7 +374,7 @@ button.cl-modalCloseButton,
   background-color: #0f172a !important;
 }
 
-/* Typography Overrides */
+/* Typography - Force ALL text to be light in dark mode */
 .dark .cl-headerTitle,
 .dark .cl-headerSubtitle,
 .dark .cl-userPreviewTextContainer,
@@ -362,13 +388,17 @@ button.cl-modalCloseButton,
 .dark .cl-formFieldLabel,
 .dark .cl-formFieldInput,
 .dark .cl-selectButton,
-.dark .cl-menuItem {
+.dark .cl-menuItem,
+.dark .cl-text,
+.dark .cl-paragraph,
+.dark .cl-heading {
   color: #f8fafc !important;
 }
 
-.dark .cl-userPreviewSecondaryIdentifier {
-  color: #94a3b8 !important;
-  /* slate-400 */
+.dark .cl-userPreviewSecondaryIdentifier,
+.dark .cl-formFieldLabel {
+  color: #cbd5e1 !important;
+  /* slate-300 */
 }
 
 /* Buttons & Interactive */
@@ -378,8 +408,9 @@ button.cl-modalCloseButton,
   color: white !important;
 }
 
-.dark .cl-menuItem:hover {
-  background-color: #334155 !important;
+.dark .cl-menuItem:hover,
+.dark .cl-actionCard:hover {
+  background-color: #1e293b !important;
 }
 
 /* Inputs */
@@ -399,10 +430,15 @@ button.cl-modalCloseButton,
 .dark .cl-internal-1dauvpw,
 .dark .cl-logoBox {
   filter: brightness(0) invert(1);
-  /* Make logo white if possible, or text white */
 }
 
 .dark .cl-badge {
   color: #f8fafc !important;
   border: 1px solid #334155 !important;
+  background-color: #1e293b !important;
+}
+
+/* Fix "Remove Email" specific dialog if it has unique classes */
+.dark .cl-localization-heIL {
+  background-color: #0f172a !important;
 }
