@@ -138,13 +138,13 @@ export function BusinessSettings() {
     const currentLogo = preview || profile?.logoUrl
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 text-right">
             {/* Logo Section */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2 text-right">
                     לוגו העסק
                 </label>
-                <p className="text-xs text-gray-500 mb-3">
+                <p className="text-xs text-gray-500 mb-3 text-right">
                     הלוגו ישמש בחשבוניות ובמסמכים שהמערכת תפיק
                 </p>
 
@@ -198,52 +198,57 @@ export function BusinessSettings() {
 
             {/* Business Details */}
             <div className="border-t pt-6">
-                <h3 className="text-sm font-medium text-gray-700 mb-4">פרטי העסק</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-4 text-right">פרטי העסק</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <Label htmlFor="companyName">שם העסק *</Label>
+                        <Label htmlFor="companyName" className="text-right block mb-2">שם העסק *</Label>
                         <Input
                             id="companyName"
                             value={formData.companyName}
                             onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                             placeholder="שם החברה"
+                            className="text-right"
                         />
                     </div>
                     <div>
-                        <Label htmlFor="companyId">מספר עוסק מורשה (ע.מ)</Label>
+                        <Label htmlFor="companyId" className="text-right block mb-2">מספר עוסק מורשה (ע.מ)</Label>
                         <Input
                             id="companyId"
                             value={formData.companyId}
                             onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
                             placeholder="123456789"
+                            className="text-right"
                         />
                     </div>
                     <div>
-                        <Label htmlFor="phone">טלפון נייד</Label>
+                        <Label htmlFor="phone" className="text-right block mb-2">טלפון נייד</Label>
                         <Input
                             id="phone"
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             placeholder="050-1234567"
+                            className="text-right"
                         />
                     </div>
                     <div>
-                        <Label htmlFor="email">אימייל</Label>
+                        <Label htmlFor="email" className="text-right block mb-2">אימייל</Label>
                         <Input
                             id="email"
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             placeholder="info@company.com"
+                            className="text-right"
                         />
                     </div>
                     <div className="md:col-span-2">
-                        <Label htmlFor="address">כתובת</Label>
+                        <Label htmlFor="address" className="text-right block mb-2">כתובת</Label>
                         <Input
                             id="address"
                             value={formData.address}
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                             placeholder="רחוב 123, עיר"
+                            className="text-right"
                         />
                     </div>
                 </div>
@@ -255,7 +260,7 @@ export function BusinessSettings() {
                     <Pen className="h-5 w-5 text-green-600" />
                     <h3 className="text-sm font-medium text-gray-700">חתימה דיגיטלית</h3>
                 </div>
-                <p className="text-xs text-gray-500 mb-3">
+                <p className="text-xs text-gray-500 mb-3 text-right">
                     החתימה תופיע בחשבוניות ובמסמכים רשמיים
                 </p>
                 <SignaturePad

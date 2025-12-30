@@ -532,7 +532,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <TabsContent value="financials" className="mt-4 space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle className="text-base">הגדרות יתרה</CardTitle>
+                                        <CardTitle className="text-base text-right">הגדרות יתרה</CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="space-y-2">
@@ -549,7 +549,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                 dir="ltr"
                                                 className="text-right"
                                             />
-                                            <p className="text-xs text-muted-foreground">היתרה בבנק לפני תחילת השימוש במערכת</p>
+                                            <p className="text-xs text-muted-foreground text-right">היתרה בבנק לפני תחילת השימוש במערכת</p>
                                         </div>
                                         <div className="space-y-2">
                                             <Label className="text-right block">יתרה התחלתית</Label>
@@ -565,7 +565,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                 dir="ltr"
                                                 className="text-right"
                                             />
-                                            <p className="text-xs text-muted-foreground">יתרת החסכונות/השקעות קודמת</p>
+                                            <p className="text-xs text-muted-foreground text-right">יתרת החסכונות/השקעות קודמת</p>
                                         </div>
                                         <Button onClick={handleSaveSettings} className="w-full bg-emerald-500 hover:bg-emerald-600 mt-4">
                                             שמור הגדרות כספיות
