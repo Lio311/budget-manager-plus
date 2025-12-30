@@ -301,9 +301,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card>
 
                 {/* 4. Equity / Bills (Leftmost) */}
-                <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('bills')}>
+                <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => {
+                    if (isBusiness) setIsSettingsOpen(true)
+                    else onNavigateToTab?.('bills')
+                }}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'הון עצמי' : 'יתרת חשבונות'}</CardTitle>
+                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'שווי העסק' : 'יתרת חשבונות'}</CardTitle>
                         <Wallet className="h-4 w-4 text-orange-500" />
                     </CardHeader>
                     <CardContent>
@@ -442,7 +445,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     onClick={() => setIsSettingsOpen(true)}
                 >
                     <CardHeader>
-                        <CardTitle>הון עצמי</CardTitle>
+                        <CardTitle>{isBusiness ? 'שווי העסק' : 'הון עצמי'}</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px] -ml-4">
                         {netWorthHistory && netWorthHistory.length > 0 && (isBusiness || (parseFloat(initialBalance) > 0 || parseFloat(initialSavings) > 0)) ? (
@@ -450,7 +453,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         ) : (
                             <div className="pl-4 h-full">
                                 <EmptyChartState
-                                    title="הגדרת הון עצמי"
+                                    title={isBusiness ? 'הגדרת שווי העסק' : 'הגדרת הון עצמי'}
                                     subtitle="לחץ כאן כדי להגדיר יתרה התחלתית ולהציג נתונים"
                                 />
                             </div>
@@ -513,47 +516,108 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
             {/* Settings Dialog */}
             < Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} >
-                <DialogContent dir="rtl" className="sm:max-w-[425px]">
-                    <DialogHeader className="text-right sm:text-right">
-                        <DialogTitle className="text-right">הגדרות תצוגה</DialogTitle>
-                    </DialogHeader>
-                    {/* Settings Form Content */}
-                    <div className="space-y-4 py-4 text-right">
-                        <div className="space-y-2">
-                            <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
-                            <Input
-                                value={initialBalance}
-                                onChange={(e) => {
-                                    const val = parseFloat(e.target.value)
-                                    if (val < 0) return
-                                    setInitialBalance(e.target.value)
-                                }}
-                                type="number"
-                                min="0"
-                                dir="ltr"
-                                className="text-right"
-                            />
+                {isBusiness ? (
+                    <DialogContent dir="rtl" className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle>הגדרות עסק</DialogTitle>
+                        </DialogHeader>
+                        <Tabs defaultValue="details" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="details">פרטי העסק</TabsTrigger>
+                                <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="details" className="mt-4">
+                                <BusinessSettings />
+                            </TabsContent>
+                            <TabsContent value="financials" className="mt-4 space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="text-base">הגדרות יתרה</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-right block">יתרה התחלתית (עו"ש)</Label>
+                                            <Input
+                                                value={initialBalance}
+                                                onChange={(e) => {
+                                                    const val = parseFloat(e.target.value)
+                                                    if (val < 0) return
+                                                    setInitialBalance(e.target.value)
+                                                }}
+                                                type="number"
+                                                min="0"
+                                                dir="ltr"
+                                                className="text-right"
+                                            />
+                                            <p className="text-xs text-muted-foreground">היתרה בבנק לפני תחילת השימוש במערכת</p>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-right block">יתרה התחלתית</Label>
+                                            <Input
+                                                value={initialSavings}
+                                                onChange={(e) => {
+                                                    const val = parseFloat(e.target.value)
+                                                    if (val < 0) return
+                                                    setInitialSavings(e.target.value)
+                                                }}
+                                                type="number"
+                                                min="0"
+                                                dir="ltr"
+                                                className="text-right"
+                                            />
+                                            <p className="text-xs text-muted-foreground">יתרת החסכונות/השקעות קודמת</p>
+                                        </div>
+                                        <Button onClick={handleSaveSettings} className="w-full bg-emerald-500 hover:bg-emerald-600 mt-4">
+                                            שמור הגדרות כספיות
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                        </Tabs>
+                    </DialogContent>
+                ) : (
+                    <DialogContent dir="rtl" className="sm:max-w-[425px]">
+                        <DialogHeader className="text-right sm:text-right">
+                            <DialogTitle className="text-right">הגדרות תצוגה</DialogTitle>
+                        </DialogHeader>
+                        {/* Settings Form Content */}
+                        <div className="space-y-4 py-4 text-right">
+                            <div className="space-y-2">
+                                <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
+                                <Input
+                                    value={initialBalance}
+                                    onChange={(e) => {
+                                        const val = parseFloat(e.target.value)
+                                        if (val < 0) return
+                                        setInitialBalance(e.target.value)
+                                    }}
+                                    type="number"
+                                    min="0"
+                                    dir="ltr"
+                                    className="text-right"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
+                                <Input
+                                    value={initialSavings}
+                                    onChange={(e) => {
+                                        const val = parseFloat(e.target.value)
+                                        if (val < 0) return
+                                        setInitialSavings(e.target.value)
+                                    }}
+                                    type="number"
+                                    min="0"
+                                    dir="ltr"
+                                    className="text-right"
+                                />
+                            </div>
                         </div>
-                        <div className="space-y-2">
-                            <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
-                            <Input
-                                value={initialSavings}
-                                onChange={(e) => {
-                                    const val = parseFloat(e.target.value)
-                                    if (val < 0) return
-                                    setInitialSavings(e.target.value)
-                                }}
-                                type="number"
-                                min="0"
-                                dir="ltr"
-                                className="text-right"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter className="sm:justify-end gap-2">
-                        <Button onClick={handleSaveSettings} className="bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
-                    </DialogFooter>
-                </DialogContent>
+                        <DialogFooter className="sm:justify-end gap-2">
+                            <Button onClick={handleSaveSettings} className="bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                )}
             </Dialog >
         </div >
     )
