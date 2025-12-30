@@ -104,7 +104,7 @@ export default function RootLayout({
                     ...heIL.unstable__errors,
                     resource_linked_to_connected_account: "לא ניתן להסיר כתובת אימייל זו מכיוון שאין כתובת אימייל נוספת שמקושרת לחשבון.",
                     delete_primary_email_address_is_not_allowed: "לא ניתן להסיר את כתובת האימייל הראשי."
-                }
+                } as any
             }}
             appearance={{
                 elements: {
