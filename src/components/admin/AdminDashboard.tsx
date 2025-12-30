@@ -328,15 +328,19 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                 </Card>
             </div>
 
-            {/* User Growth Chart */}
-            <UserGrowthChart users={users} />
+            {/* Removed standalone chart */}
 
             <Tabs defaultValue="users" className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="users">Users Management</TabsTrigger>
                     <TabsTrigger value="coupons">Coupons</TabsTrigger>
+                    <TabsTrigger value="statistics">Statistics</TabsTrigger>
                     <TabsTrigger value="feedbacks">Feedbacks</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="statistics" className="space-y-4">
+                    <UserGrowthChart users={users} />
+                </TabsContent>
 
                 <TabsContent value="users" className="space-y-4">
                     <Card>
