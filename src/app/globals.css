@@ -544,6 +544,7 @@ button.cl-modalCloseButton,
 }
 
 /* Specific fix for "Development" or "Preview" sash/strap on Avatar */
+.cl-internal-cieags,
 .cl-internal-cieags::after,
 .cl-internal-cieags::before,
 [class*="cl-internal-"]::after,
@@ -551,6 +552,12 @@ button.cl-modalCloseButton,
   display: none !important;
   content: none !important;
   background: transparent !important;
+}
+
+/* Structurally target the badge next to the avatar */
+.cl-userButtonAvatarBox+span,
+.cl-avatarBox+span {
+  display: none !important;
 }
 
 /* Force hide any badge on the avatar */
