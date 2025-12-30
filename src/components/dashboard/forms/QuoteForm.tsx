@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { getNextQuoteNumber, createQuote, type QuoteFormData } from '@/lib/actions/quotes'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -93,17 +94,21 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         לקוח *
                     </label>
-                    <select
-                        required
-                        value={formData.clientId}
-                        onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                    >
-                        <option value="">בחר לקוח</option>
-                        {clients.map((client: any) => (
-                            <option key={client.id} value={client.id}>{client.name}</option>
-                        ))}
-                    </select>
+                    <div dir="rtl">
+                        <Select
+                            value={formData.clientId}
+                            onValueChange={(value) => setFormData((prev) => ({ ...prev, clientId: value }))}
+                        >
+                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                                <SelectValue placeholder="בחר לקוח" />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl">
+                                {clients.map((client: any) => (
+                                    <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -141,14 +146,20 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         שיעור מע"מ
                     </label>
-                    <select
-                        value={formData.vatRate}
-                        onChange={(e) => setFormData({ ...formData, vatRate: parseFloat(e.target.value) })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                    >
-                        <option value="0">ללא מע"מ (0%)</option>
-                        <option value="0.18">מע"מ רגיל (18%)</option>
-                    </select>
+                    <div dir="rtl">
+                        <Select
+                            value={formData.vatRate.toString()}
+                            onValueChange={(value) => setFormData((prev) => ({ ...prev, vatRate: parseFloat(value) }))}
+                        >
+                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                                <SelectValue placeholder='בחר מע"מ' />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl">
+                                <SelectItem value="0">ללא מע"מ (0%)</SelectItem>
+                                <SelectItem value="0.18">מע"מ רגיל (18%)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </div>
 

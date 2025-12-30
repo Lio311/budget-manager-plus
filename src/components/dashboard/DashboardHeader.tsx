@@ -62,17 +62,17 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
                 {/* Right Section - Date Navigation */}
                 <div className="hidden md:flex items-center gap-4">
-                    <div className="flex bg-gray-100/50 rounded-full p-1 border border-white/50 backdrop-blur-sm">
-                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 hover:bg-white rounded-full">
+                    <div className="flex bg-gray-100/50 dark:bg-slate-800/50 rounded-full p-1 border border-white/50 dark:border-slate-700/50 backdrop-blur-sm">
+                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 hover:bg-white dark:hover:bg-slate-700 rounded-full dark:text-gray-200">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                         <div className="min-w-[140px] flex flex-col items-center justify-center px-2">
-                            <span className="text-sm font-bold text-[#323338] leading-none">
+                            <span className="text-sm font-bold text-[#323338] dark:text-gray-200 leading-none">
                                 {getMonthName(month)} {year}
                             </span>
-                            <span className="text-[10px] text-gray-500 font-medium">סקירה חודשית</span>
+                            <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">סקירה חודשית</span>
                         </div>
-                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 hover:bg-white rounded-full">
+                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 hover:bg-white dark:hover:bg-slate-700 rounded-full dark:text-gray-200">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
                     </div>
@@ -99,8 +99,8 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     </div>
 
                     {/* Date Selector */}
-                    <div className="flex items-center gap-1 bg-white/50 rounded-full p-1 border border-white/40 shadow-sm">
-                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 rounded-full">
+                    <div className="flex items-center gap-1 bg-white/50 dark:bg-slate-800/50 rounded-full p-1 border border-white/40 dark:border-slate-700/50 shadow-sm">
+                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 rounded-full dark:text-gray-200 dark:hover:bg-slate-700">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                         <div className="text-center min-w-[80px]" onClick={() => {
@@ -109,7 +109,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             handleToggle(nextType)
                         }}>
                             <div className="flex flex-col items-center">
-                                <h2 className="text-sm font-bold whitespace-nowrap text-[#323338] leading-none">
+                                <h2 className="text-sm font-bold whitespace-nowrap text-[#323338] dark:text-gray-200 leading-none">
                                     {getMonthName(month)} {year}
                                 </h2>
                                 <span className={`text-[10px] font-bold ${budgetType === 'BUSINESS' ? 'text-blue-600' : 'text-emerald-600'}`}>
@@ -117,7 +117,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                 </span>
                             </div>
                         </div>
-                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 rounded-full">
+                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 rounded-full dark:text-gray-200 dark:hover:bg-slate-700">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
                     </div>

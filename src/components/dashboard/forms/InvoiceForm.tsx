@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { getNextInvoiceNumber, createInvoice, type InvoiceFormData } from '@/lib/actions/invoices'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -97,17 +98,21 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         לקוח *
                     </label>
-                    <select
-                        required
-                        value={formData.clientId}
-                        onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                    >
-                        <option value="">בחר לקוח</option>
-                        {clients.map((client: any) => (
-                            <option key={client.id} value={client.id}>{client.name}</option>
-                        ))}
-                    </select>
+                    <div dir="rtl">
+                        <Select
+                            value={formData.clientId}
+                            onValueChange={(value) => setFormData((prev) => ({ ...prev, clientId: value }))}
+                        >
+                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                                <SelectValue placeholder="בחר לקוח" />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl">
+                                {clients.map((client: any) => (
+                                    <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -145,33 +150,44 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         שיעור מע"מ
                     </label>
-                    <select
-                        value={formData.vatRate}
-                        onChange={(e) => setFormData({ ...formData, vatRate: parseFloat(e.target.value) })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                    >
-                        <option value="0">ללא מע"מ (0%)</option>
-                        <option value="0.18">מע"מ רגיל (18%)</option>
-                    </select>
+                    <div dir="rtl">
+                        <Select
+                            value={formData.vatRate.toString()}
+                            onValueChange={(value) => setFormData((prev) => ({ ...prev, vatRate: parseFloat(value) }))}
+                        >
+                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                                <SelectValue placeholder='בחר מע"מ' />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl">
+                                <SelectItem value="0">ללא מע"מ (0%)</SelectItem>
+                                <SelectItem value="0.18">מע"מ רגיל (18%)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         אמצעי תשלום
                     </label>
-                    <select
-                        value={formData.paymentMethod}
-                        onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                    >
-                        <option value="">בחר אמצעי תשלום</option>
-                        <option value="BANK_TRANSFER">העברה בנקאית</option>
-                        <option value="CREDIT_CARD">כרטיס אשראי</option>
-                        <option value="BIT">ביט</option>
-                        <option value="PAYBOX">פייבוקס</option>
-                        <option value="CASH">מזומן</option>
-                        <option value="CHECK">צ'ק</option>
-                        <option value="OTHER">אחר</option>
-                    </select>
+                    <div dir="rtl">
+                        <Select
+                            value={formData.paymentMethod}
+                            onValueChange={(value) => setFormData((prev) => ({ ...prev, paymentMethod: value }))}
+                        >
+                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                                <SelectValue placeholder="בחר אמצעי תשלום" />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl">
+                                <SelectItem value="BANK_TRANSFER">העברה בנקאית</SelectItem>
+                                <SelectItem value="CREDIT_CARD">כרטיס אשראי</SelectItem>
+                                <SelectItem value="BIT">ביט</SelectItem>
+                                <SelectItem value="PAYBOX">פייבוקס</SelectItem>
+                                <SelectItem value="CASH">מזומן</SelectItem>
+                                <SelectItem value="CHECK">צ'ק</SelectItem>
+                                <SelectItem value="OTHER">אחר</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </div>
 
