@@ -448,25 +448,30 @@ button.cl-modalCloseButton,
   background-color: #1e293b !important;
 }
 
-/* User Avatar Border - Make it white in dark mode, no background */
-.dark .cl-userButtonTrigger,
-.dark .cl-avatarBox {
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  background-color: transparent !important;
+/* Make Clerk modals MUCH more compact - fit to content (BOTH MODES) */
+.cl-userProfile-root,
+.cl-modal,
+.cl-modalContent,
+.cl-userButtonPopoverCard {
+  max-width: 480px !important;
+  width: auto !important;
+  min-width: 380px !important;
 }
 
-.dark .cl-userButtonTrigger:hover,
-.dark .cl-avatarBox:hover {
-  border-color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Make Clerk modals MUCH more compact - fit to content */
 .dark .cl-userProfile-root,
 .dark .cl-modal,
 .dark .cl-modalContent {
-  max-width: 500px !important;
-  width: fit-content !important;
-  min-width: 400px !important;
+  max-width: 480px !important;
+  width: auto !important;
+  min-width: 380px !important;
+}
+
+.cl-pageScrollBox,
+.cl-scrollBox {
+  min-height: auto !important;
+  max-height: 70vh !important;
+  padding: 1rem !important;
+  width: 100% !important;
 }
 
 .dark .cl-pageScrollBox,
@@ -474,8 +479,15 @@ button.cl-modalCloseButton,
   min-height: auto !important;
   max-height: 70vh !important;
   padding: 1rem !important;
+  width: 100% !important;
+}
+
+.cl-profileSection {
+  padding: 0.75rem !important;
+  max-width: 100% !important;
 }
 
 .dark .cl-profileSection {
   padding: 0.75rem !important;
+  max-width: 100% !important;
 }
