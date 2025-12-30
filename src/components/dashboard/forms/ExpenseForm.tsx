@@ -1,12 +1,9 @@
-
 'use client'
 
 import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
 import {
-    Loader2, Plus, TrendingDown, RefreshCw,
-    ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn,
-    Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane, Shield, Dumbbell
+    Loader2, Plus, TrendingDown, RefreshCw
 } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -14,22 +11,21 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
 import { formatCurrency } from '@/lib/utils'
-import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
 import { addExpense, importExpenses } from '@/lib/actions/expense'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
-import { addCategory } from '@/lib/actions/category'
 import { BankImportModal } from '../BankImportModal'
+import { CategoryManagementDialog } from './CategoryManagementDialog'
 
 interface Category {
     id: string
     name: string
     color: string | null
+    isDefault?: boolean
 }
 
 interface Supplier {
@@ -52,9 +48,6 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     const isBusiness = budgetType === 'BUSINESS'
 
     const [submitting, setSubmitting] = useState(false)
-    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
-    const [newCategoryName, setNewCategoryName] = useState('')
-    const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
 
     const [newExpense, setNewExpense] = useState({
         description: '',
@@ -181,37 +174,6 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         }
     }
 
-    async function handleAddCategory() {
-        if (!newCategoryName.trim()) return
-
-        setSubmitting(true)
-        try {
-            const result = await addCategory({
-                name: newCategoryName.trim(),
-                type: 'expense',
-                color: newCategoryColor,
-                scope: budgetType
-            })
-
-            if (result.success) {
-                toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
-                setNewCategoryName('')
-                setIsAddCategoryOpen(false)
-                if (onCategoriesChange) await onCategoriesChange()
-
-                const newCatName = newCategoryName.trim()
-                setNewExpense(prev => ({ ...prev, category: newCatName }))
-            } else {
-                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
-            }
-        } catch (error: any) {
-            console.error('Add category failed:', error)
-            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשרת', variant: 'destructive' })
-        } finally {
-            setSubmitting(false)
-        }
-    }
-
     const handleImportExpenses = async (data: any[]) => {
         const expensesToImport = data.map(row => ({
             description: row.description,
@@ -226,7 +188,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         const result = await importExpenses(expensesToImport, budgetType)
         if (result.success) {
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            if (onCategoriesChange) await onCategoriesChange() // Implicitly refreshes list too via mutate
+            if (onCategoriesChange) await onCategoriesChange()
             if (onSuccess) onSuccess()
         } else {
             throw new Error(result.error)
@@ -305,28 +267,26 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         >
                             <option value="" disabled>בחר קטגוריה</option>
                             {categories.map(cat => (
-                                <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                <option key={cat.id} value={cat.name}>
+                                    {cat.name} {cat.isDefault ? '' : '(מותאם)'}
+                                </option>
                             ))}
                         </select>
                     </div>
                     <div className="pt-6">
-                        <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 hover:bg-gray-50"><Plus className="h-4 w-4" /></Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80 p-4 z-50 rounded-xl shadow-xl" dir="rtl">
-                                <div className="space-y-4">
-                                    <h4 className="font-medium mb-4 text-[#323338]">קטגוריה חדשה</h4>
-                                    <Input className="h-10" placeholder="שם הקטגוריה" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
-                                    <div className="grid grid-cols-5 gap-2">
-                                        {PRESET_COLORS.map(color => (
-                                            <div key={color.name} className={`h-8 w-8 rounded-full cursor-pointer transition-transform hover:scale-110 border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-[#323338] scale-110' : 'border-transparent'}`} onClick={() => setNewCategoryColor(color.class)} />
-                                        ))}
-                                    </div>
-                                    <Button onClick={handleAddCategory} className={`w-full ${isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d43f55]'} text-white rounded-lg h-10`} disabled={!newCategoryName || submitting}>שמור</Button>
-                                </div>
-                            </PopoverContent>
-                        </Popover>
+                        <CategoryManagementDialog
+                            categories={categories}
+                            type="expense"
+                            scope={budgetType}
+                            onChange={() => {
+                                if (onCategoriesChange) onCategoriesChange()
+                            }}
+                            trigger={
+                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 hover:bg-gray-50 bg-white" title="ניהול קטגוריות">
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                            }
+                        />
                     </div>
                 </div>
 

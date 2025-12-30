@@ -69,7 +69,21 @@ export async function getCategories(type: string = 'expense', scope: 'PERSONAL' 
             }
         }
 
-        return { success: true, data: categories.map(serializeCategory) }
+        // Helper to check if default
+        const isDefault = (name: string) => {
+            const defaults = type === 'expense' ? DEFAULT_EXPENSE_CATEGORIES :
+                (type === 'income' ? DEFAULT_INCOME_CATEGORIES :
+                    (type === 'saving' ? DEFAULT_SAVINGS_CATEGORIES : []))
+            return defaults.some(d => d.name === name)
+        }
+
+        return {
+            success: true,
+            data: categories.map(cat => ({
+                ...serializeCategory(cat),
+                isDefault: isDefault(cat.name)
+            }))
+        }
     } catch (error: any) {
         console.error('[getCategories] Error:', error)
         return { success: false, error: `Failed to fetch categories: ${error.message}` }
