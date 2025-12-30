@@ -105,6 +105,18 @@ export function SignaturePad({ value, onChange, onClear }: SignaturePadProps) {
 
     // ... (rest of component)
 
+    const clearSignature = () => {
+        const canvas = canvasRef.current
+        if (canvas) {
+            const ctx = canvas.getContext('2d')
+            if (ctx) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                setHasSignature(false)
+                onClear()
+            }
+        }
+    }
+
     return (
         <div className="space-y-2 select-none">
             <div className="relative w-full">
