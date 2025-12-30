@@ -3,6 +3,18 @@
 import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+
+const InvoiceSchema = z.object({
+    clientId: z.string().min(1, 'חובה לבחור לקוח'),
+    invoiceNumber: z.string().min(1, 'חובה להזין מספר חשבונית'),
+    issueDate: z.date(),
+    dueDate: z.date().optional().nullable(),
+    subtotal: z.number().min(0, 'סכום לא יכול להיות שלילי'),
+    vatRate: z.number().min(0).max(1).optional().default(0.18),
+    paymentMethod: z.string().optional().nullable(),
+    notes: z.string().max(1000, 'הערות ארוכות מדי').optional().nullable()
+})
 
 export interface InvoiceFormData {
     clientId: string
@@ -75,25 +87,32 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
 
         const db = await authenticatedPrisma(userId)
 
-        const vatRate = data.vatRate ?? 0.18
-        const vatAmount = data.subtotal * vatRate
-        const total = data.subtotal + vatAmount
+        // Validate Input
+        const result = InvoiceSchema.safeParse(data)
+        if (!result.success) {
+            return { success: false, error: result.error.errors[0]?.message || 'נתונים לא תקינים' }
+        }
+        const validData = result.data
+
+        const vatRate = validData.vatRate ?? 0.18
+        const vatAmount = validData.subtotal * vatRate
+        const total = validData.subtotal + vatAmount
 
         const invoice = await db.invoice.create({
             data: {
                 userId,
-                clientId: data.clientId,
+                clientId: validData.clientId,
                 scope,
-                invoiceNumber: data.invoiceNumber,
-                issueDate: data.issueDate,
-                dueDate: data.dueDate,
-                subtotal: data.subtotal,
+                invoiceNumber: validData.invoiceNumber,
+                issueDate: validData.issueDate,
+                dueDate: validData.dueDate || null,
+                subtotal: validData.subtotal,
                 vatRate,
                 vatAmount,
                 total,
 
-                notes: data.notes,
-                paymentMethod: data.paymentMethod,
+                notes: validData.notes || null,
+                paymentMethod: validData.paymentMethod || null,
                 status: 'DRAFT'
             },
             include: {

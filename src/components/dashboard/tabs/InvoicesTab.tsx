@@ -184,13 +184,21 @@ export function InvoicesTab() {
 
                 {/* Desktop Button */}
                 <div className="hidden md:block">
+                    <Button
+                        className="bg-purple-600 hover:bg-purple-700"
+                        onClick={() => {
+                            if (!clients || clients.length === 0) {
+                                toast.error('אין לקוחות פעילים, לא ניתן לייצר חשבונית')
+                                return
+                            }
+                            setIsDialogOpen(true)
+                        }}
+                    >
+                        <Plus className="h-4 w-4 ml-2" />
+                        חשבונית חדשה
+                    </Button>
+
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button className="bg-purple-600 hover:bg-purple-700">
-                                <Plus className="h-4 w-4 ml-2" />
-                                חשבונית חדשה
-                            </Button>
-                        </DialogTrigger>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-3xl rounded-xl" dir="rtl">
                             <DialogTitle className="sr-only">הוספת חשבונית</DialogTitle>
                             <div className="p-2">
@@ -222,10 +230,19 @@ export function InvoicesTab() {
 
             {/* Mobile FAB */}
             <div className="md:hidden">
+                <FloatingActionButton
+                    onClick={() => {
+                        if (!clients || clients.length === 0) {
+                            toast.error('אין לקוחות פעילים, לא ניתן לייצר חשבונית')
+                            return
+                        }
+                        setIsMobileOpen(true)
+                    }}
+                    colorClass="bg-purple-600"
+                    label="הוסף חשבונית"
+                />
+
                 <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
-                    <DialogTrigger asChild>
-                        <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass="bg-purple-600" label="הוסף חשבונית" />
-                    </DialogTrigger>
                     <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
                         <DialogTitle className="sr-only">הוספת חשבונית</DialogTitle>
                         <div className="mt-4">

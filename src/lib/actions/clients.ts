@@ -3,6 +3,17 @@
 import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+
+const ClientSchema = z.object({
+    name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
+    email: z.string().email('כתובת אימייל לא תקינה').max(100).optional().or(z.literal('')),
+    phone: z.string().regex(/^[\d-]*$/, 'מספר טלפון לא תקין').max(20).optional().or(z.literal('')),
+    taxId: z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional().or(z.literal('')),
+    address: z.string().max(200, 'הכתובת ארוכה מדי').optional().or(z.literal('')),
+    notes: z.string().max(500, 'הערות ארוכות מדי').optional().or(z.literal('')),
+    isActive: z.boolean().optional()
+})
 
 export interface ClientFormData {
     name: string
@@ -128,17 +139,24 @@ export async function createClient(data: ClientFormData, scope: string = 'BUSINE
 
         const db = await authenticatedPrisma(userId)
 
+        // Validate Input
+        const result = ClientSchema.safeParse(data)
+        if (!result.success) {
+            return { success: false, error: result.error.errors[0]?.message || 'נתונים לא תקינים' }
+        }
+        const validData = result.data
+
         const client = await db.client.create({
             data: {
                 userId,
                 scope,
-                name: data.name,
-                email: data.email,
-                phone: data.phone,
-                taxId: data.taxId,
-                address: data.address,
-                notes: data.notes,
-                isActive: data.isActive ?? true
+                name: validData.name,
+                email: validData.email || null,
+                phone: validData.phone || null,
+                taxId: validData.taxId || null,
+                address: validData.address || null,
+                notes: validData.notes || null,
+                isActive: validData.isActive ?? true
             }
         })
 
@@ -160,6 +178,13 @@ export async function updateClient(id: string, data: ClientFormData) {
 
         const db = await authenticatedPrisma(userId)
 
+        // Validate Input
+        const result = ClientSchema.safeParse(data)
+        if (!result.success) {
+            return { success: false, error: result.error.errors[0]?.message || 'נתונים לא תקינים' }
+        }
+        const validData = result.data
+
         // Verify ownership
         const existing = await db.client.findUnique({ where: { id } })
         if (!existing || existing.userId !== userId) {
@@ -169,13 +194,13 @@ export async function updateClient(id: string, data: ClientFormData) {
         const client = await db.client.update({
             where: { id },
             data: {
-                name: data.name,
-                email: data.email,
-                phone: data.phone,
-                taxId: data.taxId,
-                address: data.address,
-                notes: data.notes,
-                isActive: data.isActive
+                name: validData.name,
+                email: validData.email || null,
+                phone: validData.phone || null,
+                taxId: validData.taxId || null,
+                address: validData.address || null,
+                notes: validData.notes || null,
+                isActive: validData.isActive
             }
         })
 
