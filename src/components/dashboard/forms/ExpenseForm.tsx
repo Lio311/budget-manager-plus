@@ -187,6 +187,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
         const result = await importExpenses(expensesToImport, budgetType)
         if (result.success) {
+            globalMutate(['expenses', month, year, budgetType])
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             if (onCategoriesChange) await onCategoriesChange()
             if (onSuccess) onSuccess()

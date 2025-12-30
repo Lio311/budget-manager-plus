@@ -413,7 +413,9 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
             }
         }
 
-        // ...
+        if (samples.length > 0 && duplicateCount === samples.length) {
+            return { success: false, error: 'הקובץ הזה כבר נטען למערכת (זוהו רשומות כפולות)' }
+        }
 
         // Get or Create Default Category "All" or "General"
         let defaultCategory = await db.category.findFirst({
