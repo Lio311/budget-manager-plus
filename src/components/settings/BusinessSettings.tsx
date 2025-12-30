@@ -288,14 +288,14 @@ export function BusinessSettings() {
 
             {/* Signature Section */}
             <div className="border-t pt-4">
-                <div className="flex flex-row-reverse items-center justify-end gap-2 mb-3">
+                <div className="flex flex-row-reverse items-center justify-start gap-2 mb-3">
                     <h3 className="text-sm font-medium text-gray-700">חתימה דיגיטלית</h3>
                     <Pen className="h-5 w-5 text-green-600" />
                 </div>
                 <p className="text-xs text-gray-500 mb-3 text-right">
                     החתימה תופיע בחשבוניות ובמסמכים רשמיים
                 </p>
-                <div className="flex justify-start w-full">
+                <div className="flex justify-center w-full">
                     <div className="w-full max-w-md relative">
                         <SignaturePad
                             value={formData.signature}
