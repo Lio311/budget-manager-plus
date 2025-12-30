@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { addBill } from '@/lib/actions/bill'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -154,11 +155,10 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 </div>
                 <div className="col-span-2 space-y-2">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום</label>
-                    <Input
-                        type="number"
-                        value={formData.amount}
-                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    <FormattedNumberInput
                         placeholder="0.00"
+                        value={formData.amount}
+                        onValueChange={(values) => setFormData({ ...formData, amount: values.value })}
                         className="h-10 text-right"
                     />
                 </div>

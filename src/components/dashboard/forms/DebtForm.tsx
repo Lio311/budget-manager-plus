@@ -9,6 +9,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Checkbox } from '@/components/ui/checkbox'
 import { formatCurrency } from '@/lib/utils'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
@@ -160,12 +161,11 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                     </div>
                     <div>
                         <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל</label>
-                        <Input
-                            type="number"
-                            placeholder="0.00"
+                        <FormattedNumberInput
+                            placeholder="סכום כולל"
                             className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
                             value={newDebt.totalAmount}
-                            onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
+                            onValueChange={(values) => setNewDebt({ ...newDebt, totalAmount: values.value })}
                             disabled={submitting}
                             dir="ltr"
                         />
@@ -175,14 +175,13 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                 {/* Due Day - Full Width */}
                 <div className="w-full">
                     <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">יום חיוב (1-31)</label>
-                    <Input
-                        type="number"
+                    <FormattedNumberInput
                         placeholder="1"
                         min="1"
                         max="31"
                         className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
                         value={newDebt.dueDay}
-                        onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
+                        onValueChange={(values) => setNewDebt({ ...newDebt, dueDay: values.value })}
                         disabled={submitting}
                         dir="ltr"
                     />

@@ -12,6 +12,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -288,7 +289,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     </div>
                     <div className="col-span-2">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל</label>
-                        <Input className="h-10 border-gray-200 focus:ring-blue-500/20" type="number" placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
+                        <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-blue-500/20' : 'focus:ring-green-500/20'}`} placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
                     </div>
                 </div>
 

@@ -10,6 +10,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -279,8 +280,8 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-200">יעד</label>
                         <Input
                             type="number"
-                            placeholder="0.00"
-                            className="h-10 border-gray-200 focus:ring-[#00c875]/20 focus:border-[#00c875] w-full"
+                        <FormattedNumberInput
+                            placeholder="מטרה"
                             value={newSaving.goal}
                             onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
                         />
