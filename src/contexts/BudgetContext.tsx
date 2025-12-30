@@ -20,7 +20,7 @@ const BudgetContext = createContext<BudgetContextType | undefined>(undefined)
 export function BudgetProvider({ children, initialPlan }: { children: React.ReactNode, initialPlan?: BudgetType }) {
     const [month, setMonth] = useState(1) // Default to January
     const [year, setYear] = useState(2025) // Default to 2025
-    const [currency, setCurrency] = useState('₪')
+    const [currency, setCurrency] = useState('ILS')
     const [budgetType, setBudgetTypeInternal] = useState<BudgetType>(initialPlan || 'PERSONAL')
     const [isInitialized, setIsInitialized] = useState(false)
 
