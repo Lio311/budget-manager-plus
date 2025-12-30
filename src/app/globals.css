@@ -398,6 +398,12 @@ button.cl-modalCloseButton,
   background-color: transparent !important;
 }
 
+/* Specific fix for the icon box container which might have its own background */
+.dark .cl-userButtonPopoverActionButtonIconBox,
+.dark .cl-userButtonPopoverActionButtonIcon {
+  background-color: transparent !important;
+}
+
 /* Sidebar specifically - lighter background for better contrast */
 .dark .cl-navbar,
 .dark .cl-userProfile-navbar {
