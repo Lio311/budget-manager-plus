@@ -289,7 +289,7 @@ export function BusinessSettings() {
                 <p className="text-xs text-gray-500 mb-3 text-right">
                     החתימה תופיע בחשבוניות ובמסמכים רשמיים
                 </p>
-                <div className="flex justify-center w-full">
+                <div className="flex justify-start w-full">
                     <div className="w-full max-w-md relative">
                         <SignaturePad
                             value={formData.signature}
