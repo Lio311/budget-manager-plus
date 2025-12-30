@@ -448,12 +448,14 @@ button.cl-modalCloseButton,
   background-color: #1e293b !important;
 }
 
-/* Make Clerk modals MUCH more compact - AGGRESSIVE (BOTH MODES) */
+/* Make Clerk modals MUCH more compact - ULTRA AGGRESSIVE (BOTH MODES) */
 .cl-userProfile-root,
 .cl-modal,
 .cl-modalContent,
 .cl-userButtonPopoverCard,
-.cl-card {
+.cl-card,
+div[data-clerk-modal],
+.cl-internal-b3fm6y {
   max-width: 380px !important;
   width: 380px !important;
   min-width: 320px !important;
@@ -462,25 +464,36 @@ button.cl-modalCloseButton,
 .dark .cl-userProfile-root,
 .dark .cl-modal,
 .dark .cl-modalContent,
-.dark .cl-card {
+.dark .cl-card,
+.dark div[data-clerk-modal],
+.dark .cl-internal-b3fm6y {
   max-width: 380px !important;
   width: 380px !important;
   min-width: 320px !important;
 }
 
+/* Force all Clerk containers to be compact */
+[class*="cl-"]>div,
+.cl-userProfile-root>div,
+.cl-modalContent>div {
+  max-width: 100% !important;
+}
+
 /* Reduce sidebar width */
 .cl-navbar,
 .cl-userProfile-navbar {
-  width: 120px !important;
-  min-width: 120px !important;
-  max-width: 120px !important;
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  flex-shrink: 0 !important;
 }
 
 .dark .cl-navbar,
 .dark .cl-userProfile-navbar {
-  width: 120px !important;
-  min-width: 120px !important;
-  max-width: 120px !important;
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  flex-shrink: 0 !important;
 }
 
 .cl-pageScrollBox,
@@ -506,13 +519,15 @@ button.cl-modalCloseButton,
 }
 
 .cl-profileSection,
-.cl-profileSectionContent {
+.cl-profileSectionContent,
+.cl-profileSectionPrimaryButton {
   padding: 0.5rem !important;
   max-width: 100% !important;
 }
 
 .dark .cl-profileSection,
-.dark .cl-profileSectionContent {
+.dark .cl-profileSectionContent,
+.dark .cl-profileSectionPrimaryButton {
   padding: 0.5rem !important;
   max-width: 100% !important;
 }
