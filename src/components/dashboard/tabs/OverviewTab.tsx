@@ -595,16 +595,17 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <div className="space-y-4 py-4 text-right">
                             <div className="space-y-2">
                                 <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
-                                <FormattedNumberInput
-                                    value={quickAddData.amount}
-                                    onChange={(e) => setQuickAddData({ ...quickAddData, amount: e.target.value })}
-                                    placeholder="סכום"
-                                />    setInitialBalance(e.target.value)
+                                <Input
+                                    value={initialBalance}
+                                    onChange={(e) => {
+                                        const val = parseFloat(e.target.value)
+                                        if (val < 0) return
+                                        setInitialBalance(e.target.value)
                                     }}
-                                type="number"
-                                min="0"
-                                dir="ltr"
-                                className="text-right"
+                                    type="number"
+                                    min="0"
+                                    dir="ltr"
+                                    className="text-right"
                                 />
                             </div>
                             <div className="space-y-2">
