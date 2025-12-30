@@ -223,7 +223,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         <div>
             <div className="mb-4 flex items-center gap-2">
                 <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`} />
-                <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
+                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
                 <div className="mr-auto flex items-center gap-2">
                     <Button
                         variant="outline"
@@ -254,15 +254,15 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
             <div className="flex flex-col gap-4">
                 <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879]">תיאור ההוצאה</label>
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור ההוצאה</label>
                     <Input className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} placeholder="מה קנית / שילמת?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
                 </div>
 
                 {isBusiness && (
                     <div className="w-full">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879]">ספק</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">ספק</label>
                         <select
-                            className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 focus:ring-orange-500/20 outline-none"
+                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 focus:ring-orange-500/20 outline-none"
                             value={newExpense.supplierId}
                             onChange={(e) => setNewExpense({ ...newExpense, supplierId: e.target.value })}
                         >
@@ -276,9 +276,9 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
                 <div className="flex gap-2 w-full">
                     <div className="flex-1">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879]">קטגוריה</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה</label>
                         <select
-                            className={`w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'} outline-none`}
+                            className={`w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'} outline-none`}
                             value={newExpense.category}
                             onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
                             style={{ position: 'relative' }}
@@ -300,7 +300,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                                 if (onCategoriesChange) onCategoriesChange()
                             }}
                             trigger={
-                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 hover:bg-gray-50 bg-white" title="ניהול קטגוריות">
+                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800" title="ניהול קטגוריות">
                                     <Plus className="h-4 w-4" />
                                 </Button>
                             }
@@ -310,9 +310,9 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
                 <div className="grid grid-cols-3 gap-3 w-full">
                     <div className="col-span-1">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879]">מטבע</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">מטבע</label>
                         <select
-                            className="w-full p-2 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                            className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none"
                             value={newExpense.currency}
                             onChange={(e) => setNewExpense({ ...newExpense, currency: e.target.value })}
                         >
@@ -322,7 +322,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         </select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879]">סכום כולל</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל</label>
                         <Input className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} type="number" placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
                     </div>
                 </div>
@@ -336,31 +336,31 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 </div>
 
                 {isBusiness && (
-                    <div className="grid grid-cols-2 gap-3 p-3 bg-red-50/50 rounded-lg border border-red-100">
+                    <div className="grid grid-cols-2 gap-3 p-3 bg-red-50/50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/50">
                         <div>
-                            <label className="text-[10px] font-bold text-red-800 uppercase mb-1 block">מע"מ מוכר (18%)</label>
-                            <div className="text-sm font-bold text-red-900">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
+                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">מע"מ מוכר (18%)</label>
+                            <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
                         </div>
                         <div>
-                            <label className="text-[10px] font-bold text-red-800 uppercase mb-1 block">סכום נקי</label>
-                            <div className="text-sm font-bold text-red-900">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</div>
+                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">סכום נקי</label>
+                            <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</div>
                         </div>
                     </div>
                 )}
 
                 <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879]">תאריך</label>
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך</label>
                     <DatePicker date={newExpense.date ? new Date(newExpense.date) : undefined} setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
                 </div>
 
                 {isBusiness && (
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700">
                         <Checkbox id="is-deductible" checked={newExpense.isDeductible} onCheckedChange={(checked) => setNewExpense({ ...newExpense, isDeductible: checked as boolean })} className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600" />
-                        <label htmlFor="is-deductible" className="text-xs font-bold text-[#323338] cursor-pointer">הוצאה מוכרת לצורכי מס</label>
+                        <label htmlFor="is-deductible" className="text-xs font-bold text-[#323338] dark:text-gray-100 cursor-pointer">הוצאה מוכרת לצורכי מס</label>
                     </div>
                 )}
 
-                <div className="flex items-start gap-4 p-4 border border-gray-100 rounded-xl bg-gray-50/50 w-full">
+                <div className="flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full">
                     <div className="flex items-center gap-2">
                         <Checkbox
                             id="recurring-expense"
@@ -368,12 +368,12 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })}
                             className={isBusiness ? 'data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600' : 'data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]'}
                         />
-                        <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338]">הוצאה קבועה</label>
+                        <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הוצאה קבועה</label>
                     </div>
                     {newExpense.isRecurring && (
                         <div className="flex gap-4 flex-1">
                             <div className="space-y-2 w-full">
-                                <label className="text-xs font-medium text-[#676879]">תאריך סיום</label>
+                                <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
                                 <DatePicker date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined} setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
                             </div>
                         </div>

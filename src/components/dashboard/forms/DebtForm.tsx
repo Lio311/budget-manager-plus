@@ -127,13 +127,13 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
         <div>
             <div className="flex items-center gap-2 mb-6">
                 <Wallet className="h-5 w-5 text-purple-600" />
-                <h3 className="text-lg font-bold text-[#323338]">הוספת הלוואה</h3>
+                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">הוספת הלוואה</h3>
             </div>
 
             <div className="flex flex-col gap-4">
                 {/* Creditor Name - Full Width */}
                 <div className="w-full">
-                    <label className="text-xs font-medium mb-1.5 block text-[#676879]">שם המלווה / לווה</label>
+                    <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">שם המלווה / לווה</label>
                     <Input
                         placeholder="שם..."
                         className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
@@ -146,9 +146,9 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                 {/* Currency, Amount, Due Day - 2 columns on desktop */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
                     <div>
-                        <label className="text-xs font-medium mb-1.5 block text-[#676879]">מטבע</label>
+                        <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">מטבע</label>
                         <select
-                            className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none"
                             value={newDebt.currency}
                             onChange={(e) => setNewDebt({ ...newDebt, currency: e.target.value })}
                             disabled={submitting}
@@ -159,7 +159,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                         </select>
                     </div>
                     <div>
-                        <label className="text-xs font-medium mb-1.5 block text-[#676879]">סכום כולל</label>
+                        <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל</label>
                         <Input
                             type="number"
                             placeholder="0.00"
@@ -174,7 +174,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
 
                 {/* Due Day - Full Width */}
                 <div className="w-full">
-                    <label className="text-xs font-medium mb-1.5 block text-[#676879]">יום חיוב (1-31)</label>
+                    <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">יום חיוב (1-31)</label>
                     <Input
                         type="number"
                         placeholder="1"
@@ -197,22 +197,22 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                 </div>
 
                 <div className="flex flex-col gap-4"> {/* Container for Checkbox and Button */}
-                    <div className="flex items-center gap-2 h-10 bg-gray-50 px-3 rounded-lg border border-gray-100 w-full sm:w-auto self-start">
+                    <div className="flex items-center gap-2 h-10 bg-gray-50 dark:bg-slate-800/50 px-3 rounded-lg border border-gray-100 dark:border-slate-700 w-full sm:w-auto self-start">
                         <Checkbox
                             id="recurring-debt"
                             checked={newDebt.isRecurring}
                             onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
                             className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                         />
-                        <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none text-[#323338]">
+                        <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none text-[#323338] dark:text-gray-100">
                             תשלומים
                         </label>
                     </div>
 
                     {newDebt.isRecurring && (
-                        <div className="p-4 pt-0 border-t border-gray-100 mt-2 grid gap-6 grid-cols-1 sm:grid-cols-2 animate-in slide-in-from-top-2 duration-200">
+                        <div className="p-4 pt-0 border-t border-gray-100 dark:border-slate-700 mt-2 grid gap-6 grid-cols-1 sm:grid-cols-2 animate-in slide-in-from-top-2 duration-200">
                             <div className="space-y-1.5 mt-2">
-                                <label className="text-xs text-[#676879]">מספר תשלומים</label>
+                                <label className="text-xs text-[#676879] dark:text-gray-300">מספר תשלומים</label>
                                 <Input
                                     type="number"
                                     placeholder="12"
@@ -226,8 +226,8 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                             </div>
                             {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
                                 <div className="space-y-1.5 mt-2">
-                                    <label className="text-xs text-[#676879]">תשלום חודשי משוער</label>
-                                    <div className="h-10 px-3 py-1.5 border border-gray-200 rounded-lg bg-white text-sm flex items-center w-full font-medium text-[#323338]">
+                                    <label className="text-xs text-[#676879] dark:text-gray-300">תשלום חודשי משוער</label>
+                                    <div className="h-10 px-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm flex items-center w-full font-medium text-[#323338] dark:text-gray-100">
                                         {formatCurrency(
                                             parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
                                             getCurrencySymbol(newDebt.currency)

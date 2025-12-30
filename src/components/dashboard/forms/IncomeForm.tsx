@@ -210,21 +210,21 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         <div>
             <div className="mb-4 flex items-center gap-2">
                 <TrendingDown className={`h-5 w-5 rotate-180 ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`} />
-                <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד מכירה / הכנסה' : 'הוספת הכנסה'}</h3>
+                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד מכירה / הכנסה' : 'הוספת הכנסה'}</h3>
             </div>
 
             <div className="flex flex-col gap-4">
                 {/* Source Input */}
                 <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879]">תיאור / מקור</label>
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור / מקור</label>
                     <Input className="h-10 border-gray-200 focus:ring-blue-500/20" placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"} value={newIncome.source} onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })} />
                 </div>
 
                 {isBusiness && (
                     <div className="w-full">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879]">לקוח</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">לקוח</label>
                         <select
-                            className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
+                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
                             value={newIncome.clientId}
                             onChange={(e) => setNewIncome({ ...newIncome, clientId: e.target.value })}
                         >
@@ -239,9 +239,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 {/* Category Select */}
                 <div className="flex gap-2 w-full">
                     <div className="flex-1">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879]">קטגוריה</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה</label>
                         <select
-                            className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
+                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
                             value={newIncome.category}
                             onChange={(e) => setNewIncome({ ...newIncome, category: e.target.value })}
                         >
@@ -259,7 +259,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
                             <PopoverContent className="w-80 p-4 z-50 rounded-xl shadow-xl" dir="rtl">
                                 <div className="space-y-4">
-                                    <h4 className="font-medium mb-4 text-[#323338]">קטגוריה חדשה</h4>
+                                    <h4 className="font-medium mb-4 text-[#323338] dark:text-gray-100">קטגוריה חדשה</h4>
                                     <Input className="h-10" placeholder="שם הקטגוריה" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
                                     <div className="grid grid-cols-5 gap-2">
                                         {PRESET_COLORS.map(color => (
@@ -275,9 +275,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
                 <div className="grid grid-cols-3 gap-3 w-full">
                     <div className="col-span-1">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879]">מטבע</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">מטבע</label>
                         <select
-                            className="w-full p-2 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                            className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none"
                             value={newIncome.currency}
                             onChange={(e) => setNewIncome({ ...newIncome, currency: e.target.value })}
                         >
@@ -287,27 +287,27 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         </select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879]">סכום כולל</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל</label>
                         <Input className="h-10 border-gray-200 focus:ring-blue-500/20" type="number" placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
                     </div>
                 </div>
 
                 {isBusiness && (
-                    <div className="grid grid-cols-2 gap-3 p-3 bg-green-50/50 rounded-lg border border-green-100">
+                    <div className="grid grid-cols-2 gap-3 p-3 bg-green-50/50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800/50">
                         <div>
-                            <label className="text-[10px] font-bold text-green-800 uppercase mb-1 block">מע"מ (18%)</label>
-                            <div className="text-sm font-bold text-green-900">{formatCurrency(parseFloat(newIncome.vatAmount) || 0, getCurrencySymbol(newIncome.currency))}</div>
+                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">מע"מ (18%)</label>
+                            <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency(parseFloat(newIncome.vatAmount) || 0, getCurrencySymbol(newIncome.currency))}</div>
                         </div>
                         <div>
-                            <label className="text-[10px] font-bold text-green-800 uppercase mb-1 block">לפני מע"מ</label>
-                            <div className="text-sm font-bold text-green-900">{formatCurrency(parseFloat(newIncome.amountBeforeVat) || 0, getCurrencySymbol(newIncome.currency))}</div>
+                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">לפני מע"מ</label>
+                            <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency(parseFloat(newIncome.amountBeforeVat) || 0, getCurrencySymbol(newIncome.currency))}</div>
                         </div>
                     </div>
                 )}
 
                 {/* Payer Input (Optional) */}
                 <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879]">התקבל מ... (אופציונלי)</label>
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל מ... (אופציונלי)</label>
                     <Input
                         className="h-10 border-gray-200 focus:ring-blue-500/20"
                         placeholder="שם המשלם"
@@ -326,20 +326,20 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 </div>
 
                 <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879]">תאריך קבלה</label>
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
                     <DatePicker date={newIncome.date ? new Date(newIncome.date) : undefined} setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
                 </div>
 
                 {/* Recurring Checkbox */}
-                <div className="flex items-start gap-4 p-4 border border-gray-100 rounded-xl bg-gray-50/50 w-full">
+                <div className="flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full">
                     <div className="flex items-center gap-2">
                         <Checkbox id="recurring-income" checked={newIncome.isRecurring} onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })} className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" />
-                        <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338]">הכנסה קבועה</label>
+                        <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הכנסה קבועה</label>
                     </div>
                     {newIncome.isRecurring && (
                         <div className="flex gap-4 flex-1">
                             <div className="space-y-2 w-full">
-                                <label className="text-xs font-medium text-[#676879]">תאריך סיום</label>
+                                <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
                                 <DatePicker date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined} setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
                             </div>
                         </div>

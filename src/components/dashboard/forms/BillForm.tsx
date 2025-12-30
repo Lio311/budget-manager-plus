@@ -131,7 +131,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">שם החשבון</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">שם החשבון</label>
                 <Input
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -141,9 +141,9 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
             </div>
             <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-1">
-                    <label className="text-sm font-medium text-gray-700">מטבע</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">מטבע</label>
                     <select
-                        className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                        className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 text-sm outline-none"
                         value={formData.currency}
                         onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                     >
@@ -153,7 +153,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                     </select>
                 </div>
                 <div className="col-span-2 space-y-2">
-                    <label className="text-sm font-medium text-gray-700">סכום</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום</label>
                     <Input
                         type="number"
                         value={formData.amount}
@@ -164,7 +164,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 </div>
             </div>
             <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">יום בחודש לתשלום</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">יום בחודש לתשלום</label>
                 <Input
                     type="number"
                     min="1"
@@ -184,7 +184,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 />
             </div>
 
-            <div className="flex items-center space-x-2 space-x-reverse pt-2 border-t border-gray-100">
+            <div className="flex items-center space-x-2 space-x-reverse pt-2 border-t border-gray-100 dark:border-slate-700">
                 <Checkbox
                     id="recurring"
                     checked={formData.isRecurring}
@@ -200,11 +200,11 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
 
             {
                 formData.isRecurring && (
-                    <div className="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-lg animate-in slide-in-from-top-2">
+                    <div className="grid grid-cols-2 gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg animate-in slide-in-from-top-2">
                         <div className="space-y-1">
-                            <label className="text-xs text-gray-500">תדירות</label>
+                            <label className="text-xs text-gray-500 dark:text-gray-400">תדירות</label>
                             <select
-                                className="w-full p-2 border border-gray-200 rounded-md h-9 text-sm outline-none bg-white"
+                                className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-md h-9 text-sm outline-none bg-white dark:bg-slate-800 dark:text-gray-100"
                                 value={formData.frequency}
                                 onChange={(e) => setFormData({ ...formData, frequency: e.target.value as 'MONTHLY' | 'BI_MONTHLY' })}
                             >
@@ -213,7 +213,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                             </select>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs text-gray-500">תוקף עד <span className="text-red-500">*</span></label>
+                            <label className="text-xs text-gray-500 dark:text-gray-400">תוקף עד <span className="text-red-500">*</span></label>
                             <DatePicker
                                 date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
                                 setDate={(date) => setFormData({ ...formData, recurringEndDate: date ? date.toISOString() : undefined })}

@@ -189,15 +189,15 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
         <div>
             <div className="mb-6 flex items-center gap-2">
                 <PiggyBank className="h-5 w-5 text-blue-600" />
-                <h3 className="text-lg font-bold text-[#323338]">הוספת חיסכון</h3>
+                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">הוספת חיסכון</h3>
             </div>
 
             <div className="flex flex-wrap gap-4 items-end">
                 <div className="w-full space-y-2">
-                    <label className="text-sm font-medium text-gray-700">קטגוריה</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">קטגוריה</label>
                     <div className="flex gap-2">
                         <select
-                            className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white text-sm focus:ring-2 focus:ring-[#00c875]/20 focus:border-[#00c875] outline-none transition-all"
+                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 focus:ring-[#00c875]/20 focus:border-[#00c875] outline-none transition-all"
                             value={newSaving.category}
                             onChange={(e) => setNewSaving({ ...newSaving, category: e.target.value })}
                             disabled={submitting}
@@ -209,13 +209,13 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                         </select>
                         <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
                             <PopoverTrigger asChild>
-                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 hover:bg-gray-50">
+                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800">
                                     <Plus className="h-4 w-4" />
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-80 p-4 z-50 rounded-xl shadow-xl" dir="rtl">
                                 <div className="space-y-4">
-                                    <h4 className="font-medium leading-none mb-4 text-[#323338]">קטגוריה חדשה</h4>
+                                    <h4 className="font-medium leading-none mb-4 text-[#323338] dark:text-gray-100">קטגוריה חדשה</h4>
                                     <div className="space-y-2">
                                         <Input
                                             className="h-10"
@@ -241,7 +241,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 </div>
 
                 <div className="w-full space-y-2">
-                    <label className="text-sm font-medium text-gray-700">תיאור</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תיאור</label>
                     <Input
                         placeholder="תיאור"
                         className="h-10 border-gray-200 focus:ring-[#00c875]/20 focus:border-[#00c875]"
@@ -251,9 +251,9 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 </div>
 
                 <div className="w-full space-y-2">
-                    <label className="text-sm font-medium text-gray-700">מטבע</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">מטבע</label>
                     <select
-                        className="w-full p-2 border border-gray-200 rounded-lg h-10 bg-white text-sm outline-none"
+                        className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none"
                         value={newSaving.currency}
                         onChange={(e) => setNewSaving({ ...newSaving, currency: e.target.value })}
                     >
@@ -265,7 +265,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
 
                 <div className="w-full grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">הפקדה</label>
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">הפקדה</label>
                         <Input
                             type="number"
                             placeholder="0.00"
@@ -276,7 +276,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700">יעד</label>
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">יעד</label>
                         <Input
                             type="number"
                             placeholder="0.00"
@@ -296,7 +296,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 </div>
 
                 <div className="w-full space-y-2">
-                    <label className="text-sm font-medium text-gray-700">תאריך</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תאריך</label>
                     <DatePicker
                         date={newSaving.date}
                         setDate={(date) => setNewSaving({ ...newSaving, date: date || new Date() })}
@@ -304,7 +304,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                     />
                 </div>
 
-                <div className="w-full flex items-start gap-4 p-4 mt-2 border border-gray-100 rounded-xl bg-gray-50/50 transition-all">
+                <div className="w-full flex items-start gap-4 p-4 mt-2 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 transition-all">
                     <div className="flex items-center gap-2">
                         <Checkbox
                             id="recurring-saving"
@@ -312,7 +312,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                             onCheckedChange={(checked) => setNewSaving({ ...newSaving, isRecurring: checked as boolean })}
                             className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                         />
-                        <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer text-[#323338]">
+                        <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">
                             חיסכון קבוע
                         </label>
                     </div>
@@ -320,7 +320,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                     {newSaving.isRecurring && (
                         <div className="flex gap-4 flex-1">
                             <div className="space-y-2 w-full">
-                                <label className="text-xs font-medium text-[#676879]">תאריך סיום</label>
+                                <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
                                 <DatePicker
                                     date={newSaving.recurringEndDate}
                                     setDate={(date) => setNewSaving({ ...newSaving, recurringEndDate: date })}
