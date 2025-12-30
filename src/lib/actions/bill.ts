@@ -46,7 +46,16 @@ export async function getBills(month: number, year: number, type: 'PERSONAL' | '
 export async function addBill(
     month: number,
     year: number,
-    data: { name: string; amount: number; currency: string; dueDay: number; paymentMethod?: string },
+    data: {
+        name: string;
+        amount: number;
+        currency: string;
+        dueDay: number;
+        paymentMethod?: string;
+        isRecurring?: boolean;
+        recurringEndDate?: string;
+        frequency?: 'MONTHLY' | 'BI_MONTHLY';
+    },
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
@@ -67,15 +76,113 @@ export async function addBill(
                 currency: data.currency,
                 dueDate: dueDate,
                 isPaid: false,
-                paymentMethod: data.paymentMethod
+                paymentMethod: data.paymentMethod,
+                isRecurring: data.isRecurring || false,
+                recurringSourceId: null // First one is the source
             }
         })
+
+        // Handle Recurrence
+        if (data.isRecurring && data.recurringEndDate) {
+            await createRecurringBills(
+                bill.id,
+                data.name,
+                data.amount,
+                data.currency,
+                data.dueDay,
+                dueDate,
+                new Date(data.recurringEndDate),
+                data.frequency || 'MONTHLY',
+                type,
+                data.paymentMethod
+            )
+        }
 
         revalidatePath('/dashboard')
         return { success: true, data: bill }
     } catch (error) {
         console.error('Error adding bill:', error)
         return { success: false, error: 'Failed to add bill' }
+    }
+}
+
+async function createRecurringBills(
+    sourceId: string,
+    name: string,
+    amount: number,
+    currency: string,
+    dueDay: number,
+    startDate: Date,
+    endDate: Date,
+    frequency: 'MONTHLY' | 'BI_MONTHLY',
+    type: 'PERSONAL' | 'BUSINESS',
+    paymentMethod?: string
+) {
+    const startMonth = startDate.getMonth() + 1
+    const startYear = startDate.getFullYear()
+    const endMonth = endDate.getMonth() + 1
+    const endYear = endDate.getFullYear()
+
+    let currentMonth = startMonth
+    let currentYear = startYear
+
+    // Determine increment based on frequency
+    const increment = frequency === 'BI_MONTHLY' ? 2 : 1
+
+    // Skip the first one (already created)
+    if (currentMonth + increment > 12) {
+        currentMonth = (currentMonth + increment) - 12
+        currentYear++
+    } else {
+        currentMonth += increment
+    }
+
+    while (
+        currentYear < endYear ||
+        (currentYear === endYear && currentMonth <= endMonth)
+    ) {
+        try {
+            const budget = await getCurrentBudget(currentMonth, currentYear, '₪', type)
+
+            // Handle invalid days (e.g., Feb 31 -> Feb 28/29)
+            const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate()
+            const dayToUse = Math.min(dueDay, lastDayOfMonth)
+            const dueDate = new Date(currentYear, currentMonth - 1, dayToUse)
+
+            const { userId } = await auth();
+            if (userId) {
+                const db = await authenticatedPrisma(userId);
+                await db.bill.create({
+                    data: {
+                        budgetId: budget.id,
+                        name,
+                        amount,
+                        currency,
+                        dueDate,
+                        isPaid: false,
+                        paymentMethod,
+                        isRecurring: true,
+                        recurringSourceId: sourceId
+                    }
+                })
+            }
+        } catch (error) {
+            console.error(`Error creating recurring bill for ${currentMonth}/${currentYear}:`, error)
+        }
+
+        // Increment loop
+        let nextMonth = currentMonth + increment
+        if (nextMonth > 12) {
+            currentMonth = nextMonth - 12
+            currentYear++
+            // Handle multiple year jumps if increment > 12 (unlikely for bi-monthly but good practice)
+            while (currentMonth > 12) {
+                currentMonth -= 12
+                currentYear++
+            }
+        } else {
+            currentMonth = nextMonth
+        }
     }
 }
 

@@ -11,6 +11,9 @@ import { useSWRConfig } from 'swr'
 import { SUPPORTED_CURRENCIES } from '@/lib/currency'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 
+import { Checkbox } from '@/components/ui/checkbox'
+import { DatePicker } from '@/components/ui/date-picker'
+
 interface BillFormProps {
     onSuccess?: () => void
     isMobile?: boolean
@@ -22,12 +25,24 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
     const { mutate: globalMutate } = useSWRConfig()
 
     const [submitting, setSubmitting] = useState(false)
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        name: string
+        amount: string
+        currency: string
+        dueDay: string
+        paymentMethod: string
+        isRecurring: boolean
+        frequency: 'MONTHLY' | 'BI_MONTHLY'
+        recurringEndDate?: string
+    }>({
         name: '',
         amount: '',
         currency: 'ILS',
         dueDay: '',
-        paymentMethod: ''
+        paymentMethod: '',
+        isRecurring: false,
+        frequency: 'MONTHLY',
+        recurringEndDate: undefined
     })
 
     async function handleSubmit() {
@@ -57,7 +72,10 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 amount: parseFloat(formData.amount),
                 currency: formData.currency,
                 dueDay: parseInt(formData.dueDay),
-                paymentMethod: formData.paymentMethod || undefined
+                paymentMethod: formData.paymentMethod || undefined,
+                isRecurring: formData.isRecurring,
+                recurringEndDate: formData.recurringEndDate,
+                frequency: formData.frequency
             }, budgetType)
 
             if (result.success) {
@@ -65,7 +83,16 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                     title: 'הצלחה',
                     description: 'החשבון נוסף בהצלחה'
                 })
-                setFormData({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
+                setFormData({
+                    name: '',
+                    amount: '',
+                    currency: 'ILS',
+                    dueDay: '',
+                    paymentMethod: '',
+                    isRecurring: false,
+                    frequency: 'MONTHLY',
+                    recurringEndDate: undefined
+                })
 
                 // Trigger revalidation for bills and overview
                 globalMutate(['bills', month, year, budgetType])
@@ -140,7 +167,6 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 />
             </div>
 
-            <div className="w-full">
                 <PaymentMethodSelector
                     value={formData.paymentMethod}
                     onChange={(val) => setFormData({ ...formData, paymentMethod: val })}
@@ -148,13 +174,54 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 />
             </div>
 
-            <Button
-                className="w-full bg-orange-500 hover:bg-orange-600 h-10 shadow-sm mt-2 font-medium"
-                onClick={handleSubmit}
-                disabled={submitting}
-            >
-                {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : "הוסף"}
-            </Button>
-        </div>
+            <div className="flex items-center space-x-2 space-x-reverse pt-2 border-t border-gray-100">
+                <Checkbox
+                    id="recurring"
+                    checked={formData.isRecurring}
+                    onCheckedChange={(checked) => setFormData({ ...formData, isRecurring: checked as boolean })}
+                />
+                <label
+                    htmlFor="recurring"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                    חשבון קבוע / חוזר
+                </label>
+            </div>
+
+            {
+        formData.isRecurring && (
+            <div className="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-lg animate-in slide-in-from-top-2">
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-500">תדירות</label>
+                    <select
+                        className="w-full p-2 border border-gray-200 rounded-md h-9 text-sm outline-none bg-white"
+                        value={formData.frequency}
+                        onChange={(e) => setFormData({ ...formData, frequency: e.target.value as 'MONTHLY' | 'BI_MONTHLY' })}
+                    >
+                        <option value="MONTHLY">כל חודש</option>
+                        <option value="BI_MONTHLY">דו-חודשי (כל חודשיים)</option>
+                    </select>
+                </div>
+                <div className="space-y-1">
+                    <label className="text-xs text-gray-500">תוקף עד</label>
+                    <DatePicker
+                        date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
+                        setDate={(date) => setFormData({ ...formData, recurringEndDate: date ? date.toISOString() : undefined })}
+                        placeholder="ללא הגבלה / בחר תאריך"
+                        className="w-full h-9 bg-white"
+                    />
+                </div>
+            </div>
+        )
+    }
+
+    <Button
+        className="w-full bg-orange-500 hover:bg-orange-600 h-10 shadow-sm mt-2 font-medium"
+        onClick={handleSubmit}
+        disabled={submitting}
+    >
+        {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : "הוסף"}
+    </Button>
+        </div >
     )
 }
