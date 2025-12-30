@@ -613,8 +613,47 @@ div[class*="cl-branding"] {
 }
 
 /* Ensure the modal content allows the footer to sit nicely */
+/* Ensure the modal content allows the footer to sit nicely */
 .cl-modalContent {
   overflow: visible !important;
+}
+
+/* Mobile Fixes for Clerk User Profile */
+@media (max-width: 768px) {
+
+  /* Hide Mobile Navigation Bar/Drawer */
+  .cl-navbarMobileMenuRow,
+  .cl-navbar {
+    display: none !important;
+  }
+
+  /* Force the content area to be visible and take full width */
+  .cl-pageScrollBox,
+  .cl-scrollBox {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Make the card centered and sized like a card, not full screen */
+  .cl-userProfile-root,
+  .cl-card {
+    width: 90vw !important;
+    max-width: 400px !important;
+    height: auto !important;
+    max-height: 85vh !important;
+    margin: 0 auto !important;
+    border-radius: 1.5rem !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* Ensure the internal layout is vertical and centered */
+  .cl-rootBox {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
 }
 
 /* Force container to have no gap */
