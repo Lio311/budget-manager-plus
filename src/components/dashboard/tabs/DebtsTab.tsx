@@ -320,13 +320,6 @@ export function DebtsTab() {
                                                         disabled={submitting}
                                                     />
                                                 </div>
-                                                <div className="w-full">
-                                                    <FormattedNumberInput
-                                                        value={editData.paidAmount}
-                                                        onChange={(e) => setEditData({ ...editData, paidAmount: e.target.value })}
-                                                        placeholder="שולם"
-                                                    />
-                                                </div>
 
                                                 {/* Row 2: Currency, Total Amount, Monthly Payment, Due Day */}
                                                 <div className="flex flex-wrap gap-2 w-full">
