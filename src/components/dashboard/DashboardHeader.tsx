@@ -10,15 +10,7 @@ import { ModeToggle } from '@/components/mode-toggle'
 import { MonthYearPicker } from './MonthYearPicker'
 import Image from 'next/image'
 
-interface DashboardHeaderProps {
-    onMenuToggle?: () => void
-    menuOpen?: boolean
-    userPlan?: 'PERSONAL' | 'BUSINESS'
-    hasPersonalAccess?: boolean
-    hasBusinessAccess?: boolean
-}
-
-export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PERSONAL', hasPersonalAccess = true, hasBusinessAccess = false }: DashboardHeaderProps) {
+export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PERSONAL', hasPersonalAccess = true, hasBusinessAccess = false }: any) {
     const { month, year, budgetType, setMonth, setYear, setBudgetType } = useBudget()
     const router = useRouter()
 
@@ -52,10 +44,10 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
         }
     }
 
-    // --- הגדרות עיצוב לכפתור הפופ-אפ הקטן (התפריט שנפתח בלחיצה על התמונה) ---
+    // --- הגדרות עיצוב לכפתור הפופ-אפ הקטן (Dropdown) ---
     const userButtonAppearance = {
         elements: {
-            // מסתיר את כפתור "נהל חשבון" (גלגל שיניים) במובייל בלבד
+            // מסתיר את כפתור "נהל חשבון" במובייל (hidden), ומציג בדסקטופ (md:flex)
             userButtonPopoverActionButton__manageAccount: "hidden md:flex"
         }
     }
@@ -68,22 +60,21 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                 profileSection__emailAddresses: "hidden",
                 profileSection__connectedAccounts: "hidden",
 
-                // 2. תיקון הרקע השקוף (Backdrop)
-                // השימוש ב-! חשוב מאוד ב-Dark Mode כדי לדרוס את הצבע האטום של Clerk
-                modalBackdrop: "!bg-black/50 !backdrop-blur-sm",
+                // 2. עיצוב המודל (שימוש ב-Tailwind כדי להבדיל בין דסקטופ למובייל)
+                // במובייל: רוחב מלא. בדסקטופ (md): מותאם לתוכן (fit) עם מינימום רוחב
+                cardBox: "w-full h-full md:w-fit md:h-auto md:min-w-[700px] md:max-w-[90vw]",
+                
+                // מוודא שהגלילה לא תופסת גובה קבוע בדסקטופ
+                scrollBox: "h-full md:h-auto",
+                pageScrollBox: "h-full md:h-auto",
 
-                // 3. הגדרות גודל חכמות (Tailwind)
-                // w-full h-full: במובייל החלון תופס את כל המסך.
-                // md:!h-fit: בדסקטופ הגובה מתכווץ לתוכן (מונע את הרווח הריק למטה).
-                // md:!w-auto: בדסקטופ הרוחב נקבע לפי התוכן (ולא רוחב מלא).
-                // md:!min-w-[800px]: שומר על רוחב מינימלי יפה בדסקטופ כדי שהתפריט לא יהיה צפוף.
-                cardBox: "w-full h-full md:!h-fit md:!w-auto md:!min-w-[800px] md:!max-w-[90vw]",
+                // 3. רקע כהה ומטושטש
+                modalBackdrop: {
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    backdropFilter: "blur(4px)"
+                },
 
-                // מונע גלילה פנימית מיותרת שגורמת לגובה להימתח
-                scrollBox: "h-full md:!h-auto",
-                pageScrollBox: "h-full md:!h-auto",
-
-                // 4. ביטול מסגרת בכפתור "עדכן פרופיל" במעבר עכבר
+                // 4. ביטול מסגרת בכפתור Hover
                 "profileSectionPrimaryButton:hover": {
                     border: "none",
                     boxShadow: "none",
@@ -124,9 +115,8 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     </div>
                 </div>
 
-                {/* Mobile Layout - Compressed */}
+                {/* Mobile Layout */}
                 <div className="flex md:hidden items-center justify-between w-full px-1">
-                    {/* Menu Button */}
                     <div className="flex items-center gap-2">
                         <Button
                             size="icon"
@@ -138,19 +128,18 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         >
                             <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                         </Button>
-
-                        {/* Mobile User Button - uses same props */}
+                        
+                        {/* Mobile User Button */}
                         <UserButton
                             userProfileProps={userProfileProps}
                             appearance={userButtonAppearance}
                         />
-
+                        
                         <div className="mr-2">
                             <ModeToggle />
                         </div>
                     </div>
 
-                    {/* Date Selector */}
                     <div className="flex items-center gap-1 bg-white/50 dark:bg-slate-800/50 rounded-full p-1 border border-white/40 dark:border-slate-700/50 shadow-sm">
                         <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 rounded-full dark:text-gray-200 dark:hover:bg-slate-700">
                             <ChevronRight className="h-4 w-4" />
@@ -176,7 +165,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
                 {/* Center Section - Logo */}
                 <div className="hidden md:flex flex-1 justify-center items-center opacity-80 hover:opacity-100 transition-opacity">
-                    {/* Light Mode Logo */}
                     <Image
                         src="/K-LOGO.png"
                         alt="Keseflow"
@@ -185,7 +173,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         className="h-8 w-auto object-contain drop-shadow-sm dark:hidden"
                         priority
                     />
-                    {/* Dark Mode Logo */}
                     <Image
                         src="/K-LOGO2.png"
                         alt="Keseflow"
@@ -196,10 +183,9 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     />
                 </div>
 
-                {/* Left Section - Mode Switcher & Profile */}
+                {/* Left Section */}
                 <div className="hidden md:flex items-center justify-end gap-4">
                     <ModeToggle />
-
                     <div className="flex bg-gray-100/50 p-1.5 rounded-full border border-white/50 shadow-inner dark:bg-slate-800/50 dark:border-slate-700/50">
                         <button
                             onClick={() => handleToggle('PERSONAL')}
