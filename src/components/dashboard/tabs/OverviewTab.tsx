@@ -548,14 +548,13 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     <CardContent className="space-y-4">
                                         <div className="space-y-2">
                                             <Label className="text-right block">יתרה התחלתית (עו"ש)</Label>
-                                            <Input
+                                            <FormattedNumberInput
                                                 value={initialBalance}
                                                 onChange={(e) => {
                                                     const val = parseFloat(e.target.value)
                                                     if (val < 0) return
                                                     setInitialBalance(e.target.value)
                                                 }}
-                                                type="number"
                                                 min="0"
                                                 dir="ltr"
                                                 className="text-right"
@@ -564,14 +563,13 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                         </div>
                                         <div className="space-y-2">
                                             <Label className="text-right block">יתרה התחלתית</Label>
-                                            <Input
+                                            <FormattedNumberInput
                                                 value={initialSavings}
                                                 onChange={(e) => {
                                                     const val = parseFloat(e.target.value)
                                                     if (val < 0) return
                                                     setInitialSavings(e.target.value)
                                                 }}
-                                                type="number"
                                                 min="0"
                                                 dir="ltr"
                                                 className="text-right"
