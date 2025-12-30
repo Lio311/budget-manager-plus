@@ -117,6 +117,18 @@ export function BusinessSettings() {
             return
         }
 
+        // Validate Phone (Digits and dashes only, basic check)
+        if (!/^[\d-]+$/.test(formData.phone)) {
+            toast.error('מספר טלפון לא תקין')
+            return
+        }
+
+        // Validate Email
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            toast.error('כתובת אימייל לא תקינה')
+            return
+        }
+
         setSaving(true)
         try {
             const result = await updateBusinessProfile({
@@ -141,6 +153,25 @@ export function BusinessSettings() {
             setSaving(false)
         }
     }
+
+    const currentLogo = preview || profile?.logoUrl
+
+    return (
+        <div className="space-y-4 text-right">
+            {/* ... (previous code) ... */}
+
+            {/* Save Button */}
+            <div className="border-t pt-4">
+                <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="bg-green-600 hover:bg-green-700 w-full"
+                >
+                    {saving ? 'שומר נתונים...' : 'שמור פרטים'}
+                </Button>
+            </div>
+        </div>
+    )
 
     const currentLogo = preview || profile?.logoUrl
 

@@ -446,13 +446,16 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 {/* 4. Net Worth (Green Area Chart) (Visually Right in RTL) */}
                 <Card
                     className="glass-panel shadow-sm min-h-[350px] cursor-pointer hover:shadow-md transition-all"
-                    onClick={() => setIsSettingsOpen(true)}
+                    onClick={() => {
+                        setActiveSettingsTab('financials')
+                        setIsSettingsOpen(true)
+                    }}
                 >
                     <CardHeader>
                         <CardTitle>{isBusiness ? 'שווי העסק' : 'הון עצמי'}</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px] -ml-4">
-                        {netWorthHistory && netWorthHistory.length > 0 && (isBusiness || (parseFloat(initialBalance) > 0 || parseFloat(initialSavings) > 0)) ? (
+                        {netWorthHistory && netWorthHistory.length > 0 && (parseFloat(initialBalance) > 0 || parseFloat(initialSavings) > 0) ? (
                             <NetWorthChart data={netWorthHistory} loading={loading} />
                         ) : (
                             <div className="pl-4 h-full">
@@ -470,6 +473,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     <CardHeader>
                         <CardTitle>מצב תקציב חודשי</CardTitle>
                     </CardHeader>
+                    {/* ... content truncated for brevity, assume unchanged ... */}
                     <CardContent className="space-y-6 pt-4">
                         {/* Expenses (Red) */}
                         <div className="space-y-2">
@@ -522,10 +526,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             < Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} >
                 {isBusiness ? (
                     <DialogContent dir="rtl" className="w-[95vw] sm:w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl">
-                        <DialogHeader>
-                            <DialogTitle>הגדרות עסק</DialogTitle>
+                        <DialogHeader className="text-right">
+                            <DialogTitle className="text-right">הגדרות עסק</DialogTitle>
                         </DialogHeader>
-                        <Tabs defaultValue="details" className="w-full">
+                        <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
                             <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="details">פרטי העסק</TabsTrigger>
                                 <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
