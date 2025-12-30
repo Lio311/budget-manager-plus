@@ -236,7 +236,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => setIsSettingsOpen(true)}
+                            onClick={() => {
+                                setActiveSettingsTab('details')
+                                setIsSettingsOpen(true)
+                            }}
                             className="bg-white hover:bg-gray-50 text-gray-700"
                             title="הגדרות תצוגה"
                         >
