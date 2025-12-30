@@ -232,15 +232,17 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                 {/* Buttons Group - Second in DOM -> Left in RTL */}
                 <div className="flex gap-2 items-center w-full md:w-auto justify-end md:justify-end">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setIsSettingsOpen(true)}
-                        className="bg-white hover:bg-gray-50 text-gray-700"
-                        title="הגדרות תצוגה"
-                    >
-                        <Settings className="w-4 h-4" />
-                    </Button>
+                    {isBusiness && (
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setIsSettingsOpen(true)}
+                            className="bg-white hover:bg-gray-50 text-gray-700"
+                            title="הגדרות תצוגה"
+                        >
+                            <Settings className="w-4 h-4" />
+                        </Button>
+                    )}
                     <FinancialAdvisorButton financialData={aiFinancialData} />
                     <FeedbackButton />
                 </div>
@@ -435,7 +437,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card >
 
                 {/* 4. Net Worth (Green Area Chart) (Visually Right in RTL) */}
-                <Card className="glass-panel shadow-sm min-h-[350px]">
+                <Card
+                    className="glass-panel shadow-sm min-h-[350px] cursor-pointer hover:shadow-md transition-all"
+                    onClick={() => setIsSettingsOpen(true)}
+                >
                     <CardHeader>
                         <CardTitle>הון עצמי</CardTitle>
                     </CardHeader>
@@ -444,7 +449,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <NetWorthChart data={netWorthHistory} loading={loading} />
                         ) : (
                             <div className="pl-4 h-full">
-                                <EmptyChartState title="הון עצמי" />
+                                <EmptyChartState
+                                    title="הגדרת הון עצמי"
+                                    subtitle="לחץ כאן כדי להגדיר יתרה התחלתית ולהציג נתונים"
+                                />
                             </div>
                         )}
                     </CardContent>
