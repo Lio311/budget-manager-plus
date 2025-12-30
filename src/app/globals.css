@@ -679,9 +679,10 @@ div[class*="cl-branding"] {
     /* Keep transparent if needed */
   }
 
-  /* Hide "Manage Account" (ניהול חשבון) button in UserButton Popover on Mobile */
+  /* Hide "Manage Account" (ניהול חשבון / נהל חשבון) button in UserButton Popover on Mobile */
   .cl-userButtonPopoverActionButton[aria-label="Manage account"],
   .cl-userButtonPopoverActionButton[aria-label="ניהול חשבון"],
+  .cl-userButtonPopoverActionButton[aria-label="נהל חשבון"],
   button[data-localization-key="userButton.action.manageAccount"] {
     display: none !important;
   }
