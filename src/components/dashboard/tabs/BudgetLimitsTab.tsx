@@ -211,7 +211,7 @@ export function BudgetLimitsTab() {
                     <Button
                         onClick={handleSmartRecommendations}
                         disabled={activeDefaults}
-                        className="relative w-full h-full min-h-[140px] p-0 overflow-hidden border-0 rounded-2xl bg-gradient-to-br from-yellow-50/50 to-orange-50/50 hover:from-yellow-100/50 hover:to-orange-100/50 shadow-sm hover:shadow-md transition-all duration-300 group ring-1 ring-yellow-100 hover:ring-yellow-200"
+                        className="relative w-full h-full min-h-[140px] p-0 overflow-hidden border-0 rounded-2xl bg-gradient-to-br from-yellow-50/50 to-orange-50/50 dark:from-slate-800 dark:to-slate-900 hover:from-yellow-100/50 hover:to-orange-100/50 dark:hover:from-slate-800 dark:hover:to-slate-800 shadow-sm hover:shadow-md transition-all duration-300 group ring-1 ring-yellow-100 hover:ring-yellow-200 dark:ring-slate-700 dark:hover:ring-slate-600"
                         variant="ghost"
                     >
                         {/* Decorative background sparkles */}
@@ -219,15 +219,18 @@ export function BudgetLimitsTab() {
                         <Sparkles className="absolute -bottom-8 -right-8 w-24 h-24 text-orange-200/10 -rotate-12 transition-transform duration-700 group-hover:-rotate-45" />
 
                         <div className="relative flex flex-col items-center justify-center gap-3 w-full h-full py-4 z-10">
-                            <div className="p-3 bg-white rounded-full shadow-sm ring-1 ring-yellow-100 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
-                                {activeDefaults ? <RefreshCw className="h-6 w-6 text-yellow-600 animate-spin" /> : <Sparkles className="h-6 w-6 text-yellow-500 fill-yellow-200" />}
+                            <div className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm ring-1 ring-yellow-100 dark:ring-yellow-900/30 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
+                                {activeDefaults ? <RefreshCw className="h-6 w-6 text-yellow-600 dark:text-yellow-400 animate-spin" /> : <Sparkles className="h-6 w-6 text-yellow-500 fill-yellow-200 dark:text-yellow-400 dark:fill-yellow-900/50" />}
                             </div>
                             <div className="flex flex-col items-center text-center gap-1 px-2">
-                                <span className="text-base font-bold text-gray-800 group-hover:text-yellow-800 transition-colors">
+                                <span className="text-base font-bold text-gray-800 dark:text-gray-100 group-hover:text-yellow-800 dark:group-hover:text-yellow-200 transition-colors">
                                     {activeDefaults ? 'מעדכן תקציב...' : 'המלץ לי על תקציב'}
                                 </span>
-                                <span className="text-[11px] text-gray-500 font-normal max-w-[180px] leading-tight group-hover:text-gray-600">
+                                <span className="text-[11px] text-gray-500 dark:text-gray-400 font-normal max-w-[180px] leading-tight group-hover:text-gray-600 dark:group-hover:text-gray-300">
                                     ה-AI ינתח את ההיסטוריה שלך ויציע תקציב חכם
+                                </span>
+                                <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-2 italic">
+                                    * המידע אינו מהווה ייעוץ פיננסי
                                 </span>
                             </div>
                         </div>
