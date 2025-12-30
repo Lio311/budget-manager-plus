@@ -6,27 +6,15 @@ import { getMonthName } from '@/lib/utils'
 import { ChevronLeft, ChevronRight, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { FeedbackButton } from './FeedbackButton'
 import { ModeToggle } from '@/components/mode-toggle'
 import { MonthYearPicker } from './MonthYearPicker'
 import Image from 'next/image'
 
-const CURRENCIES = ['₪', '$', '€', '£']
-
-interface DashboardHeaderProps {
-    onMenuToggle?: () => void
-    menuOpen?: boolean
-    userPlan?: 'PERSONAL' | 'BUSINESS'
-    hasPersonalAccess?: boolean
-    hasBusinessAccess?: boolean
-}
-
-export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PERSONAL', hasPersonalAccess = true, hasBusinessAccess = false }: DashboardHeaderProps) {
-    const { month, year, currency, budgetType, setMonth, setYear, setCurrency, setBudgetType } = useBudget()
+export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PERSONAL', hasPersonalAccess = true, hasBusinessAccess = false }: any) {
+    const { month, year, budgetType, setMonth, setYear, setBudgetType } = useBudget()
     const router = useRouter()
 
     const handleToggle = (type: 'PERSONAL' | 'BUSINESS') => {
-        // Check if user has access to the requested plan
         if (type === 'BUSINESS' && !hasBusinessAccess) {
             router.push('/subscribe?plan=BUSINESS')
             return
@@ -56,37 +44,42 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
         }
     }
 
-    // הגדרות עיצוב ל-UserButton כדי למנוע כפילות קוד
+    // --- הגדרות עיצוב לכפתור הפופ-אפ הקטן (Dropdown) ---
     const userButtonAppearance = {
         elements: {
-            // מסתיר את כפתור "נהל חשבון" (גלגל שיניים) בתפריט הקטן - רק במובייל
-            // במחשב (md) הוא יופיע (flex)
+            // מסתיר את כפתור "נהל חשבון" במובייל (hidden), ומציג בדסקטופ (md:flex)
             userButtonPopoverActionButton__manageAccount: "hidden md:flex"
         }
     }
 
+    // --- הגדרות עיצוב לחלונית הפרופיל הגדולה (Modal) ---
     const userProfileProps = {
         appearance: {
             elements: {
-                // הסתרת מדורים לא רצויים בתוך הפרופיל
+                // 1. הסתרת אלמנטים לא רצויים
                 profileSection__emailAddresses: "hidden",
                 profileSection__connectedAccounts: "hidden",
 
-                // עיצוב הרקע של המודל (כהה ומטושטש)
+                // 2. עיצוב המודל (שימוש ב-Tailwind כדי להבדיל בין דסקטופ למובייל)
+                // במובייל: רוחב מלא. בדסקטופ (md): מותאם לתוכן (fit) עם מינימום רוחב
+                cardBox: "w-full h-full md:w-fit md:h-auto md:min-w-[700px] md:max-w-[90vw]",
+                
+                // מוודא שהגלילה לא תופסת גובה קבוע בדסקטופ
+                scrollBox: "h-full md:h-auto",
+                pageScrollBox: "h-full md:h-auto",
+
+                // 3. רקע כהה ומטושטש
                 modalBackdrop: {
                     backgroundColor: "rgba(0,0,0,0.5)",
                     backdropFilter: "blur(4px)"
                 },
 
-                // ביטול המסגרת והצללית בכפתור "עדכן פרופיל" במעבר עכבר
+                // 4. ביטול מסגרת בכפתור Hover
                 "profileSectionPrimaryButton:hover": {
                     border: "none",
                     boxShadow: "none",
                     outline: "none"
                 }
-
-                // הערה: הוסרו כאן כל הגדרות הגודל (fit-content) וההסתרה של ה-navbar
-                // כדי שהמודל יחזור לתצוגה התקינה והרחבה שלו
             }
         }
     }
@@ -122,9 +115,8 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     </div>
                 </div>
 
-                {/* Mobile Layout - Compressed */}
+                {/* Mobile Layout */}
                 <div className="flex md:hidden items-center justify-between w-full px-1">
-                    {/* Menu Button */}
                     <div className="flex items-center gap-2">
                         <Button
                             size="icon"
@@ -136,19 +128,18 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         >
                             <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                         </Button>
-
+                        
                         {/* Mobile User Button */}
                         <UserButton
                             userProfileProps={userProfileProps}
                             appearance={userButtonAppearance}
                         />
-
+                        
                         <div className="mr-2">
                             <ModeToggle />
                         </div>
                     </div>
 
-                    {/* Date Selector */}
                     <div className="flex items-center gap-1 bg-white/50 dark:bg-slate-800/50 rounded-full p-1 border border-white/40 dark:border-slate-700/50 shadow-sm">
                         <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 rounded-full dark:text-gray-200 dark:hover:bg-slate-700">
                             <ChevronRight className="h-4 w-4" />
@@ -174,7 +165,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
                 {/* Center Section - Logo */}
                 <div className="hidden md:flex flex-1 justify-center items-center opacity-80 hover:opacity-100 transition-opacity">
-                    {/* Light Mode Logo */}
                     <Image
                         src="/K-LOGO.png"
                         alt="Keseflow"
@@ -183,7 +173,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         className="h-8 w-auto object-contain drop-shadow-sm dark:hidden"
                         priority
                     />
-                    {/* Dark Mode Logo */}
                     <Image
                         src="/K-LOGO2.png"
                         alt="Keseflow"
@@ -194,10 +183,9 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     />
                 </div>
 
-                {/* Left Section - Mode Switcher & Profile */}
+                {/* Left Section */}
                 <div className="hidden md:flex items-center justify-end gap-4">
                     <ModeToggle />
-
                     <div className="flex bg-gray-100/50 p-1.5 rounded-full border border-white/50 shadow-inner dark:bg-slate-800/50 dark:border-slate-700/50">
                         <button
                             onClick={() => handleToggle('PERSONAL')}
