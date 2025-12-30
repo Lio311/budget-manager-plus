@@ -428,3 +428,15 @@ button.cl-modalCloseButton,
 .dark .cl-avatarBox img {
   border: 2px solid #ffffff !important;
 }
+
+/* Make Clerk modals more compact - fit to content */
+.dark .cl-userProfile-root,
+.dark .cl-modal {
+  max-width: 600px !important;
+  width: auto !important;
+}
+
+.dark .cl-pageScrollBox {
+  min-height: auto !important;
+  max-height: 80vh !important;
+}
