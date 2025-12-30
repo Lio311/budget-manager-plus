@@ -376,12 +376,14 @@ button.cl-modalCloseButton,
   color: #94a3b8 !important;
 }
 
-/* Menu items in popover */
+/* Menu items in popover - Fix hover background consistency */
 .dark .cl-userButtonPopoverCard .cl-userButtonPopoverActionButton,
 .dark .cl-userButtonPopoverCard button {
   color: #e2e8f0 !important;
   border-radius: 8px !important;
   transition: all 0.2s ease !important;
+  border: 1px solid transparent !important;
+  /* Prevent layout shift */
 }
 
 .dark .cl-userButtonPopoverCard .cl-userButtonPopoverActionButton:hover,
@@ -390,29 +392,42 @@ button.cl-modalCloseButton,
   color: #ffffff !important;
 }
 
+/* Ensure ALL children of the button have transparent background on hover to avoid "boxes" */
+.dark .cl-userButtonPopoverCard .cl-userButtonPopoverActionButton:hover *,
+.dark .cl-userButtonPopoverCard button:hover * {
+  background-color: transparent !important;
+}
+
 /* Sidebar specifically - lighter background for better contrast */
 .dark .cl-navbar,
 .dark .cl-userProfile-navbar {
-  background-color: #1e293b !important;
-  border-left: 1px solid #475569 !important;
+  background-color: #0f172a !important;
+  /* Match main modal background for seamless look */
+  border-left: 1px solid #334155 !important;
+  /* Softer border */
 }
 
 /* Sidebar menu items */
 .dark .cl-navbarButton,
 .dark .cl-profileSection__emailAddresses,
 .dark .cl-profileSection__connectedAccounts {
-  color: #e2e8f0 !important;
+  color: #94a3b8 !important;
+  /* Muted text for inactive */
   background-color: transparent !important;
 }
 
 .dark .cl-navbarButton:hover {
-  background-color: #334155 !important;
-  color: #ffffff !important;
+  background-color: #1e293b !important;
+  /* Subtle hover */
+  color: #f8fafc !important;
 }
 
 .dark .cl-navbarButton[data-active="true"] {
-  background-color: #475569 !important;
-  color: #ffffff !important;
+  background-color: #1e293b !important;
+  /* Subtle active state (same as hover) */
+  color: #ffff !important;
+  border-right: 2px solid #22c55e !important;
+  /* Green accent line for active state instead of full heavy background */
 }
 
 /* Inputs */
@@ -430,7 +445,7 @@ button.cl-modalCloseButton,
 .dark .cl-navbarButton[data-active="true"],
 .dark .cl-menuItem:hover,
 .dark .cl-actionCard:hover {
-  background-color: #334155 !important;
+  background-color: #1e293b !important;
   color: white !important;
 }
 
