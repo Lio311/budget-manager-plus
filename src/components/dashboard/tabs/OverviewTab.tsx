@@ -363,7 +363,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                     return (
                                                         <div className="glass-panel px-3 py-2 border border-white/50 shadow-xl rounded-xl backdrop-blur-xl text-right">
                                                             <p className="font-bold text-[#323338] dark:text-gray-100 text-sm mb-0.5">{data.name}</p>
-                                                            <p className="font-mono text-gray-600 font-medium text-xs">
+                                                            <p className="font-mono text-gray-600 dark:text-white font-medium text-xs">
                                                                 ₪{Number(data.value).toLocaleString()}
                                                             </p>
                                                         </div>
@@ -419,7 +419,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                     return (
                                                         <div className="glass-panel px-3 py-2 border border-white/50 dark:border-slate-700/50 shadow-xl rounded-xl backdrop-blur-xl text-right dark:bg-slate-800/90">
                                                             <p className="font-bold text-[#323338] dark:text-gray-100 text-sm mb-0.5">{label}</p>
-                                                            <p className="font-mono text-gray-600 dark:text-gray-300 font-medium text-xs">
+                                                            <p className="font-mono text-gray-600 dark:text-white font-medium text-xs">
                                                                 ₪{Number(payload[0].value).toLocaleString()}
                                                             </p>
                                                         </div>
