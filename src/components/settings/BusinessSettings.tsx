@@ -161,11 +161,11 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
     return (
         <div className="space-y-4 text-right">
             {/* Logo Section */}
-            <div className="flex flex-col items-start">
-                <label className="block text-sm font-medium text-gray-700 mb-2 text-right w-full">
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 text-right">
                     לוגו העסק
                 </label>
-                <p className="text-xs text-gray-500 mb-3 text-right w-full">
+                <p className="text-xs text-gray-500 mb-3 text-right">
                     הלוגו ישמש בחשבוניות ובמסמכים שהמערכת תפיק
                 </p>
 
@@ -189,7 +189,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                 ) : (
                     <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 cursor-pointer transition-colors flex flex-col items-center justify-center gap-2 bg-gray-50"
+                        className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 cursor-pointer transition-colors flex flex-col items-center justify-center gap-2 bg-gray-50 inline-flex"
                     >
                         <ImageIcon className="h-12 w-12 text-gray-400" />
                         <p className="text-sm text-gray-500">לחץ להעלאת לוגו</p>
@@ -206,14 +206,16 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                 />
 
                 {!currentLogo && (
-                    <Button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploading}
-                        className="bg-blue-600 hover:bg-blue-700 mt-3"
-                    >
-                        {uploading ? 'מעלה...' : 'העלה לוגו'}
-                        <Upload className="h-4 w-4 mr-2" />
-                    </Button>
+                    <div className="mt-3">
+                        <Button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                            className="bg-blue-600 hover:bg-blue-700"
+                        >
+                            {uploading ? 'מעלה...' : 'העלה לוגו'}
+                            <Upload className="h-4 w-4 mr-2" />
+                        </Button>
+                    </div>
                 )}
             </div>
 
@@ -314,6 +316,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                     onClick={handleSave}
                     disabled={saving}
                     className="bg-green-600 hover:bg-green-700 w-full"
+                    dir="rtl"
                 >
                     {saving ? 'שומר שינויים...' : 'שמור פרטים'}
                 </Button>
