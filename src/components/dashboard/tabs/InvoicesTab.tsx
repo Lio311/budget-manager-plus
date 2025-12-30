@@ -178,8 +178,8 @@ export function InvoicesTab() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">חשבוניות</h2>
-                    <p className="text-sm text-gray-500 mt-1">ניהול חשבוניות ללקוחות</p>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">חשבוניות</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">ניהול חשבוניות ללקוחות</p>
                 </div>
 
                 {/* Desktop Button */}
@@ -202,7 +202,7 @@ export function InvoicesTab() {
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-3xl rounded-xl" dir="rtl">
                             <DialogTitle className="sr-only">הוספת חשבונית</DialogTitle>
                             <div className="p-2">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת חשבונית חדשה</h3>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">יצירת חשבונית חדשה</h3>
                                 <InvoiceForm
                                     clients={clients}
                                     onSuccess={() => {
@@ -224,7 +224,7 @@ export function InvoicesTab() {
                     placeholder="חיפוש לפי שם לקוח או מספר חשבונית..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                 />
             </div>
 
@@ -262,12 +262,12 @@ export function InvoicesTab() {
             {/* Invoices List */}
             <div className="flex flex-col gap-3">
                 {paginatedInvoices.length === 0 ? (
-                    <div className="text-center py-10 bg-white rounded-lg border border-gray-200 text-gray-500">
+                    <div className="text-center py-10 bg-white rounded-lg border border-gray-200 text-gray-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-400">
                         {searchTerm ? 'לא נמצאו חשבוניות' : 'אין חשבוניות עדיין. צור חשבונית חדשה כדי להתחיל.'}
                     </div>
                 ) : (
                     paginatedInvoices.map((inv) => (
-                        <div key={inv.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group">
+                        <div key={inv.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group dark:bg-slate-800 dark:border-slate-700">
                             {/* Mobile Layout: Stacked */}
                             {/* Top: Client + Status */}
                             <div className="flex items-start justify-between w-full md:w-auto md:flex-1 gap-4">
@@ -276,7 +276,7 @@ export function InvoicesTab() {
                                         {inv.clientName?.[0] || '?'}
                                     </div>
                                     <div>
-                                        <div className="font-bold text-gray-900 flex items-center gap-2">
+                                        <div className="font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                                             {inv.clientName}
                                         </div>
                                         <div className="text-xs text-gray-500">
@@ -322,7 +322,7 @@ export function InvoicesTab() {
                                             inv.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
                                                 inv.status === 'PAID' ? 'bg-green-50 text-green-700' :
                                                     inv.status === 'OVERDUE' ? 'bg-red-50 text-red-700' :
-                                                        'bg-gray-50 text-gray-700'
+                                                        'bg-gray-50 text-gray-700 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600'
                                     )}>
                                         <span className="w-full text-center font-medium">
                                             <SelectValue />
@@ -339,9 +339,9 @@ export function InvoicesTab() {
                             </div>
 
                             {/* Bottom/Right: Amount + Actions */}
-                            <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto md:flex-1 mt-2 md:mt-0 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100">
+                            <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto md:flex-1 mt-2 md:mt-0 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-slate-700">
                                 <div className="text-right md:text-left">
-                                    <div className="font-bold text-gray-900 text-lg">{formatCurrency(inv.totalAmount)}</div>
+                                    <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">{formatCurrency(inv.totalAmount)}</div>
                                     <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(inv.totalAmount - (inv.vatAmount || 0))}</div>
                                 </div>
                                 <Button variant="outline" size="sm" onClick={() => handleDownloadPDF(inv.id)} className="gap-2">
@@ -355,7 +355,7 @@ export function InvoicesTab() {
             </div>
 
             {totalPages > 1 && (
-                <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
+                <div className="p-4 border-t border-gray-100 dark:border-slate-700 flex justify-center direction-ltr">
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}

@@ -174,8 +174,8 @@ export function QuotesTab() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">הצעות מחיר</h2>
-                    <p className="text-sm text-gray-500 mt-1">ניהול הצעות מחיר ללקוחות</p>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">הצעות מחיר</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">ניהול הצעות מחיר ללקוחות</p>
                 </div>
 
                 {/* Desktop Button */}
@@ -190,7 +190,7 @@ export function QuotesTab() {
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-3xl rounded-xl" dir="rtl">
                             <DialogTitle className="sr-only">הוספת הצעת מחיר</DialogTitle>
                             <div className="p-2">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת הצעת מחיר חדשה</h3>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">יצירת הצעת מחיר חדשה</h3>
                                 <QuoteForm
                                     clients={clients}
                                     onSuccess={() => {
@@ -212,7 +212,7 @@ export function QuotesTab() {
                     placeholder="חיפוש לפי שם לקוח או מספר הצעה..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                 />
             </div>
 
@@ -241,12 +241,12 @@ export function QuotesTab() {
             {/* List */}
             <div className="flex flex-col gap-3">
                 {paginatedQuotes.length === 0 ? (
-                    <div className="text-center py-10 bg-white rounded-lg border border-gray-200 text-gray-500">
+                    <div className="text-center py-10 bg-white rounded-lg border border-gray-200 text-gray-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-400">
                         {searchTerm ? 'לא נמצאו הצעות מחיר' : 'אין הצעות מחיר עדיין. צור הצעת מחיר חדשה כדי להתחיל.'}
                     </div>
                 ) : (
                     paginatedQuotes.map((quote) => (
-                        <div key={quote.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group">
+                        <div key={quote.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group dark:bg-slate-800 dark:border-slate-700">
                             {/* Mobile Layout: Stacked */}
                             {/* Top: Client + Status */}
                             <div className="flex items-start justify-between w-full md:w-auto md:flex-1">
@@ -255,7 +255,7 @@ export function QuotesTab() {
                                         {quote.clientName?.[0] || '?'}
                                     </div>
                                     <div>
-                                        <div className="font-bold text-gray-900 flex items-center gap-2">
+                                        <div className="font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                                             {quote.clientName}
                                         </div>
                                         <div className="text-xs text-gray-500">
@@ -308,7 +308,7 @@ export function QuotesTab() {
                                             quote.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
                                                 quote.status === 'ACCEPTED' ? 'bg-green-50 text-green-700' :
                                                     quote.status === 'EXPIRED' ? 'bg-orange-50 text-orange-700' :
-                                                        'bg-gray-50 text-gray-700'
+                                                        'bg-gray-50 text-gray-700 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600'
                                     )}>
                                         <span className="w-full text-center font-medium">
                                             <SelectValue />
@@ -325,9 +325,9 @@ export function QuotesTab() {
                             </div>
 
                             {/* Bottom/Right: Amount + Actions */}
-                            <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto md:flex-1 mt-2 md:mt-0 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100">
+                            <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto md:flex-1 mt-2 md:mt-0 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-slate-700">
                                 <div className="text-right md:text-left">
-                                    <div className="font-bold text-gray-900 text-lg">{formatCurrency(quote.totalAmount)}</div>
+                                    <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">{formatCurrency(quote.totalAmount)}</div>
                                     <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
                                 </div>
                                 <Button variant="outline" size="sm" onClick={() => handleDownloadPDF(quote.id)} className="gap-2">
@@ -341,7 +341,7 @@ export function QuotesTab() {
             </div>
 
             {totalPages > 1 && (
-                <div className="p-4 border-t border-gray-100 flex justify-center direction-ltr">
+                <div className="p-4 border-t border-gray-100 dark:border-slate-700 flex justify-center direction-ltr">
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}

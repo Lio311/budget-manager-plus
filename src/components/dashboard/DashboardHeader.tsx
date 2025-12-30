@@ -93,6 +93,9 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                         </Button>
                         <UserButton />
+                        <div className="mr-2">
+                            <ModeToggle />
+                        </div>
                     </div>
 
                     {/* Date Selector */}

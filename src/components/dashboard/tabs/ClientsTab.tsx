@@ -199,20 +199,20 @@ export function ClientsTab() {
                     placeholder="חיפוש לקוח..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                 />
             </div>
 
             {/* Form */}
             {showForm && (
-                <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 dark:bg-slate-800 dark:border-slate-700">
                     <h3 className="text-lg font-semibold mb-4">
                         {editingClient ? 'עריכת לקוח' : 'לקוח חדש'}
                     </h3>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     שם לקוח *
                                 </label>
                                 <input
@@ -220,12 +220,12 @@ export function ClientsTab() {
                                     required
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                                 />
                                 {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     ח.פ / ע.מ
                                 </label>
                                 <input
@@ -237,24 +237,24 @@ export function ClientsTab() {
                                             setFormData({ ...formData, taxId: value })
                                         }
                                     }}
-                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.taxId ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.taxId ? 'border-red-500' : 'border-gray-300'}`}
                                 />
                                 {errors.taxId && <p className="text-red-500 text-xs mt-1">{errors.taxId}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     אימייל
                                 </label>
                                 <input
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                                 />
                                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     טלפון
                                 </label>
                                 <input
@@ -266,33 +266,33 @@ export function ClientsTab() {
                                             setFormData({ ...formData, phone: value })
                                         }
                                     }}
-                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
                                     dir="rtl"
                                 />
                                 {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 כתובת
                             </label>
                             <input
                                 type="text"
                                 value={formData.address}
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
+                                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                             />
                             {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 הערות
                             </label>
                             <textarea
                                 value={formData.notes}
                                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                 rows={3}
-                                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.notes ? 'border-red-500' : 'border-gray-300'}`}
+                                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.notes ? 'border-red-500' : 'border-gray-300'}`}
                             />
                             {errors.notes && <p className="text-red-500 text-xs mt-1">{errors.notes}</p>}
                         </div>
@@ -321,23 +321,23 @@ export function ClientsTab() {
                 {filteredClients.map((client: any) => (
                     <div
                         key={client.id}
-                        className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow"
+                        className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700"
                     >
                         <div className="flex justify-between items-start mb-3">
                             <div className="flex items-center gap-2">
                                 <Building2 className="h-5 w-5 text-green-600" />
-                                <h3 className="font-semibold text-lg text-gray-900">{client.name}</h3>
+                                <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{client.name}</h3>
                             </div>
                             <div className="flex gap-1">
                                 <button
                                     onClick={() => handleEdit(client)}
-                                    className="p-1 hover:bg-gray-100 rounded"
+                                    className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                 >
-                                    <Edit2 className="h-4 w-4 text-gray-600" />
+                                    <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(client.id)}
-                                    className="p-1 hover:bg-gray-100 rounded"
+                                    className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                 >
                                     <Trash2 className="h-4 w-4 text-red-600" />
                                 </button>
@@ -345,33 +345,33 @@ export function ClientsTab() {
                         </div>
 
                         {client.taxId && (
-                            <p className="text-sm text-gray-600 mb-2">ח.פ: {client.taxId}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ח.פ: {client.taxId}</p>
                         )}
 
                         {client.email && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
                                 <Mail className="h-4 w-4" />
                                 <span>{client.email}</span>
                             </div>
                         )}
 
                         {client.phone && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
                                 <Phone className="h-4 w-4" />
                                 <span>{client.phone}</span>
                             </div>
                         )}
 
-                        <div className="border-t pt-3 mt-3">
+                        <div className="border-t pt-3 mt-3 dark:border-slate-700">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">סה"כ הכנסות:</span>
+                                <span className="text-gray-600 dark:text-gray-400">סה"כ הכנסות:</span>
                                 <span className="font-semibold text-green-600">
                                     ₪{client.totalRevenue?.toLocaleString() || 0}
                                 </span>
                             </div>
                             <div className="flex justify-between text-sm mt-1">
-                                <span className="text-gray-600">עסקאות:</span>
-                                <span className="font-semibold">{client._count?.incomes || 0}</span>
+                                <span className="text-gray-600 dark:text-gray-400">עסקאות:</span>
+                                <span className="font-semibold dark:text-gray-200">{client._count?.incomes || 0}</span>
                             </div>
                         </div>
                     </div>

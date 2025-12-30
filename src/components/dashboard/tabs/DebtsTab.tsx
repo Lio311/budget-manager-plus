@@ -239,7 +239,7 @@ export function DebtsTab() {
             {/* Summary Cards */}
             <div className="grid gap-3 grid-cols-1 md:grid-cols-3">
                 <div className="monday-card p-4 border-l-4 border-l-[#00c875] dark:bg-slate-800">
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">יתרה כוללת (נטו)</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground dark:text-gray-200 mb-1">יתרה כוללת (נטו)</h3>
                     <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : stats.netDebtILS > 0 ? 'text-red-500' : 'text-green-500'}`}>
                         {loading ? '...' : formatCurrency(Math.abs(stats.netDebtILS), '₪')}
                     </div>
@@ -248,18 +248,18 @@ export function DebtsTab() {
                     </p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-[#0073ea] dark:bg-slate-800">
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">תשלום חודשי (נטו)</h3>
-                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : 'text-slate-900'}`}>
+                    <h3 className="text-sm font-medium text-muted-foreground dark:text-gray-200 mb-1">תשלום חודשי (נטו)</h3>
+                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : 'text-slate-900 dark:text-white'}`}>
                         {loading ? '...' : formatCurrency(stats.netMonthlyPaymentILS, '₪')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">התחייבות חודשית</p>
                 </div>
                 <div className="monday-card p-4 border-l-4 border-l-red-500 dark:bg-slate-800">
-                    <h3 className="text-sm font-medium text-muted-foreground mb-1">נותר לתשלום החודש</h3>
-                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : 'text-slate-900'}`}>
+                    <h3 className="text-sm font-medium text-muted-foreground dark:text-gray-200 mb-1">נותר לתשלום החודש</h3>
+                    <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : 'text-slate-900 dark:text-white'}`}>
                         {loading ? '...' : formatCurrency(stats.unpaidThisMonthILS, '₪')}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground dark:text-gray-400 mt-1">
                         {loading ? '' : `${formatCurrency(stats.paidThisMonthILS, '₪')} שולם`}
                     </p>
                 </div>
@@ -405,10 +405,10 @@ export function DebtsTab() {
                                                             </p>
                                                         </div>
                                                         <div className="grid grid-cols-1 gap-1 mt-1 text-xs text-muted-foreground">
-                                                            <span className="truncate text-slate-500">סה"כ: {formatCurrency(debt.totalAmount, getCurrencySymbol(debt.currency))}</span>
-                                                            <span className="text-slate-500">יום חיוב: {debt.dueDay}</span>
+                                                            <span className="truncate text-slate-500 dark:text-slate-400">סה"כ: {formatCurrency(debt.totalAmount, getCurrencySymbol(debt.currency))}</span>
+                                                            <span className="text-slate-500 dark:text-slate-400">יום חיוב: {debt.dueDay}</span>
                                                             {debt.paymentMethod && (
-                                                                <span className="text-slate-500">
+                                                                <span className="text-slate-500 dark:text-slate-400">
                                                                     • {debt.paymentMethod}
                                                                 </span>
                                                             )}

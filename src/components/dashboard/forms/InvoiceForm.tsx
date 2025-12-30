@@ -74,7 +74,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
         <form onSubmit={handleSubmit} className="space-y-4 p-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         מספר חשבונית *
                     </label>
                     <div className="relative">
@@ -83,7 +83,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                             required
                             value={formData.invoiceNumber}
                             onChange={(e) => setFormData({ ...formData, invoiceNumber: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                             disabled={loadingNumber}
                         />
                         {loadingNumber && (
@@ -94,14 +94,14 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                     </div>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         לקוח *
                     </label>
                     <select
                         required
                         value={formData.clientId}
                         onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                     >
                         <option value="">בחר לקוח</option>
                         {clients.map((client: any) => (
@@ -110,7 +110,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                     </select>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         תאריך הנפקה *
                     </label>
                     <DatePicker
@@ -119,7 +119,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         תאריך תשלום
                     </label>
                     <DatePicker
@@ -128,7 +128,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         סכום לפני מע"מ *
                     </label>
                     <input
@@ -138,30 +138,30 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                         step="0.01"
                         value={formData.subtotal}
                         onChange={(e) => setFormData({ ...formData, subtotal: parseFloat(e.target.value) || 0 })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         שיעור מע"מ
                     </label>
                     <select
                         value={formData.vatRate}
                         onChange={(e) => setFormData({ ...formData, vatRate: parseFloat(e.target.value) })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                     >
                         <option value="0">ללא מע"מ (0%)</option>
                         <option value="0.18">מע"מ רגיל (18%)</option>
                     </select>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         אמצעי תשלום
                     </label>
                     <select
                         value={formData.paymentMethod}
                         onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                     >
                         <option value="">בחר אמצעי תשלום</option>
                         <option value="BANK_TRANSFER">העברה בנקאית</option>
@@ -175,30 +175,30 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                 </div>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-md">
+            <div className="bg-gray-50 p-4 rounded-md dark:bg-slate-800/50">
                 <div className="flex justify-between text-sm mb-2">
-                    <span>סכום לפני מע"מ:</span>
-                    <span>₪{formData.subtotal.toLocaleString()}</span>
+                    <span className="dark:text-gray-300">סכום לפני מע"מ:</span>
+                    <span className="dark:text-gray-100">₪{formData.subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
-                    <span>מע"מ ({(formData.vatRate || 0) * 100}%):</span>
-                    <span>₪{(formData.subtotal * (formData.vatRate || 0)).toLocaleString()}</span>
+                    <span className="dark:text-gray-300">מע"מ ({(formData.vatRate || 0) * 100}%):</span>
+                    <span className="dark:text-gray-100">₪{(formData.subtotal * (formData.vatRate || 0)).toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold border-t pt-2">
-                    <span>סה"כ לתשלום:</span>
+                <div className="flex justify-between text-lg font-bold border-t pt-2 dark:border-slate-700">
+                    <span className="dark:text-gray-100">סה"כ לתשלום:</span>
                     <span className="text-purple-600">₪{total.toLocaleString()}</span>
                 </div>
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     הערות
                 </label>
                 <textarea
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                 />
             </div>
 
