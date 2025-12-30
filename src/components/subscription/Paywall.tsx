@@ -83,11 +83,11 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => window.location.href = '/dashboard'}
+                            onClick={() => window.history.back()}
                             className="text-gray-500 hover:text-gray-900 gap-1"
                         >
                             <ArrowRight className="h-4 w-4" />
-                            <span className="text-xs">חזור לממשק אישי</span>
+                            <span className="text-xs">חזרה</span>
                         </Button>
                     </div>
                 </SignedIn>
