@@ -283,7 +283,6 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                             value={newSaving.goal}
                             onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
                         />
-                        />
                     </div>
                 </div>
 
