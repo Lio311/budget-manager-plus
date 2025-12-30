@@ -21,6 +21,7 @@ import {
 import { createCoupon, deleteCoupon, deleteUser, updateSubscription, updateCoupon, resetRevenue } from '@/lib/actions/admin'
 import { toggleMaintenanceMode } from '@/lib/actions/maintenance'
 import { CountdownTimer } from '@/components/admin/CountdownTimer'
+import { UserGrowthChart } from '@/components/admin/UserGrowthChart'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 
@@ -325,7 +326,11 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                         <div className="text-2xl font-bold text-center">{feedbacks.length}</div>
                     </CardContent>
                 </Card>
-            </div>
+            </Card>
+        </div>
+
+            {/* User Growth Chart */ }
+            <UserGrowthChart users={users} />
 
             <Tabs defaultValue="users" className="space-y-4">
                 <TabsList>
