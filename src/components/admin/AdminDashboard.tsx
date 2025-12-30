@@ -326,301 +326,294 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                         <div className="text-2xl font-bold text-center">{feedbacks.length}</div>
                     </CardContent>
                 </Card>
-            </Card>
-            
-            {/* User Growth Chart */}
-            <UserGrowthChart users={users} />
-            </div>
 
-            <Tabs defaultValue="users" className="space-y-4">
+                <Tabs defaultValue="users" className="space-y-4">
+                    <TabsList>
+                        <TabsTrigger value="users">Users Management</TabsTrigger>
+                        <TabsTrigger value="coupons">Coupons</TabsTrigger>
+                        <TabsTrigger value="feedbacks">Feedbacks</TabsTrigger>
+                    </TabsList>
 
-            <Tabs defaultValue="users" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="users">Users Management</TabsTrigger>
-                    <TabsTrigger value="coupons">Coupons</TabsTrigger>
-                    <TabsTrigger value="feedbacks">Feedbacks</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="users" className="space-y-4">
-                    <Card>
-                        <CardHeader><CardTitle>Users</CardTitle></CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="text-center">Email</TableHead>
-                                        <TableHead className="text-center">Status</TableHead>
-                                        <TableHead className="text-center">Plan</TableHead>
-                                        <TableHead className="text-center">Coupon</TableHead>
-                                        <TableHead className="text-center">Start Date</TableHead>
-                                        <TableHead className="text-center">Renewal/Expiry</TableHead>
-                                        <TableHead className="text-center">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {users.map((user) => (
-                                        <TableRow key={user.id}>
-                                            <TableCell className="text-center">{user.email}</TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex flex-wrap justify-center gap-1">
-                                                    {user.subscriptions && user.subscriptions.length > 0 ? (
-                                                        user.subscriptions
-                                                            .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
-                                                            .map((sub: any) => (
-                                                                <span key={sub.id} className={`px-2 py-1 rounded-full text-xs ${sub.status === 'active' ? 'bg-green-100 text-green-800' :
-                                                                    sub.status === 'trial' ? 'bg-blue-100 text-blue-800' :
-                                                                        'bg-gray-100 text-gray-800'
-                                                                    }`}>
-                                                                    {sub.status === 'active' ? 'Active' :
-                                                                        sub.status === 'trial' ? 'Trial' :
-                                                                            sub.status || 'None'}
-                                                                </span>
-                                                            ))
-                                                    ) : (
-                                                        <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                                                            {user.subscription?.status || 'None'}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex flex-wrap justify-center gap-1">
-                                                    {(() => {
-                                                        console.log(`[CLIENT] User ${user.email}:`, {
-                                                            hasSubscriptions: !!user.subscriptions,
-                                                            subscriptionsLength: user.subscriptions?.length,
-                                                            subscriptions: user.subscriptions?.map((s: any) => ({
-                                                                id: s.id,
-                                                                planType: s.planType,
-                                                                status: s.status
-                                                            }))
-                                                        });
-
-                                                        return user.subscriptions && user.subscriptions.length > 0 ? (
+                    <TabsContent value="users" className="space-y-4">
+                        <Card>
+                            <CardHeader><CardTitle>Users</CardTitle></CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="text-center">Email</TableHead>
+                                            <TableHead className="text-center">Status</TableHead>
+                                            <TableHead className="text-center">Plan</TableHead>
+                                            <TableHead className="text-center">Coupon</TableHead>
+                                            <TableHead className="text-center">Start Date</TableHead>
+                                            <TableHead className="text-center">Renewal/Expiry</TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {users.map((user) => (
+                                            <TableRow key={user.id}>
+                                                <TableCell className="text-center">{user.email}</TableCell>
+                                                <TableCell className="text-center">
+                                                    <div className="flex flex-wrap justify-center gap-1">
+                                                        {user.subscriptions && user.subscriptions.length > 0 ? (
                                                             user.subscriptions
                                                                 .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
                                                                 .map((sub: any) => (
-                                                                    <span key={sub.id} className={`px-2 py-0.5 rounded text-[10px] font-medium border ${sub.planType === 'BUSINESS'
-                                                                        ? 'bg-purple-100 text-purple-800 border-purple-200'
-                                                                        : 'bg-orange-100 text-orange-800 border-orange-200'
+                                                                    <span key={sub.id} className={`px-2 py-1 rounded-full text-xs ${sub.status === 'active' ? 'bg-green-100 text-green-800' :
+                                                                        sub.status === 'trial' ? 'bg-blue-100 text-blue-800' :
+                                                                            'bg-gray-100 text-gray-800'
                                                                         }`}>
-                                                                        {sub.planType}
+                                                                        {sub.status === 'active' ? 'Active' :
+                                                                            sub.status === 'trial' ? 'Trial' :
+                                                                                sub.status || 'None'}
+                                                                    </span>
+                                                                ))
+                                                        ) : (
+                                                            <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
+                                                                {user.subscription?.status || 'None'}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <div className="flex flex-wrap justify-center gap-1">
+                                                        {(() => {
+                                                            console.log(`[CLIENT] User ${user.email}:`, {
+                                                                hasSubscriptions: !!user.subscriptions,
+                                                                subscriptionsLength: user.subscriptions?.length,
+                                                                subscriptions: user.subscriptions?.map((s: any) => ({
+                                                                    id: s.id,
+                                                                    planType: s.planType,
+                                                                    status: s.status
+                                                                }))
+                                                            });
+
+                                                            return user.subscriptions && user.subscriptions.length > 0 ? (
+                                                                user.subscriptions
+                                                                    .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
+                                                                    .map((sub: any) => (
+                                                                        <span key={sub.id} className={`px-2 py-0.5 rounded text-[10px] font-medium border ${sub.planType === 'BUSINESS'
+                                                                            ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                                                            : 'bg-orange-100 text-orange-800 border-orange-200'
+                                                                            }`}>
+                                                                            {sub.planType}
+                                                                        </span>
+                                                                    ))
+                                                            ) : (
+                                                                <span className="text-gray-400 text-xs">-</span>
+                                                            );
+                                                        })()}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <div className="flex flex-wrap justify-center gap-1">
+                                                        {user.subscriptions && user.subscriptions.length > 0 ? (
+                                                            user.subscriptions
+                                                                .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
+                                                                .map((sub: any) => (
+                                                                    <span key={sub.id} className="text-xs font-mono bg-gray-50 px-2 py-0.5 rounded border border-gray-200 text-gray-600">
+                                                                        {sub.couponCode || '-'}
                                                                     </span>
                                                                 ))
                                                         ) : (
                                                             <span className="text-gray-400 text-xs">-</span>
-                                                        );
-                                                    })()}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex flex-wrap justify-center gap-1">
-                                                    {user.subscriptions && user.subscriptions.length > 0 ? (
-                                                        user.subscriptions
-                                                            .filter((sub: any) => sub.status === 'active' || sub.status === 'trial')
-                                                            .map((sub: any) => (
-                                                                <span key={sub.id} className="text-xs font-mono bg-gray-50 px-2 py-0.5 rounded border border-gray-200 text-gray-600">
-                                                                    {sub.couponCode || '-'}
-                                                                </span>
-                                                            ))
-                                                    ) : (
-                                                        <span className="text-gray-400 text-xs">-</span>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                {user.subscription?.startDate ? format(new Date(user.subscription.startDate), 'dd/MM/yyyy') : '-'}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                {user.subscription?.endDate ? format(new Date(user.subscription.endDate), 'dd/MM/yyyy') : '-'}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex gap-2 justify-center">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                            setEditingUser(user)
-                                                            setIsEditDialogOpen(true)
-                                                        }}
-                                                    >
-                                                        <Edit2 className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                        onClick={() => {
-                                                            if (confirm('Are you sure you want to delete this user?')) deleteUser(user.id)
-                                                        }}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    {user.subscription?.startDate ? format(new Date(user.subscription.startDate), 'dd/MM/yyyy') : '-'}
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    {user.subscription?.endDate ? format(new Date(user.subscription.endDate), 'dd/MM/yyyy') : '-'}
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <div className="flex gap-2 justify-center">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setEditingUser(user)
+                                                                setIsEditDialogOpen(true)
+                                                            }}
+                                                        >
+                                                            <Edit2 className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                            onClick={() => {
+                                                                if (confirm('Are you sure you want to delete this user?')) deleteUser(user.id)
+                                                            }}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
 
-                <TabsContent value="coupons" className="space-y-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <CardTitle>{editingId ? 'Edit Coupon' : 'Create Coupon'}</CardTitle>
-                            {editingId && (
-                                <Button variant="outline" size="sm" onClick={() => {
-                                    setEditingId(null)
-                                    setNewCoupon({ code: '', discountPercent: 0, expiryDate: '', specificEmail: '', planType: 'PERSONAL' })
-                                }}>Cancel Edit</Button>
-                            )}
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid gap-4 md:grid-cols-6 items-end text-left" dir="ltr">
-                                <div className="space-y-2">
-                                    <Label className="text-left block">Code</Label>
-                                    <Input
-                                        className="text-left"
-                                        value={newCoupon.code}
-                                        onChange={e => setNewCoupon({ ...newCoupon, code: e.target.value })}
-                                        dir="ltr"
-                                    />
+                    <TabsContent value="coupons" className="space-y-4">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <CardTitle>{editingId ? 'Edit Coupon' : 'Create Coupon'}</CardTitle>
+                                {editingId && (
+                                    <Button variant="outline" size="sm" onClick={() => {
+                                        setEditingId(null)
+                                        setNewCoupon({ code: '', discountPercent: 0, expiryDate: '', specificEmail: '', planType: 'PERSONAL' })
+                                    }}>Cancel Edit</Button>
+                                )}
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid gap-4 md:grid-cols-6 items-end text-left" dir="ltr">
+                                    <div className="space-y-2">
+                                        <Label className="text-left block">Code</Label>
+                                        <Input
+                                            className="text-left"
+                                            value={newCoupon.code}
+                                            onChange={e => setNewCoupon({ ...newCoupon, code: e.target.value })}
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-left block">Discount %</Label>
+                                        <Input
+                                            className="text-left"
+                                            type="number"
+                                            value={newCoupon.discountPercent}
+                                            onChange={e => setNewCoupon({ ...newCoupon, discountPercent: Number(e.target.value) })}
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-left block">Expiry Date</Label>
+                                        <Input
+                                            className="text-left"
+                                            type="datetime-local"
+                                            value={newCoupon.expiryDate}
+                                            onChange={e => setNewCoupon({ ...newCoupon, expiryDate: e.target.value })}
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-left block">Specific Email</Label>
+                                        <Input
+                                            className="text-left"
+                                            type="email"
+                                            value={newCoupon.specificEmail}
+                                            onChange={e => setNewCoupon({ ...newCoupon, specificEmail: e.target.value })}
+                                            dir="ltr"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-left block">Plan Type</Label>
+                                        <select
+                                            className="w-full border rounded-md p-2 h-10"
+                                            value={newCoupon.planType}
+                                            onChange={e => setNewCoupon({ ...newCoupon, planType: e.target.value })}
+                                        >
+                                            <option value="PERSONAL">Personal</option>
+                                            <option value="BUSINESS">Business</option>
+                                            <option value="">Any</option>
+                                        </select>
+                                    </div>
+                                    <Button onClick={handleCreateOrUpdateCoupon}>{editingId ? 'Update' : 'Create'}</Button>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-left block">Discount %</Label>
-                                    <Input
-                                        className="text-left"
-                                        type="number"
-                                        value={newCoupon.discountPercent}
-                                        onChange={e => setNewCoupon({ ...newCoupon, discountPercent: Number(e.target.value) })}
-                                        dir="ltr"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-left block">Expiry Date</Label>
-                                    <Input
-                                        className="text-left"
-                                        type="datetime-local"
-                                        value={newCoupon.expiryDate}
-                                        onChange={e => setNewCoupon({ ...newCoupon, expiryDate: e.target.value })}
-                                        dir="ltr"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-left block">Specific Email</Label>
-                                    <Input
-                                        className="text-left"
-                                        type="email"
-                                        value={newCoupon.specificEmail}
-                                        onChange={e => setNewCoupon({ ...newCoupon, specificEmail: e.target.value })}
-                                        dir="ltr"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-left block">Plan Type</Label>
-                                    <select
-                                        className="w-full border rounded-md p-2 h-10"
-                                        value={newCoupon.planType}
-                                        onChange={e => setNewCoupon({ ...newCoupon, planType: e.target.value })}
-                                    >
-                                        <option value="PERSONAL">Personal</option>
-                                        <option value="BUSINESS">Business</option>
-                                        <option value="">Any</option>
-                                    </select>
-                                </div>
-                                <Button onClick={handleCreateOrUpdateCoupon}>{editingId ? 'Update' : 'Create'}</Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader><CardTitle>Active Coupons</CardTitle></CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="text-center">Code</TableHead>
-                                        <TableHead className="text-center">Discount</TableHead>
-                                        <TableHead className="text-center">Plan</TableHead>
-                                        <TableHead className="text-center">Expiry</TableHead>
-                                        <TableHead className="text-center">Email Limit</TableHead>
-                                        <TableHead className="text-center">Used</TableHead>
-                                        <TableHead className="text-center">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {coupons.map((coupon) => (
-                                        <TableRow key={coupon.id}>
-                                            <TableCell className="font-mono font-bold text-center">{coupon.code}</TableCell>
-                                            <TableCell className="text-center">{coupon.discountPercent}%</TableCell>
-                                            <TableCell className="text-center">
-                                                <span className={`px-2 py-1 rounded text-xs ${coupon.planType === 'BUSINESS' ? 'bg-purple-100 text-purple-800' :
-                                                    coupon.planType === 'PERSONAL' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'
-                                                    }`}>
-                                                    {coupon.planType || 'Any'}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                {coupon.expiryDate ? (
-                                                    <CountdownTimer targetDate={coupon.expiryDate} />
-                                                ) : 'No Expiry'}
-                                            </TableCell>
-                                            <TableCell className="text-center">{coupon.specificEmail || 'All'}</TableCell>
-                                            <TableCell className="text-center">{coupon.usedCount}</TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex gap-2 justify-center">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => startEdit(coupon)}
-                                                    >
-                                                        <Edit2 className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => deleteCoupon(coupon.id)}
-                                                    >
-                                                        <Trash2 className="h-4 w-4 text-red-500" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
+                        <Card>
+                            <CardHeader><CardTitle>Active Coupons</CardTitle></CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="text-center">Code</TableHead>
+                                            <TableHead className="text-center">Discount</TableHead>
+                                            <TableHead className="text-center">Plan</TableHead>
+                                            <TableHead className="text-center">Expiry</TableHead>
+                                            <TableHead className="text-center">Email Limit</TableHead>
+                                            <TableHead className="text-center">Used</TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {coupons.map((coupon) => (
+                                            <TableRow key={coupon.id}>
+                                                <TableCell className="font-mono font-bold text-center">{coupon.code}</TableCell>
+                                                <TableCell className="text-center">{coupon.discountPercent}%</TableCell>
+                                                <TableCell className="text-center">
+                                                    <span className={`px-2 py-1 rounded text-xs ${coupon.planType === 'BUSINESS' ? 'bg-purple-100 text-purple-800' :
+                                                        coupon.planType === 'PERSONAL' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'
+                                                        }`}>
+                                                        {coupon.planType || 'Any'}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    {coupon.expiryDate ? (
+                                                        <CountdownTimer targetDate={coupon.expiryDate} />
+                                                    ) : 'No Expiry'}
+                                                </TableCell>
+                                                <TableCell className="text-center">{coupon.specificEmail || 'All'}</TableCell>
+                                                <TableCell className="text-center">{coupon.usedCount}</TableCell>
+                                                <TableCell className="text-center">
+                                                    <div className="flex gap-2 justify-center">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => startEdit(coupon)}
+                                                        >
+                                                            <Edit2 className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => deleteCoupon(coupon.id)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
 
-                <TabsContent value="feedbacks" className="space-y-4">
-                    <Card>
-                        <CardHeader><CardTitle>User Feedback</CardTitle></CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="text-center">User</TableHead>
-                                        <TableHead className="text-center">Date</TableHead>
-                                        <TableHead className="text-center">Content</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {feedbacks.map((f) => (
-                                        <TableRow key={f.id}>
-                                            <TableCell className="text-center">{f.user.email}</TableCell>
-                                            <TableCell className="text-center">{format(new Date(f.createdAt), 'dd/MM/yyyy')}</TableCell>
-                                            <TableCell className="max-w-md truncate text-right" dir="rtl">{f.content}</TableCell>
+                    <TabsContent value="feedbacks" className="space-y-4">
+                        <Card>
+                            <CardHeader><CardTitle>User Feedback</CardTitle></CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="text-center">User</TableHead>
+                                            <TableHead className="text-center">Date</TableHead>
+                                            <TableHead className="text-center">Content</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
-        </div >
-    )
+                                    </TableHeader>
+                                    <TableBody>
+                                        {feedbacks.map((f) => (
+                                            <TableRow key={f.id}>
+                                                <TableCell className="text-center">{f.user.email}</TableCell>
+                                                <TableCell className="text-center">{format(new Date(f.createdAt), 'dd/MM/yyyy')}</TableCell>
+                                                <TableCell className="max-w-md truncate text-right" dir="rtl">{f.content}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                </Tabs>
+            </div >
+            )
 }
