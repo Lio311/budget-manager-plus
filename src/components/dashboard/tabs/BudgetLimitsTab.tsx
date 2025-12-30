@@ -218,7 +218,7 @@ export function BudgetLimitsTab() {
                         <Sparkles className="absolute -top-6 -left-6 w-32 h-32 text-yellow-200/20 rotate-12 transition-transform duration-700 group-hover:rotate-45" />
                         <Sparkles className="absolute -bottom-8 -right-8 w-24 h-24 text-orange-200/10 -rotate-12 transition-transform duration-700 group-hover:-rotate-45" />
 
-                        <div className="relative flex flex-col items-center justify-center gap-3 w-full h-full py-4 z-10">
+                        <div className="relative flex flex-col items-center justify-center gap-3 w-full h-full py-4 px-6 z-10">
                             <div className="p-3 bg-white dark:bg-slate-800 rounded-full shadow-sm ring-1 ring-yellow-100 dark:ring-yellow-900/30 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-md">
                                 {activeDefaults ? <RefreshCw className="h-6 w-6 text-yellow-600 dark:text-yellow-400 animate-spin" /> : <Sparkles className="h-6 w-6 text-yellow-500 fill-yellow-200 dark:text-yellow-400 dark:fill-yellow-900/50" />}
                             </div>
