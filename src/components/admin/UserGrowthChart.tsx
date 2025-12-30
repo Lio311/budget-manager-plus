@@ -69,9 +69,9 @@ export function UserGrowthChart({ users }: UserGrowthChartProps) {
 
     return (
         <Card className="col-span-4 shadow-none border-0">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
                 <CardTitle className="text-base font-bold">User Registration Trends</CardTitle>
-                <div className="w-[180px]">
+                <div className="w-[180px]" dir="ltr">
                     <Select value={period} onValueChange={(val) => setPeriod(val as Period)}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select Period" />
