@@ -108,6 +108,10 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                     elements: {
                                         profileSection__emailAddresses: "hidden",
                                         profileSection__connectedAccounts: "hidden",
+                                        modalBackdrop: {
+                                            backgroundColor: "rgba(0,0,0,0.5)",
+                                            backdropFilter: "blur(4px)"
+                                        },
                                         cardBox: {
                                             width: "fit-content",
                                             height: "auto",
@@ -206,6 +210,10 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                     elements: {
                                         profileSection__emailAddresses: "hidden",
                                         profileSection__connectedAccounts: "hidden",
+                                        modalBackdrop: {
+                                            backgroundColor: "rgba(0,0,0,0.5)",
+                                            backdropFilter: "blur(4px)"
+                                        },
                                         cardBox: {
                                             width: "fit-content",
                                             height: "auto",
