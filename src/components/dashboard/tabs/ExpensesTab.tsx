@@ -400,24 +400,7 @@ export function ExpensesTab() {
 
 
 
-    const handleDeleteAll = async () => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק את כל ההוצאות של אותו חודש?')) return
 
-        // Ideally we should have a loading state, but for now relies on toast
-        try {
-            const result = await deleteAllMonthlyExpenses(month, year, budgetType)
-            if (result.success) {
-                toast({ title: 'הצלחה', description: 'כל ההוצאות נמחקו בהצלחה' })
-                await mutateExpenses()
-                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            } else {
-                toast({ title: 'שגיאה', description: 'מחיקת ההוצאות נכשלה', variant: 'destructive' })
-            }
-        } catch (error) {
-            console.error(error)
-            toast({ title: 'שגיאה', description: 'שגיאה במחיקת נתונים', variant: 'destructive' })
-        }
-    }
 
     const handleRecurrenceConfirm = async (mode: 'SINGLE' | 'FUTURE') => {
         setRecurrenceDialogOpen(false)
