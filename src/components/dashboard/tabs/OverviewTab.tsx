@@ -227,8 +227,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                 {/* Title - First in DOM -> Right in RTL */}
                 <div className="flex items-center gap-2">
-                    <PieChartIcon className="w-6 h-6 text-[#323338] dark:text-gray-100 dark:text-gray-100" />
-                    <h1 className="text-2xl font-bold text-[#323338] dark:text-gray-100 dark:text-gray-100">סקירה כללית</h1>
+                    <PieChartIcon className="w-6 h-6 text-[#323338] dark:text-gray-100" />
+                    <h1 className="text-2xl font-bold text-[#323338] dark:text-gray-100">סקירה כללית</h1>
                 </div>
 
                 {/* Buttons Group - Second in DOM -> Left in RTL */}
@@ -263,7 +263,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <TrendingUp className="h-4 w-4 text-green-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100 dark:text-gray-100">
+                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
                             {loading ? '...' : <AnimatedNumber value={totalIncome} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
@@ -279,7 +279,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <TrendingDown className="h-4 w-4 text-red-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100 dark:text-gray-100">
+                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
                             {loading ? '...' : <AnimatedNumber value={totalExpenses} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
@@ -295,7 +295,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <PiggyBank className="h-4 w-4 text-blue-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100 dark:text-gray-100">
+                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
                             {loading ? '...' : <AnimatedNumber value={monthlySavingsCalculated} currency="₪" />}
                         </div>
                         <p className="text-xs text-muted-foreground mt-1 text-right">
@@ -314,7 +314,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <Wallet className="h-4 w-4 text-orange-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100 dark:text-gray-100">
+                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
                             {/* If Business -> Net Worth. If Personal -> Bills to Pay (Unpaid) */}
                             {loading ? '...' : <AnimatedNumber value={isBusiness ? currentNetWorth : currentBillsDisplay} currency="₪" />}
                         </div>
@@ -362,7 +362,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                     const data = payload[0];
                                                     return (
                                                         <div className="glass-panel px-3 py-2 border border-white/50 shadow-xl rounded-xl backdrop-blur-xl text-right">
-                                                            <p className="font-bold text-[#323338] dark:text-gray-100 dark:text-gray-100 text-sm mb-0.5">{data.name}</p>
+                                                            <p className="font-bold text-[#323338] dark:text-gray-100 text-sm mb-0.5">{data.name}</p>
                                                             <p className="font-mono text-gray-600 font-medium text-xs">
                                                                 ₪{Number(data.value).toLocaleString()}
                                                             </p>
@@ -418,7 +418,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                 if (active && payload && payload.length) {
                                                     return (
                                                         <div className="glass-panel px-3 py-2 border border-white/50 shadow-xl rounded-xl backdrop-blur-xl text-right">
-                                                            <p className="font-bold text-[#323338] dark:text-gray-100 dark:text-gray-100 text-sm mb-0.5">{label}</p>
+                                                            <p className="font-bold text-[#323338] dark:text-gray-100 text-sm mb-0.5">{label}</p>
                                                             <p className="font-mono text-gray-600 font-medium text-xs">
                                                                 ₪{Number(payload[0].value).toLocaleString()}
                                                             </p>
@@ -482,7 +482,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-700">הוצאות שוטפות</span>
                                 <span className="font-medium text-gray-900">{formatCurrency(totalExpenses)}</span>
                             </div>
-                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div className={`h-full bg-red-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalExpenses / (totalIncome || 1)) * 100, 100)}%` : '0%' }} />
                             </div>
                         </div>
@@ -493,7 +493,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-700">חשבונות ששולמו</span>
                                 <span className="font-medium text-gray-900">{formatCurrency(paidBills)}</span>
                             </div>
-                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div className={`h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((paidBills / (totalBills || 1)) * 100, 100)}%` : '0%' }} />
                             </div>
                         </div>
@@ -504,7 +504,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-700">הלוואות ששולמו</span>
                                 <span className="font-medium text-gray-900">{formatCurrency(paidDebts)}</span>
                             </div>
-                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div className={`h-full bg-purple-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((paidDebts / (totalDebts || 1)) * 100, 100)}%` : '0%' }} />
                             </div>
                         </div>
@@ -515,7 +515,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <span className="font-medium text-gray-700">חיסכון והפקדות</span>
                                 <span className="font-medium text-gray-900">{formatCurrency(totalSavingsObserved)}</span>
                             </div>
-                            <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalSavingsObserved / (totalIncome * 0.2 || 1)) * 100, 100)}%` : '0%' }} />
                             </div>
                         </div>
