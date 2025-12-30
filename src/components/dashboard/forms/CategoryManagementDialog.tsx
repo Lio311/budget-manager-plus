@@ -83,7 +83,7 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
     }
 
     async function handleDelete(id: string) {
-        if (!confirm('האם אתה בטוח? פעולה זו תמחק את הקטגוריה לצמיתות.')) return
+        if (!confirm('האם ברצונך למחוק את הקטגוריה? כל ההוצאות המקושרות לה ימחקו לאחר מכן')) return
 
         try {
             const result = await deleteCategory(id)
