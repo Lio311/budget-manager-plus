@@ -268,7 +268,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             <option value="" disabled>בחר קטגוריה</option>
                             {categories.map(cat => (
                                 <option key={cat.id} value={cat.name}>
-                                    {cat.name} {cat.isDefault ? '' : '(מותאם)'}
+                                    {cat.name}
                                 </option>
                             ))}
                         </select>
