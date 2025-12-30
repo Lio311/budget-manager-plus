@@ -257,10 +257,17 @@ input[autocomplete="one-time-code"] {
 /* 🔒 Clerk UI Overrides & RTL Fixes */
 
 /* Fix Close Button Position for RTL (Move to Left) */
+/* Targeted very specifically to override Clerk defaults */
+button.cl-modalCloseButton,
 .cl-modalCloseButton {
   right: auto !important;
-  left: 20px !important;
-  top: 20px !important;
+  left: 16px !important;
+  top: 16px !important;
+  position: absolute !important;
+  z-index: 50 !important;
+  margin: 0 !important;
+  order: -9999 !important;
+  /* In case it's flex */
 }
 
 /* Fix "Weird Corners" - Ensure proper radius and no clipping artifacts */
@@ -301,4 +308,73 @@ input[autocomplete="one-time-code"] {
 
 .dark .cl-userProfile-navbar {
   border-left: 1px solid #1e293b !important;
+  background-color: transparent !important;
+}
+
+/* 🌑 Dark Mode for Clerk Components */
+.dark .cl-userButtonPopoverCard,
+.dark .cl-userProfile-root,
+.dark .cl-card,
+.dark .cl-modalContent,
+.dark .cl-menuButton,
+.dark .cl-menuList {
+  background-color: #1e293b !important;
+  /* slate-800 */
+  color: #f8fafc !important;
+  /* slate-50 */
+  border-color: #334155 !important;
+  /* slate-700 */
+}
+
+.dark .cl-headerTitle,
+.dark .cl-headerSubtitle,
+.dark .cl-userPreviewTextContainer,
+.dark .cl-userPreviewSecondaryIdentifier,
+.dark .cl-userPreviewMainIdentifier,
+.dark .cl-navbarButton,
+.dark .cl-breadcrumbsItem,
+.dark .cl-profileSectionTitle,
+.dark .cl-profileSectionTitleText,
+.dark .cl-accordionTriggerButton {
+  color: #f8fafc !important;
+}
+
+.dark .cl-navbarButton:hover,
+.dark .cl-navbarButton[data-active="true"] {
+  background-color: #334155 !important;
+  /* slate-700 */
+  color: white !important;
+}
+
+.dark .cl-scrollBox {
+  background-color: #1e293b !important;
+}
+
+.dark .cl-profileSectionPrimaryButton,
+.dark .cl-accordionContent {
+  color: #cbd5e1 !important;
+  /* slate-300 */
+}
+
+.dark .cl-formFieldLabel {
+  color: #e2e8f0 !important;
+}
+
+.dark .cl-formFieldInput {
+  background-color: #0f172a !important;
+  /* slate-950 */
+  border-color: #334155 !important;
+  color: white !important;
+}
+
+.dark .cl-footer {
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0) 0%, #1e293b 100%) !important;
+}
+
+.dark .cl-userButtonPopoverFooter {
+  display: none !important;
+}
+
+.dark .cl-internal-1dauvpw {
+  color: #94a3b8 !important;
 }
