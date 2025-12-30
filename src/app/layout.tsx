@@ -102,8 +102,12 @@ export default function RootLayout({
                 ...heIL,
                 unstable__errors: {
                     ...heIL.unstable__errors,
+                    // Email deletion errors
+                    "This email address is linked to one or more Connected Accounts. Remove the Connected Account before deleting this email address": "לא ניתן להסיר כתובת אימייל זו מכיוון שאין כתובת אימייל נוספת שמקושרת לחשבון.",
                     resource_linked_to_connected_account: "לא ניתן להסיר כתובת אימייל זו מכיוון שאין כתובת אימייל נוספת שמקושרת לחשבון.",
-                    delete_primary_email_address_is_not_allowed: "לא ניתן להסיר את כתובת האימייל הראשי."
+                    delete_primary_email_address_is_not_allowed: "לא ניתן להסיר את כתובת האימייל הראשי.",
+                    form_identifier_not_found: "לא ניתן למחוק את כתובת האימייל היחידה בחשבון.",
+                    form_param_nil: "לא ניתן למחוק את כתובת האימייל היחידה בחשבון."
                 } as any
             }}
             appearance={{
