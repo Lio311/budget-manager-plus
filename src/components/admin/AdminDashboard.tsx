@@ -327,10 +327,12 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                     </CardContent>
                 </Card>
             </Card>
-        </div>
-
-            {/* User Growth Chart */ }
+            
+            {/* User Growth Chart */}
             <UserGrowthChart users={users} />
+            </div>
+
+            <Tabs defaultValue="users" className="space-y-4">
 
             <Tabs defaultValue="users" className="space-y-4">
                 <TabsList>
