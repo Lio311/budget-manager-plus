@@ -260,7 +260,12 @@ export function SuppliersTab() {
                                 <input
                                     type="tel"
                                     value={formData.phone}
-                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    onChange={(e) => {
+                                        const value = e.target.value
+                                        if (/^[\d-]*$/.test(value)) {
+                                            setFormData({ ...formData, phone: value })
+                                        }
+                                    }}
                                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
                                     dir="rtl"
                                 />
