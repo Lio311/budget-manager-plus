@@ -3,7 +3,8 @@
 [![Live Demo](https://img.shields.io/badge/demo-live-success)](https://budget-manager-plus.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-5.0-2D3748)](https://www.prisma.io/)
+[![Prisma](https://img.shields.io/badge/Prisma-5.22-2D3748)](https://www.prisma.io/)
+[![Neon](https://img.shields.io/badge/PostgreSQL-Neon-00E599)](https://neon.tech/)
 
 An advanced full-stack web application for intelligent personal and business financial management. Featuring a Hebrew-first interface, real-time optimistic updates, and comprehensive business tools.
 
@@ -11,41 +12,52 @@ An advanced full-stack web application for intelligent personal and business fin
 
 ## ✨ Key Features
 
-### 🏢 Business Financial Suite (New!)
-- **Client & Supplier Management**: Comprehensive database for tracking business relationships
-- **Invoices & Quotes Engine**: Generate and manage professional documents with status tracking
-- **Dynamic VAT Handling**: Automatic VAT calculations (18% standard/exempt) for revenue and expenses
-- **Business-First View**: Optimized terminology (Revenue/Sales, Costs) for business budget modes
+### 📱 Enhanced Mobile Experience (New!)
+- **Responsive Toolbar**: Full access to all tools (Delete All, Import, Settings) on mobile devices.
+- **Smart Formatting**: Optimized tables and cards for small screens.
+- **Floating Action Buttons**: Quick access to key actions regardless of scroll position.
+- **PWA Ready**: Installable as a native app on iOS and Android.
+
+### 🏢 Business Financial Suite
+- **Dual Mode**: Seamlessly toggle between **Personal** and **Business** budgets per month.
+- **Client & Supplier Management**: Comprehensive implementation for tracking business entities.
+- **Invoices & Quotes**: Generate, track, and manage status of financial documents.
+- **Tax Tracking**: Dynamic VAT handling (Exempt/Full/Partial) and tax-deductible expense recognition.
+- **Business Terminology**: Context-aware labels (Revenue vs Income, Costs vs Expenses).
+
+### ⚡ Smart Data Management
+- **Excel Import Engine**:
+  - Intelligent parsing of bank exports.
+  - Automatic categorization based on description/branch matching.
+  - Duplicate detection to prevent double-entry.
+- **Cascading Categories**:
+  - **Live Updates**: Renaming a category automatically updates all historical records.
+  - **Smart Deletion**: Deleting a category prompts to remove all associated transactions.
+  - **Color Coding**: Visual category differentiation.
+- **Bulk Actions**: One-click "Delete All Monthly Expenses" for rapid resets.
 
 ### 💸 Personal Financial Management
-- **Smart Categorization**: Predefined and custom categories with visual icons
-- **Bills & Subscriptions**: Track monthly commitments with paid/unpaid status toggles
-- **Debt Tracking**: Manage loans and debts with scheduled payments
-- **Savings Goals**: Set and track progress towards financial targets
+- **Smart Categorization**: Predefined and custom categories with visual icons.
+- **Bills & Subscriptions**: Track monthly commitments with paid/unpaid status toggles.
+- **Debt Tracking**: Manage loans and debts with scheduled payments and "paid" markers.
+- **Savings Goals**: Set and track progress towards financial targets with specific allocations.
 
-### ⚡ Optimistic UI Infrastructure
-- **Zero-Latency Feedback**: Instant UI updates for Add, Delete, and Toggle operations
-- **Automatic Rollback**: Built-in error handling that restores state on server failure
-- **Custom SWR Hooks**: Specialized infrastructure (`useOptimisticMutation`) for high-performance state management
-- **Silent Toggles**: Smooth status changes without intrusive loading states
-
-### 📊 Intelligence & Visualization
-- **Dynamic Dashboard**: Responsive overview of income, expenses, and current balance
-- **Advanced Charts**: Visual breakdown of spending habits using Recharts
-- **Interactive Calendar**: Full-screen calendar view for monthly transaction tracking
-- **Multi-Currency Support**: Track financials in ILS, USD, EUR, and GBP
+### 🛠️ Advanced Technical Architecture
+- **Optimistic UI**: Zero-latency feedback for all CRUD operations (Add, Edit, Delete).
+- **Server Actions**: Direct database mutations using React Server Components.
+- **Robust Error Handling**: Automatic rollbacks if server operations fail.
+- **Security**:
+  - Clerk Authentication (Multi-factor, Social Login).
+  - Row-level security principles via Prisma middleware.
+  - Input validation using Zod.
 
 ---
 
-## 🚀 Experience & UX
-
-- **Hebrew-First RTL**: Native support for Right-to-Left layouts with professional Hebrew localization
-- **PWA Support**: Install Keseflow as a native app on iOS and Android
-- **Performance Optimized**: 
-  - Async data loading with **Skeleton Loaders**
-  - Static content hydration for instant perceived performance
-  - Automatic bundle splitting and image optimization
-- **Premium Aesthetics**: Vibrant design system with Glassmorphism elements and smooth micro-animations
+## 🚀 UX & Design
+- **Hebrew-First RTL**: Native support for Right-to-Left layouts.
+- **Glassmorphism UI**: Modern aesthetic with transparency, blurring, and cohesive color palettes.
+- **Micro-animations**: Smooth transitions using Tailwind CSS and Framer Motion concepts.
+- **Bento Grid Layout**: Information-dense yet clean dashboard overview.
 
 ---
 
@@ -53,102 +65,40 @@ An advanced full-stack web application for intelligent personal and business fin
 
 ### Frontend
 - **Framework**: Next.js 14 (App Router)
-- **State & Data**: SWR (Stale-While-Revalidate) with custom optimistic hooks
-- **Styling**: Tailwind CSS with Radix UI Primitives
-- **Notifications**: Sonner (Toasts)
-- **Authenticaton**: Clerk (he-IL localized)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS, Shadcn/ui (Radix Primitives)
+- **Data Fetching**: SWR (Stale-While-Revalidate)
+- **Icons**: Lucide React
+- **Notifications**: Sonner
 
-### Backend & DevOps
-- **Database**: PostgreSQL (Neon Serverless) with Prisma ORM
-- **SEO**: Dynamic JSON-LD, Sitemap generation, and Open Graph optimization
-- **API**: Type-safe Server Actions with Zod validation
-- **Deployment**: Vercel (CI/CD integrated)
-
----
-
-## 📦 Quick Start
-
-1. **Clone & Install**
-   ```bash
-   git clone https://github.com/Lio311/budget-manager-plus.git
-   npm install
-   ```
-
-2. **Environment Variables**
-   Set up your `.env` with Clerk keys and Neon database URL.
-
-3. **Database Setup**
-   ```bash
-   npx prisma db push
-   ```
-
-4. **Run**
-   ```bash
-   npm run dev
-   ```
+### Backend & Infrastructure
+- **Database**: PostgreSQL (Neon Serverless)
+- **ORM**: Prisma (with relational integrity)
+- **Auth**: Clerk
+- **Hosting**: Vercel (Edge Network)
 
 ---
 
 ## 📁 Project Structure
 
-```
+```bash
 budget-manager-plus/
 ├── src/
-│   ├── app/                        # Next.js App Router
-│   │   ├── page.tsx               # Landing page
-│   │   ├── layout.tsx             # Root layout with Clerk
-│   │   └── dashboard/             # Dashboard pages
+│   ├── app/                        # Next.js App Router (Dashboard, Auth, API)
 │   ├── components/
-│   │   ├── ui/                    # Reusable UI components (Radix UI)
-│   │   └── dashboard/             # Dashboard-specific components
-│   │       ├── DashboardHeader.tsx
-│   │       ├── DashboardTabs.tsx
-│   │       └── tabs/              # Tab components
-│   │           ├── OverviewTab.tsx
-│   │           ├── IncomeTab.tsx
-│   │           ├── ExpensesTab.tsx
-│   │           ├── BillsTab.tsx
-│   │           └── DebtsTab.tsx
+│   │   ├── dashboard/              # Core Dashboard Components
+│   │   │   ├── forms/              # Data Entry Forms (Expense, Income, etc.)
+│   │   │   ├── tabs/               # Main Tabs (Overview, Expenses, etc.)
+│   │   │   └── dialogs/            # Modals (Recurrence, Categories)
+│   │   └── ui/                     # Reusable Shadcn Components
 │   ├── lib/
-│   │   ├── actions/               # Server Actions
-│   │   │   ├── income.ts
-│   │   │   ├── expense.ts
-│   │   │   ├── bill.ts
-│   │   │   └── debts.ts
-│   │   └── utils.ts               # Utility functions
-│   ├── contexts/
-│   │   └── BudgetContext.tsx      # Global state management
-│   └── middleware.ts              # Clerk authentication middleware
-├── prisma/
-│   └── schema.prisma              # Database schema
-├── public/
-│   └── keseflow.png               # Logo and assets
-└── package.json
+│   │   ├── actions/                # Server Actions (Backend Logic)
+│   │   └── db.ts                   # Database Connection
+│   ├── hooks/                      # Custom Hooks (useOptimisticMutation)
+│   └── contexts/                   # Global Contexts (Budget)
+├── prisma/                         # Database Schema
+└── public/                         # Static Assets
 ```
-
----
-
-## 📈 Search Engine Optimization (SEO)
-The application includes a comprehensive SEO suite:
-- **JSON-LD**: Structured data for better Google search results
-- **Meta Tags**: Optimized Open Graph and Twitter card integration
-- **Sitemap & Robots**: Automatically generated for efficient crawling
-- **PWA Manifest**: Full progressive web app configuration
-
----
-
-## 🔄 Version History
-
-### v3.0 - December 2024 (Current)
-- 🏢 **Business Mode**: Added full support for Client/Supplier management and Invoices/Quotes
-- ⚡ **Full Optimistic UI**: Rewrote the interaction layer for instant feedback across all modules
-- 📦 **PWA & Mobile**: Implemented PWA support and optimized touch interactions
-- 🔍 **SEO Suite**: Completed comprehensive SEO and performance optimizations
-
-### v2.0 - November 2024
-- 🔄 **Recurring Transactions**: Support for long-term financial planning
-- ✏️ **Inline Editing**: Real-time editing of all transaction types
-- 🎨 **Design Refresh**: Transitioned to the new "Keseflow" branding
 
 ---
 
