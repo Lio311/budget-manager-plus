@@ -1,5 +1,6 @@
 import LandingPage from '@/components/home/LandingPage'
 import type { Metadata } from 'next'
+import { ThemeProvider } from '@/components/theme-provider'
 
 export const metadata: Metadata = {
     title: 'דף הבית',
@@ -11,5 +12,9 @@ export const metadata: Metadata = {
 }
 
 export default function HomePage() {
-    return <LandingPage />
+    return (
+        <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" enableSystem={false}>
+            <LandingPage />
+        </ThemeProvider>
+    )
 }

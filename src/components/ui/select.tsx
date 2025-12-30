@@ -19,7 +19,7 @@ const SelectTrigger = React.forwardRef<
     <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
-            "flex h-11 w-full items-center justify-between rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:!bg-slate-800 px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 text-right transition-all duration-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:text-gray-100",
+            "flex h-11 w-full items-center justify-between rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:!bg-slate-800 px-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 text-right transition-all duration-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400",
             className
         )}
         {...props}
@@ -118,7 +118,7 @@ const SelectItem = React.forwardRef<
     <SelectPrimitive.Item
         ref={ref}
         className={cn(
-            "relative flex w-full cursor-default select-none items-center rounded-lg py-2 pr-8 pl-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-right transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 dark:focus:bg-slate-800 dark:text-gray-100",
+            "relative flex w-full cursor-default select-none items-center rounded-lg py-2 pr-8 pl-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-right transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 dark:focus:bg-slate-800 dark:text-gray-100 dark:focus:text-white",
             className
         )}
         {...props}
