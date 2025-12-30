@@ -543,6 +543,23 @@ button.cl-modalCloseButton,
   content: none !important;
 }
 
+/* Specific fix for "Development" or "Preview" sash/strap on Avatar */
+.cl-internal-cieags::after,
+.cl-internal-cieags::before,
+[class*="cl-internal-"]::after,
+[class*="cl-internal-"]::before {
+  display: none !important;
+  content: none !important;
+  background: transparent !important;
+}
+
+/* Force hide any badge on the avatar */
+.cl-badge,
+.cl-userButtonPopoverCard .cl-badge,
+.cl-userProfile-root .cl-badge {
+  display: none !important;
+}
+
 /* Ensure parent containers don't leak background */
 .dark .cl-userPreviewSecondaryIdentifier,
 .dark .cl-userPreviewMainIdentifier {
