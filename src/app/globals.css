@@ -253,3 +253,52 @@ input[autocomplete="one-time-code"] {
 .animate-rainbow-spin {
   animation: rainbow-spin 1.5s linear infinite;
 }
+
+/* 🔒 Clerk UI Overrides & RTL Fixes */
+
+/* Fix Close Button Position for RTL (Move to Left) */
+.cl-modalCloseButton {
+  right: auto !important;
+  left: 20px !important;
+  top: 20px !important;
+}
+
+/* Fix "Weird Corners" - Ensure proper radius and no clipping artifacts */
+.cl-card,
+.cl-userProfile-root {
+  border-radius: 1.5rem !important;
+  /* rounded-3xl */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Fix Text Overlap in Error Messages (Disconnected Account) */
+/* Targets the error message container to wrap properly */
+.cl-identityPreviewEditButton+div,
+.cl-alert {
+  white-space: normal !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+/* Ensure the layout for "Try again" (נסה שוב) is accessible */
+.cl-formFieldErrorMessage {
+  text-align: right !important;
+  margin-top: 4px !important;
+}
+
+/* Hide Remove Button for Primary Email (Visual Aid) */
+/* This finds the row with the "Primary" badge and hides the remove button within it */
+.cl-profileSectionItem:has(.cl-badge[data-localization-key="badge__primary"]) .cl-profileSectionItemAction__delete {
+  display: none !important;
+}
+
+/* Fix Account Page Layout in RTL */
+.cl-userProfile-navbar {
+  border-right: none !important;
+  border-left: 1px solid #e2e8f0 !important;
+}
+
+.dark .cl-userProfile-navbar {
+  border-left: 1px solid #1e293b !important;
+}

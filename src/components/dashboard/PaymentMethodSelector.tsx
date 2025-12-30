@@ -134,19 +134,19 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
 
     return (
         <div className={cn("relative", className)} ref={containerRef}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-100 mb-1">
                 אמצעי תשלום
             </label>
             <div
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
-                    "w-full px-3 py-2 border border-gray-300 rounded-md bg-white cursor-pointer flex justify-between items-center transition-colors",
+                    "w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-slate-800 dark:border-slate-700 cursor-pointer flex justify-between items-center transition-colors",
                     styles.hoverBorder
                 )}
                 role="button"
                 tabIndex={0}
             >
-                <span className={cn("text-sm", !value && "text-gray-500")}>
+                <span className={cn("text-sm dark:text-gray-100", !value && "text-gray-500 dark:text-gray-400")}>
                     {value ? getLabel(value) : "בחר אמצעי תשלום"}
                 </span>
                 <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -158,7 +158,7 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                        className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-md shadow-lg max-h-48 overflow-y-auto"
                     >
                         {!isCustom ? (
                             <div className="p-1">
@@ -168,7 +168,7 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
                                         onClick={() => handleSelect(method.label)}
                                         className={cn(
                                             "px-3 py-2 text-sm rounded-md cursor-pointer flex items-center justify-between",
-                                            value === method.label ? styles.itemSelected : "hover:bg-gray-50 text-gray-700"
+                                            value === method.label ? styles.itemSelected : "hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200"
                                         )}
                                     >
                                         {method.label}
@@ -179,7 +179,7 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
                                 <div
                                     onClick={() => setIsCustom(true)}
                                     className={cn(
-                                        "px-3 py-2 text-sm rounded-md cursor-pointer hover:bg-gray-50 flex items-center gap-2 font-medium",
+                                        "px-3 py-2 text-sm rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2 font-medium",
                                         styles.customItemText
                                     )}
                                 >
@@ -190,13 +190,13 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
                         ) : (
                             <div className="p-2">
                                 <div className="mb-2">
-                                    <label className="text-xs text-gray-500 block mb-1">שם אמצעי התשלום:</label>
+                                    <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">שם אמצעי התשלום:</label>
                                     <input
                                         type="text"
                                         value={customValue}
                                         onChange={(e) => setCustomValue(e.target.value)}
                                         className={cn(
-                                            "w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1",
+                                            "w-full px-2 py-1 text-sm border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded focus:ring-1",
                                             styles.focusRing
                                         )}
                                         placeholder="לדוגמה: גיפטקארד"
@@ -222,7 +222,7 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
                                     </button>
                                     <button
                                         onClick={() => setIsCustom(false)}
-                                        className="flex-1 bg-gray-100 text-gray-700 text-xs py-1.5 rounded hover:bg-gray-200"
+                                        className="flex-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-xs py-1.5 rounded hover:bg-gray-200 dark:hover:bg-slate-600"
                                     >
                                         ביטול
                                     </button>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { SignInButton, SignUpButton, SignedIn, SignedOut } from '@clerk/nextjs'
 import { ArrowLeft, Calendar, PieChart, TrendingUp, Wallet, ShieldCheck, Smartphone, Bell, BarChart3, Receipt, CreditCard, LayoutDashboard } from 'lucide-react'
@@ -29,6 +30,18 @@ const itemVariants = {
 }
 
 export default function LandingPage() {
+    useEffect(() => {
+        // Force light mode scrollbar behavior
+        const originalColorScheme = document.documentElement.style.colorScheme;
+        document.documentElement.style.colorScheme = 'light';
+        document.documentElement.classList.remove('dark'); // Optional: ensure no dark class leaks
+
+        return () => {
+            document.documentElement.style.colorScheme = originalColorScheme;
+            // Note: We don't restore 'dark' class here blindly because next-themes resolves it on the next page mount.
+        }
+    }, [])
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100 font-sans" dir="rtl">
             <div className="container mx-auto px-4 py-16">
