@@ -214,11 +214,26 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                             backgroundColor: "rgba(0,0,0,0.5)",
                                             backdropFilter: "blur(4px)"
                                         },
+                                        rootBox: {
+                                            width: "fit-content",
+                                            minWidth: "0",
+                                            flex: "none",
+                                            margin: "0 auto"
+                                        },
                                         cardBox: {
                                             width: "fit-content",
+                                            minWidth: "0",
+                                            flex: "none",
                                             height: "auto",
-                                            maxWidth: "100vw",
-                                            minWidth: "300px"
+                                            maxHeight: "80vh",
+                                            maxWidth: "100vw"
+                                        },
+                                        navbar: {
+                                            display: "none"
+                                        },
+                                        pageScrollBox: {
+                                            flex: "none",
+                                            width: "100%"
                                         },
                                         scrollBox: {
                                             height: "auto",
