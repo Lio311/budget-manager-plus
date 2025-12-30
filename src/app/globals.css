@@ -314,21 +314,41 @@ button.cl-modalCloseButton,
   background-color: transparent !important;
 }
 
-/* 🌑 Dark Mode for Clerk Components */
+/* 🌑 Dark Mode for Clerk Components - FIXED & AGGRESSIVE */
 .dark .cl-userButtonPopoverCard,
 .dark .cl-userProfile-root,
 .dark .cl-card,
 .dark .cl-modalContent,
 .dark .cl-menuButton,
-.dark .cl-menuList {
-  background-color: #1e293b !important;
-  /* slate-800 */
+.dark .cl-menuList,
+.dark .cl-navbar,
+.dark .cl-navbarSidebar,
+.dark .cl-userProfile-navbar,
+.dark .cl-scrollBox,
+.dark .cl-pageScrollBox {
+  background-color: #0f172a !important;
+  /* slate-950 for deep contrast */
+  background: #0f172a !important;
   color: #f8fafc !important;
   /* slate-50 */
   border-color: #334155 !important;
-  /* slate-700 */
 }
 
+/* Sidebar fix specifically */
+.dark .cl-navbar,
+.dark .cl-userProfile-navbar {
+  background-color: #1e293b !important;
+  /* Slightly lighter for sidebar */
+  border-left: 1px solid #334155 !important;
+}
+
+/* Main Content Area */
+.dark .cl-scrollBox,
+.dark .cl-pageScrollBox {
+  background-color: #0f172a !important;
+}
+
+/* Typography Overrides */
 .dark .cl-headerTitle,
 .dark .cl-headerSubtitle,
 .dark .cl-userPreviewTextContainer,
@@ -338,46 +358,51 @@ button.cl-modalCloseButton,
 .dark .cl-breadcrumbsItem,
 .dark .cl-profileSectionTitle,
 .dark .cl-profileSectionTitleText,
-.dark .cl-accordionTriggerButton {
+.dark .cl-accordionTriggerButton,
+.dark .cl-formFieldLabel,
+.dark .cl-formFieldInput,
+.dark .cl-selectButton,
+.dark .cl-menuItem {
   color: #f8fafc !important;
 }
 
+.dark .cl-userPreviewSecondaryIdentifier {
+  color: #94a3b8 !important;
+  /* slate-400 */
+}
+
+/* Buttons & Interactive */
 .dark .cl-navbarButton:hover,
 .dark .cl-navbarButton[data-active="true"] {
   background-color: #334155 !important;
-  /* slate-700 */
   color: white !important;
 }
 
-.dark .cl-scrollBox {
+.dark .cl-menuItem:hover {
+  background-color: #334155 !important;
+}
+
+/* Inputs */
+.dark .cl-formFieldInput,
+.dark .cl-selectButton {
   background-color: #1e293b !important;
+  border: 1px solid #334155 !important;
 }
 
-.dark .cl-profileSectionPrimaryButton,
-.dark .cl-accordionContent {
-  color: #cbd5e1 !important;
-  /* slate-300 */
-}
-
-.dark .cl-formFieldLabel {
-  color: #e2e8f0 !important;
-}
-
-.dark .cl-formFieldInput {
-  background-color: #0f172a !important;
-  /* slate-950 */
-  border-color: #334155 !important;
-  color: white !important;
-}
-
-.dark .cl-footer {
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0) 0%, #1e293b 100%) !important;
-}
-
+/* Footer & Branding */
+.dark .cl-footer,
 .dark .cl-userButtonPopoverFooter {
-  display: none !important;
+  background: #1e293b !important;
+  border-top: 1px solid #334155 !important;
 }
 
-.dark .cl-internal-1dauvpw {
-  color: #94a3b8 !important;
+.dark .cl-internal-1dauvpw,
+.dark .cl-logoBox {
+  filter: brightness(0) invert(1);
+  /* Make logo white if possible, or text white */
+}
+
+.dark .cl-badge {
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
 }

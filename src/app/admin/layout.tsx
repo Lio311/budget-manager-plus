@@ -23,16 +23,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     console.log('Admin Layout checking email:', userEmail)
 
     if (!userEmail || !ADMIN_EMAILS.includes(userEmail)) {
-        console.log('Admin Layout: Unauthorized email', userEmail)
-        return (
-            <div className="p-8 text-center text-red-500">
-                <h1 className="text-2xl font-bold">Unauthorized</h1>
-                <p>Your email ({userEmail}) is not allowed to access this page.</p>
-                <div className="mt-4 p-4 bg-gray-100 text-left">
-                    <p className="font-mono text-sm">Allowed: {JSON.stringify(ADMIN_EMAILS)}</p>
-                </div>
-            </div>
-        )
+        console.log('Admin Layout: Unauthorized email, redirecting to home', userEmail)
+        redirect('/')
     }
 
     return (

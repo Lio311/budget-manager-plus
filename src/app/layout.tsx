@@ -98,7 +98,14 @@ export default function RootLayout({
 }) {
     return (
         <ClerkProvider
-            localization={heIL}
+            localization={{
+                ...heIL,
+                unstable__errors: {
+                    ...heIL.unstable__errors,
+                    resource_linked_to_connected_account: "לא ניתן להסיר כתובת אימייל זו מכיוון שאין כתובת אימייל נוספת שמקושרת לחשבון.",
+                    delete_primary_email_address_is_not_allowed: "לא ניתן להסיר את כתובת האימייל הראשי."
+                }
+            }}
             appearance={{
                 elements: {
                     logoImage: "/K-LOGO.png",
