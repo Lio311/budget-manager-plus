@@ -231,7 +231,12 @@ export function ClientsTab() {
                                 <input
                                     type="text"
                                     value={formData.taxId}
-                                    onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
+                                    onChange={(e) => {
+                                        const value = e.target.value
+                                        if (/^\d*$/.test(value)) {
+                                            setFormData({ ...formData, taxId: value })
+                                        }
+                                    }}
                                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 ${errors.taxId ? 'border-red-500' : 'border-gray-300'}`}
                                 />
                                 {errors.taxId && <p className="text-red-500 text-xs mt-1">{errors.taxId}</p>}
