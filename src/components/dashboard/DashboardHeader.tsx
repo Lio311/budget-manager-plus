@@ -56,6 +56,41 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
         }
     }
 
+    // הגדרות עיצוב ל-UserButton כדי למנוע כפילות קוד
+    const userButtonAppearance = {
+        elements: {
+            // מסתיר את כפתור "נהל חשבון" (גלגל שיניים) בתפריט הקטן - רק במובייל
+            // במחשב (md) הוא יופיע (flex)
+            userButtonPopoverActionButton__manageAccount: "hidden md:flex"
+        }
+    }
+
+    const userProfileProps = {
+        appearance: {
+            elements: {
+                // הסתרת מדורים לא רצויים בתוך הפרופיל
+                profileSection__emailAddresses: "hidden",
+                profileSection__connectedAccounts: "hidden",
+
+                // עיצוב הרקע של המודל (כהה ומטושטש)
+                modalBackdrop: {
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    backdropFilter: "blur(4px)"
+                },
+
+                // ביטול המסגרת והצללית בכפתור "עדכן פרופיל" במעבר עכבר
+                "profileSectionPrimaryButton:hover": {
+                    border: "none",
+                    boxShadow: "none",
+                    outline: "none"
+                }
+
+                // הערה: הוסרו כאן כל הגדרות הגודל (fit-content) וההסתרה של ה-navbar
+                // כדי שהמודל יחזור לתצוגה התקינה והרחבה שלו
+            }
+        }
+    }
+
     return (
         <div className="sticky top-4 z-[60] mx-4 mb-6">
             <div className="glass-panel w-full flex h-[72px] items-center px-6 justify-between gap-4 transition-all duration-300 hover:shadow-2xl hover:border-white/60">
@@ -101,33 +136,13 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         >
                             <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                         </Button>
+
+                        {/* Mobile User Button */}
                         <UserButton
-                            userProfileProps={{
-                                appearance: {
-                                    elements: {
-                                        // הסתרת המדורים שרצית להסתיר
-                                        profileSection__emailAddresses: "hidden",
-                                        profileSection__connectedAccounts: "hidden",
-
-                                        // עיצוב הרקע של המודל (כהה ומטושטש)
-                                        modalBackdrop: {
-                                            backgroundColor: "rgba(0,0,0,0.5)",
-                                            backdropFilter: "blur(4px)"
-                                        },
-
-                                        // הסרת המסגרת ב-Hover (לבקשתך)
-                                        "profileSectionPrimaryButton:hover": {
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none"
-                                        }
-
-                                        // שים לב: מחקנו מכאן את cardBox, rootBox, navbar וכו'.
-                                        // זה יחזיר את המודל לתצוגה התקינה והרחבה שלו עם התפריט בצד.
-                                    }
-                                }
-                            }}
+                            userProfileProps={userProfileProps}
+                            appearance={userButtonAppearance}
                         />
+
                         <div className="mr-2">
                             <ModeToggle />
                         </div>
@@ -205,31 +220,10 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     </div>
 
                     <div className="pl-2">
+                        {/* Desktop User Button */}
                         <UserButton
-                            userProfileProps={{
-                                appearance: {
-                                    elements: {
-                                        // הסתרת המדורים שרצית להסתיר
-                                        profileSection__emailAddresses: "hidden",
-                                        profileSection__connectedAccounts: "hidden",
-
-                                        // עיצוב הרקע של המודל
-                                        modalBackdrop: {
-                                            backgroundColor: "rgba(0,0,0,0.5)",
-                                            backdropFilter: "blur(4px)"
-                                        },
-
-                                        // הסרת המסגרת ב-Hover
-                                        "profileSectionPrimaryButton:hover": {
-                                            border: "none",
-                                            boxShadow: "none",
-                                            outline: "none"
-                                        }
-
-                                        // תפריט הצד והגודל יסתדרו לבד כעת
-                                    }
-                                }
-                            }}
+                            userProfileProps={userProfileProps}
+                            appearance={userButtonAppearance}
                         />
                     </div>
                 </div>
