@@ -1,7 +1,7 @@
 'use client'
 
 import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
-import { useAuth, useUser } from '@clerk/nextjs'
+import { useAuth, useUser, SignedIn } from '@clerk/nextjs'
 import { Check, Tag, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
@@ -78,17 +78,19 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 p-2 sm:p-4">
             <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-4 overflow-y-auto max-h-[95vh] relative">
                 {/* Back Button */}
-                <div className="absolute top-4 right-4">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => window.location.href = '/dashboard'}
-                        className="text-gray-500 hover:text-gray-900 gap-1"
-                    >
-                        <ArrowRight className="h-4 w-4" />
-                        <span className="text-xs">חזור לממשק אישי</span>
-                    </Button>
-                </div>
+                <SignedIn>
+                    <div className="absolute top-4 right-4">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.location.href = '/dashboard'}
+                            className="text-gray-500 hover:text-gray-900 gap-1"
+                        >
+                            <ArrowRight className="h-4 w-4" />
+                            <span className="text-xs">חזור לממשק אישי</span>
+                        </Button>
+                    </div>
+                </SignedIn>
 
                 {/* Logo */}
                 <div className="flex justify-center mb-1 pt-6">

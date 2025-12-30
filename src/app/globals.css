@@ -295,8 +295,11 @@ button.cl-modalCloseButton,
 }
 
 /* Hide Remove Button for Primary Email (Visual Aid) */
-/* This finds the row with the "Primary" badge and hides the remove button within it */
-.cl-profileSectionItem:has(.cl-badge[data-localization-key="badge__primary"]) .cl-profileSectionItemAction__delete {
+.cl-profileSectionItem:has(.cl-badge[data-localization-key="badge__primary"]) .cl-profileSectionItemAction__delete,
+.cl-profileSectionItem:has(.cl-badge[data-localization-key="badge__primary"]) button[aria-label*="Remove"],
+.cl-profileSectionItem:has(.cl-badge[data-localization-key="badge__primary"]) button[aria-label*="Delete"],
+.cl-profileSectionItem:has(.cl-badge[data-localization-key="badge__primary"]) button[aria-label*="הסר"],
+.cl-profileSectionItem:has(.cl-badge[data-localization-key="badge__primary"]) button[aria-label*="מחק"] {
   display: none !important;
 }
 
