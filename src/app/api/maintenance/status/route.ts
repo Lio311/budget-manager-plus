@@ -1,14 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
 import { ADMIN_EMAILS } from "@/lib/constants";
+import { auth } from "@clerk/nextjs/server";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
     try {
-        const { searchParams } = new URL(req.url);
-        const userId = searchParams.get('userId');
+        const { userId } = await auth();
 
         const config = await prisma.siteConfig.findUnique({
             where: { id: 'default' }

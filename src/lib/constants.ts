@@ -1,4 +1,5 @@
-export const ADMIN_EMAILS = ['lior31197@gmail.com', 'ron.kor97@gmail.com'];
+// Admin emails from environment variables
+export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
 
 export const PRESET_COLORS = [
     { name: 'Green', class: 'bg-green-500 text-white border-green-600', hex: '#22C55E' },
