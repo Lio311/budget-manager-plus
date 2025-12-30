@@ -665,6 +665,13 @@ div[class*="cl-branding"] {
     background: #0f172a !important;
   }
 
+  /* Hide "Manage Account" (ניהול חשבון) button in UserButton Popover on Mobile */
+  .cl-userButtonPopoverActionButton[aria-label="Manage account"],
+  .cl-userButtonPopoverActionButton[aria-label="ניהול חשבון"],
+  button[data-localization-key="userButton.action.manageAccount"] {
+    display: none !important;
+  }
+
   /* Ensure the internal layout is vertical and centered */
   .cl-rootBox {
     display: flex !important;
