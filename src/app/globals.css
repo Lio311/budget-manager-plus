@@ -417,16 +417,16 @@ button.cl-modalCloseButton,
   background-color: #1e293b !important;
 }
 
-/* User Avatar Border - Make it white in dark mode */
+/* User Avatar Border - Make it white in dark mode, no background */
 .dark .cl-userButtonTrigger,
-.dark .cl-avatarBox,
-.dark .cl-userButtonBox {
-  border-color: #ffffff !important;
+.dark .cl-avatarBox {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  background-color: transparent !important;
 }
 
-.dark .cl-userButtonTrigger img,
-.dark .cl-avatarBox img {
-  border: 2px solid #ffffff !important;
+.dark .cl-userButtonTrigger:hover,
+.dark .cl-avatarBox:hover {
+  border-color: rgba(255, 255, 255, 0.5) !important;
 }
 
 /* Make Clerk modals more compact - fit to content */
