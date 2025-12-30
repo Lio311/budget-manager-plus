@@ -102,7 +102,7 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
                             {advice ? (
                                 <div className="space-y-4">
                                     <div className="prose prose-sm max-w-none text-right" dir="rtl">
-                                        <div className="text-base md:text-lg leading-relaxed whitespace-pre-wrap text-gray-700">
+                                        <div className="text-base md:text-lg leading-relaxed whitespace-pre-wrap text-gray-700 dark:text-gray-100">
                                             {advice}
                                         </div>
                                     </div>
