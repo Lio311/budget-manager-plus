@@ -217,23 +217,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         }
     }
 
-    const handleRefreshCategories = async () => {
-        try {
-            const res = await fetch('/api/admin/backfill-categories')
-            if (res.ok) {
-                toast({
-                    title: 'קטגוריות עודכנו',
-                    description: 'רשימת הקטגוריות רועננה בהצלחה',
-                    variant: 'default',
-                    className: "bg-green-500 text-white border-none"
-                })
-                if (onCategoriesChange) onCategoriesChange()
-            }
-        } catch (err) {
-            console.error(err)
-            toast({ title: 'שגיאה', description: 'רענון קטגוריות נכשל', variant: 'destructive' })
-        }
-    }
+
 
     return (
         <div>
@@ -263,15 +247,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             </Button>
                         }
                     />
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handleRefreshCategories}
-                        title="רענן קטגוריות (הוסף חסרות)"
-                        className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50"
-                    >
-                        <RefreshCw className="h-4 w-4" />
-                    </Button>
+
                     <BankImportModal onImport={handleImportExpenses} />
                 </div>
             </div>
