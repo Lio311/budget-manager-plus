@@ -251,7 +251,13 @@ export function BusinessSettings() {
                         <Input
                             id="phone"
                             value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            onChange={(e) => {
+                                const val = e.target.value
+                                // Allow only numbers and dashes
+                                if (val === '' || /^[\d-]+$/.test(val)) {
+                                    setFormData({ ...formData, phone: val })
+                                }
+                            }}
                             placeholder="050-1234567"
                             className="text-right"
                         />
@@ -312,6 +318,4 @@ export function BusinessSettings() {
             </div>
         </div>
     )
-
-
 }
