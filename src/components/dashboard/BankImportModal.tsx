@@ -77,7 +77,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                 desc: ["שם בית עסק", "שם בית העסק", "בית עסק", "תיאור", "desc", "merchant", "details", "פרטים", "שם", "שם העסק"],
                 amount: ["סכום חיוב", "סכום עסקה", "סכום", "amount", "total", "מחיר", "debit", "חיוב", "סכום לחיוב", "סכום החיוב"],
                 billingAmount: ["סכום חיוב", "חיוב בפועל", "billing", "charge", "סכום לחיוב בש\"ח"],
-                branch: ["ענף", "קטגוריה", "category", "branch", "סוג"],
+                branch: ["ענף", "קטגוריה", "category", "branch"],
                 paymentMethod: ["אמצעי תשלום", "card", "method", "type", "כרטיס", "פרטים נוספים"]
             }
 
