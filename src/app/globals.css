@@ -475,6 +475,19 @@ button.cl-modalCloseButton,
   /* Ensure no gradients */
 }
 
+/* Remove any pseudo-elements that create overlays/stripes */
+.dark .cl-avatarBox::before,
+.dark .cl-avatarBox::after,
+.dark .cl-userButtonAvatarBox::before,
+.dark .cl-userButtonAvatarBox::after,
+.dark .cl-userPreviewAvatarContainer::before,
+.dark .cl-userPreviewAvatarContainer::after,
+.dark .cl-userPreviewAvatarBox::before,
+.dark .cl-userPreviewAvatarBox::after {
+  display: none !important;
+  content: none !important;
+}
+
 /* Ensure parent containers don't leak background */
 .dark .cl-userPreviewSecondaryIdentifier,
 .dark .cl-userPreviewMainIdentifier {
