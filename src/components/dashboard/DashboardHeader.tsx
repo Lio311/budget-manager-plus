@@ -44,37 +44,30 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
         }
     }
 
-    // --- הגדרות עיצוב לכפתור הפופ-אפ הקטן (Dropdown) ---
+    // --- הגדרות עיצוב לכפתור הפופ-אפ הקטן ---
     const userButtonAppearance = {
         elements: {
-            // מסתיר את כפתור "נהל חשבון" במובייל (hidden), ומציג בדסקטופ (md:flex)
             userButtonPopoverActionButton__manageAccount: "hidden md:flex"
         }
     }
 
-    // --- הגדרות עיצוב לחלונית הפרופיל הגדולה (Modal) ---
+    // --- הגדרות עיצוב לחלונית הפרופיל הגדולה ---
     const userProfileProps = {
         appearance: {
             elements: {
-                // 1. הסתרת אלמנטים לא רצויים
+                // 1. הסתרת אלמנטים
                 profileSection__emailAddresses: "hidden",
                 profileSection__connectedAccounts: "hidden",
 
-                // 2. עיצוב המודל (שימוש ב-Tailwind כדי להבדיל בין דסקטופ למובייל)
-                // במובייל: רוחב מלא. בדסקטופ (md): מותאם לתוכן (fit) עם מינימום רוחב
+                // *הערה: נמחק מכאן החלק של modalBackdrop*
+
+                // 2. עיצוב המודל (רספונסיבי)
                 cardBox: "w-full h-full md:w-fit md:h-auto md:min-w-[700px] md:max-w-[90vw]",
                 
-                // מוודא שהגלילה לא תופסת גובה קבוע בדסקטופ
                 scrollBox: "h-full md:h-auto",
                 pageScrollBox: "h-full md:h-auto",
 
-                // 3. רקע כהה ומטושטש
-                modalBackdrop: {
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                    backdropFilter: "blur(4px)"
-                },
-
-                // 4. ביטול מסגרת בכפתור Hover
+                // 3. ביטול מסגרת בכפתור Hover
                 "profileSectionPrimaryButton:hover": {
                     border: "none",
                     boxShadow: "none",
@@ -208,7 +201,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     </div>
 
                     <div className="pl-2">
-                        {/* Desktop User Button */}
                         <UserButton
                             userProfileProps={userProfileProps}
                             appearance={userButtonAppearance}
