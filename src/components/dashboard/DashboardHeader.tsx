@@ -9,7 +9,6 @@ import { useRouter } from 'next/navigation'
 import { FeedbackButton } from './FeedbackButton'
 import { ModeToggle } from '@/components/mode-toggle'
 import { MonthYearPicker } from './MonthYearPicker'
-
 import Image from 'next/image'
 
 const CURRENCIES = ['₪', '$', '€', '£']
@@ -106,22 +105,25 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             userProfileProps={{
                                 appearance: {
                                     elements: {
+                                        // הסתרת המדורים שרצית להסתיר
                                         profileSection__emailAddresses: "hidden",
                                         profileSection__connectedAccounts: "hidden",
+
+                                        // עיצוב הרקע של המודל (כהה ומטושטש)
                                         modalBackdrop: {
                                             backgroundColor: "rgba(0,0,0,0.5)",
                                             backdropFilter: "blur(4px)"
                                         },
-                                        cardBox: {
-                                            width: "fit-content",
-                                            height: "auto",
-                                            maxWidth: "100vw",
-                                            minWidth: "300px"
-                                        },
-                                        scrollBox: {
-                                            height: "auto",
-                                            maxHeight: "80vh"
+
+                                        // הסרת המסגרת ב-Hover (לבקשתך)
+                                        "profileSectionPrimaryButton:hover": {
+                                            border: "none",
+                                            boxShadow: "none",
+                                            outline: "none"
                                         }
+
+                                        // שים לב: מחקנו מכאן את cardBox, rootBox, navbar וכו'.
+                                        // זה יחזיר את המודל לתצוגה התקינה והרחבה שלו עם התפריט בצד.
                                     }
                                 }
                             }}
@@ -137,7 +139,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                         <div className="text-center min-w-[80px]" onClick={() => {
-                            // Simple toggle for mobile if space is tight, or just render the full switcher below
                             const nextType = budgetType === 'PERSONAL' ? 'BUSINESS' : 'PERSONAL'
                             handleToggle(nextType)
                         }}>
@@ -208,37 +209,24 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             userProfileProps={{
                                 appearance: {
                                     elements: {
+                                        // הסתרת המדורים שרצית להסתיר
                                         profileSection__emailAddresses: "hidden",
                                         profileSection__connectedAccounts: "hidden",
+
+                                        // עיצוב הרקע של המודל
                                         modalBackdrop: {
                                             backgroundColor: "rgba(0,0,0,0.5)",
                                             backdropFilter: "blur(4px)"
                                         },
-                                        rootBox: {
-                                            width: "fit-content",
-                                            minWidth: "0",
-                                            flex: "none",
-                                            margin: "0 auto"
-                                        },
-                                        cardBox: {
-                                            width: "fit-content",
-                                            minWidth: "0",
-                                            flex: "none",
-                                            height: "auto",
-                                            maxHeight: "80vh",
-                                            maxWidth: "100vw"
-                                        },
-                                        navbar: {
-                                            display: "none"
-                                        },
-                                        pageScrollBox: {
-                                            flex: "none",
-                                            width: "100%"
-                                        },
-                                        scrollBox: {
-                                            height: "auto",
-                                            maxHeight: "80vh"
+
+                                        // הסרת המסגרת ב-Hover
+                                        "profileSectionPrimaryButton:hover": {
+                                            border: "none",
+                                            boxShadow: "none",
+                                            outline: "none"
                                         }
+
+                                        // תפריט הצד והגודל יסתדרו לבד כעת
                                     }
                                 }
                             }}
