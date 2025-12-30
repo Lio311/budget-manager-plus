@@ -179,7 +179,7 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
                                     </div>
 
                                     {!cat.isDefault && (
-                                        <div className="flex items-center gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex items-center gap-1">
                                             <Button size="icon" variant="ghost" onClick={() => startEdit(cat)} className="h-7 w-7 text-gray-400 hover:text-blue-600">
                                                 <Pencil className="h-3.5 w-3.5" />
                                             </Button>
