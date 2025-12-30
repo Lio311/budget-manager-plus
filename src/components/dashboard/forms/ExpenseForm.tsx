@@ -240,42 +240,40 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
             <div className="mb-4 flex items-center gap-2">
                 <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`} />
                 <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
-                {!isMobile && (
-                    <div className="mr-auto flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={handleDeleteAll}
-                            title="מחק את כל ההוצאות לחודש זה"
-                            className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <CategoryManagementDialog
-                            categories={categories}
-                            type="expense"
-                            scope={budgetType}
-                            onChange={() => {
-                                if (onCategoriesChange) onCategoriesChange()
-                            }}
-                            trigger={
-                                <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
-                                    <Settings className="h-4 w-4" />
-                                </Button>
-                            }
-                        />
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={handleRefreshCategories}
-                            title="רענן קטגוריות (הוסף חסרות)"
-                            className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50"
-                        >
-                            <RefreshCw className="h-4 w-4" />
-                        </Button>
-                        <BankImportModal onImport={handleImportExpenses} />
-                    </div>
-                )}
+                <div className="mr-auto flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleDeleteAll}
+                        title="מחק את כל ההוצאות לחודש זה"
+                        className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <CategoryManagementDialog
+                        categories={categories}
+                        type="expense"
+                        scope={budgetType}
+                        onChange={() => {
+                            if (onCategoriesChange) onCategoriesChange()
+                        }}
+                        trigger={
+                            <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
+                                <Settings className="h-4 w-4" />
+                            </Button>
+                        }
+                    />
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleRefreshCategories}
+                        title="רענן קטגוריות (הוסף חסרות)"
+                        className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                    >
+                        <RefreshCw className="h-4 w-4" />
+                    </Button>
+                    <BankImportModal onImport={handleImportExpenses} />
+                </div>
             </div>
 
             <div className="flex flex-col gap-4">
