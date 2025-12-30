@@ -133,13 +133,15 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                 </div>
 
                 {/* Left Section - Mode Switcher & Profile */}
-                <div className="hidden md:flex items-center justify-end gap-6">
-                    <div className="flex bg-gray-100/50 p-1.5 rounded-full border border-white/50 shadow-inner">
+                <div className="hidden md:flex items-center justify-end gap-4">
+                    <ModeToggle />
+
+                    <div className="flex bg-gray-100/50 p-1.5 rounded-full border border-white/50 shadow-inner dark:bg-slate-800/50 dark:border-slate-700/50">
                         <button
                             onClick={() => handleToggle('PERSONAL')}
                             className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'PERSONAL'
-                                ? 'bg-white text-emerald-600 shadow-md transform scale-105'
-                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'
+                                ? 'bg-white text-emerald-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-emerald-400'
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-slate-700/50'
                                 }`}
                         >
                             פרטי
@@ -147,19 +149,16 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         <button
                             onClick={() => handleToggle('BUSINESS')}
                             className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'BUSINESS'
-                                ? 'bg-white text-blue-600 shadow-md transform scale-105'
-                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'
+                                ? 'bg-white text-blue-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-blue-400'
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-slate-700/50'
                                 }`}
                         >
                             עסקי
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <ModeToggle />
-                        <div className="pl-2 border-l border-gray-200 dark:border-gray-700">
-                            <UserButton />
-                        </div>
+                    <div className="pl-2 border-l border-gray-200 dark:border-gray-700">
+                        <UserButton />
                     </div>
                 </div>
             </div>
