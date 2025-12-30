@@ -180,7 +180,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         </button>
                     </div>
 
-                    <div className="pl-2 border-l border-gray-200 dark:border-gray-700">
+                    <div className="pl-2">
                         <UserButton />
                     </div>
                 </div>
