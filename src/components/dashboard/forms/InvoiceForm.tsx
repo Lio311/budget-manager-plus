@@ -1,3 +1,4 @@
+```javascript
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -9,6 +10,7 @@ import { getNextInvoiceNumber, createInvoice, type InvoiceFormData } from '@/lib
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useBudget } from '@/contexts/BudgetContext'
 import { toast } from 'sonner'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 
 interface InvoiceFormProps {
     clients: any[]
