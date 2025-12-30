@@ -184,7 +184,7 @@ export function BudgetLimitsTab() {
     return (
         <div className="space-y-6 pb-20" dir="rtl">
             {/* Header / Summary */}
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">תקציב חודשי כולל</CardTitle>
@@ -207,7 +207,7 @@ export function BudgetLimitsTab() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card className="flex flex-col justify-center items-center p-0 bg-transparent border-none shadow-none h-full mx-auto">
+                <Card className="flex flex-col justify-center items-center p-0 bg-transparent border-none shadow-none h-full mx-auto md:col-span-2">
                     <Button
                         onClick={handleSmartRecommendations}
                         disabled={activeDefaults}
