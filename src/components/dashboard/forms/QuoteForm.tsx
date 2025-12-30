@@ -148,7 +148,7 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                     </label>
                     <div dir="rtl">
                         <Select
-                            value={formData.vatRate.toString()}
+                            value={(formData.vatRate ?? 0).toString()}
                             onValueChange={(value) => setFormData((prev) => ({ ...prev, vatRate: parseFloat(value) }))}
                         >
                             <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
