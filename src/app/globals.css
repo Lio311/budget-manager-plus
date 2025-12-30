@@ -456,10 +456,10 @@ button.cl-modalCloseButton,
 .cl-card,
 div[data-clerk-modal],
 .cl-internal-b3fm6y {
-  max-width: 380px !important;
-  width: 380px !important;
-  min-width: 320px !important;
-  max-height: 60vh !important;
+  max-width: 500px !important;
+  width: 500px !important;
+  min-width: 450px !important;
+  max-height: 75vh !important;
 }
 
 .dark .cl-userProfile-root,
@@ -468,10 +468,10 @@ div[data-clerk-modal],
 .dark .cl-card,
 .dark div[data-clerk-modal],
 .dark .cl-internal-b3fm6y {
-  max-width: 380px !important;
-  width: 380px !important;
-  min-width: 320px !important;
-  max-height: 60vh !important;
+  max-width: 500px !important;
+  width: 500px !important;
+  min-width: 450px !important;
+  max-height: 75vh !important;
 }
 
 /* Force all Clerk containers to be compact */
@@ -484,18 +484,22 @@ div[data-clerk-modal],
 /* Reduce sidebar width */
 .cl-navbar,
 .cl-userProfile-navbar {
-  width: 100px !important;
-  min-width: 100px !important;
-  max-width: 100px !important;
+  width: 140px !important;
+  min-width: 140px !important;
+  max-width: 140px !important;
   flex-shrink: 0 !important;
+  height: 100% !important;
+  min-height: 100% !important;
 }
 
 .dark .cl-navbar,
 .dark .cl-userProfile-navbar {
-  width: 100px !important;
-  min-width: 100px !important;
-  max-width: 100px !important;
+  width: 140px !important;
+  min-width: 140px !important;
+  max-width: 140px !important;
   flex-shrink: 0 !important;
+  height: 100% !important;
+  min-height: 100% !important;
 }
 
 .cl-pageScrollBox,
@@ -503,8 +507,8 @@ div[data-clerk-modal],
 .cl-rootBox,
 .cl-main {
   min-height: auto !important;
-  max-height: 55vh !important;
-  padding: 0.5rem !important;
+  max-height: 70vh !important;
+  padding: 0.75rem !important;
   width: 100% !important;
   max-width: 100% !important;
   overflow-y: auto !important;
@@ -515,8 +519,8 @@ div[data-clerk-modal],
 .dark .cl-rootBox,
 .dark .cl-main {
   min-height: auto !important;
-  max-height: 55vh !important;
-  padding: 0.5rem !important;
+  max-height: 70vh !important;
+  padding: 0.75rem !important;
   width: 100% !important;
   max-width: 100% !important;
   overflow-y: auto !important;
@@ -525,14 +529,14 @@ div[data-clerk-modal],
 .cl-profileSection,
 .cl-profileSectionContent,
 .cl-profileSectionPrimaryButton {
-  padding: 0.5rem !important;
+  padding: 0.75rem !important;
   max-width: 100% !important;
 }
 
 .dark .cl-profileSection,
 .dark .cl-profileSectionContent,
 .dark .cl-profileSectionPrimaryButton {
-  padding: 0.5rem !important;
+  padding: 0.75rem !important;
   max-width: 100% !important;
 }
 
