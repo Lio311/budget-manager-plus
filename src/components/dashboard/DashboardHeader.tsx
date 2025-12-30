@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { FeedbackButton } from './FeedbackButton'
 import { ModeToggle } from '@/components/mode-toggle'
+import { MonthYearPicker } from './MonthYearPicker'
 
 import Image from 'next/image'
 
@@ -66,12 +67,21 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 hover:bg-white dark:hover:bg-slate-700 rounded-full dark:text-gray-200">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
-                        <div className="min-w-[140px] flex flex-col items-center justify-center px-2">
-                            <span className="text-sm font-bold text-[#323338] dark:text-gray-200 leading-none">
-                                {getMonthName(month)} {year}
-                            </span>
-                            <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">סקירה חודשית</span>
-                        </div>
+                        <MonthYearPicker
+                            currentMonth={month - 1}
+                            currentYear={year}
+                            onSelect={(selectedMonth, selectedYear) => {
+                                setMonth(selectedMonth + 1)
+                                setYear(selectedYear)
+                            }}
+                        >
+                            <button className="min-w-[140px] flex flex-col items-center justify-center px-2 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors">
+                                <span className="text-sm font-bold text-[#323338] dark:text-gray-200 leading-none">
+                                    {getMonthName(month)} {year}
+                                </span>
+                                <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">סקירה חודשית</span>
+                            </button>
+                        </MonthYearPicker>
                         <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 hover:bg-white dark:hover:bg-slate-700 rounded-full dark:text-gray-200">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
