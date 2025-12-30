@@ -65,6 +65,15 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
             return
         }
 
+        if (formData.isRecurring && !formData.recurringEndDate) {
+            toast({
+                title: 'שגיאה',
+                description: 'יש לבחור תאריך סיום לחשבון קבוע',
+                variant: 'destructive'
+            })
+            return
+        }
+
         setSubmitting(true)
         try {
             const result = await addBill(month, year, {
@@ -204,11 +213,11 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                             </select>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-xs text-gray-500">תוקף עד</label>
+                            <label className="text-xs text-gray-500">תוקף עד <span className="text-red-500">*</span></label>
                             <DatePicker
                                 date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
                                 setDate={(date) => setFormData({ ...formData, recurringEndDate: date ? date.toISOString() : undefined })}
-                                placeholder="ללא הגבלה / בחר תאריך"
+                                placeholder="בחר תאריך סיום"
                                 className="w-full h-9 bg-white"
                             />
                         </div>
