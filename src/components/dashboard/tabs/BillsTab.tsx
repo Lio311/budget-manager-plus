@@ -227,9 +227,9 @@ export function BillsTab() {
     return (
         <div className="space-y-4 p-1" dir="rtl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="monday-card p-4 border-l-4 border-l-blue-500 min-w-0">
+                <div className="monday-card p-4 border-l-4 border-l-blue-500 min-w-0 dark:bg-slate-800 dark:border-blue-500/50">
                     <p className="text-xs text-gray-500 mb-1 truncate">סה"כ לתשלום (חודשי)</p>
-                    <p className={`text-base md:text-xl font-bold text-[#323338] truncate ${loading ? 'animate-pulse' : ''}`}>
+                    <p className={`text-base md:text-xl font-bold text-[#323338] dark:text-gray-100 truncate ${loading ? 'animate-pulse' : ''}`}>
                         {loading ? '...' : formatCurrency(totalBillsILS, '₪')}
                     </p>
                 </div>
@@ -252,7 +252,7 @@ export function BillsTab() {
                 <div className="glass-panel p-5 h-fit hidden md:block">
                     <div className="flex items-center gap-2 mb-4 min-w-0">
                         <CreditCard className="h-5 w-5 text-orange-500 flex-shrink-0" />
-                        <h3 className="text-base md:text-lg font-bold text-[#323338] truncate flex-1 min-w-0">הוספת חשבון חדש</h3>
+                        <h3 className="text-base md:text-lg font-bold text-[#323338] dark:text-gray-100 truncate flex-1 min-w-0">הוספת חשבון חדש</h3>
                     </div>
                     <BillForm />
                 </div>
@@ -275,7 +275,7 @@ export function BillsTab() {
 
 
                 <div className="glass-panel p-5 block">
-                    <h3 className="text-lg font-bold text-[#323338] mb-4">רשימת חשבונות</h3>
+                    <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100 mb-4">רשימת חשבונות</h3>
                     <div className="space-y-3">
                         {loading ? (
                             // Skeleton loader while loading
@@ -302,7 +302,7 @@ export function BillsTab() {
                                 {paginatedBills.map((bill: Bill) => (
                                     <div
                                         key={bill.id}
-                                        className="group relative flex flex-col md:flex-row items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 gap-3"
+                                        className="group relative flex flex-col md:flex-row items-center justify-between p-3 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 gap-3"
                                     >
                                         {editingId === bill.id ? (
                                             <div className="flex flex-col gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
@@ -314,7 +314,7 @@ export function BillsTab() {
                                                         autoFocus
                                                     />
                                                     <select
-                                                        className="p-2 border rounded-md h-9 bg-white text-sm w-20"
+                                                        className="p-2 border rounded-md h-9 bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-sm w-20 text-slate-900 dark:text-slate-100"
                                                         value={editData.currency}
                                                         onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
                                                     >
@@ -367,7 +367,7 @@ export function BillsTab() {
                                                         </button>
 
                                                         <div className="flex flex-col overflow-hidden">
-                                                            <span className={`font-bold text-base transition-colors truncate ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338]'}`}>
+                                                            <span className={`font-bold text-base transition-colors truncate ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338] dark:text-gray-100'}`}>
                                                                 {bill.name}
                                                             </span>
                                                             <div className="flex items-center gap-2 text-xs text-[#676879]">

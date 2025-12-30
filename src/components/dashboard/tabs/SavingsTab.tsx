@@ -262,16 +262,16 @@ export function SavingsTab() {
         <div className="space-y-6 w-full pb-10 px-2 md:px-0" dir="rtl">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2">
-                    <h3 className="text-sm font-medium text-gray-500">סך הפקדות חודשיות</h3>
-                    <div className={`text-2xl font-bold text-[#0073ea] break-all ${loadingSavings ? 'animate-pulse' : ''}`}>
+                <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2 dark:bg-slate-800 dark:border-l-blue-500">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">סך הפקדות חודשיות</h3>
+                    <div className={`text-2xl font-bold text-[#0073ea] dark:text-blue-400 break-all ${loadingSavings ? 'animate-pulse' : ''}`}>
                         {loadingSavings ? '...' : formatCurrency(stats.totalMonthlyDepositILS, '₪')}
                     </div>
                 </div>
 
-                <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2">
-                    <h3 className="text-sm font-medium text-gray-500">מספר חסכונות</h3>
-                    <div className={`text-2xl font-bold text-[#0073ea] ${loadingSavings ? 'animate-pulse' : ''}`}>
+                <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2 dark:bg-slate-800 dark:border-l-blue-500">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">מספר חסכונות</h3>
+                    <div className={`text-2xl font-bold text-[#0073ea] dark:text-blue-400 ${loadingSavings ? 'animate-pulse' : ''}`}>
                         {loadingSavings ? '...' : stats.count}
                     </div>
                 </div>
@@ -312,7 +312,7 @@ export function SavingsTab() {
                 {/* Savings List */}
                 <div className="glass-panel p-5 block">
                     <div className="flex items-center gap-2 mb-4 px-2">
-                        <h3 className="text-lg font-bold text-[#323338]">רשימת חסכונות</h3>
+                        <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">רשימת חסכונות</h3>
                     </div>
 
                     <div className="space-y-3">
@@ -326,13 +326,13 @@ export function SavingsTab() {
                             <>
                                 {paginatedSavings.map((saving) => <div
                                     key={saving.id}
-                                    className="group relative flex flex-col sm:flex-row items-center justify-between p-3 sm:p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+                                    className="group relative flex flex-col sm:flex-row items-center justify-between p-3 sm:p-3 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
                                 >
                                     {editingId === saving.id ? (
                                         <div className="flex flex-col gap-3 w-full animate-in fade-in zoom-in-95 duration-200">
                                             <div className="flex flex-wrap gap-2 w-full">
                                                 <select
-                                                    className="p-2 border rounded-lg h-9 bg-white text-sm min-w-[100px] flex-1"
+                                                    className="p-2 border rounded-lg h-9 bg-white dark:bg-slate-800 dark:border-slate-700 text-sm min-w-[100px] flex-1 dark:text-slate-100"
                                                     value={editData.category}
                                                     onChange={(e) => setEditData({ ...editData, category: e.target.value })}
                                                     disabled={submitting}
@@ -350,7 +350,7 @@ export function SavingsTab() {
                                             </div>
                                             <div className="flex flex-wrap gap-2 w-full">
                                                 <select
-                                                    className="p-2 border rounded-lg h-9 bg-white text-sm min-w-[80px] flex-1"
+                                                    className="p-2 border rounded-lg h-9 bg-white dark:bg-slate-800 dark:border-slate-700 text-sm min-w-[80px] flex-1 dark:text-slate-100"
                                                     value={editData.currency}
                                                     onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
                                                     disabled={submitting}
@@ -412,7 +412,7 @@ export function SavingsTab() {
                                                 <div className="flex flex-col gap-1 min-w-0 flex-1">
                                                     {/* Name - full width, no truncate */}
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-sm sm:text-base text-[#323338]">{saving.name}</span>
+                                                        <span className="font-bold text-sm sm:text-base text-[#323338] dark:text-gray-100">{saving.name}</span>
                                                         {saving.isRecurring && (
                                                             <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
                                                                 <span className="w-1 h-1 rounded-full bg-current" />

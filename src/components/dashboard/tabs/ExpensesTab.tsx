@@ -424,8 +424,8 @@ export function ExpensesTab() {
     return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             {/* Summary Card */}
-            <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'}`}>
-                <h3 className="text-sm font-medium text-gray-500">{isBusiness ? 'סך עלויות / הוצאות חודשיות' : 'סך הוצאות חודשיות'}</h3>
+            <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'} dark:bg-slate-800`}>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך עלויות / הוצאות חודשיות' : 'סך הוצאות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'} ${loadingExpenses ? 'animate-pulse' : ''}`}>
                     {loadingExpenses ? '...' : formatCurrency(totalExpensesILS, '₪')}
                 </div>
@@ -465,7 +465,7 @@ export function ExpensesTab() {
                 {/* List View */}
                 <div className="lg:col-span-7 space-y-3">
                     <div className="flex items-center justify-between px-1">
-                        <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'פירוט עלויות והוצאות' : 'רשימת הוצאות'}</h3>
+                        <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'פירוט עלויות והוצאות' : 'רשימת הוצאות'}</h3>
                         <span className="text-xs text-gray-400 font-medium">{expenses.length} שורות</span>
                     </div>
 
@@ -487,7 +487,7 @@ export function ExpensesTab() {
                                             </div>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <select
-                                                    className="w-full p-2 border border-blue-100 bg-blue-50/50 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                                                    className="w-full p-2 border border-blue-100 bg-blue-50/50 dark:bg-slate-800 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all dark:text-slate-100"
                                                     value={editData.category}
                                                     onChange={(e) => setEditData({ ...editData, category: e.target.value })}
                                                 >
@@ -510,7 +510,7 @@ export function ExpensesTab() {
                                                 </div>
                                                 <div className="flex flex-col min-w-0 gap-0.5">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-[#323338] truncate text-sm sm:text-base">{exp.description}</span>
+                                                        <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base">{exp.description}</span>
                                                         {exp.isRecurring && (
                                                             <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${isBusiness ? 'bg-red-100 text-red-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
                                                                 <span className="w-1 h-1 rounded-full bg-current" />
@@ -518,7 +518,7 @@ export function ExpensesTab() {
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] flex-wrap">
+                                                    <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] dark:text-gray-400 flex-wrap">
                                                         <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                         <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
                                                         <span className="truncate max-w-[80px] sm:max-w-none">{exp.category}</span>

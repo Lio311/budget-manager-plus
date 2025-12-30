@@ -152,12 +152,12 @@ export function CalendarTab() {
         <div className="space-y-6">
             {/* Summary */}
             <div className="grid gap-4 md:grid-cols-2">
-                <Card className="bg-gradient-to-l from-blue-50 to-white border-blue-200">
+                <Card className="bg-gradient-to-l from-blue-50 to-white dark:from-slate-900 dark:to-slate-800 border-blue-200 dark:border-blue-900/50">
                     <CardHeader>
-                        <CardTitle className="text-blue-700">סך תשלומים החודש</CardTitle>
+                        <CardTitle className="text-blue-700 dark:text-blue-400">סך תשלומים החודש</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-blue-600">
+                        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                             {formatCurrency(totalPayments, currency)}
                         </div>
                         <p className="text-sm text-muted-foreground mt-2">
@@ -165,12 +165,12 @@ export function CalendarTab() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card className="bg-gradient-to-l from-green-50 to-white border-green-200">
+                <Card className="bg-gradient-to-l from-green-50 to-white dark:from-slate-900 dark:to-slate-800 border-green-200 dark:border-green-900/50">
                     <CardHeader>
-                        <CardTitle className="text-green-700">שולם עד כה</CardTitle>
+                        <CardTitle className="text-green-700 dark:text-green-400">שולם עד כה</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-green-600">
+                        <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                             {formatCurrency(paidPayments, currency)}
                         </div>
                         <p className="text-sm text-muted-foreground mt-2">
@@ -210,12 +210,12 @@ export function CalendarTab() {
                                     key={index}
                                     onClick={() => day && hasPayments && setSelectedDay(day)}
                                     className={`h-[80px] md:min-h-[80px] md:h-auto p-2 border rounded-lg overflow-hidden ${day === null
-                                        ? 'bg-gray-50'
+                                        ? 'bg-gray-50 dark:bg-slate-900/50 border-gray-100 dark:border-slate-800'
                                         : hasPayments
                                             ? allPaid
-                                                ? 'bg-green-50 border-green-200 cursor-pointer hover:bg-green-100'
-                                                : 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100 cursor-pointer'
-                                            : 'hover:bg-accent'
+                                                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30'
+                                                : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 cursor-pointer'
+                                            : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:bg-accent'
                                         } transition-colors`}
                                 >
                                     {day && (
@@ -284,7 +284,7 @@ export function CalendarTab() {
                                     .map((payment) => (
                                         <div
                                             key={payment.id}
-                                            className={`flex items-center justify-between p-4 border rounded-lg transition-colors ${payment.isPaid ? 'bg-green-50 border-green-200' : 'hover:bg-accent'
+                                            className={`flex items-center justify-between p-4 border rounded-lg transition-colors ${payment.isPaid ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/50' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 hover:bg-accent'
                                                 }`}
                                         >
                                             <div className="flex items-center gap-4 flex-1">

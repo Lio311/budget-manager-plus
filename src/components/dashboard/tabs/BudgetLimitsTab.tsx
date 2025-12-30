@@ -237,7 +237,7 @@ export function BudgetLimitsTab() {
 
             {/* Add Budget Section */}
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-800">תקציבים פעילים</h3>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">תקציבים פעילים</h3>
 
                 <div className="w-64">
                     <Select
@@ -245,7 +245,7 @@ export function BudgetLimitsTab() {
                             setNewlyAddedIds(prev => [...prev, val])
                         }}
                     >
-                        <SelectTrigger className="w-full h-10 bg-white border-gray-200 text-right direction-rtl">
+                        <SelectTrigger className="w-full h-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-right direction-rtl">
                             <SelectValue placeholder="הוסף תקציב לקטגוריה" />
                         </SelectTrigger>
                         <SelectContent className="max-h-[200px]" dir="rtl">
@@ -276,14 +276,14 @@ export function BudgetLimitsTab() {
                         const isOverBudget = percentage > 100
 
                         return (
-                            <div key={budget.categoryId} className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
-                                <div className="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600 font-bold shrink-0">
+                            <div key={budget.categoryId} className="flex items-center gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-all hover:shadow-md">
+                                <div className="w-12 h-12 rounded-full bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-600 dark:text-yellow-400 font-bold shrink-0">
                                     {getCategoryIcon(budget.categoryName)}
                                 </div>
 
                                 <div className="flex-1 space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <div className="font-semibold text-gray-900 text-lg">{budget.categoryName}</div>
+                                        <div className="font-semibold text-gray-900 dark:text-gray-100 text-lg">{budget.categoryName}</div>
                                         <div className="flex items-center gap-2">
                                             <div className="text-sm font-medium text-gray-500 font-mono flex items-center gap-1" dir="ltr">
                                                 <span>₪{budget.spent.toLocaleString()}</span>
@@ -348,7 +348,7 @@ export function BudgetLimitsTab() {
                                         </div>
                                         <Progress
                                             value={Math.min(100, percentage)}
-                                            className={cn("h-2 rotate-180", isOverBudget ? "bg-red-100" : "bg-gray-100")}
+                                            className={cn("h-2 rotate-180", isOverBudget ? "bg-red-100 dark:bg-red-900/30" : "bg-gray-100 dark:bg-slate-700")}
                                             indicatorClassName={cn(
                                                 isOverBudget ? "bg-red-500" :
                                                     percentage >= 75 ? "bg-red-500" :

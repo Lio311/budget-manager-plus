@@ -238,7 +238,7 @@ export function DebtsTab() {
         <div className="space-y-4 p-1" dir="rtl">
             {/* Summary Cards */}
             <div className="grid gap-3 grid-cols-1 md:grid-cols-3">
-                <div className="monday-card p-4 border-l-4 border-l-[#00c875]">
+                <div className="monday-card p-4 border-l-4 border-l-[#00c875] dark:bg-slate-800">
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">יתרה כוללת (נטו)</h3>
                     <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : stats.netDebtILS > 0 ? 'text-red-500' : 'text-green-500'}`}>
                         {loading ? '...' : formatCurrency(Math.abs(stats.netDebtILS), '₪')}
@@ -247,14 +247,14 @@ export function DebtsTab() {
                         {loading ? '' : stats.netDebtILS > 0 ? 'הלוואות שלי' : 'חייבים לי'}
                     </p>
                 </div>
-                <div className="monday-card p-4 border-l-4 border-l-[#0073ea]">
+                <div className="monday-card p-4 border-l-4 border-l-[#0073ea] dark:bg-slate-800">
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">תשלום חודשי (נטו)</h3>
                     <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : 'text-slate-900'}`}>
                         {loading ? '...' : formatCurrency(stats.netMonthlyPaymentILS, '₪')}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">התחייבות חודשית</p>
                 </div>
-                <div className="monday-card p-4 border-l-4 border-l-red-500">
+                <div className="monday-card p-4 border-l-4 border-l-red-500 dark:bg-slate-800">
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">נותר לתשלום החודש</h3>
                     <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : 'text-slate-900'}`}>
                         {loading ? '...' : formatCurrency(stats.unpaidThisMonthILS, '₪')}
@@ -292,7 +292,7 @@ export function DebtsTab() {
                 {/* Debts List */}
                 <div className="glass-panel p-5 block">
                     <div className="flex items-center gap-2 mb-4 px-2">
-                        <h3 className="text-lg font-bold text-[#323338]">רשימת הלוואות</h3>
+                        <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">רשימת הלוואות</h3>
                     </div>
 
                     <div className="space-y-3">
@@ -305,7 +305,7 @@ export function DebtsTab() {
                                 {paginatedDebts.map((debt) => (
                                     <div
                                         key={debt.id}
-                                        className={`group relative flex flex-col sm:flex-row items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 ${debt.isPaid ? 'bg-green-50/50 border-green-200' : ''}`}
+                                        className={`group relative flex flex-col sm:flex-row items-center justify-between p-3 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 ${debt.isPaid ? 'bg-green-50/50 border-green-200 dark:bg-green-900/10 dark:border-green-800' : ''}`}
                                     >
                                         {editingId === debt.id ? (
                                             <div className="flex flex-col gap-3 w-full animate-in fade-in zoom-in-95 duration-200">
@@ -323,7 +323,7 @@ export function DebtsTab() {
                                                 {/* Row 2: Currency, Total Amount, Monthly Payment, Due Day */}
                                                 <div className="flex flex-wrap gap-2 w-full">
                                                     <select
-                                                        className="p-2 border rounded-lg h-9 bg-white text-sm min-w-[80px] flex-1"
+                                                        className="p-2 border rounded-lg h-9 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-sm min-w-[80px] flex-1 text-slate-900 dark:text-slate-100"
                                                         value={editData.currency}
                                                         onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
                                                         disabled={submitting}
@@ -400,7 +400,7 @@ export function DebtsTab() {
                                                                 }`}>
                                                                 {DEBT_TYPE_LABELS[debt.debtType as keyof typeof DEBT_TYPE_LABELS]}
                                                             </span>
-                                                            <p className={`font-bold text-base truncate ${debt.isPaid ? 'line-through text-muted-foreground' : 'text-slate-900'}`}>
+                                                            <p className={`font-bold text-base truncate ${debt.isPaid ? 'line-through text-muted-foreground' : 'text-slate-900 dark:text-slate-100'}`}>
                                                                 {debt.creditor}
                                                             </p>
                                                         </div>

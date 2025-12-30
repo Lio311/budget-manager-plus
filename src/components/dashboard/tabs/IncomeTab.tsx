@@ -280,8 +280,8 @@ export function IncomeTab() {
 
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
-            <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-blue-600' : 'border-l-[#00c875]'}`}>
-                <h3 className="text-sm font-medium text-gray-500">{isBusiness ? 'סך מכירות/הכנסות חודשיות' : 'סך הכנסות חודשיות'}</h3>
+            <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-blue-600' : 'border-l-[#00c875]'} dark:bg-slate-800`}>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך מכירות/הכנסות חודשיות' : 'סך הכנסות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
                     {loadingIncomes ? '...' : formatCurrency(totalIncomeILS, '₪')}
                 </div>
@@ -321,7 +321,7 @@ export function IncomeTab() {
                 {/* List View */}
                 <div className="lg:col-span-7 space-y-3">
                     <div className="flex items-center justify-between px-1">
-                        <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'פירוט הכנסות ומכירות' : 'רשימת הכנסות'}</h3>
+                        <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'פירוט הכנסות ומכירות' : 'רשימת הכנסות'}</h3>
                         <span className="text-xs text-gray-400 font-medium">{incomes.length} שורות</span>
                     </div>
 
@@ -331,7 +331,7 @@ export function IncomeTab() {
                         </div>
                     ) : (
                         paginatedIncomes.map((income: any) => (
-                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-l-4 border-l-blue-100">
+                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-l-4 border-l-blue-100 dark:border-l-blue-900/50">
                                 {editingId === income.id ? (
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -347,7 +347,7 @@ export function IncomeTab() {
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                             <Input type="number" value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} />
-                                            <select className="p-2 border rounded-lg bg-white text-sm" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
+                                            <select className="p-2 border rounded-lg bg-white dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-slate-100" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
                                                 {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                             </select>
                                             <DatePicker date={editData.date ? new Date(editData.date) : undefined} setDate={(d) => setEditData({ ...editData, date: d ? format(d, 'yyyy-MM-dd') : '' })} />
@@ -367,7 +367,7 @@ export function IncomeTab() {
                                             </div>
                                             <div className="flex flex-col min-w-0 gap-0.5">
                                                 <div className="flex items-center gap-2 min-w-0">
-                                                    <span className="font-bold text-[#323338] truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
+                                                    <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
                                                     {income.isRecurring && (
                                                         <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-green-50 text-green-600 border border-green-100">
                                                             <span className="w-1 h-1 rounded-full bg-current" />
@@ -380,7 +380,7 @@ export function IncomeTab() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#676879] mt-0.5">
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#676879] dark:text-gray-400 mt-0.5">
                                                     <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                     <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
                                                     <span className="">{income.category}</span>
