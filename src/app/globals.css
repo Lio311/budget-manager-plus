@@ -607,8 +607,40 @@ div[class*="cl-branding"] {
 }
 
 /* Force container to have no gap */
-.cl-userProfile-root div[class*="cl-"] {
-  gap: 0 !important;
+/* Profile Form Layout Fixes */
+.cl-profilePage {
+  gap: 1.5rem !important;
+  padding: 1rem !important;
+}
+
+.cl-formFieldRow {
+  gap: 1rem !important;
+}
+
+.cl-profileSection__profileImage {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1.5rem !important;
+}
+
+.cl-profileSection__profileImage .cl-avatarBox {
+  width: 64px !important;
+  height: 64px !important;
+}
+
+.cl-fileDropAreaBox {
+  gap: 1rem !important;
+}
+
+/* Ensure inputs have space */
+.cl-formFieldInput {
+  margin-top: 0.5rem !important;
+}
+
+/* Action buttons gap */
+.cl-profilePage .cl-footer {
+  gap: 1rem !important;
+  padding-top: 2rem !important;
 }
 
 /* Footer */
