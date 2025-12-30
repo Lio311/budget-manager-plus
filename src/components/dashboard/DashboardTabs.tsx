@@ -107,11 +107,11 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
                 md:w-20 md:hover:w-64 group
                 m-0 md:m-4 md:rounded-3xl
-                bg-white/95 backdrop-blur-xl md:bg-white/40 md:backdrop-blur-md border-l md:border border-white/50 shadow-2xl
+                bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white/40 dark:md:bg-slate-900/40 md:backdrop-blur-md border-l md:border border-white/50 dark:border-slate-800/50 shadow-2xl
             `}>
-                <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10">
-                    <span className="font-bold text-lg text-[#323338]">תפריט</span>
-                    <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-[#323338] hover:bg-black/5">
+                <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10 dark:border-white/5">
+                    <span className="font-bold text-lg text-[#323338] dark:text-gray-100">תפריט</span>
+                    <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-[#323338] dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/10">
                         <X className="h-5 w-5" />
                     </Button>
                 </div>
@@ -126,8 +126,8 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                                     value={tab.value}
                                     className={`w-full relative group/item justify-start gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300
                                              ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
-                                             hover:bg-white/40
-                                             text-gray-700 outline-none ring-0 focus:ring-0 overflow-hidden whitespace-nowrap`}
+                                             hover:bg-white/40 dark:hover:bg-white/10
+                                             text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden whitespace-nowrap`}
                                 >
                                     <div className="relative z-10 flex items-center gap-4 shrink-0 transition-all duration-300 group-hover/item:scale-110">
                                         <Icon className={`h-5 w-5 ${tab.rotate ? 'rotate-180' : ''}`} />
