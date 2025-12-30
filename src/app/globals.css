@@ -505,17 +505,31 @@ button.cl-modalCloseButton,
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
   margin-left: 0 !important;
+}
+
+.cl-userProfile-root .cl-scrollBox,
+.cl-userProfile-root .cl-pageScrollBox {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
   margin-right: 0 !important;
 }
 
-.cl-userProfile-root .cl-navbar+div,
-.cl-userProfile-root .cl-userProfile-navbar+div,
-.cl-pageScrollBox,
-.cl-scrollBox {
-  border-top-right-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+/* Fix "Secured by Clerk" Footer visual glitch */
+.cl-footer,
+.cl-branding,
+div[class*="cl-footer"],
+div[class*="cl-branding"] {
+  background-color: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-top: 0 !important;
+  padding-top: 10px !important;
+}
+
+/* Ensure the modal content allows the footer to sit nicely */
+.cl-modalContent {
+  overflow: visible !important;
 }
 
 /* Force container to have no gap */
