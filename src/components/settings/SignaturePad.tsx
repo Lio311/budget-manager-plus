@@ -35,8 +35,21 @@ export function SignaturePad({ value, onChange, onClear }: SignaturePadProps) {
         if (!canvas) return
 
         const rect = canvas.getBoundingClientRect()
-        const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left
-        const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top
+        let clientX, clientY
+
+        if ('touches' in e) {
+            clientX = e.touches[0].clientX
+            clientY = e.touches[0].clientY
+        } else {
+            clientX = e.clientX
+            clientY = e.clientY
+        }
+
+        const scaleX = canvas.width / rect.width
+        const scaleY = canvas.height / rect.height
+
+        const x = (clientX - rect.left) * scaleX
+        const y = (clientY - rect.top) * scaleY
 
         const ctx = canvas.getContext('2d')
         if (ctx) {
@@ -53,8 +66,21 @@ export function SignaturePad({ value, onChange, onClear }: SignaturePadProps) {
         if (!canvas) return
 
         const rect = canvas.getBoundingClientRect()
-        const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left
-        const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top
+        let clientX, clientY
+
+        if ('touches' in e) {
+            clientX = e.touches[0].clientX
+            clientY = e.touches[0].clientY
+        } else {
+            clientX = e.clientX
+            clientY = e.clientY
+        }
+
+        const scaleX = canvas.width / rect.width
+        const scaleY = canvas.height / rect.height
+
+        const x = (clientX - rect.left) * scaleX
+        const y = (clientY - rect.top) * scaleY
 
         const ctx = canvas.getContext('2d')
         if (ctx) {
@@ -77,26 +103,17 @@ export function SignaturePad({ value, onChange, onClear }: SignaturePadProps) {
         }
     }
 
-    const clearSignature = () => {
-        const canvas = canvasRef.current
-        if (canvas) {
-            const ctx = canvas.getContext('2d')
-            if (ctx) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height)
-                setHasSignature(false)
-                onClear()
-            }
-        }
-    }
+    // ... (rest of component)
 
     return (
-        <div className="space-y-2">
-            <div className="relative">
+        <div className="space-y-2 select-none">
+            <div className="relative w-full">
                 <canvas
                     ref={canvasRef}
                     width={400}
-                    height={100}
-                    className="border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair bg-white"
+                    height={150}
+                    className="w-full h-auto border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair bg-white touch-none"
+                    style={{ touchAction: 'none' }}
                     onMouseDown={startDrawing}
                     onMouseMove={draw}
                     onMouseUp={stopDrawing}

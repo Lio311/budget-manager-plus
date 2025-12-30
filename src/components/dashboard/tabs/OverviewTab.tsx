@@ -521,7 +521,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             {/* Settings Dialog */}
             < Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} >
                 {isBusiness ? (
-                    <DialogContent dir="rtl" className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+                    <DialogContent dir="rtl" className="w-[95vw] sm:w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl">
                         <DialogHeader>
                             <DialogTitle>הגדרות עסק</DialogTitle>
                         </DialogHeader>
