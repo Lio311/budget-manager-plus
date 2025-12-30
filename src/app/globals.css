@@ -408,8 +408,10 @@ button.cl-modalCloseButton,
 .dark .cl-navbar,
 .dark .cl-userProfile-navbar,
 .dark .cl-navbarMobileMenuButton,
-.dark .cl-navbarMobileMenuRow {
+.dark .cl-navbarMobileMenuRow,
+.dark .cl-navbarMobileMenuBox {
   background-color: #0f172a !important;
+  background: #0f172a !important;
   /* Match main modal background for seamless look */
   border-left: 1px solid #334155 !important;
   /* Softer border */
