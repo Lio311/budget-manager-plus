@@ -11,6 +11,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { IncomeForm } from '@/components/dashboard/forms/IncomeForm'
@@ -346,7 +347,7 @@ export function IncomeTab() {
                                             />
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                            <Input type="number" value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} />
+                                            <FormattedNumberInput value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} placeholder="סכום" />
                                             <select className="p-2 border rounded-lg bg-white dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-slate-100" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
                                                 {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                             </select>

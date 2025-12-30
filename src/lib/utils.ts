@@ -41,3 +41,42 @@ export function getMonthName(month: number): string {
 export function getDaysInMonth(month: number, year: number): number {
     return new Date(year, month, 0).getDate()
 }
+
+/**
+ * Format a number with commas for thousands separator
+ * @param value - Number or string to format
+ * @returns Formatted string with commas (e.g., "1,000" or "1,000,000")
+ */
+export function formatNumberWithCommas(value: number | string): string {
+    if (value === '' || value === null || value === undefined) return ''
+
+    // Remove existing commas and convert to string
+    const numStr = String(value).replace(/,/g, '')
+
+    // Check if it's a valid number
+    if (isNaN(Number(numStr))) return String(value)
+
+    // Split into integer and decimal parts
+    const parts = numStr.split('.')
+    const integerPart = parts[0]
+    const decimalPart = parts[1]
+
+    // Add commas to integer part
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+
+    // Combine with decimal part if exists
+    return decimalPart !== undefined ? `${formattedInteger}.${decimalPart}` : formattedInteger
+}
+
+/**
+ * Parse a formatted number string back to a number
+ * @param value - Formatted string with commas
+ * @returns Number without commas
+ */
+export function parseNumberFromFormatted(value: string): number {
+    if (!value) return 0
+    const cleaned = String(value).replace(/,/g, '')
+    const parsed = parseFloat(cleaned)
+    return isNaN(parsed) ? 0 : parsed
+}
+
