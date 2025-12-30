@@ -9,6 +9,7 @@ import { getNextQuoteNumber, createQuote, type QuoteFormData } from '@/lib/actio
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useBudget } from '@/contexts/BudgetContext'
 import { toast } from 'sonner'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 
 interface QuoteFormProps {
     clients: any[]
