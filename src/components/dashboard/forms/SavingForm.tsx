@@ -278,12 +278,11 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-200">יעד</label>
-                        <Input
-                            type="number"
                         <FormattedNumberInput
                             placeholder="מטרה"
                             value={newSaving.goal}
                             onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
+                        />
                         />
                     </div>
                 </div>
