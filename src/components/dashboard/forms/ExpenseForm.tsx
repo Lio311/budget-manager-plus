@@ -366,7 +366,24 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         <Checkbox
                             id="recurring-expense"
                             checked={newExpense.isRecurring}
-                            onCheckedChange={(checked) => setNewExpense({ ...newExpense, isRecurring: checked as boolean })}
+                            onCheckedChange={(checked) => {
+                                const isRecurring = checked as boolean
+                                let recurringEndDate = newExpense.recurringEndDate
+
+                                if (isRecurring && !recurringEndDate) {
+                                    // Default to 1 year from the selected date (or today)
+                                    const baseDate = newExpense.date ? new Date(newExpense.date) : new Date()
+                                    const defaultEndDate = new Date(baseDate)
+                                    defaultEndDate.setFullYear(defaultEndDate.getFullYear() + 1)
+                                    recurringEndDate = format(defaultEndDate, 'yyyy-MM-dd')
+                                }
+
+                                setNewExpense({
+                                    ...newExpense,
+                                    isRecurring,
+                                    recurringEndDate: isRecurring ? recurringEndDate : undefined
+                                })
+                            }}
                             className={isBusiness ? 'data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600' : 'data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]'}
                         />
                         <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הוצאה קבועה</label>
