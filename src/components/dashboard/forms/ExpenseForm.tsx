@@ -16,7 +16,9 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { formatCurrency } from '@/lib/utils'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
-import { addExpense, importExpenses } from '@/lib/actions/expense'
+import { useRef } from 'react'
+import { addExpense, importExpenses, deleteAllMonthlyExpenses } from '@/lib/actions/expense'
+import { Trash2 } from 'lucide-react'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { BankImportModal } from '../BankImportModal'
 import { CategoryManagementDialog } from './CategoryManagementDialog'
@@ -174,6 +176,25 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         }
     }
 
+    const handleDeleteAll = async () => {
+        if (!confirm('האם אתה בטוח שברצונך למחוק את כל ההוצאות של אותו חודש?')) return
+
+        try {
+            const result = await deleteAllMonthlyExpenses(month, year, budgetType)
+            if (result.success) {
+                toast({ title: 'הצלחה', description: 'כל ההוצאות נמחקו בהצלחה' })
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
+                globalMutate(['expenses', month, year, budgetType])
+                if (onSuccess) onSuccess()
+            } else {
+                toast({ title: 'שגיאה', description: 'מחיקת ההוצאות נכשלה', variant: 'destructive' })
+            }
+        } catch (error) {
+            console.error(error)
+            toast({ title: 'שגיאה', description: 'שגיאה במחיקת נתונים', variant: 'destructive' })
+        }
+    }
+
     const handleImportExpenses = async (data: any[]) => {
         const expensesToImport = data.map(row => ({
             description: row.description,
@@ -221,6 +242,15 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 <h3 className="text-lg font-bold text-[#323338]">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
                 {!isMobile && (
                     <div className="mr-auto flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleDeleteAll}
+                            title="מחק את כל ההוצאות לחודש זה"
+                            className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
                         <CategoryManagementDialog
                             categories={categories}
                             type="expense"
