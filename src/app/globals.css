@@ -459,6 +459,7 @@ div[data-clerk-modal],
   max-width: 380px !important;
   width: 380px !important;
   min-width: 320px !important;
+  max-height: 60vh !important;
 }
 
 .dark .cl-userProfile-root,
@@ -470,6 +471,7 @@ div[data-clerk-modal],
   max-width: 380px !important;
   width: 380px !important;
   min-width: 320px !important;
+  max-height: 60vh !important;
 }
 
 /* Force all Clerk containers to be compact */
@@ -501,10 +503,11 @@ div[data-clerk-modal],
 .cl-rootBox,
 .cl-main {
   min-height: auto !important;
-  max-height: 70vh !important;
+  max-height: 55vh !important;
   padding: 0.5rem !important;
   width: 100% !important;
   max-width: 100% !important;
+  overflow-y: auto !important;
 }
 
 .dark .cl-pageScrollBox,
@@ -512,10 +515,11 @@ div[data-clerk-modal],
 .dark .cl-rootBox,
 .dark .cl-main {
   min-height: auto !important;
-  max-height: 70vh !important;
+  max-height: 55vh !important;
   padding: 0.5rem !important;
   width: 100% !important;
   max-width: 100% !important;
+  overflow-y: auto !important;
 }
 
 .cl-profileSection,
@@ -530,4 +534,18 @@ div[data-clerk-modal],
 .dark .cl-profileSectionPrimaryButton {
   padding: 0.5rem !important;
   max-width: 100% !important;
+}
+
+/* Fix number input spinner position for RTL - move to left side */
+input[type="number"] {
+  direction: ltr;
+  text-align: right;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  position: absolute;
+  left: 0;
+  right: auto;
+  margin: 0;
 }
