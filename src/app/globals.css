@@ -503,8 +503,16 @@ button.cl-modalCloseButton,
 .dark input[class*="cl-"],
 .dark textarea[class*="cl-"] {
   background-color: #1e293b !important;
-  border: 1px solid #334155 !important;
+  border: 1px solid transparent !important;
   color: #f8fafc !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.dark .cl-formFieldInput:hover,
+.dark .cl-selectButton:hover,
+.dark input[class*="cl-"]:hover,
+.dark textarea[class*="cl-"]:hover {
+  border-color: #64748b !important;
 }
 
 /* Buttons */
