@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { heIL } from '@clerk/localizations'
 import { Toaster } from '@/components/ui/toaster'
+import { Toaster as SonnerToaster } from '@/components/ui/sonner'
 import { Rubik } from 'next/font/google'
 import { WebApplicationJsonLd } from '@/components/seo/JsonLd'
 
@@ -119,6 +120,7 @@ export default function RootLayout({
                     <WebApplicationJsonLd />
                     {children}
                     <Toaster />
+                    <SonnerToaster />
                 </body>
             </html>
         </ClerkProvider>
