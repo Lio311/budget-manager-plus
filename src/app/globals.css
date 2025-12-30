@@ -454,18 +454,33 @@ button.cl-modalCloseButton,
 .cl-modalContent,
 .cl-userButtonPopoverCard,
 .cl-card {
-  max-width: 400px !important;
-  width: 400px !important;
-  min-width: 350px !important;
+  max-width: 380px !important;
+  width: 380px !important;
+  min-width: 320px !important;
 }
 
 .dark .cl-userProfile-root,
 .dark .cl-modal,
 .dark .cl-modalContent,
 .dark .cl-card {
-  max-width: 400px !important;
-  width: 400px !important;
-  min-width: 350px !important;
+  max-width: 380px !important;
+  width: 380px !important;
+  min-width: 320px !important;
+}
+
+/* Reduce sidebar width */
+.cl-navbar,
+.cl-userProfile-navbar {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.dark .cl-navbar,
+.dark .cl-userProfile-navbar {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
 }
 
 .cl-pageScrollBox,
@@ -474,7 +489,7 @@ button.cl-modalCloseButton,
 .cl-main {
   min-height: auto !important;
   max-height: 70vh !important;
-  padding: 0.75rem !important;
+  padding: 0.5rem !important;
   width: 100% !important;
   max-width: 100% !important;
 }
@@ -485,7 +500,7 @@ button.cl-modalCloseButton,
 .dark .cl-main {
   min-height: auto !important;
   max-height: 70vh !important;
-  padding: 0.75rem !important;
+  padding: 0.5rem !important;
   width: 100% !important;
   max-width: 100% !important;
 }
