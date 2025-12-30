@@ -285,7 +285,18 @@ button.cl-modalCloseButton,
   white-space: normal !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 4px !important;
+  gap: 8px !important;
+  /* Increased gap */
+  align-items: flex-start !important;
+  /* Align to start for RTL */
+  width: 100% !important;
+  /* Ensure full width */
+}
+
+/* Specific fix for the 'Try Again' text to not overlap */
+.cl-identityPreviewEditButton+div p,
+.cl-alert p {
+  margin-bottom: 4px !important;
 }
 
 /* Ensure the layout for "Try again" (נסה שוב) is accessible */
