@@ -165,7 +165,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                             placeholder="סכום כולל"
                             className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
                             value={newDebt.totalAmount}
-                            onValueChange={(values) => setNewDebt({ ...newDebt, totalAmount: values.value })}
+                            onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
                             disabled={submitting}
                             dir="ltr"
                         />
@@ -181,7 +181,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                         max="31"
                         className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
                         value={newDebt.dueDay}
-                        onValueChange={(values) => setNewDebt({ ...newDebt, dueDay: values.value })}
+                        onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
                         disabled={submitting}
                         dir="ltr"
                     />
