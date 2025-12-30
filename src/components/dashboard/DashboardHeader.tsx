@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { FeedbackButton } from './FeedbackButton'
+import { ModeToggle } from '@/components/mode-toggle'
 
 import Image from 'next/image'
 
@@ -154,8 +155,11 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         </button>
                     </div>
 
-                    <div className="pl-2 border-l border-gray-200">
-                        <UserButton />
+                    <div className="flex items-center gap-2">
+                        <ModeToggle />
+                        <div className="pl-2 border-l border-gray-200 dark:border-gray-700">
+                            <UserButton />
+                        </div>
                     </div>
                 </div>
             </div>

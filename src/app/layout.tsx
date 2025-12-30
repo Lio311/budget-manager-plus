@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { heIL } from '@clerk/localizations'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as SonnerToaster } from '@/components/ui/sonner'
+import { ThemeProvider } from '@/components/theme-provider'
 import { Rubik } from 'next/font/google'
 import { WebApplicationJsonLd } from '@/components/seo/JsonLd'
 
@@ -117,10 +118,17 @@ export default function RootLayout({
                     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
                 </head>
                 <body>
-                    <WebApplicationJsonLd />
-                    {children}
-                    <Toaster />
-                    <SonnerToaster />
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <WebApplicationJsonLd />
+                        {children}
+                        <Toaster />
+                        <SonnerToaster />
+                    </ThemeProvider>
                 </body>
             </html>
         </ClerkProvider>
