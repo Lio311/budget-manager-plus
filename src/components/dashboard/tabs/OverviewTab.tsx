@@ -56,6 +56,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const [initialBalance, setInitialBalance] = useState('')
     const [initialSavings, setInitialSavings] = useState('')
     const [showProgress, setShowProgress] = useState(false)
+    const [activeSettingsTab, setActiveSettingsTab] = useState('details')
 
     useEffect(() => {
         const timer = setTimeout(() => setShowProgress(true), 100)
