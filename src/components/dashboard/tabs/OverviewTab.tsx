@@ -445,7 +445,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <CardTitle>הון עצמי</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px] -ml-4">
-                        {netWorthHistory && netWorthHistory.length > 0 ? (
+                        {netWorthHistory && netWorthHistory.length > 0 && (isBusiness || (parseFloat(initialBalance) > 0 || parseFloat(initialSavings) > 0)) ? (
                             <NetWorthChart data={netWorthHistory} loading={loading} />
                         ) : (
                             <div className="pl-4 h-full">
