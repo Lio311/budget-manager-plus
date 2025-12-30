@@ -429,14 +429,22 @@ button.cl-modalCloseButton,
   border-color: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Make Clerk modals more compact - fit to content */
+/* Make Clerk modals MUCH more compact - fit to content */
 .dark .cl-userProfile-root,
-.dark .cl-modal {
-  max-width: 600px !important;
-  width: auto !important;
+.dark .cl-modal,
+.dark .cl-modalContent {
+  max-width: 500px !important;
+  width: fit-content !important;
+  min-width: 400px !important;
 }
 
-.dark .cl-pageScrollBox {
+.dark .cl-pageScrollBox,
+.dark .cl-scrollBox {
   min-height: auto !important;
-  max-height: 80vh !important;
+  max-height: 70vh !important;
+  padding: 1rem !important;
+}
+
+.dark .cl-profileSection {
+  padding: 0.75rem !important;
 }

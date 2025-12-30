@@ -211,7 +211,7 @@ export function BudgetLimitsTab() {
                     <Button
                         onClick={handleSmartRecommendations}
                         disabled={activeDefaults}
-                        className="relative w-full h-full min-h-[140px] p-0 overflow-hidden border-0 rounded-2xl bg-gradient-to-br from-yellow-50/50 to-orange-50/50 dark:from-slate-800 dark:to-slate-900 hover:from-yellow-100/50 hover:to-orange-100/50 dark:hover:from-slate-800 dark:hover:to-slate-800 shadow-sm hover:shadow-md transition-all duration-300 group ring-1 ring-yellow-100 hover:ring-yellow-200 dark:ring-slate-700 dark:hover:ring-slate-600"
+                        className="relative w-full h-full min-h-[180px] p-0 overflow-hidden border-0 rounded-2xl bg-gradient-to-br from-yellow-50/50 to-orange-50/50 dark:from-slate-800 dark:to-slate-900 hover:from-yellow-100/50 hover:to-orange-100/50 dark:hover:from-slate-800 dark:hover:to-slate-800 shadow-sm hover:shadow-md transition-all duration-300 group ring-1 ring-yellow-100 hover:ring-yellow-200 dark:ring-slate-700 dark:hover:ring-slate-600"
                         variant="ghost"
                     >
                         {/* Decorative background sparkles */}
