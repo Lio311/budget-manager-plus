@@ -241,10 +241,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 setActiveSettingsTab('details')
                                 setIsSettingsOpen(true)
                             }}
-                            className="bg-white hover:bg-gray-50 text-gray-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-gray-100 dark:border-slate-700"
+                            className="bg-white hover:bg-gray-50 text-gray-700 dark:bg-transparent dark:text-gray-100 dark:border-input relative overflow-hidden group"
                             title="הגדרות תצוגה"
                         >
                             <Settings className="w-4 h-4" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-slate-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10 dark:from-slate-800 dark:to-slate-800" />
                         </Button>
                     )}
                     <FinancialAdvisorButton financialData={aiFinancialData} />
