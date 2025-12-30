@@ -10,9 +10,54 @@ import { toast } from 'sonner'
 import useSWR from 'swr'
 import { SignaturePad } from './SignaturePad'
 
-export function BusinessSettings() {
+export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
     const [uploading, setUploading] = useState(false)
     const [saving, setSaving] = useState(false)
+    // ... (lines 16-144)
+    if (result.success) {
+        toast.success('הפרטים נשמרו בהצלחה')
+        mutate()
+        onSuccess?.()
+    } else {
+        // ... (lines 148-160)
+        return (
+            <div className="space-y-4 text-right">
+                {/* Logo Section */}
+                <div className="flex flex-col items-start">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 text-right w-full">
+                        לוגו העסק
+                    </label>
+                    <p className="text-xs text-gray-500 mb-3 text-right w-full">
+                        הלוגו ישמש בחשבוניות ובמסמכים שהמערכת תפיק
+                    </p>
+
+                    {currentLogo ? (
+                        // ... (lines 188-212)
+                        {!currentLogo && (
+                    <Button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="bg-blue-600 hover:bg-blue-700 mt-3"
+                    >
+                        {uploading ? 'מעלה...' : 'העלה לוגו'}
+                        <Upload className="h-4 w-4 mr-2" />
+                    </Button>
+                )}
+                </div>
+
+                {/* Business Details */}
+// ... (lines 305-310)
+                <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="bg-green-600 hover:bg-green-700 w-full"
+                >
+                    {saving ? 'שומר שינויים...' : 'שמור פרטים'}
+                </Button>
+            </div>
+        </div >
+    )
+    }
     const [preview, setPreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -144,6 +189,7 @@ export function BusinessSettings() {
             if (result.success) {
                 toast.success('הפרטים נשמרו בהצלחה')
                 mutate()
+                onSuccess?.()
             } else {
                 toast.error(result.error || 'שגיאה בשמירת הפרטים')
             }
@@ -159,11 +205,11 @@ export function BusinessSettings() {
     return (
         <div className="space-y-4 text-right">
             {/* Logo Section */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 text-right">
+            <div className="flex flex-col items-start">
+                <label className="block text-sm font-medium text-gray-700 mb-2 text-right w-full">
                     לוגו העסק
                 </label>
-                <p className="text-xs text-gray-500 mb-3 text-right">
+                <p className="text-xs text-gray-500 mb-3 text-right w-full">
                     הלוגו ישמש בחשבוניות ובמסמכים שהמערכת תפיק
                 </p>
 
@@ -313,7 +359,7 @@ export function BusinessSettings() {
                     disabled={saving}
                     className="bg-green-600 hover:bg-green-700 w-full"
                 >
-                    {saving ? 'שומר נתונים...' : 'שמור פרטים'}
+                    {saving ? 'שומר שינויים...' : 'שמור פרטים'}
                 </Button>
             </div>
         </div>

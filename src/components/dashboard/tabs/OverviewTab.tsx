@@ -535,7 +535,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
                             </TabsList>
                             <TabsContent value="details" className="mt-4">
-                                <BusinessSettings />
+                                <BusinessSettings onSuccess={() => setIsSettingsOpen(false)} />
                             </TabsContent>
                             <TabsContent value="financials" className="mt-4 space-y-4">
                                 <Card>
