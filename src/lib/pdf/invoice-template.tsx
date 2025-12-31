@@ -221,62 +221,26 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
         return `${day}/${month}/${year}`
     }
 
-    // Helper to fix Hebrew text direction in PDF
-    // React-PDF often renders mixed Hebrew/English LTR-wise.
-    // We need to reverse the order of chunks for RTL, but KEEP English chunks LTR internally.
-    // Example: "אחד שתיים FOUR FIVE" -> Visual should be "FOUR FIVE שתיים אחד"
-    const fixHebrewText = (text: string | undefined) => {
-        if (!text) return ''
-        const hasHebrew = /[\u0590-\u05FF]/.test(text)
-        if (!hasHebrew) return text
+    // New Logic: Render words individually in row-reverse to ensure visual RTL order
+    const renderNotes = (text: string | undefined) => {
+        if (!text) return null
 
-        // Split by spaces to get words
-        const words = text.split(' ')
+        // Split by newlines first to preserve paragraphs
+        const lines = text.split('\n')
 
-        const chunks: string[] = []
-        let currentChain: string[] = []
-        let isHebrewChain = false
-
-        words.forEach(word => {
-            const isHebrewWord = /[\u0590-\u05FF]/.test(word)
-
-            if (currentChain.length === 0) {
-                currentChain.push(word)
-                isHebrewChain = isHebrewWord
-            } else {
-                if (isHebrewWord === isHebrewChain) {
-                    // Continue same type chain
-                    currentChain.push(word)
-                } else {
-                    // Switch type
-                    chunks.push(currentChain.join(' '))
-                    currentChain = [word]
-                    isHebrewChain = isHebrewWord
-                }
-            }
-        })
-        if (currentChain.length > 0) {
-            chunks.push(currentChain.join(' '))
-        }
-
-        // Now we have chunks like ["אחד שתיים", "FOUR FIVE", "שלוש"]
-        // We want to reverse the order of chunks?
-        // No, we want to reverse "Hebrew" phrases word-by-word?
-        // Wait, if I have "אחד שתיים", it should be visually "שתיים אחד".
-        // So Hebrew chains MUST be reversed internally.
-        // English chains MUST NOT be reversed internally.
-
-        const processedChunks = chunks.map(chunk => {
-            const isHebrew = /[\u0590-\u05FF]/.test(chunk)
-            if (isHebrew) {
-                return chunk.split(' ').reverse().join(' ')
-            } else {
-                return chunk // Keep English LTR
-            }
-        })
-
-        // Finally, reverse the ORDER of the processed chunks
-        return processedChunks.reverse().join(' ')
+        return (
+            <View style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
+                {lines.map((line, i) => (
+                    <View key={i} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+                        {line.split(' ').map((word, j) => (
+                            <Text key={j} style={{ fontSize: 9, color: '#374151', marginLeft: 3 }}>
+                                {word}
+                            </Text>
+                        ))}
+                    </View>
+                ))}
+            </View>
+        )
     }
 
     return (
@@ -395,7 +359,7 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                 {data.notes && (
                     <View style={{ marginTop: 5, padding: 5, backgroundColor: '#f3f4f6', borderRadius: 4 }} wrap={false}>
                         <Text style={{ fontSize: 9, color: '#6b7280', textAlign: 'right', marginBottom: 2 }}>:הערות</Text>
-                        <Text style={{ fontSize: 9, color: '#374151', textAlign: 'right' }}>{fixHebrewText(data.notes)}</Text>
+                        {renderNotes(data.notes)}
                     </View>
                 )}
 
