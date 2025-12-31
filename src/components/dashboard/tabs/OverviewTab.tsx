@@ -496,8 +496,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                         {/* Bills / New Clients (Orange) */}
                         <div
-                            className={`space-y-2 ${isBusiness ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors' : ''}`}
-                            onClick={() => isBusiness && router.push('?tab=clients')}
+                            className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                            onClick={() => isBusiness ? router.push('?tab=clients') : router.push('?tab=bills')}
                         >
                             <div className="flex justify-between text-sm">
                                 <span className="font-medium text-gray-700 dark:text-gray-300">
@@ -519,16 +519,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     }}
                                 />
                             </div>
-                            {isBusiness && (
-                                <div className="text-xs text-gray-400">
-                                    {((overviewData as any)?.businessStats?.newClientsCount || 0) > 0 ? `נוספו ${((overviewData as any)?.businessStats?.newClientsCount || 0)} לקוחות החודש` : 'לא נוספו לקוחות החודש'}
-                                </div>
-                            )}
                         </div>
 
-                        {/* Debts / Sales Before VAT (Purple) */}
+                        {/* Debts / Sales Before VAT (Purple/Green) */}
                         <div
-                            className={`space-y-2 ${isBusiness ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors' : ''}`}
+                            className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
                             onClick={() => !isBusiness ? router.push('?tab=debts') : router.push('?tab=income')}
                         >
                             <div className="flex justify-between text-sm">
@@ -544,7 +539,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             </div>
                             <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div
-                                    className={`h-full bg-purple-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
+                                    className={`h-full ${isBusiness ? 'bg-green-500' : 'bg-purple-500'} rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
                                     style={{
                                         width: showProgress
                                             ? isBusiness
@@ -558,7 +553,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                         {/* Savings (Blue) - Hidden for Business */}
                         {!isBusiness && (
-                            <div className="space-y-2">
+                            <div
+                                className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                                onClick={() => router.push('?tab=savings')}
+                            >
                                 <div className="flex justify-between text-sm">
                                     <span className="font-medium text-gray-700 dark:text-gray-300">חיסכון והפקדות</span>
                                     <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalSavingsObserved)}</span>
