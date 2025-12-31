@@ -275,25 +275,10 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
         setImporting(true)
         setError(null)
 
-        // Calculate distribution for feedback
-        const monthCounts: Record<string, number> = {}
-        previewData.forEach(row => {
-            if (row.date) {
-                const date = new Date(row.date)
-                const key = `${date.getMonth() + 1}/${date.getFullYear()}`
-                monthCounts[key] = (monthCounts[key] || 0) + 1
-            }
-        })
-        const distributionStr = Object.entries(monthCounts)
-            .map(([key, count]) => `${count} ב-${key}`)
-            .join(', ')
+
 
         try {
             await onImport(previewData)
-
-            toast.success(`יובאו בהצלחה ${previewData.length} הוצאות`, {
-                description: `פירוט לפי חודשים: ${distributionStr}. (הערה: הוצאות מחודשים אחרים לא יוצגו במסך הנוכחי)`
-            })
 
             setOpen(false)
             setFile(null)
