@@ -144,11 +144,14 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const fourthMetricPrev = isBusiness ? prevNetWorth : prevBillsDisplay
     const fourthMetricChange = fourthMetricPrev !== 0 ? ((fourthMetricCurrent - fourthMetricPrev) / Math.abs(fourthMetricPrev)) * 100 : 0
 
-    const incomeVsExpenses = [
-        { name: isBusiness ? 'מכירות' : 'הכנסות', value: totalIncome, color: COLORS.income },
-        { name: isBusiness ? 'הוצאות' : 'הוצאות', value: totalExpenses, color: COLORS.expenses },
+    const incomeVsExpenses = isBusiness ? [
+        { name: 'מכירות', value: totalIncome, color: '#22c55e' }, // Green
+        { name: 'הוצאות', value: totalExpenses, color: '#ef4444' } // Red
+    ] : [
+        { name: 'הכנסות', value: totalIncome, color: COLORS.income },
+        { name: 'הוצאות', value: totalExpenses, color: COLORS.expenses },
         { name: 'חשבונות', value: totalBills, color: COLORS.bills },
-        { name: 'חובות', value: totalDebts, color: '#A855F7' }, // Purple for debts
+        { name: 'חובות', value: totalDebts, color: '#A855F7' },
         { name: 'חיסכון', value: totalSavingsObserved, color: COLORS.savings },
     ].filter(item => item.value > 0)
 
