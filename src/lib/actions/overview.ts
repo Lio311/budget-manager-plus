@@ -43,7 +43,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 where: { userId, month, year, type },
                 select: {
                     id: true,
-                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true } },
+                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true } },
                     expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
@@ -54,7 +54,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 where: { userId, month: prevMonth, year: prevYear, type },
                 select: {
                     id: true,
-                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true } },
+                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true } },
                     expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
@@ -62,6 +62,30 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 }
             })
         ])
+
+        // Get New Clients Count (Current Month vs Previous Month)
+        // Only if type is BUSINESS (optimization)
+        let newClientsCount = 0
+        let prevNewClientsCount = 0
+
+        if (type === 'BUSINESS') {
+            const startDate = new Date(year, month - 1, 1) // Start of current month
+            const endDate = new Date(year, month, 1) // Start of next month (exclusive)
+
+            const prevStartDate = new Date(prevYear, prevMonth - 1, 1)
+            const prevEndDate = new Date(prevYear, prevMonth, 1)
+
+            const [currentClients, prevClients] = await Promise.all([
+                db.client.count({
+                    where: { userId, createdAt: { gte: startDate, lt: endDate } }
+                }),
+                db.client.count({
+                    where: { userId, createdAt: { gte: prevStartDate, lt: prevEndDate } }
+                })
+            ])
+            newClientsCount = currentClients
+            prevNewClientsCount = prevClients
+        }
 
         // Convert all amounts to ILS for consistency
         const convertBudgetItems = async (budget: any) => {
@@ -174,6 +198,10 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     bills: previousBudgetConverted?.bills || [],
                     debts: previousBudgetConverted?.debts || [],
                     savings: previousBudgetConverted?.savings || []
+                },
+                businessStats: {
+                    newClientsCount,
+                    prevNewClientsCount
                 },
                 categories,
                 netWorthHistory,

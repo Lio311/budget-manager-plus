@@ -478,49 +478,84 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     </CardHeader>
                     {/* ... content truncated for brevity, assume unchanged ... */}
                     <CardContent className="space-y-6 pt-4">
-                        {/* Expenses (Red) */}
-                        <div className="space-y-2">
+                        {/* Expenses (Red) - Clickable */}
+                        <div
+                            className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                            onClick={() => router.push('?tab=expenses')}
+                        >
                             <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700">הוצאות שוטפות</span>
-                                <span className="font-medium text-gray-900">{formatCurrency(totalExpenses)}</span>
+                                <span className="font-medium text-gray-700 dark:text-gray-300">הוצאות שוטפות</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalExpenses)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div className={`h-full bg-red-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalExpenses / (totalIncome || 1)) * 100, 100)}%` : '0%' }} />
                             </div>
                         </div>
 
-                        {/* Bills (Orange) */}
+                        {/* Bills / New Clients (Orange) */}
+                        <div
+                            className={`space-y-2 ${isBusiness ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors' : ''}`}
+                            onClick={() => isBusiness && router.push('?tab=clients')}
+                        >
+                            <div className="flex justify-between text-sm">
+                                <span className="font-medium text-gray-700 dark:text-gray-300">
+                                    {isBusiness ? 'לקוחות חדשים' : 'חשבונות ששולמו'}
+                                </span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                    {isBusiness ? (overviewData as any)?.businessStats?.newClientsCount || 0 : formatCurrency(paidBills)}
+                                </span>
+                            </div>
+                            {!isBusiness && (
+                                <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div className={`h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((paidBills / (totalBills || 1)) * 100, 100)}%` : '0%' }} />
+                                </div>
+                            )}
+                            {isBusiness && (
+                                <div className="text-xs text-gray-400">
+                                    {((overviewData as any)?.businessStats?.newClientsCount || 0) > 0 ? `נוספו ${((overviewData as any)?.businessStats?.newClientsCount || 0)} לקוחות החודש` : 'לא נוספו לקוחות החודש'}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Debts / Sales Before VAT (Purple) */}
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700">חשבונות ששולמו</span>
-                                <span className="font-medium text-gray-900">{formatCurrency(paidBills)}</span>
+                                <span className="font-medium text-gray-700 dark:text-gray-300">
+                                    {isBusiness ? 'מכירות לפני מע"מ' : 'הלוואות ששולמו'}
+                                </span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                    {isBusiness
+                                        ? formatCurrency(current.incomes.reduce((sum: number, item: any) => sum + ((item.amountILS || 0) - (item.vatAmount || 0)), 0))
+                                        : formatCurrency(paidDebts)
+                                    }
+                                </span>
                             </div>
                             <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div className={`h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((paidBills / (totalBills || 1)) * 100, 100)}%` : '0%' }} />
+                                <div
+                                    className={`h-full bg-purple-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
+                                    style={{
+                                        width: showProgress
+                                            ? isBusiness
+                                                ? '100%' // Full width for sales metric
+                                                : `${Math.min((paidDebts / (totalDebts || 1)) * 100, 100)}%`
+                                            : '0%'
+                                    }}
+                                />
                             </div>
                         </div>
 
-                        {/* Debts (Purple) */}
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700">הלוואות ששולמו</span>
-                                <span className="font-medium text-gray-900">{formatCurrency(paidDebts)}</span>
+                        {/* Savings (Blue) - Hidden for Business */}
+                        {!isBusiness && (
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-sm">
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">חיסכון והפקדות</span>
+                                    <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalSavingsObserved)}</span>
+                                </div>
+                                <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalSavingsObserved / (totalIncome * 0.2 || 1)) * 100, 100)}%` : '0%' }} />
+                                </div>
                             </div>
-                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div className={`h-full bg-purple-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((paidDebts / (totalDebts || 1)) * 100, 100)}%` : '0%' }} />
-                            </div>
-                        </div>
-
-                        {/* Savings (Blue) */}
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700">חיסכון והפקדות</span>
-                                <span className="font-medium text-gray-900">{formatCurrency(totalSavingsObserved)}</span>
-                            </div>
-                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalSavingsObserved / (totalIncome * 0.2 || 1)) * 100, 100)}%` : '0%' }} />
-                            </div>
-                        </div>
+                        )}
                     </CardContent>
                 </Card >
             </div >
