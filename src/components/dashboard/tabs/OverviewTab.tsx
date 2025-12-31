@@ -97,7 +97,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         }
     }, [overviewData, budgetType])
 
-    const isBusiness = budgetType === 'BUSINESS'
     const current = overviewData?.current || { incomes: [], expenses: [], bills: [], debts: [], savings: [] }
     const previous = overviewData?.previous || { incomes: [], expenses: [], bills: [], debts: [], savings: [] }
     const categories = overviewData?.categories || []
