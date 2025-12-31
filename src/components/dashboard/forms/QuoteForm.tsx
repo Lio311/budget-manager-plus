@@ -79,7 +79,6 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                         <input
                             type="text"
                             required
-                            required
                             value={formData.quoteNumber}
                             readOnly
                             disabled
