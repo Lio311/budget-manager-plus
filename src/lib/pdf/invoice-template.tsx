@@ -222,6 +222,8 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
     }
 
     // New Logic: Render words individually in row-reverse to ensure visual RTL order
+    // CRITICAL FIX: English/Number sequences must be GROUPED together to preserve LTR order within the block.
+    // Hebrew words must be SEPARATED to flow RTL via flexbox.
     const renderNotes = (text: string | undefined) => {
         if (!text) return null
 
@@ -230,15 +232,43 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
 
         return (
             <View style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
-                {lines.map((line, i) => (
-                    <View key={i} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
-                        {line.split(' ').map((word, j) => (
-                            <Text key={j} style={{ fontSize: 9, color: '#374151', marginLeft: 3 }}>
-                                {word}
-                            </Text>
-                        ))}
-                    </View>
-                ))}
+                {lines.map((line, i) => {
+                    const words = line.split(' ')
+                    const chunks: string[] = []
+                    let currentLtrBuffer: string[] = []
+
+                    words.forEach(word => {
+                        // Check if word contains Hebrew characters
+                        const isHebrew = /[\u0590-\u05FF]/.test(word)
+
+                        if (isHebrew) {
+                            // Flush buffer if exists
+                            if (currentLtrBuffer.length > 0) {
+                                chunks.push(currentLtrBuffer.join(' '))
+                                currentLtrBuffer = []
+                            }
+                            // Push Hebrew word individually
+                            chunks.push(word)
+                        } else {
+                            // Add regular symbols/numbers/english to buffer
+                            currentLtrBuffer.push(word)
+                        }
+                    })
+                    // Final flush
+                    if (currentLtrBuffer.length > 0) {
+                        chunks.push(currentLtrBuffer.join(' '))
+                    }
+
+                    return (
+                        <View key={i} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+                            {chunks.map((chunk, j) => (
+                                <Text key={j} style={{ fontSize: 9, color: '#374151', marginLeft: 3 }}>
+                                    {chunk}
+                                </Text>
+                            ))}
+                        </View>
+                    )
+                })}
             </View>
         )
     }
