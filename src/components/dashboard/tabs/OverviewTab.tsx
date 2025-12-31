@@ -440,7 +440,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     <BarChart data={expensesByCategoryData} barSize={32} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
                                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} padding={{ left: 50, right: 10 }} />
-                                        <YAxis axisLine={false} tickLine={false} width={45} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#6b7280', fontSize: 11 }} domain={[0, 'auto']} />
+                                        <YAxis axisLine={false} tickLine={false} width={45} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#ffffff', fontSize: 11 }} domain={[0, 'auto']} />
                                         <Tooltip
                                             cursor={{ fill: 'transparent' }}
                                             content={({ active, payload, label }) => {

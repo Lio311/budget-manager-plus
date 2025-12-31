@@ -47,7 +47,7 @@ export function NetWorthChart({ data, loading }: { data: NetWorthData[], loading
                             dataKey="formattedDate"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fontSize: 10, fill: '#64748B' }}
+                            tick={{ fontSize: 10, fill: '#ffffff' }}
                             dy={10}
                         />
                         <YAxis
