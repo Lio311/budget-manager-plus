@@ -372,6 +372,8 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
 
         if (expenses.length === 0) return { success: true }
 
+        const db = await authenticatedPrisma(userId)
+
         // --- Duplicate Prevention Check (Row Level) ---
         // 1. Get Date Range
         const validDates = expenses
