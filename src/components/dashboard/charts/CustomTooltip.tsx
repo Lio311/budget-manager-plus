@@ -8,24 +8,24 @@ interface CustomTooltipProps extends TooltipProps<ValueType, NameType> {
 export const CustomTooltip = ({ active, payload, label, currency = '₪' }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
         return (
-            <div className="glass-panel p-3 border border-white/50 shadow-xl rounded-xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
-                <p className="font-bold text-[#323338] mb-1 text-sm">{label}</p>
-                <div className="space-y-1">
-                    {payload.map((entry, index) => (
-                        <div key={index} className="flex items-center gap-2 text-xs">
-                            <div
-                                className="w-2 h-2 rounded-full shadow-sm"
-                                style={{ backgroundColor: entry.color }}
-                            />
-                            <span className="font-medium text-gray-600">{entry.name}:</span>
-                            <span className="font-mono font-bold text-[#323338]">
-                                {currency}{Number(entry.value).toLocaleString()}
-                            </span>
-                        </div>
-                    ))}
-                </div>
+            <div className="glass-panel px-4 py-3 border border-white/50 dark:border-slate-700/50 shadow-xl rounded-xl backdrop-blur-xl text-right min-w-[180px]">
+                <p className="font-bold text-[#323338] dark:text-gray-100 text-sm mb-2">{label}</p>
+                {payload.map((entry: any, index: number) => (
+                    <div key={index} className="flex items-center justify-end gap-2 text-xs md:text-sm">
+                        <span className="font-mono font-bold text-[#323338] dark:text-white dir-ltr">
+                            {currency}{Number(entry.value).toLocaleString()}
+                        </span>
+                        <span className="text-gray-600 dark:text-gray-300">
+                            : {entry.name || 'שווי'}
+                        </span>
+                        <div
+                            className="w-2.5 h-2.5 rounded-full shadow-sm"
+                            style={{ backgroundColor: entry.color || entry.fill || '#22C55E' }}
+                        />
+                    </div>
+                ))}
             </div>
-        );
+        )
     }
 
     return null;

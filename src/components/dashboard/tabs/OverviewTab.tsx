@@ -2,6 +2,7 @@
 
 import useSWR from 'swr'
 import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowDown, ArrowUp, TrendingUp, Wallet, Loader2, PieChart as PieChartIcon, TrendingDown, CreditCard, Settings, Save, AlertCircle, PiggyBank, Briefcase } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
@@ -52,6 +53,8 @@ function getBoldColor(colorClass: string | null) {
 
 export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: string) => void }) {
     const { month, year, currency, budgetType } = useBudget()
+    const router = useRouter()
+    const isBusiness = budgetType === 'BUSINESS'
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [initialBalance, setInitialBalance] = useState('')
