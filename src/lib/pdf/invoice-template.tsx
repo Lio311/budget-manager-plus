@@ -221,6 +221,19 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
         return `${day}/${month}/${year}`
     }
 
+    // Helper to fix Hebrew text direction in PDF
+    // React-PDF often renders mixed Hebrew/English LTR-wise (First word on left).
+    // For RTL reading, we want the first word on the right.
+    // This simple reverser handles the word order for display.
+    const fixHebrewText = (text: string | undefined) => {
+        if (!text) return ''
+        const hasHebrew = /[\u0590-\u05FF]/.test(text)
+        if (!hasHebrew) return text
+
+        // Reverse word order so they are laid out Right-to-Left visually by LTR engine
+        return text.split(' ').reverse().join(' ')
+    }
+
     return (
         <Document>
             <Page size="A4" style={styles.page}>
@@ -337,7 +350,7 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                 {data.notes && (
                     <View style={{ marginTop: 5, padding: 5, backgroundColor: '#f3f4f6', borderRadius: 4 }} wrap={false}>
                         <Text style={{ fontSize: 9, color: '#6b7280', textAlign: 'right', marginBottom: 2 }}>:הערות</Text>
-                        <Text style={{ fontSize: 9, color: '#374151', textAlign: 'right' }}>{data.notes}</Text>
+                        <Text style={{ fontSize: 9, color: '#374151', textAlign: 'right' }}>{fixHebrewText(data.notes)}</Text>
                     </View>
                 )}
 
