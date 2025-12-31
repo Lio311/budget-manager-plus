@@ -148,7 +148,12 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
         })
 
         // Calculate net worth history - using real-time API conversion for accuracy
-        let accumulatedNetWorth = (user.initialBalance || 0) + (user.initialSavings || 0)
+        // FIX: Use correct initial values based on budget type
+        const initialBalanceToCheck = type === 'BUSINESS' ? (user.businessInitialBalance || 0) : (user.initialBalance || 0)
+        const initialSavingsToCheck = type === 'BUSINESS' ? (user.businessInitialSavings || 0) : (user.initialSavings || 0)
+
+        let accumulatedNetWorth = initialBalanceToCheck + initialSavingsToCheck
+
         const netWorthHistory = await Promise.all(allBudgets.map(async (budget) => {
             // Convert all amounts to ILS using real API rates
             const incomePromises = budget.incomes.map(item => convertToILS(item.amount, item.currency))
@@ -207,7 +212,9 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 netWorthHistory,
                 user: {
                     initialBalance: user.initialBalance,
-                    initialSavings: user.initialSavings
+                    initialSavings: user.initialSavings,
+                    businessInitialBalance: user.businessInitialBalance,
+                    businessInitialSavings: user.businessInitialSavings
                 }
             }
         }
