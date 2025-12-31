@@ -84,9 +84,10 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                             type="text"
                             required
                             value={formData.invoiceNumber}
-                            onChange={(e) => setFormData({ ...formData, invoiceNumber: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                            disabled={loadingNumber}
+                            value={formData.invoiceNumber}
+                            readOnly
+                            disabled
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed dark:bg-slate-900 dark:border-slate-800 dark:text-gray-400"
                         />
                         {loadingNumber && (
                             <div className="absolute left-2 top-2.5">
