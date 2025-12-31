@@ -103,7 +103,29 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const netWorthHistory = overviewData?.netWorthHistory || []
 
     const totalIncome = current.incomes.reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
-    const totalExpenses = current.expenses.reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
+    // For expenses: If it's a business expense and deductible, we deduct Amount BEFORE VAT from profit (since VAT is reclaimed).
+    // If it's not deductible (or personal), the full amount is the expense.
+    const totalExpenses = current.expenses.reduce((sum: number, item: any) => {
+        let expenseValue = item.amountILS || 0
+
+        // Check for business logic
+        if (isBusiness && item.isDeductible && item.amountBeforeVat) {
+            // If we have amountBeforeVat, use it. 
+            // Need to handle currency conversion if amountBeforeVat is in original currency?
+            // amountILS is already converted. amountBeforeVat is raw.
+            // We can approximate by ratio or use amountILS / (1+vatRate) if data missing?
+            // Best way: If item has amountBeforeVat, convert it to ILS.
+            // Since we don't have currency conversion here easily for each row without re-fetching rates,
+            // let's assume the ratio between amount and amountBeforeVat in original currency holds for ILS.
+
+            if (item.amount && item.amount !== 0) {
+                const ratio = item.amountBeforeVat / item.amount
+                expenseValue = expenseValue * ratio
+            }
+        }
+
+        return sum + expenseValue
+    }, 0)
     const totalBills = current.bills.reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
     const totalDebts = current.debts.reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
     const totalSavingsObserved = current.savings.reduce((sum: number, item: any) => sum + (item.monthlyDepositILS || 0), 0)
