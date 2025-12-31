@@ -209,6 +209,11 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
         const result = await importExpenses(expensesToImport, budgetType)
         if (result.success) {
+            toast({
+                title: 'ייבוא הושלם',
+                description: `נוספו ${result.count} הוצאות חדשות (${result.skipped || 0} כפילויות סוננו)`,
+                variant: 'default'
+            })
             globalMutate(['expenses', month, year, budgetType])
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
             if (onCategoriesChange) await onCategoriesChange()

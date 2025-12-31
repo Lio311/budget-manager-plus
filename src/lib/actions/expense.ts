@@ -372,50 +372,80 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
 
         if (expenses.length === 0) return { success: true }
 
-        // --- Duplicate Prevention Check ---
-        // We check a sample of rows to see if they already exist.
-        // If we find that a significant portion of the sample exists, we assume the file was already imported.
+        // --- Duplicate Prevention Check (Row Level) ---
+        // 1. Get Date Range
+        const validDates = expenses
+            .map(e => e.date ? new Date(e.date) : new Date())
+            .filter(d => !isNaN(d.getTime()))
 
-        const db = await authenticatedPrisma(userId);
-
-        // ... Duplicate Prevention Logic Check (Using db instead of prisma) ...
-        // Pick up to 5 samples
-        const sampleSize = Math.min(expenses.length, 5)
-        const step = Math.floor(expenses.length / sampleSize)
-        const samples = []
-        for (let i = 0; i < expenses.length; i += step) {
-            if (samples.length < sampleSize) samples.push(expenses[i])
+        if (validDates.length === 0 && expenses.length > 0) {
+            // Fallback if no valid dates (shouldn't happen with valid files)
+            // Proceed without check or assume today?
+            // Let's assume the loop below handles defaults.
         }
 
-        let duplicateCount = 0
+        let skippedCount = 0
+        const expensesToImport: ExpenseInput[] = []
 
-        for (const sample of samples) {
-            const date = sample.date ? new Date(sample.date) : new Date()
+        if (validDates.length > 0) {
+            const minDate = new Date(Math.min(...validDates.map(d => d.getTime())))
+            const maxDate = new Date(Math.max(...validDates.map(d => d.getTime())))
 
-            // Look for EXACT match using db (RLS enforce)
-            const existing = await db.expense.findFirst({
+            // Expand range to cover full days
+            minDate.setHours(0, 0, 0, 0)
+            maxDate.setHours(23, 59, 59, 999)
+
+            // 2. Fetch existing expenses in that range
+            const existingExpenses = await db.expense.findMany({
                 where: {
                     budget: {
                         userId: userId,
                         type: budgetType
                     },
                     date: {
-                        gte: new Date(date.setHours(0, 0, 0, 0)),
-                        lt: new Date(date.setHours(23, 59, 59, 999))
-                    },
-                    amount: sample.amount,
-                    description: sample.description
+                        gte: minDate,
+                        lte: maxDate
+                    }
+                },
+                select: {
+                    date: true,
+                    amount: true,
+                    description: true
                 }
             })
 
-            if (existing) {
-                duplicateCount++
+            // 3. Create Signatures
+            const existingSignatures = new Set(existingExpenses.map(e => {
+                const d = new Date(e.date)
+                d.setHours(0, 0, 0, 0) // Compare by date (day), not time if time is irrelevant
+                // Note: If imports have specific times, we might need to be careful. 
+                // Usually excel imports have 00:00:00 time unless specified.
+                // Existing DB expenses might have weird times if manually entered? 
+                // Let's stick to Day+Amount+Description equality.
+                return `${d.getTime()}-${e.amount}-${e.description?.trim()}`
+            }))
+
+            // 4. Filter
+            for (const exp of expenses) {
+                const d = exp.date ? new Date(exp.date) : new Date()
+                d.setHours(0, 0, 0, 0)
+                const signature = `${d.getTime()}-${exp.amount}-${exp.description?.trim()}`
+
+                if (existingSignatures.has(signature)) {
+                    skippedCount++
+                } else {
+                    expensesToImport.push(exp)
+                }
             }
+        } else {
+            // No valid dates found in input?, try to import all?
+            expensesToImport.push(...expenses)
         }
 
-        if (samples.length > 0 && duplicateCount === samples.length) {
-            return { success: false, error: 'הקובץ הזה כבר נטען למערכת (זוהו רשומות כפולות)' }
+        if (expensesToImport.length === 0) {
+            return { success: true, count: 0, skipped: skippedCount }
         }
+
 
         // Get or Create Default Category "All" or "General"
         let defaultCategory = await db.category.findFirst({
@@ -440,7 +470,7 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
         }
 
         // Create missing categories
-        const uniqueCategories = Array.from(new Set(expenses.map(e => e.category).filter(c => c && c !== 'כללי')))
+        const uniqueCategories = Array.from(new Set(expensesToImport.map(e => e.category).filter(c => c && c !== 'כללי')))
 
         for (const catName of uniqueCategories) {
             const existingCat = await db.category.findFirst({
@@ -468,7 +498,7 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
 
         // Process expenses
         let addedCount = 0
-        for (const exp of expenses) {
+        for (const exp of expensesToImport) {
             const date = exp.date ? new Date(exp.date) : new Date()
             const month = date.getMonth() + 1
             const year = date.getFullYear()
@@ -498,7 +528,7 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
         }
 
         revalidatePath('/')
-        return { success: true, count: addedCount }
+        return { success: true, count: addedCount, skipped: skippedCount }
     } catch (error: any) {
         console.error('Failed to import expenses:', error)
         return { success: false, error: 'Failed to import expenses: ' + (error.message || 'Unknown error') }
