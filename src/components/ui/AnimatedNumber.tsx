@@ -44,9 +44,9 @@ export function AnimatedNumber({ value, currency = '', duration = 1500, classNam
     // No, standard formatting is fine.
 
     return (
-        <span className={className}>
-            {currency && <span className="ml-1">{currency === 'ILS' ? '₪' : currency}</span>}
-            {formatted}
+        <span className={`inline-flex items-center gap-1 ${className}`} style={{ direction: 'rtl' }}>
+            {currency && <span>{currency === 'ILS' ? '₪' : currency}</span>}
+            <span dir="ltr">{formatted}</span>
         </span>
     );
 }
