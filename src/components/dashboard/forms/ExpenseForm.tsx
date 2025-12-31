@@ -212,7 +212,8 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
             toast({
                 title: 'ייבוא הושלם',
                 description: `נוספו ${result.count} הוצאות חדשות (${result.skipped || 0} כפילויות סוננו)`,
-                variant: 'default'
+                variant: 'default',
+                duration: 5000 // Show for 5 seconds
             })
             globalMutate(['expenses', month, year, budgetType])
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
