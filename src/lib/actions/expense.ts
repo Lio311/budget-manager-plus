@@ -418,7 +418,7 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
 
             // 3. Create Signatures
             const existingSignatures = new Set(existingExpenses.map(e => {
-                const d = new Date(e.date)
+                const d = e.date ? new Date(e.date) : new Date(0) // Fallback to 0 if null, unlikely but safe
                 d.setHours(0, 0, 0, 0) // Compare by date (day), not time if time is irrelevant
                 // Note: If imports have specific times, we might need to be careful. 
                 // Usually excel imports have 00:00:00 time unless specified.
