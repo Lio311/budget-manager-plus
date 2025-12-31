@@ -74,7 +74,7 @@ export const FormattedNumberInput = forwardRef<HTMLInputElement, FormattedNumber
                 inputMode="decimal"
                 value={displayValue}
                 onChange={handleChange}
-                className={`[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${props.className || ''}`}
+                className={`[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-base ${props.className || ''}`}
             />
         )
     }
