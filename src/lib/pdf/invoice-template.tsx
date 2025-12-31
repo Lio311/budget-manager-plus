@@ -222,16 +222,61 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
     }
 
     // Helper to fix Hebrew text direction in PDF
-    // React-PDF often renders mixed Hebrew/English LTR-wise (First word on left).
-    // For RTL reading, we want the first word on the right.
-    // This simple reverser handles the word order for display.
+    // React-PDF often renders mixed Hebrew/English LTR-wise.
+    // We need to reverse the order of chunks for RTL, but KEEP English chunks LTR internally.
+    // Example: "אחד שתיים FOUR FIVE" -> Visual should be "FOUR FIVE שתיים אחד"
     const fixHebrewText = (text: string | undefined) => {
         if (!text) return ''
         const hasHebrew = /[\u0590-\u05FF]/.test(text)
         if (!hasHebrew) return text
 
-        // Reverse word order so they are laid out Right-to-Left visually by LTR engine
-        return text.split(' ').reverse().join(' ')
+        // Split by spaces to get words
+        const words = text.split(' ')
+
+        const chunks: string[] = []
+        let currentChain: string[] = []
+        let isHebrewChain = false
+
+        words.forEach(word => {
+            const isHebrewWord = /[\u0590-\u05FF]/.test(word)
+
+            if (currentChain.length === 0) {
+                currentChain.push(word)
+                isHebrewChain = isHebrewWord
+            } else {
+                if (isHebrewWord === isHebrewChain) {
+                    // Continue same type chain
+                    currentChain.push(word)
+                } else {
+                    // Switch type
+                    chunks.push(currentChain.join(' '))
+                    currentChain = [word]
+                    isHebrewChain = isHebrewWord
+                }
+            }
+        })
+        if (currentChain.length > 0) {
+            chunks.push(currentChain.join(' '))
+        }
+
+        // Now we have chunks like ["אחד שתיים", "FOUR FIVE", "שלוש"]
+        // We want to reverse the order of chunks?
+        // No, we want to reverse "Hebrew" phrases word-by-word?
+        // Wait, if I have "אחד שתיים", it should be visually "שתיים אחד".
+        // So Hebrew chains MUST be reversed internally.
+        // English chains MUST NOT be reversed internally.
+
+        const processedChunks = chunks.map(chunk => {
+            const isHebrew = /[\u0590-\u05FF]/.test(chunk)
+            if (isHebrew) {
+                return chunk.split(' ').reverse().join(' ')
+            } else {
+                return chunk // Keep English LTR
+            }
+        })
+
+        // Finally, reverse the ORDER of the processed chunks
+        return processedChunks.reverse().join(' ')
     }
 
     return (
