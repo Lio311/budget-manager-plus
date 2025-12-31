@@ -83,7 +83,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                         <input
                             type="text"
                             required
-                            value={formData.invoiceNumber}
+                            required
                             value={formData.invoiceNumber}
                             readOnly
                             disabled
