@@ -63,7 +63,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         recurringEndDate: undefined as string | undefined,
         supplierId: '',
         amountBeforeVat: '',
-        vatRate: '0.17',
+        vatRate: '0.18',
         vatAmount: '',
         isDeductible: true,
         deductibleRate: '1.0',
@@ -71,18 +71,18 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     })
 
     // Handle VAT Calculations
-    const calculateFromTotal = (total: string, rate: string) => {
-        const t = parseFloat(total) || 0
+    const calculateFromNet = (net: string, rate: string) => {
+        const n = parseFloat(net) || 0
         const r = parseFloat(rate) || 0
-        const before = t / (1 + r)
-        const vat = t - before
-        return { before: before.toFixed(2), vat: vat.toFixed(2) }
+        const vat = n * r
+        const total = n + vat
+        return { total: total.toFixed(2), vat: vat.toFixed(2) }
     }
 
     useEffect(() => {
         if (isBusiness && newExpense.amount && newExpense.vatRate) {
-            const { before, vat } = calculateFromTotal(newExpense.amount, newExpense.vatRate)
-            setNewExpense(prev => ({ ...prev, amountBeforeVat: before, vatAmount: vat }))
+            const { total, vat } = calculateFromNet(newExpense.amount, newExpense.vatRate)
+            setNewExpense(prev => ({ ...prev, amountBeforeVat: newExpense.amount, vatAmount: vat }))
         }
     }, [newExpense.amount, newExpense.vatRate, isBusiness])
 
@@ -160,16 +160,20 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         }
 
         try {
+            const { total: calculatedTotal } = isBusiness
+                ? calculateFromNet(newExpense.amount, newExpense.vatRate)
+                : { total: newExpense.amount }
+
             await optimisticAddExpense({
                 description: newExpense.description || 'הוצאה ללא תיאור',
-                amount: parseFloat(newExpense.amount),
+                amount: parseFloat(calculatedTotal), // Send TOTAL amount to server
                 category: newExpense.category,
                 currency: newExpense.currency as "ILS" | "USD" | "EUR" | "GBP",
                 date: newExpense.date,
                 isRecurring: newExpense.isRecurring,
                 recurringEndDate: newExpense.recurringEndDate,
                 supplierId: isBusiness ? newExpense.supplierId || undefined : undefined,
-                amountBeforeVat: isBusiness ? parseFloat(newExpense.amountBeforeVat) : undefined,
+                amountBeforeVat: isBusiness ? parseFloat(newExpense.amount) : undefined, // Input is now Before Vat
                 vatRate: isBusiness ? parseFloat(newExpense.vatRate) : undefined,
                 vatAmount: isBusiness ? parseFloat(newExpense.vatAmount) : undefined,
                 isDeductible: isBusiness ? newExpense.isDeductible : undefined,
@@ -188,7 +192,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 recurringEndDate: undefined,
                 supplierId: '',
                 amountBeforeVat: '',
-                vatRate: '0.17',
+                vatRate: '0.18',
                 vatAmount: '',
                 isDeductible: true,
                 deductibleRate: '1.0',
@@ -354,7 +358,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         </select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ' : 'סכום כולל'}</label>
                         <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
                     </div>
                 </div>
@@ -370,12 +374,12 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 {isBusiness && (
                     <div className="grid grid-cols-2 gap-3 p-3 bg-red-50/50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/50">
                         <div>
-                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">מע"מ מוכר (17%)</label>
+                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">מע"מ מוכר (18%)</label>
                             <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
                         </div>
                         <div>
-                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">סכום נקי</label>
-                            <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</div>
+                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">סכום כולל (לתשלום)</label>
+                            <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency((parseFloat(newExpense.amount) || 0) + (parseFloat(newExpense.vatAmount) || 0), getCurrencySymbol(newExpense.currency))}</div>
                         </div>
                     </div>
                 )}

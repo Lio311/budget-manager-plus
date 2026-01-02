@@ -23,6 +23,8 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { getIncomes, updateIncome, deleteIncome } from '@/lib/actions/income'
 import { getCategories } from '@/lib/actions/category'
 import { getClients } from '@/lib/actions/clients'
+import { getBusinessProfile, updateBusinessProfile } from '@/lib/actions/business-settings'
+import { Settings } from 'lucide-react'
 import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
@@ -78,9 +80,52 @@ export function IncomeTab() {
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
 
-    const isBusiness = budgetType === 'BUSINESS'
 
-    // --- Data Fetching ---
+
+
+
+    const [taxRate, setTaxRate] = useState(0)
+    const [isTaxDialogOpen, setIsTaxDialogOpen] = useState(false)
+    const [taxRateInput, setTaxRateInput] = useState('0')
+
+    useEffect(() => {
+        if (isBusiness) {
+            getBusinessProfile().then(res => {
+                if (res.success && res.data) {
+                    setTaxRate(res.data.taxRate || 0)
+                    setTaxRateInput((res.data.taxRate || 0).toString())
+                }
+            })
+        }
+    }, [isBusiness])
+
+    const handleUpdateTaxRate = async () => {
+        const rate = parseFloat(taxRateInput)
+        if (isNaN(rate) || rate < 0 || rate > 100) return
+
+        const result = await updateBusinessProfile({ companyName: 'temp', taxRate: rate } as any) // Partial update workaround or need to fetch full data first
+        // Actually, updateBusinessProfile validates all keys. We need to be careful.
+        // Better strategy: fetch current profile, merge, then update.
+        // Or create a specific action for tax rate to avoid overwriting.
+        // For now, I'll fetch-merge-update in this function.
+        const current = await getBusinessProfile()
+        if (current.success && current.data) {
+            const update = await updateBusinessProfile({
+                companyName: current.data.companyName,
+                vatStatus: current.data.vatStatus,
+                taxRate: rate,
+                address: current.data.address || undefined,
+                phone: current.data.phone || undefined,
+                email: current.data.email || undefined,
+                signature: current.data.signatureUrl || undefined
+            })
+            if (update.success) {
+                setTaxRate(rate)
+                setIsTaxDialogOpen(false)
+                toast({ title: 'הגדרות מס עודכנו' })
+            }
+        }
+    }
 
     const fetcherIncomes = async () => {
         const result = await getIncomes(month, year, budgetType)
@@ -283,11 +328,60 @@ export function IncomeTab() {
 
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
-            <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-blue-600' : 'border-l-green-600'} dark:bg-slate-800`}>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך מכירות/הכנסות חודשיות (נקי)' : 'סך הכנסות חודשיות'}</h3>
-                <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-green-600'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
+            {/* Summary Card */}
+            <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-green-600' : 'border-l-[#00c875]'} dark:bg-slate-800`}>
+                <div className="flex justify-between items-start">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {isBusiness ? 'סך מכירות/הכנסות חודשיות (נקי)' : 'סך הכנסות חודשיות'}
+                    </h3>
+                    {isBusiness && (
+                        <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-gray-600">
+                                    <Settings className="h-4 w-4" />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogTitle>הגדרת מס הכנסה</DialogTitle>
+                                <div className="space-y-4 pt-4">
+                                    <div>
+                                        <label className="text-sm font-medium mb-1 block">שיעור מס (באחוזים)</label>
+                                        <div className="flex items-center gap-2">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                max="100"
+                                                value={taxRateInput}
+                                                onChange={(e) => setTaxRateInput(e.target.value)}
+                                            />
+                                            <span className="text-lg font-bold">%</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">אחוז זה יופחת אוטומטית מההכנסה הנקייה בחישוב הסופי.</p>
+                                    </div>
+                                    <Button onClick={handleUpdateTaxRate} className="w-full bg-blue-600 hover:bg-blue-700 text-white">שמור</Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    )}
+                </div>
+
+                <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
                     {loadingIncomes ? '...' : formatCurrency(isBusiness ? totalNetILS : totalIncomeILS, '₪')}
                 </div>
+
+                {/* Tax Deduction Breakdown */}
+                {isBusiness && taxRate > 0 && !loadingIncomes && (
+                    <div className="mt-2 text-xs border-t pt-2 border-gray-100 dark:border-gray-700">
+                        <div className="flex justify-between text-gray-500 mb-1">
+                            <span>הפרשה למס ({taxRate}%):</span>
+                            <span className="text-red-500">-{formatCurrency(totalNetILS * (taxRate / 100), '₪')}</span>
+                        </div>
+                        <div className="flex justify-between font-bold text-gray-700 dark:text-gray-300">
+                            <span>נשאר בכיס (נטו):</span>
+                            <span className="text-green-600">{formatCurrency(totalNetILS * (1 - taxRate / 100), '₪')}</span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Split View */}

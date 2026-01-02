@@ -13,7 +13,8 @@ const BusinessProfileSchema = z.object({
     address: z.string().max(200, 'הכתובת ארוכה מדי').optional().nullable(),
     phone: z.string().regex(/^[\d-]*$/, 'מספר טלפון לא תקין').max(20, 'מספר טלפון ארוך מדי').optional().nullable(),
     email: z.string().email('כתובת אימייל לא תקינה').max(100, 'כתובת אימייל ארוכה מדי').optional().nullable(),
-    signature: z.string().optional().nullable() // Base64 signature
+    signature: z.string().optional().nullable(), // Base64 signature
+    taxRate: z.number().min(0).max(100).optional().default(0)
 })
 
 const LogoSchema = z.string()
@@ -28,6 +29,7 @@ export interface BusinessProfileData {
     phone?: string
     email?: string
     signature?: string
+    taxRate?: number
 }
 
 export async function getBusinessProfile() {
@@ -69,7 +71,8 @@ export async function updateBusinessProfile(data: BusinessProfileData) {
                 address: validData.address || null,
                 phone: validData.phone || null,
                 email: validData.email || null,
-                signatureUrl: validData.signature || null
+                signatureUrl: validData.signature || null,
+                taxRate: validData.taxRate || 0
             },
             create: {
                 userId: user.id,
@@ -79,7 +82,8 @@ export async function updateBusinessProfile(data: BusinessProfileData) {
                 address: validData.address || null,
                 phone: validData.phone || null,
                 email: validData.email || null,
-                signatureUrl: validData.signature || null
+                signatureUrl: validData.signature || null,
+                taxRate: validData.taxRate || 0
             }
         })
 

@@ -64,7 +64,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         recurringEndDate: '',
         clientId: '',
         amountBeforeVat: '',
-        vatRate: '0.17',
+        vatRate: '0.18',
         vatAmount: '',
         paymentMethod: '',
         payer: '',
@@ -73,18 +73,18 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     })
 
     // Handle VAT Calculations
-    const calculateFromTotal = (total: string, rate: string) => {
-        const t = parseFloat(total) || 0
+    const calculateFromNet = (net: string, rate: string) => {
+        const n = parseFloat(net) || 0
         const r = parseFloat(rate) || 0
-        const before = t / (1 + r)
-        const vat = t - before
-        return { before: before.toFixed(2), vat: vat.toFixed(2) }
+        const vat = n * r
+        const total = n + vat
+        return { total: total.toFixed(2), vat: vat.toFixed(2) }
     }
 
     useEffect(() => {
         if (isBusiness && newIncome.amount && newIncome.vatRate) {
-            const { before, vat } = calculateFromTotal(newIncome.amount, newIncome.vatRate)
-            setNewIncome(prev => ({ ...prev, amountBeforeVat: before, vatAmount: vat }))
+            const { total, vat } = calculateFromNet(newIncome.amount, newIncome.vatRate)
+            setNewIncome(prev => ({ ...prev, amountBeforeVat: newIncome.amount, vatAmount: vat }))
         }
     }, [newIncome.amount, newIncome.vatRate, isBusiness])
 
@@ -294,7 +294,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         </select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ' : 'סכום כולל'}</label>
                         <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-blue-500/20' : 'focus:ring-green-500/20'}`} placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
                     </div>
                 </div>
@@ -302,12 +302,12 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 {isBusiness && (
                     <div className="grid grid-cols-2 gap-3 p-3 bg-green-50/50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800/50">
                         <div>
-                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">מע"מ (17%)</label>
+                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">מע"מ (18%)</label>
                             <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency(parseFloat(newIncome.vatAmount) || 0, getCurrencySymbol(newIncome.currency))}</div>
                         </div>
                         <div>
-                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">לפני מע"מ</label>
-                            <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency(parseFloat(newIncome.amountBeforeVat) || 0, getCurrencySymbol(newIncome.currency))}</div>
+                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">סכום כולל</label>
+                            <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency((parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0), getCurrencySymbol(newIncome.currency))}</div>
                         </div>
                     </div>
                 )}
