@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function SecurityPage() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50/50 font-sans" dir="rtl">
+        <div className="min-h-screen bg-[#eff6ff] font-rubik" dir="rtl">
 
             {/* Header / Hero */}
             <div className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-blue-100/50">

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50/50 font-sans" dir="rtl">
+        <div className="min-h-screen bg-[#f0fdf4] font-rubik" dir="rtl">
 
             {/* Header / Hero */}
             <div className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-green-100/50">
