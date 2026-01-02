@@ -59,8 +59,8 @@ export default function PremiumLandingPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6 }}
                             >
-                                <span className="inline-block py-1 px-3 rounded-full bg-green-50 border border-green-100 text-green-700 text-sm font-bold mb-6">
-                                    ✨ המהפכה בניהול הפיננסי כבר כאן
+                                <span className="inline-block py-1.5 px-4 rounded-full bg-gradient-to-r from-green-400 to-emerald-600 text-white text-sm font-bold mb-6 shadow-lg shadow-green-200">
+                                    המהפכה בניהול הפיננסי כבר כאן
                                 </span>
                                 <h1 className="text-5xl lg:text-7xl font-black text-gray-900 leading-[1.1] mb-6 tracking-tight">
                                     לשלוט בכסף שלך, <br />
@@ -100,13 +100,13 @@ export default function PremiumLandingPage() {
                             transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
                             className="flex-1 relative"
                         >
-                            <div className="relative z-10 transform hover:scale-[1.02] transition-transform duration-500">
+                            <div className="relative z-10 transform hover:scale-[1.02] transition-transform duration-500 w-full max-w-[500px]">
                                 <Image
-                                    src="/assets/hero-phone.png"
+                                    src="/assets/keseflow-hp2.png"
                                     alt="App Interface"
-                                    width={600}
-                                    height={1200}
-                                    className="w-full max-w-[400px] mx-auto drop-shadow-2xl"
+                                    width={800}
+                                    height={1600}
+                                    className="w-full h-auto drop-shadow-2xl object-contain mr-[-2rem] lg:mr-[-4rem]"
                                     priority
                                 />
 
@@ -247,7 +247,7 @@ export default function PremiumLandingPage() {
                         />
                         <FAQItem
                             question="האם יש תקופת ניסיון?"
-                            answer="בוודאי! כל משתמש חדש מקבל חודש ניסיון חינם לכל המסלולים, ללא צורך בהזנת פרטי אשראי. תנסו, תאהבו - תישארו."
+                            answer="בוודאי! כל משתמש חדש מקבל חודשיים ניסיון חינם לכל המסלולים, ללא צורך בהזנת פרטי אשראי. תנסו, תאהבו - תישארו."
                         />
                         <FAQItem
                             question="האם אפשר לבטל את המנוי?"
@@ -266,7 +266,7 @@ export default function PremiumLandingPage() {
                 <div className="container mx-auto px-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                         <div>
-                            <Image src="/K-LOGO.png" alt="Logo" width={150} height={50} className="h-10 w-auto brightness-0 invert opacity-80" />
+                            <Image src="/K-LOGO2.png" alt="Logo" width={150} height={50} className="h-10 w-auto brightness-0 invert opacity-80" />
                             <p className="text-gray-400 mt-4 text-sm">הבית הפיננסי החדש שלך.</p>
                         </div>
                         <div className="flex gap-8 text-sm text-gray-400">
