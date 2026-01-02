@@ -62,6 +62,7 @@ interface Expense {
 interface ExpenseData {
     expenses: Expense[]
     totalILS: number
+    totalNetILS?: number
 }
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
@@ -127,6 +128,7 @@ export function ExpensesTab() {
 
     const expenses = data?.expenses || []
     const totalExpensesILS = data?.totalILS || 0
+    const totalNetExpensesILS = data?.totalNetILS || 0
 
     const fetcherSuppliers = async () => {
         const result = await getSuppliers()
@@ -437,9 +439,9 @@ export function ExpensesTab() {
         <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             {/* Summary Card */}
             <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'} dark:bg-slate-800`}>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך עלויות / הוצאות חודשיות' : 'סך הוצאות חודשיות'}</h3>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך עלויות / הוצאות חודשיות (נקי)' : 'סך הוצאות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'} ${loadingExpenses ? 'animate-pulse' : ''}`}>
-                    {loadingExpenses ? '...' : formatCurrency(totalExpensesILS, '₪')}
+                    {loadingExpenses ? '...' : formatCurrency(isBusiness ? totalNetExpensesILS : totalExpensesILS, '₪')}
                 </div>
             </div>
 
@@ -553,13 +555,13 @@ export function ExpensesTab() {
                                             <div className="flex items-center gap-1.5 sm:gap-6 pl-1 shrink-0">
                                                 {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
                                                     <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
+                                                        <span>סה"כ: {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
                                                         <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
-                                                        <span>נקי: {formatCurrency(exp.amount - exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
                                                     </div>
                                                 ) : null}
                                                 <div className="text-right">
                                                     <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
-                                                        {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
+                                                        {formatCurrency(isBusiness && exp.isDeductible && exp.vatAmount ? (exp.amount - exp.vatAmount) : exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">

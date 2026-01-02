@@ -25,12 +25,23 @@ export async function getExpenses(month: number, year: number, type: 'PERSONAL' 
 
         // Calculate total in ILS
         let totalILS = 0
+        let totalNetILS = 0
+
         for (const expense of expenses) {
             const amountInILS = await convertToILS(expense.amount, expense.currency)
             totalILS += amountInILS
+
+            if (expense.isDeductible && expense.vatAmount) {
+                const net = expense.amount - (expense.vatAmount || 0)
+                const netInILS = await convertToILS(net, expense.currency)
+                totalNetILS += netInILS
+            } else {
+                // If not deductible, the full amount is the cost
+                totalNetILS += amountInILS
+            }
         }
 
-        return { success: true, data: { expenses, totalILS } }
+        return { success: true, data: { expenses, totalILS, totalNetILS } }
     } catch (error) {
         console.error('Error fetching expenses:', error)
         return { success: false, error: 'Failed to fetch expenses' }
