@@ -38,6 +38,7 @@ model User {
   invoices   Invoice[]
   quotes     Quote[]
   userPaymentMethods UserPaymentMethod[]
+  workEvents WorkEvent[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -192,12 +193,15 @@ model Income {
   paymentMethod     String?   // Changed from Enum to String for flexibility
   paymentTerms      Int?     @default(0)
   payer             String?   // NEW: Who paid this income
+  workTime          String?   // NEW: Optional Work Time
+  acceptedBy        String?   // NEW: Optional Accepted By
   currency          String   @default("ILS")
   
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   @@index([budgetId])
   @@index([clientId])
+  workEvents WorkEvent[]
   @@map("incomes")
 }
 
@@ -434,6 +438,7 @@ model Client {
   incomes   Income[]
   invoices  Invoice[]
   quotes    Quote[]
+  workEvents WorkEvent[]
   
   @@index([userId, scope])
   @@unique([userId, name, scope])
@@ -556,4 +561,30 @@ model Quote {
   @@index([clientId])
   @@unique([userId, quoteNumber])
   @@map("quotes")
+}
+// ... (existing content)
+
+model WorkEvent {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  start       DateTime
+  end         DateTime?
+  allDay      Boolean  @default(false)
+  location    String?
+  
+  // Relations
+  clientId    String?
+  client      Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  
+  incomeId    String?
+  income      Income?  @relation(fields: [incomeId], references: [id], onDelete: SetNull)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId, start])
+  @@map("work_events")
 }

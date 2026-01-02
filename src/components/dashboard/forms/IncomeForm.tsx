@@ -67,7 +67,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         vatRate: '0.18',
         vatAmount: '',
         paymentMethod: '',
-        payer: ''
+        payer: '',
+        workTime: '',
+        acceptedBy: ''
     })
 
     // Handle VAT Calculations
@@ -149,7 +151,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 vatRate: isBusiness ? parseFloat(newIncome.vatRate) : undefined,
                 vatAmount: isBusiness ? parseFloat(newIncome.vatAmount) : undefined,
                 paymentMethod: newIncome.paymentMethod || undefined,
-                payer: newIncome.payer || undefined
+                payer: newIncome.payer || undefined,
+                workTime: newIncome.workTime || undefined,
+                acceptedBy: newIncome.acceptedBy || undefined
             })
 
             // Reset form
@@ -166,7 +170,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 vatRate: '0.18',
                 vatAmount: '',
                 paymentMethod: '',
-                payer: ''
+                payer: '',
+                workTime: '',
+                acceptedBy: ''
             })
 
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
@@ -316,6 +322,20 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
                     />
                 </div>
+
+                {/* Business: Work Time & Accepted By */}
+                {isBusiness && (
+                    <div className="grid grid-cols-2 gap-3 w-full">
+                        <div className="w-full">
+                            <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">זמן עבודה (אופציונלי)</label>
+                            <Input className="h-10 border-gray-200 focus:ring-blue-500/20" placeholder="לדוגמה: 3:30 או 'שעתיים'" value={newIncome.workTime} onChange={(e) => setNewIncome({ ...newIncome, workTime: e.target.value })} />
+                        </div>
+                        <div className="w-full">
+                            <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
+                            <Input className="h-10 border-gray-200 focus:ring-blue-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
+                        </div>
+                    </div>
+                )}
 
                 {/* Payment Method Selector */}
                 <div className="w-full">

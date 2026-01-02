@@ -269,7 +269,7 @@ export function IncomeTab() {
         // Use theme-aware fallback instead of gray
         let c = cat?.color || (isBusiness
             ? 'bg-green-500 text-white border-transparent'
-            : 'bg-[#00c875] text-white border-transparent')
+            : 'bg-green-600 text-white border-transparent')
 
         if (c.includes('bg-') && c.includes('-100')) {
             c = c.replace(/bg-(\w+)-100/g, 'bg-$1-500')
@@ -281,9 +281,9 @@ export function IncomeTab() {
 
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
-            <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-blue-600' : 'border-l-[#00c875]'} dark:bg-slate-800`}>
+            <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-blue-600' : 'border-l-green-600'} dark:bg-slate-800`}>
                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך מכירות/הכנסות חודשיות' : 'סך הכנסות חודשיות'}</h3>
-                <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
+                <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-green-600'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
                     {loadingIncomes ? '...' : formatCurrency(totalIncomeILS, '₪')}
                 </div>
             </div>
@@ -304,7 +304,7 @@ export function IncomeTab() {
                 <div className="lg:hidden">
                     <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                         <DialogTrigger asChild>
-                            <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-green-600' : 'bg-[#00c875]'} label="הוסף הכנסה" />
+                            <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-green-600' : 'bg-green-600'} label="הוסף הכנסה" />
                         </DialogTrigger>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
                             <DialogTitle className="sr-only">הוספת הכנסה</DialogTitle>
@@ -355,7 +355,7 @@ export function IncomeTab() {
                                         </div>
                                         <div className="flex justify-end gap-2">
                                             <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                            <Button size="sm" onClick={handleUpdate} className={`${isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-[#00c875] hover:bg-[#00b268]'} text-white`}>שמור שינויים</Button>
+                                            <Button size="sm" onClick={handleUpdate} className={`${isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'} text-white`}>שמור שינויים</Button>
                                         </div>
                                     </div>
                                 ) : (
@@ -409,7 +409,7 @@ export function IncomeTab() {
                                                 </div>
                                             )}
                                             <div className="text-right">
-                                                <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`}>
+                                                <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-green-600' : 'text-green-600'}`}>
                                                     {formatCurrency(income.amount, getCurrencySymbol(income.currency || 'ILS'))}
                                                 </div>
                                                 {income.invoice && (

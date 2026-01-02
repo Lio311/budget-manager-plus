@@ -61,6 +61,8 @@ export async function addIncome(
         paymentMethod?: any
         paymentTerms?: number
         payer?: string
+        workTime?: string
+        acceptedBy?: string
     },
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
@@ -92,7 +94,9 @@ export async function addIncome(
                 paymentDate: data.paymentDate ? new Date(data.paymentDate) : null,
                 paymentMethod: data.paymentMethod,
                 paymentTerms: data.paymentTerms,
-                payer: data.payer
+                payer: data.payer,
+                workTime: data.workTime,
+                acceptedBy: data.acceptedBy
             }
         })
 
@@ -112,7 +116,9 @@ export async function addIncome(
                 data.paymentMethod,
                 data.payer,
                 data.vatRate,
-                data.paymentTerms
+                data.paymentTerms,
+                data.workTime,
+                data.acceptedBy
             )
         }
 
@@ -138,7 +144,9 @@ async function createRecurringIncomes(
     paymentMethod?: any,
     payer?: string,
     vatRate?: number,
-    paymentTerms?: number
+    paymentTerms?: number,
+    workTime?: string,
+    acceptedBy?: string
 ) {
     const startDate = new Date(startDateStr)
     const endDate = new Date(endDateStr)
@@ -194,7 +202,9 @@ async function createRecurringIncomes(
                         paymentMethod,
                         payer,
                         vatRate,
-                        paymentTerms
+                        paymentTerms,
+                        workTime,
+                        acceptedBy
                     }
                 })
             }
@@ -339,7 +349,9 @@ function formatIncomeDataForUpdate(data: any) {
         paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
         paymentMethod: data.paymentMethod,
         paymentTerms: data.paymentTerms,
-        payer: data.payer
+        payer: data.payer,
+        workTime: data.workTime,
+        acceptedBy: data.acceptedBy
     } as any // Cast to any to allow property deletion upstream
 }
 
