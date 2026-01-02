@@ -312,30 +312,33 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     </div>
                 )}
 
-                {/* Payer Input (Optional) */}
-                <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל מ... (אופציונלי)</label>
-                    <Input
-                        className="h-10 border-gray-200 focus:ring-blue-500/20"
-                        placeholder="שם המשלם"
-                        value={newIncome.payer}
-                        onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
-                    />
-                </div>
-
-                {/* Business: Work Time & Accepted By */}
-                {isBusiness && (
-                    <div className="grid grid-cols-2 gap-3 w-full">
-                        <div className="w-full">
-                            <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">זמן עבודה (אופציונלי)</label>
-                            <Input className="h-10 border-gray-200 focus:ring-blue-500/20" placeholder="לדוגמה: 3:30 או 'שעתיים'" value={newIncome.workTime} onChange={(e) => setNewIncome({ ...newIncome, workTime: e.target.value })} />
-                        </div>
-                        <div className="w-full">
-                            <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
-                            <Input className="h-10 border-gray-200 focus:ring-blue-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
-                        </div>
+                {/* Three fields in one row for Business, or just Payer for Personal */}
+                <div className={`grid gap-3 w-full ${isBusiness ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1'}`}>
+                    {/* Payer Input */}
+                    <div className="w-full">
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל מ... (אופציונלי)</label>
+                        <Input
+                            className="h-10 border-gray-200 focus:ring-blue-500/20"
+                            placeholder="שם המשלם"
+                            value={newIncome.payer}
+                            onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
+                        />
                     </div>
-                )}
+
+                    {/* Business Only Fields */}
+                    {isBusiness && (
+                        <>
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">זמן עבודה (אופציונלי)</label>
+                                <Input className="h-10 border-gray-200 focus:ring-blue-500/20" placeholder="לדוגמה: 3:30 או 'שעתיים'" value={newIncome.workTime} onChange={(e) => setNewIncome({ ...newIncome, workTime: e.target.value })} />
+                            </div>
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
+                                <Input className="h-10 border-gray-200 focus:ring-blue-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
+                            </div>
+                        </>
+                    )}
+                </div>
 
                 {/* Payment Method Selector */}
                 <div className="w-full">
