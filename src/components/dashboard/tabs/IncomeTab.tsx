@@ -91,8 +91,9 @@ export function IncomeTab() {
         if (isBusiness) {
             getBusinessProfile().then(res => {
                 if (res.success && res.data) {
-                    setTaxRate(res.data.taxRate || 0)
-                    setTaxRateInput((res.data.taxRate || 0).toString())
+                    const profile = res.data as any
+                    setTaxRate(profile.taxRate || 0)
+                    setTaxRateInput((profile.taxRate || 0).toString())
                 }
             })
         }

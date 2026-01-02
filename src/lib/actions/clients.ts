@@ -50,48 +50,49 @@ export async function getClients(scope: string = 'BUSINESS') {
             }
         })
 
-        // Calculate total revenue per client
-        const clientsWithStats = await Promise.all(
-            clients.map(async (client) => {
-                // Sum from incomes
-                const incomeTotal = await db.income.aggregate({
-                    where: {
-                        clientId: client.id
-                    },
-                    _sum: {
-                        amount: true
-                    }
-                })
+        const clientIds = clients.map(c => c.id)
 
-                // Sum from paid invoices only
-                const invoiceTotal = await db.invoice.aggregate({
-                    where: {
-                        clientId: client.id,
-                        status: 'PAID'
-                    },
-                    _sum: {
-                        total: true
-                    }
-                })
-
-                // Count all invoices (including drafts) for transaction count
-                const allInvoicesCount = await db.invoice.count({
-                    where: { clientId: client.id }
-                })
-
-                const totalRevenue = (incomeTotal._sum.amount || 0) + (invoiceTotal._sum.total || 0)
-                const totalTransactions = client._count.incomes + allInvoicesCount
-
-                return {
-                    ...client,
-                    totalRevenue,
-                    _count: {
-                        ...client._count,
-                        incomes: totalTransactions
-                    }
-                }
+        // Bulk aggregates for better performance
+        const [incomeGroups, paidInvoiceGroups, allInvoiceGroups] = await Promise.all([
+            db.income.groupBy({
+                by: ['clientId'],
+                where: { clientId: { in: clientIds } },
+                _sum: { amount: true }
+            }),
+            db.invoice.groupBy({
+                by: ['clientId'],
+                where: { clientId: { in: clientIds }, status: 'PAID' },
+                _sum: { total: true }
+            }),
+            db.invoice.groupBy({
+                by: ['clientId'],
+                where: { clientId: { in: clientIds } },
+                _count: { id: true }
             })
-        )
+        ])
+
+        // Create lookup maps
+        const incomeMap = new Map(incomeGroups.map(g => [g.clientId, g._sum.amount || 0]))
+        const paidInvoiceMap = new Map(paidInvoiceGroups.map(g => [g.clientId, g._sum.total || 0]))
+        const allInvoiceMap = new Map(allInvoiceGroups.map(g => [g.clientId, g._count.id || 0]))
+
+        const clientsWithStats = clients.map((client) => {
+            const incomeTotal = incomeMap.get(client.id) || 0
+            const paidInvoiceTotal = paidInvoiceMap.get(client.id) || 0
+            const allInvoicesCount = allInvoiceMap.get(client.id) || 0
+
+            const totalRevenue = incomeTotal + paidInvoiceTotal
+            const totalTransactions = client._count.incomes + allInvoicesCount
+
+            return {
+                ...client,
+                totalRevenue,
+                _count: {
+                    ...client._count,
+                    incomes: totalTransactions
+                }
+            }
+        })
 
         return { success: true, data: clientsWithStats }
     } catch (error) {

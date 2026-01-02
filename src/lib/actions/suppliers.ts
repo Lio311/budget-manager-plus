@@ -49,24 +49,26 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
             }
         })
 
-        // Calculate total expenses per supplier
-        const suppliersWithStats = await Promise.all(
-            suppliers.map(async (supplier) => {
-                const totalExpenses = await db.expense.aggregate({
-                    where: {
-                        supplierId: supplier.id
-                    },
-                    _sum: {
-                        amount: true
-                    }
-                })
+        const supplierIds = suppliers.map(s => s.id)
 
-                return {
-                    ...supplier,
-                    totalExpenses: totalExpenses._sum.amount || 0
-                }
-            })
-        )
+        // Bulk aggregates for better performance
+        const expenseGroups = await db.expense.groupBy({
+            by: ['supplierId'],
+            where: { supplierId: { in: supplierIds } },
+            _sum: { amount: true }
+        })
+
+        // Create lookup map
+        const expenseMap = new Map(expenseGroups.map(g => [g.supplierId, g._sum.amount || 0]))
+
+        const suppliersWithStats = suppliers.map((supplier) => {
+            const totalExpenses = expenseMap.get(supplier.id) || 0
+
+            return {
+                ...supplier,
+                totalExpenses
+            }
+        })
 
         return { success: true, data: suppliersWithStats }
     } catch (error) {
