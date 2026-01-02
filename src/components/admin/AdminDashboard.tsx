@@ -24,6 +24,7 @@ import { CountdownTimer } from '@/components/admin/CountdownTimer'
 import { UserGrowthChart } from '@/components/admin/UserGrowthChart'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface AdminDashboardProps {
     initialData: {
@@ -52,6 +53,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
 
     // Maintenance Mode State
     const [maintenanceMode, setMaintenanceMode] = useState(initialMaintenanceMode)
+    const confirm = useConfirm()
 
     const handleCreateOrUpdateCoupon = async () => {
         if (editingId) {
@@ -89,7 +91,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
     const handleUpdateSubscription = async (subId: string, data: any) => {
         const result = await updateSubscription(subId, data)
         if (!result.success) {
-            alert(result.error)
+            toast.error(result.error || 'Failed to update subscription')
         }
     }
 
@@ -99,7 +101,8 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
             ? "Are you sure you want to ENABLE maintenance mode? This will block ALL non-admin users."
             : "Are you sure you want to DISABLE maintenance mode? The site will be public again."
 
-        if (!confirm(confirmMsg)) return
+        const confirmed = await confirm(confirmMsg, 'Maintenance Mode')
+        if (!confirmed) return
 
         setMaintenanceMode(nextState)
         const res = await toggleMaintenanceMode(nextState)
@@ -285,7 +288,8 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                             size="icon"
                             className="absolute right-2 h-8 w-8 text-gray-400 hover:text-red-600 transition-colors"
                             onClick={async () => {
-                                if (confirm('Are you sure you want to RESET ALL REVENUE data? This will delete all payment history and clear subscription payment info.')) {
+                                const confirmed = await confirm('Are you sure you want to RESET ALL REVENUE data? This will delete all payment history and clear subscription payment info.', 'Reset Revenue')
+                                if (confirmed) {
                                     const res = await resetRevenue()
                                     if (res.success) toast.success('Revenue reset successfully')
                                     else toast.error(res.error || 'Failed to reset revenue')
@@ -451,8 +455,9 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                                         variant="ghost"
                                                         size="sm"
                                                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                        onClick={() => {
-                                                            if (confirm('Are you sure you want to delete this user?')) deleteUser(user.id)
+                                                        onClick={async () => {
+                                                            const confirmed = await confirm('Are you sure you want to delete this user?', 'Delete User')
+                                                            if (confirmed) deleteUser(user.id)
                                                         }}
                                                     >
                                                         <Trash2 className="h-4 w-4" />
