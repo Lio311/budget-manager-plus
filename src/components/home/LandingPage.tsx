@@ -48,16 +48,22 @@ export default function LandingPage() {
             {/* Top Subtle Green Glow */}
             <div className="fixed top-0 left-0 right-0 h-40 bg-gradient-to-b from-emerald-500/10 via-emerald-500/5 to-transparent pointer-events-none z-[50] blur-3xl" />
 
-            {/* Top Left Navigation Buttons - Segmented Control Glass Style */}
-            <div className="fixed top-6 left-6 z-[9999]">
-                <div className="flex p-1.5 gap-1 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full shadow-2xl">
+            {/* Top Left Navigation Buttons - Premium Segmented Control Glass Style */}
+            <div className="fixed top-6 left-6 z-[9999]" dir="ltr">
+                <div className="flex p-1 gap-1 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
                     <Link href="/personal">
-                        <Button variant="ghost" className="rounded-full bg-white/10 backdrop-blur-md border border-white/10 hover:bg-emerald-500/30 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 text-slate-900 font-bold px-6 h-10 text-sm">
+                        <Button
+                            variant="ghost"
+                            className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all duration-500 text-slate-800 font-bold px-6 h-10 text-sm border-0"
+                        >
                             ממשק אישי
                         </Button>
                     </Link>
                     <Link href="/business">
-                        <Button variant="ghost" className="rounded-full bg-white/10 backdrop-blur-md border border-white/10 hover:bg-emerald-500/30 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 text-slate-900 font-bold px-6 h-10 text-sm">
+                        <Button
+                            variant="ghost"
+                            className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all duration-500 text-slate-800 font-bold px-6 h-10 text-sm border-0"
+                        >
                             ממשק עסקי
                         </Button>
                     </Link>
