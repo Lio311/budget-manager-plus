@@ -211,7 +211,7 @@ export default function AccessibilityWidget() {
             )}
 
             {/* Trigger Button - Reduced Size, Custom Image Icon */}
-            <div className="fixed bottom-6 left-6 z-[9999] font-sans rtl group acc-widget-ignore">
+            <div className="fixed bottom-6 z-[9999] font-sans rtl group acc-widget-ignore right-6 md:right-auto md:left-6">
                 <div className="relative">
                     {/* Close X Button for the Widget */}
                     <button
@@ -244,7 +244,7 @@ export default function AccessibilityWidget() {
                 {/* The Widget Panel - Reduced size and max-height */}
                 {isOpen && (
                     <div
-                        className="absolute bottom-16 left-0 w-[300px] bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up origin-bottom-left acc-widget-ignore text-gray-800"
+                        className="absolute bottom-16 w-[300px] bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up acc-widget-ignore text-gray-800 right-0 md:right-auto md:left-0 origin-bottom-right md:origin-bottom-left"
                         dir="rtl"
                         style={{ filter: 'none', color: '#1f2937' }} // Explicit colors to override high contrast
                     >
