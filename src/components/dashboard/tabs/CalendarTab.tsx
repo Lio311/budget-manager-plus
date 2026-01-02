@@ -180,6 +180,7 @@ export function CalendarTab() {
                     <div className="flex items-center space-x-2 rtl:space-x-reverse bg-white dark:bg-slate-800 p-2 rounded-lg border border-gray-200 dark:border-slate-700">
                         <Switch
                             id="calendar-mode"
+                            dir="ltr"
                             checked={viewMode === 'work'}
                             onCheckedChange={(checked) => setViewMode(checked ? 'work' : 'financial')}
                         />
