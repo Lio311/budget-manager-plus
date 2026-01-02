@@ -79,6 +79,49 @@ export default function LandingPage() {
                     </motion.p>
                 </motion.div>
 
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 0.8 }}
+                    className="flex flex-col sm:flex-row gap-4 justify-center"
+                >
+                    <SignedOut>
+                        <SignUpButton mode="modal">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="px-8 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl"
+                            >
+                                הרשמה חינם
+                            </motion.button>
+                        </SignUpButton>
+                        <SignInButton mode="modal">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="px-8 py-3 bg-white border-2 border-primary text-primary rounded-2xl font-bold text-lg hover:bg-green-50 transition-all shadow-md"
+                            >
+                                כניסה למערכת
+                            </motion.button>
+                        </SignInButton>
+                    </SignedOut>
+
+                    <SignedIn>
+                        <Link href="/dashboard">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-2xl font-bold text-lg hover:shadow-xl transition-all shadow-lg inline-flex items-center gap-2"
+                            >
+                                כניסה לדשבורד
+                                <ArrowLeft className="w-5 h-5" />
+                            </motion.button>
+                        </Link>
+                    </SignedIn>
+                </motion.div>
+
+
+
                 {/* Personal Solution Section */}
                 <motion.div
                     initial="hidden"
@@ -406,7 +449,7 @@ export default function LandingPage() {
 
             </div>
             <SecurityBadge />
-        </div>
+        </div >
     )
 }
 

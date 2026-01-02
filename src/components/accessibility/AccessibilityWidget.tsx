@@ -177,9 +177,10 @@ export default function AccessibilityWidget() {
                     filter: grayscale(100%);
                 }
 
-                /* Big Cursor (Global on Body) */
+                /* Big Cursor (Global on Body) - Improved SVG Data URI */
                 body.acc-big-cursor, body.acc-big-cursor * {
-                    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewport="0 0 48 48" style="fill:black;stroke:white;stroke-width:2px;"><path d="M7,2l12,36l6-16l16-6L7,2z"></path></svg>') 0 0, auto !important;
+                    cursor: auto !important; /* Fallback */
+                    cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48cGF0aCBmaWxsPSJibGFjayIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgZD0iTTcgMmwxMiAzNmw2LTE2IDE2LTZMNyAyeiIvPjwvc3ZnPg==') 0 0, auto !important;
                 }
 
                 /* Stop Animations (Global on Body) */
