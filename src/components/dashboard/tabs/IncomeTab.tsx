@@ -344,19 +344,20 @@ export function IncomeTab() {
                                 <div className="space-y-4 pt-4">
                                     <div>
                                         <label className="text-sm font-medium mb-1 block">שיעור מס (באחוזים)</label>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 justify-center">
+                                            <span className="text-lg font-bold">%</span>
                                             <Input
                                                 type="number"
                                                 min="0"
                                                 max="100"
                                                 value={taxRateInput}
                                                 onChange={(e) => setTaxRateInput(e.target.value)}
+                                                className="max-w-[100px] text-center"
                                             />
-                                            <span className="text-lg font-bold">%</span>
                                         </div>
                                         <p className="text-xs text-gray-500 mt-1">אחוז זה יופחת אוטומטית מההכנסה הנקייה בחישוב הסופי.</p>
                                     </div>
-                                    <Button onClick={handleUpdateTaxRate} className="w-full bg-blue-600 hover:bg-blue-700 text-white">שמור</Button>
+                                    <Button onClick={handleUpdateTaxRate} className="w-full bg-green-600 hover:bg-green-700 text-white">שמור</Button>
                                 </div>
                             </DialogContent>
                         </Dialog>
@@ -372,7 +373,7 @@ export function IncomeTab() {
                     <div className="mt-2 text-xs border-t pt-2 border-gray-100 dark:border-gray-700">
                         <div className="flex justify-between text-gray-500 mb-1">
                             <span>הפרשה למס ({taxRate}%):</span>
-                            <span className="text-red-500">-{formatCurrency(totalNetILS * (taxRate / 100), '₪')}</span>
+                            <span className="text-red-500">{formatCurrency(totalNetILS * (taxRate / 100), '₪')}-</span>
                         </div>
                         <div className="flex justify-between font-bold text-gray-700 dark:text-gray-300">
                             <span>נשאר בכיס (נטו):</span>
