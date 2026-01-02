@@ -178,7 +178,9 @@ export default async function RootLayout({
                         disableTransitionOnChange
                     >
                         <WebApplicationJsonLd />
-                        {children}
+                        <div id="site-content">
+                            {children}
+                        </div>
                         <ReactivationPopup shouldShow={shouldShowReactivation} />
                         <AccessibilityWidget />
                         <Toaster />

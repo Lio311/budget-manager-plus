@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // --- Icons (Inline SVGs for performance & no deps) ---
 const Icons = {
@@ -39,6 +39,23 @@ export default function AccessibilityWidget() {
     const [readingGuideY, setReadingGuideY] = useState(0);
 
     const [isVisible, setIsVisible] = useState(true);
+    const widgetRef = useRef<HTMLDivElement>(null);
+
+    // --- Click Outside Logic ---
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (widgetRef.current && !widgetRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
 
     // --- Initialization & Persistence ---
     useEffect(() => {
@@ -211,7 +228,7 @@ export default function AccessibilityWidget() {
             )}
 
             {/* Trigger Button - Reduced Size, Custom Image Icon */}
-            <div className="fixed bottom-6 z-[9999] font-sans rtl group acc-widget-ignore right-6 md:right-auto md:left-6">
+            <div ref={widgetRef} className="fixed bottom-6 z-[9999] font-sans rtl group acc-widget-ignore right-6 md:right-auto md:left-6">
                 <div className="relative">
                     {/* Close X Button for the Widget */}
                     <button
