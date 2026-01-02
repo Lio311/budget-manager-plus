@@ -35,10 +35,15 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     const urlTab = searchParams.get('tab') || 'overview'
     const [activeTab, setActiveTab] = useState(urlTab)
 
-    // Sync active tab with URL (handles refresh, back/forward)
+    // Sync active tab with URL (handles refresh, back/forward) & Deep Links
     useEffect(() => {
-        setActiveTab(urlTab)
-    }, [urlTab])
+        const isDeepLink = searchParams.get('autoOpen') === 'true' || searchParams.has('amount')
+        if (isDeepLink) {
+            setActiveTab('expenses')
+        } else {
+            setActiveTab(urlTab)
+        }
+    }, [urlTab, searchParams])
 
     // Reset to overview ONLY when budget type changes (and it's not the initial load)
     const [prevBudgetType, setPrevBudgetType] = useState(budgetType)
