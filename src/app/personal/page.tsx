@@ -174,12 +174,12 @@ export default function PersonalLandingPage() {
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center gap-6">
                         <Link href="/sign-in">
-                            <Button variant="ghost" className="text-white hover:bg-white/20 backdrop-blur-md rounded-full px-6 border border-white/10">
+                            <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">
                                 כניסה
                             </Button>
                         </Link>
                         <Link href="/sign-up">
-                            <Button className="bg-white/10 backdrop-blur-lg text-white hover:bg-white/20 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border border-white/20">
+                            <Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">
                                 התחל עכשיו
                             </Button>
                         </Link>
@@ -369,7 +369,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                                 className="flex gap-4"
                             >
                                 <Link href="/sign-up">
-                                    <Button size="lg" className="bg-white/10 backdrop-blur-xl text-white hover:bg-white/20 rounded-full px-10 py-7 text-xl shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 border border-white/20">
+                                    <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-10 py-7 text-xl shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">
                                         התחל עכשיו
                                         <ArrowLeft className="mr-3" size={24} />
                                     </Button>
