@@ -25,6 +25,7 @@ import { Trash2 } from 'lucide-react'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { BankImportModal } from '../BankImportModal'
 import { CategoryManagementDialog } from './CategoryManagementDialog'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface Category {
     id: string
@@ -52,6 +53,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     const endOfMonth = new Date(year, month, 0)
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
+    const confirm = useConfirm()
     const isBusiness = budgetType === 'BUSINESS'
 
     const [submitting, setSubmitting] = useState(false)
@@ -210,7 +212,8 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     }
 
     const handleDeleteAll = async () => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק את כל ההוצאות של אותו חודש?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק את כל ההוצאות של אותו חודש?', 'מחיקת הוצאות')
+        if (!confirmed) return
 
         try {
             const result = await deleteAllMonthlyExpenses(month, year, budgetType)
@@ -218,13 +221,12 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 toast({ title: 'הצלחה', description: 'כל ההוצאות נמחקו בהצלחה' })
                 globalMutate(key => Array.isArray(key) && key[0] === 'overview')
                 globalMutate(['expenses', month, year, budgetType])
-                if (onSuccess) onSuccess()
+                onSuccess?.()
             } else {
-                toast({ title: 'שגיאה', description: 'מחיקת ההוצאות נכשלה', variant: 'destructive' })
+                toast({ title: 'שגיאה', description: result.error || 'שגיאה במחיקת ההוצאות', variant: 'destructive' })
             }
         } catch (error) {
-            console.error(error)
-            toast({ title: 'שגיאה', description: 'שגיאה במחיקת נתונים', variant: 'destructive' })
+            toast({ title: 'שגיאה', description: 'שגיאה במחיקת ההוצאות', variant: 'destructive' })
         }
     }
 

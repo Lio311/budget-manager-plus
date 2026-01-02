@@ -29,6 +29,7 @@ import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
 import { Briefcase, DollarSign, TrendingUp, Gift, Home, Landmark, PiggyBank, Wallet } from 'lucide-react'
+import { useConfirm } from '@/hooks/useConfirm'
 
 const getCategoryIcon = (categoryName: string) => {
     const name = categoryName.toLowerCase()
@@ -79,7 +80,7 @@ export function IncomeTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
-
+    const confirm = useConfirm()
     const isBusiness = budgetType === 'BUSINESS'
 
     const [taxRate, setTaxRate] = useState(0)
@@ -224,7 +225,8 @@ export function IncomeTab() {
             return
         }
 
-        if (!confirm('האם אתה בטוח שברצונך למחוק הכנסה זו?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק הכנסה זו?', 'מחיקת הכנסה')
+        if (!confirmed) return
 
         try {
             await optimisticDeleteIncome(income.id)

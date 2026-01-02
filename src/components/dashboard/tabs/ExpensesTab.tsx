@@ -32,6 +32,7 @@ import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { getCategories } from '@/lib/actions/category'
 import { getCategoryBudgets, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
+import { useConfirm } from '@/hooks/useConfirm'
 
 
 interface Category {
@@ -109,6 +110,7 @@ export function ExpensesTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
+    const confirm = useConfirm()
 
     const isBusiness = budgetType === 'BUSINESS'
 
@@ -219,7 +221,8 @@ export function ExpensesTab() {
             return
         }
 
-        if (!confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?', 'מחיקת הוצאה')
+        if (!confirmed) return
 
         try {
             await optimisticDeleteExpense(exp.id)
