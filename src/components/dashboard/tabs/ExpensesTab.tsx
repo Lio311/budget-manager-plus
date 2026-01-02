@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import useSWR, { useSWRConfig } from 'swr'
+import { useSearchParams } from 'next/navigation'
 
 import {
     Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X,
@@ -184,6 +185,16 @@ export function ExpensesTab() {
     const [recurrenceDialogOpen, setRecurrenceDialogOpen] = useState(false)
     const [pendingAction, setPendingAction] = useState<{ type: 'delete' | 'edit', id: string } | null>(null)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+
+    // Deep Linking Support: Auto-open dialog if params exist
+    const searchParams = useSearchParams()
+
+    useEffect(() => {
+        const shouldAutoOpen = searchParams.get('autoOpen') === 'true' || searchParams.has('amount')
+        if (shouldAutoOpen && !isMobileOpen) {
+            setIsMobileOpen(true)
+        }
+    }, [searchParams])
 
     // Optimistic delete for instant UI feedback
     const { deleteItem: optimisticDeleteExpense } = useOptimisticDelete<ExpenseData>(

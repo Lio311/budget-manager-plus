@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
+import { useSearchParams } from 'next/navigation'
 import {
     Loader2, Plus, TrendingDown, RefreshCw, Settings
 } from 'lucide-react'
@@ -84,6 +85,30 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
             setNewExpense(prev => ({ ...prev, amountBeforeVat: before, vatAmount: vat }))
         }
     }, [newExpense.amount, newExpense.vatRate, isBusiness])
+
+    // Deep Linking: Pre-fill form from URL parameters
+    const searchParams = useSearchParams()
+
+    useEffect(() => {
+        if (!searchParams) return
+
+        const paramAmount = searchParams.get('amount')
+        const paramDesc = searchParams.get('description') || searchParams.get('merchant') || searchParams.get('title')
+        const paramCat = searchParams.get('category')
+        const paramCurrency = searchParams.get('currency')
+        const paramDate = searchParams.get('date')
+
+        if (paramAmount || paramDesc || paramCat) {
+            setNewExpense(prev => ({
+                ...prev,
+                amount: paramAmount || prev.amount,
+                description: paramDesc || prev.description,
+                category: paramCat || prev.category,
+                currency: (paramCurrency && Object.keys(SUPPORTED_CURRENCIES).includes(paramCurrency)) ? paramCurrency : prev.currency,
+                date: paramDate ? format(new Date(paramDate), 'yyyy-MM-dd') : prev.date
+            }))
+        }
+    }, [searchParams])
 
     // Optimistic add for instant UI feedback
     const { execute: optimisticAddExpense } = useOptimisticMutation<any, any>(
