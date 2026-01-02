@@ -11,7 +11,7 @@ export default function SecurityBadge() {
             {/* Security Badge - Fixed position in top right */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed top-6 right-6 z-40 p-4 bg-gradient-to-br from-green-600 to-green-700 text-white rounded-full shadow-2xl hover:shadow-green-500/50 hover:scale-110 transition-all duration-300 group"
+                className="fixed top-6 right-6 z-50 p-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-full shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:scale-110 transition-all duration-300 group border-0"
                 aria-label="אבטחת מידע"
             >
                 <Shield className="w-6 h-6 group-hover:rotate-12 transition-transform" />
