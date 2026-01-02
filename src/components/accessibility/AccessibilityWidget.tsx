@@ -38,6 +38,8 @@ export default function AccessibilityWidget() {
     const [settings, setSettings] = useState(DEFAULT_SETTINGS);
     const [readingGuideY, setReadingGuideY] = useState(0);
 
+    const [isVisible, setIsVisible] = useState(true);
+
     // --- Initialization & Persistence ---
     useEffect(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -105,6 +107,8 @@ export default function AccessibilityWidget() {
     const resetAll = () => {
         setSettings(DEFAULT_SETTINGS);
     };
+
+    if (!isVisible) return null;
 
     return (
         <div className="acc-widget-root">
@@ -208,20 +212,34 @@ export default function AccessibilityWidget() {
 
             {/* Trigger Button - Reduced Size, Custom Image Icon */}
             <div className="fixed bottom-6 left-6 z-[9999] font-sans rtl group acc-widget-ignore">
-                <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="w-12 h-12 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
-                    aria-label="פתח תפריט נגישות"
-                    style={{ filter: 'none' }} // Extra safety
-                >
-                    {/* Custom Accessibility Image Icon */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                        src="/images/accessibility-icon.png"
-                        alt="Accessibility"
-                        className="w-10 h-10 object-contain rounded-full"
-                    />
-                </button>
+                <div className="relative">
+                    {/* Close X Button for the Widget */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsVisible(false);
+                        }}
+                        className="absolute -top-2 -right-2 bg-gray-200 text-gray-600 hover:bg-red-500 hover:text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-50 w-5 h-5 flex items-center justify-center"
+                        title="סגור נגישות"
+                    >
+                        <Icons.Close />
+                    </button>
+
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="w-12 h-12 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+                        aria-label="פתח תפריט נגישות"
+                        style={{ filter: 'none' }} // Extra safety
+                    >
+                        {/* Custom Accessibility Image Icon */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src="/images/accessibility.png"
+                            alt="Accessibility"
+                            className="w-10 h-10 object-contain rounded-full"
+                        />
+                    </button>
+                </div>
 
                 {/* The Widget Panel - Reduced size and max-height */}
                 {isOpen && (
