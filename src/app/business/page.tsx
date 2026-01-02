@@ -383,7 +383,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={isActive ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="relative h-[600px] hidden md:block"
+                        className="relative h-[400px] md:h-[600px] hidden md:flex items-center justify-center"
                     >
                         {index === 0 && (
                             <div className="relative w-full h-full flex items-center justify-center">
@@ -396,7 +396,18 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                                 />
                             </div>
                         )}
-                        {index > 0 && (
+                        {index === 1 && (
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                <Image
+                                    src="/screenshots/clients_mockup.png"
+                                    alt="Clients Management"
+                                    width={1200}
+                                    height={800}
+                                    className="w-full h-auto drop-shadow-2xl rounded-2xl border border-white/20"
+                                />
+                            </div>
+                        )}
+                        {index > 1 && (
                             <div className="w-full h-full flex items-center justify-center">
                                 <div className="w-96 h-96 bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 shadow-2xl" />
                             </div>
