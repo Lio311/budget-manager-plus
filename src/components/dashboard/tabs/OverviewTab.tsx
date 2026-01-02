@@ -320,7 +320,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 {/* 3. Month Savings (Calculated) */}
                 <Card className="glass-panel border-r-4 border-r-blue-500 shadow-sm transition-all">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'רווח נקי' : 'חיסכון חודשי'}</CardTitle>
+                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'רווח נקי' : 'יתרה חודשית'}</CardTitle>
                         <PiggyBank className="h-4 w-4 text-blue-500" />
                     </CardHeader>
                     <CardContent>
