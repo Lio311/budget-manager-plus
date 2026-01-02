@@ -12,6 +12,7 @@ import { currentUser } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/db'
 import { getSubscriptionStatus } from '@/lib/actions/subscription'
 import { differenceInDays } from 'date-fns'
+import AccessibilityWidget from '@/components/accessibility/AccessibilityWidget'
 
 const rubik = Rubik({
     subsets: ['hebrew', 'latin'],
@@ -179,6 +180,7 @@ export default async function RootLayout({
                         <WebApplicationJsonLd />
                         {children}
                         <ReactivationPopup shouldShow={shouldShowReactivation} />
+                        <AccessibilityWidget />
                         <Toaster />
                         <SonnerToaster />
                     </ThemeProvider>

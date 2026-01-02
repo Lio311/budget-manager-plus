@@ -395,6 +395,9 @@ export default function LandingPage() {
                         <Link href="/security" className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline decoration-gray-300 hover:decoration-gray-900 underline-offset-4">
                             אבטחת מידע
                         </Link>
+                        <Link href="/accessibility" className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline decoration-gray-300 hover:decoration-gray-900 underline-offset-4">
+                            הצהרת נגישות
+                        </Link>
                     </div>
                     <p className="text-xs text-gray-400 mt-4">
                         © {new Date().getFullYear()} Keseflow. כל הזכויות שמורות.
