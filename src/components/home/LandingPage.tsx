@@ -51,20 +51,20 @@ export default function LandingPage() {
             {/* Top Left Navigation Buttons - Premium Segmented Control Glass Style */}
             <div className="fixed top-6 left-6 z-[9999] hidden md:block" dir="ltr">
                 <div className="flex p-1 gap-1 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
-                    <Link href="/personal">
-                        <Button
-                            variant="ghost"
-                            className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all duration-500 text-slate-800 font-bold px-6 h-10 text-sm border-0"
-                        >
-                            ממשק אישי
-                        </Button>
-                    </Link>
                     <Link href="/business">
                         <Button
                             variant="ghost"
                             className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all duration-500 text-slate-800 font-bold px-6 h-10 text-sm border-0"
                         >
                             ממשק עסקי
+                        </Button>
+                    </Link>
+                    <Link href="/personal">
+                        <Button
+                            variant="ghost"
+                            className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all duration-500 text-slate-800 font-bold px-6 h-10 text-sm border-0"
+                        >
+                            ממשק אישי
                         </Button>
                     </Link>
                 </div>
@@ -109,26 +109,6 @@ export default function LandingPage() {
                         transition={{ delay: 0.5, duration: 0.8 }}
                         className="flex flex-col items-center gap-4 justify-center mt-10"
                     >
-                        {/* Mobile Interface Toggle */}
-                        <div className="md:hidden flex p-1 gap-1 bg-white/40 backdrop-blur-md border border-white/20 rounded-full shadow-lg mb-4" dir="ltr">
-                            <Link href="/personal">
-                                <Button
-                                    variant="ghost"
-                                    className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
-                                >
-                                    ממשק אישי
-                                </Button>
-                            </Link>
-                            <Link href="/business">
-                                <Button
-                                    variant="ghost"
-                                    className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
-                                >
-                                    ממשק עסקי
-                                </Button>
-                            </Link>
-                        </div>
-
                         <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
                             <SignedOut>
                                 <SignUpButton mode="modal">
@@ -163,6 +143,26 @@ export default function LandingPage() {
                                     </motion.button>
                                 </Link>
                             </SignedIn>
+                        </div>
+
+                        {/* Mobile Interface Toggle */}
+                        <div className="md:hidden flex p-1 gap-1 bg-white/40 backdrop-blur-md border border-white/20 rounded-full shadow-lg mt-4" dir="ltr">
+                            <Link href="/business">
+                                <Button
+                                    variant="ghost"
+                                    className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
+                                >
+                                    ממשק עסקי
+                                </Button>
+                            </Link>
+                            <Link href="/personal">
+                                <Button
+                                    variant="ghost"
+                                    className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
+                                >
+                                    ממשק אישי
+                                </Button>
+                            </Link>
                         </div>
                     </motion.div>
                 </motion.div>
