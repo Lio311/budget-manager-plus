@@ -297,12 +297,13 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
 
             {/* Content */}
             <div className="container mx-auto px-6 h-full flex items-center relative z-10">
-                <div className="w-full max-w-4xl mx-auto text-center">
+                <div className="grid md:grid-cols-2 gap-12 items-center w-full">
                     {/* Text Content */}
                     <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={isActive ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
+                        className="text-right"
                     >
                         {section.number && (
                             <motion.div
@@ -348,14 +349,14 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                             initial={{ width: 0 }}
                             animate={isActive ? { width: '100px' } : { width: 0 }}
                             transition={{ delay: 0.7, duration: 0.5 }}
-                            className="border-t-4 border-white/50 mb-8 mx-auto"
+                            className="border-t-4 border-white/50 mb-8"
                         />
 
                         <motion.p
                             initial={{ opacity: 0 }}
                             animate={isActive ? { opacity: 1 } : { opacity: 0 }}
                             transition={{ delay: 0.8 }}
-                            className="text-lg md:text-xl text-white/70 mb-8 max-w-3xl mx-auto leading-relaxed"
+                            className="text-lg md:text-xl text-white/70 mb-8 max-w-xl leading-relaxed"
                         >
                             {section.description}
                         </motion.p>
@@ -365,7 +366,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                                 transition={{ delay: 0.9 }}
-                                className="flex gap-4 justify-center"
+                                className="flex gap-4"
                             >
                                 <Link href="/sign-up">
                                     <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full px-10 py-7 text-xl shadow-2xl shadow-emerald-500/20 transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">
@@ -374,6 +375,31 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                                     </Button>
                                 </Link>
                             </motion.div>
+                        )}
+                    </motion.div>
+
+                    {/* Image/Animation Area */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={isActive ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.8, delay: 0.4 }}
+                        className="relative h-[600px] hidden md:block"
+                    >
+                        {index === 0 && (
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                <Image
+                                    src="/assets/dashboard_mockup.png"
+                                    alt="Dashboard"
+                                    width={800}
+                                    height={600}
+                                    className="w-full h-auto drop-shadow-2xl"
+                                />
+                            </div>
+                        )}
+                        {index > 0 && (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <div className="w-96 h-96 bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 shadow-2xl" />
+                            </div>
                         )}
                     </motion.div>
                 </div>
