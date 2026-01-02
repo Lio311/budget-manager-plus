@@ -439,6 +439,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                                     date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
                                     setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
                                     fromDate={startOfMonth}
+                                    placeholder="בחר תאריך"
                                 />
                             </div>
                         </div>

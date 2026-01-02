@@ -390,6 +390,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                     date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
                                     setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
                                     fromDate={startOfMonth}
+                                    placeholder="בחר תאריך"
                                 />
                             </div>
                         </div>

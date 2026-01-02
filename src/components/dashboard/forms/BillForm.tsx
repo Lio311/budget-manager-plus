@@ -222,7 +222,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                                     date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
                                     setDate={(date) => setFormData({ ...formData, recurringEndDate: date ? date.toISOString() : undefined })}
                                     fromDate={startOfMonth}
-                                    placeholder="בחר תאריך סיום"
+                                    placeholder="בחר תאריך"
                                     className="w-full h-9 bg-white"
                                 />
                             </div>

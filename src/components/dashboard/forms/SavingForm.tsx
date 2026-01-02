@@ -328,6 +328,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                                     date={newSaving.recurringEndDate ? new Date(newSaving.recurringEndDate) : undefined}
                                     setDate={(date) => setNewSaving({ ...newSaving, recurringEndDate: date })}
                                     fromDate={startOfMonth}
+                                    placeholder="בחר תאריך"
                                 />
                             </div>
                         </div>
