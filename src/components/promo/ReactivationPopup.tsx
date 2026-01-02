@@ -111,6 +111,15 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
                                         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                                     </motion.button>
                                 </SignUpButton>
+
+                                <div className="mt-4 space-y-1">
+                                    <p className="text-[10px] text-gray-400 text-center">
+                                        *בתוקף עד ה31.1.2026
+                                    </p>
+                                    <p className="text-[10px] text-gray-400 text-center">
+                                        *החברה רשאית לעצור את המבצע בכל רגע נתון
+                                    </p>
+                                </div>
                             </div>
                         </motion.div>
                     )}
