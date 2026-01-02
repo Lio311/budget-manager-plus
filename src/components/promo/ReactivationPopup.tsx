@@ -6,6 +6,7 @@ import { X, Gift, Sparkles } from 'lucide-react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { SignUpButton } from '@clerk/nextjs'
 
 interface ReactivationPopupProps {
     shouldShow: boolean
@@ -34,7 +35,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden bg-transparent border-0 shadow-none">
+            <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden bg-transparent border-0 shadow-none">
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div
@@ -76,7 +77,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
                                     className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4 shadow-inner"
                                 >
                                     <Sparkles className="w-4 h-4" />
-                                    <span>הטבה בלעדית לחוזרים</span>
+                                    <span>הטבה בלעדית לרגל ההשקה</span>
                                 </motion.div>
 
                                 <h2 className="text-3xl font-extrabold mb-3">
@@ -87,7 +88,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
 
                                 <div className="space-y-4 mb-8">
                                     <p className="text-gray-600 text-lg leading-relaxed">
-                                        שמחים שחזרת! קבל/י
+                                        שמחים שהגעת אלינו! קבל/י
                                         <span className="px-1 font-bold text-green-600">חודשיים מתנה</span>
                                         לשימוש מלא במערכת.
                                     </p>
@@ -96,18 +97,20 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
                                     </p>
                                 </div>
 
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={handleClose}
-                                    className="w-full relative group overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-green-200 hover:shadow-green-300 transition-all"
-                                >
-                                    <span className="relative z-10 flex items-center justify-center gap-2 text-lg">
-                                        <Gift className="w-5 h-5 animate-pulse" />
-                                        אני רוצה את המתנה!
-                                    </span>
-                                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                                </motion.button>
+                                <SignUpButton mode="modal">
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={handleClose}
+                                        className="w-full relative group overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-green-200 hover:shadow-green-300 transition-all"
+                                    >
+                                        <span className="relative z-10 flex items-center justify-center gap-2 text-lg">
+                                            אני רוצה את המתנה!
+                                            <Gift className="w-5 h-5 animate-pulse" />
+                                        </span>
+                                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                                    </motion.button>
+                                </SignUpButton>
                             </div>
                         </motion.div>
                     )}
