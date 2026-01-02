@@ -1,9 +1,9 @@
-
 'use client'
 
 import { useState } from 'react'
 import { useSWRConfig } from 'swr'
 import { Loader2, Plus, Wallet } from 'lucide-react'
+import { format } from 'date-fns'
 
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -16,6 +16,7 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { addDebt } from '@/lib/actions/debts'
 import { DEBT_TYPES } from '@/lib/constants/debt-types'
+import { DatePicker } from '@/components/ui/date-picker'
 
 interface DebtFormProps {
     isMobile?: boolean
@@ -23,7 +24,9 @@ interface DebtFormProps {
 }
 
 export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
-    const { month, year, budgetType } = useBudget()
+    const { month, year, currency: budgetCurrency, budgetType } = useBudget()
+    const startOfMonth = new Date(year, month - 1, 1)
+    const endOfMonth = new Date(year, month, 0)
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
 
@@ -33,7 +36,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
         debtType: string
         totalAmount: string
         currency: string
-        dueDay: string
+        date: string // Changed from dueDay
         isRecurring: boolean
         numberOfInstallments: string
         paymentMethod: string
@@ -42,7 +45,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
         debtType: DEBT_TYPES.OWED_BY_ME,
         totalAmount: '',
         currency: 'ILS',
-        dueDay: '',
+        date: '', // Changed from dueDay
         isRecurring: false,
         numberOfInstallments: '',
         paymentMethod: ''
@@ -60,8 +63,8 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
             return
         }
 
-        if (!newDebt.dueDay || parseInt(newDebt.dueDay) < 1 || parseInt(newDebt.dueDay) > 31) {
-            toast({ title: 'שגיאה', description: 'יש למלא יום תשלום בין 1-31', variant: 'destructive' })
+        if (!newDebt.date) { // New validation for date
+            toast({ title: 'שגיאה', description: 'יש לבחור תאריך הלוואה', variant: 'destructive' })
             return
         }
 
@@ -79,13 +82,16 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                 ? totalAmount / parseInt(newDebt.numberOfInstallments)
                 : totalAmount
 
+            const debtDate = new Date(newDebt.date) // Parse the date string
+            const dueDay = debtDate.getDate() // Extract day from the date
+
             const result = await addDebt(month, year, {
                 creditor: newDebt.creditor.trim(),
                 debtType: newDebt.debtType,
                 totalAmount,
                 currency: newDebt.currency,
                 monthlyPayment,
-                dueDay: parseInt(newDebt.dueDay),
+                dueDay, // Use the extracted day
                 isRecurring: newDebt.isRecurring,
                 totalDebtAmount: newDebt.isRecurring ? totalAmount : undefined,
                 numberOfInstallments: newDebt.isRecurring ? parseInt(newDebt.numberOfInstallments) : undefined,
@@ -98,7 +104,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                     debtType: DEBT_TYPES.OWED_BY_ME,
                     totalAmount: '',
                     currency: 'ILS',
-                    dueDay: '',
+                    date: '', // Reset date
                     isRecurring: false,
                     numberOfInstallments: '',
                     paymentMethod: ''
@@ -174,16 +180,12 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
 
                 {/* Due Day - Full Width */}
                 <div className="w-full">
-                    <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">יום חיוב (1-31)</label>
-                    <FormattedNumberInput
-                        placeholder="1"
-                        min="1"
-                        max="31"
-                        className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
-                        value={newDebt.dueDay}
-                        onChange={(e) => setNewDebt({ ...newDebt, dueDay: e.target.value })}
-                        disabled={submitting}
-                        dir="ltr"
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הלוואה</label>
+                    <DatePicker
+                        date={newDebt.date ? new Date(newDebt.date) : undefined}
+                        setDate={(date) => setNewDebt({ ...newDebt, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                        fromDate={startOfMonth}
+                        toDate={endOfMonth}
                     />
                 </div>
 

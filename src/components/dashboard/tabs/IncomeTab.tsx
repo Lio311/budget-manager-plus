@@ -80,9 +80,7 @@ export function IncomeTab() {
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
 
-
-
-
+    const isBusiness = budgetType === 'BUSINESS'
 
     const [taxRate, setTaxRate] = useState(0)
     const [isTaxDialogOpen, setIsTaxDialogOpen] = useState(false)

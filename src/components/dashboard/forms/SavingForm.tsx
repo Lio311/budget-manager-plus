@@ -36,6 +36,8 @@ interface SavingFormProps {
 
 export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess }: SavingFormProps) {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
+    const startOfMonth = new Date(year, month - 1, 1)
+    const endOfMonth = new Date(year, month, 0)
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
 
@@ -294,12 +296,13 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                     />
                 </div>
 
-                <div className="w-full space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תאריך</label>
+                <div className="w-full">
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הפקדה</label>
                     <DatePicker
-                        date={newSaving.date}
+                        date={newSaving.date ? new Date(newSaving.date) : undefined}
                         setDate={(date) => setNewSaving({ ...newSaving, date: date || new Date() })}
-                        placeholder="תאריך"
+                        fromDate={startOfMonth}
+                        toDate={endOfMonth}
                     />
                 </div>
 
@@ -321,9 +324,9 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                             <div className="space-y-2 w-full">
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
                                 <DatePicker
-                                    date={newSaving.recurringEndDate}
+                                    date={newSaving.recurringEndDate ? new Date(newSaving.recurringEndDate) : undefined}
                                     setDate={(date) => setNewSaving({ ...newSaving, recurringEndDate: date })}
-                                    placeholder="בחר תאריך סיום"
+                                    fromDate={startOfMonth}
                                 />
                             </div>
                         </div>

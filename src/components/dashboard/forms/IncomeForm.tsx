@@ -45,6 +45,8 @@ interface IncomeFormProps {
 
 export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, onSuccess }: IncomeFormProps) {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
+    const startOfMonth = new Date(year, month - 1, 1)
+    const endOfMonth = new Date(year, month, 0)
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
     const isBusiness = budgetType === 'BUSINESS'
@@ -365,7 +367,12 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
                 <div className="w-full">
                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
-                    <DatePicker date={newIncome.date ? new Date(newIncome.date) : undefined} setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
+                    <DatePicker
+                        date={newIncome.date ? new Date(newIncome.date) : undefined}
+                        setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                        fromDate={startOfMonth}
+                        toDate={endOfMonth}
+                    />
                 </div>
 
                 {/* Recurring Checkbox */}
@@ -378,7 +385,11 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         <div className="flex gap-4 flex-1">
                             <div className="space-y-2 w-full">
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <DatePicker date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined} setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
+                                <DatePicker
+                                    date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
+                                    setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                    fromDate={startOfMonth}
+                                />
                             </div>
                         </div>
                     )}

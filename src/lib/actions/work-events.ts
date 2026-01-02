@@ -51,6 +51,8 @@ export async function addWorkEvent(data: {
         const { userId } = await auth();
         if (!userId) return { success: false, error: 'Unauthorized' };
 
+        console.log('Adding Work Event:', { userId, ...data }); // Debug Log
+
         const db = await authenticatedPrisma(userId);
 
         const event = await db.workEvent.create({
@@ -63,9 +65,11 @@ export async function addWorkEvent(data: {
                 location: data.location,
                 clientId: data.clientId,
                 incomeId: data.incomeId,
-                userId: userId // Should be handled by authenticatedPrisma but explicit is fine if schema requires
+                userId: userId
             }
         })
+
+        console.log('Work Event Created:', event); // Debug Log
 
         revalidatePath('/dashboard')
         return { success: true, data: event }

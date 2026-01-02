@@ -47,6 +47,8 @@ interface ExpenseFormProps {
 
 export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobile, onSuccess }: ExpenseFormProps) {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
+    const startOfMonth = new Date(year, month - 1, 1)
+    const endOfMonth = new Date(year, month, 0)
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
     const isBusiness = budgetType === 'BUSINESS'
@@ -385,8 +387,13 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 )}
 
                 <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך</label>
-                    <DatePicker date={newExpense.date ? new Date(newExpense.date) : undefined} setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })} />
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הוצאה</label>
+                    <DatePicker
+                        date={newExpense.date ? new Date(newExpense.date) : undefined}
+                        setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                        fromDate={startOfMonth}
+                        toDate={endOfMonth}
+                    />
                 </div>
 
                 {isBusiness && (
@@ -427,7 +434,11 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         <div className="flex gap-4 flex-1">
                             <div className="space-y-2 w-full">
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <DatePicker date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined} setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })} />
+                                <DatePicker
+                                    date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
+                                    setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                    fromDate={startOfMonth}
+                                />
                             </div>
                         </div>
                     )}

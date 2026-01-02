@@ -21,7 +21,9 @@ interface BillFormProps {
 }
 
 export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
-    const { month, year, budgetType } = useBudget()
+    const { month, year, currency: budgetCurrency, budgetType } = useBudget()
+    const startOfMonth = new Date(year, month - 1, 1)
+    const endOfMonth = new Date(year, month, 0)
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
 
@@ -212,14 +214,17 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                                 <option value="BI_MONTHLY">דו-חודשי (כל חודשיים)</option>
                             </select>
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-xs text-gray-500 dark:text-gray-400">תוקף עד <span className="text-red-500">*</span></label>
-                            <DatePicker
-                                date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
-                                setDate={(date) => setFormData({ ...formData, recurringEndDate: date ? date.toISOString() : undefined })}
-                                placeholder="בחר תאריך סיום"
-                                className="w-full h-9 bg-white"
-                            />
+                        <div className="flex gap-4 flex-1">
+                            <div className="space-y-2 w-full">
+                                <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
+                                <DatePicker
+                                    date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
+                                    setDate={(date) => setFormData({ ...formData, recurringEndDate: date ? date.toISOString() : undefined })}
+                                    fromDate={startOfMonth}
+                                    placeholder="בחר תאריך סיום"
+                                    className="w-full h-9 bg-white"
+                                />
+                            </div>
                         </div>
                     </div>
                 )
