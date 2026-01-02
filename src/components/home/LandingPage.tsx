@@ -380,7 +380,7 @@ export default function LandingPage() {
                 >
                     <SignedOut>
                         <div className="space-y-6">
-                            <h2 className="text-4xl font-bold mb-2">מוכן להתחיל?</h2>
+                            <h2 className="text-4xl font-bold mb-2">מוכנים להתחיל?</h2>
                             <p className="text-gray-600 mb-8 max-w-md mx-auto">
                                 הצטרפו לאלפי משתמשים שכבר לקחו שליטה על העתיד הכלכלי שלהם
                             </p>

@@ -177,10 +177,9 @@ export default function AccessibilityWidget() {
                     filter: grayscale(100%);
                 }
 
-                /* Big Cursor (Global on Body) - Improved SVG Data URI */
+                /* Big Cursor (Global on Body) - Improved Persistence */
                 body.acc-big-cursor, body.acc-big-cursor * {
-                    cursor: auto !important; /* Fallback */
-                    cursor: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48cGF0aCBmaWxsPSJibGFjayIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgZD0iTTcgMmwxMiAzNmw2LTE2IDE2LTZMNyAyeiIvPjwvc3ZnPg==') 0 0, auto !important;
+                    cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTEgMWwxMS4zMTQgMjguMjgzTDE4IDIwLjA3bDguNDg1IDguNDg1IDIuODI5LTIuODI4TDIwLjgyOCAxNy4yNCAyOSAxMS41ODYgMSAxeiIgZmlsbD0iIzAwMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=') 0 0, auto !important;
                 }
 
                 /* Stop Animations (Global on Body) */
