@@ -381,6 +381,21 @@ export default function LandingPage() {
                     </SignedIn>
                 </motion.div>
 
+                {/* Footer Section - Terms & Privacy */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    className="mt-24 pt-8 border-t border-gray-200 text-center"
+                >
+                    <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline decoration-gray-300 hover:decoration-gray-900 underline-offset-4">
+                        תקנון ומדיניות פרטיות
+                    </Link>
+                    <p className="text-xs text-gray-400 mt-4">
+                        © {new Date().getFullYear()} Keseflow. כל הזכויות שמורות.
+                    </p>
+                </motion.div>
+
             </div>
             <SecurityBadge />
         </div>
