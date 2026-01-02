@@ -47,14 +47,15 @@ export default function LandingPage() {
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100 font-sans" dir="rtl">
             {/* Top Left Navigation Buttons */}
             <div className="fixed top-6 left-6 z-[9999] flex gap-3">
-                <Link href="/personal">
-                    <Button variant="ghost" className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all shadow-xl text-slate-800 font-bold px-6">
-                        ממשק אישי
+                <Link href="/business">
+                    <Button variant="ghost" className="rounded-full bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm text-slate-900 font-bold px-6 h-12 relative overflow-hidden group">
+                        <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-emerald-500/20 to-transparent group-hover:from-emerald-500/30 transition-all" />
+                        <span className="relative z-10">ממשק עסקי</span>
                     </Button>
                 </Link>
-                <Link href="/business">
-                    <Button variant="ghost" className="rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all shadow-xl text-slate-800 font-bold px-6">
-                        ממשק עסקי
+                <Link href="/personal">
+                    <Button variant="ghost" className="rounded-full bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm text-slate-900 font-bold px-6 h-12">
+                        ממשק אישי
                     </Button>
                 </Link>
             </div>
