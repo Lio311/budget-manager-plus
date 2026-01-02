@@ -132,6 +132,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     const totalOutflow = totalExpenses + totalBills + totalDebts
 
+    // VAT Calculations
+    const totalVatCollected = current.incomes.reduce((sum: number, item: any) => sum + (item.vatAmount || 0), 0)
+    const totalVatPaid = current.expenses.reduce((sum: number, item: any) => sum + (item.vatAmount || 0), 0)
+
     // Net Worth / Balance Logic
     const currentNetWorth = netWorthHistory.length > 0 ? netWorthHistory[netWorthHistory.length - 1].accumulatedNetWorth : 0
 
@@ -592,6 +596,28 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             </div>
                         )}
                     </CardContent>
+
+                    {isBusiness && (
+                        <div className="px-6 pb-6 pt-2">
+                            <div className="grid grid-cols-2 gap-3">
+                                {/* VAT Refund (Green) */}
+                                <div className="bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/20">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">החזר מע"מ צפוי</div>
+                                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                                        {formatCurrency(totalVatPaid)}
+                                    </div>
+                                </div>
+
+                                {/* VAT Pay (Red) */}
+                                <div className="bg-red-50 dark:bg-red-900/10 p-3 rounded-xl border border-red-100 dark:border-red-900/20">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">מע"מ לתשלום</div>
+                                    <div className="text-lg font-bold text-red-600 dark:text-red-400">
+                                        {formatCurrency(totalVatCollected)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </Card >
             </div >
 
