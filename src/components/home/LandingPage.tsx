@@ -7,6 +7,7 @@ import { ArrowLeft, Calendar, PieChart, TrendingUp, Wallet, ShieldCheck, Smartph
 import Image from 'next/image'
 import SecurityBadge from '@/components/SecurityBadge'
 import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -44,6 +45,20 @@ export default function LandingPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100 font-sans" dir="rtl">
+            {/* Top Left Navigation Buttons */}
+            <div className="fixed top-6 left-6 z-50 flex gap-3">
+                <Link href="/personal">
+                    <Button variant="ghost" className="rounded-full bg-white/50 backdrop-blur-md border border-slate-200 hover:bg-white transition-all shadow-sm">
+                        ממשק אישי
+                    </Button>
+                </Link>
+                <Link href="/business">
+                    <Button variant="ghost" className="rounded-full bg-white/50 backdrop-blur-md border border-slate-200 hover:bg-white transition-all shadow-sm">
+                        ממשק עסקי
+                    </Button>
+                </Link>
+            </div>
+
             <div className="container mx-auto px-4 py-16">
 
                 {/* Header */}
@@ -89,7 +104,7 @@ export default function LandingPage() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="px-8 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl"
+                                    className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-2xl font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
                                 >
                                     הרשמה חינם
                                 </motion.button>
@@ -98,7 +113,7 @@ export default function LandingPage() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="px-8 py-3 bg-white border-2 border-primary text-primary rounded-2xl font-bold text-lg hover:bg-green-50 transition-all shadow-md"
+                                    className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-2xl font-bold text-lg transition-all shadow-md"
                                 >
                                     כניסה למערכת
                                 </motion.button>
@@ -110,10 +125,10 @@ export default function LandingPage() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-2xl font-bold text-lg hover:shadow-xl transition-all shadow-lg inline-flex items-center gap-2"
+                                    className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
                                 >
                                     כניסה לדשבורד
-                                    <ArrowLeft className="w-5 h-5" />
+                                    <LayoutDashboard className="w-6 h-6" />
                                 </motion.button>
                             </Link>
                         </SignedIn>
