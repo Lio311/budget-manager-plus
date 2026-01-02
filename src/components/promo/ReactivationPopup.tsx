@@ -56,12 +56,12 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
                             </motion.button>
 
                             {/* Image Section */}
-                            <div className="relative w-full aspect-[4/3]">
+                            <div className="relative w-full aspect-video">
                                 <Image
                                     src="/keseflow-pop.png"
                                     alt="Keseflow Offer"
                                     fill
-                                    className="object-cover object-center"
+                                    className="object-contain object-center"
                                     priority
                                 />
                                 {/* Gradient Overlay */}
