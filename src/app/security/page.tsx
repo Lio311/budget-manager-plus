@@ -116,7 +116,7 @@ export default function SecurityPage() {
 
                             <div className="mt-16 pt-10 border-t border-gray-100 text-center">
                                 <p className="font-medium text-gray-500 mb-2">מצאתם חולשת אבטחה? יש לכם שאלה?</p>
-                                <a href="mailto:security@keseflow.com" className="inline-flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700 transition-colors px-6 py-3 bg-blue-50 hover:bg-blue-100 rounded-full">
+                                <a href="mailto:keseflow.il@gmail.com" className="inline-flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700 transition-colors px-6 py-3 bg-blue-50 hover:bg-blue-100 rounded-full">
                                     דווחו לצוות האבטחה
                                 </a>
                                 <p className="text-sm text-gray-400 mt-8">
