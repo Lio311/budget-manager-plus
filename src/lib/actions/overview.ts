@@ -44,7 +44,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 select: {
                     id: true,
                     incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true } },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } }
@@ -55,7 +55,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 select: {
                     id: true,
                     incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true } },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } }
@@ -92,14 +92,29 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
             if (!budget) return null
 
             const [incomes, expenses, bills, debts, savings] = await Promise.all([
-                Promise.all(budget.incomes?.map(async (item: any) => ({
-                    ...item,
-                    amountILS: await convertToILS(item.amount, item.currency)
-                })) || []),
-                Promise.all(budget.expenses?.map(async (item: any) => ({
-                    ...item,
-                    amountILS: await convertToILS(item.amount, item.currency)
-                })) || []),
+                Promise.all(budget.incomes?.map(async (item: any) => {
+                    const amountILS = await convertToILS(item.amount, item.currency)
+                    const ratio = item.amount && item.amount !== 0 ? amountILS / item.amount : 0
+                    const vatAmountILS = (item.vatAmount || 0) * ratio
+                    return {
+                        ...item,
+                        amountILS,
+                        vatAmountILS,
+                        amountBeforeVatILS: amountILS - vatAmountILS
+                    }
+                }) || []),
+                Promise.all(budget.expenses?.map(async (item: any) => {
+                    const amountILS = await convertToILS(item.amount, item.currency)
+                    // Calculate ratios for VAT and Amount Before VAT to avoid redundant API calls per item
+                    const ratio = item.amount && item.amount !== 0 ? amountILS / item.amount : 0
+
+                    return {
+                        ...item,
+                        amountILS,
+                        vatAmountILS: (item.vatAmount || 0) * ratio,
+                        amountBeforeVatILS: (item.amountBeforeVat || 0) * ratio
+                    }
+                }) || []),
                 Promise.all(budget.bills?.map(async (item: any) => ({
                     ...item,
                     amountILS: await convertToILS(item.amount, item.currency)

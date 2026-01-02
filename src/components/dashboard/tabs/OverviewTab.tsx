@@ -109,19 +109,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         let expenseValue = item.amountILS || 0
 
         // Check for business logic
-        if (isBusiness && item.isDeductible && item.amountBeforeVat) {
-            // If we have amountBeforeVat, use it. 
-            // Need to handle currency conversion if amountBeforeVat is in original currency?
-            // amountILS is already converted. amountBeforeVat is raw.
-            // We can approximate by ratio or use amountILS / (1+vatRate) if data missing?
-            // Best way: If item has amountBeforeVat, convert it to ILS.
-            // Since we don't have currency conversion here easily for each row without re-fetching rates,
-            // let's assume the ratio between amount and amountBeforeVat in original currency holds for ILS.
-
-            if (item.amount && item.amount !== 0) {
-                const ratio = item.amountBeforeVat / item.amount
-                expenseValue = expenseValue * ratio
-            }
+        if (isBusiness && item.isDeductible && item.amountBeforeVatILS !== undefined) {
+            // Use the pre-converted ILS value from server action
+            expenseValue = item.amountBeforeVatILS
         }
 
         return sum + expenseValue
@@ -133,15 +123,21 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const totalOutflow = totalExpenses + totalBills + totalDebts
 
     // VAT Calculations
-    const totalVatCollected = current.incomes.reduce((sum: number, item: any) => sum + (item.vatAmount || 0), 0)
-    const totalVatPaid = current.expenses.reduce((sum: number, item: any) => sum + (item.vatAmount || 0), 0)
+    const totalVatCollected = current.incomes.reduce((sum: number, item: any) => sum + (item.vatAmountILS || 0), 0)
+    const totalVatPaid = current.expenses.reduce((sum: number, item: any) => sum + (item.vatAmountILS || 0), 0)
 
     // Net Worth / Balance Logic
     const currentNetWorth = netWorthHistory.length > 0 ? netWorthHistory[netWorthHistory.length - 1].accumulatedNetWorth : 0
 
     // Calculate previous month's metrics for trends
-    const prevTotalIncome = previous.incomes.reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
-    const prevTotalExpenses = previous.expenses.reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
+    const prevTotalIncome = previous.incomes.reduce((sum: number, item: any) => sum + (isBusiness ? item.amountBeforeVatILS || 0 : item.amountILS || 0), 0)
+    const prevTotalExpenses = previous.expenses.reduce((sum: number, item: any) => {
+        let expenseValue = item.amountILS || 0
+        if (isBusiness && item.isDeductible && item.amountBeforeVatILS !== undefined) {
+            expenseValue = item.amountBeforeVatILS
+        }
+        return sum + expenseValue
+    }, 0)
 
     const prevPaidBills = previous.bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
     const prevPaidDebts = previous.debts.reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
@@ -561,7 +557,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 </span>
                                 <span className="font-medium text-gray-900 dark:text-gray-100">
                                     {isBusiness
-                                        ? formatCurrency(current.incomes.reduce((sum: number, item: any) => sum + ((item.amountILS || 0) - (item.vatAmount || 0)), 0))
+                                        ? formatCurrency(current.incomes.reduce((sum: number, item: any) => sum + (item.amountBeforeVatILS || 0), 0))
                                         : formatCurrency(paidDebts)
                                     }
                                 </span>
