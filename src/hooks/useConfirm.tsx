@@ -68,12 +68,12 @@ export function ConfirmDialogProvider() {
         }}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle className="text-right">{title}</AlertDialogTitle>
-                    <AlertDialogDescription className="text-right">
+                    <AlertDialogTitle>{title}</AlertDialogTitle>
+                    <AlertDialogDescription>
                         {message}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter className="flex-row-reverse justify-start gap-2">
+                <AlertDialogFooter className="gap-2">
                     <AlertDialogCancel onClick={onCancel || undefined}>ביטול</AlertDialogCancel>
                     <AlertDialogAction onClick={onConfirm || undefined} className="bg-red-600 hover:bg-red-700">
                         אישור
