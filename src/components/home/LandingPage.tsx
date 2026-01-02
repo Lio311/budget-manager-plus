@@ -77,50 +77,48 @@ export default function LandingPage() {
                         שליטה מלאה בתזרים המזומנים שלך – כל הכלים לצמיחה כלכלית במקום אחד.
                         מערכת מקיפה לניהול תקציב, מעקב הוצאות, תכנון חובות וחיסכון.
                     </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5, duration: 0.8 }}
+                        className="flex flex-col sm:flex-row gap-4 justify-center mt-10"
+                    >
+                        <SignedOut>
+                            <SignUpButton mode="modal">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="px-8 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl"
+                                >
+                                    הרשמה חינם
+                                </motion.button>
+                            </SignUpButton>
+                            <SignInButton mode="modal">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="px-8 py-3 bg-white border-2 border-primary text-primary rounded-2xl font-bold text-lg hover:bg-green-50 transition-all shadow-md"
+                                >
+                                    כניסה למערכת
+                                </motion.button>
+                            </SignInButton>
+                        </SignedOut>
+
+                        <SignedIn>
+                            <Link href="/dashboard">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-2xl font-bold text-lg hover:shadow-xl transition-all shadow-lg inline-flex items-center gap-2"
+                                >
+                                    כניסה לדשבורד
+                                    <ArrowLeft className="w-5 h-5" />
+                                </motion.button>
+                            </Link>
+                        </SignedIn>
+                    </motion.div>
                 </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
-                    className="flex flex-col sm:flex-row gap-4 justify-center"
-                >
-                    <SignedOut>
-                        <SignUpButton mode="modal">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="px-8 py-3 bg-primary text-primary-foreground rounded-2xl font-bold text-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl"
-                            >
-                                הרשמה חינם
-                            </motion.button>
-                        </SignUpButton>
-                        <SignInButton mode="modal">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="px-8 py-3 bg-white border-2 border-primary text-primary rounded-2xl font-bold text-lg hover:bg-green-50 transition-all shadow-md"
-                            >
-                                כניסה למערכת
-                            </motion.button>
-                        </SignInButton>
-                    </SignedOut>
-
-                    <SignedIn>
-                        <Link href="/dashboard">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="px-8 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-2xl font-bold text-lg hover:shadow-xl transition-all shadow-lg inline-flex items-center gap-2"
-                            >
-                                כניסה לדשבורד
-                                <ArrowLeft className="w-5 h-5" />
-                            </motion.button>
-                        </Link>
-                    </SignedIn>
-                </motion.div>
-
-
 
                 {/* Personal Solution Section */}
                 <motion.div
@@ -129,8 +127,7 @@ export default function LandingPage() {
                     viewport={{ once: true, margin: "-100px" }}
                     variants={itemVariants}
                     className="mb-20 bg-blue-50 p-8 md:p-12 rounded-3xl border border-blue-200 relative overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-500"
-                >
-                    <div className="absolute top-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mt-32 animate-pulse"></div>
+                >           <div className="absolute top-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mt-32 animate-pulse"></div>
                     <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-200 rounded-full blur-3xl opacity-20 -mr-32 -mb-32 animate-pulse"></div>
 
                     <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
@@ -208,10 +205,10 @@ export default function LandingPage() {
                             </SignedOut>
                         </motion.div>
                     </div>
-                </motion.div>
+                </motion.div >
 
                 {/* Business Solution Section */}
-                <motion.div
+                < motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
@@ -314,11 +311,11 @@ export default function LandingPage() {
                             </div>
                         </motion.div>
                     </div>
-                </motion.div>
+                </motion.div >
 
 
                 {/* Features List - REDESIGNED */}
-                <motion.div
+                < motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
@@ -371,10 +368,10 @@ export default function LandingPage() {
                             description="גישה מלאה לנתונים מהמחשב, מהטאבלט ומהנייד"
                         />
                     </div>
-                </motion.div>
+                </motion.div >
 
                 {/* CTA Section */}
-                <motion.div
+                < motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
@@ -422,10 +419,10 @@ export default function LandingPage() {
                             </motion.button>
                         </Link>
                     </SignedIn>
-                </motion.div>
+                </motion.div >
 
                 {/* Footer Section - Terms & Privacy */}
-                <motion.div
+                < motion.div
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
@@ -445,9 +442,9 @@ export default function LandingPage() {
                     <p className="text-xs text-gray-400 mt-4">
                         © {new Date().getFullYear()} Keseflow. כל הזכויות שמורות.
                     </p>
-                </motion.div>
+                </motion.div >
 
-            </div>
+            </div >
             <SecurityBadge />
         </div >
     )
