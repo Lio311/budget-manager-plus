@@ -11,19 +11,19 @@ export const metadata: Metadata = {
 
 export default function SecurityPage() {
     return (
-        <div className="min-h-screen bg-[#eff6ff] font-rubik" dir="rtl">
+        <div className="min-h-screen bg-[#fef2f2] font-rubik" dir="rtl">
 
             {/* Header / Hero */}
-            <div className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-blue-100/50">
+            <div className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-red-100/50">
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg shadow-red-200">
                                 <span className="text-white font-bold text-lg">K</span>
                             </div>
                             <span className="font-bold text-xl text-gray-800 tracking-tight">Keseflow</span>
                         </div>
-                        <a href="/" className="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+                        <a href="/" className="text-sm font-medium text-gray-500 hover:text-red-600 transition-colors">
                             חזרה לדף הבית
                         </a>
                     </div>
@@ -32,7 +32,7 @@ export default function SecurityPage() {
 
             <main className="container mx-auto px-4 py-12 max-w-4xl">
                 <div className="text-center mb-16 space-y-4">
-                    <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-800 to-blue-600 pb-2">
+                    <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-red-800 to-red-600 pb-2">
                         מדיניות אבטחת מידע
                     </h1>
                     <p className="text-lg text-gray-500 font-medium">
@@ -40,9 +40,9 @@ export default function SecurityPage() {
                     </p>
                 </div>
 
-                <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-1 shadow-xl border border-white/50 ring-1 ring-blue-100">
+                <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-1 shadow-xl border border-white/50 ring-1 ring-red-100">
                     <div className="bg-white rounded-[1.4rem] p-8 md:p-12 shadow-sm">
-                        <article className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-800 prose-p:text-gray-600 prose-li:text-gray-600 prose-strong:text-gray-900 prose-a:text-blue-600 hover:prose-a:text-blue-700">
+                        <article className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-800 prose-p:text-gray-600 prose-li:text-gray-600 prose-strong:text-gray-900 prose-a:text-red-600 hover:prose-a:text-red-700">
 
                             <p className="lead text-xl md:text-2xl font-medium text-gray-700 leading-relaxed mb-10">
                                 ב-Keseflow, אבטחת המידע שלכם היא בראש סדר העדיפויות שלנו.
@@ -79,7 +79,7 @@ export default function SecurityPage() {
                                     <p>
                                         הפיצ'ר לתיעוד מהיר מ-Apple Pay / Google Pay פועל בארכיטקטורה השומרת על פרטיות (Privacy-First):
                                     </p>
-                                    <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 my-4">
+                                    <div className="bg-red-50/50 p-6 rounded-2xl border border-red-100 my-4">
                                         <ol className="list-decimal pr-5 space-y-2 m-0">
                                             <li>בעת תשלום, ה-Shortcut רץ <strong>מקומית</strong> על המכשיר שלכם.</li>
                                             <li>הנתונים (סכום ושם עסק) מועברים ישירות לאפליקציית Keseflow בדפדפן שלכם דרך Deep Link.</li>
@@ -116,7 +116,7 @@ export default function SecurityPage() {
 
                             <div className="mt-16 pt-10 border-t border-gray-100 text-center">
                                 <p className="font-medium text-gray-500 mb-2">מצאתם חולשת אבטחה? יש לכם שאלה?</p>
-                                <a href="mailto:keseflow.il@gmail.com" className="inline-flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700 transition-colors px-6 py-3 bg-blue-50 hover:bg-blue-100 rounded-full">
+                                <a href="mailto:keseflow.il@gmail.com" className="inline-flex items-center gap-2 text-red-600 font-bold hover:text-red-700 transition-colors px-6 py-3 bg-red-50 hover:bg-red-100 rounded-full">
                                     דווחו לצוות האבטחה
                                 </a>
                                 <p className="text-sm text-gray-400 mt-8">
@@ -126,9 +126,9 @@ export default function SecurityPage() {
 
                         </article>
                     </div>
-                </div >
-            </main >
-        </div >
+                </div>
+            </main>
+        </div>
     )
 }
 
@@ -139,7 +139,7 @@ function Section({ title, children, number }: { title: string, children: React.R
                 {number}
             </div>
             <h2 className="flex items-center gap-3 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-l from-gray-900 to-gray-600 mb-6">
-                <span className="w-8 h-1 rounded-full bg-blue-500 block"></span>
+                <span className="w-8 h-1 rounded-full bg-red-500 block"></span>
                 {title}
             </h2>
             <div className="text-gray-600 leading-relaxed space-y-4">
