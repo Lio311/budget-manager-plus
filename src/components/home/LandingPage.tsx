@@ -68,6 +68,9 @@ export default function LandingPage() {
                     transition={{ duration: 0.8 }}
                     className="text-center mb-16"
                 >
+                    {/* Top Subtle Green Glow */}
+                    <div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-emerald-500/10 to-transparent pointer-events-none z-[50] blur-3xl" />
+
                     <div className="flex items-center justify-center gap-3 mb-2">
                         <motion.div
                             whileHover={{ scale: 1.05 }}
