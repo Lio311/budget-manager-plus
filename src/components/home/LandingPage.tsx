@@ -45,22 +45,26 @@ export default function LandingPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100 font-sans" dir="rtl">
-            {/* Top Left Navigation Buttons */}
-            <div className="fixed top-6 left-6 z-[9999] flex gap-3">
-                <Link href="/personal">
-                    <Button variant="ghost" className="rounded-2xl bg-white/70 backdrop-blur-md border border-white/20 hover:bg-white/90 transition-all shadow-sm text-slate-900 font-bold px-6 h-12">
-                        ממשק אישי
-                    </Button>
-                </Link>
-                <Link href="/business">
-                    <Button variant="ghost" className="rounded-2xl bg-white/70 backdrop-blur-md border border-white/20 hover:bg-white/90 transition-all shadow-sm text-slate-900 font-bold px-6 h-12">
-                        ממשק עסקי
-                    </Button>
-                </Link>
+            {/* Top Subtle Green Glow */}
+            <div className="fixed top-0 left-0 right-0 h-40 bg-gradient-to-b from-emerald-500/10 via-emerald-500/5 to-transparent pointer-events-none z-[50] blur-3xl" />
+
+            {/* Top Left Navigation Buttons - Segmented Control Glass Style */}
+            <div className="fixed top-6 left-6 z-[9999]">
+                <div className="flex p-1.5 gap-1 bg-white/10 backdrop-blur-xl border border-white/20 rounded-full shadow-2xl">
+                    <Link href="/personal">
+                        <Button variant="ghost" className="rounded-full bg-white/10 backdrop-blur-md border border-white/10 hover:bg-emerald-500/30 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 text-slate-900 font-bold px-6 h-10 text-sm">
+                            ממשק אישי
+                        </Button>
+                    </Link>
+                    <Link href="/business">
+                        <Button variant="ghost" className="rounded-full bg-white/10 backdrop-blur-md border border-white/10 hover:bg-emerald-500/30 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 text-slate-900 font-bold px-6 h-10 text-sm">
+                            ממשק עסקי
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             <div className="container mx-auto px-4 py-16">
-
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
@@ -68,11 +72,6 @@ export default function LandingPage() {
                     transition={{ duration: 0.8 }}
                     className="text-center mb-16"
                 >
-                    <div className="relative min-h-screen bg-[#F8FAF9] overflow-hidden">
-                        {/* Top Subtle Green Glow */}
-                        <div className="fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-emerald-500/15 to-transparent pointer-events-none z-[50] blur-3xl" />
-
-                        {/* Background Decorations */}</div>
                     <div className="flex items-center justify-center gap-3 mb-2">
                         <motion.div
                             whileHover={{ scale: 1.05 }}
