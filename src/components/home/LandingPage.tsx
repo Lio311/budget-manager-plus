@@ -388,9 +388,14 @@ export default function LandingPage() {
                     viewport={{ once: true }}
                     className="mt-24 pt-8 border-t border-gray-200 text-center"
                 >
-                    <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline decoration-gray-300 hover:decoration-gray-900 underline-offset-4">
-                        תקנון ומדיניות פרטיות
-                    </Link>
+                    <div className="flex justify-center gap-6">
+                        <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline decoration-gray-300 hover:decoration-gray-900 underline-offset-4">
+                            תקנון ותנאי שימוש
+                        </Link>
+                        <Link href="/security" className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline decoration-gray-300 hover:decoration-gray-900 underline-offset-4">
+                            אבטחת מידע
+                        </Link>
+                    </div>
                     <p className="text-xs text-gray-400 mt-4">
                         © {new Date().getFullYear()} Keseflow. כל הזכויות שמורות.
                     </p>
