@@ -105,7 +105,7 @@ export default function LandingPage() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-2xl font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
+                                    className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
                                 >
                                     הרשמה חינם
                                 </motion.button>
@@ -114,7 +114,7 @@ export default function LandingPage() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-2xl font-bold text-lg transition-all shadow-md"
+                                    className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-full font-bold text-lg transition-all shadow-md"
                                 >
                                     כניסה למערכת
                                 </motion.button>
@@ -126,7 +126,7 @@ export default function LandingPage() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
+                                    className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
                                 >
                                     כניסה לדשבורד
                                     <LayoutDashboard className="w-6 h-6" />

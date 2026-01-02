@@ -175,12 +175,12 @@ export default function PersonalLandingPage() {
                     <div className="hidden md:flex items-center gap-6">
                         <Link href="/sign-in">
                             <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">
-                                כניסה למערכת
+                                כניסה
                             </Button>
                         </Link>
                         <Link href="/sign-up">
-                            <Button className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white border-0 rounded-full px-8 shadow-xl shadow-emerald-900/20 transition-all duration-300 transform hover:scale-105 active:scale-95">
-                                הרשמה חינם
+                            <Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">
+                                התחל עכשיו
                             </Button>
                         </Link>
                     </div>
@@ -369,8 +369,8 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                                 className="flex gap-4"
                             >
                                 <Link href="/sign-up">
-                                    <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full px-10 py-7 text-xl shadow-2xl shadow-emerald-500/20 transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">
-                                        הרשמה חינם
+                                    <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-10 py-7 text-xl shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">
+                                        התחל עכשיו
                                         <ArrowLeft className="mr-3" size={24} />
                                     </Button>
                                 </Link>
