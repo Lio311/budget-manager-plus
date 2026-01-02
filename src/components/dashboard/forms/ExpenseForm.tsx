@@ -63,7 +63,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         recurringEndDate: undefined as string | undefined,
         supplierId: '',
         amountBeforeVat: '',
-        vatRate: '0.18',
+        vatRate: '0.17',
         vatAmount: '',
         isDeductible: true,
         deductibleRate: '1.0',
@@ -188,7 +188,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 recurringEndDate: undefined,
                 supplierId: '',
                 amountBeforeVat: '',
-                vatRate: '0.18',
+                vatRate: '0.17',
                 vatAmount: '',
                 isDeductible: true,
                 deductibleRate: '1.0',
@@ -370,7 +370,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 {isBusiness && (
                     <div className="grid grid-cols-2 gap-3 p-3 bg-red-50/50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/50">
                         <div>
-                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">מע"מ מוכר (18%)</label>
+                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">מע"מ מוכר (17%)</label>
                             <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
                         </div>
                         <div>

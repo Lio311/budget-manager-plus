@@ -26,7 +26,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
         issueDate: new Date(),
         dueDate: undefined,
         subtotal: 0,
-        vatRate: 0.18,
+        vatRate: 0.17,
         paymentMethod: '',
         notes: ''
     })
@@ -159,7 +159,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                             </SelectTrigger>
                             <SelectContent dir="rtl">
                                 <SelectItem value="0">ללא מע"מ (0%)</SelectItem>
-                                <SelectItem value="0.18">מע"מ רגיל (18%)</SelectItem>
+                                <SelectItem value="0.17">מע"מ רגיל (17%)</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

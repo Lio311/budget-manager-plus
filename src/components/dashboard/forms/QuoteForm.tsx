@@ -26,7 +26,7 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
         issueDate: new Date(),
         validUntil: undefined,
         subtotal: 0,
-        vatRate: 0.18,
+        vatRate: 0.17,
         notes: ''
     })
 
@@ -155,7 +155,7 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                             </SelectTrigger>
                             <SelectContent dir="rtl">
                                 <SelectItem value="0">ללא מע"מ (0%)</SelectItem>
-                                <SelectItem value="0.18">מע"מ רגיל (18%)</SelectItem>
+                                <SelectItem value="0.17">מע"מ רגיל (17%)</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
