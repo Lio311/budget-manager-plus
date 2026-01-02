@@ -347,6 +347,7 @@ export function CalendarTab() {
                             <div className="space-y-2">
                                 <Label className="text-right block">כותרת האירוע</Label>
                                 <Input
+                                    className="text-right"
                                     value={newEvent.title}
                                     onChange={e => setNewEvent({ ...newEvent, title: e.target.value })}
                                     placeholder="שם הפגישה/עבודה"
@@ -355,18 +356,18 @@ export function CalendarTab() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label className="text-right block">שעת התחלה</Label>
-                                    <Input type="time" value={newEvent.startTime} onChange={e => setNewEvent({ ...newEvent, startTime: e.target.value })} />
+                                    <Input className="text-right" type="time" value={newEvent.startTime} onChange={e => setNewEvent({ ...newEvent, startTime: e.target.value })} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-right block">שעת סיום</Label>
-                                    <Input type="time" value={newEvent.endTime} onChange={e => setNewEvent({ ...newEvent, endTime: e.target.value })} />
+                                    <Input className="text-right" type="time" value={newEvent.endTime} onChange={e => setNewEvent({ ...newEvent, endTime: e.target.value })} />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
                                 <Label className="text-right block">לקוח (אופציונלי)</Label>
                                 <Select value={newEvent.clientId} onValueChange={v => setNewEvent({ ...newEvent, clientId: v })}>
-                                    <SelectTrigger dir="rtl">
+                                    <SelectTrigger dir="rtl" className="text-right flex flex-row-reverse">
                                         <SelectValue placeholder="בחר לקוח" />
                                     </SelectTrigger>
                                     <SelectContent dir="rtl">
@@ -381,7 +382,7 @@ export function CalendarTab() {
                             <div className="space-y-2">
                                 <Label className="text-right block">מכירה מקושרת (אופציונלי)</Label>
                                 <Select value={newEvent.incomeId} onValueChange={v => setNewEvent({ ...newEvent, incomeId: v })}>
-                                    <SelectTrigger dir="rtl">
+                                    <SelectTrigger dir="rtl" className="text-right flex flex-row-reverse">
                                         <SelectValue placeholder="בחר הכנסה/עסקה" />
                                     </SelectTrigger>
                                     <SelectContent dir="rtl">
