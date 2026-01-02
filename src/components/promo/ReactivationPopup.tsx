@@ -35,7 +35,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden bg-transparent border-0 shadow-none">
+            <DialogContent className="sm:max-w-lg md:max-w-2xl p-0 gap-0 overflow-hidden bg-transparent border-0 shadow-none">
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div
