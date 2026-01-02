@@ -213,8 +213,8 @@ export default function AccessibilityWidget() {
                 
                 /* Widget Ignore - Ensure widget itself is not affected by high contrast */
                 .acc-widget-ignore, .acc-widget-ignore * {
-                     background-color: initial;
-                     color: initial;
+                     /* background-color: initial; */
+                     /* color: initial; */
                      filter: none !important;
                 }
             `}</style>
@@ -393,12 +393,12 @@ function FeatureTile({ label, icon, active, onClick }: { label: string, icon: Re
             className={`
                 flex flex-col items-center justify-center gap-1 p-2 rounded-xl border transition-all duration-200 min-h-[70px]
                 ${active
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-md transform scale-[1.02]'
-                    : 'bg-white text-gray-600 border-gray-100 hover:border-blue-300 hover:bg-blue-50'
+                    ? '!bg-blue-600 !text-white !border-blue-600 shadow-md transform scale-[1.02]'
+                    : '!bg-white !text-gray-600 border-gray-100 hover:border-blue-300 hover:bg-blue-50'
                 }
             `}
         >
-            <div className={`${active ? 'text-white' : 'text-blue-500'}`}>
+            <div className={`${active ? '!text-white' : 'text-blue-500'}`}>
                 {icon}
             </div>
             <span className="text-[11px] font-bold">{label}</span>
