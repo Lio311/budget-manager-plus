@@ -48,13 +48,12 @@ export default function LandingPage() {
             {/* Top Left Navigation Buttons */}
             <div className="fixed top-6 left-6 z-[9999] flex gap-3">
                 <Link href="/business">
-                    <Button variant="ghost" className="rounded-full bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm text-slate-900 font-bold px-6 h-12 relative overflow-hidden group">
-                        <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-emerald-500/20 to-transparent group-hover:from-emerald-500/30 transition-all" />
-                        <span className="relative z-10">ממשק עסקי</span>
+                    <Button variant="ghost" className="rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm text-slate-900 font-bold px-6 h-12">
+                        ממשק עסקי
                     </Button>
                 </Link>
                 <Link href="/personal">
-                    <Button variant="ghost" className="rounded-full bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm text-slate-900 font-bold px-6 h-12">
+                    <Button variant="ghost" className="rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm text-slate-900 font-bold px-6 h-12">
                         ממשק אישי
                     </Button>
                 </Link>
