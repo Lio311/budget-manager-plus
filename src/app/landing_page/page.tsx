@@ -41,10 +41,10 @@ export default function PremiumLandingPage() {
             </nav>
 
             {/* HERO SECTION */}
-            <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-                {/* Background Blobs */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-green-100/40 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
+            <section className="relative min-h-[90vh] flex items-center pt-32 pb-20 overflow-hidden bg-gradient-to-br from-[#052e16] via-[#064e3b] to-[#022c22]">
+                {/* Ambient Background Effects */}
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-emerald-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
@@ -59,33 +59,33 @@ export default function PremiumLandingPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6 }}
                             >
-                                <span className="inline-block py-1.5 px-4 rounded-full bg-gradient-to-r from-green-400 to-emerald-600 text-white text-sm font-bold mb-6 shadow-lg shadow-green-200">
-                                    המהפכה בניהול הפיננסי כבר כאן
+                                <span className="inline-block py-2 px-5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-sm font-bold mb-8 backdrop-blur-md">
+                                    ✨ המהפכה בניהול הפיננסי כבר כאן
                                 </span>
-                                <h1 className="text-5xl lg:text-7xl font-black text-gray-900 leading-[1.1] mb-6 tracking-tight">
+                                <h1 className="text-5xl lg:text-7xl font-black text-white leading-[1.1] mb-8 tracking-tight drop-shadow-lg">
                                     לשלוט בכסף שלך, <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-l from-green-600 to-emerald-400">
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-300">
                                         בסטייל.
                                     </span>
                                 </h1>
-                                <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium">
+                                <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium">
                                     המערכת המתקדמת בישראל לניהול תקציב אישי ועסקי.
                                     כל הכלים שצריך כדי לצמוח, בממשק אחד יפהפה ונוח.
                                 </p>
 
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                                    <Button size="lg" className="h-14 px-8 text-lg rounded-full bg-gray-900 hover:bg-black shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                                <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
+                                    <Button size="lg" className="h-14 px-10 text-lg rounded-full bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:-translate-y-1 transition-all duration-300">
                                         להתחיל חינם עכשיו
                                     </Button>
-                                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full border-2 hover:bg-gray-50">
+                                    <Button size="lg" variant="outline" className="h-14 px-10 text-lg rounded-full border-2 border-emerald-500/30 text-emerald-100 hover:bg-emerald-500/10 hover:border-emerald-500/50 hover:text-white backdrop-blur-sm">
                                         איך זה עובד?
                                     </Button>
                                 </div>
 
                                 <div className="mt-10 flex items-center justify-center lg:justify-start gap-4 text-sm text-gray-500 font-medium">
-                                    <div className="flex -space-x-2 space-x-reverse">
+                                    <div className="flex -space-x-3 space-x-reverse">
                                         {[1, 2, 3, 4].map(i => (
-                                            <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-gray-200" />
+                                            <div key={i} className="w-10 h-10 rounded-full border-2 border-[#064e3b] bg-gray-700" />
                                         ))}
                                     </div>
                                     <p>הצטרפו ל-5,000+ משתמשים מרוצים</p>
@@ -144,29 +144,29 @@ export default function PremiumLandingPage() {
                 </div>
             </section>
 
-            {/* FEATURES SCROLL SECTION */}
-            <section className="py-24 bg-gray-50/50">
+            {/* FEATURES SCROLL SECTION - Dark Theme */}
+            <section className="py-24 bg-[#022c22] relative">
                 <div className="container mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-20">
-                        <h2 className="text-4xl font-bold mb-4">יותר מסתם מעקב הוצאות</h2>
-                        <p className="text-xl text-gray-600 text-center">בנינו מערכת שמבינה את הצרכים שלך, בין אם אתה סטודנט, משפחה או בעל עסק.</p>
+                        <h2 className="text-4xl font-bold mb-6 text-white">יותר מסתם מעקב הוצאות</h2>
+                        <p className="text-xl text-gray-400 text-center">בנינו מערכת שמבינה את הצרכים שלך, בין אם אתה סטודנט, משפחה או בעל עסק.</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
                         <ScrollRevealCard
-                            icon={<PieChart className="w-8 h-8 text-purple-500" />}
+                            icon={<PieChart className="w-8 h-8 text-emerald-400" />}
                             title="ניתוח חכם"
                             description="דוחות שמסבירים לך בדיוק לאן הכסף הולך, בצורה ויזואלית ופשוטה להבנה."
                             delay={0}
                         />
                         <ScrollRevealCard
-                            icon={<Smartphone className="w-8 h-8 text-blue-500" />}
+                            icon={<Smartphone className="w-8 h-8 text-blue-400" />}
                             title="תמיד איתך"
                             description="גישה מלאה מכל מקום - מהנייד, מהמחשב או מהטאבלט. הנתונים תמיד מסונכרנים."
                             delay={0.2}
                         />
                         <ScrollRevealCard
-                            icon={<Building2 className="w-8 h-8 text-orange-500" />}
+                            icon={<Building2 className="w-8 h-8 text-orange-400" />}
                             title="תמיכה עסקית"
                             description="מודול מיוחד לעסקים קטנים - מעקב מע״מ, הפקת קבלות וניהול תזרים מזומנים."
                             delay={0.4}
@@ -176,13 +176,13 @@ export default function PremiumLandingPage() {
             </section>
 
 
-            {/* PRICING SECTION */}
-            <section className="py-24 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-white via-green-50/30 to-white" />
+            {/* PRICING SECTION - Dark Theme */}
+            <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#022c22] to-[#042f1a]">
+                <div className="absolute inset-0 bg-[url('/assets/grid.svg')] opacity-5" />
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold mb-4">מחיר שקוף, תמורה מלאה</h2>
-                        <p className="text-xl text-gray-600">בחרו את המסלול המתאים ביותר עבורכם</p>
+                        <h2 className="text-4xl font-bold mb-4 text-white">מחיר שקוף, תמורה מלאה</h2>
+                        <p className="text-xl text-gray-400">בחרו את המסלול המתאים ביותר עבורכם</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
@@ -202,7 +202,7 @@ export default function PremiumLandingPage() {
 
                         {/* Combined Plan - Highlighted */}
                         <div className="relative transform md:-translate-y-4">
-                            <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-600 rounded-3xl blur opacity-30" />
+                            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-green-500 rounded-3xl blur opacity-40" />
                             <PricingCard
                                 title="משולב (מומלץ)"
                                 price="₪169"
@@ -236,10 +236,10 @@ export default function PremiumLandingPage() {
                 </div>
             </section>
 
-            {/* FAQ SECTION */}
-            <section className="py-24 bg-gray-50">
+            {/* FAQ SECTION - Dark Theme */}
+            <section className="py-24 bg-[#022c22]">
                 <div className="container mx-auto px-6 max-w-3xl">
-                    <h2 className="text-4xl font-bold mb-12 text-center">שאלות נפוצות</h2>
+                    <h2 className="text-4xl font-bold mb-12 text-center text-white">שאלות נפוצות</h2>
                     <div className="w-full space-y-4">
                         <FAQItem
                             question="האם המידע שלי מאובטח?"
@@ -261,21 +261,21 @@ export default function PremiumLandingPage() {
                 </div>
             </section>
 
-            {/* FOOTER */}
-            <footer className="bg-gray-900 text-white py-16">
+            {/* FOOTER - Dark Theme */}
+            <footer className="bg-[#011c15] text-white py-16 border-t border-white/5">
                 <div className="container mx-auto px-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                         <div>
-                            <Image src="/K-LOGO2.png" alt="Logo" width={150} height={50} className="h-10 w-auto brightness-0 invert opacity-80" />
-                            <p className="text-gray-400 mt-4 text-sm">הבית הפיננסי החדש שלך.</p>
+                            <Image src="/K-LOGO2.png" alt="Logo" width={150} height={50} className="h-10 w-auto brightness-0 invert opacity-90" />
+                            <p className="text-gray-500 mt-4 text-sm">הבית הפיננסי החדש שלך.</p>
                         </div>
                         <div className="flex gap-8 text-sm text-gray-400">
-                            <Link href="/terms" className="hover:text-white transition">תנאי שימוש</Link>
-                            <Link href="/privacy" className="hover:text-white transition">מדיניות פרטיות</Link>
-                            <Link href="/contact" className="hover:text-white transition">צור קשר</Link>
+                            <Link href="/terms" className="hover:text-emerald-400 transition">תנאי שימוש</Link>
+                            <Link href="/privacy" className="hover:text-emerald-400 transition">מדיניות פרטיות</Link>
+                            <Link href="/contact" className="hover:text-emerald-400 transition">צור קשר</Link>
                         </div>
                     </div>
-                    <div className="border-t border-gray-800 mt-12 pt-8 text-center text-xs text-gray-500">
+                    <div className="border-t border-white/5 mt-12 pt-8 text-center text-xs text-gray-600">
                         © {new Date().getFullYear()} Keseflow. כל הזכויות שמורות.
                     </div>
                 </div>
