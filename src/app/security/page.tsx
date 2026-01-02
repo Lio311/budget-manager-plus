@@ -120,15 +120,15 @@ export default function SecurityPage() {
                                     דווחו לצוות האבטחה
                                 </a>
                                 <p className="text-sm text-gray-400 mt-8">
-                                    Keseflow Security Team
+                                    keseflow.il@gmail.com
                                 </p>
                             </div>
 
                         </article>
                     </div>
-                </div>
-            </main>
-        </div>
+                </div >
+            </main >
+        </div >
     )
 }
 
