@@ -63,7 +63,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
                 // 2. עיצוב המודל (רספונסיבי)
                 cardBox: "w-full h-full md:w-fit md:h-auto md:min-w-[700px] md:max-w-[90vw]",
-
+                
                 scrollBox: "h-full md:h-auto",
                 pageScrollBox: "h-full md:h-auto",
 
@@ -79,38 +79,32 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
     return (
         <div className="sticky top-4 z-[60] mx-4 mb-6">
-            <div className="w-full flex h-[72px] items-center px-6 justify-between gap-4 transition-all duration-300 border border-white/20 dark:border-slate-700/30 rounded-2xl backdrop-blur-sm hover:border-white/40 dark:hover:border-slate-600/50">
+            <div className="glass-panel w-full flex h-[72px] items-center px-6 justify-between gap-4 transition-all duration-300 hover:shadow-2xl hover:border-white/60">
 
-                {/* Left Section - Buttons (Desktop) */}
+                {/* Right Section - Date Navigation */}
                 <div className="hidden md:flex items-center gap-4">
-                    <div className="flex bg-gray-100/50 p-1.5 rounded-full border border-white/50 shadow-inner dark:bg-slate-800/50 dark:border-slate-700/50">
-                        <button
-                            onClick={() => handleToggle('PERSONAL')}
-                            className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'PERSONAL'
-                                ? 'bg-white text-emerald-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-emerald-400'
-                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-slate-700/50'
-                                }`}
+                    <div className="flex bg-gray-100/50 dark:bg-slate-800/50 rounded-full p-1 border border-white/50 dark:border-slate-700/50 backdrop-blur-sm">
+                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 hover:bg-white dark:hover:bg-slate-700 rounded-full dark:text-gray-200">
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                        <MonthYearPicker
+                            currentMonth={month - 1}
+                            currentYear={year}
+                            onSelect={(selectedMonth, selectedYear) => {
+                                setMonth(selectedMonth + 1)
+                                setYear(selectedYear)
+                            }}
                         >
-                            פרטי
-                        </button>
-                        <button
-                            onClick={() => handleToggle('BUSINESS')}
-                            className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'BUSINESS'
-                                ? 'bg-white text-blue-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-blue-400'
-                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-slate-700/50'
-                                }`}
-                        >
-                            עסקי
-                        </button>
-                    </div>
-
-                    <ModeToggle />
-
-                    <div className="pl-2">
-                        <UserButton
-                            userProfileProps={userProfileProps}
-                            appearance={userButtonAppearance}
-                        />
+                            <button className="min-w-[140px] flex flex-col items-center justify-center px-2 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors">
+                                <span className="text-sm font-bold text-[#323338] dark:text-gray-200 leading-none">
+                                    {getMonthName(month)} {year}
+                                </span>
+                                <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">סקירה חודשית</span>
+                            </button>
+                        </MonthYearPicker>
+                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 hover:bg-white dark:hover:bg-slate-700 rounded-full dark:text-gray-200">
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
                     </div>
                 </div>
 
@@ -127,13 +121,13 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         >
                             <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                         </Button>
-
+                        
                         {/* Mobile User Button */}
                         <UserButton
                             userProfileProps={userProfileProps}
                             appearance={userButtonAppearance}
                         />
-
+                        
                         <div className="mr-2">
                             <ModeToggle />
                         </div>
@@ -182,30 +176,35 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     />
                 </div>
 
-                {/* Right Section - Date Navigation */}
-                <div className="hidden md:flex items-center gap-4">
-                    <div className="flex bg-gray-100/50 dark:bg-slate-800/50 rounded-full p-1 border border-white/50 dark:border-slate-700/50 backdrop-blur-sm">
-                        <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 hover:bg-white dark:hover:bg-slate-700 rounded-full dark:text-gray-200">
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                        <MonthYearPicker
-                            currentMonth={month - 1}
-                            currentYear={year}
-                            onSelect={(selectedMonth, selectedYear) => {
-                                setMonth(selectedMonth + 1)
-                                setYear(selectedYear)
-                            }}
+                {/* Left Section */}
+                <div className="hidden md:flex items-center justify-end gap-4">
+                    <ModeToggle />
+                    <div className="flex bg-gray-100/50 p-1.5 rounded-full border border-white/50 shadow-inner dark:bg-slate-800/50 dark:border-slate-700/50">
+                        <button
+                            onClick={() => handleToggle('PERSONAL')}
+                            className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'PERSONAL'
+                                ? 'bg-white text-emerald-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-emerald-400'
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-slate-700/50'
+                                }`}
                         >
-                            <button className="min-w-[140px] flex flex-col items-center justify-center px-2 cursor-pointer hover:bg-white/50 dark:hover:bg-slate-700/50 rounded-lg transition-colors">
-                                <span className="text-sm font-bold text-[#323338] dark:text-gray-200 leading-none">
-                                    {getMonthName(month)} {year}
-                                </span>
-                                <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">סקירה חודשית</span>
-                            </button>
-                        </MonthYearPicker>
-                        <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8 hover:bg-white dark:hover:bg-slate-700 rounded-full dark:text-gray-200">
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
+                            פרטי
+                        </button>
+                        <button
+                            onClick={() => handleToggle('BUSINESS')}
+                            className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'BUSINESS'
+                                ? 'bg-white text-blue-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-blue-400'
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-white/50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-slate-700/50'
+                                }`}
+                        >
+                            עסקי
+                        </button>
+                    </div>
+
+                    <div className="pl-2">
+                        <UserButton
+                            userProfileProps={userProfileProps}
+                            appearance={userButtonAppearance}
+                        />
                     </div>
                 </div>
             </div>
