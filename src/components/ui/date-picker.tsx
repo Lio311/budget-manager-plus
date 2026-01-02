@@ -19,9 +19,10 @@ interface DatePickerProps {
     placeholder?: string
     fromDate?: Date
     toDate?: Date
+    disableNavigation?: boolean
 }
 
-export function DatePicker({ date, setDate, className, placeholder = "בחר תאריך", fromDate, toDate }: DatePickerProps) {
+export function DatePicker({ date, setDate, className, placeholder = "בחר תאריך", fromDate, toDate, disableNavigation = false }: DatePickerProps) {
     const [open, setOpen] = React.useState(false)
 
     return (
@@ -49,6 +50,7 @@ export function DatePicker({ date, setDate, className, placeholder = "בחר ת�
                     }}
                     fromDate={fromDate}
                     toDate={toDate}
+                    disableNavigation={disableNavigation}
                     initialFocus
                 />
             </PopoverContent>
