@@ -105,8 +105,12 @@ export default async function RootLayout({
     let shouldShowReactivation = false
     try {
         const user = await currentUser()
-        if (user) {
-            // Check last active in DB
+
+        if (!user) {
+            // Guest user - Show popup (targeting users who are not connected)
+            shouldShowReactivation = true
+        } else {
+            // Logged in user - Check last active in DB
             const dbUser = await prisma.user.findUnique({
                 where: { id: user.id },
                 select: { updatedAt: true }
@@ -116,7 +120,7 @@ export default async function RootLayout({
                 const daysInactive = differenceInDays(new Date(), dbUser.updatedAt)
 
                 // If inactive for more than 30 days, check subscription
-                if (daysInactive > 30) { // Changed from 30 to match "near month" interpretation
+                if (daysInactive > 30) {
                     const personalStatus = await getSubscriptionStatus(user.id, 'PERSONAL')
                     const businessStatus = await getSubscriptionStatus(user.id, 'BUSINESS')
 
@@ -130,6 +134,7 @@ export default async function RootLayout({
         }
     } catch (error) {
         console.error('Error checking reactivation status:', error)
+        // On error (e.g. DB down), we default to false to avoid annoying users
     }
 
     return (
