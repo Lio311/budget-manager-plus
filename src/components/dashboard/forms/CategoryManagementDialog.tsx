@@ -9,6 +9,7 @@ import { PRESET_COLORS } from '@/lib/constants'
 import { addCategory, updateCategory, deleteCategory } from '@/lib/actions/category'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface Category {
     id: string
@@ -30,6 +31,7 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
     const [newItemName, setNewItemName] = useState('')
     const [newItemColor, setNewItemColor] = useState(PRESET_COLORS[0].class)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const confirm = useConfirm()
 
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editName, setEditName] = useState('')
@@ -83,7 +85,8 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
     }
 
     async function handleDelete(id: string) {
-        if (!confirm('האם ברצונך למחוק את הקטגוריה? כל ההוצאות המקושרות לה ימחקו לאחר מכן')) return
+        const confirmed = await confirm('האם ברצונך למחוק את הקטגוריה? כל ההוצאות המקושרות לה ימחקו לאחר מכן', 'מחיקת קטגוריה')
+        if (!confirmed) return
 
         try {
             const result = await deleteCategory(id)

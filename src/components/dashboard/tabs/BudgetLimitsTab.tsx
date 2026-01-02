@@ -19,6 +19,7 @@ import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Pagination } from '@/components/ui/Pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useConfirm } from '@/hooks/useConfirm'
 
 const getCategoryIcon = (name: string) => {
     switch (name) {
@@ -93,6 +94,7 @@ export function BudgetLimitsTab() {
     const { month, year } = useBudget()
     const { toast } = useToast()
     const { mutate } = useSWRConfig()
+    const confirm = useConfirm()
 
     // Load Data with SWR
     const { data: budgetsData, isLoading: loading, mutate: mutateThis } = useSWR(
@@ -308,8 +310,9 @@ export function BudgetLimitsTab() {
                                                             variant="ghost"
                                                             size="icon"
                                                             className="h-7 w-7 text-gray-400 hover:text-red-500"
-                                                            onClick={() => {
-                                                                if (confirm('האם לבטל את הגבלת התקציב לקטגוריה זו?')) {
+                                                            onClick={async () => {
+                                                                const confirmed = await confirm('האם לבטל את הגבלת התקציב לקטגוריה זו?', 'ביטול תקציב')
+                                                                if (confirmed) {
                                                                     handleLimitCommit(budget.categoryId, [0])
                                                                     setNewlyAddedIds(prev => prev.filter(id => id !== budget.categoryId))
                                                                 }
