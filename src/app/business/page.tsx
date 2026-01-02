@@ -29,9 +29,9 @@ export default function BusinessLandingPage() {
             title: 'לקוחות',
             subtitle: 'נהל את הלקוחות שלך',
             description: 'מערכת ניהול לקוחות מקיפה שמאפשרת לך לעקוב אחר כל פרטי הלקוח, היסטוריית עסקאות, חשבוניות והצעות מחיר. שמור מידע חשוב כמו פרטי קשר, תנאי תשלום ומועדים. המערכת תזכיר לך מתי לחדש הצעות, לשלוח תזכורות תשלום ולעקוב אחר חובות. בנה קשרי לקוחות חזקים עם ניהול מקצועי ומסודר.',
-            bgColor: 'from-blue-600 via-blue-700 to-blue-900',
+            bgColor: 'from-green-600 via-green-700 to-green-900',
             textColor: 'text-white',
-            accentColor: 'blue',
+            accentColor: 'green',
             tag: 'ניהול | מעקב | קשרי לקוחות'
         },
         {
@@ -40,9 +40,9 @@ export default function BusinessLandingPage() {
             title: 'ספקים',
             subtitle: 'שלוט בשרשרת האספקה',
             description: 'נהל את כל הספקים שלך במקום אחד - עקוב אחר הזמנות, חשבוניות, תנאי תשלום ומועדים. המערכת תעזור לך לנהל את תזרים המזומנים, לתכנן תשלומים ולשמור על קשרים טובים עם הספקים. קבל תזכורות לפני מועדי תשלום, עקוב אחר היסטוריית רכישות וזהה הזדמנויות למשא ומתן על מחירים טובים יותר.',
-            bgColor: 'from-purple-600 via-purple-700 to-purple-900',
+            bgColor: 'from-blue-600 via-blue-700 to-blue-900',
             textColor: 'text-white',
-            accentColor: 'purple',
+            accentColor: 'blue',
             tag: 'ניהול | תזרים | תשלומים'
         },
         {
@@ -62,9 +62,9 @@ export default function BusinessLandingPage() {
             title: 'חשבוניות',
             subtitle: 'חשבוניות חכמות ומסודרות',
             description: 'הפק חשבוניות מס ו/או קבלות בהתאם לדרישות החוק הישראלי. המערכת תחשב אוטומטית מע"מ, תעקוב אחר תשלומים ותזכיר ללקוחות על חובות פתוחים. ייצא דוחות למס הכנסה, עקוב אחר תזרים מזומנים וקבל תובנות על מצב העסק. הכל מסודר, מאורגן ומוכן לביקורת.',
-            bgColor: 'from-green-600 via-green-700 to-green-900',
+            bgColor: 'from-purple-600 via-purple-700 to-purple-900',
             textColor: 'text-white',
-            accentColor: 'green',
+            accentColor: 'purple',
             tag: 'הפקה | מעמ | דוחות'
         },
         {
