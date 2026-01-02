@@ -302,7 +302,7 @@ function ScrollRevealCard({ icon, title, description, delay }: { icon: any, titl
     )
 }
 
-function PricingCard({ title, price, period, features, highlight, description, badge }: any) {
+function PricingCard({ title, price, period, features = [], highlight, description, badge }: any) {
     return (
         <motion.div className={`
             relative p-8 rounded-3xl border 
@@ -327,7 +327,7 @@ function PricingCard({ title, price, period, features, highlight, description, b
             </div>
 
             <ul className="space-y-4 mb-8 flex-1">
-                {features.map((feature: string, i: number) => (
+                {(features || []).map((feature: string, i: number) => (
                     <li key={i} className="flex items-start gap-3 text-sm font-medium opacity-90">
                         <Check size={20} className={highlight ? 'text-green-400' : 'text-green-600'} />
                         {feature}
