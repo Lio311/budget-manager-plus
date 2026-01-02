@@ -9,10 +9,12 @@ import { uploadBusinessLogo, deleteBusinessLogo, getBusinessProfile, updateBusin
 import { toast } from 'sonner'
 import useSWR from 'swr'
 import { SignaturePad } from './SignaturePad'
+import { useConfirm } from '@/hooks/useConfirm'
 
 export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
     const [uploading, setUploading] = useState(false)
     const [saving, setSaving] = useState(false)
+    const confirm = useConfirm()
 
     const [preview, setPreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -89,7 +91,8 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
     }
 
     const handleDelete = async () => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק את הלוגו?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק את הלוגו?', 'מחיקת לוגו')
+        if (!confirmed) return
 
         try {
             const result = await deleteBusinessLogo()

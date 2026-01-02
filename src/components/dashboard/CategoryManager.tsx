@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast'
 import { getCategories, addCategory, updateCategory, deleteCategory } from '@/lib/actions/category'
 import { PRESET_COLORS } from '@/lib/constants'
 import { useBudget } from '@/contexts/BudgetContext'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface Category {
     id: string
@@ -22,6 +23,7 @@ export function CategoryManager() {
     const { toast } = useToast()
     const { budgetType } = useBudget()
     const [activeTab, setActiveTab] = useState('expense')
+    const confirm = useConfirm()
 
     // Data Fetching
     const fetcher = async () => {
@@ -86,7 +88,8 @@ export function CategoryManager() {
     }
 
     async function handleDelete(id: string) {
-        if (!confirm('האם אתה בטוח שברצונך למחוק קטגוריה זו?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק קטגוריה זו?', 'מחיקת קטגוריה')
+        if (!confirmed) return
         const result = await deleteCategory(id)
         if (result.success) {
             toast({ title: 'הצלחה', description: 'הקטגוריה נמחקה בהצלחה' })

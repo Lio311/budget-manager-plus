@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button'
 import { uploadBusinessLogo, deleteBusinessLogo, getBusinessProfile } from '@/lib/actions/business-settings'
 import { toast } from 'sonner'
 import useSWR from 'swr'
+import { useConfirm } from '@/hooks/useConfirm'
 
 export function BusinessLogoUpload() {
     const [uploading, setUploading] = useState(false)
     const [preview, setPreview] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const confirm = useConfirm()
 
     const fetcher = async () => {
         const result = await getBusinessProfile()
@@ -62,7 +64,8 @@ export function BusinessLogoUpload() {
     }
 
     const handleDelete = async () => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק את הלוגו?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק את הלוגו?', 'מחיקת לוגו')
+        if (!confirmed) return
 
         try {
             const result = await deleteBusinessLogo()
