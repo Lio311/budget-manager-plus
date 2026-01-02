@@ -16,6 +16,7 @@ import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
+import { RecurringEndDatePicker } from '@/components/ui/recurring-end-date-picker'
 import { formatCurrency } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
@@ -385,7 +386,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         <div className="flex gap-4 flex-1">
                             <div className="space-y-2 w-full">
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <DatePicker
+                                <RecurringEndDatePicker
                                     date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
                                     setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
                                     fromDate={startOfMonth}

@@ -14,6 +14,7 @@ import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
+import { RecurringEndDatePicker } from '@/components/ui/recurring-end-date-picker'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES } from '@/lib/currency'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
@@ -323,7 +324,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                         <div className="flex gap-4 flex-1">
                             <div className="space-y-2 w-full">
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <DatePicker
+                                <RecurringEndDatePicker
                                     date={newSaving.recurringEndDate ? new Date(newSaving.recurringEndDate) : undefined}
                                     setDate={(date) => setNewSaving({ ...newSaving, recurringEndDate: date })}
                                     fromDate={startOfMonth}

@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
+import { RecurringEndDatePicker } from '@/components/ui/recurring-end-date-picker'
 import { formatCurrency } from '@/lib/utils'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
@@ -434,7 +435,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         <div className="flex gap-4 flex-1">
                             <div className="space-y-2 w-full">
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <DatePicker
+                                <RecurringEndDatePicker
                                     date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
                                     setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
                                     fromDate={startOfMonth}

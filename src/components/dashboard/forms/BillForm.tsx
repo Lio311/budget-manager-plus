@@ -14,6 +14,7 @@ import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelec
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
+import { RecurringEndDatePicker } from '@/components/ui/recurring-end-date-picker'
 
 interface BillFormProps {
     onSuccess?: () => void
@@ -217,7 +218,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                         <div className="flex gap-4 flex-1">
                             <div className="space-y-2 w-full">
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <DatePicker
+                                <RecurringEndDatePicker
                                     date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
                                     setDate={(date) => setFormData({ ...formData, recurringEndDate: date ? date.toISOString() : undefined })}
                                     fromDate={startOfMonth}
