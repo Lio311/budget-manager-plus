@@ -9,6 +9,7 @@ import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
 import { z } from 'zod'
+import { useConfirm } from '@/hooks/useConfirm'
 
 const SupplierSchema = z.object({
     name: z.string().min(2, 'שם הספק חייב להכיל לפחות 2 תווים').max(100, 'שם הספק ארוך מדי'),
@@ -21,6 +22,7 @@ const SupplierSchema = z.object({
 
 export function SuppliersTab() {
     const { budgetType } = useBudget()
+    const confirm = useConfirm()
     const [searchTerm, setSearchTerm] = useState('')
     const [showForm, setShowForm] = useState(false)
     const [editingSupplier, setEditingSupplier] = useState<any>(null)
@@ -138,7 +140,8 @@ export function SuppliersTab() {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק ספק זה?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק ספק זה?', 'מחיקת ספק')
+        if (!confirmed) return
 
         try {
             await optimisticDeleteSupplier(id)

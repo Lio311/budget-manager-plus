@@ -9,6 +9,7 @@ import useSWR from 'swr'
 import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
 import { z } from 'zod'
+import { useConfirm } from '@/hooks/useConfirm'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -21,6 +22,7 @@ const ClientSchema = z.object({
 
 export function ClientsTab() {
     const { budgetType } = useBudget()
+    const confirm = useConfirm()
     const [searchTerm, setSearchTerm] = useState('')
     const [showForm, setShowForm] = useState(false)
     const [editingClient, setEditingClient] = useState<any>(null)
@@ -138,7 +140,8 @@ export function ClientsTab() {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק לקוח זה?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק לקוח זה?', 'מחיקת לקוח')
+        if (!confirmed) return
 
         try {
             await optimisticDeleteClient(id)
