@@ -69,7 +69,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
                             </div>
 
                             {/* Content Section */}
-                            <div className="relative px-6 pb-8 pt-2 text-center -mt-12">
+                            <div className="relative px-6 pb-8 pt-2 text-center -mt-4 md:-mt-12">
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
