@@ -529,6 +529,12 @@ export function ExpensesTab() {
                                                                 קבועה
                                                             </div>
                                                         )}
+                                                        {isBusiness && exp.isDeductible && (
+                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
+                                                                <span className="w-1 h-1 rounded-full bg-current" />
+                                                                הוצאה מוכרת
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] dark:text-gray-400 flex-wrap">
                                                         <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>

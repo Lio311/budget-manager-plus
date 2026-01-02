@@ -70,6 +70,7 @@ interface Income {
 interface IncomeData {
     incomes: Income[]
     totalILS: number
+    totalNetILS?: number
 }
 
 export function IncomeTab() {
@@ -95,6 +96,7 @@ export function IncomeTab() {
 
     const incomes = data?.incomes || []
     const totalIncomeILS = data?.totalILS || 0
+    const totalNetILS = data?.totalNetILS || 0
 
     const fetcherClients = async () => {
         const result = await getClients()
@@ -282,9 +284,9 @@ export function IncomeTab() {
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-blue-600' : 'border-l-green-600'} dark:bg-slate-800`}>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך מכירות/הכנסות חודשיות' : 'סך הכנסות חודשיות'}</h3>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך מכירות/הכנסות חודשיות (נקי)' : 'סך הכנסות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-green-600'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
-                    {loadingIncomes ? '...' : formatCurrency(totalIncomeILS, '₪')}
+                    {loadingIncomes ? '...' : formatCurrency(isBusiness ? totalNetILS : totalIncomeILS, '₪')}
                 </div>
             </div>
 
@@ -402,15 +404,15 @@ export function IncomeTab() {
                                         </div>
 
                                         <div className="flex items-center gap-2 sm:gap-6 shrink-0 pl-1">
-                                            {isBusiness && income.vatAmount > 0 && (
+                                            {isBusiness && income.vatAmount && income.vatAmount > 0 && (
                                                 <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
+                                                    <span>סה"כ: {formatCurrency(income.amount, getCurrencySymbol(income.currency))}</span>
                                                     <span>מע"מ: {formatCurrency(income.vatAmount, getCurrencySymbol(income.currency))}</span>
-                                                    <span>נקי: {formatCurrency(income.amount - income.vatAmount, getCurrencySymbol(income.currency))}</span>
                                                 </div>
                                             )}
                                             <div className="text-right">
                                                 <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-green-600' : 'text-green-600'}`}>
-                                                    {formatCurrency(income.amount, getCurrencySymbol(income.currency || 'ILS'))}
+                                                    {formatCurrency(isBusiness && income.vatAmount ? (income.amount - income.vatAmount) : income.amount, getCurrencySymbol(income.currency || 'ILS'))}
                                                 </div>
                                                 {income.invoice && (
                                                     <div className="text-[10px] text-gray-400 font-medium hidden sm:block">#{income.invoice.invoiceNumber}</div>

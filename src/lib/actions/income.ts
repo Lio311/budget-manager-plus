@@ -26,12 +26,18 @@ export async function getIncomes(month: number, year: number, type: 'PERSONAL' |
 
         // Calculate total in ILS
         let totalILS = 0
+        let totalNetILS = 0
         for (const income of incomes) {
             const amountInILS = await convertToILS(income.amount, income.currency)
             totalILS += amountInILS
+
+            const vat = income.vatAmount || 0
+            const net = income.amount - vat
+            const netInILS = await convertToILS(net, income.currency)
+            totalNetILS += netInILS
         }
 
-        return { success: true, data: { incomes, totalILS } }
+        return { success: true, data: { incomes, totalILS, totalNetILS } }
     } catch (error) {
         console.error('Error fetching incomes:', error)
         return { success: false, error: 'Failed to fetch incomes' }
