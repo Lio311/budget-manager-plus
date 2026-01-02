@@ -7,6 +7,11 @@ import { Toaster as SonnerToaster } from '@/components/ui/sonner'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Rubik } from 'next/font/google'
 import { WebApplicationJsonLd } from '@/components/seo/JsonLd'
+import { ReactivationPopup } from '@/components/promo/ReactivationPopup'
+import { currentUser } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/db'
+import { getSubscriptionStatus } from '@/lib/actions/subscription'
+import { differenceInDays } from 'date-fns'
 
 const rubik = Rubik({
     subsets: ['hebrew', 'latin'],
@@ -91,11 +96,42 @@ export const metadata: Metadata = {
     },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    // Logic for Reactivation Popup
+    let shouldShowReactivation = false
+    try {
+        const user = await currentUser()
+        if (user) {
+            // Check last active in DB
+            const dbUser = await prisma.user.findUnique({
+                where: { id: user.id },
+                select: { updatedAt: true }
+            })
+
+            if (dbUser?.updatedAt) {
+                const daysInactive = differenceInDays(new Date(), dbUser.updatedAt)
+
+                // If inactive for more than 30 days, check subscription
+                if (daysInactive > 30) { // Changed from 30 to match "near month" interpretation
+                    const personalStatus = await getSubscriptionStatus(user.id, 'PERSONAL')
+                    const businessStatus = await getSubscriptionStatus(user.id, 'BUSINESS')
+
+                    const hasActiveSubscription = personalStatus.hasAccess || businessStatus.hasAccess
+
+                    if (!hasActiveSubscription) {
+                        shouldShowReactivation = true
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error checking reactivation status:', error)
+    }
+
     return (
         <ClerkProvider
             localization={{
@@ -137,6 +173,7 @@ export default function RootLayout({
                     >
                         <WebApplicationJsonLd />
                         {children}
+                        <ReactivationPopup shouldShow={shouldShowReactivation} />
                         <Toaster />
                         <SonnerToaster />
                     </ThemeProvider>
