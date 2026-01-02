@@ -205,12 +205,12 @@ export default function PersonalLandingPage() {
                         className="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-40 md:hidden flex flex-col items-center justify-center gap-8"
                     >
                         <Link href="/sign-in" onClick={() => setIsMenuOpen(false)}>
-                            <Button variant="ghost" size="lg" className="text-white text-2xl rounded-full">
+                            <Button variant="ghost" size="lg" className="text-white text-2xl rounded-2xl">
                                 כניסה
                             </Button>
                         </Link>
                         <Link href="/sign-up" onClick={() => setIsMenuOpen(false)}>
-                            <Button size="lg" className="bg-white text-gray-900 text-2xl px-12 rounded-full shadow-2xl">
+                            <Button size="lg" className="bg-white text-gray-900 text-2xl px-12 rounded-2xl shadow-2xl">
                                 התחל עכשיו
                             </Button>
                         </Link>
