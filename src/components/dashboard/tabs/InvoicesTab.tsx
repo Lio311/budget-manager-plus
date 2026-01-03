@@ -180,7 +180,8 @@ export function InvoicesTab() {
             toast.info('פותח חשבונית...')
             const result = await generateInvoiceLink(invoiceId) // reusing this to get/ensure token
             if (result.success && result.token) {
-                window.open(`${window.location.origin}/invoice/${result.token}`, '_blank')
+                // On mobile, async window.open is often blocked. Use location.href for reliability.
+                window.location.href = `${window.location.origin}/invoice/${result.token}`
             } else {
                 toast.error('שגיאה בפתיחת החשבונית')
             }

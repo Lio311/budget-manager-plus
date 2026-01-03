@@ -298,9 +298,8 @@ export default function PublicInvoicePage() {
                                 ) : (
                                     <div className="h-16 mb-2"></div>
                                 )}
-                                <div className="border-t border-gray-300 w-48 mt-2 pt-2 text-sm text-gray-500">
-                                    חתימת המפיק
-                                </div>
+                                <div className="border-t border-gray-300 w-40 mx-auto"></div>
+                                <div className="text-sm text-gray-500 mt-2">חתימת המפיק</div>
                             </div>
 
                             {/* Client Signature */}
@@ -324,22 +323,18 @@ export default function PublicInvoicePage() {
                                         </div>
                                     )
                                 )}
-                                <div className="border-t border-gray-300 w-48 mt-2 pt-2 text-sm text-gray-500">
-                                    חתימת הלקוח
-                                </div>
+                                <div className="border-t border-gray-300 w-40 mx-auto"></div>
+                                <div className="text-sm text-gray-500 mt-2">חתימת הלקוח</div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="mt-8 pt-4 border-t border-gray-100 flex flex-col items-center justify-center opacity-70">
-                        <span className="text-xs text-gray-400 mb-1">הופק על ידי</span>
-                        <Image
-                            src="/K-LOGO.png"
-                            alt="KeseFlow"
-                            width={80}
-                            height={32}
-                            className="object-contain opacity-80 hover:opacity-100 transition-opacity"
-                        />
+                    {/* Footer - Powered by */}
+                    <div className="mt-16 pt-8 text-center text-gray-400 text-xs pb-12 print:pb-0">
+                        <p className="mb-2">הופק על ידי</p>
+                        <div className="flex justify-center items-center gap-1 opacity-50 grayscale hover:grayscale-0 transition-all">
+                            <span className="font-bold text-lg tracking-tight">Budget Manager</span>
+                        </div>
                     </div>
                 </Card>
 
