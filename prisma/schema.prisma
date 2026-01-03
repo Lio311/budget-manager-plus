@@ -55,6 +55,13 @@ model User {
   googleCalendarId           String?
   isCalendarSyncEnabled      Boolean   @default(false)
 
+  // Referral Program
+  referralCode          String?   @unique // The code this user shares
+  referredByCode        String?   // The code this user used when verifying (optional tracking)
+  referralCount         Int       @default(0) // Successful referrals
+  referralProgramActive Boolean   @default(false) // Opted-in status
+  referralCoupons       Coupon[]  @relation("UserReferralCoupons") // Derived coupons
+
   @@map("users")
 }
 
@@ -369,6 +376,11 @@ model Coupon {
   usedCount       Int       @default(0)
   specificEmail   String?   // Optional: restrict to specific user email
   planType        PlanType? // Optional: restrict to specific plan (PERSONAL/BUSINESS)
+  
+  // Referral Reward Link
+  ownerId         String? 
+  owner           User?    @relation("UserReferralCoupons", fields: [ownerId], references: [id])
+
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   @@map("coupons")

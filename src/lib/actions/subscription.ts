@@ -4,20 +4,34 @@ import { prisma } from '@/lib/db'
 import { currentUser } from '@clerk/nextjs/server'
 import { addYears, addDays } from 'date-fns'
 import { revalidatePath } from 'next/cache'
+import { trackReferralUsage } from './referral'
 
 export async function createSubscription(paypalOrderId: string, amount: number, planType: string = 'PERSONAL', couponCode?: string) {
     try {
         console.log('createSubscription called:', { paypalOrderId, amount, planType, couponCode })
 
         if (couponCode) {
-            console.log('Incrementing usage for coupon:', couponCode)
-            // Fire and forget - don't block subscription on this
-            prisma.coupon.updateMany({
-                where: {
-                    code: { equals: couponCode, mode: 'insensitive' }
-                },
-                data: { usedCount: { increment: 1 } }
-            }).catch(err => console.error('Failed to update coupon usage:', err))
+            console.log('Processing coupon:', couponCode)
+
+            // fetch coupon to check for owner (referral)
+            const coupon = await prisma.coupon.findUnique({
+                where: { code: couponCode } // unique constraint should exist on code
+            }).catch(err => null)
+
+            if (coupon) {
+                // Increment usage
+                prisma.coupon.update({
+                    where: { id: coupon.id },
+                    data: { usedCount: { increment: 1 } }
+                }).catch(err => console.error('Failed to update coupon usage:', err))
+
+                // Check for Referral Owner
+                if (coupon.ownerId) {
+                    console.log('Referral coupon used! Tracking usage for owner:', coupon.ownerId)
+                    // Fire and forget
+                    trackReferralUsage(coupon.ownerId).catch(err => console.error('Failed to track referral:', err))
+                }
+            }
         }
 
         const user = await currentUser()

@@ -29,7 +29,8 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 initialBalance: true,
                 initialSavings: true,
                 businessInitialBalance: true,
-                businessInitialSavings: true
+                businessInitialSavings: true,
+                referralProgramActive: true
             }
         })
 
@@ -260,7 +261,8 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     businessInitialBalance: user.businessInitialBalance,
                     businessInitialSavings: user.businessInitialSavings,
                     monthlyBalanceOverride: currentBudget?.initialBalance,
-                    monthlySavingsOverride: currentBudget?.initialSavings
+                    monthlySavingsOverride: currentBudget?.initialSavings,
+                    referralProgramActive: user.referralProgramActive
                 }
             }
         }

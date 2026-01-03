@@ -62,6 +62,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const [initialSavings, setInitialSavings] = useState('')
     const [showProgress, setShowProgress] = useState(false)
     const [activeSettingsTab, setActiveSettingsTab] = useState('details')
+    const [isReferralOpen, setIsReferralOpen] = useState(false)
 
     useEffect(() => {
         const timer = setTimeout(() => setShowProgress(true), 100)
@@ -294,6 +295,24 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                     <FinancialAdvisorButton financialData={aiFinancialData} />
                     <FeedbackButton />
+                    <FeedbackButton />
+
+                    {!isBusiness && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setIsReferralOpen(true)}
+                            className="relative overflow-hidden group hover:bg-gray-100 dark:hover:bg-gray-800"
+                            title="חבר מביא חבר"
+                        >
+                            <Share2
+                                className={`w-5 h-5 transition-colors duration-300 ${(overviewData?.user as any)?.referralProgramActive
+                                        ? 'text-yellow-500 fill-yellow-500/20'
+                                        : 'text-[#323338] dark:text-gray-100'
+                                    }`}
+                            />
+                        </Button>
+                    )}
                 </div>
 
             </div>
@@ -737,6 +756,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     </DialogContent>
                 )}
             </Dialog >
+
+
+            <ReferralDashboard open={isReferralOpen} onOpenChange={setIsReferralOpen} />
         </div >
     )
 }
