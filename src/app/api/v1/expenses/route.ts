@@ -22,7 +22,19 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid API Key' }, { status: 401 })
         }
 
-        const body = await req.json()
+        let body
+        try {
+            const text = await req.text()
+            console.log('Raw Request Body:', text)
+            if (!text) {
+                return NextResponse.json({ error: 'Empty request body' }, { status: 400 })
+            }
+            body = JSON.parse(text)
+        } catch (e) {
+            console.error('Failed to parse JSON:', e)
+            return NextResponse.json({ error: 'Invalid JSON format' }, { status: 400 })
+        }
+
         let { amount, category, description, currency, date, budgetType = 'PERSONAL' } = body
 
         // Support Hebrew Keys (fallback for Israeli users/shortcuts)
