@@ -2,10 +2,9 @@
 
 import { prisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
-import { generateId } from '@/lib/utils' // Assuming this exists or I'll use a custom generator
 import { revalidatePath } from 'next/cache'
 
-// Helper to generate a short 6-char code
+// Helper to generate a short alphanumeric code
 function generateReferralCode(length: number = 6): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     let result = ''
