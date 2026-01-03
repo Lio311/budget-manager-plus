@@ -69,13 +69,13 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
         }
     }, [formData.invoiceId, invoices])
 
-    const { execute: handleCreate } = useOptimisticMutation(
-        async (data: CreditNoteFormData) => {
-            const result = await createCreditNote(data)
-            if (!result.success) throw new Error(result.error)
-            return result
-        },
+    const { execute: handleCreate } = useOptimisticMutation<any[], CreditNoteFormData>(
+        ['creditNotes', budgetType],
+        (input) => createCreditNote(input),
         {
+            getOptimisticData: (current, input) => {
+                return current
+            },
             onSuccess: () => {
                 toast.success('חשבונית זיכוי נוצרה בהצלחה')
                 onSuccess()
