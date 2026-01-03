@@ -367,7 +367,7 @@ export function QuotesTab() {
                                     <SelectContent dir="rtl">
                                         <SelectItem value="DRAFT">טיוטה</SelectItem>
                                         <SelectItem value="SENT">נשלח</SelectItem>
-                                        <SelectItem value="ACCEPTED">התקבל</SelectItem>
+                                        <SelectItem value="ACCEPTED">נחתם</SelectItem>
                                         <SelectItem value="EXPIRED">פג תוקף</SelectItem>
                                         <SelectItem value="CANCELLED">בוטל</SelectItem>
                                     </SelectContent>
