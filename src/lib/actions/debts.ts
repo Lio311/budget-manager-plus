@@ -64,13 +64,25 @@ export async function getDebts(month: number, year: number, type: 'PERSONAL' | '
             const monthlyPaymentInILS = await convertToILS(debt.monthlyPayment, debt.currency)
 
             if (debt.debtType === DEBT_TYPES.OWED_BY_ME) {
-                totalOwedByMeILS += totalAmountInILS
+                // If paid, the remaining total balance is effectively less
+                const effectiveTotal = debt.isPaid
+                    ? Math.max(0, totalAmountInILS - monthlyPaymentInILS)
+                    : totalAmountInILS
+
+                totalOwedByMeILS += effectiveTotal
                 monthlyPaymentOwedByMeILS += monthlyPaymentInILS
                 if (debt.isPaid) {
                     paidThisMonthILS += monthlyPaymentInILS
                 }
             } else if (debt.debtType === DEBT_TYPES.OWED_TO_ME) {
-                totalOwedToMeILS += totalAmountInILS
+                // Same logic for debts owed TO me? 
+                // Usually "Total Owed To Me" implies what I expect to get back. 
+                // If they paid me part of it, the total outstanding drops.
+                const effectiveTotal = debt.isPaid
+                    ? Math.max(0, totalAmountInILS - monthlyPaymentInILS)
+                    : totalAmountInILS
+
+                totalOwedToMeILS += effectiveTotal
                 monthlyPaymentOwedToMeILS += monthlyPaymentInILS
                 if (debt.isPaid) {
                     paidThisMonthILS -= monthlyPaymentInILS
