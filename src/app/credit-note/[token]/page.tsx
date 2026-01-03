@@ -124,11 +124,11 @@ export default async function PublicCreditNotePage({ params }: { params: { token
                     </div>
 
                     {/* Business Signature */}
-                    {business?.signature && (
+                    {business?.signatureUrl && (
                         <div className="mt-auto pt-8 border-t border-gray-200">
                             <div className="flex flex-col items-center gap-2">
                                 <img
-                                    src={business.signature}
+                                    src={business.signatureUrl}
                                     alt="חתימה"
                                     className="h-16 object-contain"
                                 />
