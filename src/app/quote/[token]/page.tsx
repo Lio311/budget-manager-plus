@@ -98,7 +98,7 @@ export default function PublicQuotePage() {
             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
             heightLeft -= pageHeight
 
-            while (heightLeft > 0) {
+            while (heightLeft > 5) { // Threshold to prevent tiny overflows
                 position = heightLeft - imgHeight
                 pdf.addPage()
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
@@ -236,7 +236,7 @@ export default function PublicQuotePage() {
                     )}
 
                     {/* Signature Area */}
-                    <div className="mt-12 border-t pt-8 break-inside-avoid">
+                    <div className="mt-8 border-t pt-8 break-inside-avoid">
                         <div className="flex justify-between items-end">
                             {/* Business Signature */}
                             <div className="text-center">
@@ -288,13 +288,13 @@ export default function PublicQuotePage() {
                     </div>
 
                     {/* Produced By Footer */}
-                    <div className="mt-16 pt-8 border-t border-gray-100 flex flex-col items-center justify-center opacity-70">
-                        <span className="text-xs text-gray-400 mb-2">הופק על ידי</span>
+                    <div className="mt-8 pt-4 border-t border-gray-100 flex flex-col items-center justify-center opacity-70">
+                        <span className="text-xs text-gray-400 mb-1">הופק על ידי</span>
                         <Image
                             src="/K-LOGO.png"
                             alt="KeseFlow"
-                            width={100}
-                            height={40}
+                            width={80}
+                            height={32}
                             className="object-contain opacity-80 hover:opacity-100 transition-opacity"
                         />
                     </div>
