@@ -89,7 +89,6 @@ export default function PublicQuotePage() {
                 format: 'a4'
             })
 
-            const imgWidth = 210
             const pageHeight = 297
             let imgWidth = 210
             let imgHeight = (canvas.height * imgWidth) / canvas.width
