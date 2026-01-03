@@ -260,7 +260,7 @@ export function CreditNotesTab() {
             )}
 
             {/* Mobile FAB */}
-            <FloatingActionButton onClick={() => setIsMobileOpen(true)} className="md:hidden" />
+            <FloatingActionButton onClick={() => setIsMobileOpen(true)} />
             <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                 <DialogContent className="max-w-full max-h-[90vh] overflow-y-auto">
                     <DialogTitle>חשבונית זיכוי חדשה</DialogTitle>
