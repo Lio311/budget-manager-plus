@@ -106,9 +106,10 @@ export function CreditNotesTab() {
 
     const handleViewCreditNote = async (creditNoteId: string) => {
         try {
+            toast.info('פותח חשבונית זיכוי...')
             const result = await generateCreditNoteLink(creditNoteId)
             if (result.success && result.token) {
-                window.open(`/credit-note/${result.token}`, '_blank')
+                window.location.href = `/credit-note/${result.token}`
             } else {
                 toast.error('שגיאה בפתיחת חשבונית זיכוי')
             }
