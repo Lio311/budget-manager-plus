@@ -110,11 +110,11 @@ export default function PublicInvoicePage() {
             let imgHeight = (canvas.height * imgWidth) / canvas.width
 
             // Scale to fit if slightly bigger than A4 or just to be safe
-            // We scale down to pageHeight - 10mm to ensure bottom margin/footer isn't cut
-            if (imgHeight > pageHeight - 10) {
-                const scale = (pageHeight - 10) / imgHeight
+            // We scale down to pageHeight - 30mm to ensure bottom margin/footer isn't cut
+            if (imgHeight > pageHeight - 30) {
+                const scale = (pageHeight - 30) / imgHeight
                 imgWidth *= scale
-                imgHeight = (pageHeight - 10)
+                imgHeight = (pageHeight - 30)
             }
 
             let heightLeft = imgHeight
