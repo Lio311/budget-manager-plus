@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
 
 import { convertToILS } from '@/lib/currency'
+import { syncBudgetToGoogleCalendar } from './calendar'
 
 export async function getBills(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
@@ -100,11 +101,21 @@ export async function addBill(
                 data.frequency || 'MONTHLY',
                 type,
                 data.paymentMethod
-            )
+            );
+        }
+
+        // Hook: Update Google Calendar if enabled
+        // We fire and forget (don't await to block UI, or log error)
+        // Actually, in Server Actions, usually best to await or verify.
+        // We'll await but catch error so it doesn't fail the bill creation.
+        try {
+            await syncBudgetToGoogleCalendar(month, year)
+        } catch (e) {
+            console.error('Auto-sync failed', e)
         }
 
         revalidatePath('/dashboard')
-        return { success: true, data: bill }
+        return { success: true }
     } catch (error) {
         console.error('Error adding bill:', error)
         return { success: false, error: 'Failed to add bill' }

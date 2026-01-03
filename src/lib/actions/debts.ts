@@ -8,6 +8,7 @@ import { auth } from '@clerk/nextjs/server'
 
 import { convertToILS } from '@/lib/currency'
 import { DEBT_TYPES } from '@/lib/constants/debt-types'
+import { syncBudgetToGoogleCalendar } from './calendar'
 
 export async function getDebts(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {

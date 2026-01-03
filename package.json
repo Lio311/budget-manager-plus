@@ -38,6 +38,7 @@
     "date-fns": "^3.0.6",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.23.26",
+    "googleapis": "^169.0.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
     "lucide-react": "^0.309.0",

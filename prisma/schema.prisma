@@ -49,6 +49,11 @@ model User {
   trialEndsAt    DateTime?
   hasUsedTrial   Boolean  @default(false)
 
+  // Google Calendar Integration
+  googleCalendarRefreshToken String?
+  googleCalendarId           String?
+  isCalendarSyncEnabled      Boolean   @default(false)
+
   @@map("users")
 }
 
