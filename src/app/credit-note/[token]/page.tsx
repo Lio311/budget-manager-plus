@@ -1,18 +1,43 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import { getCreditNoteByToken } from '@/lib/actions/credit-notes'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Download } from 'lucide-react'
+import { Download, ArrowRight } from 'lucide-react'
 
-export default async function PublicCreditNotePage({ params }: { params: { token: string } }) {
-    const result = await getCreditNoteByToken(params.token)
+export default function PublicCreditNotePage() {
+    const params = useParams()
+    const token = params.token as string
+    const [creditNote, setCreditNote] = useState<any>(null)
+    const [loading, setLoading] = useState(true)
 
-    if (!result.success || !result.data) {
-        notFound()
+    useEffect(() => {
+        const fetchData = async () => {
+            const result = await getCreditNoteByToken(token)
+            if (!result.success || !result.data) {
+                notFound()
+            }
+            setCreditNote(result.data)
+            setLoading(false)
+        }
+        fetchData()
+    }, [token])
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+                <div className="text-gray-500">טוען...</div>
+            </div>
+        )
     }
 
-    const creditNote = result.data
+    if (!creditNote) {
+        notFound()
+    }
     const business = creditNote.user?.businessProfile
     const invoice = creditNote.invoice
     const client = invoice?.client
@@ -30,7 +55,17 @@ export default async function PublicCreditNotePage({ params }: { params: { token
             <div className="max-w-4xl mx-auto space-y-6">
                 {/* Actions Bar */}
                 <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm print:hidden gap-4">
-                    <h1 className="text-xl font-bold text-gray-800">חשבונית זיכוי</h1>
+                    <div className="flex items-center gap-3">
+                        <Button
+                            onClick={() => window.history.back()}
+                            variant="ghost"
+                            size="icon"
+                            className="md:hidden text-gray-500 hover:text-gray-900"
+                        >
+                            <ArrowRight className="h-6 w-6" />
+                        </Button>
+                        <h1 className="text-xl font-bold text-gray-800">חשבונית זיכוי</h1>
+                    </div>
                     <Button
                         onClick={() => window.print()}
                         className="bg-green-600 hover:bg-green-700 text-white gap-2"
