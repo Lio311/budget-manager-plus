@@ -160,7 +160,7 @@ export default function PublicQuotePage() {
                 </div>
 
                 {/* Quote Content */}
-                <Card id="quote-content" className="p-8 bg-white shadow-lg print:shadow-none">
+                <Card id="quote-content" className="p-4 md:p-8 bg-white shadow-lg print:shadow-none">
                     {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-start mb-2 gap-8">
                         <div className="w-full md:w-auto">
@@ -249,7 +249,7 @@ export default function PublicQuotePage() {
 
                     {/* Signature Area */}
                     <div className="mt-8 border-t pt-8 break-inside-avoid">
-                        <div className="flex justify-between items-end">
+                        <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 md:gap-0">
                             {/* Business Signature */}
                             <div className="text-center">
                                 {business?.signatureUrl ? (
