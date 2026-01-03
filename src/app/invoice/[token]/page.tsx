@@ -99,8 +99,8 @@ export default function PublicInvoicePage() {
             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
             heightLeft -= pageHeight
 
-            // Handle multi-page if needed (basic implementation)
-            while (heightLeft >= 0) {
+            // Handle multi-page
+            while (heightLeft > 0) {
                 position = heightLeft - imgHeight
                 pdf.addPage()
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
@@ -151,7 +151,6 @@ export default function PublicInvoicePage() {
 
                 {/* Invoice Content - This gets printed/PDF'd */}
                 <Card id="invoice-content" className="p-8 bg-white shadow-lg print:shadow-none">
-                    {/* Header */}
                     {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-8">
                         <div className="w-full md:w-auto">

@@ -243,9 +243,13 @@ export async function signInvoice(token: string, signatureBase64: string) {
                 signature: signatureBase64,
                 signedAt: new Date(),
                 isSigned: true,
-                status: 'SENT' // Update status to SENT or PAID? Probably just SENT/SIGNED. 
+                status: 'SENT'
             }
         })
+
+        // Revalidate dashboard paths so the business owner sees the update
+        revalidatePath('/dashboard')
+        revalidatePath('/dashboard/invoices')
 
         return { success: true }
     } catch (error) {
