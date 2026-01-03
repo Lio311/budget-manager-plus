@@ -117,7 +117,6 @@ export async function createCreditNote(data: CreditNoteFormData) {
         // Create negative income entry to reduce revenue
         await db.income.create({
             data: {
-                userId,
                 clientId: invoice.clientId,
                 amount: -totalCredit, // Negative amount
                 description: `זיכוי עבור חשבונית ${invoice.invoiceNumber} - ${data.reason || 'זיכוי'}`,
