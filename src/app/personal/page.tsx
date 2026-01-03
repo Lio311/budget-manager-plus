@@ -400,7 +400,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                                     alt={section.title}
                                     width={1000}
                                     height={800}
-                                    className="w-full h-auto rounded-2xl shadow-2xl"
+                                    className={`w-full h-auto ${index === 0 ? '' : 'rounded-2xl shadow-2xl'}`}
                                     priority={index === 0}
                                 />
                             </div>
