@@ -78,12 +78,12 @@ export default async function PublicCreditNotePage({ params }: { params: { token
                         <div className="w-full md:w-1/2 text-center md:text-start">
                             {business ? (
                                 <div className="space-y-2">
-                                    <h3 className="text-2xl font-bold text-gray-800">{business.businessName}</h3>
+                                    <h3 className="text-2xl font-bold text-gray-800">{business.companyName}</h3>
                                     <div className="text-gray-600 space-y-1">
                                         {business.address && <p>{business.address}</p>}
                                         {business.phone && <p>טלפון: {business.phone}</p>}
                                         {business.email && <p>אימייל: {business.email}</p>}
-                                        {business.taxId && <p>ח.פ: {business.taxId}</p>}
+                                        {business.companyId && <p>ח.פ: {business.companyId}</p>}
                                     </div>
                                 </div>
                             ) : (

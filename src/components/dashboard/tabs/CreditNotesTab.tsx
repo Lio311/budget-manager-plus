@@ -217,7 +217,7 @@ export function CreditNotesTab() {
                                         <LinkIcon className="h-4 w-4" />
                                         <span className="hidden md:inline">קישור</span>
                                     </Button>
-                                    <Button variant="outline" size="icon" onClick={() => handleViewCreditNote(creditNote.id)} className="text-orange-600 border-orange-200 bg-orange-50 hover:bg-orange-100">
+                                    <Button variant="outline" size="icon" onClick={() => handleViewCreditNote(creditNote.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100">
                                         <Eye className="h-4 w-4" />
                                     </Button>
                                     <Button variant="outline" size="icon" onClick={() => handleDelete(creditNote.id)} className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100">
