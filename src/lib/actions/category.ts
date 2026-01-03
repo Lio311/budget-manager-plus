@@ -49,7 +49,8 @@ export async function getCategories(type: string = 'expense', scope: 'PERSONAL' 
                             scope,
                             color: c.color,
                             updatedAt: new Date()
-                        }))
+                        })),
+                        skipDuplicates: true
                     })
 
                     // Fetch again after seeding
@@ -269,7 +270,8 @@ export async function seedCategories(type: string = 'expense', scope: 'PERSONAL'
                 scope,
                 color: c.color,
                 updatedAt: new Date()
-            }))
+            })),
+            skipDuplicates: true
         })
 
         revalidatePath('/dashboard')

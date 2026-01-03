@@ -120,6 +120,7 @@ model Category {
   // ... (Relation to CategoryBudget)
   categoryBudgets CategoryBudget[]
   
+  @@unique([userId, name, type, scope])
   @@map("categories")
 }
 
