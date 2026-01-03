@@ -21,6 +21,8 @@ export interface InvoiceFormData {
     dueDate?: Date
     subtotal: number
     vatRate?: number
+    vatAmount?: number
+    total?: number
     paymentMethod?: string
     notes?: string
     lineItems: InvoiceLineItemData[]
