@@ -99,8 +99,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
         const nextState = !maintenanceMode
         const confirmMsg = nextState
             ? "Are you sure you want to ENABLE maintenance mode? This will block ALL non-admin users."
-            : "Are you sure you want to DISABLE maintenance mode? The site will be public again."
-
+            : "Are you sure you want to DISABLE maintenance mode?"
         const confirmed = await confirm(confirmMsg, 'Maintenance Mode')
         if (!confirmed) return
 

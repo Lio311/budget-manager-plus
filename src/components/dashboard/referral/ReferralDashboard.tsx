@@ -105,7 +105,7 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
             <Dialog open={open} onOpenChange={onOpenChange}>
                 <DialogContent className="sm:max-w-md" dir="rtl">
                     <div className="flex justify-center p-10">
-                        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                        <Loader2 className="h-8 w-8 animate-spin text-green-600" />
                     </div>
                 </DialogContent>
             </Dialog>
@@ -118,8 +118,8 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
             <Dialog open={open} onOpenChange={onOpenChange}>
                 <DialogContent className="sm:max-w-md text-center" dir="rtl">
                     <DialogHeader>
-                        <div className="mx-auto bg-purple-100 p-4 rounded-full w-fit mb-4">
-                            <Gift className="h-8 w-8 text-purple-600" />
+                        <div className="mx-auto bg-green-100 p-4 rounded-full w-fit mb-4">
+                            <Gift className="h-8 w-8 text-green-600" />
                         </div>
                         <DialogTitle className="text-xl text-center">להרוויח עד 50% הנחה?</DialogTitle>
                         <DialogDescription className="text-center text-base pt-2">
@@ -132,13 +132,15 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
                     <div className="py-4 space-y-2 text-sm text-gray-500">
                         <p>🎁 2 חברים = 8% הנחה</p>
                         <p>🎁 4 חברים = 17% הנחה</p>
+                        <p>🎁 6 חברים = 25% הנחה</p>
+                        <p>🎁 8 חברים = 40% הנחה</p>
                         <p>🎁 10 חברים = 50% הנחה!</p>
                     </div>
 
                     <Button
                         onClick={handleJoin}
                         disabled={joining}
-                        className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-6 text-lg"
+                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-6 text-lg transition-all shadow-lg hover:shadow-xl"
                     >
                         {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : 'אני רוצה להצטרף! 🚀'}
                     </Button>
@@ -168,7 +170,7 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
                     <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center">
                         <p className="text-sm text-muted-foreground mb-2">הקוד הייחודי שלך:</p>
                         <div className="flex items-center justify-center gap-3">
-                            <code className="text-3xl font-black tracking-widest text-purple-600 dark:text-purple-400 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg shadow-sm">
+                            <code className="text-3xl font-black tracking-widest text-green-600 dark:text-green-400 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg shadow-sm">
                                 {stats?.code}
                             </code>
                             <Button size="icon" variant="outline" onClick={copyToClipboard} className="h-12 w-12 rounded-xl">
@@ -188,14 +190,17 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
                                 <p className="text-sm text-muted-foreground">הבאת {stats?.count} חברים עד כה</p>
                             </div>
                             <div className="text-right">
-                                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
                                     היעד הבא: {nextMilestone ? `${nextMilestone.reward}%` : 'MAX'}
                                 </span>
                             </div>
                         </div>
 
                         <div className="relative pt-2">
-                            <Progress value={Math.min(100, (stats!.count / 10) * 100)} className="h-3" />
+                            <Progress
+                                value={Math.min(100, (stats!.count / 10) * 100)}
+                                className="h-3 bg-gray-100 [&>div]:bg-green-500" // Customizing progress bar color
+                            />
                             {/* Milestone Markers */}
                             <div className="flex justify-between mt-2 px-1 text-[10px] text-gray-400 font-medium">
                                 <span>0</span>
