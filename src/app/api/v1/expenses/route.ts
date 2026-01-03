@@ -27,12 +27,12 @@ export async function POST(req: NextRequest) {
             const text = await req.text()
             console.log('Raw Request Body:', text)
             if (!text) {
-                return NextResponse.json({ error: 'Empty request body' }, { status: 400 })
+                return NextResponse.json({ error: 'גוף הבקשה ריק' }, { status: 400 })
             }
             body = JSON.parse(text)
         } catch (e) {
             console.error('Failed to parse JSON:', e)
-            return NextResponse.json({ error: 'Invalid JSON format' }, { status: 400 })
+            return NextResponse.json({ error: 'שגיאה במבנה הנתונים (JSON)' }, { status: 400 })
         }
 
         let { amount, category, description, currency, date, budgetType = 'PERSONAL' } = body
@@ -48,12 +48,12 @@ export async function POST(req: NextRequest) {
         console.log('Received Expense Request:', { amount, category, budgetType, currency, date })
 
         if (!amount) {
-            return NextResponse.json({ error: 'Missing amount' }, { status: 400 })
+            return NextResponse.json({ error: 'נא להזין סכום' }, { status: 400 })
         }
 
         const numericAmount = parseFloat(amount)
         if (isNaN(numericAmount)) {
-            return NextResponse.json({ error: 'Invalid amount - must be a number' }, { status: 400 })
+            return NextResponse.json({ error: 'הסכום אינו תקין (חייב להיות מספר)' }, { status: 400 })
         }
 
         // Handle Category: Fallback to 'כללי' if missing or empty
@@ -112,10 +112,10 @@ export async function POST(req: NextRequest) {
         })
 
         console.log('Expense Saved:', expense.id)
-        return NextResponse.json({ success: true, id: expense.id, message: 'Expense saved successfully', debug: { category: categoryName, date: expenseDate } })
+        return NextResponse.json({ success: true, id: expense.id, message: 'ההוצאה נשמרה בהצלחה!', debug: { category: categoryName, date: expenseDate } })
 
     } catch (error) {
         console.error('API Internal Error:', error)
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+        return NextResponse.json({ error: 'שגיאה פנימית בשרת' }, { status: 500 })
     }
 }
