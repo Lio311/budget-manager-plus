@@ -12,6 +12,7 @@ import { SignaturePad } from '@/components/settings/SignaturePad'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { toast } from 'sonner'
+import { format } from 'date-fns'
 
 export default function PublicInvoicePage() {
     const params = useParams()
@@ -282,7 +283,7 @@ export default function PublicInvoicePage() {
                                         />
                                         <p className="text-xs text-green-600 mt-1 flex items-center justify-center gap-1">
                                             <CheckCircle className="h-3 w-3" />
-                                            נחתם דיגיטלית ב-{new Date(invoice.signedAt).toLocaleDateString()}
+                                            אושר דיגיטלית ב-{format(new Date(invoice.signedAt), 'dd/MM/yyyy')}
                                         </p>
                                     </div>
                                 ) : (

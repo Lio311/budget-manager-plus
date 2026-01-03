@@ -12,6 +12,7 @@ import { SignaturePad } from '@/components/settings/SignaturePad'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { toast } from 'sonner'
+import { format } from 'date-fns'
 
 export default function PublicQuotePage() {
     const params = useParams()
@@ -270,7 +271,7 @@ export default function PublicQuotePage() {
                                         />
                                         <p className="text-xs text-green-600 mt-1 flex items-center justify-center gap-1">
                                             <CheckCircle className="h-3 w-3" />
-                                            אושר דיגיטלית ב-{new Date(quote.signedAt).toLocaleDateString()}
+                                            אושר דיגיטלית ב-{format(new Date(quote.signedAt), 'dd/MM/yyyy')}
                                         </p>
                                     </div>
                                 ) : (
