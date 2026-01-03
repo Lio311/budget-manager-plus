@@ -330,9 +330,10 @@ export function QuotesTab() {
                                     <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">{formatCurrency(quote.totalAmount)}</div>
                                     <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
                                 </div>
-                                <Button variant="outline" size="sm" onClick={() => handleDownloadPDF(quote.id)} className="gap-2">
-                                    <Download className="h-4 w-4" />
-                                    <span className="md:hidden">הורד PDF</span>
+                                <Button variant="outline" size="sm" onClick={() => handleCopyLink(quote.id)} className="gap-2 text-yellow-600 border-yellow-200 bg-yellow-50 hover:bg-yellow-100">
+                                    <LinkIcon className="h-4 w-4" />
+                                    <span className="md:hidden">הערת קישור</span>
+                                    <span className="hidden md:inline">קישור לאישור</span>
                                 </Button>
                             </div>
                         </div>

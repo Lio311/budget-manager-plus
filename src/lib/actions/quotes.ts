@@ -240,3 +240,80 @@ export async function getNextQuoteNumber() {
         return { success: false, error: 'Failed to get next quote number' }
     }
 }
+
+export async function generateQuoteLink(quoteId: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        const quote = await db.quote.findUnique({ where: { id: quoteId } })
+        if (!quote || quote.userId !== userId) throw new Error('Quote not found')
+
+        if (quote.token) {
+            return { success: true, token: quote.token }
+        }
+
+        const token = crypto.randomUUID()
+        await db.quote.update({
+            where: { id: quoteId },
+            data: { token }
+        })
+
+        return { success: true, token }
+    } catch (error) {
+        console.error('generateQuoteLink error:', error)
+        return { success: false, error: 'Failed to generate link' }
+    }
+}
+
+export async function getQuoteByToken(token: string) {
+    try {
+        const quote = await prisma.quote.findUnique({
+            where: { token },
+            include: {
+                client: true,
+                user: {
+                    include: {
+                        businessProfile: true
+                    }
+                }
+            }
+        })
+
+        if (!quote) {
+            return { success: false, error: 'Quote not found or expired' }
+        }
+
+        return { success: true, data: quote }
+    } catch (error) {
+        console.error('getQuoteByToken error:', error)
+        return { success: false, error: 'Failed to fetch quote' }
+    }
+}
+
+export async function signQuote(token: string, signatureBase64: string) {
+    try {
+        const quote = await prisma.quote.findUnique({ where: { token } })
+        if (!quote) throw new Error('Quote not found')
+
+        await prisma.quote.update({
+            where: { id: quote.id },
+            data: {
+                signature: signatureBase64,
+                signedAt: new Date(),
+                isSigned: true,
+                status: 'ACCEPTED'
+            }
+        })
+
+        revalidatePath('/dashboard')
+        revalidatePath('/dashboard/quotes')
+
+        return { success: true }
+    } catch (error) {
+        console.error('signQuote error:', error)
+        return { success: false, error: 'Failed to sign quote' }
+    }
+}

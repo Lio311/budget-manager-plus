@@ -586,6 +586,12 @@ model Quote {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   
+  // Digital Signing (Public View)
+  token         String?     @unique @default(cuid()) // For public access
+  signature     String?     // Base64 encoded signature
+  signedAt      DateTime?
+  isSigned      Boolean     @default(false)
+
   @@index([userId, scope])
   @@index([clientId])
   @@unique([userId, quoteNumber])
