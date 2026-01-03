@@ -172,7 +172,7 @@ export function CreditNotesTab() {
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="hidden md:flex bg-purple-600 hover:bg-purple-700 text-white gap-2">
+                        <Button className="hidden md:flex bg-orange-600 hover:bg-orange-700 text-white gap-2">
                             <Plus className="h-4 w-4" />
                             חשבונית זיכוי חדשה
                         </Button>
@@ -198,7 +198,7 @@ export function CreditNotesTab() {
                                 {/* Info */}
                                 <div className="flex-1 space-y-1">
                                     <div className="flex items-center gap-2">
-                                        <span className="font-bold text-purple-600 dark:text-purple-400">{creditNote.creditNoteNumber}</span>
+                                        <span className="font-bold text-orange-600 dark:text-purple-400">{creditNote.creditNoteNumber}</span>
                                         <span className="text-sm text-gray-500">← חשבונית {creditNote.invoiceNumber}</span>
                                     </div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400">{creditNote.clientName}</div>
