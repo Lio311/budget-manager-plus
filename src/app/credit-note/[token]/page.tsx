@@ -2,6 +2,8 @@ import { getCreditNoteByToken } from '@/lib/actions/credit-notes'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Download } from 'lucide-react'
 
 export default async function PublicCreditNotePage({ params }: { params: { token: string } }) {
     const result = await getCreditNoteByToken(params.token)
@@ -29,6 +31,13 @@ export default async function PublicCreditNotePage({ params }: { params: { token
                 {/* Actions Bar */}
                 <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm print:hidden gap-4">
                     <h1 className="text-xl font-bold text-gray-800">חשבונית זיכוי</h1>
+                    <Button
+                        onClick={() => window.print()}
+                        className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                    >
+                        <Download className="h-4 w-4" />
+                        הורד PDF
+                    </Button>
                 </div>
 
                 {/* Credit Note Content */}
@@ -90,15 +99,15 @@ export default async function PublicCreditNotePage({ params }: { params: { token
                         </div>
                     )}
 
-                    {/* Totals - Orange Gradient Box */}
+                    {/* Totals - Green Gradient Box */}
                     <div className="flex justify-center mb-12">
-                        <div className="w-[90%] bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl p-6 shadow-md">
+                        <div className="w-[90%] bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6 shadow-md">
                             <div className="space-y-3">
-                                <div className="flex justify-between text-orange-50 font-medium">
+                                <div className="flex justify-between text-green-50 font-medium">
                                     <span>סכום לפני מע"מ:</span>
                                     <span>{formatCurrency(creditNote.creditAmount)}</span>
                                 </div>
-                                <div className="flex justify-between text-orange-50 font-medium">
+                                <div className="flex justify-between text-green-50 font-medium">
                                     <span>מע"מ ({(invoice?.vatRate || 0.18) * 100}%):</span>
                                     <span>{formatCurrency(creditNote.vatAmount)}</span>
                                 </div>
