@@ -65,6 +65,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const [showProgress, setShowProgress] = useState(false)
     const [activeSettingsTab, setActiveSettingsTab] = useState('details')
     const [isReferralOpen, setIsReferralOpen] = useState(false)
+    const [isIntegrationsOpen, setIsIntegrationsOpen] = useState(false)
 
     useEffect(() => {
         const timer = setTimeout(() => setShowProgress(true), 100)
@@ -295,18 +296,18 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                     {!isBusiness && (
                         <Button
-                            variant="ghost"
+                            variant="outline"
                             size="icon"
                             onClick={() => {
-                                setActiveSettingsTab('integrations')
-                                setIsSettingsOpen(true)
+                                setIsIntegrationsOpen(true)
                             }}
-                            className="relative overflow-hidden group hover:bg-gray-100 dark:hover:bg-gray-800"
+                            className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
                             title="אוטומציות (iPhone Shortcuts)"
                         >
-                            <svg className="w-5 h-5 fill-current text-gray-800 dark:text-gray-100" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18.71 19.5c-.31.84-.86 1.77-1.54 2.75-.68 1.02-1.4 2.02-2.39 2.02-1.02 0-1.39-.59-2.58-.59s-1.63.59-2.61.59c-1.02 0-1.77-1.05-2.48-2.1-1.41-2.12-2.5-5.38-1.05-7.96 1.15-2.07 3.32-2.22 3.8-2.22 1 0 1.95.71 2.54.71.59 0 1.63-.76 2.85-.71.51 0 2.27.05 3.39 1.66-2.51 1.25-2.15 4.59.39 5.61-.46 1.41-1.12 2.83-2.3 4.2zm-2.15-13.6c.56-.68.95-1.63.83-2.61-1.64.08-2.73 1.76-2.51 2.61-.95.05-1.85-.9-1.73-2.66 1.59.13 3.03 1.39 3.41 2.66z" />
+                            <svg className="w-4 h-4 fill-current text-[#323338] dark:text-gray-100" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.306 14.864c.25 1.705 1.528 2.296 1.625 2.334-.012.046-2.541 8.798-8.409 8.802-2.126.002-2.924-1.442-5.462-1.442-2.603 0-3.321 1.488-5.385 1.509-3.666.038-7.9-6.326-7.9-14.735 0-6.108 3.864-9.28 7.494-9.28 2.036 0 3.766 1.35 5.093 1.35 1.139 0 3.323-1.68 5.602-1.432 2.37.258 4.184 1.205 5.342 2.915-4.708 2.454-3.9 8.281 2.001 10.977zM11.696.06c2.404-.207 4.135 2.925 3.655 5.922-2.484.288-5.01-2.664-3.655-5.922z" />
                             </svg>
+                            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-stone-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                         </Button>
                     )}
 
@@ -684,7 +685,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="details">פרטי העסק</TabsTrigger>
                                 <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
-                                <TabsTrigger value="integrations">אוטומציות</TabsTrigger>
                             </TabsList>
                             <TabsContent value="details" className="mt-4">
                                 <BusinessSettings onSuccess={() => setIsSettingsOpen(false)} />
@@ -731,9 +731,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     </CardContent>
                                 </Card>
                             </TabsContent>
-                            <TabsContent value="integrations" className="mt-4">
-                                <IntegrationsSettings />
-                            </TabsContent>
                         </Tabs>
                     </DialogContent>
                 ) : (
@@ -742,9 +739,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <DialogTitle className="text-right">הגדרות</DialogTitle>
                         </DialogHeader>
                         <Tabs defaultValue="display" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2">
+                            <TabsList className="grid w-full grid-cols-1">
                                 <TabsTrigger value="display">תצוגה</TabsTrigger>
-                                <TabsTrigger value="integrations">אוטומציות</TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="display">
@@ -783,14 +779,19 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     </div>
                                 </div>
                             </TabsContent>
-                            <TabsContent value="integrations" className="mt-4">
-                                <IntegrationsSettings />
-                            </TabsContent>
                         </Tabs>
                     </DialogContent>
                 )}
             </Dialog >
 
+            <Dialog open={isIntegrationsOpen} onOpenChange={setIsIntegrationsOpen}>
+                <DialogContent dir="rtl" className="w-[95vw] sm:w-full sm:max-w-xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl">
+                    <DialogHeader className="text-right">
+                        <DialogTitle className="text-right">אוטומציות (iPhone Shortcuts)</DialogTitle>
+                    </DialogHeader>
+                    <IntegrationsSettings />
+                </DialogContent>
+            </Dialog>
 
             <ReferralDashboard open={isReferralOpen} onOpenChange={setIsReferralOpen} />
         </div >
