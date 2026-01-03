@@ -88,9 +88,16 @@ export function CreditNotesTab() {
         }
     )
 
-    const handleDelete = async (id: string) => {
-        if (confirm('האם אתה בטוח שברצונך למחוק חשבונית זיכוי זו?')) {
-            await optimisticDelete(id)
+    const handleDelete = (id: string) => {
+        setCreditNoteToDelete(id)
+        setDeleteDialogOpen(true)
+    }
+
+    const confirmDelete = async () => {
+        if (creditNoteToDelete) {
+            await optimisticDelete(creditNoteToDelete)
+            setDeleteDialogOpen(false)
+            setCreditNoteToDelete(null)
         }
     }
 
@@ -242,6 +249,24 @@ export function CreditNotesTab() {
                     <CreditNoteForm onSuccess={() => { setIsMobileOpen(false); mutate() }} />
                 </DialogContent>
             </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>האם אתה בטוח?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            פעולה זו תמחק את חשבונית הזיכוי לצמיתות. לא ניתן לשחזר את הנתונים לאחר המחיקה.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>ביטול</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+                            מחק
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }
