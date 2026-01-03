@@ -29,8 +29,9 @@ export default function PublicCreditNotePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-                <div className="text-gray-500">טוען...</div>
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+                <Loader2 className="h-10 w-10 text-green-600 animate-spin mb-4" />
+                <p className="text-gray-500 animate-pulse font-medium">טוען את פרטי הזיכוי...</p>
             </div>
         )
     }
@@ -83,63 +84,52 @@ export default function PublicCreditNotePage() {
                         <div className="w-full md:w-1/2 space-y-8 text-center md:text-start">
                             {/* Credit Note Details */}
                             <div>
-                                <h2 className="text-3xl font-bold text-orange-600 mb-2">חשבונית זיכוי</h2>
-                                <div className="space-y-1 text-gray-600">
-                                    <p><span className="font-semibold">מספר:</span> {creditNote.creditNoteNumber}</p>
-                                    <p><span className="font-semibold">תאריך הנפקה:</span> {format(new Date(creditNote.issueDate), 'dd/MM/yyyy')}</p>
-                                    <p><span className="font-semibold">חשבונית מקורית:</span> {invoice?.invoiceNumber}</p>
+                                <h1 className="text-3xl md:text-4xl font-light text-green-600 mb-2">חשבונית זיכוי</h1>
+                                <div className="text-gray-600">
+                                    <p><strong>מספר:</strong> {creditNote.creditNoteNumber}</p>
+                                    <p><strong>תאריך הנפקה:</strong> {format(new Date(creditNote.issueDate), 'dd/MM/yyyy')}</p>
+                                    <p><strong>חשבונית מקורית:</strong> {invoice?.invoiceNumber}</p>
                                 </div>
                             </div>
 
                             {/* Client Info */}
                             {client && (
-                                <div className="bg-gray-50 p-4 rounded-lg">
-                                    <h3 className="font-bold text-gray-700 mb-2">ללקוח:</h3>
-                                    <div className="text-gray-600 space-y-1">
-                                        <p className="font-semibold">{client.name}</p>
-                                        {client.email && <p>{client.email}</p>}
-                                        {client.phone && <p>{client.phone}</p>}
-                                        {client.address && <p>{client.address}</p>}
-                                        {client.taxId && <p>ח.פ/ע.מ: {client.taxId}</p>}
-                                    </div>
+                                <div>
+                                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">לכבוד</h3>
+                                    <div className="text-gray-900 font-medium text-lg">{client.name}</div>
+                                    {client.taxId && <div className="text-gray-600">ח.פ / ת.ז: {client.taxId}</div>}
+                                    {client.address && <div className="text-gray-600">{client.address}</div>}
+                                    {client.email && <div className="text-gray-600">{client.email}</div>}
                                 </div>
                             )}
                         </div>
 
                         {/* Left Side: Business Info */}
-                        <div className="w-full md:w-1/2 text-center md:text-start">
-                            {business ? (
-                                <div className="space-y-2">
-                                    {business.logoUrl && (
-                                        <div className="mb-4">
-                                            <img
-                                                src={business.logoUrl}
-                                                alt={business.companyName}
-                                                className="h-16 object-contain mx-auto md:mx-0"
-                                            />
-                                        </div>
-                                    )}
-                                    <h3 className="text-2xl font-bold text-gray-800">{business.companyName}</h3>
-                                    <div className="text-gray-600 space-y-1">
-                                        {business.address && <p>{business.address}</p>}
-                                        {business.phone && <p>טלפון: {business.phone}</p>}
-                                        {business.email && <p>אימייל: {business.email}</p>}
-                                        {business.companyId && <p>ח.פ: {business.companyId}</p>}
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="text-gray-500">
-                                    <p>פרטי עסק לא זמינים</p>
+                        <div className="text-center w-full md:w-auto">
+                            {business?.logoUrl && (
+                                <div className="mb-4 flex justify-center">
+                                    <img
+                                        src={business.logoUrl}
+                                        alt="Logo"
+                                        className="h-16 object-contain"
+                                    />
                                 </div>
                             )}
+                            <h2 className="text-2xl font-bold text-gray-900">{business?.companyName || 'שם העסק'}</h2>
+                            <p className="text-gray-500">{business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ'} {business?.companyId}</p>
+                            <div className="text-sm text-gray-500 mt-2">
+                                {business?.address && <p>{business.address}</p>}
+                                {business?.phone && <p>{business.phone}</p>}
+                                {business?.email && <p>{business.email}</p>}
+                            </div>
                         </div>
                     </div>
 
                     {/* Reason */}
                     {creditNote.reason && (
                         <div className="mb-8">
-                            <h3 className="font-bold text-gray-700 mb-2">סיבת הזיכוי:</h3>
-                            <p className="text-gray-600">{creditNote.reason}</p>
+                            <h3 className="font-bold text-gray-700 mb-2 border-b-2 border-gray-100 pb-2">סיבת הזיכוי:</h3>
+                            <p className="text-gray-600 mt-4">{creditNote.reason}</p>
                         </div>
                     )}
 
@@ -164,19 +154,17 @@ export default function PublicCreditNotePage() {
                         </div>
                     </div>
 
-                    {/* Business Signature */}
-                    {business?.signatureUrl && (
-                        <div className="mt-auto pt-8 border-t border-gray-200">
-                            <div className="flex flex-col items-center gap-2">
-                                <img
-                                    src={business.signatureUrl}
-                                    alt="חתימה"
-                                    className="h-16 object-contain"
-                                />
-                                <p className="text-sm text-gray-500">חתימת העסק</p>
-                            </div>
+                    {/* Footer - Produced by */}
+                    <div className="mt-16 pt-8 text-center text-gray-400 text-xs pb-12 print:pb-0 border-t border-gray-100">
+                        <p className="mb-2">הופק על ידי</p>
+                        <div className="flex justify-center items-center gap-1 opacity-50 grayscale hover:grayscale-0 transition-all">
+                            <img
+                                src="/K-LOGO.png"
+                                alt="Budget Manager"
+                                className="object-contain h-8 w-auto"
+                            />
                         </div>
-                    )}
+                    </div>
                 </Card>
             </div>
         </div>
