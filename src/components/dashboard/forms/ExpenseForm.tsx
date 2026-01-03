@@ -26,6 +26,7 @@ import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { BankImportModal } from '../BankImportModal'
 import { CategoryManagementDialog } from './CategoryManagementDialog'
 import { useConfirm } from '@/hooks/useConfirm'
+import { findMatchingCategory } from '@/lib/category-utils'
 
 interface Category {
     id: string
@@ -109,7 +110,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
         // Only proceed if we have at least amount or description
         if (paramAmount || paramDesc || paramCat) {
-            const matchedCategory = findMatchingCategory(paramCat)
+            const matchedCategory = findMatchingCategory(paramCat, categories)
 
             // Construct the new expense object
             const expenseFromUrl = {
