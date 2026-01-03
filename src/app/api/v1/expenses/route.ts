@@ -8,71 +8,80 @@ export async function POST(req: NextRequest) {
         const apiKey = req.headers.get('x-api-key') || req.nextUrl.searchParams.get('apiKey')
 
         if (!apiKey) {
+            console.error('API Error: Missing API Key')
             return NextResponse.json({ error: 'Missing API Key' }, { status: 401 })
         }
 
         const user = await prisma.user.findUnique({
             where: { shortcutApiKey: apiKey },
-            include: { categories: true } // Need categories for fuzzy matching logic if reused
+            include: { categories: true }
         })
 
         if (!user) {
+            console.error('API Error: Invalid API Key')
             return NextResponse.json({ error: 'Invalid API Key' }, { status: 401 })
         }
 
-        // Parse Body
         const body = await req.json()
-        const { amount, category, description, currency } = body
+        const { amount, category, description, currency, budgetType = 'PERSONAL' } = body
+
+        console.log('Received Expense Request:', { amount, category, budgetType, currency })
 
         if (!amount || !category) {
             return NextResponse.json({ error: 'Missing amount or category' }, { status: 400 })
         }
 
-        // Fuzzy Match Category using shared utility
-        const categoryName = findMatchingCategory(category, user.categories)
+        const numericAmount = parseFloat(amount)
+        if (isNaN(numericAmount)) {
+            return NextResponse.json({ error: 'Invalid amount - must be a number' }, { status: 400 })
+        }
 
-        // Create Expense
-        const budget = await prisma.budget.findFirst({
+        const categoryName = findMatchingCategory(category, user.categories) || category
+        const targetType = (budgetType === 'BUSINESS' || budgetType === 'business') ? 'BUSINESS' : 'PERSONAL'
+
+        const now = new Date()
+        const month = now.getMonth() + 1
+        const year = now.getFullYear()
+
+        // Find or Create Budget
+        let budget = await prisma.budget.findFirst({
             where: {
                 userId: user.id,
-                month: new Date().getMonth() + 1,
-                year: new Date().getFullYear(),
-                type: 'PERSONAL' // Shortcut usually personal
+                month,
+                year,
+                type: targetType
             }
         })
 
-        let budgetId = budget?.id
-
-        if (!budgetId) {
-            // Auto create budget if missing? 
-            // This is complex. Better to fail or require user to open app once?
-            // Let's try to create basic budget
-            const newBudget = await prisma.budget.create({
+        if (!budget) {
+            console.log(`Creating new ${targetType} budget for ${month}/${year}`)
+            budget = await prisma.budget.create({
                 data: {
                     userId: user.id,
-                    month: new Date().getMonth() + 1,
-                    year: new Date().getFullYear(),
-                    type: 'PERSONAL'
+                    month,
+                    year,
+                    type: targetType,
+                    currency: 'ILS'
                 }
             })
-            budgetId = newBudget.id
         }
 
         const expense = await prisma.expense.create({
             data: {
-                budgetId: budgetId,
-                amount: parseFloat(amount),
+                budgetId: budget.id,
+                amount: numericAmount,
                 category: categoryName,
                 description: description || 'From Shortcut',
-                currency: currency || 'ILS',
-                date: new Date()
+                currency: currency || 'ILS', // Default to ILS
+                date: now
             }
         })
 
-        return NextResponse.json({ success: true, id: expense.id, message: 'Expense saved' })
+        console.log('Expense Saved:', expense.id)
+        return NextResponse.json({ success: true, id: expense.id, message: 'Expense saved successfully' })
 
     } catch (error) {
-        console.error('API Error:', error)
+        console.error('API Internal Error:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
