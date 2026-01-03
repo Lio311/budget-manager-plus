@@ -168,6 +168,7 @@ export async function deleteCreditNote(id: string) {
         // Delete the negative income entry
         await db.income.deleteMany({
             where: {
+                userId,
                 invoiceId: existing.invoiceId,
                 amount: { lt: 0 }, // Negative amounts only
                 source: { contains: `זיכוי עבור חשבונית ${existing.invoice.invoiceNumber}` }

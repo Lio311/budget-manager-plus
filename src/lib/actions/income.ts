@@ -368,6 +368,31 @@ export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SING
         const db = await authenticatedPrisma(userId);
 
         if (mode === 'SINGLE') {
+            // Find the income first to check for credit notes
+            const income = await db.income.findUnique({
+                where: { id },
+                include: { creditNotes: true }
+            })
+
+            // If it's linked to a credit note, delete the credit note first
+            // (The credit note deletion logic also handles cleaning up income entries,
+            // but since we're starting from the income side, we clean up the doc explicitly)
+            if (income?.invoiceId) {
+                // Check if there's a credit note for this invoice where this income might be the ledger entry
+                const creditNote = await db.creditNote.findFirst({
+                    where: {
+                        userId,
+                        invoiceId: income.invoiceId
+                    }
+                })
+
+                if (creditNote) {
+                    await db.creditNote.delete({
+                        where: { id: creditNote.id }
+                    })
+                }
+            }
+
             await db.income.delete({
                 where: { id }
             })
