@@ -20,8 +20,8 @@ const isPublicRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, req) => {
     const { pathname } = req.nextUrl;
 
-    // Skip maintenance check for maintenance page and status API
-    if (pathname === '/maintenance' || pathname.startsWith('/api/maintenance')) {
+    // Skip maintenance check for maintenance page and status API, AND critical Shortcuts API
+    if (pathname === '/maintenance' || pathname.startsWith('/api/maintenance') || pathname.startsWith('/api/v1/expenses')) {
         return;
     }
 
