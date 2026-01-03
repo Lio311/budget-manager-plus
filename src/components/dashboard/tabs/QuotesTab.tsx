@@ -165,15 +165,33 @@ export function QuotesTab() {
         try {
             const result = await generateQuoteLink(quoteId)
             if (result.success && result.token) {
-                const link = `${window.location.origin}/quote/${result.token}`
-                await navigator.clipboard.writeText(link)
+                const url = `${window.location.origin}/quote/${result.token}`
+
+                // Try native share first (mobile)
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'הצעת מחיר',
+                            text: 'הינה הצעת המחיר שלך',
+                            url: url
+                        })
+                        return // Success
+                    } catch (err) {
+                        // Ignore sharing error (user cancelled) and fallback to clipboard
+                        if ((err as Error).name !== 'AbortError') {
+                            console.error('Share failed:', err)
+                        }
+                    }
+                }
+
+                // Fallback to clipboard
+                await navigator.clipboard.writeText(url)
                 toast.success('הקישור הועתק ללוח')
             } else {
                 toast.error('שגיאה ביצירת הקישור')
             }
         } catch (error) {
-            console.error('Copy link error:', error)
-            toast.error('משהו השתבש')
+            toast.error('שגיאה ביצירת הקישור')
         }
     }
 
@@ -364,14 +382,12 @@ export function QuotesTab() {
                                 </div>
                                 <Button variant="outline" size="sm" onClick={() => handleCopyLink(quote.id)} className="gap-2 text-yellow-600 border-yellow-200 bg-yellow-50 hover:bg-yellow-100">
                                     <LinkIcon className="h-4 w-4" />
-                                    <span className="md:hidden">קישור לאישור</span>
-                                    <span className="hidden md:inline">קישור לאישור</span>
+                                    <span className="md:hidden">קישור להצעה</span>
+                                    <span className="hidden md:inline">קישור להצעה</span>
                                 </Button>
                                 {quote.isSigned && (
-                                    <Button variant="outline" size="sm" onClick={() => handleViewQuote(quote.id)} className="gap-2 text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100">
+                                    <Button variant="outline" size="icon" onClick={() => handleViewQuote(quote.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100">
                                         <Eye className="h-4 w-4" />
-                                        <span className="md:hidden">צפה</span>
-                                        <span className="hidden md:inline">צפה בהצעה</span>
                                     </Button>
                                 )}
                             </div>
