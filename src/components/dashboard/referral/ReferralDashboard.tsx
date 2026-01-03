@@ -142,7 +142,7 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
                         disabled={joining}
                         className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-6 text-lg transition-all shadow-lg hover:shadow-xl"
                     >
-                        {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : 'אני רוצה להצטרף! 🚀'}
+                        {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : 'אני רוצה להצטרף'}
                     </Button>
                 </DialogContent>
             </Dialog>

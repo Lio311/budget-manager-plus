@@ -280,19 +280,35 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 {/* Buttons Group - Second in DOM -> Left in RTL */}
                 <div className="flex gap-2 items-center w-full md:w-auto justify-end md:justify-end">
                     <Button
-                        variant="ghost"
+                        variant="outline"
                         size="icon"
                         onClick={() => {
-                            setActiveSettingsTab('integrations')
+                            if (isBusiness) setActiveSettingsTab('details')
                             setIsSettingsOpen(true)
                         }}
-                        className="relative overflow-hidden group hover:bg-gray-100 dark:hover:bg-gray-800"
-                        title="אוטומציות (iPhone Shortcuts)"
+                        className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        title="הגדרות"
                     >
-                        <svg className="w-5 h-5 fill-current text-gray-800 dark:text-gray-100" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18.71 19.5c-.31.84-.86 1.77-1.54 2.75-.68 1.02-1.4 2.02-2.39 2.02-1.02 0-1.39-.59-2.58-.59s-1.63.59-2.61.59c-1.02 0-1.77-1.05-2.48-2.1-1.41-2.12-2.5-5.38-1.05-7.96 1.15-2.07 3.32-2.22 3.8-2.22 1 0 1.95.71 2.54.71.59 0 1.63-.76 2.85-.71.51 0 2.27.05 3.39 1.66-2.51 1.25-2.15 4.59.39 5.61-.46 1.41-1.12 2.83-2.3 4.2zm-2.15-13.6c.56-.68.95-1.63.83-2.61-1.64.08-2.73 1.76-2.51 2.61-.95.05-1.85-.9-1.73-2.66 1.59.13 3.03 1.39 3.41 2.66z" />
-                        </svg>
+                        <Settings className="w-4 h-4" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                     </Button>
+
+                    {!isBusiness && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                                setActiveSettingsTab('integrations')
+                                setIsSettingsOpen(true)
+                            }}
+                            className="relative overflow-hidden group hover:bg-gray-100 dark:hover:bg-gray-800"
+                            title="אוטומציות (iPhone Shortcuts)"
+                        >
+                            <svg className="w-5 h-5 fill-current text-gray-800 dark:text-gray-100" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18.71 19.5c-.31.84-.86 1.77-1.54 2.75-.68 1.02-1.4 2.02-2.39 2.02-1.02 0-1.39-.59-2.58-.59s-1.63.59-2.61.59c-1.02 0-1.77-1.05-2.48-2.1-1.41-2.12-2.5-5.38-1.05-7.96 1.15-2.07 3.32-2.22 3.8-2.22 1 0 1.95.71 2.54.71.59 0 1.63-.76 2.85-.71.51 0 2.27.05 3.39 1.66-2.51 1.25-2.15 4.59.39 5.61-.46 1.41-1.12 2.83-2.3 4.2zm-2.15-13.6c.56-.68.95-1.63.83-2.61-1.64.08-2.73 1.76-2.51 2.61-.95.05-1.85-.9-1.73-2.66 1.59.13 3.03 1.39 3.41 2.66z" />
+                            </svg>
+                        </Button>
+                    )}
 
                     <FinancialAdvisorButton financialData={aiFinancialData} />
                     <FeedbackButton />
