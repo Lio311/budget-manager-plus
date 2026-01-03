@@ -21,7 +21,17 @@ An advanced full-stack web application for intelligent personal and business fin
 ### 🏢 Business Financial Suite
 - **Dual Mode**: Seamlessly toggle between **Personal** and **Business** budgets per month.
 - **Client & Supplier Management**: Comprehensive implementation for tracking business entities.
-- **Invoices & Quotes**: Generate, track, and manage status of financial documents.
+- **Invoices & Quotes**: 
+  - Generate, track, and manage status of financial documents.
+  - **Line Items Table**: Detailed itemization with quantity, price, and automatic totals.
+  - **Digital Signatures**: Public signing pages for quotes with signature capture.
+  - **Native Sharing**: Share invoices and quotes via WhatsApp, email, or any app using native share API.
+- **Credit Notes System** (New!):
+  - Issue credit notes against existing invoices.
+  - Automatic revenue reduction in financial reports.
+  - Full or partial credit amounts with VAT calculations.
+  - Public viewing pages with business signature.
+  - Integrated with Overview tab for accurate revenue tracking.
 - **Tax Tracking**: Dynamic VAT handling (Exempt/Full/Partial) and tax-deductible expense recognition.
 - **Business Terminology**: Context-aware labels (Revenue vs Income, Costs vs Expenses).
 
