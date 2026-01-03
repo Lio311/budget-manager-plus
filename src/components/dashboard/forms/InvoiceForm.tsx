@@ -366,7 +366,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                             </SelectTrigger>
                             <SelectContent dir="rtl">
                                 <SelectItem value="0">ללא מע"מ (0%)</SelectItem>
-                                <SelectItem value="0.17">מע"מ רגיל (17%)</SelectItem>
+                                <SelectItem value="0.18">מע"מ רגיל (18%)</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
