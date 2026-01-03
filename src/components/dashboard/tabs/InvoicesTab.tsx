@@ -152,26 +152,35 @@ export function InvoicesTab() {
 
     const handleCopyLink = async (invoiceId: string) => {
         try {
-            toast.info('מייצר קישור לחתימה...')
             const result = await generateInvoiceLink(invoiceId)
-
             if (result.success && result.token) {
-                const link = `${window.location.origin}/invoice/${result.token}`
+                const url = `${window.location.origin}/invoice/${result.token}`
 
-                try {
-                    await navigator.clipboard.writeText(link)
-                    toast.success('הקישור הועתק ללוח!')
-                } catch (clipboardError) {
-                    console.error('Clipboard failed, falling back to prompt', clipboardError)
-                    // Fallback for mobile/secure-context issues
-                    window.prompt('העתק את הקישור:', link)
-                    toast.success('הקישור נוצר')
+                // Try native share first (mobile)
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'חשבונית',
+                            text: 'הינה החשבונית שלך',
+                            url: url
+                        })
+                        return // Success
+                    } catch (err) {
+                        // Ignore sharing error (user cancelled) and fallback to clipboard
+                        if ((err as Error).name !== 'AbortError') {
+                            console.error('Share failed:', err)
+                        }
+                    }
                 }
+
+                // Fallback to clipboard
+                await navigator.clipboard.writeText(url)
+                toast.success('הקישור הועתק ללוח')
             } else {
-                toast.error('שגיאה ביצירת הקישור במערכת')
+                toast.error('שגיאה ביצירת הקישור')
             }
         } catch (error) {
-            toast.error('שגיאה כללית ביצירת הקישור')
+            toast.error('שגיאה ביצירת הקישור')
         }
     }
 

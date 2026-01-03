@@ -74,7 +74,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         { value: 'suppliers', label: 'ספקים', icon: Building2, activeClass: 'data-[state=active]:bg-blue-600' },
         { value: 'quotes', label: 'הצעות מחיר', icon: FileText, activeClass: 'data-[state=active]:bg-yellow-500 data-[state=active]:text-black' },
         { value: 'invoices', label: 'חשבוניות', icon: FileText, activeClass: 'data-[state=active]:bg-purple-600' },
-        { value: 'credit-notes', label: 'זיכויים', icon: FileText, activeClass: 'data-[state=active]:bg-red-600' },
+        { value: 'credit-notes', label: 'זיכויים', icon: FileText, activeClass: 'data-[state=active]:bg-orange-600' },
         { value: 'income', label: 'מכירות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'expenses', label: 'עלויות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
         { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeClass: 'data-[state=active]:bg-black' },
