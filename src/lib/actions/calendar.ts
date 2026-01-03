@@ -8,7 +8,7 @@ import { convertToILS } from '@/lib/currency'
 
 export async function syncBudgetToGoogleCalendar(month: number, year: number) {
     try {
-        const { userId } = auth()
+        const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
         const db = await authenticatedPrisma(userId)
