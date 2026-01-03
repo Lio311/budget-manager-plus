@@ -211,7 +211,7 @@ async function createRecurringIncomes(
                         paymentTerms,
                         workTime,
                         acceptedBy
-                    }
+                    } as any
                 })
             }
         } catch (error) {
@@ -370,8 +370,7 @@ export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SING
         if (mode === 'SINGLE') {
             // Find the income first to check for credit notes
             const income = await db.income.findUnique({
-                where: { id },
-                include: { creditNotes: true }
+                where: { id }
             })
 
             // If it's linked to a credit note, delete the credit note first
