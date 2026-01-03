@@ -31,11 +31,22 @@ interface LineItem {
 
 export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
     const { budgetType } = useBudget()
-    const [loadingNumber, setLoadingNumber] = useState(false)
+    const [formData, setFormData] = useState<InvoiceFormData>({
+        clientId: '',
+        invoiceNumber: '',
+        issueDate: new Date(),
+        dueDate: undefined,
+        subtotal: 0,
+        vatRate: 0.18,
+        vatAmount: 0,
+        total: 0,
+        paymentMethod: '',
+        notes: '',
+        lineItems: []
+    })
 
-    const { year, month } = useBudget() // Need year/month to fetch incomes if filtering by month, or fetch all client incomes? 
-    // Ideally we fetch open sales (incomes without invoice). 
-    // For now, let's fetch current month incomes for the selected client or all.
+    const [loadingNumber, setLoadingNumber] = useState(false)
+    const { year, month } = useBudget()
 
     const [selectedIncomeId, setSelectedIncomeId] = useState<string>('none')
     const [lineItems, setLineItems] = useState<LineItem[]>([])
@@ -43,18 +54,6 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
     // Fetch incomes for selection logic
     const { data: incomesData } = useSWR(['incomes', month, year, budgetType], () => getIncomes(month, year, budgetType))
     const availableIncomes = (incomesData?.data?.incomes || []).filter((inc: any) => !inc.invoiceId && (formData.clientId ? inc.clientId === formData.clientId : true))
-
-    const [formData, setFormData] = useState<InvoiceFormData>({
-        clientId: '',
-        invoiceNumber: '',
-        issueDate: new Date(),
-        dueDate: undefined,
-        subtotal: 0,
-        vatRate: 0.17,
-        paymentMethod: '',
-        notes: '',
-        lineItems: []
-    })
 
     // Auto-fill from selected income
     useEffect(() => {
