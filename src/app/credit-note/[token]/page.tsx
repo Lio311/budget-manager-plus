@@ -75,6 +75,15 @@ export default async function PublicCreditNotePage({ params }: { params: { token
                         <div className="w-full md:w-1/2 text-center md:text-start">
                             {business ? (
                                 <div className="space-y-2">
+                                    {business.logoUrl && (
+                                        <div className="mb-4">
+                                            <img
+                                                src={business.logoUrl}
+                                                alt={business.companyName}
+                                                className="h-16 object-contain mx-auto md:mx-0"
+                                            />
+                                        </div>
+                                    )}
                                     <h3 className="text-2xl font-bold text-gray-800">{business.companyName}</h3>
                                     <div className="text-gray-600 space-y-1">
                                         {business.address && <p>{business.address}</p>}
