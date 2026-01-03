@@ -201,7 +201,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                         </div>
                         <div className="flex justify-between text-lg font-bold border-t border-orange-200 pt-2 dark:border-purple-900/50">
                             <span className="dark:text-purple-100">סה"כ זיכוי:</span>
-                            <span className="text-purple-700 dark:text-purple-400">{formatCurrency(totalCredit)}</span>
+                            <span className="text-orange-700 dark:text-orange-400">{formatCurrency(totalCredit)}</span>
                         </div>
                     </div>
                 </div>
