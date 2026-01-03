@@ -30,6 +30,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
 
     const [loadingNumber, setLoadingNumber] = useState(false)
     const [selectedInvoice, setSelectedInvoice] = useState<any>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     // Fetch invoices
     const { data: invoicesData } = useSWR(['invoices', budgetType], async () => {
@@ -68,7 +69,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
         }
     }, [formData.invoiceId, invoices])
 
-    const { execute: handleCreate, isPending } = useOptimisticMutation(
+    const { execute: handleCreate } = useOptimisticMutation(
         async (data: CreditNoteFormData) => {
             const result = await createCreditNote(data)
             if (!result.success) throw new Error(result.error)
