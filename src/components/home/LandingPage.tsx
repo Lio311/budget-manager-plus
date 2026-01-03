@@ -8,6 +8,7 @@ import Image from 'next/image'
 import SecurityBadge from '@/components/SecurityBadge'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
+import FAQ from './FAQ'
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -417,10 +418,13 @@ export default function LandingPage() {
                             description="גישה מלאה לנתונים מהמחשב, מהטאבלט ומהנייד"
                         />
                     </div>
-                </motion.div >
+                </motion.div>
+
+                {/* FAQ Section */}
+                <FAQ />
 
                 {/* CTA Section */}
-                < motion.div
+                <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
