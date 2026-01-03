@@ -40,9 +40,9 @@ interface Quote {
     date: string | Date
     validUntil?: string | Date
     status: 'DRAFT' | 'SENT' | 'ACCEPTED' | 'EXPIRED' | 'CANCELLED'
-    totalAmount: number
     vatAmount: number
     items: any[]
+    isSigned: boolean
 }
 
 export function QuotesTab() {
@@ -68,6 +68,7 @@ export function QuotesTab() {
             status: q.status as any,
             totalAmount: q.total,
             vatAmount: q.vatAmount,
+            isSigned: q.isSigned,
             items: []
         }))
     }
