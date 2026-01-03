@@ -321,6 +321,7 @@ export function InvoicesTab() {
                                         <SelectContent dir="rtl">
                                             <SelectItem value="DRAFT">טיוטה</SelectItem>
                                             <SelectItem value="SENT">נשלח</SelectItem>
+                                            <SelectItem value="SIGNED">נחתם</SelectItem>
                                             <SelectItem value="PAID">שולם</SelectItem>
                                             <SelectItem value="OVERDUE">באיחור</SelectItem>
                                             <SelectItem value="CANCELLED">בוטל</SelectItem>
