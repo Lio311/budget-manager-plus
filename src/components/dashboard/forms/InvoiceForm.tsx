@@ -9,16 +9,40 @@ import { getNextInvoiceNumber, createInvoice, type InvoiceFormData } from '@/lib
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useBudget } from '@/contexts/BudgetContext'
 import { toast } from 'sonner'
+import { Trash2 } from 'lucide-react'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
+import { getIncomes } from '@/lib/actions/income' // Need to fetch client incomes
+import useSWR from 'swr'
+import { formatCurrency } from '@/lib/utils'
 
 interface InvoiceFormProps {
     clients: any[]
     onSuccess: () => void
 }
 
+interface LineItem {
+    id: string
+    description: string
+    quantity: number
+    price: number
+    total: number
+}
+
+
 export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
     const { budgetType } = useBudget()
     const [loadingNumber, setLoadingNumber] = useState(false)
+
+    const { year, month } = useBudget() // Need year/month to fetch incomes if filtering by month, or fetch all client incomes? 
+    // Ideally we fetch open sales (incomes without invoice). 
+    // For now, let's fetch current month incomes for the selected client or all.
+
+    const [selectedIncomeId, setSelectedIncomeId] = useState<string>('none')
+    const [lineItems, setLineItems] = useState<LineItem[]>([])
+
+    // Fetch incomes for selection logic
+    const { data: incomesData } = useSWR(['incomes', month, year, budgetType], () => getIncomes(month, year, budgetType))
+    const availableIncomes = (incomesData?.data?.incomes || []).filter((inc: any) => !inc.invoiceId && (formData.clientId ? inc.clientId === formData.clientId : true))
 
     const [formData, setFormData] = useState<InvoiceFormData>({
         clientId: '',
@@ -28,8 +52,41 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
         subtotal: 0,
         vatRate: 0.17,
         paymentMethod: '',
-        notes: ''
+        notes: '',
+        lineItems: []
     })
+
+    // Auto-fill from selected income
+    useEffect(() => {
+        if (selectedIncomeId && selectedIncomeId !== 'none') {
+            const income = availableIncomes.find((i: any) => i.id === selectedIncomeId)
+            if (income) {
+                setFormData(prev => ({
+                    ...prev,
+                    clientId: income.clientId || prev.clientId,
+                    subtotal: income.amount, // Initial subtotal
+                    notes: `עבור: ${income.source}`
+                }))
+
+                // Add default line item if empty
+                if (lineItems.length === 0) {
+                    setLineItems([{
+                        id: crypto.randomUUID(),
+                        description: income.source,
+                        quantity: 1,
+                        price: income.amount,
+                        total: income.amount
+                    }])
+                }
+            }
+        }
+    }, [selectedIncomeId])
+
+    // Update subtotal when line items change
+    useEffect(() => {
+        const newSubtotal = lineItems.reduce((sum, item) => sum + item.total, 0)
+        setFormData(prev => ({ ...prev, subtotal: newSubtotal, lineItems }))
+    }, [lineItems])
 
     // Fetch next invoice number on mount
     useEffect(() => {
@@ -59,11 +116,26 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
         }
     )
 
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        if (selectedIncomeId === 'none' || !selectedIncomeId) {
+            toast.error('חובה לבחור מכירה/עסקה כדי להפיק חשבונית')
+            return
+        }
+
+        if (lineItems.length === 0) {
+            toast.error('חובה להוסיף לפחות שורה אחת לפירוט החשבונית')
+            return
+        }
+
         try {
-            await optimisticCreateInvoice(formData)
+            await optimisticCreateInvoice({
+                ...formData,
+                incomeId: selectedIncomeId,
+                lineItems
+            })
             onSuccess()
         } catch (error) {
             // Error managed by hook
@@ -133,7 +205,143 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                         setDate={(date) => setFormData({ ...formData, dueDate: date })}
                     />
                 </div>
-                <div>
+            </div>
+
+            {/* Sale Selection */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
+                <label className="block text-sm font-bold text-blue-900 dark:text-blue-300 mb-2">
+                    בחר מכירה/עסקה (חובה)
+                </label>
+                <div dir="rtl">
+                    <Select
+                        value={selectedIncomeId}
+                        onValueChange={(value) => {
+                            setSelectedIncomeId(value)
+                            // Reset line items if "none" selected? Or keep? Let's keep for flexibility but recommend reset
+                            if (value === 'none') {
+                                setLineItems([])
+                                setFormData(prev => ({ ...prev, subtotal: 0 }))
+                            }
+                        }}
+                    >
+                        <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-blue-300 dark:border-blue-700 text-right">
+                            <SelectValue placeholder="בחר הכנסה לחיוב" />
+                        </SelectTrigger>
+                        <SelectContent dir="rtl">
+                            <SelectItem value="none">-- בחר מכירה --</SelectItem>
+                            {availableIncomes.map((inc: any) => (
+                                <SelectItem key={inc.id} value={inc.id}>
+                                    {inc.source} | {formatCurrency(inc.amount, inc.currency)} | {inc.date ? new Date(inc.date).toLocaleDateString('he-IL') : '-'}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                {availableIncomes.length === 0 && (
+                    <p className="text-xs text-muted-foreground mt-1 mr-1">
+                        * לא נמצאו הכנסות פתוחות (ללא חשבונית) לחודש זה / ללקוח זה.
+                    </p>
+                )}
+            </div>
+
+            {/* Line Items Table */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    פירוט העסקה
+                </label>
+                <div className="border rounded-lg overflow-hidden dark:border-slate-700">
+                    <table className="w-full text-right text-sm">
+                        <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 font-medium">
+                            <tr>
+                                <th className="p-2 w-[40%]">תיאור</th>
+                                <th className="p-2 w-[15%]">כמות</th>
+                                <th className="p-2 w-[20%]">מחיר יח'</th>
+                                <th className="p-2 w-[20%]">סה"כ</th>
+                                <th className="p-2 w-[5%]"></th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y dark:divide-slate-700">
+                            {lineItems.map((item, index) => (
+                                <tr key={item.id} className="group hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                                    <td className="p-2">
+                                        <input
+                                            type="text"
+                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1"
+                                            value={item.description}
+                                            onChange={(e) => {
+                                                const newItems = [...lineItems]
+                                                newItems[index].description = e.target.value
+                                                setLineItems(newItems)
+                                            }}
+                                            placeholder="תיאור הפריט"
+                                        />
+                                    </td>
+                                    <td className="p-2">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1"
+                                            value={item.quantity}
+                                            onChange={(e) => {
+                                                const val = parseFloat(e.target.value) || 0
+                                                const newItems = [...lineItems]
+                                                newItems[index].quantity = val
+                                                newItems[index].total = val * newItems[index].price
+                                                setLineItems(newItems)
+                                            }}
+                                        />
+                                    </td>
+                                    <td className="p-2">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1"
+                                            value={item.price}
+                                            onChange={(e) => {
+                                                const val = parseFloat(e.target.value) || 0
+                                                const newItems = [...lineItems]
+                                                newItems[index].price = val
+                                                newItems[index].total = newItems[index].quantity * val
+                                                setLineItems(newItems)
+                                            }}
+                                        />
+                                    </td>
+                                    <td className="p-2 font-bold">
+                                        {formatCurrency(item.total)}
+                                    </td>
+                                    <td className="p-2 text-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => setLineItems(lineItems.filter(i => i.id !== item.id))}
+                                            className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <div className="p-2 bg-gray-50 dark:bg-slate-800/30 border-t dark:border-slate-700">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            onClick={() => setLineItems([...lineItems, { id: crypto.randomUUID(), description: '', quantity: 1, price: 0, total: 0 }])}
+                        >
+                            <Plus className="h-4 w-4 ml-1" />
+                            הוסף שורה
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* REMOVED: Manual Subtotal Input */}
+                {/* <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         סכום לפני מע"מ *
                     </label>
@@ -144,7 +352,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                         onChange={(e) => setFormData({ ...formData, subtotal: parseFloat(e.target.value) || 0 })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                     />
-                </div>
+                </div> */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         שיעור מע"מ

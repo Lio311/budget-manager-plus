@@ -5,19 +5,17 @@ import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-const InvoiceSchema = z.object({
-    clientId: z.string().min(1, 'חובה לבחור לקוח'),
-    invoiceNumber: z.string().min(1, 'חובה להזין מספר חשבונית'),
-    issueDate: z.date(),
-    dueDate: z.date().optional().nullable(),
-    subtotal: z.number().min(0, 'סכום לא יכול להיות שלילי'),
-    vatRate: z.number().min(0).max(1).optional().default(0.18),
-    paymentMethod: z.string().optional().nullable(),
-    notes: z.string().max(1000, 'הערות ארוכות מדי').optional().nullable()
-})
+export interface InvoiceLineItemData {
+    id?: string
+    description: string
+    quantity: number
+    price: number
+    total: number
+}
 
 export interface InvoiceFormData {
     clientId: string
+    incomeId?: string // Optional: Link to specific income
     invoiceNumber: string
     issueDate: Date
     dueDate?: Date
@@ -25,7 +23,26 @@ export interface InvoiceFormData {
     vatRate?: number
     paymentMethod?: string
     notes?: string
+    lineItems: InvoiceLineItemData[]
 }
+
+const InvoiceSchema = z.object({
+    clientId: z.string().min(1, 'חובה לבחור לקוח'),
+    incomeId: z.string().optional(),
+    invoiceNumber: z.string().min(1, 'חובה להזין מספר חשבונית'),
+    issueDate: z.date(),
+    dueDate: z.date().optional().nullable(),
+    subtotal: z.number().min(0, 'סכום לא יכול להיות שלילי'),
+    vatRate: z.number().min(0).max(1).optional().default(0.18),
+    paymentMethod: z.string().optional().nullable(),
+    notes: z.string().max(1000, 'הערות ארוכות מדי').optional().nullable(),
+    lineItems: z.array(z.object({
+        description: z.string().min(1, 'תיאור פריט חובה'),
+        quantity: z.number().min(0.01, 'כמות חייבת להיות חיובית'),
+        price: z.number().min(0, 'מחיר חייב להיות חיובי'),
+        total: z.number()
+    })).min(1, 'חובה להוסיף לפחות שורה אחת')
+})
 
 export async function getInvoices(scope: string = 'BUSINESS') {
     try {
@@ -65,7 +82,9 @@ export async function getInvoice(id: string) {
             where: { id },
             include: {
                 client: true,
-                incomes: true
+                client: true,
+                incomes: true,
+                lineItems: true
             }
         })
 
@@ -115,20 +134,43 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
                 paymentMethod: validData.paymentMethod || null,
                 status: 'DRAFT'
             },
+        },
             include: {
-                client: true
-            }
+            client: true,
+            lineItems: true
+        }
         })
 
-        revalidatePath('/dashboard')
-        return { success: true, data: invoice }
-    } catch (error: any) {
-        console.error('createInvoice error:', error)
-        if (error.code === 'P2002') {
-            return { success: false, error: 'חשבונית עם מספר זה כבר קיימת' }
-        }
-        return { success: false, error: 'Failed to create invoice' }
+    // Create Line Items
+    if (validData.lineItems && validData.lineItems.length > 0) {
+        await db.invoiceLineItem.createMany({
+            data: validData.lineItems.map(item => ({
+                invoiceId: invoice.id,
+                description: item.description,
+                quantity: item.quantity,
+                price: item.price,
+                total: item.total
+            }))
+        })
     }
+
+    // Link Income if provided
+    if (validData.incomeId) {
+        await db.income.update({
+            where: { id: validData.incomeId },
+            data: { invoiceId: invoice.id }
+        })
+    }
+
+    revalidatePath('/dashboard')
+    return { success: true, data: invoice }
+} catch (error: any) {
+    console.error('createInvoice error:', error)
+    if (error.code === 'P2002') {
+        return { success: false, error: 'חשבונית עם מספר זה כבר קיימת' }
+    }
+    return { success: false, error: 'Failed to create invoice' }
+}
 }
 
 export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) {

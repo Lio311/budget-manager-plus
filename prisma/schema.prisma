@@ -519,11 +519,29 @@ model Invoice {
   
   // Relations
   incomes       Income[]
+  lineItems     InvoiceLineItem[] // NEW
   
   @@index([userId, scope])
   @@index([clientId])
   @@unique([userId, invoiceNumber])
   @@map("invoices")
+}
+
+model InvoiceLineItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  description String
+  quantity    Float    @default(1)
+  price       Float
+  total       Float    // quantity * price
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([invoiceId])
+  @@map("invoice_line_items")
 }
 enum QuoteStatus {
   DRAFT
