@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown } from 'lucide-react'
+import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown, Link as LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
-import { getInvoices, updateInvoiceStatus, type InvoiceFormData } from '@/lib/actions/invoices'
+import { getInvoices, updateInvoiceStatus, generateInvoiceLink, type InvoiceFormData } from '@/lib/actions/invoices'
 import { getClients } from '@/lib/actions/clients'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
@@ -146,6 +146,23 @@ export function InvoicesTab() {
             toast.success('PDF הורד בהצלחה')
         } catch (error) {
             toast.error('שגיאה בהורדת PDF')
+        }
+    }
+
+    const handleCopyLink = async (invoiceId: string) => {
+        try {
+            toast.info('מייצר קישור לחתימה...')
+            const result = await generateInvoiceLink(invoiceId)
+
+            if (result.success && result.token) {
+                const link = `${window.location.origin}/invoice/${result.token}`
+                await navigator.clipboard.writeText(link)
+                toast.success('הקישור הועתק ללוח!')
+            } else {
+                toast.error('שגיאה ביצירת הקישור')
+            }
+        } catch (error) {
+            toast.error('שגיאה ביצירת הקישור')
         }
     }
 
@@ -348,21 +365,29 @@ export function InvoicesTab() {
                                     <Download className="h-4 w-4" />
                                     <span className="md:hidden">הורד PDF</span>
                                 </Button>
+                                <Button variant="outline" size="sm" onClick={() => handleCopyLink(inv.id)} className="gap-2 text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100">
+                                    <LinkIcon className="h-4 w-4" />
+                                    <span className="md:hidden">הערת קישור</span>
+                                    <span className="hidden md:inline">קישור לחתימה</span>
+                                </Button>
                             </div>
                         </div>
-                    ))
+                        </div>
+            ))
                 )}
-            </div>
-
-            {totalPages > 1 && (
-                <div className="p-4 border-t border-gray-100 dark:border-slate-700 flex justify-center direction-ltr">
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
-                    />
-                </div>
-            )}
         </div>
+
+            {
+        totalPages > 1 && (
+            <div className="p-4 border-t border-gray-100 dark:border-slate-700 flex justify-center direction-ltr">
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+            </div>
+        )
+    }
+        </div >
     )
 }
