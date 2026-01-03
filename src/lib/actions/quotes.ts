@@ -90,6 +90,7 @@ export async function createQuote(data: QuoteFormData, scope: string = 'BUSINESS
                 vatRate,
                 vatAmount,
                 total,
+                items: data.items, // Line items data
                 notes: data.notes,
                 status: 'DRAFT'
             },
