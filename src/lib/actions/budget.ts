@@ -108,3 +108,47 @@ export async function getCurrentBudget(month: number, year: number, currency: st
         throw error
     }
 }
+
+export async function updateBudgetBalances(
+    month: number,
+    year: number,
+    type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL',
+    data: { initialBalance?: number; initialSavings?: number }
+) {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+
+        // Find existing budget to get ID
+        const budget = await db.budget.findFirst({
+            where: { userId, month, year, type }
+        })
+
+        if (!budget) {
+            // Create budget if it doesn't exist
+            await db.budget.create({
+                data: {
+                    userId,
+                    month,
+                    year,
+                    type,
+                    currency: '₪',
+                    ...data
+                }
+            })
+        } else {
+            // Update existing budget
+            await db.budget.update({
+                where: { id: budget.id },
+                data
+            })
+        }
+
+        return { success: true }
+    } catch (error: any) {
+        console.error('Error updating budget balances:', error)
+        return { success: false, error: error.message || 'Failed to update monthly balances' }
+    }
+}

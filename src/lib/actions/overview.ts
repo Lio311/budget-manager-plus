@@ -47,7 +47,11 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
-                    savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } }
+                    savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },
+                    // @ts-ignore
+                    initialBalance: true,
+                    // @ts-ignore
+                    initialSavings: true
                 }
             }),
             db.budget.findFirst({
@@ -58,7 +62,11 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
-                    savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } }
+                    savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },
+                    // @ts-ignore
+                    initialBalance: true,
+                    // @ts-ignore
+                    initialSavings: true
                 }
             })
         ])
@@ -154,7 +162,11 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 incomes: { select: { amount: true, currency: true } },
                 expenses: { select: { amount: true, currency: true } },
                 bills: { select: { amount: true, currency: true } },
-                debts: { select: { monthlyPayment: true, currency: true } }
+                debts: { select: { monthlyPayment: true, currency: true } },
+                // @ts-ignore
+                initialBalance: true,
+                // @ts-ignore
+                initialSavings: true
             },
             orderBy: [
                 { year: 'asc' },
@@ -163,13 +175,23 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
         })
 
         // Calculate net worth history - using real-time API conversion for accuracy
-        // FIX: Use correct initial values based on budget type
-        const initialBalanceToCheck = type === 'BUSINESS' ? (user.businessInitialBalance || 0) : (user.initialBalance || 0)
-        const initialSavingsToCheck = type === 'BUSINESS' ? (user.businessInitialSavings || 0) : (user.initialSavings || 0)
+        // FIX: Use correct initial values based on budget type, prioritizing monthly overrides
+        const globalInitialBalance = type === 'BUSINESS' ? (user.businessInitialBalance || 0) : (user.initialBalance || 0)
+        const globalInitialSavings = type === 'BUSINESS' ? (user.businessInitialSavings || 0) : (user.initialSavings || 0)
 
-        let accumulatedNetWorth = initialBalanceToCheck + initialSavingsToCheck
+        let accumulatedNetWorth = 0
+        let hasStarted = false
 
         const netWorthHistory = await Promise.all(allBudgets.map(async (budget) => {
+            // Apply monthly override if present, otherwise use global/accumulated
+            if (budget.initialBalance !== null || budget.initialSavings !== null) {
+                accumulatedNetWorth = (budget.initialBalance || 0) + (budget.initialSavings || 0)
+                hasStarted = true
+            } else if (!hasStarted) {
+                // If no override yet and we haven't started, use global
+                accumulatedNetWorth = globalInitialBalance + globalInitialSavings
+                hasStarted = true
+            }
             // Convert all amounts to ILS using real API rates
             const incomePromises = budget.incomes.map(item => convertToILS(item.amount, item.currency))
             const expensePromises = budget.expenses.map(item => convertToILS(item.amount, item.currency))
@@ -229,7 +251,9 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     initialBalance: user.initialBalance,
                     initialSavings: user.initialSavings,
                     businessInitialBalance: user.businessInitialBalance,
-                    businessInitialSavings: user.businessInitialSavings
+                    businessInitialSavings: user.businessInitialSavings,
+                    monthlyBalanceOverride: currentBudget?.initialBalance,
+                    monthlySavingsOverride: currentBudget?.initialSavings
                 }
             }
         }

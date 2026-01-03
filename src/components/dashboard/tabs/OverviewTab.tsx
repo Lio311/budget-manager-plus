@@ -10,6 +10,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getOverviewData } from '@/lib/actions/overview'
 import { getHexFromClass, PRESET_COLORS } from '@/lib/constants'
+import { getCurrentBudget, updateBudgetBalances } from '@/lib/actions/budget'
 import { NetWorthChart } from '../charts/NetWorthChart'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -88,8 +89,16 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     useEffect(() => {
         if (overviewData?.user) {
             if (budgetType === 'BUSINESS') {
-                setInitialBalance((overviewData.user as any).businessInitialBalance?.toString() || '')
-                setInitialSavings((overviewData.user as any).businessInitialSavings?.toString() || '')
+                const overrideBalance = (overviewData.user as any).monthlyBalanceOverride
+                const overrideSavings = (overviewData.user as any).monthlySavingsOverride
+
+                setInitialBalance(overrideBalance !== undefined && overrideBalance !== null
+                    ? overrideBalance.toString()
+                    : (overviewData.user as any).businessInitialBalance?.toString() || '')
+
+                setInitialSavings(overrideSavings !== undefined && overrideSavings !== null
+                    ? overrideSavings.toString()
+                    : (overviewData.user as any).businessInitialSavings?.toString() || '')
             } else {
                 setInitialBalance(overviewData.user.initialBalance?.toString() || '')
                 setInitialSavings(overviewData.user.initialSavings?.toString() || '')
@@ -213,17 +222,23 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
 
     const handleSaveSettings = async () => {
-        const payload = isBusiness
-            ? {
-                businessInitialBalance: parseFloat(initialBalance) || 0,
-                businessInitialSavings: parseFloat(initialSavings) || 0
-            }
-            : {
+        let result;
+
+        if (isBusiness) {
+            // For business, we now save to the monthly budget
+            result = await updateBudgetBalances(month, year, 'BUSINESS', {
+                initialBalance: parseFloat(initialBalance) || 0,
+                initialSavings: parseFloat(initialSavings) || 0
+            })
+        } else {
+            // For personal, keep global (or change to monthly too?)
+            // User requested "Business Equity" specifically, so let's stick to business for monthly for now.
+            const payload = {
                 initialBalance: parseFloat(initialBalance) || 0,
                 initialSavings: parseFloat(initialSavings) || 0
             }
-
-        const result = await updateUserSettings(payload)
+            result = await updateUserSettings(payload)
+        }
 
         if (result.success) {
             toast.success('הגדרות עודכנו בהצלחה')

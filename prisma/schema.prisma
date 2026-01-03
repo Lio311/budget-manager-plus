@@ -98,6 +98,9 @@ model Budget {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
+  initialBalance Float? // Monthly override for starting balance
+  initialSavings Float? // Monthly override for starting savings
+  
   // CHANGED: Unique constraint now includes 'type' to allow 2 budgets per month (Personal + Business)
   @@unique([userId, month, year, type])
   @@index([userId, month, year])
