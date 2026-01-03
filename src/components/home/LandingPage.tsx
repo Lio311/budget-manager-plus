@@ -429,7 +429,7 @@ export default function LandingPage() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="text-center mt-12"
+                    className="text-center mt-2"
                 >
                     <SignedOut>
                         <div className="space-y-6">
