@@ -461,16 +461,18 @@ export default function LandingPage() {
                     </SignedOut>
 
                     <SignedIn>
-                        <Link href="/dashboard">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="px-10 py-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
-                            >
-                                כניסה לדשבורד
-                                <LayoutDashboard className="w-6 h-6" />
-                            </motion.button>
-                        </Link>
+                        <div className="flex justify-center">
+                            <Link href="/dashboard">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="px-10 py-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-xl transition-all inline-flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
+                                >
+                                    כניסה לדשבורד
+                                    <LayoutDashboard className="w-6 h-6" />
+                                </motion.button>
+                            </Link>
+                        </div>
                     </SignedIn>
                 </motion.div >
 
