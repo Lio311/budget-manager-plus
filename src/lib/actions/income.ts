@@ -399,3 +399,29 @@ export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SING
         return { success: false, error: 'Failed to delete income' }
     }
 }
+
+export async function getClientUninvoicedIncomes(clientId: string) {
+    try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+
+        const db = await authenticatedPrisma(userId);
+
+        const incomes = await db.income.findMany({
+            where: {
+                clientId,
+                invoiceId: null
+            },
+            orderBy: { date: 'desc' },
+            include: {
+                client: true,
+                invoice: true
+            }
+        })
+
+        return { success: true, data: incomes }
+    } catch (error) {
+        console.error('Error fetching client incomes:', error)
+        return { success: false, error: 'Failed to fetch client incomes' }
+    }
+}
