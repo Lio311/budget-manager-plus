@@ -105,7 +105,8 @@ export default function BusinessLandingPage() {
             bgColor: 'from-red-600 via-red-700 to-red-900',
             textColor: 'text-white',
             accentColor: 'red',
-            tag: 'מעקב | ניתוח | חיסכון'
+            tag: 'מעקב | ניתוח | חיסכון',
+            image: '/screenshots/expenses.png'
         },
         {
             id: 8,

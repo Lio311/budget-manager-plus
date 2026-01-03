@@ -27,6 +27,7 @@ interface Bill {
     dueDate: Date
     isPaid: boolean
     paymentMethod?: string | null
+    isRecurring: boolean
 }
 
 interface BillData {
@@ -353,18 +354,25 @@ export function BillsTab() {
                                                 <div className="flex flex-wrap items-center justify-between w-full gap-y-2">
                                                     {/* Right side (RTL): Checkbox + Name + Date */}
                                                     <div className="flex items-center gap-3 flex-1 min-w-[200px]">
-                                                        <button
-                                                            onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
-                                                            className={`
-                                                                w-14 h-7 rounded-full text-[10px] font-medium transition-all duration-200 flex items-center justify-center shrink-0
-                                                                ${bill.isPaid
-                                                                    ? 'bg-[#00c875] text-white hover:bg-[#00b065] shadow-sm'
-                                                                    : 'bg-[#ffcb00] text-[#323338] hover:bg-[#eabb00]'
-                                                                }
-                                                            `}
-                                                        >
-                                                            {bill.isPaid ? 'שולם' : 'ממתין'}
-                                                        </button>
+                                                        <div className="flex flex-col items-center gap-1 shrink-0">
+                                                            <button
+                                                                onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
+                                                                className={`
+                                                                    w-14 h-7 rounded-full text-[10px] font-medium transition-all duration-200 flex items-center justify-center
+                                                                    ${bill.isPaid
+                                                                        ? 'bg-[#00c875] text-white hover:bg-[#00b065] shadow-sm'
+                                                                        : 'bg-[#ffcb00] text-[#323338] hover:bg-[#eabb00]'
+                                                                    }
+                                                                `}
+                                                            >
+                                                                {bill.isPaid ? 'שולם' : 'ממתין'}
+                                                            </button>
+                                                            {bill.isRecurring && (
+                                                                <span className="bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 px-2 py-0.5 rounded-full text-[9px] font-bold">
+                                                                    קבוע
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                         <div className="flex flex-col min-w-0 flex-1">
                                                             <span className={`font-bold text-sm sm:text-base transition-colors truncate ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338] dark:text-gray-100'}`}>
                                                                 {bill.name}
