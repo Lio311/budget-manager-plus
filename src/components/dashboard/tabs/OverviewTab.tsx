@@ -24,7 +24,8 @@ import { toast } from 'sonner'
 import { swrConfig } from '@/lib/swr-config'
 import { FinancialAdvisorButton } from '@/components/dashboard/FinancialAdvisorButton'
 import { FeedbackButton } from '@/components/dashboard/FeedbackButton'
-import { BusinessSettings } from '@/components/settings/BusinessSettings'
+import { BusinessSettings } from '@/components/dashboard/tabs/BusinessSettings'
+import { IntegrationsSettings } from '@/components/settings/IntegrationsSettings'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { CustomTooltip } from '../charts/CustomTooltip'
 import { EmptyChartState } from '@/components/dashboard/charts/EmptyChartState'
@@ -307,8 +308,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         >
                             <Share2
                                 className={`w-5 h-5 transition-colors duration-300 ${(overviewData?.user as any)?.referralProgramActive
-                                        ? 'text-yellow-500 fill-yellow-500/20'
-                                        : 'text-[#323338] dark:text-gray-100'
+                                    ? 'text-yellow-500 fill-yellow-500/20'
+                                    : 'text-[#323338] dark:text-gray-100'
                                     }`}
                             />
                         </Button>
@@ -666,6 +667,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="details">פרטי העסק</TabsTrigger>
                                 <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
+                                <TabsTrigger value="integrations">אוטומציות</TabsTrigger>
                             </TabsList>
                             <TabsContent value="details" className="mt-4">
                                 <BusinessSettings onSuccess={() => setIsSettingsOpen(false)} />
@@ -712,47 +714,62 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     </CardContent>
                                 </Card>
                             </TabsContent>
+                            <TabsContent value="integrations" className="mt-4">
+                                <IntegrationsSettings />
+                            </TabsContent>
                         </Tabs>
                     </DialogContent>
                 ) : (
                     <DialogContent dir="rtl" className="sm:max-w-[425px]">
                         <DialogHeader className="text-right sm:text-right">
-                            <DialogTitle className="text-right">הגדרות תצוגה</DialogTitle>
+                            <DialogTitle className="text-right">הגדרות</DialogTitle>
                         </DialogHeader>
-                        {/* Settings Form Content */}
-                        <div className="space-y-4 py-4 text-right">
-                            <div className="space-y-2">
-                                <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
-                                <FormattedNumberInput
-                                    value={initialBalance}
-                                    onChange={(e) => {
-                                        const val = parseFloat(e.target.value)
-                                        if (val < 0) return
-                                        setInitialBalance(e.target.value)
-                                    }}
-                                    min="0"
-                                    dir="ltr"
-                                    className="text-right"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
-                                <FormattedNumberInput
-                                    value={initialSavings}
-                                    onChange={(e) => {
-                                        const val = parseFloat(e.target.value)
-                                        if (val < 0) return
-                                        setInitialSavings(e.target.value)
-                                    }}
-                                    min="0"
-                                    dir="ltr"
-                                    className="text-right"
-                                />
-                            </div>
-                        </div>
-                        <DialogFooter className="sm:justify-end gap-2">
-                            <Button onClick={handleSaveSettings} className="bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
-                        </DialogFooter>
+                        <Tabs defaultValue="display" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="display">תצוגה</TabsTrigger>
+                                <TabsTrigger value="integrations">אוטומציות</TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="display">
+                                {/* Settings Form Content */}
+                                <div className="space-y-4 py-4 text-right">
+                                    <div className="space-y-2">
+                                        <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
+                                        <FormattedNumberInput
+                                            value={initialBalance}
+                                            onChange={(e) => {
+                                                const val = parseFloat(e.target.value)
+                                                if (val < 0) return
+                                                setInitialBalance(e.target.value)
+                                            }}
+                                            min="0"
+                                            dir="ltr"
+                                            className="text-right"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
+                                        <FormattedNumberInput
+                                            value={initialSavings}
+                                            onChange={(e) => {
+                                                const val = parseFloat(e.target.value)
+                                                if (val < 0) return
+                                                setInitialSavings(e.target.value)
+                                            }}
+                                            min="0"
+                                            dir="ltr"
+                                            className="text-right"
+                                        />
+                                    </div>
+                                    <div className="pt-4">
+                                        <Button onClick={handleSaveSettings} className="w-full bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
+                                    </div>
+                                </div>
+                            </TabsContent>
+                            <TabsContent value="integrations" className="mt-4">
+                                <IntegrationsSettings />
+                            </TabsContent>
+                        </Tabs>
                     </DialogContent>
                 )}
             </Dialog >
