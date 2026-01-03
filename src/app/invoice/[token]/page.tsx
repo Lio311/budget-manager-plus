@@ -70,18 +70,33 @@ export default function PublicInvoicePage() {
     }
 
     const handleDownloadPDF = async () => {
-        const element = document.getElementById('invoice-content')
-        if (!element) return
-
         try {
             toast.info('מכין את קובץ ה-PDF...')
 
-            // Use html2canvas to capture the element
-            const canvas = await html2canvas(element, {
+            const element = document.getElementById('invoice-content')
+            if (!element) return
+
+            // Create a temporary container to force desktop layout
+            const container = document.createElement('div')
+            container.style.position = 'absolute'
+            container.style.left = '-9999px'
+            container.style.top = '0'
+            container.style.width = '1200px' // Force desktop width to trigger md: styles
+
+            // Clone the element
+            const clone = element.cloneNode(true) as HTMLElement
+            container.appendChild(clone)
+            document.body.appendChild(container)
+
+            const canvas = await html2canvas(clone, {
                 scale: 2, // Higher scale for better quality
                 useCORS: true, // Allow loading cross-origin images (like signatures/logos)
-                logging: false
+                logging: false,
+                windowWidth: 1200 // Ensure media queries match desktop
             })
+
+            // Cleanup
+            document.body.removeChild(container)
 
             const imgData = canvas.toDataURL('image/png')
             const pdf = new jsPDF({
@@ -214,8 +229,8 @@ export default function PublicInvoicePage() {
                     </div>
 
                     {/* Line Items */}
-                    <div className="mb-12">
-                        <table className="w-full text-right">
+                    <div className="mb-12 overflow-x-auto">
+                        <table className="w-full text-right min-w-[600px]">
                             <thead className="border-b-2 border-gray-100">
                                 <tr>
                                     <th className="py-3 text-sm font-bold text-gray-500">תיאור</th>
@@ -234,134 +249,137 @@ export default function PublicInvoicePage() {
                                     </tr>
                                 ))}
                             </tbody>
-                        </table>
-                    </div>
-
-                    {/* Totals - Green Gradient Box */}
-                    <div className="flex justify-end mb-12">
-                        <div className="w-full md:w-96 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl p-6 shadow-md">
-                            <div className="space-y-3">
-                                <div className="flex justify-between text-emerald-50 font-medium">
-                                    <span>סה"כ לפני מע"מ:</span>
-                                    <span>{formatCurrency(invoice.subtotal)}</span>
-                                </div>
-                                <div className="flex justify-between text-emerald-50 font-medium">
-                                    <span>מע"מ ({invoice.vatRate * 100}%):</span>
-                                    <span>{formatCurrency(invoice.vatAmount)}</span>
-                                </div>
-                                <div className="border-t border-emerald-400 my-2"></div>
-                                <div className="flex justify-between text-2xl font-bold">
-                                    <span>סה"כ לתשלום:</span>
-                                    <span>{formatCurrency(invoice.total)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Notes */}
-                    {invoice.notes && (
-                        <div className="mb-12 p-4 bg-gray-50 rounded text-sm text-gray-600">
-                            <strong>הערות:</strong> {invoice.notes}
-                        </div>
-                    )}
-
-                    {/* Signature Area */}
-                    <div className="mt-8 border-t pt-8 break-inside-avoid">
-                        <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 md:gap-0">
-                            {/* Business Signature */}
-                            <div className="text-center">
-                                {business?.signatureUrl ? (
-                                    <div className="mb-2">
-                                        <Image
-                                            src={business.signatureUrl}
-                                            alt="חתימת העסק"
-                                            width={150}
-                                            height={60}
-                                            className="object-contain mx-auto"
-                                            unoptimized
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="h-16 mb-2"></div>
-                                )}
-                                <div className="border-t border-gray-300 w-48 mt-2 pt-2 text-sm text-gray-500">
-                                    חתימת המפיק
-                                </div>
-                            </div>
-
-                            {/* Client Signature */}
-                            <div className="text-center">
-                                {invoice.isSigned && invoice.signature ? (
-                                    <div className="mb-2">
-                                        <img
-                                            src={invoice.signature}
-                                            alt="חתימת הלקוח"
-                                            className="h-16 object-contain mx-auto"
-                                        />
-                                        <p className="text-xs text-green-600 mt-1 flex items-center justify-center gap-1">
-                                            <CheckCircle className="h-3 w-3" />
-                                            אושר דיגיטלית ב-{format(new Date(invoice.signedAt), 'dd/MM/yyyy')}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    !isSigning && (
-                                        <div className="h-16 flex items-center justify-center text-gray-400 text-sm italic mb-2">
-                                            ממתין לחתימה...
-                                        </div>
-                                    )
-                                )}
-                                <div className="border-t border-gray-300 w-48 mt-2 pt-2 text-sm text-gray-500">
-                                    חתימת הלקוח
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-8 pt-4 border-t border-gray-100 flex flex-col items-center justify-center opacity-70">
-                        <span className="text-xs text-gray-400 mb-1">הופק על ידי</span>
-                        <Image
-                            src="/K-LOGO.png"
-                            alt="KeseFlow"
-                            width={80}
-                            height={32}
-                            className="object-contain opacity-80 hover:opacity-100 transition-opacity"
-                        />
-                    </div>
-                </Card>
-
-                {/* Signing Pad (Only if not signed) */}
-                {!invoice.isSigned && (
-                    <Card className="p-6 bg-white shadow-md print:hidden">
-                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                            <PenTool className="h-5 w-5 text-green-600" />
-                            חתימה דיגיטלית
-                        </h3>
-                        <p className="text-sm text-gray-500 mb-4">
-                            אנא חתום בתיבה למטה ולחץ על "אשר חתימה" כדי לאשר את קבלת החשבונית.
-                        </p>
-
-                        <div className="mb-4 touch-none">
-                            <SignaturePad
-                                value={signatureData}
-                                onChange={setSignatureData}
-                                onClear={() => setSignatureData('')}
-                            />
-                        </div>
-
-                        <div className="flex gap-4">
-                            <Button onClick={handleSign} disabled={isSigning || !signatureData} className="flex-1 bg-green-600 hover:bg-green-700">
-                                {isSigning ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        שומר...
-                                    </>
-                                ) : 'אשר חתימה'}
-                            </Button>
-
-                        </div>
-                    </Card>
-                )}
+                        </tbody>
+                    </table>
             </div>
-        </div>
+
+            {/* Totals - Green Gradient Box */}
+            <div className="flex justify-end mb-12">
+                <div className="w-full md:w-96 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl p-6 shadow-md">
+                    <div className="space-y-3">
+                        <div className="flex justify-between text-emerald-50 font-medium">
+                            <span>סה"כ לפני מע"מ:</span>
+                            <span>{formatCurrency(invoice.subtotal)}</span>
+                        </div>
+                        <div className="flex justify-between text-emerald-50 font-medium">
+                            <span>מע"מ ({invoice.vatRate * 100}%):</span>
+                            <span>{formatCurrency(invoice.vatAmount)}</span>
+                        </div>
+                        <div className="border-t border-emerald-400 my-2"></div>
+                        <div className="flex justify-between text-2xl font-bold">
+                            <span>סה"כ לתשלום:</span>
+                            <span>{formatCurrency(invoice.total)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Notes */}
+            {invoice.notes && (
+                <div className="mb-12 p-4 bg-gray-50 rounded text-sm text-gray-600">
+                    <strong>הערות:</strong> {invoice.notes}
+                </div>
+            )}
+
+            {/* Signature Area */}
+            <div className="mt-8 border-t pt-8 break-inside-avoid">
+                <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 md:gap-0">
+                    {/* Business Signature */}
+                    <div className="text-center">
+                        {business?.signatureUrl ? (
+                            <div className="mb-2">
+                                <Image
+                                    src={business.signatureUrl}
+                                    alt="חתימת העסק"
+                                    width={150}
+                                    height={60}
+                                    className="object-contain mx-auto"
+                                    unoptimized
+                                />
+                            </div>
+                        ) : (
+                            <div className="h-16 mb-2"></div>
+                        )}
+                        <div className="border-t border-gray-300 w-48 mt-2 pt-2 text-sm text-gray-500">
+                            חתימת המפיק
+                        </div>
+                    </div>
+
+                    {/* Client Signature */}
+                    <div className="text-center">
+                        {invoice.isSigned && invoice.signature ? (
+                            <div className="mb-2">
+                                <img
+                                    src={invoice.signature}
+                                    alt="חתימת הלקוח"
+                                    className="h-16 object-contain mx-auto"
+                                />
+                                <p className="text-xs text-green-600 mt-1 flex items-center justify-center gap-1">
+                                    <CheckCircle className="h-3 w-3" />
+                                    אושר דיגיטלית ב-{format(new Date(invoice.signedAt), 'dd/MM/yyyy')}
+                                </p>
+                            </div>
+                        ) : (
+                            !isSigning && (
+                                <div className="h-16 flex items-center justify-center text-gray-400 text-sm italic mb-2">
+                                    ממתין לחתימה...
+                                </div>
+                            )
+                        )}
+                        <div className="border-t border-gray-300 w-48 mt-2 pt-2 text-sm text-gray-500">
+                            חתימת הלקוח
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-8 pt-4 border-t border-gray-100 flex flex-col items-center justify-center opacity-70">
+                <span className="text-xs text-gray-400 mb-1">הופק על ידי</span>
+                <Image
+                    src="/K-LOGO.png"
+                    alt="KeseFlow"
+                    width={80}
+                    height={32}
+                    className="object-contain opacity-80 hover:opacity-100 transition-opacity"
+                />
+            </div>
+        </Card>
+
+                {/* Signing Pad (Only if not signed) */ }
+    {
+        !invoice.isSigned && (
+            <Card className="p-6 bg-white shadow-md print:hidden">
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                    <PenTool className="h-5 w-5 text-green-600" />
+                    חתימה דיגיטלית
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                    אנא חתום בתיבה למטה ולחץ על "אשר חתימה" כדי לאשר את קבלת החשבונית.
+                </p>
+
+                <div className="mb-4 touch-none">
+                    <SignaturePad
+                        value={signatureData}
+                        onChange={setSignatureData}
+                        onClear={() => setSignatureData('')}
+                    />
+                </div>
+
+                <div className="flex gap-4">
+                    <Button onClick={handleSign} disabled={isSigning || !signatureData} className="flex-1 bg-green-600 hover:bg-green-700">
+                        {isSigning ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                שומר...
+                            </>
+                        ) : 'אשר חתימה'}
+                    </Button>
+
+                </div>
+            </Card>
+        )
+    }
+            </div >
+        </div >
     )
 }
