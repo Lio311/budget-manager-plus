@@ -155,13 +155,10 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
             <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                     <div className="flex items-center justify-between">
-                        <DialogTitle className="text-xl flex items-center justify-start gap-2">
+                        <DialogTitle className="text-xl">
                             איזור השותפים שלך
-                            <span className="text-2xl">🏆</span>
                         </DialogTitle>
-                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
-                            סטטוס זהב
-                        </Badge>
+
                     </div>
                 </DialogHeader>
 
