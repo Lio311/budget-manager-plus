@@ -174,9 +174,9 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                             <thead className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700">
                                 <tr>
                                     <th className="px-4 py-3 text-sm font-medium text-gray-500">תיאור</th>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 w-24">כמות</th>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 w-32">מחיר יח'</th>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 w-32">סה"כ</th>
+                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 text-center w-24">כמות</th>
+                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 text-center w-32">מחיר יח'</th>
+                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 text-center w-32">סה"כ</th>
                                     <th className="px-4 py-3 w-10"></th>
                                 </tr>
                             </thead>
@@ -209,7 +209,7 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                                                 className="w-full text-center bg-transparent border-none focus:ring-0 p-1"
                                             />
                                         </td>
-                                        <td className="p-2 text-left font-medium">
+                                        <td className="p-2 text-center font-medium">
                                             {(item.quantity * item.price).toLocaleString()} ₪
                                         </td>
                                         <td className="p-2 text-center pointer-events-auto">
