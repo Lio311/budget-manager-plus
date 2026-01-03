@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
 import {
-    Loader2, Plus, TrendingDown
+    Loader2, Plus, TrendingDown, Settings
 } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -23,7 +23,7 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { addIncome } from '@/lib/actions/income'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
-import { addCategory } from '@/lib/actions/category'
+import { CategoryManagementDialog } from './CategoryManagementDialog'
 
 interface Category {
     id: string
@@ -53,9 +53,6 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     const isBusiness = budgetType === 'BUSINESS'
 
     const [submitting, setSubmitting] = useState(false)
-    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
-    const [newCategoryName, setNewCategoryName] = useState('')
-    const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
 
     const [newIncome, setNewIncome] = useState({
         source: '',
@@ -64,7 +61,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         currency: 'ILS',
         date: format(new Date(), 'yyyy-MM-dd'),
         isRecurring: false,
-        recurringEndDate: '',
+        recurringEndDate: undefined as string | undefined,
         clientId: '',
         amountBeforeVat: '',
         vatRate: '0.18',
@@ -167,7 +164,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 currency: budgetCurrency,
                 date: format(new Date(), 'yyyy-MM-dd'),
                 isRecurring: false,
-                recurringEndDate: '',
+                recurringEndDate: undefined,
                 clientId: '',
                 amountBeforeVat: '',
                 vatRate: '0.18',
@@ -185,42 +182,28 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         }
     }
 
-    async function handleAddCategory() {
-        if (!newCategoryName.trim()) return
 
-        setSubmitting(true)
-        try {
-            const result = await addCategory({
-                name: newCategoryName.trim(),
-                type: 'income',
-                color: newCategoryColor,
-                scope: budgetType
-            })
-
-            if (result.success) {
-                toast({ title: 'הצלחה', description: 'קטגוריה נוספה בהצלחה' })
-                setNewCategoryName('')
-                setIsAddCategoryOpen(false)
-                if (onCategoriesChange) await onCategoriesChange()
-
-                const newCatName = newCategoryName.trim()
-                setNewIncome(prev => ({ ...prev, category: newCatName }))
-            } else {
-                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף קטגוריה', variant: 'destructive' })
-            }
-        } catch (error: any) {
-            console.error('Add category failed:', error)
-            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשרת', variant: 'destructive' })
-        } finally {
-            setSubmitting(false)
-        }
-    }
 
     return (
         <div>
             <div className="mb-4 flex items-center gap-2">
                 <TrendingDown className={`h-5 w-5 rotate-180 ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`} />
                 <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד מכירה / הכנסה' : 'הוספת הכנסה'}</h3>
+                <div className="mr-auto">
+                    <CategoryManagementDialog
+                        categories={categories}
+                        type="income"
+                        scope={budgetType}
+                        onChange={() => {
+                            if (onCategoriesChange) onCategoriesChange()
+                        }}
+                        trigger={
+                            <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
+                                <Settings className="h-4 w-4" />
+                            </Button>
+                        }
+                    />
+                </div>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -262,24 +245,19 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         </select>
                     </div>
                     <div className="pt-6">
-                        <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 hover:bg-gray-50"><Plus className="h-4 w-4" /></Button>
-                            </PopoverTrigger>
-
-                            <PopoverContent className="w-80 p-4 z-50 rounded-xl shadow-xl" dir="rtl">
-                                <div className="space-y-4">
-                                    <h4 className="font-medium mb-4 text-[#323338] dark:text-gray-100">קטגוריה חדשה</h4>
-                                    <Input className="h-10" placeholder="שם הקטגוריה" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} />
-                                    <div className="grid grid-cols-5 gap-2">
-                                        {PRESET_COLORS.map(color => (
-                                            <div key={color.name} className={`h-8 w-8 rounded-full cursor-pointer transition-transform hover:scale-110 border-2 ${color.class.split(' ')[0]} ${newCategoryColor === color.class ? 'border-[#323338] scale-110' : 'border-transparent'} `} onClick={() => setNewCategoryColor(color.class)} />
-                                        ))}
-                                    </div>
-                                    <Button onClick={handleAddCategory} className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg h-10" disabled={!newCategoryName || submitting}>שמור</Button>
-                                </div>
-                            </PopoverContent>
-                        </Popover>
+                        <CategoryManagementDialog
+                            categories={categories}
+                            type="income"
+                            scope={budgetType}
+                            onChange={() => {
+                                if (onCategoriesChange) onCategoriesChange()
+                            }}
+                            trigger={
+                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800" title="ניהול קטגוריות">
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                            }
+                        />
                     </div>
                 </div>
 
@@ -379,7 +357,19 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 {/* Recurring Checkbox */}
                 <div className="flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full">
                     <div className="flex items-center gap-2">
-                        <Checkbox id="recurring-income" checked={newIncome.isRecurring} onCheckedChange={(checked) => setNewIncome({ ...newIncome, isRecurring: checked as boolean })} className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" />
+                        <Checkbox
+                            id="recurring-income"
+                            checked={newIncome.isRecurring}
+                            onCheckedChange={(checked) => {
+                                const isRecurring = checked as boolean
+                                setNewIncome(prev => ({
+                                    ...prev,
+                                    isRecurring,
+                                    recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
+                                }))
+                            }}
+                            className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                        />
                         <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הכנסה קבועה</label>
                     </div>
                     {newIncome.isRecurring && (
@@ -388,9 +378,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
                                 <RecurringEndDatePicker
                                     date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
-                                    setDate={(date) => setNewIncome({ ...newIncome, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                    setDate={(date) => setNewIncome(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
                                     fromDate={startOfMonth}
-                                    placeholder="בחר תאריך"
+                                    placeholder="בחר תאריך סיום"
                                 />
                             </div>
                         </div>

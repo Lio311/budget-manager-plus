@@ -107,62 +107,64 @@ export default function LandingPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5, duration: 0.8 }}
-                        className="flex flex-col items-center gap-4 justify-center mt-10"
+                        className="flex flex-col items-center justify-center mt-10 w-full"
                     >
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-                            <SignedOut>
-                                <SignUpButton mode="modal">
-                                    <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
-                                    >
-                                        הרשמה חינם
-                                    </motion.button>
-                                </SignUpButton>
-                                <SignInButton mode="modal">
-                                    <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-full font-bold text-lg transition-all shadow-md"
-                                    >
-                                        כניסה למערכת
-                                    </motion.button>
-                                </SignInButton>
-                            </SignedOut>
+                        <div className="flex flex-col items-center gap-4 w-fit mx-auto">
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                                <SignedOut>
+                                    <SignUpButton mode="modal">
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
+                                        >
+                                            הרשמה חינם
+                                        </motion.button>
+                                    </SignUpButton>
+                                    <SignInButton mode="modal">
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-full font-bold text-lg transition-all shadow-md"
+                                        >
+                                            כניסה למערכת
+                                        </motion.button>
+                                    </SignInButton>
+                                </SignedOut>
 
-                            <SignedIn>
-                                <Link href="/dashboard">
-                                    <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
+                                <SignedIn>
+                                    <Link href="/dashboard" className="flex">
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
+                                        >
+                                            כניסה לדשבורד
+                                            <LayoutDashboard className="w-6 h-6" />
+                                        </motion.button>
+                                    </Link>
+                                </SignedIn>
+                            </div>
+
+                            {/* Mobile Interface Toggle */}
+                            <div className="md:hidden flex p-1 gap-1 bg-white/40 backdrop-blur-md border border-white/20 rounded-full shadow-lg mt-2">
+                                <Link href="/personal">
+                                    <Button
+                                        variant="ghost"
+                                        className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
                                     >
-                                        כניסה לדשבורד
-                                        <LayoutDashboard className="w-6 h-6" />
-                                    </motion.button>
+                                        ממשק אישי
+                                    </Button>
                                 </Link>
-                            </SignedIn>
-                        </div>
-
-                        {/* Mobile Interface Toggle */}
-                        <div className="md:hidden flex p-1 gap-1 bg-white/40 backdrop-blur-md border border-white/20 rounded-full shadow-lg mt-4" dir="ltr">
-                            <Link href="/business">
-                                <Button
-                                    variant="ghost"
-                                    className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
-                                >
-                                    ממשק עסקי
-                                </Button>
-                            </Link>
-                            <Link href="/personal">
-                                <Button
-                                    variant="ghost"
-                                    className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
-                                >
-                                    ממשק אישי
-                                </Button>
-                            </Link>
+                                <Link href="/business">
+                                    <Button
+                                        variant="ghost"
+                                        className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
+                                    >
+                                        ממשק עסקי
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </motion.div>
                 </motion.div>

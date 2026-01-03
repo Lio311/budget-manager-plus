@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
@@ -191,7 +192,14 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 <Checkbox
                     id="recurring"
                     checked={formData.isRecurring}
-                    onCheckedChange={(checked) => setFormData({ ...formData, isRecurring: checked as boolean })}
+                    onCheckedChange={(checked) => {
+                        const isRecurring = checked as boolean
+                        setFormData(prev => ({
+                            ...prev,
+                            isRecurring,
+                            recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
+                        }))
+                    }}
                 />
                 <label
                     htmlFor="recurring"
@@ -220,9 +228,9 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
                                 <RecurringEndDatePicker
                                     date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
-                                    setDate={(date) => setFormData({ ...formData, recurringEndDate: date ? date.toISOString() : undefined })}
+                                    setDate={(date) => setFormData(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
                                     fromDate={startOfMonth}
-                                    placeholder="בחר תאריך"
+                                    placeholder="בחר תאריך סיום"
                                     className="w-full h-9 bg-white"
                                 />
                             </div>

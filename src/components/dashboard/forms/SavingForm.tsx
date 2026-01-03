@@ -312,7 +312,14 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                         <Checkbox
                             id="recurring-saving"
                             checked={newSaving.isRecurring}
-                            onCheckedChange={(checked) => setNewSaving({ ...newSaving, isRecurring: checked as boolean })}
+                            onCheckedChange={(checked) => {
+                                const isRecurring = checked as boolean
+                                setNewSaving(prev => ({
+                                    ...prev,
+                                    isRecurring,
+                                    recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
+                                }))
+                            }}
                             className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                         />
                         <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">
@@ -326,9 +333,9 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
                                 <RecurringEndDatePicker
                                     date={newSaving.recurringEndDate ? new Date(newSaving.recurringEndDate) : undefined}
-                                    setDate={(date) => setNewSaving({ ...newSaving, recurringEndDate: date })}
+                                    setDate={(date) => setNewSaving(prev => ({ ...prev, recurringEndDate: date }))}
                                     fromDate={startOfMonth}
-                                    placeholder="בחר תאריך"
+                                    placeholder="בחר תאריך סיום"
                                 />
                             </div>
                         </div>

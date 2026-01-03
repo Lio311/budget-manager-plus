@@ -180,6 +180,8 @@ export function ExpensesTab() {
         date: '',
         supplierId: '',
         vatAmount: '',
+        amountBeforeVat: '',
+        vatRate: '0.18',
         isDeductible: true,
         paymentMethod: ''
     })
@@ -242,6 +244,8 @@ export function ExpensesTab() {
             date: exp.date ? format(new Date(exp.date), 'yyyy-MM-dd') : '',
             supplierId: exp.supplierId || '',
             vatAmount: exp.vatAmount?.toString() || '',
+            amountBeforeVat: exp.amountBeforeVat?.toString() || exp.amount.toString(),
+            vatRate: exp.vatRate?.toString() || '0.18',
             isDeductible: exp.isDeductible ?? true,
             paymentMethod: exp.paymentMethod || ''
         })
@@ -271,6 +275,8 @@ export function ExpensesTab() {
             currency: editData.currency as "ILS" | "USD" | "EUR" | "GBP",
             date: editData.date,
             supplierId: isBusiness ? editData.supplierId || undefined : undefined,
+            amountBeforeVat: isBusiness ? parseFloat(editData.amountBeforeVat) || undefined : undefined,
+            vatRate: isBusiness ? parseFloat(editData.vatRate) || undefined : undefined,
             vatAmount: isBusiness ? parseFloat(editData.vatAmount) || undefined : undefined,
             isDeductible: isBusiness ? editData.isDeductible : undefined,
             paymentMethod: editData.paymentMethod || undefined
@@ -500,7 +506,27 @@ export function ExpensesTab() {
                                         <div className="space-y-4">
                                             <div className="grid grid-cols-2 gap-3">
                                                 <Input value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="תיאור" />
-                                                <FormattedNumberInput value={editData.amount} onChange={(e) => setEditData({ ...editData, amount: e.target.value })} placeholder="סכום" />
+                                                <FormattedNumberInput
+                                                    value={isBusiness ? editData.amountBeforeVat : editData.amount}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        if (isBusiness) {
+                                                            const rate = parseFloat(editData.vatRate) || 1.18;
+                                                            const n = parseFloat(val) || 0;
+                                                            const vat = n * 0.18; // Default to 18% if rate is missing/weird during edit
+                                                            const total = n + vat;
+                                                            setEditData({
+                                                                ...editData,
+                                                                amountBeforeVat: val,
+                                                                vatAmount: vat.toFixed(2),
+                                                                amount: total.toFixed(2)
+                                                            });
+                                                        } else {
+                                                            setEditData({ ...editData, amount: val });
+                                                        }
+                                                    }}
+                                                    placeholder={isBusiness ? 'סכום לפני מע"מ' : 'סכום'}
+                                                />
                                             </div>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <select

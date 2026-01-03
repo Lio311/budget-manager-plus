@@ -413,21 +413,11 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             checked={newExpense.isRecurring}
                             onCheckedChange={(checked) => {
                                 const isRecurring = checked as boolean
-                                let recurringEndDate = newExpense.recurringEndDate
-
-                                if (isRecurring && !recurringEndDate) {
-                                    // Default to 1 year from the selected date (or today)
-                                    const baseDate = newExpense.date ? new Date(newExpense.date) : new Date()
-                                    const defaultEndDate = new Date(baseDate)
-                                    defaultEndDate.setFullYear(defaultEndDate.getFullYear() + 1)
-                                    recurringEndDate = format(defaultEndDate, 'yyyy-MM-dd')
-                                }
-
-                                setNewExpense({
-                                    ...newExpense,
+                                setNewExpense(prev => ({
+                                    ...prev,
                                     isRecurring,
-                                    recurringEndDate: isRecurring ? recurringEndDate : undefined
-                                })
+                                    recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
+                                }))
                             }}
                             className={isBusiness ? 'data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600' : 'data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]'}
                         />
@@ -439,9 +429,9 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                                 <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
                                 <RecurringEndDatePicker
                                     date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
-                                    setDate={(date) => setNewExpense({ ...newExpense, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : '' })}
+                                    setDate={(date) => setNewExpense(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
                                     fromDate={startOfMonth}
-                                    placeholder="בחר תאריך"
+                                    placeholder="בחר תאריך סיום"
                                 />
                             </div>
                         </div>
