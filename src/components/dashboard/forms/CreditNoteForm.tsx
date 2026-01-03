@@ -104,7 +104,12 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
             return
         }
 
-        await handleCreate(formData)
+        setIsSubmitting(true)
+        try {
+            await handleCreate(formData)
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     const vatAmount = selectedInvoice ? formData.creditAmount * selectedInvoice.vatRate : 0
@@ -219,9 +224,9 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                 <Button
                     type="submit"
                     className="bg-purple-600 hover:bg-purple-700 text-white w-full md:w-auto"
-                    disabled={isPending || !formData.invoiceId}
+                    disabled={isSubmitting || !formData.invoiceId}
                 >
-                    {isPending ? (
+                    {isSubmitting ? (
                         <>
                             <Loader2 className="h-4 w-4 animate-spin ml-2" />
                             יוצר...
