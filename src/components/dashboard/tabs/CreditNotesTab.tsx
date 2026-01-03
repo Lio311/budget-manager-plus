@@ -198,7 +198,7 @@ export function CreditNotesTab() {
                                 {/* Info */}
                                 <div className="flex-1 space-y-1">
                                     <div className="flex items-center gap-2">
-                                        <span className="font-bold text-orange-600 dark:text-purple-400">{creditNote.creditNoteNumber}</span>
+                                        <span className="font-bold text-orange-600 dark:text-orange-400">{creditNote.creditNoteNumber}</span>
                                         <span className="text-sm text-gray-500">← חשבונית {creditNote.invoiceNumber}</span>
                                     </div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400">{creditNote.clientName}</div>
