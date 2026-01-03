@@ -22,7 +22,7 @@ export default function PersonalLandingPage() {
             bgColor: 'from-slate-900 via-slate-800 to-slate-900',
             textColor: 'text-white',
             accentColor: 'emerald',
-            image: '/assets/dashboard_mockup.png'
+            image: '/screenshots/personal/home.png'
         },
         {
             id: 1,
@@ -57,7 +57,8 @@ export default function PersonalLandingPage() {
             bgColor: 'from-orange-600 via-orange-700 to-orange-900',
             textColor: 'text-white',
             accentColor: 'orange',
-            tag: 'תזכורות | מעקב | תזרים'
+            tag: 'תזכורות | מעקב | תזרים',
+            image: '/screenshots/personal/bills.png'
         },
         {
             id: 4,
@@ -394,19 +395,14 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                     >
                         {section.image ? (
                             <div className="relative w-full h-full flex items-center justify-center">
-
-                                <div className="relative bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-2 shadow-2xl overflow-hidden">
-                                    <Image
-                                        src={section.image}
-                                        alt={section.title}
-                                        width={1000}
-                                        height={800}
-                                        className="w-full h-auto rounded-2xl"
-                                        priority={index === 0}
-                                    />
-                                    {/* Overlay Gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
-                                </div>
+                                <Image
+                                    src={section.image}
+                                    alt={section.title}
+                                    width={1000}
+                                    height={800}
+                                    className="w-full h-auto rounded-2xl shadow-2xl"
+                                    priority={index === 0}
+                                />
                             </div>
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
