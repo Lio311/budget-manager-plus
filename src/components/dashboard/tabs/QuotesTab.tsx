@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown } from 'lucide-react'
+import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown, Link as LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
-import { getQuotes, updateQuoteStatus, type QuoteFormData } from '@/lib/actions/quotes'
+import { getQuotes, updateQuoteStatus, generateQuoteLink, type QuoteFormData } from '@/lib/actions/quotes'
 import { getClients } from '@/lib/actions/clients'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
@@ -142,6 +142,22 @@ export function QuotesTab() {
             toast.success('PDF הורד בהצלחה')
         } catch (error) {
             toast.error('שגיאה בהורדת PDF')
+        }
+    }
+
+    const handleCopyLink = async (quoteId: string) => {
+        try {
+            const result = await generateQuoteLink(quoteId)
+            if (result.success && result.token) {
+                const link = `${window.location.origin}/quote/${result.token}`
+                await navigator.clipboard.writeText(link)
+                toast.success('הקישור הועתק ללוח')
+            } else {
+                toast.error('שגיאה ביצירת הקישור')
+            }
+        } catch (error) {
+            console.error('Copy link error:', error)
+            toast.error('משהו השתבש')
         }
     }
 
