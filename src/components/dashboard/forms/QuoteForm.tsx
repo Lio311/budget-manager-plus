@@ -195,7 +195,8 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                                         <td className="p-2">
                                             <FormattedNumberInput
                                                 value={item.quantity}
-                                                onChange={(value) => updateItem(item.id, 'quantity', value)}
+                                                onChange={(e) => { }}
+                                                onValueChange={(value) => updateItem(item.id, 'quantity', value)}
                                                 className="w-full text-center bg-transparent border-none focus:ring-0 p-1"
                                                 min={1}
                                             />
@@ -203,7 +204,8 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                                         <td className="p-2">
                                             <FormattedNumberInput
                                                 value={item.price}
-                                                onChange={(value) => updateItem(item.id, 'price', value)}
+                                                onChange={(e) => { }}
+                                                onValueChange={(value) => updateItem(item.id, 'price', value)}
                                                 className="w-full text-center bg-transparent border-none focus:ring-0 p-1"
                                             />
                                         </td>
