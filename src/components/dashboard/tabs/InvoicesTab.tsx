@@ -157,13 +157,21 @@ export function InvoicesTab() {
 
             if (result.success && result.token) {
                 const link = `${window.location.origin}/invoice/${result.token}`
-                await navigator.clipboard.writeText(link)
-                toast.success('הקישור הועתק ללוח!')
+
+                try {
+                    await navigator.clipboard.writeText(link)
+                    toast.success('הקישור הועתק ללוח!')
+                } catch (clipboardError) {
+                    console.error('Clipboard failed, falling back to prompt', clipboardError)
+                    // Fallback for mobile/secure-context issues
+                    window.prompt('העתק את הקישור:', link)
+                    toast.success('הקישור נוצר')
+                }
             } else {
-                toast.error('שגיאה ביצירת הקישור')
+                toast.error('שגיאה ביצירת הקישור במערכת')
             }
         } catch (error) {
-            toast.error('שגיאה ביצירת הקישור')
+            toast.error('שגיאה כללית ביצירת הקישור')
         }
     }
 
@@ -366,7 +374,7 @@ export function InvoicesTab() {
                                 </div>
                                 <Button variant="outline" size="sm" onClick={() => handleCopyLink(inv.id)} className="gap-2 text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100">
                                     <LinkIcon className="h-4 w-4" />
-                                    <span className="md:hidden">הערת קישור</span>
+                                    <span className="md:hidden">קישור לחתימה</span>
                                     <span className="hidden md:inline">קישור לחתימה</span>
                                 </Button>
                             </div>
