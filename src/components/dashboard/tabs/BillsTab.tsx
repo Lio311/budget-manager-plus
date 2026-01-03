@@ -367,16 +367,19 @@ export function BillsTab() {
                                                             >
                                                                 {bill.isPaid ? 'שולם' : 'ממתין'}
                                                             </button>
-                                                            {bill.isRecurring && (
-                                                                <span className="bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 px-2 py-0.5 rounded-full text-[9px] font-bold">
-                                                                    קבוע
-                                                                </span>
-                                                            )}
                                                         </div>
                                                         <div className="flex flex-col min-w-0 flex-1">
-                                                            <span className={`font-bold text-sm sm:text-base transition-colors truncate ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338] dark:text-gray-100'}`}>
-                                                                {bill.name}
-                                                            </span>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`font-bold text-sm sm:text-base transition-colors truncate ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338] dark:text-gray-100'}`}>
+                                                                    {bill.name}
+                                                                </span>
+                                                                {bill.isRecurring && (
+                                                                    <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${budgetType === 'BUSINESS' ? 'bg-red-100 text-red-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                                                                        <span className="w-1 h-1 rounded-full bg-current" />
+                                                                        קבוע
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-xs text-[#676879]">
                                                                 <span className="shrink-0">
                                                                     תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
