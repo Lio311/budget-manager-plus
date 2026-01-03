@@ -12,11 +12,21 @@ An advanced full-stack web application for intelligent personal and business fin
 
 ## ✨ Key Features
 
-### 📱 Enhanced Mobile Experience (New!)
+### 📱 Enhanced Mobile Experience
 - **Responsive Toolbar**: Full access to all tools (Delete All, Import, Settings) on mobile devices.
 - **Smart Formatting**: Optimized tables and cards for small screens.
 - **Floating Action Buttons**: Quick access to key actions regardless of scroll position.
 - **PWA Ready**: Installable as a native app on iOS and Android.
+
+### 🎨 Modern Landing Page
+- **Animated Hero Section**: Eye-catching gradient backgrounds with smooth animations.
+- **Feature Showcase**: Interactive cards highlighting key capabilities.
+- **Pricing Plans**: Clear comparison of Personal vs Business tiers with feature breakdowns.
+- **Testimonials & Social Proof**: Build trust with user reviews and statistics.
+- **FAQ Section**: Comprehensive answers to common questions.
+- **Responsive Design**: Pixel-perfect on all devices from mobile to desktop.
+- **Performance Optimized**: Fast loading with Next.js Image optimization and lazy loading.
+- **SEO Friendly**: Comprehensive meta tags, Open Graph, and structured data.
 
 ### 🏢 Business Financial Suite
 - **Dual Mode**: Seamlessly toggle between **Personal** and **Business** budgets per month.
