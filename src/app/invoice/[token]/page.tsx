@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
-import { Loader2, Download, PenTool, CheckCircle } from 'lucide-react'
+import { Loader2, Download, PenTool, CheckCircle, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { getInvoiceByToken, signInvoice } from '@/lib/actions/invoices'
@@ -167,7 +167,17 @@ export default function PublicInvoicePage() {
 
                 {/* Actions Bar */}
                 <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm print:hidden gap-4">
-                    <h1 className="text-xl font-bold text-gray-800">חשבונית לתשלום</h1>
+                    <div className="flex items-center gap-3">
+                        <Button
+                            onClick={() => window.history.back()}
+                            variant="ghost"
+                            size="icon"
+                            className="md:hidden text-gray-500 hover:text-gray-900"
+                        >
+                            <ArrowRight className="h-6 w-6" />
+                        </Button>
+                        <h1 className="text-xl font-bold text-gray-800">חשבונית לתשלום</h1>
+                    </div>
                     {invoice.isSigned && (
                         <Button onClick={handleDownloadPDF} variant="outline" className="gap-2 w-full sm:w-auto">
                             <Download className="h-4 w-4" />
