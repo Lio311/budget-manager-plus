@@ -28,6 +28,14 @@ async function testAddBillLeakage() {
         return;
     }
 
+    if (!result.data) {
+        console.error('No data returned');
+        return;
+    }
+
+    const createdBillId = result.data.id;
+    console.log(`Bill created with ID: ${createdBillId}`);
+
     // 3. Verify where it landed
     const bill = await prisma.bill.findUnique({
         where: { id: createdBillId },
