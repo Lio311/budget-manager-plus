@@ -152,10 +152,20 @@ export default function PublicInvoicePage() {
                 {/* Invoice Content - This gets printed/PDF'd */}
                 <Card id="invoice-content" className="p-8 bg-white shadow-lg print:shadow-none">
                     {/* Header */}
+                    {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-8">
-                        <div>
+                        <div className="w-full md:w-auto">
+                            <h1 className="text-4xl font-light text-purple-600 mb-2">חשבונית מס</h1>
+                            <div className="text-gray-600">
+                                <p><strong>מספר חשבונית:</strong> {invoice.invoiceNumber}</p>
+                                <p><strong>תאריך:</strong> {new Date(invoice.issueDate).toLocaleDateString('he-IL')}</p>
+                                {invoice.dueDate && <p><strong>לתשלום עד:</strong> {new Date(invoice.dueDate).toLocaleDateString('he-IL')}</p>}
+                            </div>
+                        </div>
+
+                        <div className="text-right md:text-left w-full md:w-auto">
                             {business?.logoUrl && (
-                                <div className="mb-4">
+                                <div className="mb-4 flex justify-end md:justify-start">
                                     <Image
                                         src={business.logoUrl}
                                         alt="Logo"
@@ -172,14 +182,6 @@ export default function PublicInvoicePage() {
                                 {business?.address && <p>{business.address}</p>}
                                 {business?.phone && <p>{business.phone}</p>}
                                 {business?.email && <p>{business.email}</p>}
-                            </div>
-                        </div>
-                        <div className="text-right md:text-left w-full md:w-auto">
-                            <h1 className="text-4xl font-light text-purple-600 mb-2">חשבונית מס</h1>
-                            <div className="text-gray-600">
-                                <p><strong>מספר חשבונית:</strong> {invoice.invoiceNumber}</p>
-                                <p><strong>תאריך:</strong> {new Date(invoice.issueDate).toLocaleDateString('he-IL')}</p>
-                                {invoice.dueDate && <p><strong>לתשלום עד:</strong> {new Date(invoice.dueDate).toLocaleDateString('he-IL')}</p>}
                             </div>
                         </div>
                     </div>
