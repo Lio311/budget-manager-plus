@@ -210,9 +210,6 @@ export async function getInvoiceByToken(token: string) {
             include: {
                 client: true,
                 lineItems: true,
-                businessProfile: true, // Need to fetch business profile separately if not linked directly? 
-                // Wait, BusinessProfile is linked to User, not Invoice directly.
-                // We access it via invoice.user.businessProfile
                 user: {
                     include: {
                         businessProfile: true
