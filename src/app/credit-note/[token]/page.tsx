@@ -7,7 +7,7 @@ import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Download, ArrowRight } from 'lucide-react'
+import { Download, ArrowRight, Loader2 } from 'lucide-react'
 
 export default function PublicCreditNotePage() {
     const params = useParams()
