@@ -57,7 +57,8 @@ export default function BusinessLandingPage() {
             bgColor: 'from-yellow-500 via-yellow-600 to-yellow-700',
             textColor: 'text-white',
             accentColor: 'yellow',
-            tag: 'יצירה | מעקב | המרה'
+            tag: 'יצירה | מעקב | המרה',
+            image: '/screenshots/quotes.png'
         },
         {
             id: 4,
@@ -115,7 +116,8 @@ export default function BusinessLandingPage() {
             bgColor: 'from-teal-600 via-teal-700 to-teal-900',
             textColor: 'text-white',
             accentColor: 'teal',
-            tag: 'תכנון | סנכרון | התראות'
+            tag: 'תכנון | סנכרון | התראות',
+            image: '/screenshots/calendar.png'
         }
     ]
 
