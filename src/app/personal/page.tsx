@@ -33,7 +33,8 @@ export default function PersonalLandingPage() {
             bgColor: 'from-green-600 via-green-700 to-green-900',
             textColor: 'text-white',
             accentColor: 'green',
-            tag: 'מעקב | ניתוח | תובנות'
+            tag: 'מעקב | ניתוח | תובנות',
+            image: '/screenshots/personal/income.png'
         },
         {
             id: 2,
