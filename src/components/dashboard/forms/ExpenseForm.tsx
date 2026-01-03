@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import {
     Loader2, Plus, TrendingDown, RefreshCw, Settings
 } from 'lucide-react'
@@ -92,28 +92,126 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     }, [newExpense.amount, newExpense.vatRate, isBusiness])
 
     // Deep Linking: Pre-fill form from URL parameters
+    // Helper for fuzzy category matching
+    const findMatchingCategory = (inputCat: string | null): string => {
+        if (!inputCat) return ''
+
+        // Direct match
+        const directMatch = categories.find(c => c.name === inputCat)
+        if (directMatch) return directMatch.name
+
+        const normalizedInput = inputCat.toLowerCase().trim()
+
+        // Common mappings (English/Hebrew variations -> Actual Category Name)
+        const MAPPINGS: Record<string, string[]> = {
+            'מזון': ['food', 'groceries', 'supermarket', 'אוכל', 'סופר', 'קניות לבית'],
+            'דלק': ['fuel', 'gas', 'petrol', 'תחנת דלק'],
+            'מסעדות': ['restaurants', 'dining', 'eating out', 'מסעדה', 'בחוץ'],
+            'תחבורה': ['transport', 'transportation', 'bus', 'train', 'taxi', 'uber', 'מונית', 'אוטובוס', 'רכבת'],
+            'בילויים': ['entertainment', 'movies', 'fun', 'party', 'cinema', 'סרט', 'בילוי', 'יציאה'],
+            'קניות': ['shopping', 'clothes', 'clothing', 'store', 'בגדים', 'שופינג'],
+            'בית': ['home', 'house', 'rent', 'utilities', 'חשמל', 'ארנונה', 'מים', 'שכירות'],
+        }
+
+        for (const [actualName, aliases] of Object.entries(MAPPINGS)) {
+            if (aliases.some(alias => normalizedInput.includes(alias))) {
+                // Verify the mapped category actually exists in the user's categories
+                const exists = categories.find(c => c.name === actualName)
+                if (exists) return exists.name
+            }
+        }
+
+        // If no smart match, return the input and let the user correct if needed, 
+        // OR try to find a category that *contains* the input string
+        const partialMatch = categories.find(c => c.name.toLowerCase().includes(normalizedInput))
+        if (partialMatch) return partialMatch.name
+
+        return inputCat
+    }
+
+    // Deep Linking: Pre-fill form from URL parameters
     const searchParams = useSearchParams()
+    const router = useRouter() // Need to import this
 
     useEffect(() => {
         if (!searchParams) return
 
         const paramAmount = searchParams.get('amount')
-        const paramDesc = searchParams.get('description') || searchParams.get('merchant') || searchParams.get('title')
+        const paramDesc = searchParams.get('description') || searchParams.get('merchant') || searchParams.get('title') || searchParams.get('desc')
         const paramCat = searchParams.get('category')
         const paramCurrency = searchParams.get('currency')
         const paramDate = searchParams.get('date')
+        const paramAutoSubmit = searchParams.get('autoSubmit') === 'true'
 
+        // Only proceed if we have at least amount or description
         if (paramAmount || paramDesc || paramCat) {
+            const matchedCategory = findMatchingCategory(paramCat)
+
+            // Construct the new expense object
+            const expenseFromUrl = {
+                amount: paramAmount || '',
+                description: paramDesc || '',
+                category: matchedCategory || (categories.length > 0 ? categories[0].name : ''),
+                currency: (paramCurrency && Object.keys(SUPPORTED_CURRENCIES).includes(paramCurrency)) ? paramCurrency : 'ILS',
+                date: paramDate ? format(new Date(paramDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+                isRecurring: false,
+                recurringEndDate: undefined,
+                supplierId: '',
+                amountBeforeVat: '',
+                vatRate: '0.18',
+                vatAmount: '',
+                isDeductible: true,
+                deductibleRate: '1.0',
+                paymentMethod: ''
+            }
+
             setNewExpense(prev => ({
                 ...prev,
-                amount: paramAmount || prev.amount,
-                description: paramDesc || prev.description,
-                category: paramCat || prev.category,
-                currency: (paramCurrency && Object.keys(SUPPORTED_CURRENCIES).includes(paramCurrency)) ? paramCurrency : prev.currency,
-                date: paramDate ? format(new Date(paramDate), 'yyyy-MM-dd') : prev.date
+                ...expenseFromUrl
             }))
+
+            // Auto Submit Logic
+            if (paramAutoSubmit && expenseFromUrl.amount && expenseFromUrl.category) {
+                // We need to trigger the add function explicitly. 
+                // Since handleAdd reads from `newExpense` state which might not be updated yet in this render cycle,
+                // we'll use a timeout or pass the data directly. 
+                // Better approach: Call a dedicated internal submit function with the data.
+
+                // However, `handleAdd` relies on state. simplest way is to set state, then set a flag to submit on next effect, 
+                // OR refactor handleAdd.
+                // For safety and simplicity in this edit, I will trigger it via a refined effect or just wait for state update.
+                // Let's use a "ready to submit" flag in state or ref.
+                setPendingAutoSubmit(true)
+            }
+
+            // Cleanup URL params
+            const newUrl = new URL(window.location.href)
+            newUrl.searchParams.delete('amount')
+            newUrl.searchParams.delete('description')
+            newUrl.searchParams.delete('merchant')
+            newUrl.searchParams.delete('title')
+            newUrl.searchParams.delete('desc')
+            newUrl.searchParams.delete('category')
+            newUrl.searchParams.delete('currency')
+            newUrl.searchParams.delete('date')
+            newUrl.searchParams.delete('autoSubmit')
+            newUrl.searchParams.delete('autoOpen')
+
+            // Ensure we stay on the expenses tab
+            newUrl.searchParams.set('tab', 'expenses')
+
+            router.replace(newUrl.pathname + newUrl.search)
         }
-    }, [searchParams])
+    }, [searchParams, categories]) // Re-run when categories load to ensure matching works
+
+    const [pendingAutoSubmit, setPendingAutoSubmit] = useState(false)
+
+    useEffect(() => {
+        if (pendingAutoSubmit && newExpense.amount && newExpense.category) {
+            handleAdd()
+            setPendingAutoSubmit(false)
+        }
+    }, [pendingAutoSubmit, newExpense])
 
     // Optimistic add for instant UI feedback
     const { execute: optimisticAddExpense } = useOptimisticMutation<any, any>(
