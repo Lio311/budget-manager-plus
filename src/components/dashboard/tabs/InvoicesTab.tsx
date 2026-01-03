@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown, Link as LinkIcon, PenTool } from 'lucide-react'
+import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown, Link as LinkIcon, PenTool, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
 import { getInvoices, updateInvoiceStatus, generateInvoiceLink, type InvoiceFormData } from '@/lib/actions/invoices'
@@ -172,6 +172,20 @@ export function InvoicesTab() {
             }
         } catch (error) {
             toast.error('שגיאה כללית ביצירת הקישור')
+        }
+    }
+
+    const handleViewInvoice = async (invoiceId: string) => {
+        try {
+            toast.info('פותח חשבונית...')
+            const result = await generateInvoiceLink(invoiceId) // reusing this to get/ensure token
+            if (result.success && result.token) {
+                window.open(`${window.location.origin}/invoice/${result.token}`, '_blank')
+            } else {
+                toast.error('שגיאה בפתיחת החשבונית')
+            }
+        } catch (error) {
+            toast.error('שגיאה בפתיחת החשבונית')
         }
     }
 
@@ -377,6 +391,11 @@ export function InvoicesTab() {
                                     <span className="md:hidden">קישור לחתימה</span>
                                     <span className="hidden md:inline">קישור לחתימה</span>
                                 </Button>
+                                {inv.status === 'SIGNED' && (
+                                    <Button variant="outline" size="sm" onClick={() => handleViewInvoice(inv.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100" title="צפה בחשבונית">
+                                        <Eye className="h-4 w-4" />
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     ))

@@ -23,13 +23,10 @@ async function testAddBillLeakage() {
         dueDay: billDueDay
     }, type);
 
-    if (!result.success || !result.data) {
+    if (!result.success) {
         console.error('Failed to add bill:', result.error);
         return;
     }
-
-    const createdBillId = result.data.id;
-    console.log(`Bill created with ID: ${createdBillId}`);
 
     // 3. Verify where it landed
     const bill = await prisma.bill.findUnique({
