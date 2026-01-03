@@ -22,7 +22,7 @@ export default function PersonalLandingPage() {
             bgColor: 'from-slate-900 via-slate-800 to-slate-900',
             textColor: 'text-white',
             accentColor: 'emerald',
-            image: '/screenshots/personal/home.png'
+            image: '/screenshots/personal/budget_mockup.png'
         },
         {
             id: 1,
@@ -41,7 +41,7 @@ export default function PersonalLandingPage() {
             number: '02',
             title: 'הוצאות',
             subtitle: 'שליטה מלאה בהוצאות',
-            description: 'עקוב אחר כל הוצאה קטנה וגדולה עם קטגוריזציה אוטומטית חכמה. המערכת מנתחת את הרגלי ההוצאה שלך, מזהה דפוסים ומציעה דרכים לחסוך. קבל התראות כשאתה מתקרב לגבול התקציב ותראה בדיוק לאן הכסף הולך עם גרפים ויזואליים ברורים.',
+            description: 'עקוב אחר כל הוצאה קטנה וגדולה עם קטגוריזציה אוטומטית חכמה. המערכת מנתחת את הרגלי ההוצאה שלך, מזהה דפוסים ומציעה דרכים לחסוך. קבל תראות כשאתה מתקרב לגבול התקציב ותראה בדיוק לאן הכסף הולך עם גרפים ויזואליים ברורים.',
             bgColor: 'from-red-600 via-red-700 to-red-900',
             textColor: 'text-white',
             accentColor: 'red',
@@ -94,7 +94,7 @@ export default function PersonalLandingPage() {
             textColor: 'text-white',
             accentColor: 'yellow',
             tag: 'תכנון | מעקב | התראות',
-            image: '/screenshots/personal/budget_mockup.png'
+            image: '/screenshots/personal/budget.png'
         },
         {
             id: 7,
