@@ -94,7 +94,7 @@ export default function PersonalLandingPage() {
             textColor: 'text-white',
             accentColor: 'yellow',
             tag: 'תכנון | מעקב | התראות',
-            image: '/screenshots/personal/budget.png'
+            image: '/screenshots/personal/budget_mockup.png'
         },
         {
             id: 7,
