@@ -391,7 +391,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={isActive ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="relative h-[400px] md:h-[600px] hidden md:flex items-center justify-center p-4"
+                        className={`relative h-[400px] md:h-[600px] hidden md:flex items-center p-4 ${index === 0 ? 'justify-end' : 'justify-center'}`}
                     >
                         {section.image ? (
                             <div className="relative w-full h-full flex items-center justify-center">
