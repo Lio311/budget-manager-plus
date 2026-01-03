@@ -22,6 +22,7 @@ import { getSavings } from '@/lib/actions/savings'
 import { getWorkEvents, addWorkEvent, updateWorkEvent, deleteWorkEvent } from '@/lib/actions/work-events'
 import { getClients } from '@/lib/actions/clients'
 import { useToast } from '@/hooks/use-toast'
+import { CalendarSyncButton } from '@/components/dashboard/CalendarSyncButton'
 
 interface Payment {
     id: string
@@ -242,6 +243,8 @@ export function CalendarTab() {
                         סה"כ תשלומים: <span className="font-bold text-blue-600">{formatCurrency(totalPayments, currency)}</span>
                     </div>
                 )}
+
+                <CalendarSyncButton />
             </div>
 
             {/* Calendar */}

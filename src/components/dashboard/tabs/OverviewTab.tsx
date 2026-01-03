@@ -23,7 +23,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { swrConfig } from '@/lib/swr-config'
 import { FinancialAdvisorButton } from '@/components/dashboard/FinancialAdvisorButton'
-import { CalendarSyncButton } from '@/components/dashboard/CalendarSyncButton'
 import { FeedbackButton } from '@/components/dashboard/FeedbackButton'
 import { BusinessSettings } from '@/components/settings/BusinessSettings'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
@@ -292,7 +291,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                         </Button>
                     )}
-                    <CalendarSyncButton />
+
                     <FinancialAdvisorButton financialData={aiFinancialData} />
                     <FeedbackButton />
                 </div>
