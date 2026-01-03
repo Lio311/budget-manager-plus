@@ -374,7 +374,7 @@ export function BillsTab() {
                                                                     {bill.name}
                                                                 </span>
                                                                 {bill.isRecurring && (
-                                                                    <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${budgetType === 'BUSINESS' ? 'bg-red-100 text-red-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                                                                    <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${budgetType === 'BUSINESS' ? 'bg-orange-100 text-orange-700' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
                                                                         <span className="w-1 h-1 rounded-full bg-current" />
                                                                         קבוע
                                                                     </div>

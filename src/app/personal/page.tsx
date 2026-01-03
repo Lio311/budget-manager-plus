@@ -393,17 +393,15 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                         className="relative h-[400px] md:h-[600px] flex items-center justify-center p-4"
                     >
                         {section.image ? (
-                            <div className="relative w-full h-full flex items-center justify-center group">
-                                {/* Glow Effect */}
-                                <div className={`absolute -inset-4 bg-${section.accentColor}-500/20 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+                            <div className="relative w-full h-full flex items-center justify-center">
 
-                                <div className="relative bg-white/5 backdrop-blur-xl rounded-[2rem] border border-white/10 p-2 shadow-2xl overflow-hidden transform transition-transform duration-700 group-hover:scale-[1.02]">
+                                <div className="relative bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-2 shadow-2xl overflow-hidden">
                                     <Image
                                         src={section.image}
                                         alt={section.title}
                                         width={1000}
                                         height={800}
-                                        className="w-full h-auto rounded-2xl shadow-2xl"
+                                        className="w-full h-auto rounded-2xl"
                                         priority={index === 0}
                                     />
                                     {/* Overlay Gradient */}

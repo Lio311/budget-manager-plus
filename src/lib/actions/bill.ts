@@ -21,6 +21,28 @@ export async function getBills(month: number, year: number, type: 'PERSONAL' | '
             orderBy: { dueDate: 'asc' }
         })
 
+        // Auto-paid logic: mark overdue bills as paid
+        const now = new Date()
+        const overdueBills = bills.filter(bill => !bill.isPaid && new Date(bill.dueDate) < now)
+
+        if (overdueBills.length > 0) {
+            await Promise.all(overdueBills.map(bill =>
+                db.bill.update({
+                    where: { id: bill.id },
+                    data: { isPaid: true, paidDate: now }
+                })
+            ))
+
+            // Refetch bills to get updated status
+            const updatedBills = await db.bill.findMany({
+                where: { budgetId: budget.id },
+                orderBy: { dueDate: 'asc' }
+            })
+
+            // Replace local bills with updated ones
+            bills.splice(0, bills.length, ...updatedBills)
+        }
+
         // Calculate totals in ILS
         let totalILS = 0
         let totalPaidILS = 0
