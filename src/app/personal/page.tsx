@@ -21,7 +21,8 @@ export default function PersonalLandingPage() {
             description: 'המערכת המתקדמת בישראל לניהול תקציב אישי. כל הכלים שצריך כדי לשלוט בכסף שלך, בממשק אחד יפהפה ונוח.',
             bgColor: 'from-slate-900 via-slate-800 to-slate-900',
             textColor: 'text-white',
-            accentColor: 'emerald'
+            accentColor: 'emerald',
+            image: '/assets/dashboard_mockup.png'
         },
         {
             id: 1,
@@ -43,7 +44,8 @@ export default function PersonalLandingPage() {
             bgColor: 'from-red-600 via-red-700 to-red-900',
             textColor: 'text-white',
             accentColor: 'red',
-            tag: 'מעקב | קטגוריזציה | ניתוח'
+            tag: 'מעקב | קטגוריזציה | ניתוח',
+            image: '/screenshots/personal/expenses.png'
         },
         {
             id: 3,
@@ -65,7 +67,8 @@ export default function PersonalLandingPage() {
             bgColor: 'from-purple-600 via-purple-700 to-purple-900',
             textColor: 'text-white',
             accentColor: 'purple',
-            tag: 'מעקב | תכנון | חיסכון'
+            tag: 'מעקב | תכנון | חיסכון',
+            image: '/screenshots/personal/loans.png'
         },
         {
             id: 5,
@@ -76,7 +79,8 @@ export default function PersonalLandingPage() {
             bgColor: 'from-blue-600 via-blue-700 to-blue-900',
             textColor: 'text-white',
             accentColor: 'blue',
-            tag: 'יעדים | מעקב | המלצות'
+            tag: 'יעדים | מעקב | המלצות',
+            image: '/screenshots/personal/savings.png'
         },
         {
             id: 6,
@@ -87,7 +91,8 @@ export default function PersonalLandingPage() {
             bgColor: 'from-yellow-500 via-yellow-600 to-yellow-700',
             textColor: 'text-white',
             accentColor: 'yellow',
-            tag: 'תכנון | מעקב | התראות'
+            tag: 'תכנון | מעקב | התראות',
+            image: '/screenshots/personal/budget.png'
         },
         {
             id: 7,
@@ -98,7 +103,8 @@ export default function PersonalLandingPage() {
             bgColor: 'from-teal-600 via-teal-700 to-teal-900',
             textColor: 'text-white',
             accentColor: 'teal',
-            tag: 'תכנון | סנכרון | תצוגה'
+            tag: 'תכנון | סנכרון | תצוגה',
+            image: '/screenshots/personal/calendar.png'
         }
     ]
 
@@ -383,22 +389,38 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={isActive ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="relative h-[600px] hidden md:block"
+                        className="relative h-[400px] md:h-[600px] flex items-center justify-center p-4"
                     >
-                        {index === 0 && (
-                            <div className="relative w-full h-full flex items-center justify-center">
-                                <Image
-                                    src="/assets/dashboard_mockup.png"
-                                    alt="Dashboard"
-                                    width={800}
-                                    height={600}
-                                    className="w-full h-auto drop-shadow-2xl"
-                                />
+                        {section.image ? (
+                            <div className="relative w-full h-full flex items-center justify-center group">
+                                {/* Glow Effect */}
+                                <div className={`absolute -inset-4 bg-${section.accentColor}-500/20 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+
+                                <div className="relative bg-white/5 backdrop-blur-xl rounded-[2rem] border border-white/10 p-2 shadow-2xl overflow-hidden transform transition-transform duration-700 group-hover:scale-[1.02]">
+                                    <Image
+                                        src={section.image}
+                                        alt={section.title}
+                                        width={1000}
+                                        height={800}
+                                        className="w-full h-auto rounded-2xl shadow-2xl"
+                                        priority={index === 0}
+                                    />
+                                    {/* Overlay Gradient */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
+                                </div>
                             </div>
-                        )}
-                        {index > 0 && (
+                        ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                                <div className="w-96 h-96 bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 shadow-2xl" />
+                                <motion.div
+                                    animate={isActive ? {
+                                        rotate: [0, 5, -5, 0],
+                                        scale: [1, 1.05, 0.95, 1]
+                                    } : {}}
+                                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                                    className="w-64 h-64 md:w-96 md:h-96 bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 shadow-2xl flex items-center justify-center"
+                                >
+                                    <div className={`w-32 h-32 rounded-full bg-${section.accentColor}-500/20 blur-xl animate-pulse`} />
+                                </motion.div>
                             </div>
                         )}
                     </motion.div>
