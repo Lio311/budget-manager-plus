@@ -199,7 +199,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                             <span className="dark:text-purple-100">מע"מ ({(selectedInvoice.vatRate * 100)}%):</span>
                             <span className="dark:text-purple-100">{formatCurrency(vatAmount)}</span>
                         </div>
-                        <div className="flex justify-between text-lg font-bold border-t border-purple-200 pt-2 dark:border-purple-900/50">
+                        <div className="flex justify-between text-lg font-bold border-t border-orange-200 pt-2 dark:border-purple-900/50">
                             <span className="dark:text-purple-100">סה"כ זיכוי:</span>
                             <span className="text-purple-700 dark:text-purple-400">{formatCurrency(totalCredit)}</span>
                         </div>
@@ -216,14 +216,14 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                     onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                     rows={3}
                     placeholder="למשל: ביטול עסקה, החזר כספי, תיקון טעות..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                 />
             </div>
 
             <div className="flex gap-2 pt-2">
                 <Button
                     type="submit"
-                    className="bg-purple-600 hover:bg-purple-700 text-white w-full md:w-auto"
+                    className="bg-orange-600 hover:bg-orange-700 text-white w-full md:w-auto"
                     disabled={isSubmitting || !formData.invoiceId}
                 >
                     {isSubmitting ? (
