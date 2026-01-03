@@ -174,7 +174,7 @@ export default function PublicQuotePage() {
                                 </div>
                             )}
                             <h2 className="text-2xl font-bold text-gray-900">{business?.companyName || 'שם העסק'}</h2>
-                            <p className="text-gray-500">{business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'עוסק פטור'} {business?.companyId}</p>
+                            <p className="text-gray-500">{business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ'} {business?.companyId}</p>
                             <div className="text-sm text-gray-500 mt-2">
                                 {business?.address && <p>{business.address}</p>}
                                 {business?.phone && <p>{business.phone}</p>}

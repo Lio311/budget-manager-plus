@@ -152,7 +152,8 @@ export default function PublicInvoicePage() {
                 {/* Invoice Content - This gets printed/PDF'd */}
                 <Card id="invoice-content" className="p-8 bg-white shadow-lg print:shadow-none">
                     {/* Header */}
-                    <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-8">
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-8">
                         <div className="w-full md:w-auto">
                             <h1 className="text-4xl font-light text-green-600 mb-2">חשבונית מס</h1>
                             <div className="text-gray-600">
@@ -176,7 +177,7 @@ export default function PublicInvoicePage() {
                                 </div>
                             )}
                             <h2 className="text-2xl font-bold text-gray-900">{business?.companyName || 'שם העסק'}</h2>
-                            <p className="text-gray-500">{business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'עוסק פטור'} {business?.companyId}</p>
+                            <p className="text-gray-500">{business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ'} {business?.companyId}</p>
                             <div className="text-sm text-gray-500 mt-2">
                                 {business?.address && <p>{business.address}</p>}
                                 {business?.phone && <p>{business.phone}</p>}
@@ -218,20 +219,23 @@ export default function PublicInvoicePage() {
                         </table>
                     </div>
 
-                    {/* Totals */}
+                    {/* Totals - Green Gradient Box */}
                     <div className="flex justify-end mb-12">
-                        <div className="w-64 space-y-3">
-                            <div className="flex justify-between text-gray-600">
-                                <span>סה"כ לפני מע"מ:</span>
-                                <span>{formatCurrency(invoice.subtotal)}</span>
-                            </div>
-                            <div className="flex justify-between text-gray-600">
-                                <span>מע"מ ({invoice.vatRate * 100}%):</span>
-                                <span>{formatCurrency(invoice.vatAmount)}</span>
-                            </div>
-                            <div className="flex justify-between text-xl font-bold text-green-600 border-t pt-3">
-                                <span>סה"כ לתשלום:</span>
-                                <span>{formatCurrency(invoice.total)}</span>
+                        <div className="w-full md:w-96 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl p-6 shadow-md">
+                            <div className="space-y-3">
+                                <div className="flex justify-between text-emerald-50 font-medium">
+                                    <span>סה"כ לפני מע"מ:</span>
+                                    <span>{formatCurrency(invoice.subtotal)}</span>
+                                </div>
+                                <div className="flex justify-between text-emerald-50 font-medium">
+                                    <span>מע"מ ({invoice.vatRate * 100}%):</span>
+                                    <span>{formatCurrency(invoice.vatAmount)}</span>
+                                </div>
+                                <div className="border-t border-emerald-400 my-2"></div>
+                                <div className="flex justify-between text-2xl font-bold">
+                                    <span>סה"כ לתשלום:</span>
+                                    <span>{formatCurrency(invoice.total)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
