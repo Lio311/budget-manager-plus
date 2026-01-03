@@ -258,7 +258,9 @@ export default function PublicQuotePage() {
                             <tbody className="divide-y divide-gray-50">
                                 {/* Since Quote doesn't have line items relation yet, we show a summary row */}
                                 <tr>
-                                    <td className="py-4 text-gray-900">שירות / מוצר (ראה פירוט בהערות)</td>
+                                    <td className="py-4 text-gray-900 font-medium">
+                                        {quote.notes || 'שירות / מוצר'}
+                                    </td>
                                     <td className="py-4 text-gray-600 text-center">1</td>
                                     <td className="py-4 text-gray-600 text-center">{formatCurrency(quote.subtotal)}</td>
                                     <td className="py-4 text-gray-900 font-medium text-left">{formatCurrency(quote.subtotal)}</td>
