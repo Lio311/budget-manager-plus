@@ -22,7 +22,7 @@ import { getSavings } from '@/lib/actions/savings'
 import { getWorkEvents, addWorkEvent, updateWorkEvent, deleteWorkEvent } from '@/lib/actions/work-events'
 import { getClients } from '@/lib/actions/clients'
 import { useToast } from '@/hooks/use-toast'
-import { CalendarSyncButton } from '@/components/dashboard/CalendarSyncButton'
+// import { CalendarSyncButton } from '@/components/dashboard/CalendarSyncButton'
 
 interface Payment {
     id: string
@@ -244,7 +244,7 @@ export function CalendarTab() {
                     </div>
                 )}
 
-                <CalendarSyncButton />
+                {/* <CalendarSyncButton /> */}
             </div>
 
             {/* Calendar */}
