@@ -82,7 +82,6 @@ export async function getInvoice(id: string) {
             where: { id },
             include: {
                 client: true,
-                client: true,
                 incomes: true,
                 lineItems: true
             }

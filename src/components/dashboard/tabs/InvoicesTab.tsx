@@ -387,6 +387,6 @@ export function InvoicesTab() {
                     </div>
                 )
             }
-        </div >
+        </div>
     )
 }
