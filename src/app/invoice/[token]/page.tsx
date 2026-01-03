@@ -333,7 +333,13 @@ export default function PublicInvoicePage() {
                     <div className="mt-16 pt-8 text-center text-gray-400 text-xs pb-12 print:pb-0">
                         <p className="mb-2">הופק על ידי</p>
                         <div className="flex justify-center items-center gap-1 opacity-50 grayscale hover:grayscale-0 transition-all">
-                            <span className="font-bold text-lg tracking-tight">Budget Manager</span>
+                            <Image
+                                src="/logo.png"
+                                alt="Budget Manager"
+                                width={120}
+                                height={40}
+                                className="object-contain h-8 w-auto"
+                            />
                         </div>
                     </div>
                 </Card>

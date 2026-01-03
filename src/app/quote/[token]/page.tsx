@@ -322,16 +322,18 @@ export default function PublicQuotePage() {
                         </div>
                     </div>
 
-                    {/* Produced By Footer */}
-                    <div className="mt-8 pt-4 border-t border-gray-100 flex flex-col items-center justify-center opacity-70">
-                        <span className="text-xs text-gray-400 mb-1">הופק על ידי</span>
-                        <Image
-                            src="/K-LOGO.png"
-                            alt="KeseFlow"
-                            width={80}
-                            height={32}
-                            className="object-contain opacity-80 hover:opacity-100 transition-opacity"
-                        />
+                    {/* Footer - Powered by */}
+                    <div className="mt-16 pt-8 text-center text-gray-400 text-xs pb-12 print:pb-0">
+                        <p className="mb-2">הופק על ידי</p>
+                        <div className="flex justify-center items-center gap-1 opacity-50 grayscale hover:grayscale-0 transition-all">
+                            <Image
+                                src="/logo.png"
+                                alt="Budget Manager"
+                                width={120}
+                                height={40}
+                                className="object-contain h-8 w-auto"
+                            />
+                        </div>
                     </div>
                 </Card>
 
