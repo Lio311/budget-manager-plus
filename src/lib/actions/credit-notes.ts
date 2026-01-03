@@ -81,7 +81,10 @@ export async function createCreditNote(data: CreditNoteFormData) {
 
         // Verify invoice exists and belongs to user
         const invoice = await db.invoice.findUnique({
-            where: { id: data.invoiceId }
+            where: { id: data.invoiceId },
+            include: {
+                budget: true
+            }
         })
 
         if (!invoice || invoice.userId !== userId) {
@@ -117,12 +120,12 @@ export async function createCreditNote(data: CreditNoteFormData) {
         // Create negative income entry to reduce revenue
         await db.income.create({
             data: {
-                clientId: invoice.clientId,
-                amount: -totalCredit, // Negative amount
-                description: `זיכוי עבור חשבונית ${invoice.invoiceNumber} - ${data.reason || 'זיכוי'}`,
-                date: data.issueDate,
+                budgetId: invoice.budgetId,
+                source: `זיכוי עבור חשבונית ${invoice.invoiceNumber} - ${data.reason || 'זיכוי'}`,
                 category: 'זיכויים',
-                scope: 'BUSINESS',
+                amount: -totalCredit,
+                date: data.issueDate,
+                clientId: invoice.clientId,
                 invoiceId: invoice.id
             }
         })
