@@ -3,6 +3,7 @@
 import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { getCurrentBudget } from './budget'
 
 export interface CreditNoteFormData {
     invoiceId: string
@@ -81,15 +82,21 @@ export async function createCreditNote(data: CreditNoteFormData) {
 
         // Verify invoice exists and belongs to user
         const invoice = await db.invoice.findUnique({
-            where: { id: data.invoiceId },
-            include: {
-                budget: true
-            }
+            where: { id: data.invoiceId }
         })
 
         if (!invoice || invoice.userId !== userId) {
             throw new Error('Invoice not found')
         }
+
+        // Get budget for the credit note date
+        const issueDate = new Date(data.issueDate)
+        const budget = await getCurrentBudget(
+            issueDate.getMonth() + 1,
+            issueDate.getFullYear(),
+            '₪',
+            'BUSINESS'
+        )
 
         // Calculate VAT and total
         const vatAmount = data.creditAmount * invoice.vatRate
@@ -120,7 +127,7 @@ export async function createCreditNote(data: CreditNoteFormData) {
         // Create negative income entry to reduce revenue
         await db.income.create({
             data: {
-                budgetId: invoice.budgetId,
+                budgetId: budget.id,
                 source: `זיכוי עבור חשבונית ${invoice.invoiceNumber} - ${data.reason || 'זיכוי'}`,
                 category: 'זיכויים',
                 amount: -totalCredit,
