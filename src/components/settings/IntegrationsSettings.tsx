@@ -59,9 +59,9 @@ export function IntegrationsSettings() {
         <div className="space-y-6" dir="rtl">
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-right flex items-center gap-2">
-                        <Key className="w-5 h-5" />
+                    <CardTitle className="text-right flex items-center justify-start gap-2">
                         ממשק קיצורי דרך (Shortcuts)
+                        <Key className="w-5 h-5" />
                     </CardTitle>
                     <CardDescription className="text-right">
                         צור מפתח גישה אישי כדי לאפשר הוספת הוצאות ברקע דרך אפליקציית Shortcuts.
@@ -91,8 +91,8 @@ export function IntegrationsSettings() {
 
                     <div className="flex justify-end pt-2">
                         <Button onClick={handleGenerate} disabled={loading} variant={apiKey ? "secondary" : "default"}>
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <RefreshCw className="w-4 h-4 ml-2" />}
                             {apiKey ? 'צור מפתח חדש' : 'צור מפתח ראשוני'}
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
                         </Button>
                     </div>
                 </CardContent>

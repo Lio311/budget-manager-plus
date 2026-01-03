@@ -304,8 +304,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
                             title="אוטומציות (iPhone Shortcuts)"
                         >
-                            <svg className="w-4 h-4 fill-current text-[#323338] dark:text-gray-100" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M17.306 14.864c.25 1.705 1.528 2.296 1.625 2.334-.012.046-2.541 8.798-8.409 8.802-2.126.002-2.924-1.442-5.462-1.442-2.603 0-3.321 1.488-5.385 1.509-3.666.038-7.9-6.326-7.9-14.735 0-6.108 3.864-9.28 7.494-9.28 2.036 0 3.766 1.35 5.093 1.35 1.139 0 3.323-1.68 5.602-1.432 2.37.258 4.184 1.205 5.342 2.915-4.708 2.454-3.9 8.281 2.001 10.977zM11.696.06c2.404-.207 4.135 2.925 3.655 5.922-2.484.288-5.01-2.664-3.655-5.922z" />
+                            <svg className="w-4 h-4 fill-current text-[#323338] dark:text-gray-100" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 49 126.7 83.6 126.1 27.2-.5 38-19.1 82.9-19.1s54.9 19.1 83.6 18.9c35.5-.3 67.2-76.5 87.8-109.2-25.2-13.8-49.9-46.7-47.6-102.7zM245.8 48.9c30.1-39.1 24.8-82.5 24.4-86.4-29.2 2.8-55.5 17.5-74 40.6-16.7 20.9-24.6 57-19.8 86.1 32 3.8 54.4-23.9 69.4-40.3z" />
                             </svg>
                             <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-stone-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                         </Button>

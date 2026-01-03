@@ -130,11 +130,11 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
                     </DialogHeader>
 
                     <div className="py-4 space-y-2 text-sm text-gray-500">
-                        <p>🎁 2 חברים = 8% הנחה</p>
-                        <p>🎁 4 חברים = 17% הנחה</p>
-                        <p>🎁 6 חברים = 25% הנחה</p>
-                        <p>🎁 8 חברים = 40% הנחה</p>
-                        <p>🎁 10 חברים = 50% הנחה!</p>
+                        <p>2 חברים = 8% הנחה 🎁</p>
+                        <p>4 חברים = 17% הנחה 🎁</p>
+                        <p>6 חברים = 25% הנחה 🎁</p>
+                        <p>8 חברים = 40% הנחה 🎁</p>
+                        <p>10 חברים = 50% הנחה! 🎁</p>
                     </div>
 
                     <Button
@@ -155,9 +155,9 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
             <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                     <div className="flex items-center justify-between">
-                        <DialogTitle className="text-xl flex items-center gap-2">
-                            <span className="text-2xl">🏆</span>
+                        <DialogTitle className="text-xl flex items-center justify-start gap-2">
                             איזור השותפים שלך
+                            <span className="text-2xl">🏆</span>
                         </DialogTitle>
                         <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
                             סטטוס זהב
