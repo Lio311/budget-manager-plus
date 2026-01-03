@@ -23,7 +23,14 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json()
-        const { amount, category, description, currency, budgetType = 'PERSONAL' } = body
+        let { amount, category, description, currency, budgetType = 'PERSONAL' } = body
+
+        // Support Hebrew Keys (fallback for Israeli users/shortcuts)
+        if (!amount && body['סכום']) amount = body['סכום']
+        if (!category && body['קטגוריה']) category = body['קטגוריה']
+        if (!description && (body['תיאור'] || body['תיאור ההוצאה'])) description = body['תיאור'] || body['תיאור ההוצאה']
+        if (!currency && body['מטבע']) currency = body['מטבע']
+        if (!budgetType && body['סוג']) budgetType = body['סוג']
 
         console.log('Received Expense Request:', { amount, category, budgetType, currency })
 
