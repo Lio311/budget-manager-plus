@@ -442,7 +442,7 @@ export default function LandingPage() {
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="px-10 py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-xl hover:opacity-90 transition-all shadow-xl hover:shadow-2xl"
+                                        className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full font-bold text-lg hover:shadow-lg hover:shadow-emerald-500/20 transition-all shadow-md"
                                     >
                                         הרשמה חינם
                                     </motion.button>
@@ -451,7 +451,7 @@ export default function LandingPage() {
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="px-10 py-4 bg-white border-2 border-primary text-primary rounded-2xl font-bold text-xl hover:bg-green-50 transition-all"
+                                        className="px-8 py-3 bg-white text-gray-700 hover:text-emerald-600 rounded-full font-bold text-lg border border-gray-200 hover:border-emerald-200 hover:shadow-md transition-all shadow-sm"
                                     >
                                         כניסה למערכת
                                     </motion.button>

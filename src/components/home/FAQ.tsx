@@ -30,7 +30,7 @@ const faqData = [
 
 export default function FAQ() {
     return (
-        <section className="py-20 bg-gradient-to-b from-white to-green-50/50">
+        <section className="pt-20 pb-0 bg-gradient-to-b from-white to-green-50/50">
             <div className="container mx-auto px-4 max-w-4xl">
                 <div className="text-center mb-16">
                     <motion.div
