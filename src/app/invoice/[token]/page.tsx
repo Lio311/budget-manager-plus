@@ -90,21 +90,31 @@ export default function PublicInvoicePage() {
                 format: 'a4'
             })
 
-            const imgWidth = 210 // A4 width in mm
+            let imgWidth = 210 // A4 width in mm
             const pageHeight = 297 // A4 height in mm
-            const imgHeight = (canvas.height * imgWidth) / canvas.width
+            let imgHeight = (canvas.height * imgWidth) / canvas.width
+
+            // Scale to fit if slightly bigger than A4 (up to 30mm overflow) to avoid cut-off or 2nd page
+            if (imgHeight > pageHeight && imgHeight < pageHeight + 30) {
+                const scale = pageHeight / imgHeight
+                imgWidth *= scale
+                imgHeight = pageHeight
+            }
 
             let heightLeft = imgHeight
             let position = 0
 
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+            // Center horizontally if scaled down
+            const xOffset = (210 - imgWidth) / 2
+
+            pdf.addImage(imgData, 'PNG', xOffset, position, imgWidth, imgHeight)
             heightLeft -= pageHeight
 
-            // Handle multi-page
+            // Handle multi-page (only if still huge overflow)
             while (heightLeft > 5) { // Threshold to prevent tiny overflows causing new page
                 position = heightLeft - imgHeight
                 pdf.addPage()
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+                pdf.addImage(imgData, 'PNG', xOffset, position, imgWidth, imgHeight)
                 heightLeft -= pageHeight
             }
 
