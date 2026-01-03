@@ -115,7 +115,8 @@ export async function addBill(
         }
 
         revalidatePath('/dashboard')
-        return { success: true }
+        revalidatePath('/dashboard')
+        return { success: true, data: bill }
     } catch (error) {
         console.error('Error adding bill:', error)
         return { success: false, error: 'Failed to add bill' }
