@@ -350,7 +350,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                 {/* 4. Equity / Bills (Leftmost) */}
                 <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => {
-                    if (isBusiness) setIsSettingsOpen(true)
+                    if (isBusiness) {
+                        setActiveSettingsTab('financials')
+                        setIsSettingsOpen(true)
+                    }
                     else onNavigateToTab?.('bills')
                 }}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

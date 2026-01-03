@@ -152,10 +152,17 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
             select: { id: true, name: true, color: true }
         })
 
-        // Get net worth history (all budgets for this user and type)
+        // Get net worth history (up to current month for accurate "Current" state)
         // @ts-ignore
         const allBudgets = await db.budget.findMany({
-            where: { userId, type },
+            where: {
+                userId,
+                type,
+                OR: [
+                    { year: { lt: year } },
+                    { year: year, month: { lte: month } }
+                ]
+            },
             select: {
                 month: true,
                 year: true,
