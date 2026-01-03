@@ -269,15 +269,23 @@ export default function PublicQuotePage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
-                                {/* Since Quote doesn't have line items relation yet, we show a summary row */}
-                                <tr>
-                                    <td className="py-4 text-gray-900 font-medium">
-                                        {quote.notes || 'שירות / מוצר'}
-                                    </td>
-                                    <td className="py-4 text-gray-600 text-center">1</td>
-                                    <td className="py-4 text-gray-600 text-center">{formatCurrency(quote.subtotal)}</td>
-                                    <td className="py-4 text-gray-900 font-medium text-left">{formatCurrency(quote.subtotal)}</td>
-                                </tr>
+                                {quote.items && Array.isArray(quote.items) && quote.items.length > 0 ? (
+                                    quote.items.map((item: any, index: number) => (
+                                        <tr key={index}>
+                                            <td className="py-4 text-gray-900 font-medium">{item.description}</td>
+                                            <td className="py-4 text-center text-gray-600">{item.quantity}</td>
+                                            <td className="py-4 text-center text-gray-600">{formatCurrency(item.price)}</td>
+                                            <td className="py-4 text-left text-gray-900 font-bold">{formatCurrency(item.quantity * item.price)}</td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td className="py-4 text-gray-900 font-medium">{quote.notes || 'שירות / מוצר'}</td>
+                                        <td className="py-4 text-center text-gray-600">1</td>
+                                        <td className="py-4 text-center text-gray-600">{formatCurrency(quote.subtotal)}</td>
+                                        <td className="py-4 text-left text-gray-900 font-bold">{formatCurrency(quote.subtotal)}</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

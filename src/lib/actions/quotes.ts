@@ -12,6 +12,7 @@ export interface QuoteFormData {
     subtotal: number
     vatRate?: number
     notes?: string
+    items?: any[]
 }
 
 export async function getQuotes(scope: string = 'BUSINESS') {
@@ -127,6 +128,7 @@ export async function updateQuote(id: string, data: Partial<QuoteFormData>) {
         if (data.issueDate) updateData.issueDate = data.issueDate
         if (data.validUntil !== undefined) updateData.validUntil = data.validUntil
         if (data.notes !== undefined) updateData.notes = data.notes
+        if (data.items !== undefined) updateData.items = data.items
 
         if (data.subtotal !== undefined) {
             const vatRate = data.vatRate ?? existing.vatRate

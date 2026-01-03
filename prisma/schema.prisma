@@ -584,6 +584,9 @@ model Quote {
   total         Float
   currency      String      @default("₪")
   
+  // Line Items
+  items         Json?       // Stores array of { description, quantity, price, total }
+  
   // Notes
   notes         String?     @db.Text
   
