@@ -164,16 +164,31 @@ export default function PublicInvoicePage() {
                 <Card id="invoice-content" className="p-4 md:p-8 bg-white shadow-lg print:shadow-none">
                     {/* Header */}
                     {/* Header */}
-                    <div className="flex flex-col md:flex-row justify-between items-start mb-2 gap-8">
-                        <div className="w-full md:w-auto">
-                            <h1 className="text-4xl font-light text-green-600 mb-2">חשבונית מס</h1>
-                            <div className="text-gray-600">
-                                <p><strong>מספר חשבונית:</strong> {invoice.invoiceNumber}</p>
-                                <p><strong>תאריך:</strong> {new Date(invoice.issueDate).toLocaleDateString('he-IL')}</p>
-                                {invoice.dueDate && <p><strong>לתשלום עד:</strong> {new Date(invoice.dueDate).toLocaleDateString('he-IL')}</p>}
+                    {/* Main Layout: Header & Client Info vs Business Info */}
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-8">
+                        {/* Right Side (RTL): Invoice Details & Client Info */}
+                        <div className="w-full md:w-1/2 space-y-8">
+                            {/* Invoice Details */}
+                            <div>
+                                <h1 className="text-4xl font-light text-green-600 mb-2">חשבונית מס</h1>
+                                <div className="text-gray-600">
+                                    <p><strong>מספר חשבונית:</strong> {invoice.invoiceNumber}</p>
+                                    <p><strong>תאריך:</strong> {new Date(invoice.issueDate).toLocaleDateString('he-IL')}</p>
+                                    {invoice.dueDate && <p><strong>לתשלום עד:</strong> {new Date(invoice.dueDate).toLocaleDateString('he-IL')}</p>}
+                                </div>
+                            </div>
+
+                            {/* Client Info */}
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">לכבוד</h3>
+                                <div className="text-gray-900 font-medium text-lg">{client?.name}</div>
+                                {client?.taxId && <div className="text-gray-600">ח.פ / ת.ז: {client.taxId}</div>}
+                                {client?.address && <div className="text-gray-600">{client.address}</div>}
+                                {client?.email && <div className="text-gray-600">{client.email}</div>}
                             </div>
                         </div>
 
+                        {/* Left Side (RTL): Business Info */}
                         <div className="text-center w-full md:w-auto">
                             {business?.logoUrl && (
                                 <div className="mb-4 flex justify-center">
@@ -195,15 +210,6 @@ export default function PublicInvoicePage() {
                                 {business?.email && <p>{business.email}</p>}
                             </div>
                         </div>
-                    </div>
-
-                    {/* Client Info */}
-                    <div className="mb-12 border-b pb-8">
-                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">לכבוד</h3>
-                        <div className="text-gray-900 font-medium text-lg">{client?.name}</div>
-                        {client?.taxId && <div className="text-gray-600">ח.פ / ת.ז: {client.taxId}</div>}
-                        {client?.address && <div className="text-gray-600">{client.address}</div>}
-                        {client?.email && <div className="text-gray-600">{client.email}</div>}
                     </div>
 
                     {/* Line Items */}

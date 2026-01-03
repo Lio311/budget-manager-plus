@@ -162,16 +162,31 @@ export default function PublicQuotePage() {
                 {/* Quote Content */}
                 <Card id="quote-content" className="p-4 md:p-8 bg-white shadow-lg print:shadow-none">
                     {/* Header */}
-                    <div className="flex flex-col md:flex-row justify-between items-start mb-2 gap-8">
-                        <div className="w-full md:w-auto">
-                            <h1 className="text-4xl font-light text-green-600 mb-2">הצעת מחיר</h1>
-                            <div className="text-gray-600">
-                                <p><strong>מספר הצעה:</strong> {quote.quoteNumber}</p>
-                                <p><strong>תאריך:</strong> {new Date(quote.issueDate).toLocaleDateString('he-IL')}</p>
-                                {quote.validUntil && <p><strong>בתוקף עד:</strong> {new Date(quote.validUntil).toLocaleDateString('he-IL')}</p>}
+                    {/* Main Layout: Header & Client Info vs Business Info */}
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-8">
+                        {/* Right Side (RTL): Quote Details & Client Info */}
+                        <div className="w-full md:w-1/2 space-y-8">
+                            {/* Quote Details */}
+                            <div>
+                                <h1 className="text-4xl font-light text-green-600 mb-2">הצעת מחיר</h1>
+                                <div className="text-gray-600">
+                                    <p><strong>מספר הצעה:</strong> {quote.quoteNumber}</p>
+                                    <p><strong>תאריך:</strong> {new Date(quote.issueDate).toLocaleDateString('he-IL')}</p>
+                                    {quote.validUntil && <p><strong>בתוקף עד:</strong> {new Date(quote.validUntil).toLocaleDateString('he-IL')}</p>}
+                                </div>
+                            </div>
+
+                            {/* Client Info */}
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">לכבוד</h3>
+                                <div className="text-gray-900 font-medium text-lg">{client?.name}</div>
+                                {client?.taxId && <div className="text-gray-600">ח.פ / ת.ז: {client.taxId}</div>}
+                                {client?.address && <div className="text-gray-600">{client.address}</div>}
+                                {client?.email && <div className="text-gray-600">{client.email}</div>}
                             </div>
                         </div>
 
+                        {/* Left Side (RTL): Business Info */}
                         <div className="text-center w-full md:w-auto">
                             {business?.logoUrl && (
                                 <div className="mb-4 flex justify-center">
@@ -193,15 +208,6 @@ export default function PublicQuotePage() {
                                 {business?.email && <p>{business.email}</p>}
                             </div>
                         </div>
-                    </div>
-
-                    {/* Client Info */}
-                    <div className="mb-8 border-b pb-8">
-                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">לכבוד</h3>
-                        <div className="text-gray-900 font-medium text-lg">{client?.name}</div>
-                        {client?.taxId && <div className="text-gray-600">ח.פ / ת.ז: {client.taxId}</div>}
-                        {client?.address && <div className="text-gray-600">{client.address}</div>}
-                        {client?.email && <div className="text-gray-600">{client.email}</div>}
                     </div>
 
                     {/* Line Items - Placeholder since Quotes usually don't have detailed line items in DB yet, but if they do we map them. 
