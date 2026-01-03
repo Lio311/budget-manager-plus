@@ -27,7 +27,7 @@ import { QuoteForm } from '@/components/dashboard/forms/QuoteForm'
 const statusConfig = {
     DRAFT: { label: 'טיוטה', icon: FileText, color: 'text-gray-600', bg: 'bg-gray-100' },
     SENT: { label: 'נשלח', icon: Clock, color: 'text-blue-600', bg: 'bg-blue-100' },
-    ACCEPTED: { label: 'התקבל', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
+    ACCEPTED: { label: 'נחתם', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
     EXPIRED: { label: 'פג תוקף', icon: AlertCircle, color: 'text-orange-600', bg: 'bg-orange-100' },
     CANCELLED: { label: 'בוטל', icon: XCircle, color: 'text-gray-600', bg: 'bg-gray-100' }
 }
@@ -339,7 +339,7 @@ export function QuotesTab() {
                                         <SelectContent dir="rtl">
                                             <SelectItem value="DRAFT">טיוטה</SelectItem>
                                             <SelectItem value="SENT">נשלח</SelectItem>
-                                            <SelectItem value="ACCEPTED">התקבל</SelectItem>
+                                            <SelectItem value="ACCEPTED">נחתם</SelectItem>
                                             <SelectItem value="EXPIRED">פג תוקף</SelectItem>
                                             <SelectItem value="CANCELLED">בוטל</SelectItem>
                                         </SelectContent>
