@@ -517,6 +517,12 @@ model Invoice {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   
+  // Digital Signing (Green Invoice)
+  token         String?       @unique @default(cuid()) // For public access
+  signature     String?       // Base64 encoded signature
+  signedAt      DateTime?
+  isSigned      Boolean       @default(false)
+  
   // Relations
   incomes       Income[]
   lineItems     InvoiceLineItem[] // NEW

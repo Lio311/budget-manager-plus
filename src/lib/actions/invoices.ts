@@ -134,43 +134,126 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
                 paymentMethod: validData.paymentMethod || null,
                 status: 'DRAFT'
             },
-        },
             include: {
-            client: true,
-            lineItems: true
+                client: true,
+                lineItems: true
+            }
+        })
+
+        // Create Line Items
+        if (validData.lineItems && validData.lineItems.length > 0) {
+            await db.invoiceLineItem.createMany({
+                data: validData.lineItems.map(item => ({
+                    invoiceId: invoice.id,
+                    description: item.description,
+                    quantity: item.quantity,
+                    price: item.price,
+                    total: item.total
+                }))
+            })
         }
-        })
 
-    // Create Line Items
-    if (validData.lineItems && validData.lineItems.length > 0) {
-        await db.invoiceLineItem.createMany({
-            data: validData.lineItems.map(item => ({
-                invoiceId: invoice.id,
-                description: item.description,
-                quantity: item.quantity,
-                price: item.price,
-                total: item.total
-            }))
-        })
-    }
+        // Link Income if provided
+        if (validData.incomeId) {
+            await db.income.update({
+                where: { id: validData.incomeId },
+                data: { invoiceId: invoice.id }
+            })
+        }
 
-    // Link Income if provided
-    if (validData.incomeId) {
-        await db.income.update({
-            where: { id: validData.incomeId },
-            data: { invoiceId: invoice.id }
-        })
+        revalidatePath('/dashboard')
+        return { success: true, data: invoice }
+    } catch (error: any) {
+        console.error('createInvoice error:', error)
+        if (error.code === 'P2002') {
+            return { success: false, error: 'חשבונית עם מספר זה כבר קיימת' }
+        }
+        return { success: false, error: 'Failed to create invoice' }
     }
-
-    revalidatePath('/dashboard')
-    return { success: true, data: invoice }
-} catch (error: any) {
-    console.error('createInvoice error:', error)
-    if (error.code === 'P2002') {
-        return { success: false, error: 'חשבונית עם מספר זה כבר קיימת' }
-    }
-    return { success: false, error: 'Failed to create invoice' }
 }
+
+export async function generateInvoiceLink(invoiceId: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        const invoice = await db.invoice.findUnique({ where: { id: invoiceId } })
+        if (!invoice || invoice.userId !== userId) throw new Error('Invoice not found')
+
+        if (invoice.token) {
+            return { success: true, token: invoice.token }
+        }
+
+        const token = crypto.randomUUID()
+        await db.invoice.update({
+            where: { id: invoiceId },
+            data: { token }
+        })
+
+        return { success: true, token }
+    } catch (error) {
+        console.error('generateInvoiceLink error:', error)
+        return { success: false, error: 'Failed to generate link' }
+    }
+}
+
+export async function getInvoiceByToken(token: string) {
+    try {
+        // No auth check needed for public access, but we verify token existence
+        // We use the global prisma instance for public read access if needed, 
+        // or we need to bypass row-level security or use a system context.
+        // Since `authenticatedPrisma` requires a userId, we'll use the raw `prisma` client for this public/token lookup.
+
+        const invoice = await prisma.invoice.findUnique({
+            where: { token },
+            include: {
+                client: true,
+                lineItems: true,
+                businessProfile: true, // Need to fetch business profile separately if not linked directly? 
+                // Wait, BusinessProfile is linked to User, not Invoice directly.
+                // We access it via invoice.user.businessProfile
+                user: {
+                    include: {
+                        businessProfile: true
+                    }
+                }
+            }
+        })
+
+        if (!invoice) {
+            return { success: false, error: 'Invoice not found or expired' }
+        }
+
+        return { success: true, data: invoice }
+    } catch (error) {
+        console.error('getInvoiceByToken error:', error)
+        return { success: false, error: 'Failed to fetch invoice' }
+    }
+}
+
+export async function signInvoice(token: string, signatureBase64: string) {
+    try {
+        // Validation: Verify invoice exists first
+        const invoice = await prisma.invoice.findUnique({ where: { token } })
+        if (!invoice) throw new Error('Invoice not found')
+
+        await prisma.invoice.update({
+            where: { id: invoice.id },
+            data: {
+                signature: signatureBase64,
+                signedAt: new Date(),
+                isSigned: true,
+                status: 'SENT' // Update status to SENT or PAID? Probably just SENT/SIGNED. 
+            }
+        })
+
+        return { success: true }
+    } catch (error) {
+        console.error('signInvoice error:', error)
+        return { success: false, error: 'Failed to sign invoice' }
+    }
 }
 
 export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) {
