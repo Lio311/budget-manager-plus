@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import { Loader2, Download, PenTool, CheckCircle } from 'lucide-react'
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { getInvoiceByToken, signInvoice } from '@/lib/actions/invoices'
 import { formatCurrency } from '@/lib/utils'
-import SignatureCanvas from 'react-signature-canvas'
+import { SignaturePad } from '@/components/settings/SignaturePad'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { toast } from 'sonner'
@@ -23,7 +23,7 @@ export default function PublicInvoicePage() {
 
     // Signing State
     const [isSigning, setIsSigning] = useState(false)
-    const sigCanvas = useRef<any>(null)
+    const [signatureData, setSignatureData] = useState('')
 
     useEffect(() => {
         if (token) {
@@ -46,17 +46,11 @@ export default function PublicInvoicePage() {
         }
     }
 
-    const handleClear = () => {
-        sigCanvas.current?.clear()
-    }
-
     const handleSign = async () => {
-        if (sigCanvas.current?.isEmpty()) {
+        if (!signatureData) {
             toast.error('נא לחתום לפני השמירה')
             return
         }
-
-        const signatureData = sigCanvas.current?.getTrimmedCanvas().toDataURL('image/png')
 
         try {
             setIsSigning(true)
@@ -145,18 +139,20 @@ export default function PublicInvoicePage() {
             <div className="max-w-4xl mx-auto space-y-6">
 
                 {/* Actions Bar */}
-                <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm print:hidden">
+                <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm print:hidden gap-4">
                     <h1 className="text-xl font-bold text-gray-800">חשבונית לתשלום</h1>
-                    <Button onClick={handleDownloadPDF} variant="outline" className="gap-2">
-                        <Download className="h-4 w-4" />
-                        הורד PDF
-                    </Button>
+                    {invoice.isSigned && (
+                        <Button onClick={handleDownloadPDF} variant="outline" className="gap-2 w-full sm:w-auto">
+                            <Download className="h-4 w-4" />
+                            הורד PDF
+                        </Button>
+                    )}
                 </div>
 
                 {/* Invoice Content - This gets printed/PDF'd */}
                 <Card id="invoice-content" className="p-8 bg-white shadow-lg print:shadow-none">
                     {/* Header */}
-                    <div className="flex justify-between items-start mb-12">
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-8">
                         <div>
                             {business?.logoUrl && (
                                 <div className="mb-4">
@@ -178,7 +174,7 @@ export default function PublicInvoicePage() {
                                 {business?.email && <p>{business.email}</p>}
                             </div>
                         </div>
-                        <div className="text-left">
+                        <div className="text-right md:text-left w-full md:w-auto">
                             <h1 className="text-4xl font-light text-purple-600 mb-2">חשבונית מס</h1>
                             <div className="text-gray-600">
                                 <p><strong>מספר חשבונית:</strong> {invoice.invoiceNumber}</p>
@@ -310,18 +306,16 @@ export default function PublicInvoicePage() {
                             אנא חתום בתיבה למטה ולחץ על "אשר חתימה" כדי לאשר את קבלת החשבונית.
                         </p>
 
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 mb-4 touch-none">
-                            <SignatureCanvas
-                                ref={sigCanvas}
-                                canvasProps={{
-                                    className: 'w-full h-48',
-                                }}
-                                backgroundColor="rgba(255, 255, 255, 0)"
+                        <div className="mb-4 touch-none">
+                            <SignaturePad
+                                value={signatureData}
+                                onChange={setSignatureData}
+                                onClear={() => setSignatureData('')}
                             />
                         </div>
 
                         <div className="flex gap-4">
-                            <Button onClick={handleSign} disabled={isSigning} className="flex-1 bg-purple-600 hover:bg-purple-700">
+                            <Button onClick={handleSign} disabled={isSigning || !signatureData} className="flex-1 bg-purple-600 hover:bg-purple-700">
                                 {isSigning ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -329,9 +323,7 @@ export default function PublicInvoicePage() {
                                     </>
                                 ) : 'אשר חתימה'}
                             </Button>
-                            <Button variant="outline" onClick={handleClear} disabled={isSigning}>
-                                נקה
-                            </Button>
+
                         </div>
                     </Card>
                 )}
