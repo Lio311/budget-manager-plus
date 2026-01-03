@@ -154,7 +154,7 @@ export default function PublicInvoicePage() {
                     {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-8">
                         <div className="w-full md:w-auto">
-                            <h1 className="text-4xl font-light text-purple-600 mb-2">חשבונית מס</h1>
+                            <h1 className="text-4xl font-light text-green-600 mb-2">חשבונית מס</h1>
                             <div className="text-gray-600">
                                 <p><strong>מספר חשבונית:</strong> {invoice.invoiceNumber}</p>
                                 <p><strong>תאריך:</strong> {new Date(invoice.issueDate).toLocaleDateString('he-IL')}</p>
@@ -162,9 +162,9 @@ export default function PublicInvoicePage() {
                             </div>
                         </div>
 
-                        <div className="text-right md:text-left w-full md:w-auto">
+                        <div className="text-center w-full md:w-auto">
                             {business?.logoUrl && (
-                                <div className="mb-4 flex justify-end md:justify-start">
+                                <div className="mb-4 flex justify-center">
                                     <Image
                                         src={business.logoUrl}
                                         alt="Logo"
@@ -229,7 +229,7 @@ export default function PublicInvoicePage() {
                                 <span>מע"מ ({invoice.vatRate * 100}%):</span>
                                 <span>{formatCurrency(invoice.vatAmount)}</span>
                             </div>
-                            <div className="flex justify-between text-xl font-bold text-purple-600 border-t pt-3">
+                            <div className="flex justify-between text-xl font-bold text-green-600 border-t pt-3">
                                 <span>סה"כ לתשלום:</span>
                                 <span>{formatCurrency(invoice.total)}</span>
                             </div>
@@ -294,13 +294,24 @@ export default function PublicInvoicePage() {
                             </div>
                         </div>
                     </div>
+
+                    <div className="mt-16 pt-8 border-t border-gray-100 flex flex-col items-center justify-center opacity-70">
+                        <span className="text-xs text-gray-400 mb-2">הופק על ידי</span>
+                        <Image
+                            src="/K-LOGO.png"
+                            alt="KeseFlow"
+                            width={100}
+                            height={40}
+                            className="object-contain opacity-80 hover:opacity-100 transition-opacity"
+                        />
+                    </div>
                 </Card>
 
                 {/* Signing Pad (Only if not signed) */}
                 {!invoice.isSigned && (
                     <Card className="p-6 bg-white shadow-md print:hidden">
                         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                            <PenTool className="h-5 w-5 text-purple-600" />
+                            <PenTool className="h-5 w-5 text-green-600" />
                             חתימה דיגיטלית
                         </h3>
                         <p className="text-sm text-gray-500 mb-4">
@@ -316,7 +327,7 @@ export default function PublicInvoicePage() {
                         </div>
 
                         <div className="flex gap-4">
-                            <Button onClick={handleSign} disabled={isSigning || !signatureData} className="flex-1 bg-purple-600 hover:bg-purple-700">
+                            <Button onClick={handleSign} disabled={isSigning || !signatureData} className="flex-1 bg-green-600 hover:bg-green-700">
                                 {isSigning ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

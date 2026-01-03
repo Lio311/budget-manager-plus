@@ -361,10 +361,6 @@ export function InvoicesTab() {
                                     <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">{formatCurrency(inv.totalAmount)}</div>
                                     <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(inv.totalAmount - (inv.vatAmount || 0))}</div>
                                 </div>
-                                <Button variant="outline" size="sm" onClick={() => handleDownloadPDF(inv.id)} className="gap-2">
-                                    <Download className="h-4 w-4" />
-                                    <span className="md:hidden">הורד PDF</span>
-                                </Button>
                                 <Button variant="outline" size="sm" onClick={() => handleCopyLink(inv.id)} className="gap-2 text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100">
                                     <LinkIcon className="h-4 w-4" />
                                     <span className="md:hidden">הערת קישור</span>
