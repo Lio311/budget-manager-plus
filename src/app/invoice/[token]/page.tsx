@@ -164,7 +164,7 @@ export default function PublicInvoicePage() {
                 <Card id="invoice-content" className="p-8 bg-white shadow-lg print:shadow-none">
                     {/* Header */}
                     {/* Header */}
-                    <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-8">
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-2 gap-8">
                         <div className="w-full md:w-auto">
                             <h1 className="text-4xl font-light text-green-600 mb-2">חשבונית מס</h1>
                             <div className="text-gray-600">
