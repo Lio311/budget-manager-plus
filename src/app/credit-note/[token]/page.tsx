@@ -8,12 +8,76 @@ import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Download, ArrowRight, Loader2 } from 'lucide-react'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
+import { toast } from 'sonner'
 
 export default function PublicCreditNotePage() {
     const params = useParams()
     const token = params.token as string
     const [creditNote, setCreditNote] = useState<any>(null)
     const [loading, setLoading] = useState(true)
+    const [isDownloading, setIsDownloading] = useState(false)
+
+    const handleDownloadPDF = async () => {
+        const element = document.getElementById('credit-note-content')
+        if (!element) return
+
+        try {
+            setIsDownloading(true)
+            toast.info('מכין PDF להורדה...')
+
+            // Create a hidden container for higher resolution rendering
+            const container = document.createElement('div')
+            container.style.position = 'absolute'
+            container.style.left = '-9999px'
+            container.style.top = '0'
+            container.style.width = '1200px'
+
+            // Clone the element
+            const clone = element.cloneNode(true) as HTMLElement
+            container.appendChild(clone)
+            document.body.appendChild(container)
+
+            const canvas = await html2canvas(clone, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                windowWidth: 1200
+            })
+
+            // Cleanup
+            document.body.removeChild(container)
+
+            const imgData = canvas.toDataURL('image/png')
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            })
+
+            let imgWidth = 210
+            const pageHeight = 297
+            let imgHeight = (canvas.height * imgWidth) / canvas.width
+
+            if (imgHeight > pageHeight - 30) {
+                const scale = (pageHeight - 30) / imgHeight
+                imgWidth *= scale
+                imgHeight = (pageHeight - 30)
+            }
+
+            const xOffset = (210 - imgWidth) / 2
+            pdf.addImage(imgData, 'PNG', xOffset, 0, imgWidth, imgHeight)
+
+            pdf.save(`credit_note_${creditNote.creditNoteNumber}.pdf`)
+            toast.success('הורדה הושלמה')
+        } catch (err) {
+            console.error(err)
+            toast.error('שגיאה ביצירת PDF')
+        } finally {
+            setIsDownloading(false)
+        }
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -68,11 +132,16 @@ export default function PublicCreditNotePage() {
                         <h1 className="text-xl font-bold text-gray-800">חשבונית זיכוי</h1>
                     </div>
                     <Button
-                        onClick={() => window.print()}
+                        onClick={handleDownloadPDF}
+                        disabled={isDownloading}
                         variant="outline"
                         className="gap-2 w-full sm:w-auto"
                     >
-                        <Download className="h-4 w-4" />
+                        {isDownloading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <Download className="h-4 w-4" />
+                        )}
                         הורד PDF
                     </Button>
                 </div>
