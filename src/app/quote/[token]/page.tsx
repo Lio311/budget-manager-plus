@@ -93,11 +93,12 @@ export default function PublicQuotePage() {
             let imgWidth = 210
             let imgHeight = (canvas.height * imgWidth) / canvas.width
 
-            // Scale to fit if slightly bigger than A4 (up to 30mm overflow) to avoid cut-off or 2nd page
-            if (imgHeight > pageHeight && imgHeight < pageHeight + 30) {
-                const scale = pageHeight / imgHeight
+            // Scale to fit if slightly bigger than A4 or just to be safe
+            // We scale down to pageHeight - 10mm to ensure bottom margin/footer isn't cut
+            if (imgHeight > pageHeight - 10) {
+                const scale = (pageHeight - 10) / imgHeight
                 imgWidth *= scale
-                imgHeight = pageHeight
+                imgHeight = (pageHeight - 10)
             }
 
             let heightLeft = imgHeight
