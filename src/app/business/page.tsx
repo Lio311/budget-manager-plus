@@ -21,7 +21,8 @@ export default function BusinessLandingPage() {
             description: 'המערכת המקצועית לניהול פיננסי של עסקים קטנים ובינוניים. כל הכלים שצריך כדי לנהל את העסק בצורה חכמה ויעילה.',
             bgColor: 'from-slate-900 via-slate-800 to-slate-900',
             textColor: 'text-white',
-            accentColor: 'emerald'
+            accentColor: 'emerald',
+            image: '/assets/dashboard_mockup.png'
         },
         {
             id: 1,
@@ -32,7 +33,8 @@ export default function BusinessLandingPage() {
             bgColor: 'from-green-600 via-green-700 to-green-900',
             textColor: 'text-white',
             accentColor: 'green',
-            tag: 'ניהול | מעקב | קשרי לקוחות'
+            tag: 'ניהול | מעקב | קשרי לקוחות',
+            image: '/screenshots/clients.png'
         },
         {
             id: 2,
@@ -43,7 +45,8 @@ export default function BusinessLandingPage() {
             bgColor: 'from-blue-600 via-blue-700 to-blue-900',
             textColor: 'text-white',
             accentColor: 'blue',
-            tag: 'ניהול | תזרים | תשלומים'
+            tag: 'ניהול | תזרים | תשלומים',
+            image: '/screenshots/suppliers.png'
         },
         {
             id: 3,
@@ -65,22 +68,36 @@ export default function BusinessLandingPage() {
             bgColor: 'from-purple-600 via-purple-700 to-purple-900',
             textColor: 'text-white',
             accentColor: 'purple',
-            tag: 'הפקה | מעמ | דוחות'
+            tag: 'הפקה | מעמ | דוחות',
+            image: '/screenshots/invoices.png'
         },
         {
             id: 5,
             number: '05',
+            title: 'חשבוניות זיכוי',
+            subtitle: 'נהל החזרים וזיכויים',
+            description: 'הפק חשבוניות זיכוי מקצועיות עבור החזרים ללקוחות. המערכת תעדכן אוטומטית את ההכנסות, תקשר את הזיכוי לחשבונית המקורית ותשמור על סדר בחשבון הלקוח. נהל בקרת החזרים יעילה ושמור על שקיפות מלאה מול הלקוחות והשלטונות.',
+            bgColor: 'from-orange-500 via-orange-600 to-orange-700',
+            textColor: 'text-white',
+            accentColor: 'orange',
+            tag: 'החזרים | זיכויים | ניהול',
+            image: '/screenshots/credit-notes.png'
+        },
+        {
+            id: 6,
+            number: '06',
             title: 'מכירות',
             subtitle: 'עקוב אחר ההכנסות',
             description: 'נתח את כל מקורות ההכנסה של העסק - מכירות מוצרים, שירותים, פרויקטים ועוד. המערכת תציג לך גרפים ברורים של מגמות המכירות, תזהה עונתיות ותעזור לך לתכנן צמיחה. עקוב אחר ביצועי מוצרים שונים, זהה לקוחות מובילים וקבל תובנות לשיפור האסטרטגיה העסקית שלך.',
             bgColor: 'from-emerald-600 via-emerald-700 to-emerald-900',
             textColor: 'text-white',
             accentColor: 'emerald',
-            tag: 'ניתוח | מגמות | תובנות'
+            tag: 'ניתוח | מגמות | תובנות',
+            image: '/screenshots/revenue.png'
         },
         {
-            id: 6,
-            number: '06',
+            id: 7,
+            number: '07',
             title: 'עלויות',
             subtitle: 'שלוט בהוצאות העסק',
             description: 'עקוב אחר כל עלויות העסק - שכר עובדים, חומרי גלם, שכירות, שיווק ועוד. המערכת תקטלג אוטומטית את ההוצאות, תזהה חריגות ותעזור לך למצוא הזדמנויות לחיסכון. קבל דוחות מפורטים לכל קטגוריה, השווה בין תקופות וקבל החלטות מושכלות על בסיס נתונים אמיתיים. הפוך את העסק לרווחי יותר.',
@@ -90,8 +107,8 @@ export default function BusinessLandingPage() {
             tag: 'מעקב | ניתוח | חיסכון'
         },
         {
-            id: 7,
-            number: '07',
+            id: 8,
+            number: '08',
             title: 'לוח שנה',
             subtitle: 'תכנן את העסק מראש',
             description: 'ראה את כל האירועים העסקיים בלוח שנה מרכזי - תשלומים ללקוחות וספקים, מועדי דיווח למס, פגישות חשובות ועוד. המערכת תסנכרן אוטומטית את כל הנתונים מהמודולים השונים ותתריע לך על מועדים קריטיים. תכנן את תזרים המזומנים, היערך לעונות עמוסות והישאר תמיד צעד אחד לפני.',
@@ -378,36 +395,24 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                         )}
                     </motion.div>
 
-                    {/* Image/Animation Area */}
+                    {/* Image Area */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={isActive ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
                         className="relative h-[400px] md:h-[600px] hidden md:flex items-center justify-center"
                     >
-                        {index === 0 && (
+                        {section.image ? (
                             <div className="relative w-full h-full flex items-center justify-center">
                                 <Image
-                                    src="/assets/dashboard_mockup.png"
-                                    alt="Dashboard"
-                                    width={800}
-                                    height={600}
-                                    className="w-full h-auto drop-shadow-2xl"
+                                    src={section.image}
+                                    alt={section.title}
+                                    width={index === 0 ? 800 : 1200}
+                                    height={index === 0 ? 600 : 800}
+                                    className={`w-full h-auto drop-shadow-2xl ${index === 0 ? '' : 'rounded-2xl border border-white/20'}`}
                                 />
                             </div>
-                        )}
-                        {index === 1 && (
-                            <div className="relative w-full h-full flex items-center justify-center">
-                                <Image
-                                    src="/screenshots/clients_mockup.png"
-                                    alt="Clients Management"
-                                    width={1200}
-                                    height={800}
-                                    className="w-full h-auto drop-shadow-2xl rounded-2xl border border-white/20"
-                                />
-                            </div>
-                        )}
-                        {index > 1 && (
+                        ) : (
                             <div className="w-full h-full flex items-center justify-center">
                                 <div className="w-96 h-96 bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 shadow-2xl" />
                             </div>
