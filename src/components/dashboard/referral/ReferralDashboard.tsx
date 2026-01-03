@@ -152,7 +152,7 @@ export function ReferralDashboard({ open, onOpenChange }: ReferralDashboardProps
     // MODE 2: Active Dashboard
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto" dir="rtl">
+            <DialogContent className="w-[95%] sm:w-full sm:max-w-xl max-h-[90vh] overflow-y-auto rounded-xl" dir="rtl">
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle className="text-xl">
