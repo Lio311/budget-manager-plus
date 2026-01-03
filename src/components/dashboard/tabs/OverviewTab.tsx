@@ -278,21 +278,19 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                 {/* Buttons Group - Second in DOM -> Left in RTL */}
                 <div className="flex gap-2 items-center w-full md:w-auto justify-end md:justify-end">
-                    {isBusiness && (
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                                setActiveSettingsTab('details')
-                                setIsSettingsOpen(true)
-                            }}
-                            className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                            title="הגדרות תצוגה"
-                        >
-                            <Settings className="w-4 h-4" />
-                            <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
-                        </Button>
-                    )}
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                            if (isBusiness) setActiveSettingsTab('details')
+                            setIsSettingsOpen(true)
+                        }}
+                        className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        title="הגדרות"
+                    >
+                        <Settings className="w-4 h-4" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+                    </Button>
 
                     <FinancialAdvisorButton financialData={aiFinancialData} />
                     <FeedbackButton />
