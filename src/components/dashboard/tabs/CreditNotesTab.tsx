@@ -70,21 +70,16 @@ export function CreditNotesTab() {
         currentPage * itemsPerPage
     )
 
-    const { execute: optimisticDelete } = useOptimisticMutation(
-        async (id: string) => {
-            const result = await deleteCreditNote(id)
-            if (!result.success) throw new Error(result.error)
-            return result
-        },
+    const { execute: optimisticDelete } = useOptimisticMutation<CreditNote[], string>(
+        ['creditNotes', budgetType],
+        (id) => deleteCreditNote(id),
         {
-            onMutate: (id: string) => {
-                const previous = creditNotes
-                mutate(creditNotes.filter(cn => cn.id !== id), false)
-                return { previous }
+            getOptimisticData: (current, id) => {
+                return current.filter(cn => cn.id !== id)
             },
-            onError: (error: any, id: string, context: any) => {
-                mutate(context?.previous)
+            onError: (error: any) => {
                 toast.error('שגיאה במחיקת חשבונית זיכוי')
+                mutate()
             },
             onSuccess: () => {
                 toast.success('חשבונית זיכוי נמחקה בהצלחה')
