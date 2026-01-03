@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown, Link as LinkIcon } from 'lucide-react'
+import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown, Link as LinkIcon, PenTool } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
 import { getInvoices, updateInvoiceStatus, generateInvoiceLink, type InvoiceFormData } from '@/lib/actions/invoices'
@@ -28,6 +28,7 @@ const statusConfig = {
     DRAFT: { label: 'טיוטה', icon: FileText, color: 'text-gray-600', bg: 'bg-gray-100' },
     SENT: { label: 'נשלח', icon: Clock, color: 'text-blue-600', bg: 'bg-blue-100' },
     PAID: { label: 'שולם', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
+    SIGNED: { label: 'נחתם', icon: PenTool, color: 'text-purple-600', bg: 'bg-purple-100' },
     OVERDUE: { label: 'באיחור', icon: AlertCircle, color: 'text-red-600', bg: 'bg-red-100' },
     CANCELLED: { label: 'בוטל', icon: XCircle, color: 'text-gray-600', bg: 'bg-gray-100' }
 }

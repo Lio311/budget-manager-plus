@@ -243,7 +243,7 @@ export async function signInvoice(token: string, signatureBase64: string) {
                 signature: signatureBase64,
                 signedAt: new Date(),
                 isSigned: true,
-                status: 'SENT'
+                status: 'SIGNED'
             }
         })
 

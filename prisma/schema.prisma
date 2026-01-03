@@ -483,6 +483,7 @@ enum InvoiceStatus {
   PAID
   OVERDUE
   CANCELLED
+  SIGNED
 }
 
 model Invoice {
