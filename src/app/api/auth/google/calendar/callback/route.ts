@@ -4,7 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { authenticatedPrisma } from '@/lib/db'
 
 export async function GET(req: NextRequest) {
-    const { userId } = auth()
+    const { userId } = await auth()
     if (!userId) {
         return NextResponse.redirect(new URL('/dashboard', req.url))
     }
