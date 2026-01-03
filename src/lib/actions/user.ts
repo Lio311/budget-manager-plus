@@ -50,6 +50,9 @@ export async function getUserSettings() {
 
         return { success: true, data: user };
 
+    } catch (error) {
+        console.error('Error fetching settings:', error)
+        return { success: false, error: 'Failed to fetch settings' }
     }
 }
 
