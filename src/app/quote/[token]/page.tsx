@@ -243,6 +243,31 @@ export default function PublicQuotePage() {
                     */}
 
                     {/* Totals - Green Gradient Box */}
+
+                    {/* Line Items (Simulated for Quote) */}
+                    <div className="mb-12 overflow-x-auto">
+                        <table className="w-full text-right min-w-[600px]">
+                            <thead className="border-b-2 border-gray-100">
+                                <tr>
+                                    <th className="py-3 text-sm font-bold text-gray-500">תיאור</th>
+                                    <th className="py-3 text-sm font-bold text-gray-500 text-center w-24">כמות</th>
+                                    <th className="py-3 text-sm font-bold text-gray-500 text-center w-32">מחיר יח'</th>
+                                    <th className="py-3 text-sm font-bold text-gray-500 text-left w-32">סה"כ</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {/* Since Quote doesn't have line items relation yet, we show a summary row */}
+                                <tr>
+                                    <td className="py-4 text-gray-900">שירות / מוצר (ראה פירוט בהערות)</td>
+                                    <td className="py-4 text-gray-600 text-center">1</td>
+                                    <td className="py-4 text-gray-600 text-center">{formatCurrency(quote.subtotal)}</td>
+                                    <td className="py-4 text-gray-900 font-medium text-left">{formatCurrency(quote.subtotal)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Totals - Green Gradient Box */}
                     <div className="flex justify-center mb-12">
                         <div className="w-[90%] bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl p-6 shadow-md">
                             <div className="space-y-3">
