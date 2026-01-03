@@ -11,7 +11,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { toast } from 'sonner'
 import { Trash2 } from 'lucide-react'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
-import { getIncomes } from '@/lib/actions/income' // Need to fetch client incomes
+import { getIncomes, getClientUninvoicedIncomes } from '@/lib/actions/income' // Need to fetch client incomes
 import useSWR from 'swr'
 import { formatCurrency } from '@/lib/utils'
 
@@ -53,7 +53,17 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
 
     // Fetch incomes for selection logic
     const { data: incomesData } = useSWR(['incomes', month, year, budgetType], () => getIncomes(month, year, budgetType))
-    const availableIncomes = (incomesData?.data?.incomes || []).filter((inc: any) => !inc.invoiceId && (formData.clientId ? inc.clientId === formData.clientId : true))
+
+    // Fetch client-specific open incomes (regardless of month)
+    const { data: clientIncomesData } = useSWR(
+        formData.clientId ? ['client-incomes', formData.clientId] : null,
+        () => getClientUninvoicedIncomes(formData.clientId)
+    )
+
+    // Determine which incomes to show
+    const availableIncomes = formData.clientId
+        ? (clientIncomesData?.data || [])
+        : (incomesData?.data?.incomes || []).filter((inc: any) => !inc.invoiceId)
 
     // Auto-fill from selected income
     useEffect(() => {
