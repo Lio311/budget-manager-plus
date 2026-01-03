@@ -38,13 +38,22 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
         const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
         if (!budget) return { success: false, error: 'No budget found' }
 
+        // Fetch bills and debts explicitly
+        const bills = await db.bill.findMany({
+            where: { budgetId: budget.id }
+        })
+
+        const debts = await db.debt.findMany({
+            where: { budgetId: budget.id }
+        })
+
         // 3. Prepare Events
         const events = []
         const calendarId = user.googleCalendarId || 'primary'
 
         // Bills (Due Date)
-        if (budget.bills) {
-            for (const bill of budget.bills) {
+        if (bills) {
+            for (const bill of bills) {
                 if (bill.dueDate) {
                     events.push({
                         summary: `🛒 חוב/הוצאה: ${bill.name}`,
@@ -58,8 +67,8 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
         }
 
         // Debts (Due Day)
-        if (budget.debts) {
-            for (const debt of budget.debts) {
+        if (debts) {
+            for (const debt of debts) {
                 // Construct date from dueDay + month/year
                 // Be careful with day validity (e.g. 31st in Feb)
                 const safeDay = Math.min(debt.dueDay, new Date(year, month, 0).getDate())
