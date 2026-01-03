@@ -5,7 +5,7 @@ import { useState, useRef } from 'react'
 import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Check, Loader2, Calendar as CalendarIcon, X, Plus, Clock, Briefcase } from 'lucide-react'
+import { Check, Loader2, Calendar as CalendarIcon, X, Plus, Clock, Briefcase, Pencil, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
@@ -19,7 +19,7 @@ import { getDebts, toggleDebtPaid } from '@/lib/actions/debts'
 import { getIncomes } from '@/lib/actions/income'
 import { getExpenses } from '@/lib/actions/expense'
 import { getSavings } from '@/lib/actions/savings'
-import { getWorkEvents, addWorkEvent } from '@/lib/actions/work-events'
+import { getWorkEvents, addWorkEvent, updateWorkEvent, deleteWorkEvent } from '@/lib/actions/work-events'
 import { getClients } from '@/lib/actions/clients'
 import { useToast } from '@/hooks/use-toast'
 
@@ -52,6 +52,7 @@ export function CalendarTab() {
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
     const [viewMode, setViewMode] = useState<'financial' | 'work'>('financial')
     const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
+    const [editingEventId, setEditingEventId] = useState<string | null>(null)
     const [newEvent, setNewEvent] = useState({
         title: '',
         description: '',
@@ -132,23 +133,67 @@ export function CalendarTab() {
         const [endHour, endMinute] = newEvent.endTime.split(':')
         endDateTime.setHours(parseInt(endHour), parseInt(endMinute))
 
-        const result = await addWorkEvent({
-            title: newEvent.title,
-            description: newEvent.description,
-            start: startDateTime,
-            end: endDateTime,
-            allDay: false,
-            clientId: newEvent.clientId === 'none' ? undefined : newEvent.clientId,
-            incomeId: newEvent.incomeId === 'none' ? undefined : newEvent.incomeId
-        })
+        let result;
+
+        if (editingEventId) {
+            result = await updateWorkEvent(editingEventId, {
+                title: newEvent.title,
+                description: newEvent.description,
+                start: startDateTime,
+                end: endDateTime,
+                allDay: false,
+                clientId: newEvent.clientId === 'none' ? undefined : newEvent.clientId,
+                incomeId: newEvent.incomeId === 'none' ? undefined : newEvent.incomeId
+            })
+        } else {
+            result = await addWorkEvent({
+                title: newEvent.title,
+                description: newEvent.description,
+                start: startDateTime,
+                end: endDateTime,
+                allDay: false,
+                clientId: newEvent.clientId === 'none' ? undefined : newEvent.clientId,
+                incomeId: newEvent.incomeId === 'none' ? undefined : newEvent.incomeId
+            })
+        }
 
         if (result.success) {
             mutateWorkEvents()
+            mutateWorkEvents()
             setIsEventDialogOpen(false)
+            setEditingEventId(null)
             setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
-            toast({ title: 'נוסף בהצלחה', description: 'האירוע נוסף ליומן' })
+            toast({ title: editingEventId ? 'עודכן בהצלחה' : 'נוסף בהצלחה', description: editingEventId ? 'האירוע עודכן' : 'האירוע נוסף ליומן' })
         } else {
             toast({ title: 'שגיאה', description: 'שגיאה בהוספת האירוע', variant: 'destructive' })
+        }
+    }
+
+    const handleEditEvent = (event: WorkEvent) => {
+        setEditingEventId(event.id)
+        setNewEvent({
+            title: event.title,
+            description: event.description || '',
+            startTime: format(new Date(event.start), 'HH:mm'),
+            endTime: event.end ? format(new Date(event.end), 'HH:mm') : '10:00',
+            clientId: event.clientId || 'none',
+            incomeId: event.incomeId || 'none'
+        })
+    }
+
+    const handleDeleteEvent = async (id: string) => {
+        if (confirm('האם אתה בטוח שברצונך למחוק אירוע זה?')) {
+            const result = await deleteWorkEvent(id)
+            if (result.success) {
+                mutateWorkEvents()
+                if (editingEventId === id) {
+                    setEditingEventId(null)
+                    setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
+                }
+                toast({ title: 'נמחק בהצלחה' })
+            } else {
+                toast({ title: 'שגיאה במחיקה', variant: 'destructive' })
+            }
         }
     }
 
@@ -243,7 +288,14 @@ export function CalendarTab() {
                             return (
                                 <div
                                     key={index}
-                                    onClick={() => { setSelectedDay(day); if (viewMode === 'work') setIsEventDialogOpen(true) }}
+                                    onClick={() => {
+                                        setSelectedDay(day);
+                                        if (viewMode === 'work') {
+                                            setIsEventDialogOpen(true)
+                                            setEditingEventId(null)
+                                            setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
+                                        }
+                                    }}
                                     className={`h-[80px] md:h-auto md:min-h-[100px] p-2 border rounded-lg overflow-hidden cursor-pointer hover:bg-accent transition-colors
                                         ${viewMode === 'financial' ? financialBg : workBg}
                                     `}
@@ -323,7 +375,14 @@ export function CalendarTab() {
 
             {/* Work Event Dialog */}
             {viewMode === 'work' && selectedDay && (
-                <Dialog open={isEventDialogOpen} onOpenChange={(open) => { setIsEventDialogOpen(open); if (!open) setSelectedDay(null) }}>
+                <Dialog open={isEventDialogOpen} onOpenChange={(open) => {
+                    setIsEventDialogOpen(open);
+                    if (!open) {
+                        setSelectedDay(null)
+                        setEditingEventId(null)
+                        setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
+                    }
+                }}>
                     <DialogContent dir="rtl" className="max-w-lg max-h-[85vh] overflow-y-auto">
                         <DialogHeader className="text-right sm:text-right">
                             <DialogTitle>יומן עבודה - {selectedDay}/{month}/{year}</DialogTitle>
@@ -332,18 +391,38 @@ export function CalendarTab() {
                         {/* Existing Events List */}
                         <div className="mb-4 space-y-2">
                             {getEventsForDay(selectedDay).map(event => (
-                                <div key={event.id} className="p-2 border rounded bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/50">
-                                    <div className="font-bold text-sm">{event.title}</div>
-                                    <div className="text-xs text-muted-foreground flex gap-2">
-                                        <span>{format(new Date(event.start), 'HH:mm')} - {event.end ? format(new Date(event.end), 'HH:mm') : ''}</span>
-                                        {event.client && <span>• {event.client.name}</span>}
+                                <div key={event.id} className="p-2 border rounded bg-blue-50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/50 flex justify-between items-start group">
+                                    <div>
+                                        <div className="font-bold text-sm">{event.title}</div>
+                                        <div className="text-xs text-muted-foreground flex gap-2">
+                                            <span>{format(new Date(event.start), 'HH:mm')} - {event.end ? format(new Date(event.end), 'HH:mm') : ''}</span>
+                                            {event.client && <span>• {event.client.name}</span>}
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleEditEvent(event)}>
+                                            <Pencil className="h-3 w-3" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-600" onClick={() => handleDeleteEvent(event.id)}>
+                                            <Trash2 className="h-3 w-3" />
+                                        </Button>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
                         <div className="space-y-4 border-t pt-4">
-                            <h4 className="font-bold text-sm text-right">הוסף אירוע חדש</h4>
+                            <div className="flex justify-between items-center">
+                                <h4 className="font-bold text-sm text-right">{editingEventId ? 'ערוך אירוע' : 'הוסף אירוע חדש'}</h4>
+                                {editingEventId && (
+                                    <Button variant="ghost" size="sm" onClick={() => {
+                                        setEditingEventId(null)
+                                        setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
+                                    }}>
+                                        ביטול עריכה
+                                    </Button>
+                                )}
+                            </div>
                             <div className="space-y-2">
                                 <Label className="text-right block">כותרת האירוע</Label>
                                 <Input
@@ -408,7 +487,7 @@ export function CalendarTab() {
 
                         <DialogFooter>
                             <Button variant="outline" onClick={() => setIsEventDialogOpen(false)}>ביטול</Button>
-                            <Button onClick={handleAddEvent}>שמור אירוע</Button>
+                            <Button onClick={handleAddEvent}>{editingEventId ? 'עדכן אירוע' : 'שמור אירוע'}</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
