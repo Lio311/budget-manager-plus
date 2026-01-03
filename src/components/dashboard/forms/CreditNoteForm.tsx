@@ -189,7 +189,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
             </div>
 
             {selectedInvoice && (
-                <div className="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-lg border border-purple-100 dark:border-purple-900/30">
+                <div className="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-lg border border-orange-100 dark:border-orange-900/30">
                     <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                             <span className="dark:text-purple-100">סכום לפני מע"מ:</span>
