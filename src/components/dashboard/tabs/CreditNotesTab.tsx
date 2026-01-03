@@ -13,6 +13,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { format } from 'date-fns'
 import { formatCurrency } from '@/lib/utils'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { CreditNoteForm } from '@/components/dashboard/forms/CreditNoteForm'
 
@@ -33,6 +34,8 @@ export function CreditNotesTab() {
     const [currentPage, setCurrentPage] = useState(1)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [creditNoteToDelete, setCreditNoteToDelete] = useState<string | null>(null)
 
     const creditNotesFetcher = async () => {
         const result = await getCreditNotes(budgetType)
