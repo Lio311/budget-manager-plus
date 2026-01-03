@@ -115,6 +115,20 @@ export function QuotesTab() {
         }
     }
 
+    const handleViewQuote = async (quoteId: string) => {
+        try {
+            toast.info('פותח הצעת מחיר...')
+            const result = await generateQuoteLink(quoteId)
+            if (result.success && result.token) {
+                window.location.href = `${window.location.origin}/quote/${result.token}`
+            } else {
+                toast.error('שגיאה בפתיחת הצעת המחיר')
+            }
+        } catch (error) {
+            toast.error('שגיאה בפתיחת הצעת המחיר')
+        }
+    }
+
     const handleDownloadPDF = async (quoteId: string) => {
         try {
             const response = await fetch(`/api/quotes/${quoteId}/pdf`)
