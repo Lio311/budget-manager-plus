@@ -161,7 +161,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     // Current Month Calculations (Moved up for dependencies)
     const paidBills = current.bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
-    const paidDebts = current.debts.reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
+    const paidDebts = current.debts.filter((d: any) => d.isPaid).reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
     const monthlySavingsCalculated = totalIncome - totalExpenses - paidBills - totalSavingsObserved - paidDebts
     const currentBillsDisplay = current.bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
 

@@ -22,6 +22,35 @@ export async function getDebts(month: number, year: number, type: 'PERSONAL' | '
             orderBy: { dueDay: 'asc' }
         })
 
+        // Auto-mark debts as paid if due date has passed
+        const today = new Date()
+        const currentDay = today.getDate()
+        const currentMonth = today.getMonth() + 1
+        const currentYear = today.getFullYear()
+
+        const isPastMonth = year < currentYear || (year === currentYear && month < currentMonth)
+        const isCurrentMonth = year === currentYear && month === currentMonth
+
+        const debtsToAutoPay = debts.filter(debt => {
+            if (debt.isPaid) return false
+            if (isPastMonth) return true
+            if (isCurrentMonth && debt.dueDay <= currentDay) return true
+            return false
+        })
+
+        if (debtsToAutoPay.length > 0) {
+            await Promise.all(debtsToAutoPay.map(debt =>
+                db.debt.update({
+                    where: { id: debt.id },
+                    data: { isPaid: true, paidDate: new Date() }
+                })
+            ))
+
+            // Refetch to get updated status
+            // Or just update the local array
+            debtsToAutoPay.forEach(d => d.isPaid = true)
+        }
+
         // Calculate stats in ILS
         let totalOwedByMeILS = 0
         let totalOwedToMeILS = 0
