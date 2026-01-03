@@ -165,12 +165,12 @@ export default function PublicInvoicePage() {
                     {/* Header */}
                     {/* Header */}
                     {/* Main Layout: Header & Client Info vs Business Info */}
-                    <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-8">
+                    <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-8 gap-8">
                         {/* Right Side (RTL): Invoice Details & Client Info */}
-                        <div className="w-full md:w-1/2 space-y-8">
+                        <div className="w-full md:w-1/2 space-y-8 text-center md:text-start">
                             {/* Invoice Details */}
                             <div>
-                                <h1 className="text-4xl font-light text-green-600 mb-2">חשבונית מס</h1>
+                                <h1 className="text-3xl md:text-4xl font-light text-green-600 mb-2">חשבונית מס</h1>
                                 <div className="text-gray-600">
                                     <p><strong>מספר חשבונית:</strong> {invoice.invoiceNumber}</p>
                                     <p><strong>תאריך:</strong> {new Date(invoice.issueDate).toLocaleDateString('he-IL')}</p>

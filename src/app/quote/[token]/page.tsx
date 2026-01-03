@@ -163,12 +163,12 @@ export default function PublicQuotePage() {
                 <Card id="quote-content" className="p-4 md:p-8 bg-white shadow-lg print:shadow-none">
                     {/* Header */}
                     {/* Main Layout: Header & Client Info vs Business Info */}
-                    <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-8">
+                    <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-8 gap-8">
                         {/* Right Side (RTL): Quote Details & Client Info */}
-                        <div className="w-full md:w-1/2 space-y-8">
+                        <div className="w-full md:w-1/2 space-y-8 text-center md:text-start">
                             {/* Quote Details */}
                             <div>
-                                <h1 className="text-4xl font-light text-green-600 mb-2">הצעת מחיר</h1>
+                                <h1 className="text-3xl md:text-4xl font-light text-green-600 mb-2">הצעת מחיר</h1>
                                 <div className="text-gray-600">
                                     <p><strong>מספר הצעה:</strong> {quote.quoteNumber}</p>
                                     <p><strong>תאריך:</strong> {new Date(quote.issueDate).toLocaleDateString('he-IL')}</p>
