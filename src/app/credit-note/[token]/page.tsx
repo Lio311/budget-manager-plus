@@ -69,7 +69,8 @@ export default function PublicCreditNotePage() {
                     </div>
                     <Button
                         onClick={() => window.print()}
-                        className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                        variant="outline"
+                        className="gap-2 w-full sm:w-auto"
                     >
                         <Download className="h-4 w-4" />
                         הורד PDF
