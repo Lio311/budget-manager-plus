@@ -40,6 +40,7 @@ interface Quote {
     date: string | Date
     validUntil?: string | Date
     status: 'DRAFT' | 'SENT' | 'ACCEPTED' | 'EXPIRED' | 'CANCELLED'
+    totalAmount: number
     vatAmount: number
     items: any[]
     isSigned: boolean
