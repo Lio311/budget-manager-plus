@@ -176,8 +176,8 @@ export default function PublicQuotePage() {
                     )}
                 </div>
 
-                {/* Quote Content */}
-                <Card id="quote-content" className="p-4 md:p-8 bg-white shadow-lg print:shadow-none">
+                {/* Quote Content - This gets printed/PDF'd */}
+                <Card id="quote-content" className="p-4 md:p-8 md:pb-24 bg-white shadow-lg print:shadow-none min-h-[1000px] flex flex-col justify-between">
                     {/* Header */}
                     {/* Main Layout: Header & Client Info vs Business Info */}
                     <div className="flex flex-col md:flex-row justify-between items-center md:items-start mb-8 gap-8">
@@ -243,8 +243,8 @@ export default function PublicQuotePage() {
                     */}
 
                     {/* Totals - Green Gradient Box */}
-                    <div className="flex justify-end mb-12">
-                        <div className="w-full md:w-96 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl p-6 shadow-md">
+                    <div className="flex justify-center mb-12">
+                        <div className="w-[90%] bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl p-6 shadow-md">
                             <div className="space-y-3">
                                 <div className="flex justify-between text-emerald-50 font-medium">
                                     <span>סכום לפני מע"מ:</span>
