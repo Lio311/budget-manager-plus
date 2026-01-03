@@ -94,39 +94,17 @@ export function CreditNotesTab() {
         }
     }
 
-    const handleDownloadPDF = async (id: string) => {
+    const handleViewCreditNote = async (creditNoteId: string) => {
         try {
-            const response = await fetch(`/api/credit-notes/${id}/pdf`)
-            if (!response.ok) throw new Error('Failed to download PDF')
-
-            let filename = `credit-note-${id}.pdf`
-            const contentDisposition = response.headers.get('Content-Disposition')
-
-            if (contentDisposition) {
-                const filenameMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/)
-                if (filenameMatch && filenameMatch[1]) {
-                    filename = decodeURIComponent(filenameMatch[1])
-                }
+            const result = await generateCreditNoteLink(creditNoteId)
+            if (result.success && result.token) {
+                window.open(`/credit-note/${result.token}`, '_blank')
+            } else {
+                toast.error('שגיאה בפתיחת חשבונית זיכוי')
             }
-
-            const blob = await response.blob()
-            const url = window.URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = filename
-            document.body.appendChild(a)
-            a.click()
-            window.URL.revokeObjectURL(url)
-            document.body.removeChild(a)
-
-            toast.success('PDF הורד בהצלחה')
         } catch (error) {
-            toast.error('שגיאה בהורדת PDF')
+            toast.error('שגיאה בפתיחת חשבונית זיכוי')
         }
-    }
-
-    const handleViewCreditNote = (id: string) => {
-        window.open(`/credit-note/${id}`, '_blank')
     }
 
     const handleCopyLink = async (creditNoteId: string) => {
@@ -222,21 +200,18 @@ export function CreditNotesTab() {
 
                                 {/* Amount */}
                                 <div className="text-right">
-                                    <div className="font-bold text-purple-600 dark:text-purple-400 text-lg">{formatCurrency(creditNote.totalCredit)}</div>
+                                    <div className="font-bold text-orange-600 dark:text-orange-400 text-lg">{formatCurrency(creditNote.totalCredit)}</div>
                                     <div className="text-xs text-gray-400">לפני מע"מ: {formatCurrency(creditNote.creditAmount)}</div>
                                 </div>
 
                                 {/* Actions */}
                                 <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" onClick={() => handleCopyLink(creditNote.id)} className="gap-2 text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100">
+                                    <Button variant="outline" size="sm" onClick={() => handleCopyLink(creditNote.id)} className="gap-2 text-orange-600 border-orange-200 bg-orange-50 hover:bg-orange-100">
                                         <LinkIcon className="h-4 w-4" />
                                         <span className="hidden md:inline">קישור</span>
                                     </Button>
-                                    <Button variant="outline" size="icon" onClick={() => handleViewCreditNote(creditNote.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100">
+                                    <Button variant="outline" size="icon" onClick={() => handleViewCreditNote(creditNote.id)} className="text-orange-600 border-orange-200 bg-orange-50 hover:bg-orange-100">
                                         <Eye className="h-4 w-4" />
-                                    </Button>
-                                    <Button variant="outline" size="icon" onClick={() => handleDownloadPDF(creditNote.id)} className="text-green-600 border-green-200 bg-green-50 hover:bg-green-100">
-                                        <Download className="h-4 w-4" />
                                     </Button>
                                     <Button variant="outline" size="icon" onClick={() => handleDelete(creditNote.id)} className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100">
                                         <Trash2 className="h-4 w-4" />
