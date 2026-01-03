@@ -48,8 +48,8 @@ export async function getUserSettings() {
             }
         })
 
-        return { success: true, data: user }
-        return { success: false, error: 'Failed to fetch settings' }
+        return { success: true, data: user };
+
     }
 }
 
