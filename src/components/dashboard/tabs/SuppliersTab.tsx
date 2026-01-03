@@ -60,9 +60,9 @@ export function SuppliersTab() {
     const { data: suppliers = [], isLoading, mutate } = useSWR(['suppliers', budgetType], fetcher)
 
     const filteredSuppliers = suppliers.filter((supplier: any) =>
-        supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        supplier.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        supplier.phone?.includes(searchTerm)
+        (supplier.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (supplier.email?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (supplier.phone || '').includes(searchTerm)
     )
 
     // Optimistic create for instant UI feedback

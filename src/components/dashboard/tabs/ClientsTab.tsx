@@ -60,7 +60,7 @@ export function ClientsTab() {
     const { data: clients = [], isLoading, mutate } = useSWR(['clients', budgetType], fetcher)
 
     const filteredClients = clients.filter((client: any) =>
-        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (client.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.phone?.includes(searchTerm)
     )

@@ -83,8 +83,8 @@ export function QuotesTab() {
     const { data: clients = [] } = useSWR(['clients', budgetType], clientsFetcher)
 
     const filteredQuotes = quotes.filter((q: any) =>
-        q.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        q.quoteNumber.toString().includes(searchTerm)
+        (q.clientName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        q.quoteNumber?.toString().includes(searchTerm)
     )
 
     const itemsPerPage = 5

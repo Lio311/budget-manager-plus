@@ -86,8 +86,8 @@ export function InvoicesTab() {
     const { data: clients = [] } = useSWR(['clients', budgetType], clientsFetcher)
 
     const filteredInvoices = invoices.filter(inv =>
-        inv.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        inv.invoiceNumber.toString().includes(searchTerm)
+        (inv.clientName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        inv.invoiceNumber?.toString().includes(searchTerm)
     )
 
     const itemsPerPage = 5

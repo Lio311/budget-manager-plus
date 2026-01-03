@@ -60,9 +60,9 @@ export function CreditNotesTab() {
     )
 
     const filteredCreditNotes = creditNotes.filter(cn =>
-        cn.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        cn.creditNoteNumber.includes(searchTerm) ||
-        cn.invoiceNumber.includes(searchTerm)
+        (cn.clientName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        cn.creditNoteNumber?.toString().includes(searchTerm) ||
+        cn.invoiceNumber?.toString().includes(searchTerm)
     )
 
     const itemsPerPage = 5

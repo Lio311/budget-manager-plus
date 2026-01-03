@@ -106,7 +106,10 @@ export default async function RootLayout({
     // Logic for Reactivation Popup
     let shouldShowReactivation = false
     try {
-        const user = await currentUser()
+        // We catch everything here to be 100% safe.
+        // On 404 pages of static files (like /favicon.ico), currentUser() might throw 
+        // if the middleware didn't run for that specific path.
+        const user = await currentUser().catch(() => null)
 
         if (!user) {
             // Guest user - Show popup (targeting users who are not connected)
@@ -123,8 +126,8 @@ export default async function RootLayout({
 
                 // If inactive for more than 30 days, check subscription
                 if (daysInactive > 30) {
-                    const personalStatus = await getSubscriptionStatus(user.id, 'PERSONAL')
-                    const businessStatus = await getSubscriptionStatus(user.id, 'BUSINESS')
+                    const personalStatus = await getSubscriptionStatus(user.id, 'PERSONAL').catch(() => ({ hasAccess: false }))
+                    const businessStatus = await getSubscriptionStatus(user.id, 'BUSINESS').catch(() => ({ hasAccess: false }))
 
                     const hasActiveSubscription = personalStatus.hasAccess || businessStatus.hasAccess
 
@@ -135,8 +138,9 @@ export default async function RootLayout({
             }
         }
     } catch (error) {
-        console.error('Error checking reactivation status:', error)
-        // On error (e.g. DB down), we default to false to avoid annoying users
+        // Log sparingly as this can happen for every static asset 404
+        // console.error('Error checking reactivation status:', error)
+        shouldShowReactivation = false
     }
 
     return (
