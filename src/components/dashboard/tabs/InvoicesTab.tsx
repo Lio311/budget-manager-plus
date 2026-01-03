@@ -391,7 +391,7 @@ export function InvoicesTab() {
                                     <span className="md:hidden">קישור לחתימה</span>
                                     <span className="hidden md:inline">קישור לחתימה</span>
                                 </Button>
-                                {inv.status === 'SIGNED' && (
+                                {((inv.status as string) === 'SIGNED' || inv.status === 'SIGNED') && (
                                     <Button variant="outline" size="sm" onClick={() => handleViewInvoice(inv.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100" title="צפה בחשבונית">
                                         <Eye className="h-4 w-4" />
                                     </Button>
