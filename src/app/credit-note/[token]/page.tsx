@@ -1,8 +1,6 @@
 import { getCreditNoteByToken } from '@/lib/actions/credit-notes'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
-import { ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
 export default async function PublicCreditNotePage({ params }: { params: { token: string } }) {
@@ -30,17 +28,7 @@ export default async function PublicCreditNotePage({ params }: { params: { token
             <div className="max-w-4xl mx-auto space-y-6">
                 {/* Actions Bar */}
                 <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-lg shadow-sm print:hidden gap-4">
-                    <div className="flex items-center gap-3">
-                        <Button
-                            onClick={() => window.history.back()}
-                            variant="ghost"
-                            size="icon"
-                            className="md:hidden text-gray-500 hover:text-gray-900"
-                        >
-                            <ArrowRight className="h-6 w-6" />
-                        </Button>
-                        <h1 className="text-xl font-bold text-gray-800">חשבונית זיכוי</h1>
-                    </div>
+                    <h1 className="text-xl font-bold text-gray-800">חשבונית זיכוי</h1>
                 </div>
 
                 {/* Credit Note Content */}
