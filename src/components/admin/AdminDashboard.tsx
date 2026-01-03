@@ -118,8 +118,8 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
         <div className="space-y-8">
             {/* Edit User Dialog */}
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto" dir="ltr">
-                    <DialogHeader>
+                <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto [&>button]:right-4 [&>button]:left-auto" dir="ltr">
+                    <DialogHeader className="text-left sm:text-left">
                         <DialogTitle className="text-xl">Edit Subscriptions for {editingUser?.email}</DialogTitle>
                         <p className="text-sm text-muted-foreground">Manage user subscription plans, status, and expiration dates</p>
                     </DialogHeader>
