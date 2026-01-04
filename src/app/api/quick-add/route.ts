@@ -16,41 +16,46 @@ type QuickAddInput = z.infer<typeof quickAddSchema>
 /**
  * POST /api/quick-add
  * 
- * Secure API endpoint for iOS Shortcuts to add expenses directly.
- * Requires API Key authentication via x-api-key header.
+ * Multi-user SaaS endpoint for iOS Shortcuts to add expenses directly.
+ * Each user has their own API key stored in the database (User.shortcutApiKey).
  * 
  * @returns JSON response with success/error status
  */
 export async function POST(request: NextRequest) {
     try {
-        // 1. Security & Authentication
+        // 1. Extract API Key from Header
         const apiKey = request.headers.get('x-api-key')
-        const validApiKey = process.env.KESEFLOW_API_KEY
 
-        if (!apiKey || !validApiKey || apiKey !== validApiKey) {
+        if (!apiKey) {
             return NextResponse.json(
                 {
                     success: false,
-                    error: 'Unauthorized: Invalid or missing API key'
+                    error: 'Unauthorized: Missing API key'
                 },
                 { status: 401 }
             )
         }
 
-        // Get Admin User ID from environment
-        const adminUserId = process.env.ADMIN_USER_ID
-        if (!adminUserId) {
-            console.error('ADMIN_USER_ID environment variable is not configured')
+        // 2. Look Up User by API Key in Database (Multi-User Support!)
+        const user = await prisma.user.findUnique({
+            where: { shortcutApiKey: apiKey },
+            select: { id: true }
+        })
+
+        if (!user) {
             return NextResponse.json(
                 {
                     success: false,
-                    error: 'Server configuration error'
+                    error: 'Unauthorized: Invalid API key'
                 },
-                { status: 500 }
+                { status: 401 }
             )
         }
 
-        // 2. Parse and Validate Request Body
+        // The userId is now dynamically resolved from the database
+        const userId = user.id
+
+        // 3. Parse and Validate Request Body
         const body = await request.json()
         const validationResult = quickAddSchema.safeParse(body)
 
@@ -67,7 +72,7 @@ export async function POST(request: NextRequest) {
 
         const data: QuickAddInput = validationResult.data
 
-        // 3. Database Operation
+        // 4. Database Operation
         // Get current month and year from the provided date
         const expenseDate = data.date
         const month = expenseDate.getMonth() + 1
@@ -78,7 +83,7 @@ export async function POST(request: NextRequest) {
         const budget = await prisma.budget.upsert({
             where: {
                 userId_month_year_type: {
-                    userId: adminUserId,
+                    userId,
                     month,
                     year,
                     type: 'PERSONAL'
@@ -86,7 +91,7 @@ export async function POST(request: NextRequest) {
             },
             update: {},
             create: {
-                userId: adminUserId,
+                userId,
                 month,
                 year,
                 type: 'PERSONAL',
@@ -98,7 +103,7 @@ export async function POST(request: NextRequest) {
         const category = await prisma.category.upsert({
             where: {
                 userId_name_type_scope: {
-                    userId: adminUserId,
+                    userId,
                     name: data.category,
                     type: 'expense',
                     scope: 'PERSONAL'
@@ -106,7 +111,7 @@ export async function POST(request: NextRequest) {
             },
             update: {},
             create: {
-                userId: adminUserId,
+                userId,
                 name: data.category,
                 type: 'expense',
                 scope: 'PERSONAL',
@@ -127,7 +132,7 @@ export async function POST(request: NextRequest) {
             }
         })
 
-        // 4. Cache Revalidation
+        // 5. Cache Revalidation
         revalidatePath('/dashboard')
         revalidatePath('/') // Also revalidate home in case of overview data
 
@@ -148,7 +153,7 @@ export async function POST(request: NextRequest) {
         )
 
     } catch (error) {
-        // 5. Error Handling
+        // 6. Error Handling
         console.error('Quick-Add API Error:', error)
 
         // Log detailed error for debugging but return generic message to client
