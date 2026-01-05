@@ -38,7 +38,7 @@ async function main() {
         })
 
         latest.forEach(e => {
-            console.log(`- ${e.date.toISOString().split('T')[0]}: ${e.description} (${e.amount} ILS) [User: ${e.budget.user.email}]`)
+            console.log(`- ${e.date ? e.date.toISOString().split('T')[0] : 'No Date'}: ${e.description} (${e.amount} ILS) [User: ${e.budget.user.email}]`)
         })
 
     } else {
