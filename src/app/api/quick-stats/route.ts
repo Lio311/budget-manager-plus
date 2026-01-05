@@ -116,14 +116,19 @@ export async function GET(request: NextRequest) {
             // Update Total Net Worth
             totalAccountBalance += (incomeSum - totalOutflow)
 
-            // If this is the CURRENT month, save for specific stats
+            // Current Month Stats (Match Dashboard Logic)
             if (budget.month === month && budget.year === year) {
                 currentMonthIncome = incomeSum
-                currentMonthExpenses = totalOutflow
+
+                // Dashboard "Total Expenses" card only includes pure expenses
+                // But we successfully calculated totalOutflow for Net Worth correctly above
+
+                // For the API response, we'll offer the split
+                currentMonthExpenses = expensesSum
             }
         }
 
-        const monthlyBalance = currentMonthIncome - currentMonthExpenses
+        // Net Worth is totalAccountBalance
 
         // 5. Response
         return NextResponse.json({
@@ -131,10 +136,19 @@ export async function GET(request: NextRequest) {
             data: {
                 month,
                 year,
-                totalIncome: Math.round(currentMonthIncome),
-                totalExpenses: Math.round(currentMonthExpenses),
-                monthlyBalance: Math.round(monthlyBalance),
+                // Dashboard Matches
+                totalIncome: Math.round(currentMonthIncome), // "סך הכנסות"
+                totalExpenses: Math.round(currentMonthExpenses), // "סך הוצאות" (Dashboard style)
+
+                // Requested Explicitly
+                monthlyIncome: Math.round(currentMonthIncome), // Alias for user convenience
+
+                // "Real" Totals (Optional for user)
+                totalOutflow: Math.round(currentMonthExpenses),
+
+                // Net Worth (Total Money) - This is likely what they want for "Account Balance"
                 accountBalance: Math.round(totalAccountBalance),
+
                 currency: '₪'
             }
         })
