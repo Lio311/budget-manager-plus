@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 
 // Validation Schema for Quick-Add Expense
 const quickAddSchema = z.object({
-    amount: z.number().positive('Amount must be positive'),
+    amount: z.coerce.number().positive('Amount must be positive'),
     description: z.string().min(1, 'Description is required'),
     category: z.string().optional().default('כללי'), // Default to "General" in Hebrew
     date: z.coerce.date().optional().default(() => new Date())
