@@ -183,6 +183,13 @@ export function IntegrationsSettings() {
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
                             גלול למטה ומצא את שדה הטקסט מתחת לכותרת "x-api-key". הדבק שם את המפתח שהעתקת בשלב 1.
                         </p>
+                        <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm max-w-sm mb-4">
+                            <img
+                                src="/images/shortcuts/shortcut_step_4.png"
+                                alt="Find Key Field"
+                                className="w-full object-cover"
+                            />
+                        </div>
                         <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm max-w-sm">
                             <img
                                 src="/images/shortcuts/shortcut_step_3.png"
@@ -199,6 +206,13 @@ export function IntegrationsSettings() {
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
                             לסיום, לחץ על שם הקיצור בראש המסך, ובחר ב "Add to Home Screen" לגישה מהירה.
                         </p>
+                        <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm max-w-sm mb-4">
+                            <img
+                                src="/images/shortcuts/shortcut_step_5a.png"
+                                alt="Open Menu"
+                                className="w-full object-cover"
+                            />
+                        </div>
                         <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm max-w-sm">
                             <img
                                 src="/images/shortcuts/shortcut_step_5.png"
