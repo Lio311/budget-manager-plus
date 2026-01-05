@@ -30,7 +30,16 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 initialSavings: true,
                 businessInitialBalance: true,
                 businessInitialSavings: true,
-                referralProgramActive: true
+                referralProgramActive: true,
+                trialEndsAt: true,
+                hasUsedTrial: true,
+                subscriptions: {
+                    where: { status: 'active' },
+                    select: {
+                        endDate: true,
+                        planType: true
+                    }
+                }
             }
         })
 
@@ -262,7 +271,9 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     businessInitialSavings: user.businessInitialSavings,
                     monthlyBalanceOverride: currentBudget?.initialBalance,
                     monthlySavingsOverride: currentBudget?.initialSavings,
-                    referralProgramActive: user.referralProgramActive
+                    referralProgramActive: user.referralProgramActive,
+                    trialEndsAt: user.trialEndsAt,
+                    activeSubscription: user.subscriptions[0] || null
                 }
             }
         }

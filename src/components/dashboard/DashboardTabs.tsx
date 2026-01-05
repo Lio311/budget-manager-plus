@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { WelcomePopup } from './WelcomePopup'
+import { getUserSubscriptionStatus } from '@/lib/actions/user'
+
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield } from 'lucide-react'
@@ -28,6 +31,28 @@ interface DashboardTabsProps {
 
 export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTabsProps) {
     const router = useRouter()
+
+    // Popup State
+    const [showWelcome, setShowWelcome] = useState(false)
+    const [subscriptionStatus, setSubscriptionStatus] = useState<{
+        trialEndsAt?: Date | null
+        activeSubscription?: { endDate: Date | null, planType: 'PERSONAL' | 'BUSINESS' } | null
+    } | null>(null)
+
+    useEffect(() => {
+        // Check session storage to show only once per session
+        const hasShown = sessionStorage.getItem('welcome_shown')
+        if (!hasShown) {
+            getUserSubscriptionStatus().then(status => {
+                if (status) {
+                    setSubscriptionStatus(status)
+                    setShowWelcome(true)
+                    sessionStorage.setItem('welcome_shown', 'true')
+                }
+            })
+        }
+    }, [])
+
     const searchParams = useSearchParams()
     const { budgetType } = useBudget()
     const { mutate: globalMutate } = useSWRConfig()
@@ -95,6 +120,13 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
     return (
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full flex min-h-screen bg-transparent gap-4" dir="rtl">
+
+            <WelcomePopup
+                isOpen={showWelcome}
+                onClose={() => setShowWelcome(false)}
+                trialEndsAt={subscriptionStatus?.trialEndsAt}
+                activeSubscription={subscriptionStatus?.activeSubscription}
+            />
 
             {/* Mobile Sidebar Overlay */}
             {mobileMenuOpen && (

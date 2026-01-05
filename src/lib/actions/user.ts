@@ -98,3 +98,34 @@ export async function getShortcutApiKey() {
         return { success: false, error: 'Failed to fetch key' }
     }
 }
+
+export async function getUserSubscriptionStatus() {
+    try {
+        const { userId } = await auth()
+        if (!userId) return null
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                trialEndsAt: true,
+                subscriptions: {
+                    where: { status: 'active' },
+                    select: {
+                        endDate: true,
+                        planType: true
+                    }
+                }
+            }
+        })
+
+        if (!user) return null
+
+        return {
+            trialEndsAt: user.trialEndsAt,
+            activeSubscription: user.subscriptions[0] || null
+        }
+    } catch (error) {
+        console.error('Error fetching subscription status:', error)
+        return null
+    }
+}
