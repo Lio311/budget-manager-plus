@@ -89,16 +89,6 @@ export function WelcomePopup({ isOpen, onClose, trialEndsAt, activeSubscription,
 
                 {/* Decorative Header */}
                 <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-32 relative flex items-center justify-center">
-                    <div className="absolute top-4 left-4 z-20">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={onClose}
-                            className="text-white/80 hover:text-white hover:bg-white/20 rounded-full"
-                        >
-                            <X className="w-5 h-5" />
-                        </Button>
-                    </div>
 
                     <div className="bg-white/20 p-4 rounded-full backdrop-blur-sm animate-in zoom-in duration-500">
                         <PartyPopper className="w-12 h-12 text-white" />
@@ -121,7 +111,7 @@ export function WelcomePopup({ isOpen, onClose, trialEndsAt, activeSubscription,
 
                     <div className="pt-2">
                         <p className="text-emerald-600 dark:text-emerald-400 font-medium font-handwriting text-xl">
-                            המשך יום נעים! ✨
+                            המשך יום נעים!
                         </p>
                     </div>
 
