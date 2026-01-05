@@ -148,6 +148,7 @@ export async function GET(request: NextRequest) {
                 month,
                 year,
                 // Dashboard Matches
+                monthName: new Intl.DateTimeFormat('he-IL', { month: 'long' }).format(new Date(year, month - 1)), // "ינואר"
                 totalIncome: Math.round(currentMonthIncome), // "סך הכנסות"
                 totalExpenses: Math.round(currentMonthExpenses), // "סך הוצאות" (Dashboard style)
 
