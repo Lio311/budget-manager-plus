@@ -40,16 +40,23 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     } | null>(null)
 
     useEffect(() => {
-        // Check session storage to show only once per session
-        const hasShown = sessionStorage.getItem('welcome_shown')
-        if (!hasShown) {
-            getUserSubscriptionStatus().then(status => {
-                if (status) {
-                    setSubscriptionStatus(status)
-                    setShowWelcome(true)
-                    sessionStorage.setItem('welcome_shown', 'true')
-                }
-            })
+        // Show only on Sundays (Day 0) and only once per day
+        const today = new Date()
+        const isSunday = today.getDay() === 0
+
+        if (isSunday) {
+            const todayDateString = today.toDateString()
+            const lastShownDate = localStorage.getItem('welcome_popup_last_shown')
+
+            if (lastShownDate !== todayDateString) {
+                getUserSubscriptionStatus().then(status => {
+                    if (status) {
+                        setSubscriptionStatus(status)
+                        setShowWelcome(true)
+                        localStorage.setItem('welcome_popup_last_shown', todayDateString)
+                    }
+                })
+            }
         }
     }, [])
 
