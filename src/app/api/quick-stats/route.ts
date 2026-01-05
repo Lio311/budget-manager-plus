@@ -61,7 +61,8 @@ export async function GET(request: NextRequest) {
                 bills: { select: { amount: true, currency: true, isPaid: true } },
                 debts: { select: { monthlyPayment: true, currency: true } },
                 initialBalance: true,
-                initialSavings: true
+                initialSavings: true,
+                savings: { select: { monthlyDeposit: true, currency: true } }
             },
             orderBy: [{ year: 'asc' }, { month: 'asc' }]
         })
@@ -70,6 +71,8 @@ export async function GET(request: NextRequest) {
         let totalAccountBalance = (user.initialBalance || 0) + (user.initialSavings || 0)
         let currentMonthIncome = 0
         let currentMonthExpenses = 0
+        let currentMonthBalance = 0 // To match Dashboard "Net Monthly"
+        let currentMonthTotalOutflow = 0
 
         let hasStarted = false
 
@@ -89,16 +92,12 @@ export async function GET(request: NextRequest) {
             // but for a simple loop awaiting might be safer to not flood currency API if it's external.
             // Assuming convertToILS is fast/cached or internal.
 
-            let bIncome = 0
-            let bExpense = 0
-
             // Helper to sum
             const sumItems = async (items: any[], isExpense = false) => {
                 let sum = 0
                 for (const item of items) {
-                    // For bills/debts, we usually count them as expenses
-                    // For quick-stats, we want "What did I spend vs earn"
-                    const amountILS = await convertToILS(isExpense ? (item.amount || item.monthlyPayment) : item.amount, item.currency)
+                    const val = isExpense ? (item.amount || item.monthlyPayment || item.monthlyDeposit) : item.amount
+                    const amountILS = await convertToILS(val, item.currency)
                     sum += amountILS
                 }
                 return sum
@@ -110,21 +109,33 @@ export async function GET(request: NextRequest) {
             const expensesSum = await sumItems(budget.expenses, true)
             const billsSum = await sumItems(budget.bills, true)
             const debtsSum = await sumItems(budget.debts, true)
+            const savingsSum = await sumItems(budget.savings || [], true) // Treat savings as "outflow" from current cash, but it adds to net worth typically.
+            // Wait, for "Monthly Balance" (Cash Flow), savings IS an outflow (money moved aside).
+            // For Net Worth, Savings IS part of the balance.
 
-            const totalOutflow = expensesSum + billsSum + debtsSum
+            // Dashboard Net Worth Logic:
+            // accumulatedNetWorth = (prev + income - expenses - bills - debts - savings) + savings? 
+            // Actually Dashboard Net Worth is mostly cumulative.
+            // But let's stick to the requested "Monthly Balance" card (-527k).
+            // That card is: Income - Expenses - Bills - Debts - Savings.
 
-            // Update Total Net Worth
-            totalAccountBalance += (incomeSum - totalOutflow)
+            const totalOutflowForNetWorth = expensesSum + billsSum + debtsSum // Savings stays in your pocket (technically)
+
+            // Update Total Net Worth (Accumulated)
+            // Income adds, Expenses/Bills/Debts subtract. Savings just move from Checking to Savings, so Net Worth assumes (Check + Save).
+            // So for Net Worth, we only subtract real expenses.
+            totalAccountBalance += (incomeSum - totalOutflowForNetWorth)
 
             // Current Month Stats (Match Dashboard Logic)
             if (budget.month === month && budget.year === year) {
                 currentMonthIncome = incomeSum
+                currentMonthExpenses = expensesSum // Pure expenses
 
-                // Dashboard "Total Expenses" card only includes pure expenses
-                // But we successfully calculated totalOutflow for Net Worth correctly above
+                // Exact Dashboard Formula for "Monthly Balance" / "Savings Remainder":
+                currentMonthBalance = incomeSum - expensesSum - billsSum - debtsSum - savingsSum
 
-                // For the API response, we'll offer the split
-                currentMonthExpenses = expensesSum
+                // For "Total Outflow" (optional stat)
+                currentMonthTotalOutflow = expensesSum + billsSum + debtsSum + savingsSum
             }
         }
 
@@ -143,8 +154,11 @@ export async function GET(request: NextRequest) {
                 // Requested Explicitly
                 monthlyIncome: Math.round(currentMonthIncome), // Alias for user convenience
 
-                // "Real" Totals (Optional for user)
-                totalOutflow: Math.round(currentMonthExpenses),
+                totalOutflow: Math.round(currentMonthTotalOutflow), // Keep as is for reference if needed
+
+                // Dashboard "Monthly Balance" (Rubber Pig Card)
+                // Formula: Income - Expenses - Bills - Debts - Savings
+                monthlyBalance: Math.round(currentMonthBalance),
 
                 // Net Worth (Total Money) - This is likely what they want for "Account Balance"
                 accountBalance: Math.round(totalAccountBalance),
