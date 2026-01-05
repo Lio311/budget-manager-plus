@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
             {
                 success: false,
-                error: 'Internal server error: Failed to add expense'
+                error: `Internal server error: ${error instanceof Error ? error.message : 'Unknown error'}`
             },
             { status: 500 }
         )
