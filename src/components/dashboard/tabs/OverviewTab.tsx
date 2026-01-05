@@ -301,7 +301,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             onClick={() => {
                                 setIsIntegrationsOpen(true)
                             }}
-                            className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                            className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground md:hidden"
                             title="אוטומציות (iPhone Shortcuts)"
                         >
                             <svg className="w-4 h-4 fill-current text-[#323338] dark:text-gray-100" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
