@@ -49,8 +49,19 @@ export async function POST(request: NextRequest) {
 
         // 2. Process Image & Scope
         const formData = await request.formData()
-        const file = formData.get('file') as File
+        const fileEntry = formData.get('file')
         const scopeParam = formData.get('scope') as string | null
+
+        console.log(`[API Scan] File entry:`, fileEntry)
+
+        if (!fileEntry || !(fileEntry instanceof File)) {
+            return NextResponse.json(
+                { success: false, error: 'Invalid file received. Please ensure Shortuct sends a File, not Text. (Received: ' + (typeof fileEntry) + ')' },
+                { status: 400 }
+            )
+        }
+
+        const file = fileEntry
 
         // Normalize scope (handle Hebrew from iPhone Shortcut)
         let targetScope: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
@@ -63,13 +74,6 @@ export async function POST(request: NextRequest) {
         }
 
         console.log(`[API Scan] Raw scope: "${scopeParam}", Resolved: ${targetScope}`)
-
-        if (!file) {
-            return NextResponse.json(
-                { success: false, error: 'No file provided' },
-                { status: 400 }
-            )
-        }
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
