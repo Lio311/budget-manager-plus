@@ -179,17 +179,24 @@ export default function ProfitLossTab() {
                             <FileText className="text-emerald-500 opacity-20 group-hover:opacity-100 transition-opacity" size={48} />
                         </div>
 
-                        {isYearCompleted(year) ? (
-                            <div className="flex gap-2 mt-4">
-                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={() => handleYearSelect(year)}>
-                                    צפייה בדוח
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                            {isYearCompleted(year) ? (
+                                <Button
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    onClick={() => handleYearSelect(year)}
+                                >
+                                    צפה בדוח שנתי
                                 </Button>
-                            </div>
-                        ) : (
-                            <div className="mt-4 bg-gray-100 text-gray-600 p-3 rounded-lg text-sm text-center font-medium">
-                                הדו"ח יהיה זמין בסוף השנה
-                            </div>
-                        )}
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+                                    onClick={() => handleYearSelect(year)}
+                                >
+                                    צפה בנתונים (זמן אמת)
+                                </Button>
+                            )}
+                        </div>
 
                         {/* Footer with Logo */}
                         <div className="mt-6 pt-4 border-t flex justify-between items-center opacity-60 text-xs">
