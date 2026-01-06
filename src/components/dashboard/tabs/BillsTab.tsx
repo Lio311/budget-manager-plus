@@ -396,7 +396,7 @@ export function BillsTab() {
 
                                                     {/* Left side (RTL): Amount + Actions */}
                                                     <div className="flex items-center gap-2 sm:gap-4 justify-between sm:justify-end w-full sm:w-auto mt-1 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-gray-50 dark:border-slate-700/50">
-                                                        <span className={`text-base sm:text-lg font-bold font-mono ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
+                                                        <span className={`text-base sm:text-lg font-bold ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
                                                             {formatCurrency(bill.amount, getCurrencySymbol(bill.currency || 'ILS'))}
                                                         </span>
                                                         <div className="flex gap-1">
