@@ -230,22 +230,25 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         }
 
         try {
-            const { total: calculatedTotal } = isBusiness
-                ? calculateFromNet(newExpense.amount, newExpense.vatRate)
-                : { total: newExpense.amount }
+            const totalAmount = newExpense.amount
+
+            // Calculate derived values for payload
+            const { net, vat } = isBusiness
+                ? calculateFromGross(totalAmount, newExpense.vatRate)
+                : { net: totalAmount, vat: '0' }
 
             await optimisticAddExpense({
                 description: newExpense.description || 'הוצאה ללא תיאור',
-                amount: parseFloat(calculatedTotal), // Send TOTAL amount to server
+                amount: parseFloat(totalAmount),
                 category: newExpense.category,
                 currency: newExpense.currency as "ILS" | "USD" | "EUR" | "GBP",
                 date: newExpense.date,
                 isRecurring: newExpense.isRecurring,
                 recurringEndDate: newExpense.recurringEndDate,
                 supplierId: isBusiness ? newExpense.supplierId || undefined : undefined,
-                amountBeforeVat: isBusiness ? parseFloat(newExpense.amount) : undefined, // Input is now Before Vat
+                amountBeforeVat: isBusiness ? parseFloat(net) : undefined,
                 vatRate: isBusiness ? parseFloat(newExpense.vatRate) : undefined,
-                vatAmount: isBusiness ? parseFloat(newExpense.vatAmount) : undefined,
+                vatAmount: isBusiness ? parseFloat(vat) : undefined,
                 isDeductible: isBusiness ? newExpense.isDeductible : undefined,
                 deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
                 paymentMethod: newExpense.paymentMethod || undefined
