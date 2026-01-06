@@ -209,11 +209,14 @@ export default function ProfitLossTab() {
 
                         {/* Centered Action Buttons */}
                         <div className="flex flex-col md:flex-row justify-center gap-4 w-full">
+                            <Button variant="outline" onClick={() => fetchReport(selectedYear!)} disabled={isLoading} className="gap-2 min-w-[200px]">
+                                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                                רענן נתונים
+                            </Button>
                             <Button variant="outline" onClick={() => handleDownloadPDF(selectedYear!)} className="gap-2 min-w-[200px]">
                                 <Download size={16} />
                                 הורד PDF
                             </Button>
-
                         </div>
                     </DialogHeader>
 
