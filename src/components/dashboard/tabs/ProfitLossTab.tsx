@@ -143,21 +143,23 @@ export default function ProfitLossTab() {
 
             {/* Report Dialog */}
             <Dialog open={!!selectedYear && isDetailOpen && isYearCompleted(selectedYear!)} onOpenChange={(open) => !open && setIsDetailOpen(false)}>
-                <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold flex justify-between items-center">
-                            <span>דוח רווח והפסד - {selectedYear}</span>
-                            <div className="flex gap-2">
-                                <Button variant="outline" className="gap-2">
-                                    <Download size={16} />
-                                    הורד PDF
-                                </Button>
-                                <Button variant="outline" onClick={() => handleDownloadOpenFormat(selectedYear!)} className="gap-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50">
-                                    <Download size={16} />
-                                    הורד BKMVDATA
-                                </Button>
-                            </div>
+                <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto w-full">
+                    <DialogHeader className="flex flex-col gap-4">
+                        <DialogTitle className="text-2xl font-bold text-center">
+                            דוח רווח והפסד - {selectedYear}
                         </DialogTitle>
+
+                        {/* Centered Action Buttons */}
+                        <div className="flex justify-center gap-4 w-full">
+                            <Button variant="outline" className="gap-2 min-w-[140px]">
+                                הורד PDF
+                                <Download size={16} />
+                            </Button>
+                            <Button variant="outline" onClick={() => handleDownloadOpenFormat(selectedYear!)} className="gap-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 min-w-[140px]">
+                                הורד BKMVDATA
+                                <Download size={16} />
+                            </Button>
+                        </div>
                     </DialogHeader>
 
                     {isLoading ? (
@@ -168,14 +170,10 @@ export default function ProfitLossTab() {
                         <div className="py-20 text-center text-red-500">לא נמצאו נתונים</div>
                     )}
 
-                    <div className="mt-8 pt-4 border-t flex items-center justify-between text-gray-400 text-sm">
-                        <div className="flex items-center gap-2">
-                            <span>הופק על ידי</span>
-                            <img src="/K-LOGO2.png" alt="Keseflow" className="h-6 brightness-0 opacity-50 type-grayscale" />
-                        </div>
-                        <div>
-                            {new Date().toLocaleDateString('he-IL')}
-                        </div>
+                    <div className="mt-8 pt-4 border-t flex items-center justify-center text-gray-400 text-sm gap-1">
+                        <span>הופק ע"י Keseflow</span>
+                        <span>•</span>
+                        <span>{new Date().toLocaleDateString('he-IL')}</span>
                     </div>
                 </DialogContent>
             </Dialog>
@@ -270,6 +268,17 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
 
     const formatMoney = (amount: number) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(amount)
 
+    // Reversed Column Order:
+    // Original: Date | Ref | Entity | Desc | Gross | VAT | Net
+    // New: Net | VAT | Gross | Desc | Entity | Ref | Date
+    // Note: In RTL flex/table, first child is Right.
+    // User wants "Reverse Order".
+    // If we assume they want standard Hebrew "Date on Right":
+    // The previous implementation HAD Date as first child (Right).
+    // If they want "Reverse", they might want the AMOUNTS on the Right?
+    // OR they want the logical columns to be swapped?
+    // Let's implement the reversed DOM order as requested.
+
     return (
         <div className="space-y-4">
             <div className="relative max-w-sm">
@@ -286,14 +295,14 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                 <Table>
                     <TableHeader className="bg-gray-50">
                         <TableRow>
-                            <TableHead className="text-right">תאריך</TableHead>
-                            <TableHead className="text-right">אסמכתא</TableHead>
-                            <TableHead className="text-right">{type === 'income' ? 'לקוח' : 'ספק'}</TableHead>
-                            <TableHead className="text-right">תיאור</TableHead>
-                            <TableHead className="text-left">סכום ברוטו</TableHead>
-                            <TableHead className="text-left">מע"מ</TableHead>
-                            <TableHead className="text-left">נטו</TableHead>
                             {type === 'expense' && <TableHead className="text-center">מוכר?</TableHead>}
+                            <TableHead className="text-left">נטו</TableHead>
+                            <TableHead className="text-left">מע"מ</TableHead>
+                            <TableHead className="text-left">סכום ברוטו</TableHead>
+                            <TableHead className="text-right">תיאור</TableHead>
+                            <TableHead className="text-right">{type === 'income' ? 'לקוח' : 'ספק'}</TableHead>
+                            <TableHead className="text-right">אסמכתא</TableHead>
+                            <TableHead className="text-right">תאריך</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -305,16 +314,6 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                             </TableRow>
                         ) : filtered.map((t) => (
                             <TableRow key={t.id} className="hover:bg-gray-50">
-                                <TableCell>{new Date(t.date).toLocaleDateString('he-IL')}</TableCell>
-                                <TableCell className="font-medium">
-                                    {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200 ml-2">זיכוי</Badge>}
-                                    {t.number || '-'}
-                                </TableCell>
-                                <TableCell>{t.entityName || '-'}</TableCell>
-                                <TableCell className="max-w-[200px] truncate" title={t.description}>{t.description}</TableCell>
-                                <TableCell className="text-left ltr font-mono">{formatMoney(t.amount)}</TableCell>
-                                <TableCell className="text-left ltr font-mono text-gray-500">{formatMoney(t.vat)}</TableCell>
-                                <TableCell className="text-left ltr font-mono font-bold">{formatMoney(t.amountNet)}</TableCell>
                                 {type === 'expense' && (
                                     <TableCell className="text-center">
                                         {t.isRecognized ? (
@@ -324,6 +323,16 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                                         )}
                                     </TableCell>
                                 )}
+                                <TableCell className="text-left ltr font-mono font-bold">{formatMoney(t.amountNet)}</TableCell>
+                                <TableCell className="text-left ltr font-mono text-gray-500">{formatMoney(t.vat)}</TableCell>
+                                <TableCell className="text-left ltr font-mono">{formatMoney(t.amount)}</TableCell>
+                                <TableCell className="max-w-[200px] truncate" title={t.description}>{t.description}</TableCell>
+                                <TableCell>{t.entityName || '-'}</TableCell>
+                                <TableCell className="font-medium">
+                                    {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200 ml-2">זיכוי</Badge>}
+                                    {t.number || '-'}
+                                </TableCell>
+                                <TableCell>{new Date(t.date).toLocaleDateString('he-IL')}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

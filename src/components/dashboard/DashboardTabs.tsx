@@ -6,7 +6,7 @@ import { getUserSubscriptionStatus } from '@/lib/actions/user'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp } from 'lucide-react'
+import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
@@ -105,7 +105,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
         { value: 'clients', label: 'לקוחות', icon: Users, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'suppliers', label: 'ספקים', icon: Building2, activeClass: 'data-[state=active]:bg-blue-600' },
-        { value: 'profit_loss', label: 'דוח רווח והפסד', icon: TrendingUp, activeClass: 'data-[state=active]:bg-emerald-600' },
+        { value: 'profit_loss', label: 'דוח רווח והפסד', icon: Calculator, activeClass: 'data-[state=active]:bg-emerald-600' },
         { value: 'quotes', label: 'הצעות מחיר', icon: FileText, activeClass: 'data-[state=active]:bg-yellow-500 data-[state=active]:text-black' },
         { value: 'invoices', label: 'חשבוניות', icon: FileText, activeClass: 'data-[state=active]:bg-purple-600' },
         { value: 'credit-notes', label: 'זיכויים', icon: FileText, activeClass: 'data-[state=active]:bg-orange-600' },
