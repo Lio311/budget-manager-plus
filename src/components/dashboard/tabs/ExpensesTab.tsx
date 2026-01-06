@@ -581,7 +581,7 @@ export function ExpensesTab() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-1.5 sm:gap-6 pl-1 shrink-0">
+                                            <div className="flex items-center gap-1.5 sm:gap-6 pl-5 shrink-0">
                                                 {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
                                                     <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
                                                         <span>סה"כ: {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
