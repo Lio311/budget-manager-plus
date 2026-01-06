@@ -151,6 +151,57 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
             })
         }
 
+        // 2.5 Fetch Manual Incomes (Not linked to Invoices)
+        // This covers "Sales/Income" records added manually without generating an invoice in the system.
+        const manualIncomes = await db.income.findMany({
+            where: {
+                budget: { userId },
+                date: {
+                    gte: startDate,
+                    lte: endDate
+                },
+                invoiceId: null // Only fetch incomes NOT already counted via invoices
+            },
+            include: { client: true }
+        })
+
+        for (const inc of manualIncomes) {
+            const rate = inc.currency === 'ILS' ? 1 : await convertToILS(1, inc.currency)
+            const totalILS = inc.amount * rate
+
+            // If vatAmount is specified, use it. Otherwise calculate from rate if available, or assume inclusive?
+            // Usually manual income in Business mode has `vatAmount` and `amountBeforeVat`.
+            // In Personal mode (or if missing), we might assume 0 VAT or inclusive.
+
+            let vatILS = 0
+            let netILS = totalILS
+
+            if (inc.vatAmount) {
+                vatILS = inc.vatAmount * rate
+                netILS = totalILS - vatILS
+            } else if (inc.amountBeforeVat) {
+                // If we have before vat but no vat amount explicitly (rare)
+                netILS = inc.amountBeforeVat * rate
+                vatILS = totalILS - netILS
+            }
+
+            revenueTotal += totalILS
+            revenueNet += netILS
+            revenueVat += vatILS
+
+            transactions.push({
+                id: inc.id,
+                date: inc.date || new Date(),
+                type: 'INCOME', // General Income
+                description: inc.source || inc.category,
+                category: inc.category,
+                entityName: inc.client?.name || inc.payer,
+                amount: totalILS,
+                amountNet: netILS,
+                vat: vatILS
+            })
+        }
+
         // Process Expenses
         let expensesTotal = 0
         let expensesRecognized = 0
