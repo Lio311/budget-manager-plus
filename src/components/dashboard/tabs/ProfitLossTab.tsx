@@ -158,7 +158,7 @@ export default function ProfitLossTab() {
 
     const formatMoney = (amount: number) => {
         return (
-            <span className="inline-block whitespace-nowrap">
+            <span className="inline-block whitespace-nowrap" dir="rtl">
                 {formatNumberWithCommas(Number(amount || 0).toFixed(2))} ₪
             </span>
         )
@@ -369,7 +369,7 @@ function TransactionsTable({ data, type, searchTerm }: { data: TransactionItem[]
 
 function TransactionList({ filtered, type }: { filtered: TransactionItem[], type: 'income' | 'expense' }) {
     const formatMoney = (amount: number) => (
-        <span className="inline-block whitespace-nowrap">
+        <span className="inline-block whitespace-nowrap" dir="rtl">
             {formatNumberWithCommas(Number(amount || 0).toFixed(2))} ₪
         </span>
     )
