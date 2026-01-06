@@ -156,7 +156,9 @@ export default function ProfitLossTab() {
 
     const isYearCompleted = (year: number) => year < currentYear
 
-    const formatMoney = (amount: number) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(amount)
+    const formatMoney = (amount: number) => {
+        return '₪' + new Intl.NumberFormat('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
+    }
 
     return (
         <div className="space-y-6 md:space-y-8 p-2 md:p-6" dir="rtl">
