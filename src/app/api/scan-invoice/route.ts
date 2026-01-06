@@ -37,9 +37,15 @@ export async function POST(request: NextRequest) {
 
         const userId = user.id
 
-        // 2. Process Image
+        // 2. Process Image & Scope
         const formData = await request.formData()
         const file = formData.get('file') as File
+        const scopeParam = formData.get('scope') as string | null
+
+        // Normalize scope (default to PERSONAL if missing or invalid)
+        const targetScope = (scopeParam === 'BUSINESS') ? 'BUSINESS' : 'PERSONAL'
+
+        console.log(`[API Scan] Processing for scope: ${targetScope}`)
 
         if (!file) {
             return NextResponse.json(
@@ -97,14 +103,14 @@ export async function POST(request: NextRequest) {
         const month = expenseDate.getMonth() + 1
         const year = expenseDate.getFullYear()
 
-        // Ensure Budget Exists (Personal)
+        // Ensure Budget Exists (Personal or Business based on scope)
         const budget = await prisma.budget.upsert({
             where: {
                 userId_month_year_type: {
                     userId,
                     month,
                     year,
-                    type: 'PERSONAL'
+                    type: targetScope // Updated to use targetScope
                 }
             },
             update: {},
@@ -112,13 +118,12 @@ export async function POST(request: NextRequest) {
                 userId,
                 month,
                 year,
-                type: 'PERSONAL',
+                type: targetScope, // Updated to use targetScope
                 currency: 'ILS'
             }
         })
 
-        // Ensure Category Exists ("חשבוניות סרוקות" or whatever AI found, let's stick to "חשבוניות סרוקות" for consistency or AI suggestion?)
-        // User requested: "Assign all expenses generated from scanned images to a new or existing category named "חשבוניות סרוקות" (Scanned Invoices)."
+        // Ensure Category Exists ("חשבוניות סרוקות")
         const categoryName = 'חשבוניות סרוקות'
 
         await prisma.category.upsert({
@@ -127,7 +132,7 @@ export async function POST(request: NextRequest) {
                     userId,
                     name: categoryName,
                     type: 'expense',
-                    scope: 'PERSONAL'
+                    scope: targetScope // Updated to use targetScope
                 }
             },
             update: {},
@@ -135,8 +140,8 @@ export async function POST(request: NextRequest) {
                 userId,
                 name: categoryName,
                 type: 'expense',
-                scope: 'PERSONAL',
-                color: 'bg-purple-500' // Distinct color
+                scope: targetScope, // Updated to use targetScope
+                color: targetScope === 'BUSINESS' ? 'bg-blue-500' : 'bg-purple-500' // Different color for business
             }
         })
 
@@ -150,7 +155,9 @@ export async function POST(request: NextRequest) {
                 currency: 'ILS',
                 date: expenseDate,
                 isRecurring: false,
-                paymentMethod: 'כרטיס אשראי' // Default
+                paymentMethod: 'כרטיס אשראי', // Default
+                // For Business expenses, we might want to default VAT type or deducibility? 
+                // Leaving as default for now as they are handled by DB defaults (FULL recognized)
             }
         })
 
@@ -163,7 +170,8 @@ export async function POST(request: NextRequest) {
                 id: expense.id,
                 amount: expense.amount,
                 business: expense.description,
-                date: expense.date
+                date: expense.date,
+                scope: targetScope
             }
         })
 
