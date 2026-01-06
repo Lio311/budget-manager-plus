@@ -76,19 +76,21 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         paymentMethod: ''
     })
 
-    // Handle VAT Calculations
-    const calculateFromNet = (net: string, rate: string) => {
-        const n = parseFloat(net) || 0
+    // Handle VAT Calculations (Backwards from Gross)
+    const calculateFromGross = (gross: string, rate: string) => {
+        const g = parseFloat(gross) || 0
         const r = parseFloat(rate) || 0
-        const vat = n * r
-        const total = n + vat
-        return { total: total.toFixed(2), vat: vat.toFixed(2) }
+        // Gross = Net * (1 + r)
+        // Net = Gross / (1 + r)
+        const net = g / (1 + r)
+        const vat = g - net
+        return { net: net.toFixed(2), vat: vat.toFixed(2) }
     }
 
     useEffect(() => {
         if (isBusiness && newExpense.amount && newExpense.vatRate) {
-            const { total, vat } = calculateFromNet(newExpense.amount, newExpense.vatRate)
-            setNewExpense(prev => ({ ...prev, amountBeforeVat: newExpense.amount, vatAmount: vat }))
+            const { net, vat } = calculateFromGross(newExpense.amount, newExpense.vatRate)
+            setNewExpense(prev => ({ ...prev, amountBeforeVat: net, vatAmount: vat }))
         }
     }, [newExpense.amount, newExpense.vatRate, isBusiness])
 

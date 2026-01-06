@@ -157,7 +157,11 @@ export default function ProfitLossTab() {
     const isYearCompleted = (year: number) => year < currentYear
 
     const formatMoney = (amount: number) => {
-        return new Intl.NumberFormat('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount) + ' ₪'
+        return (
+            <span dir="ltr" className="inline-block whitespace-nowrap">
+                ₪ {new Intl.NumberFormat('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)}
+            </span>
+        )
     }
 
     return (
@@ -217,12 +221,12 @@ export default function ProfitLossTab() {
                         {/* Centered Action Buttons */}
                         <div className="flex flex-col md:flex-row justify-center gap-4 w-full">
                             <Button variant="outline" onClick={() => fetchReport(selectedYear!)} disabled={isLoading} className="gap-2 min-w-[200px]">
-                                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                                 רענן נתונים
+                                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                             </Button>
                             <Button variant="outline" onClick={() => handleDownloadPDF(selectedYear!)} className="gap-2 min-w-[200px]">
-                                <Download size={16} />
                                 הורד PDF
+                                <Download size={16} />
                             </Button>
                         </div>
                     </DialogHeader>
