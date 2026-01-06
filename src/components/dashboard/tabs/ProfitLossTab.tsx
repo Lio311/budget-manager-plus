@@ -30,7 +30,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { getProfitLossData, type ProfitLossReport, type TransactionItem } from '@/lib/actions/reports'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, formatNumberWithCommas } from '@/lib/utils'
 import { toast } from 'sonner'
 import {
     Dialog,
@@ -158,8 +158,8 @@ export default function ProfitLossTab() {
 
     const formatMoney = (amount: number) => {
         return (
-            <span dir="ltr" className="inline-block whitespace-nowrap">
-                ₪ {new Intl.NumberFormat('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)}
+            <span className="inline-block whitespace-nowrap">
+                {formatNumberWithCommas(Number(amount || 0).toFixed(2))} ₪
             </span>
         )
     }
