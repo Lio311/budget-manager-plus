@@ -135,7 +135,7 @@ export default function ProfitLossTab() {
 
                         {/* Footer with Logo */}
                         <div className="mt-6 pt-4 border-t flex justify-between items-center opacity-60 text-xs">
-                            <span>הופק ע"י Keseflow</span>
+                            <span>הופק ע"י Keseflow בתאריך {new Date().toLocaleDateString('he-IL')}</span>
                         </div>
                     </Card>
                 ))}
