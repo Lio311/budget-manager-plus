@@ -543,6 +543,7 @@ model Invoice {
   // Digital Signing (Green Invoice)
   token         String?       @unique @default(cuid()) // For public access
   signature     String?       // Base64 encoded signature
+  documentHash  String?       // SHA-256 Hash
   signedAt      DateTime?
   isSigned      Boolean       @default(false)
   
@@ -645,6 +646,10 @@ model CreditNote {
   // Reason/Notes
   reason          String?  @db.Text
   
+  // Digital Signing
+  documentHash    String?  // SHA-256 Hash
+  signedAt        DateTime?
+
   // Metadata
   scope           String   @default("BUSINESS")
   createdAt       DateTime @default(now())
