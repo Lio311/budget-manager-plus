@@ -98,9 +98,23 @@ export async function createCreditNote(data: CreditNoteFormData) {
             'BUSINESS'
         )
 
+        import { createHash } from 'crypto'
+
+        // ... in createCreditNote ...
+
         // Calculate VAT and total
         const vatAmount = data.creditAmount * invoice.vatRate
         const totalCredit = data.creditAmount + vatAmount
+
+        // Generate Hash
+        const hashData = JSON.stringify({
+            number: data.creditNoteNumber,
+            date: data.issueDate.toISOString(),
+            amount: totalCredit,
+            invoiceId: data.invoiceId,
+            reason: data.reason
+        })
+        const documentHash = createHash('sha256').update(hashData).digest('hex')
 
         // Create credit note
         const creditNote = await db.creditNote.create({
@@ -113,7 +127,9 @@ export async function createCreditNote(data: CreditNoteFormData) {
                 vatAmount,
                 totalCredit,
                 reason: data.reason,
-                scope: 'BUSINESS'
+                scope: 'BUSINESS',
+                documentHash,
+                signedAt: new Date()
             },
             include: {
                 invoice: {

@@ -231,16 +231,38 @@ export async function getInvoiceByToken(token: string) {
     }
 }
 
+import { createHash } from 'crypto'
+
+// ...
+
 export async function signInvoice(token: string, signatureBase64: string) {
     try {
         // Validation: Verify invoice exists first
-        const invoice = await prisma.invoice.findUnique({ where: { token } })
+        const invoice = await prisma.invoice.findUnique({
+            where: { token },
+            include: { client: true, lineItems: true } // Include data for hash
+        })
         if (!invoice) throw new Error('Invoice not found')
+
+        // Generate Hash
+        const hashData = JSON.stringify({
+            invoiceNumber: invoice.invoiceNumber,
+            date: invoice.issueDate.toISOString(),
+            total: invoice.total,
+            clientId: invoice.clientId,
+            items: invoice.lineItems.map(item => ({
+                desc: item.description,
+                total: item.total
+            }))
+        })
+
+        const documentHash = createHash('sha256').update(hashData).digest('hex')
 
         await prisma.invoice.update({
             where: { id: invoice.id },
             data: {
                 signature: signatureBase64,
+                documentHash,
                 signedAt: new Date(),
                 isSigned: true,
                 status: 'SIGNED'
