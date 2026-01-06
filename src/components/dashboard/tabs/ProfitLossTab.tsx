@@ -165,10 +165,7 @@ export default function ProfitLossTab() {
                                 <Download size={16} />
                                 הורד PDF
                             </Button>
-                            <Button variant="default" onClick={() => handleSaveReport(selectedYear!)} className="gap-2 min-w-[200px]">
-                                <Save size={16} />
-                                שמור למערכת
-                            </Button>
+
                         </div>
                     </DialogHeader>
 
@@ -223,10 +220,10 @@ export default function ProfitLossTab() {
                             <Tabs defaultValue="incomes" className="w-full">
                                 <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-4 mb-4 border-b pb-0">
                                     <div className="relative w-full md:w-auto md:min-w-[300px] mb-4 md:mb-0">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                         <Input
                                             placeholder="חיפוש לפי שם, תיאור או מספר..."
-                                            className="pr-10"
+                                            className="pl-10"
                                             value={searchTerm}
                                             onChange={e => setSearchTerm(e.target.value)}
                                         />
