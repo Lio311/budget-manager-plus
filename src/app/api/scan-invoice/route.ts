@@ -74,7 +74,8 @@ export async function POST(request: NextRequest) {
         const base64Data = Buffer.from(arrayBuffer).toString('base64')
 
         // 3. Call Gemini AI
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-09-2025' })
+        // Use a stable model version
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
         const prompt = `
         Analyze this invoice/receipt image and extract the following details into a JSON object:
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
         - date: string (YYYY-MM-DD format, estimate if missing)
         - category: string (suggest a category in Hebrew)
 
-        Return ONLY the JSON.
+        Return ONLY the JSON. Do not include markdown formatting.
         `
 
         const result = await model.generateContent([
@@ -99,14 +100,42 @@ export async function POST(request: NextRequest) {
         const response = result.response
         const text = response.text()
 
+        console.log('[API Scan] Raw AI Response:', text)
+
         // Clean and parse JSON
-        const cleanedText = text.replace(/```json\n|\n```/g, '').trim()
-        const extractedData = JSON.parse(cleanedText)
+        let extractedData: any
+        try {
+            // Attempt 1: naive clean
+            let cleanedText = text.replace(/```json\n|\n```/g, '').replace(/```/g, '').trim()
+
+            // Attempt 2: find first { and last }
+            const firstBrace = cleanedText.indexOf('{')
+            const lastBrace = cleanedText.lastIndexOf('}')
+
+            if (firstBrace !== -1 && lastBrace !== -1) {
+                cleanedText = cleanedText.substring(firstBrace, lastBrace + 1)
+            }
+
+            extractedData = JSON.parse(cleanedText)
+        } catch (e) {
+            console.error('[API Scan] JSON Parse Error:', e)
+            return NextResponse.json(
+                { success: false, error: 'Failed to parse AI response. See server logs.' },
+                { status: 500 }
+            )
+        }
 
         console.log('[API Scan] Extracted:', extractedData)
 
         // 4. Save to Database
         const expenseDate = extractedData.date ? new Date(extractedData.date) : new Date()
+
+        // Validate Date
+        if (isNaN(expenseDate.getTime())) {
+            console.error('[API Scan] Invalid date parsed:', extractedData.date)
+            // Fallback to today? Or error? Let's fallback to today but warn.
+        }
+
         const month = expenseDate.getMonth() + 1
         const year = expenseDate.getFullYear()
 
