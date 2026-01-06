@@ -56,9 +56,11 @@ const styles = StyleSheet.create({
         borderBottom: '1px solid #e5e7eb',
         alignItems: 'center'
     },
-    colCategory: { width: '50%', textAlign: 'right', fontSize: 10, color: '#374151', paddingRight: 10 },
-    colAmount: { width: '50%', textAlign: 'right', fontSize: 10, color: '#1f2937', fontWeight: 'bold' },
-    // colPct removed as it was unused and taking space
+    colDate: { width: '15%', textAlign: 'right', fontSize: 9, color: '#6b7280', paddingRight: 2 },
+    colDesc: { width: '35%', textAlign: 'right', fontSize: 9, color: '#374151', paddingRight: 2 },
+    colCategory: { width: '20%', textAlign: 'right', fontSize: 9, color: '#6b7280', paddingRight: 2 },
+    colAmount: { width: '15%', textAlign: 'right', fontSize: 9, color: '#1f2937', fontWeight: 'bold' },
+    colVat: { width: '15%', textAlign: 'right', fontSize: 9, color: '#6b7280' },
 
     sectionTitle: {
         fontSize: 14,
@@ -147,12 +149,12 @@ interface ProfitLossData {
 
     incomes: {
         total: number
-        items: { category: string, amount: number }[]
+        items: { date: Date, description: string, category: string, amount: number, vat: number }[]
     }
 
     expenses: {
         total: number
-        items: { category: string, amount: number }[]
+        items: { date: Date, description: string, category: string, amount: number, vat: number }[]
     }
 
     netProfit: number
@@ -182,18 +184,25 @@ export const ProfitLossTemplate: React.FC<{ data: ProfitLossData }> = ({ data })
                 <View>
                     <Text style={styles.sectionTitle}>הכנסות</Text>
                     <View style={styles.tableHeaderRegex}>
+                        <Text style={styles.colDate}>תאריך</Text>
+                        <Text style={styles.colDesc}>תיאור</Text>
                         <Text style={styles.colCategory}>קטגוריה</Text>
-                        <Text style={styles.colAmount}>סכום</Text>
+                        <Text style={styles.colAmount}>נטו</Text>
+                        <Text style={styles.colVat}>מע"מ</Text>
                     </View>
                     {data.incomes.items.map((item, i) => (
                         <View key={i} style={styles.tableRow}>
+                            <Text style={styles.colDate}>{new Date(item.date).toLocaleDateString('he-IL')}</Text>
+                            <Text style={styles.colDesc}>{item.description}</Text>
                             <Text style={styles.colCategory}>{item.category}</Text>
                             <Text style={styles.colAmount}>{formatCurrency(item.amount)}</Text>
+                            <Text style={styles.colVat}>{formatCurrency(item.vat)}</Text>
                         </View>
                     ))}
                     <View style={[styles.tableRow, { backgroundColor: '#f0fdf4', borderTop: '1px solid #10b981' }]}>
-                        <Text style={[styles.colCategory, { fontWeight: 'bold' }]}>סה״כ הכנסות</Text>
+                        <Text style={[styles.colDesc, { fontWeight: 'bold', width: '70%' }]}>סה״כ הכנסות</Text>
                         <Text style={[styles.colAmount, { fontWeight: 'bold', color: '#166534' }]}>{formatCurrency(data.incomes.total)}</Text>
+                        <Text style={styles.colVat}></Text>
                     </View>
                 </View>
 
@@ -201,18 +210,25 @@ export const ProfitLossTemplate: React.FC<{ data: ProfitLossData }> = ({ data })
                 <View style={{ marginTop: 10 }}>
                     <Text style={[styles.sectionTitle, { color: '#b91c1c', borderBottomColor: '#b91c1c' }]}>הוצאות</Text>
                     <View style={styles.tableHeaderRegex}>
+                        <Text style={styles.colDate}>תאריך</Text>
+                        <Text style={styles.colDesc}>תיאור</Text>
                         <Text style={styles.colCategory}>קטגוריה</Text>
-                        <Text style={styles.colAmount}>סכום</Text>
+                        <Text style={styles.colAmount}>נטו</Text>
+                        <Text style={styles.colVat}>מע"מ</Text>
                     </View>
                     {data.expenses.items.map((item, i) => (
                         <View key={i} style={styles.tableRow}>
+                            <Text style={styles.colDate}>{new Date(item.date).toLocaleDateString('he-IL')}</Text>
+                            <Text style={styles.colDesc}>{item.description}</Text>
                             <Text style={styles.colCategory}>{item.category}</Text>
                             <Text style={styles.colAmount}>{formatCurrency(item.amount)}</Text>
+                            <Text style={styles.colVat}>{formatCurrency(item.vat)}</Text>
                         </View>
                     ))}
                     <View style={[styles.tableRow, { backgroundColor: '#fef2f2', borderTop: '1px solid #ef4444' }]}>
-                        <Text style={[styles.colCategory, { fontWeight: 'bold' }]}>סה״כ הוצאות</Text>
+                        <Text style={[styles.colDesc, { fontWeight: 'bold', width: '70%' }]}>סה״כ הוצאות</Text>
                         <Text style={[styles.colAmount, { fontWeight: 'bold', color: '#b91c1c' }]}>{formatCurrency(data.expenses.total)}</Text>
+                        <Text style={styles.colVat}></Text>
                     </View>
                 </View>
 

@@ -74,7 +74,8 @@ export async function generateProfitLossPDF({ year, userId }: GenerateProfitLoss
                 date: item.date,
                 description: item.description,
                 category: item.category || 'כללי',
-                amount: item.amountNet
+                amount: item.amountNet,
+                vat: item.vat
             }))
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
@@ -86,7 +87,8 @@ export async function generateProfitLossPDF({ year, userId }: GenerateProfitLoss
                 date: item.date,
                 description: item.description,
                 category: item.category || 'כללי',
-                amount: item.amountNet
+                amount: item.amountNet,
+                vat: item.vat
             }))
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
