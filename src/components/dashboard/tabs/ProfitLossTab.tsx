@@ -42,9 +42,35 @@ import { saveBkmvData } from '@/lib/actions/stored-reports'
 // ...
 
 export default function ProfitLossTab() {
-    // ... (state remains)
+    const [selectedYear, setSelectedYear] = useState<number | null>(null)
+    const [reportData, setReportData] = useState<ProfitLossReport | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const [isDetailOpen, setIsDetailOpen] = useState(false)
 
-    // ... (fetchReport remains)
+    const currentYear = new Date().getFullYear()
+    const availableYears = [2025, 2026]
+
+    useEffect(() => {
+        if (selectedYear) {
+            fetchReport(selectedYear)
+        }
+    }, [selectedYear])
+
+    const fetchReport = async (year: number) => {
+        setIsLoading(true)
+        try {
+            const result = await getProfitLossData(year)
+            if (result.success && result.data) {
+                setReportData(result.data)
+            } else {
+                toast.error(result.error || 'שגיאה בטעינת הדוח')
+            }
+        } catch (err) {
+            toast.error('שגיאה בתקשורת')
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     const handleDownloadPDF = async (year: number) => {
         // Open the API route in a new tab
