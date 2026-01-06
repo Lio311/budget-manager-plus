@@ -324,13 +324,19 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                 ) : filtered.map((t) => (
                     <div key={t.id} className="bg-white p-4 rounded-xl border shadow-sm space-y-3">
                         <div className="flex justify-between items-start">
-                            <div>
+                            <div className="text-right">
                                 <div className="font-bold text-gray-900">{t.description}</div>
                                 <div className="text-sm text-gray-500">{t.entityName || '-'}</div>
                             </div>
-                            <div className="text-left">
-                                <div className="font-bold font-mono text-lg">{formatMoney(t.amount)}</div>
-                                <div className="text-xs text-gray-400 font-mono">נטו: {formatMoney(t.amountNet)}</div>
+                            <div className="text-left" dir="ltr">
+                                <div className="font-bold font-mono text-lg flex gap-1 items-center justify-end">
+                                    <span>₪</span>
+                                    <span>{t.amount.toLocaleString()}</span>
+                                </div>
+                                <div className="text-xs text-gray-400 font-mono flex gap-1 justify-end">
+                                    <span>נטו:</span>
+                                    <span>₪{t.amountNet.toLocaleString()}</span>
+                                </div>
                             </div>
                         </div>
 
@@ -340,9 +346,11 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                             </div>
                             <div className="flex items-center gap-2">
                                 {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200">זיכוי</Badge>}
-                                <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-mono text-xs">
-                                    #{t.number || '-'}
-                                </span>
+                                {t.number && (
+                                    <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-mono text-xs">
+                                        #{t.number}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
