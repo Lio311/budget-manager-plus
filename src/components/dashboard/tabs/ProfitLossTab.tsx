@@ -236,25 +236,17 @@ function ReportDetailView({ data }: { data: ProfitLossReport }) {
                 </TabsList>
 
                 <TabsContent value="incomes" className="mt-6">
-                    <div className="overflow-x-auto -mx-2 sm:mx-0">
-                        <div className="min-w-[600px] p-1">
-                            <TransactionsTable
-                                transactions={data.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE')}
-                                type="income"
-                            />
-                        </div>
-                    </div>
+                    <TransactionsTable
+                        transactions={data.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE')}
+                        type="income"
+                    />
                 </TabsContent>
 
                 <TabsContent value="expenses" className="mt-6">
-                    <div className="overflow-x-auto -mx-2 sm:mx-0">
-                        <div className="min-w-[600px] p-1">
-                            <TransactionsTable
-                                transactions={data.transactions.filter(t => t.type === 'EXPENSE')}
-                                type="expense"
-                            />
-                        </div>
-                    </div>
+                    <TransactionsTable
+                        transactions={data.transactions.filter(t => t.type === 'EXPENSE')}
+                        type="expense"
+                    />
                 </TabsContent>
             </Tabs>
         </div>
@@ -284,11 +276,11 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                 />
             </div>
 
-            <div className="border rounded-xl overflow-hidden">
+            {/* Desktop View (Table) */}
+            <div className="hidden md:block border rounded-xl overflow-hidden">
                 <Table>
                     <TableHeader className="bg-gray-50">
                         <TableRow>
-                            {/* Removed 'Recognized?' column */}
                             <TableHead className="text-center w-[120px]">נטו</TableHead>
                             <TableHead className="text-center w-[100px]">מע"מ</TableHead>
                             <TableHead className="text-center w-[120px]">סכום ברוטו</TableHead>
@@ -307,7 +299,6 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                             </TableRow>
                         ) : filtered.map((t) => (
                             <TableRow key={t.id} className="hover:bg-gray-50">
-                                {/* Removed 'Recognized?' cell */}
                                 <TableCell className="text-center ltr font-mono font-bold">{formatMoney(t.amountNet)}</TableCell>
                                 <TableCell className="text-center ltr font-mono text-gray-500">{formatMoney(t.vat)}</TableCell>
                                 <TableCell className="text-center ltr font-mono">{formatMoney(t.amount)}</TableCell>
@@ -322,6 +313,40 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                         ))}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Mobile View (Cards) */}
+            <div className="md:hidden space-y-3">
+                {filtered.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                        לא נמצאו נתונים
+                    </div>
+                ) : filtered.map((t) => (
+                    <div key={t.id} className="bg-white p-4 rounded-xl border shadow-sm space-y-3">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <div className="font-bold text-gray-900">{t.description}</div>
+                                <div className="text-sm text-gray-500">{t.entityName || '-'}</div>
+                            </div>
+                            <div className="text-left">
+                                <div className="font-bold font-mono text-lg">{formatMoney(t.amount)}</div>
+                                <div className="text-xs text-gray-400 font-mono">נטו: {formatMoney(t.amountNet)}</div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center text-sm pt-2 border-t border-gray-100">
+                            <div className="text-gray-500">
+                                {new Date(t.date).toLocaleDateString('he-IL')}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200">זיכוי</Badge>}
+                                <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-mono text-xs">
+                                    #{t.number || '-'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     )
