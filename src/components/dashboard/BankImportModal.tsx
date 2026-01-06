@@ -391,8 +391,11 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                                 <p className="text-sm font-medium text-gray-700">
                                     לחץ לבחירת קובץ או גרור אותו לכאן
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    תומך בקבצי Excel (.xlsx, .xls) ו-CSV
+                                <p className="text-xs text-gray-500 mt-1 flex flex-row-reverse justify-center gap-1">
+                                    <span>תומך בקבצי</span>
+                                    <span className="font-sans">Excel (.xlsx, .xls)</span>
+                                    <span>ו-</span>
+                                    <span className="font-sans">CSV</span>
                                 </p>
                                 <input
                                     ref={fileInputRef}
@@ -424,8 +427,9 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                                 <p className="text-sm font-medium text-gray-700">
                                     לחץ להעלאת צילום חשבונית
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    תומך בקבצי JPG, PNG, WEBP
+                                <p className="text-xs text-gray-500 mt-1 flex flex-row-reverse justify-center gap-1">
+                                    <span>תומך בקבצי</span>
+                                    <span className="font-sans">JPG, PNG, WEBP</span>
                                 </p>
                                 <input
                                     ref={imageInputRef}
@@ -487,7 +491,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                                     <tbody className="divide-y divide-gray-100">
                                         {previewData.slice(0, 50).map((row, idx) => (
                                             <tr key={idx} className="hover:bg-blue-50/50 transition-colors">
-                                                <td className="p-2 text-gray-600">{row.date}</td>
+                                                <td className="p-2 text-gray-600 font-mono text-center">{format(new Date(row.date), 'dd/MM/yyyy')}</td>
                                                 <td className="p-2 font-medium">{row.description}</td>
                                                 <td className="p-2 text-gray-500">{row.branchName || '-'}</td>
                                                 <td className="p-2 font-bold text-red-600" dir="ltr">₪{row.billingAmount?.toFixed(2)}</td>
