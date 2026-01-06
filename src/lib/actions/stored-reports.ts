@@ -24,9 +24,9 @@ export async function saveBkmvData(year: number) {
         }
 
         // 2. Generate BKMVDATA String
-        // I need to import the generator function. providing placeholder for now, will verify import.
-        const { generateBkmvString } = await import('./open-format')
-        const fileContent = await generateBkmvString(reportResult.data, year)
+        const { generateBkmvData } = await import('@/lib/open-format/generator')
+        const { bkmv } = await generateBkmvData(year)
+        const fileContent = bkmv
 
         // 3. Save to DB
         const filename = `BKMVDATA-${year}.txt`
