@@ -124,7 +124,8 @@ export async function generateProfitLossPDF({ year, userId }: GenerateProfitLoss
                 total: data.expenses.recognized, // Use recognized summary
                 items: expenseItems
             },
-            netProfit: data.netProfit // Use calculated net profit
+            netProfit: data.netProfit, // Use calculated net profit
+            poweredByLogoPath: `${process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') || 'https://budget-manager-plus.vercel.app'}/K-LOGO.png`
         }
 
         const filename = `profit-loss-report-${year}.pdf`

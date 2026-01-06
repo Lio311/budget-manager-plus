@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
 
     footer: {
         position: 'absolute',
-        bottom: 30,
+        bottom: 20,
         left: 30,
         right: 30,
         textAlign: 'center',
@@ -122,14 +122,32 @@ const styles = StyleSheet.create({
     },
     footerText: {
         fontSize: 8,
-        color: '#9ca3af'
+        color: '#9ca3af',
+        marginBottom: 3
+    },
+    poweredBy: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 5
+    },
+    poweredByText: {
+        fontSize: 7,
+        color: '#6b7280',
+        marginLeft: 5
+    },
+    poweredByLogo: {
+        width: 50,
+        height: 15,
+        objectFit: 'contain'
     }
 })
 
 interface ProfitLossData {
-    period: string // "2024" or "01/2024 - 12/2024"
+    period: string
     businessName: string
     businessLogo?: string
+    poweredByLogoPath?: string
 
     incomes: {
         total: number
@@ -230,11 +248,14 @@ export const ProfitLossTemplate: React.FC<{ data: ProfitLossData }> = ({ data })
                 {/* Footer */}
                 <View style={styles.footer} wrap={false}>
                     <Text style={styles.footerText}>
-                        מסמך זה הופק באופן אוטומטי על ידי Keseflow
+                        !תודה על העסקה
                     </Text>
-                    <Text style={styles.footerText}>
-                        {new Date().toLocaleDateString('he-IL')} :תאריך הפקה
-                    </Text>
+                    <View style={styles.poweredBy}>
+                        {data.poweredByLogoPath && (
+                            <Image src={data.poweredByLogoPath} style={styles.poweredByLogo} />
+                        )}
+                        <Text style={styles.poweredByText}>הופק על ידי</Text>
+                    </View>
                 </View>
             </Page>
         </Document>
