@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
         const base64Data = Buffer.from(arrayBuffer).toString('base64')
 
         // 3. Call Gemini AI
-        // Use a stable model version
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        // Reverting to the preview model as requested
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-09-2025' })
 
         const prompt = `
         Analyze this invoice/receipt image and extract the following details into a JSON object:
