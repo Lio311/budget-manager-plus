@@ -10,8 +10,7 @@ import {
     Download,
     FileText,
     AlertCircle,
-    ChevronDown,
-    ChevronUp,
+    Save,
     Search
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -73,8 +72,22 @@ export default function ProfitLossTab() {
     }
 
     const handleDownloadPDF = async (year: number) => {
-        // Open the API route in a new tab
-        window.open(`/api/reports/profit-loss/${year}/pdf`, '_blank')
+        try {
+            const response = await fetch(`/api/reports/profit-loss/${year}/pdf`)
+            if (!response.ok) throw new Error('Download failed')
+
+            const blob = await response.blob()
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `profit-loss-${year}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(a)
+        } catch (e) {
+            toast.error('שגיאה בהורדת הדו"ח')
+        }
     }
 
     const handleSaveReport = async (year: number) => {
@@ -93,6 +106,8 @@ export default function ProfitLossTab() {
     }
 
     const isYearCompleted = (year: number) => year < currentYear
+
+    const formatMoney = (amount: number) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(amount)
 
     return (
         <div className="space-y-8 p-6" dir="rtl">
@@ -145,31 +160,94 @@ export default function ProfitLossTab() {
 
                         {/* Centered Action Buttons */}
                         <div className="flex flex-col md:flex-row justify-center gap-4 w-full">
-                            <Button variant="outline" onClick={() => handleDownloadPDF(selectedYear!)} className="gap-2 min-w-[140px]">
-                                הורד דוח PDF
+                            <Button variant="outline" onClick={() => handleDownloadPDF(selectedYear!)} className="gap-2 min-w-[200px]">
                                 <Download size={16} />
+                                הורד PDF
                             </Button>
-                            <Button variant="outline" onClick={() => handleSaveReport(selectedYear!)} className="gap-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 min-w-[140px]">
-                                שמור דוח פתוח (BKMV)
-                                <FileText size={16} />
+                            <Button variant="default" onClick={() => handleSaveReport(selectedYear!)} className="gap-2 min-w-[200px]">
+                                <Save size={16} />
+                                שמור למערכת
                             </Button>
                         </div>
                     </DialogHeader>
 
-                    <div id="profit-loss-report-content" className="bg-white p-2 md:p-4 rounded-lg">
-                        {isLoading ? (
-                            <div className="py-20 text-center">טוען נתונים...</div>
-                        ) : reportData ? (
-                            <ReportDetailView data={reportData} />
-                        ) : (
-                            <div className="py-20 text-center text-red-500">לא נמצאו נתונים</div>
-                        )}
+                    {isLoading ? (
+                        <div className="py-20 text-center">טוען נתונים...</div>
+                    ) : reportData ? (
+                        <div className="mt-6 space-y-8">
+                            {/* Summary Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 direction-rtl">
+                                <Card className="p-6 bg-emerald-50 border-emerald-100">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-emerald-100 rounded-full text-emerald-600">
+                                            <TrendingUp size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-emerald-700 font-medium">סה"כ הכנסות (חייבות)</p>
+                                            <h3 className="text-2xl font-bold text-emerald-900">{formatMoney(reportData.revenue.taxable)}</h3>
+                                            <p className="text-xs text-emerald-600 mt-1">מע"מ: {formatMoney(reportData.revenue.vat)}</p>
+                                        </div>
+                                    </div>
+                                </Card>
 
-                        <div className="mt-8 pt-4 border-t flex items-center justify-center text-gray-400 text-sm gap-1">
-                            <span>הופק ע"י Keseflow</span>
-                            <span>•</span>
-                            <span>{new Date().toLocaleDateString('he-IL')}</span>
+                                <Card className="p-6 bg-red-50 border-red-100">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-red-100 rounded-full text-red-600">
+                                            <TrendingDown size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-red-700 font-medium">סה"כ הוצאות (מוכרות)</p>
+                                            <h3 className="text-2xl font-bold text-red-900">{formatMoney(reportData.expenses.recognized)}</h3>
+                                            <p className="text-xs text-red-600 mt-1">מע"מ: {formatMoney(reportData.expenses.vatRecognized)}</p>
+                                        </div>
+                                    </div>
+                                </Card>
+
+                                <Card className="p-6 bg-blue-50 border-blue-100">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-blue-100 rounded-full text-blue-600">
+                                            <DollarSign size={24} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-blue-700 font-medium">רווח נקי</p>
+                                            <h3 className="text-2xl font-bold text-blue-900">{formatMoney(reportData.netProfit)}</h3>
+                                            <p className="text-xs text-blue-600 mt-1">לפני מס הכנסה</p>
+                                        </div>
+                                    </div>
+                                </Card>
+                            </div>
+
+                            {/* Detailed Tables */}
+                            <Tabs defaultValue="incomes" className="w-full">
+                                <TabsList className="w-full justify-end border-b rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 overflow-x-auto hide-scrollbar">
+                                    <TabsTrigger value="incomes" className="data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
+                                        הכנסות ({reportData.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE').length})
+                                    </TabsTrigger>
+                                    <TabsTrigger value="expenses" className="data-[state=active]:border-red-500 data-[state=active]:text-red-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
+                                        הוצאות ({reportData.transactions.filter(t => t.type === 'EXPENSE').length})
+                                    </TabsTrigger>
+                                </TabsList>
+
+                                <TransactionsTable
+                                    data={reportData.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE')}
+                                    type="income"
+                                />
+                                <TransactionsTable
+                                    data={reportData.transactions.filter(t => t.type === 'EXPENSE')}
+                                    type="expense"
+                                />
+                            </Tabs>
                         </div>
+                    ) : (
+                        <div className="text-center py-12 text-gray-500">
+                            לא נמצאו נתונים להצגה
+                        </div>
+                    )}
+
+                    <div className="mt-8 pt-4 border-t flex items-center justify-center text-gray-400 text-sm gap-1">
+                        <span>הופק ע"י Keseflow</span>
+                        <span>•</span>
+                        <span>{new Date().toLocaleDateString('he-IL')}</span>
                     </div>
                 </DialogContent>
             </Dialog>
@@ -177,95 +255,30 @@ export default function ProfitLossTab() {
     )
 }
 
-function ReportDetailView({ data }: { data: ProfitLossReport }) {
-    const formatMoney = (amount: number) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(amount)
-
-    return (
-        <div className="space-y-8">
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="p-6 bg-emerald-50 border-emerald-100">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-emerald-100 rounded-full text-emerald-600">
-                            <TrendingUp size={24} />
-                        </div>
-                        <div>
-                            <p className="text-sm text-emerald-700 font-medium">סה"כ הכנסות (חייבות)</p>
-                            <h3 className="text-2xl font-bold text-emerald-900">{formatMoney(data.revenue.taxable)}</h3>
-                            <p className="text-xs text-emerald-600 mt-1">מע"מ: {formatMoney(data.revenue.vat)}</p>
-                        </div>
-                    </div>
-                </Card>
-
-                <Card className="p-6 bg-red-50 border-red-100">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-red-100 rounded-full text-red-600">
-                            <TrendingDown size={24} />
-                        </div>
-                        <div>
-                            <p className="text-sm text-red-700 font-medium">סה"כ הוצאות (מוכרות)</p>
-                            <h3 className="text-2xl font-bold text-red-900">{formatMoney(data.expenses.recognized)}</h3>
-                            <p className="text-xs text-red-600 mt-1">מע"מ: {formatMoney(data.expenses.vatRecognized)}</p>
-                        </div>
-                    </div>
-                </Card>
-
-                <Card className="p-6 bg-blue-50 border-blue-100">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-blue-100 rounded-full text-blue-600">
-                            <DollarSign size={24} />
-                        </div>
-                        <div>
-                            <p className="text-sm text-blue-700 font-medium">רווח נקי</p>
-                            <h3 className="text-2xl font-bold text-blue-900">{formatMoney(data.netProfit)}</h3>
-                            <p className="text-xs text-blue-600 mt-1">לפני מס הכנסה</p>
-                        </div>
-                    </div>
-                </Card>
-            </div>
-
-            {/* Detailed Tables */}
-            <Tabs defaultValue="incomes" className="w-full">
-                <TabsList className="w-full justify-end border-b rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 overflow-x-auto hide-scrollbar">
-                    <TabsTrigger value="incomes" className="data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
-                        הכנסות ({data.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE').length})
-                    </TabsTrigger>
-                    <TabsTrigger value="expenses" className="data-[state=active]:border-red-500 data-[state=active]:text-red-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
-                        הוצאות ({data.transactions.filter(t => t.type === 'EXPENSE').length})
-                    </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="incomes" className="mt-6">
-                    <TransactionsTable
-                        transactions={data.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE')}
-                        type="income"
-                    />
-                </TabsContent>
-
-                <TabsContent value="expenses" className="mt-6">
-                    <TransactionsTable
-                        transactions={data.transactions.filter(t => t.type === 'EXPENSE')}
-                        type="expense"
-                    />
-                </TabsContent>
-            </Tabs>
-        </div>
-    )
-}
-
-function TransactionsTable({ transactions, type }: { transactions: TransactionItem[], type: 'income' | 'expense' }) {
+function TransactionsTable({ data, type }: { data: TransactionItem[], type: 'income' | 'expense' }) {
     const [searchTerm, setSearchTerm] = useState('')
 
-    const filtered = transactions.filter(t =>
+    const filteredTransactions = data.filter(t =>
         t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.entityName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.number?.includes(searchTerm)
     )
 
-    const formatMoney = (amount: number) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(amount)
+    if (!filteredTransactions.length && !searchTerm) return <div className="py-8 text-center text-gray-500">אין נתונים להצגה</div>
+
+    // Sort by date descending
+    const sortedData = [...filteredTransactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+    // Group by month
+    const groupedByMonth = sortedData.reduce((acc: any, t) => {
+        const monthKey = new Date(t.date).toLocaleString('he-IL', { month: 'long', year: 'numeric' })
+        if (!acc[monthKey]) acc[monthKey] = []
+        acc[monthKey].push(t)
+        return acc
+    }, {})
 
     return (
-        <div className="space-y-4">
+        <TabsContent value={type === 'income' ? 'incomes' : 'expenses'} className="space-y-6 mt-6">
             <div className="relative max-w-sm">
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 <Input
@@ -276,6 +289,27 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                 />
             </div>
 
+            {Object.entries(groupedByMonth).length === 0 && searchTerm ? (
+                <div className="py-8 text-center text-gray-500">לא נמצאו נתונים עבור החיפוש</div>
+            ) : (
+                Object.entries(groupedByMonth).map(([month, transactions]) => (
+                    <div key={month} className="space-y-4">
+                        <h4 className="text-lg font-bold text-gray-700 sticky top-0 bg-white py-2 z-10 border-b">
+                            {month}
+                        </h4>
+                        <TransactionList filtered={transactions as TransactionItem[]} type={type} />
+                    </div>
+                ))
+            )}
+        </TabsContent>
+    )
+}
+
+function TransactionList({ filtered, type }: { filtered: TransactionItem[], type: 'income' | 'expense' }) {
+    const formatMoney = (amount: number) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(amount)
+
+    return (
+        <div>
             {/* Desktop View (Table) */}
             <div className="hidden md:block border rounded-xl overflow-hidden">
                 <Table>
@@ -323,20 +357,21 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                     </div>
                 ) : filtered.map((t) => (
                     <div key={t.id} className="bg-white p-4 rounded-xl border shadow-sm space-y-3">
-                        <div className="flex justify-between items-start">
-                            <div className="text-right">
-                                <div className="font-bold text-gray-900">{t.description}</div>
-                                <div className="text-sm text-gray-500">{t.entityName || '-'}</div>
-                            </div>
-                            <div className="text-left" dir="ltr">
-                                <div className="font-bold font-mono text-lg flex gap-1 items-center justify-end">
-                                    <span>₪</span>
+                        <div className="flex justify-between items-start flex-row-reverse">
+                            <div className="text-left w-[40%]" dir="ltr">
+                                <div className="font-bold font-mono text-lg flex gap-1 items-center justify-start text-gray-900">
+                                    <span className="text-sm">₪</span>
                                     <span>{t.amount.toLocaleString()}</span>
                                 </div>
-                                <div className="text-xs text-gray-400 font-mono flex gap-1 justify-end">
+                                <div className="text-xs text-gray-400 font-mono flex gap-1 justify-start">
                                     <span>נטו:</span>
                                     <span>₪{t.amountNet.toLocaleString()}</span>
                                 </div>
+                            </div>
+
+                            <div className="text-right flex-1">
+                                <div className="font-bold text-gray-900 line-clamp-1">{t.description}</div>
+                                <div className="text-sm text-gray-500 truncate">{t.entityName || '-'}</div>
                             </div>
                         </div>
 
