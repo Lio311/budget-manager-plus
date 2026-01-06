@@ -4,12 +4,8 @@ import { prisma } from '@/lib/db'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { revalidatePath } from 'next/cache'
 
-// Initialize Gemini
-const apiKey = process.env.GEMINI_API_KEY
-if (!apiKey) {
-    throw new Error('GEMINI_API_KEY is not set')
-}
-const genAI = new GoogleGenerativeAI(apiKey)
+// Initialize Gemini context variable
+let genAI: GoogleGenerativeAI | null = null;
 
 export async function POST(request: NextRequest) {
     try {
@@ -36,6 +32,20 @@ export async function POST(request: NextRequest) {
         }
 
         const userId = user.id
+
+        // Initialize Gemini inside handler
+        const geminiKey = process.env.GEMINI_API_KEY
+        if (!geminiKey) {
+            console.error('GEMINI_API_KEY is not set')
+            return NextResponse.json(
+                { success: false, error: 'Server Configuration Error: Missing AI Key' },
+                { status: 500 }
+            )
+        }
+
+        if (!genAI) {
+            genAI = new GoogleGenerativeAI(geminiKey)
+        }
 
         // 2. Process Image & Scope
         const formData = await request.formData()
@@ -74,8 +84,12 @@ export async function POST(request: NextRequest) {
         const base64Data = Buffer.from(arrayBuffer).toString('base64')
 
         // 3. Call Gemini AI
-        // Reverting to the preview model as requested
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-09-2025' })
+        // User requested 'gemini-2.5-flash-preview-09-2025' but it seems unstable or non-existent.
+        // We will try it, but wrap in try/catch to fallback to stable if it fails.
+        const modelName = 'gemini-2.5-flash-preview-09-2025'
+        const stableModelName = 'gemini-1.5-flash'
+
+        const model = genAI.getGenerativeModel({ model: modelName })
 
         const prompt = `
         Analyze this invoice/receipt image and extract the following details into a JSON object:
@@ -87,15 +101,30 @@ export async function POST(request: NextRequest) {
         Return ONLY the JSON. Do not include markdown formatting.
         `
 
-        const result = await model.generateContent([
-            prompt,
-            {
-                inlineData: {
-                    data: base64Data,
-                    mimeType: file.type
+        let result;
+        try {
+            result = await model.generateContent([
+                prompt,
+                {
+                    inlineData: {
+                        data: base64Data,
+                        mimeType: file.type
+                    }
                 }
-            }
-        ])
+            ])
+        } catch (modelError: any) {
+            console.log(`[API Scan] Model ${modelName} failed, trying ${stableModelName}. Error:`, modelError.message)
+            const fallbackModel = genAI.getGenerativeModel({ model: stableModelName })
+            result = await fallbackModel.generateContent([
+                prompt,
+                {
+                    inlineData: {
+                        data: base64Data,
+                        mimeType: file.type
+                    }
+                }
+            ])
+        }
 
         const response = result.response
         const text = response.text()
