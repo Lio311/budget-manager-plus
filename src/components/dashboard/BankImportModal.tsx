@@ -482,19 +482,19 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                                 <table className="w-full text-xs text-right">
                                     <thead className="bg-gray-50 sticky top-0 text-gray-500">
                                         <tr>
-                                            <th className="p-2 border-b">תאריך</th>
-                                            <th className="p-2 border-b">תיאור / עסק</th>
-                                            <th className="p-2 border-b">קטגוריה</th>
-                                            <th className="p-2 border-b">סכום</th>
+                                            <th className="p-2 border-b text-right">תאריך</th>
+                                            <th className="p-2 border-b text-right">תיאור / עסק</th>
+                                            <th className="p-2 border-b text-right">קטגוריה</th>
+                                            <th className="p-2 border-b text-right">סכום</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
                                         {previewData.slice(0, 50).map((row, idx) => (
                                             <tr key={idx} className="hover:bg-blue-50/50 transition-colors">
-                                                <td className="p-2 text-gray-600 font-mono text-center">{format(new Date(row.date), 'dd/MM/yyyy')}</td>
-                                                <td className="p-2 font-medium">{row.description}</td>
-                                                <td className="p-2 text-gray-500">{row.branchName || '-'}</td>
-                                                <td className="p-2 font-bold text-red-600" dir="ltr">₪{row.billingAmount?.toFixed(2)}</td>
+                                                <td className="p-2 text-gray-600 font-mono text-right">{format(new Date(row.date), 'dd/MM/yyyy')}</td>
+                                                <td className="p-2 font-medium text-right">{row.description}</td>
+                                                <td className="p-2 text-gray-500 text-right">{row.branchName || '-'}</td>
+                                                <td className="p-2 font-bold text-red-600 text-right" dir="ltr">₪{row.billingAmount?.toFixed(2)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
