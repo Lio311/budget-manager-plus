@@ -37,98 +37,27 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { downloadOpenFormat } from '@/lib/actions/open-format'
-import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
+import { saveBkmvData } from '@/lib/actions/stored-reports'
+
+// ...
 
 export default function ProfitLossTab() {
-    const [selectedYear, setSelectedYear] = useState<number | null>(null)
-    const [reportData, setReportData] = useState<ProfitLossReport | null>(null)
-    const [isLoading, setIsLoading] = useState(false)
-    const [isDetailOpen, setIsDetailOpen] = useState(false)
+    // ... (state remains)
 
-    const currentYear = new Date().getFullYear()
-    const availableYears = [2025, 2026]
-
-    useEffect(() => {
-        if (selectedYear) {
-            fetchReport(selectedYear)
-        }
-    }, [selectedYear])
-
-    const fetchReport = async (year: number) => {
-        setIsLoading(true)
-        try {
-            const result = await getProfitLossData(year)
-            if (result.success && result.data) {
-                setReportData(result.data)
-            } else {
-                toast.error(result.error || 'שגיאה בטעינת הדוח')
-            }
-        } catch (err) {
-            toast.error('שגיאה בתקשורת')
-        } finally {
-            setIsLoading(false)
-        }
-    }
+    // ... (fetchReport remains)
 
     const handleDownloadPDF = async (year: number) => {
-        const content = document.getElementById('profit-loss-report-content')
-        if (!content) return
-
-        toast.info('מכין PDF להורדה...')
-
-        try {
-            const canvas = await html2canvas(content, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff'
-            })
-
-            const imgData = canvas.toDataURL('image/png')
-            const pdf = new jsPDF('l', 'mm', 'a4') // Landscape
-            const pdfWidth = pdf.internal.pageSize.getWidth()
-            const pdfHeight = pdf.internal.pageSize.getHeight()
-            const imgWidth = canvas.width
-            const imgHeight = canvas.height
-            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight)
-            const imgX = (pdfWidth - imgWidth * ratio) / 2
-            const imgY = 30 // Top margin
-
-            // Add Header
-            pdf.setFontSize(20)
-            pdf.text(`דוח רווח והפסד - ${year}`, pdfWidth / 2, 20, { align: 'center' })
-
-            pdf.addImage(imgData, 'PNG', 0, imgY, imgWidth * ratio, imgHeight * ratio) // Fit width, maintain aspect ratio
-
-            pdf.save(`profit_loss_report_${year}.pdf`)
-            toast.success('PDF ירד בהצלחה')
-        } catch (error) {
-            console.error(error)
-            toast.error('שגיאה ביצירת PDF')
-        }
+        // Open the API route in a new tab
+        window.open(`/api/reports/profit-loss/${year}/pdf`, '_blank')
     }
 
-    const handleDownloadOpenFormat = async (year: number) => {
-        toast.info('מכין קבצים להורדה...')
-        const result = await downloadOpenFormat(year)
-        if (result.success && result.data) {
-            const downloadFile = (content: string, filename: string) => {
-                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = filename
-                document.body.appendChild(a)
-                a.click()
-                document.body.removeChild(a)
-            }
-
-            downloadFile(result.data.ini, 'INI.TXT')
-            downloadFile(result.data.bkmv, 'BKMVDATA.TXT')
-            toast.success('הקבצים ירדו בהצלחה')
+    const handleSaveReport = async (year: number) => {
+        toast.info('שומר דוח במערכת...')
+        const result = await saveBkmvData(year)
+        if (result.success) {
+            toast.success(result.message)
         } else {
-            toast.error(result.error || 'שגיאה בהורדת הקבצים')
+            toast.error(result.error || 'שגיאה בשמירת הדוח')
         }
     }
 
@@ -191,12 +120,12 @@ export default function ProfitLossTab() {
                         {/* Centered Action Buttons */}
                         <div className="flex flex-col md:flex-row justify-center gap-4 w-full">
                             <Button variant="outline" onClick={() => handleDownloadPDF(selectedYear!)} className="gap-2 min-w-[140px]">
-                                הורד PDF
+                                הורד דוח PDF
                                 <Download size={16} />
                             </Button>
-                            <Button variant="outline" onClick={() => handleDownloadOpenFormat(selectedYear!)} className="gap-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 min-w-[140px]">
-                                הורד BKMVDATA
-                                <Download size={16} />
+                            <Button variant="outline" onClick={() => handleSaveReport(selectedYear!)} className="gap-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 min-w-[140px]">
+                                שמור דוח פתוח (BKMV)
+                                <FileText size={16} />
                             </Button>
                         </div>
                     </DialogHeader>
