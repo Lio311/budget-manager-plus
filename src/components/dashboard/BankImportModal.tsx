@@ -365,11 +365,11 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
 
                 <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); resetModal(); }} className="w-full">
                     <TabsList className="grid w-full grid-cols-2 mb-4">
-                        <TabsTrigger value="file" className="flex items-center justify-center gap-2 flex-row-reverse">
+                        <TabsTrigger value="file" className="flex items-center justify-center gap-2 flex-row" dir="ltr">
                             <span className="font-sans">Excel/CSV</span>
                             <span>קובץ</span>
                         </TabsTrigger>
-                        <TabsTrigger value="scan" className="flex items-center justify-center gap-2 flex-row-reverse">
+                        <TabsTrigger value="scan" className="flex items-center justify-center gap-2 flex-row" dir="ltr">
                             <span className="font-sans">(AI)</span>
                             <span>סריקת חשבוניות</span>
                         </TabsTrigger>
