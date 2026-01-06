@@ -4,6 +4,7 @@ import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { getCurrentBudget } from './budget'
+import { createHash } from 'crypto'
 
 export interface CreditNoteFormData {
     invoiceId: string
@@ -98,9 +99,7 @@ export async function createCreditNote(data: CreditNoteFormData) {
             'BUSINESS'
         )
 
-        import { createHash } from 'crypto'
 
-        // ... in createCreditNote ...
 
         // Calculate VAT and total
         const vatAmount = data.creditAmount * invoice.vatRate
