@@ -584,14 +584,14 @@ export function ExpensesTab() {
                                             <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
                                                 {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
                                                     <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
-                                                        <span>סה"כ: <span className="inline-block">{formatNumberWithCommas(exp.amount.toFixed(2))} {getCurrencySymbol(exp.currency || 'ILS')}</span></span>
-                                                        <span>מע"מ: <span className="inline-block">{formatNumberWithCommas(exp.vatAmount.toFixed(2))} {getCurrencySymbol(exp.currency || 'ILS')}</span></span>
+                                                        <span>סה"כ: <span className="inline-block">{getCurrencySymbol(exp.currency || 'ILS')} {formatNumberWithCommas(exp.amount.toFixed(2))}</span></span>
+                                                        <span>מע"מ: <span className="inline-block">{getCurrencySymbol(exp.currency || 'ILS')} {formatNumberWithCommas(exp.vatAmount.toFixed(2))}</span></span>
                                                     </div>
                                                 ) : null}
                                                 <div className="text-left sm:text-right">
                                                     <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
                                                         <span className="inline-block">
-                                                            {formatNumberWithCommas((isBusiness && exp.isDeductible && exp.vatAmount ? (exp.amount - exp.vatAmount) : exp.amount).toFixed(2))} {getCurrencySymbol(exp.currency || 'ILS')}
+                                                            {getCurrencySymbol(exp.currency || 'ILS')} {formatNumberWithCommas((isBusiness && exp.isDeductible && exp.vatAmount ? (exp.amount - exp.vatAmount) : exp.amount).toFixed(2))}
                                                         </span>
                                                     </div>
                                                 </div>
