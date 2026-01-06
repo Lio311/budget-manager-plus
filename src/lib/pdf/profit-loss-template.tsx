@@ -56,9 +56,9 @@ const styles = StyleSheet.create({
         borderBottom: '1px solid #e5e7eb',
         alignItems: 'center'
     },
-    colCategory: { width: '40%', textAlign: 'right', fontSize: 10, color: '#374151' },
-    colAmount: { width: '30%', textAlign: 'right', fontSize: 10, color: '#1f2937', fontWeight: 'bold' }, // Changed to right align as requested
-    colPct: { width: '30%', textAlign: 'left', fontSize: 10, color: '#6b7280' },
+    colCategory: { width: '50%', textAlign: 'right', fontSize: 10, color: '#374151', paddingRight: 10 },
+    colAmount: { width: '50%', textAlign: 'right', fontSize: 10, color: '#1f2937', fontWeight: 'bold' },
+    // colPct removed as it was unused and taking space
 
     sectionTitle: {
         fontSize: 14,
@@ -118,27 +118,23 @@ const styles = StyleSheet.create({
         right: 30,
         textAlign: 'center',
         paddingTop: 10,
-        borderTop: '1px solid #e5e7eb'
+        borderTop: '1px solid #e5e7eb',
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+    footerRow: {
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 5
     },
     footerText: {
-        fontSize: 8,
-        color: '#9ca3af',
-        marginBottom: 3
-    },
-    poweredBy: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 5
-    },
-    poweredByText: {
-        fontSize: 7,
+        fontSize: 10,
         color: '#6b7280',
-        marginLeft: 5
     },
     poweredByLogo: {
-        width: 50,
-        height: 15,
+        width: 60,
+        height: 18,
         objectFit: 'contain'
     }
 })
@@ -188,19 +184,16 @@ export const ProfitLossTemplate: React.FC<{ data: ProfitLossData }> = ({ data })
                     <View style={styles.tableHeaderRegex}>
                         <Text style={styles.colCategory}>קטגוריה</Text>
                         <Text style={styles.colAmount}>סכום</Text>
-                        <Text style={styles.colPct}></Text>
                     </View>
                     {data.incomes.items.map((item, i) => (
                         <View key={i} style={styles.tableRow}>
                             <Text style={styles.colCategory}>{item.category}</Text>
                             <Text style={styles.colAmount}>{formatCurrency(item.amount)}</Text>
-                            <Text style={styles.colPct}></Text>
                         </View>
                     ))}
                     <View style={[styles.tableRow, { backgroundColor: '#f0fdf4', borderTop: '1px solid #10b981' }]}>
                         <Text style={[styles.colCategory, { fontWeight: 'bold' }]}>סה״כ הכנסות</Text>
                         <Text style={[styles.colAmount, { fontWeight: 'bold', color: '#166534' }]}>{formatCurrency(data.incomes.total)}</Text>
-                        <Text style={styles.colPct}></Text>
                     </View>
                 </View>
 
@@ -210,19 +203,16 @@ export const ProfitLossTemplate: React.FC<{ data: ProfitLossData }> = ({ data })
                     <View style={styles.tableHeaderRegex}>
                         <Text style={styles.colCategory}>קטגוריה</Text>
                         <Text style={styles.colAmount}>סכום</Text>
-                        <Text style={styles.colPct}></Text>
                     </View>
                     {data.expenses.items.map((item, i) => (
                         <View key={i} style={styles.tableRow}>
                             <Text style={styles.colCategory}>{item.category}</Text>
                             <Text style={styles.colAmount}>{formatCurrency(item.amount)}</Text>
-                            <Text style={styles.colPct}></Text>
                         </View>
                     ))}
                     <View style={[styles.tableRow, { backgroundColor: '#fef2f2', borderTop: '1px solid #ef4444' }]}>
                         <Text style={[styles.colCategory, { fontWeight: 'bold' }]}>סה״כ הוצאות</Text>
                         <Text style={[styles.colAmount, { fontWeight: 'bold', color: '#b91c1c' }]}>{formatCurrency(data.expenses.total)}</Text>
-                        <Text style={styles.colPct}></Text>
                     </View>
                 </View>
 
@@ -247,15 +237,15 @@ export const ProfitLossTemplate: React.FC<{ data: ProfitLossData }> = ({ data })
 
                 {/* Footer */}
                 <View style={styles.footer} wrap={false}>
-                    <Text style={styles.footerText}>
-                        !תודה על העסקה
-                    </Text>
-                    <View style={styles.poweredBy}>
+                    <View style={styles.footerRow}>
+                        <Text style={styles.footerText}>מסמך זה הופק באופן אוטומטי על ידי</Text>
                         {data.poweredByLogoPath && (
                             <Image src={data.poweredByLogoPath} style={styles.poweredByLogo} />
                         )}
-                        <Text style={styles.poweredByText}>הופק על ידי</Text>
                     </View>
+                    <Text style={styles.footerText}>
+                        {new Date().toLocaleDateString('he-IL')} :תאריך הפקה
+                    </Text>
                 </View>
             </Page>
         </Document>
