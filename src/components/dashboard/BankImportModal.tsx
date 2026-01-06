@@ -365,8 +365,14 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
 
                 <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); resetModal(); }} className="w-full">
                     <TabsList className="grid w-full grid-cols-2 mb-4">
-                        <TabsTrigger value="file">קובץ Excel/CSV</TabsTrigger>
-                        <TabsTrigger value="scan">סריקת חשבונית (AI)</TabsTrigger>
+                        <TabsTrigger value="file" className="flex items-center justify-center gap-2">
+                            <span>קובץ</span>
+                            <span className="font-sans">Excel/CSV</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="scan" className="flex items-center justify-center gap-2">
+                            <span>סריקת חשבוניות</span>
+                            <span className="font-sans">(AI)</span>
+                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="file" className="space-y-4">
@@ -484,7 +490,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                                                 <td className="p-2 text-gray-600">{row.date}</td>
                                                 <td className="p-2 font-medium">{row.description}</td>
                                                 <td className="p-2 text-gray-500">{row.branchName || '-'}</td>
-                                                <td className="p-2 font-bold text-red-600" dir="ltr">{formatCurrency(row.billingAmount)}</td>
+                                                <td className="p-2 font-bold text-red-600" dir="ltr">₪{row.billingAmount?.toFixed(2)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -515,7 +521,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                                 activeTab === 'scan' ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
                             )}
                         >
-                            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                            {importing && <Loader2 className="h-4 w-4 animate-spin" />}
                             {activeTab === 'scan' ? 'שמור חשבונית' : 'ייבוא נתונים'}
                         </Button>
                     </div>
