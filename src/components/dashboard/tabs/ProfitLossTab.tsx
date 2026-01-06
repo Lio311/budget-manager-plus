@@ -157,7 +157,7 @@ export default function ProfitLossTab() {
     const isYearCompleted = (year: number) => year < currentYear
 
     const formatMoney = (amount: number) => {
-        return '₪' + new Intl.NumberFormat('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
+        return new Intl.NumberFormat('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount) + ' ₪'
     }
 
     return (

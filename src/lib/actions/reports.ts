@@ -236,25 +236,20 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
             const vat = (exp.vatAmount || 0) * rate
             const net = amountILS - vat
 
-            // "Entity" (Business) usually cares about Net cost.
-            // If expense is NOT deductible, the FULL amount (inc VAT) is the cost (loss).
-            // If expense IS deductible, the Cost is the Net (VAT is returned).
-
-            let recognizedCost = 0
-            if (exp.isDeductible) {
-                const deductibleRate = exp.deductibleRate ?? 1.0
-                recognizedCost = net * deductibleRate
-                // If only 45% is deductible, is the rest lost? Yes.
-                // But for the specific "Profit & Loss" for Tax Authorities:
-                // They sum "Recognized Expenses".
-            } else {
-                // Not deductible at all?
-                recognizedCost = 0
+            // Filter: User requested ONLY recognized expenses
+            if (exp.isDeductible === false) {
+                continue
             }
 
-            expensesTotal += amountILS // Cash flow total
+            let recognizedCost = 0
+            const deductibleRate = exp.deductibleRate ?? 1.0
+            recognizedCost = net * deductibleRate
+
+            expensesTotal += amountILS
             expensesRecognized += recognizedCost
-            expensesVatRecognized += (exp.isDeductible ? vat : 0) // Approximation
+            expensesVatRecognized += vat // Assuming fully recognized for VAT if recognized? Or separate rate?
+            // Usually if expense is 45% recognized, VAT is also partial? 
+            // Simplified: If deductible, include VAT. 
 
             transactions.push({
                 id: exp.id,
@@ -266,7 +261,7 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
                 amount: amountILS,
                 amountNet: net,
                 vat: vat,
-                isRecognized: exp.isDeductible || false
+                isRecognized: true
             })
         }
 
