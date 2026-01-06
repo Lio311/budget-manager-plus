@@ -72,14 +72,13 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
         })
 
         // 3. Fetch Expenses
-        // Need to check budgets for this year periods?
-        // Or simpler: Find expenses by date directly if we can, but expenses are linked to Budgets.
-        // However, `Expense` has a `date` field. We can query `Expense` directly across budgets if we access `db.expense`.
-        // BUT `db.expense` query should filter by `user` which is usually done via `budget.userId`.
-        // Let's verify schema: `Expense` -> `Budget` -> `User`.
+        // Filter by Business Budget to ensure we don't mix personal expenses
         const expenses = await db.expense.findMany({
             where: {
-                budget: { userId },
+                budget: {
+                    userId,
+                    type: 'BUSINESS'
+                },
                 date: {
                     gte: startDate,
                     lte: endDate
@@ -153,9 +152,13 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
 
         // 2.5 Fetch Manual Incomes (Not linked to Invoices)
         // This covers "Sales/Income" records added manually without generating an invoice in the system.
+        // MUST be restricted to BUSINESS budget.
         const manualIncomes = await db.income.findMany({
             where: {
-                budget: { userId },
+                budget: {
+                    userId,
+                    type: 'BUSINESS'
+                },
                 date: {
                     gte: startDate,
                     lte: endDate
