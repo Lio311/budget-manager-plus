@@ -98,8 +98,8 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
     const handleToggleMaintenance = async () => {
         const nextState = !maintenanceMode
         const confirmMsg = nextState
-            ? "Are you sure you want to ENABLE maintenance mode? This will block ALL non-admin users"
-            : "Are you sure you want to DISABLE maintenance mode?"
+            ? "Are you sure you want to ENABLE maintenance mode? This will block ALL non-admin users\u200E"
+            : "Are you sure you want to DISABLE maintenance mode?\u200E"
         const confirmed = await confirm(confirmMsg, 'Maintenance Mode')
         if (!confirmed) return
 
@@ -287,7 +287,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                             size="icon"
                             className="absolute right-2 h-8 w-8 text-gray-400 hover:text-red-600 transition-colors"
                             onClick={async () => {
-                                const confirmed = await confirm('Are you sure you want to RESET ALL REVENUE data? This will delete all payment history and clear subscription payment info.', 'Reset Revenue')
+                                const confirmed = await confirm('Are you sure you want to RESET ALL REVENUE data? This will delete all payment history and clear subscription payment info.\u200E', 'Reset Revenue')
                                 if (confirmed) {
                                     const res = await resetRevenue()
                                     if (res.success) toast.success('Revenue reset successfully')
@@ -455,7 +455,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                                         size="sm"
                                                         className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                                         onClick={async () => {
-                                                            const confirmed = await confirm('Are you sure you want to delete this user?', 'Delete User')
+                                                            const confirmed = await confirm('Are you sure you want to delete this user?\u200E', 'Delete User')
                                                             if (confirmed) deleteUser(user.id)
                                                         }}
                                                     >
