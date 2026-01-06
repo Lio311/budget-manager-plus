@@ -368,7 +368,11 @@ function TransactionsTable({ data, type, searchTerm }: { data: TransactionItem[]
 }
 
 function TransactionList({ filtered, type }: { filtered: TransactionItem[], type: 'income' | 'expense' }) {
-    const formatMoney = (amount: number) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(amount)
+    const formatMoney = (amount: number) => (
+        <span className="inline-block whitespace-nowrap">
+            {formatNumberWithCommas(Number(amount || 0).toFixed(2))} ₪
+        </span>
+    )
 
     return (
         <div>
