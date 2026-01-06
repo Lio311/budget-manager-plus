@@ -330,7 +330,7 @@ export function IncomeTab() {
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             {/* Summary Card */}
-            <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-green-600' : 'border-r-[#00c875]'} dark:bg-slate-800`}>
+            <div className={`monday-card border-l-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-green-600' : 'border-l-[#00c875]'} dark:bg-slate-800`}>
                 <div className="flex justify-between items-start">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                         {isBusiness ? 'סך מכירות/הכנסות חודשיות (נקי)' : 'סך הכנסות חודשיות'}
@@ -430,7 +430,7 @@ export function IncomeTab() {
                         </div>
                     ) : (
                         paginatedIncomes.map((income: any) => (
-                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
+                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-l-4 border-l-blue-100 dark:border-l-blue-900/50">
                                 {editingId === income.id ? (
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -457,8 +457,8 @@ export function IncomeTab() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="flex flex-row-reverse items-center justify-between gap-2 sm:gap-3">
-                                        <div className="flex flex-row-reverse items-center gap-2 sm:gap-3 text-right">
+                                    <div className="flex items-center justify-between gap-2 sm:gap-3">
+                                        <div className="flex items-center gap-2 sm:gap-3">
                                             <div className="shrink-0">
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
                                                     {getCategoryIcon(income.category)}
@@ -499,7 +499,7 @@ export function IncomeTab() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-2 sm:gap-6 shrink-0 pl-4">
+                                        <div className="flex items-center gap-2 sm:gap-6 shrink-0 pl-1">
                                             {isBusiness && income.vatAmount && income.vatAmount > 0 && (
                                                 <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
                                                     <span>סה"כ: {formatCurrency(income.amount, getCurrencySymbol(income.currency))}</span>
