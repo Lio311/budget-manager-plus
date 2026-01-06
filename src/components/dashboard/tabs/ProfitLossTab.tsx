@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { downloadOpenFormat } from '@/lib/actions/open-format'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 
 export default function ProfitLossTab() {
     const [selectedYear, setSelectedYear] = useState<number | null>(null)
@@ -67,6 +69,43 @@ export default function ProfitLossTab() {
             toast.error('שגיאה בתקשורת')
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleDownloadPDF = async (year: number) => {
+        const content = document.getElementById('profit-loss-report-content')
+        if (!content) return
+
+        toast.info('מכין PDF להורדה...')
+
+        try {
+            const canvas = await html2canvas(content, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            })
+
+            const imgData = canvas.toDataURL('image/png')
+            const pdf = new jsPDF('l', 'mm', 'a4') // Landscape
+            const pdfWidth = pdf.internal.pageSize.getWidth()
+            const pdfHeight = pdf.internal.pageSize.getHeight()
+            const imgWidth = canvas.width
+            const imgHeight = canvas.height
+            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight)
+            const imgX = (pdfWidth - imgWidth * ratio) / 2
+            const imgY = 30 // Top margin
+
+            // Add Header
+            pdf.setFontSize(20)
+            pdf.text(`דוח רווח והפסד - ${year}`, pdfWidth / 2, 20, { align: 'center' })
+
+            pdf.addImage(imgData, 'PNG', 0, imgY, imgWidth * ratio, imgHeight * ratio) // Fit width, maintain aspect ratio
+
+            pdf.save(`profit_loss_report_${year}.pdf`)
+            toast.success('PDF ירד בהצלחה')
+        } catch (error) {
+            console.error(error)
+            toast.error('שגיאה ביצירת PDF')
         }
     }
 
@@ -143,15 +182,15 @@ export default function ProfitLossTab() {
 
             {/* Report Dialog */}
             <Dialog open={!!selectedYear && isDetailOpen && isYearCompleted(selectedYear!)} onOpenChange={(open) => !open && setIsDetailOpen(false)}>
-                <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto w-full">
+                <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-y-auto p-4 md:p-6">
                     <DialogHeader className="flex flex-col gap-4">
                         <DialogTitle className="text-2xl font-bold text-center">
                             דוח רווח והפסד - {selectedYear}
                         </DialogTitle>
 
                         {/* Centered Action Buttons */}
-                        <div className="flex justify-center gap-4 w-full">
-                            <Button variant="outline" className="gap-2 min-w-[140px]">
+                        <div className="flex flex-col md:flex-row justify-center gap-4 w-full">
+                            <Button variant="outline" onClick={() => handleDownloadPDF(selectedYear!)} className="gap-2 min-w-[140px]">
                                 הורד PDF
                                 <Download size={16} />
                             </Button>
@@ -162,18 +201,20 @@ export default function ProfitLossTab() {
                         </div>
                     </DialogHeader>
 
-                    {isLoading ? (
-                        <div className="py-20 text-center">טוען נתונים...</div>
-                    ) : reportData ? (
-                        <ReportDetailView data={reportData} />
-                    ) : (
-                        <div className="py-20 text-center text-red-500">לא נמצאו נתונים</div>
-                    )}
+                    <div id="profit-loss-report-content" className="bg-white p-2 md:p-4 rounded-lg">
+                        {isLoading ? (
+                            <div className="py-20 text-center">טוען נתונים...</div>
+                        ) : reportData ? (
+                            <ReportDetailView data={reportData} />
+                        ) : (
+                            <div className="py-20 text-center text-red-500">לא נמצאו נתונים</div>
+                        )}
 
-                    <div className="mt-8 pt-4 border-t flex items-center justify-center text-gray-400 text-sm gap-1">
-                        <span>הופק ע"י Keseflow</span>
-                        <span>•</span>
-                        <span>{new Date().toLocaleDateString('he-IL')}</span>
+                        <div className="mt-8 pt-4 border-t flex items-center justify-center text-gray-400 text-sm gap-1">
+                            <span>הופק ע"י Keseflow</span>
+                            <span>•</span>
+                            <span>{new Date().toLocaleDateString('he-IL')}</span>
+                        </div>
                     </div>
                 </DialogContent>
             </Dialog>
