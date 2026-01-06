@@ -77,7 +77,10 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
         // Fetching all for now.
         const expenses = await db.expense.findMany({
             where: {
-                budget: { userId },
+                budget: {
+                    userId,
+                    type: 'BUSINESS'
+                },
                 date: {
                     gte: startDate,
                     lte: endDate
