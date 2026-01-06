@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { Loader2, Copy, RefreshCw, Key, Download, ArrowRight, ExternalLink } from 'lucide-react'
+import { Loader2, Copy, RefreshCw, Key, Download, ArrowRight, ExternalLink, Camera } from 'lucide-react'
 import { generateShortcutApiKey, getShortcutApiKey } from '@/lib/actions/user'
 import Image from 'next/image'
 
@@ -143,6 +143,28 @@ export function IntegrationsSettings() {
                                     <div className="text-right">
                                         <h4 className="text-lg font-bold">הוספת הוצאה חדשה</h4>
                                         <p className="text-rose-100 text-sm">תיעוד הוצאה בקליק</p>
+                                    </div>
+                                </div>
+                                <ArrowRight className="w-6 h-6 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                            </CardContent>
+                        </Card>
+                    </a>
+
+                    <a
+                        href="https://www.icloud.com/shortcuts/ce0592b919a6403ea223182f7ae7aee9"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block group"
+                    >
+                        <Card className="bg-blue-500 hover:bg-blue-600 border-0 transition-colors cursor-pointer text-white">
+                            <CardContent className="p-4 flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-white/20 p-3 rounded-full">
+                                        <Camera className="w-6 h-6" />
+                                    </div>
+                                    <div className="text-right">
+                                        <h4 className="text-lg font-bold">סריקת חשבונית (AI)</h4>
+                                        <p className="text-blue-100 text-sm">צילום וניתוח אוטומטי</p>
                                     </div>
                                 </div>
                                 <ArrowRight className="w-6 h-6 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
