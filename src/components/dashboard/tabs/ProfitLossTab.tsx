@@ -45,6 +45,7 @@ export default function ProfitLossTab() {
     const [reportData, setReportData] = useState<ProfitLossReport | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [isDetailOpen, setIsDetailOpen] = useState(false)
+    const [searchTerm, setSearchTerm] = useState('')
 
     const currentYear = new Date().getFullYear()
     const availableYears = [2025, 2026]
@@ -218,23 +219,37 @@ export default function ProfitLossTab() {
                             </div>
 
                             {/* Detailed Tables */}
+                            {/* Detailed Tables */}
                             <Tabs defaultValue="incomes" className="w-full">
-                                <TabsList className="w-full justify-end border-b rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 overflow-x-auto hide-scrollbar">
-                                    <TabsTrigger value="incomes" className="data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
-                                        הכנסות ({reportData.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE').length})
-                                    </TabsTrigger>
-                                    <TabsTrigger value="expenses" className="data-[state=active]:border-red-500 data-[state=active]:text-red-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
-                                        הוצאות ({reportData.transactions.filter(t => t.type === 'EXPENSE').length})
-                                    </TabsTrigger>
-                                </TabsList>
+                                <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-4 mb-4 border-b pb-0">
+                                    <div className="relative w-full md:w-auto md:min-w-[300px] mb-4 md:mb-0">
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                        <Input
+                                            placeholder="חיפוש לפי שם, תיאור או מספר..."
+                                            className="pr-10"
+                                            value={searchTerm}
+                                            onChange={e => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
+                                    <TabsList className="w-full md:w-auto justify-end border-b-0 rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 overflow-x-auto hide-scrollbar">
+                                        <TabsTrigger value="incomes" className="data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
+                                            הכנסות ({reportData.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE').length})
+                                        </TabsTrigger>
+                                        <TabsTrigger value="expenses" className="data-[state=active]:border-red-500 data-[state=active]:text-red-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
+                                            הוצאות ({reportData.transactions.filter(t => t.type === 'EXPENSE').length})
+                                        </TabsTrigger>
+                                    </TabsList>
+                                </div>
 
                                 <TransactionsTable
                                     data={reportData.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE')}
                                     type="income"
+                                    searchTerm={searchTerm}
                                 />
                                 <TransactionsTable
                                     data={reportData.transactions.filter(t => t.type === 'EXPENSE')}
                                     type="expense"
+                                    searchTerm={searchTerm}
                                 />
                             </Tabs>
                         </div>
@@ -255,16 +270,12 @@ export default function ProfitLossTab() {
     )
 }
 
-function TransactionsTable({ data, type }: { data: TransactionItem[], type: 'income' | 'expense' }) {
-    const [searchTerm, setSearchTerm] = useState('')
-
+function TransactionsTable({ data, type, searchTerm }: { data: TransactionItem[], type: 'income' | 'expense', searchTerm: string }) {
     const filteredTransactions = data.filter(t =>
         t.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.entityName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.number?.includes(searchTerm)
     )
-
-    if (!filteredTransactions.length && !searchTerm) return <div className="py-8 text-center text-gray-500">אין נתונים להצגה</div>
 
     // Sort by date descending
     const sortedData = [...filteredTransactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -279,22 +290,14 @@ function TransactionsTable({ data, type }: { data: TransactionItem[], type: 'inc
 
     return (
         <TabsContent value={type === 'income' ? 'incomes' : 'expenses'} className="space-y-6 mt-6">
-            <div className="relative max-w-sm">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                <Input
-                    placeholder="חיפוש לפי שם, תיאור או מספר..."
-                    className="pr-10"
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                />
-            </div>
-
-            {Object.entries(groupedByMonth).length === 0 && searchTerm ? (
-                <div className="py-8 text-center text-gray-500">לא נמצאו נתונים עבור החיפוש</div>
+            {!filteredTransactions.length ? (
+                <div className="py-8 text-center text-gray-500">
+                    {searchTerm ? 'לא נמצאו נתונים עבור החיפוש' : 'אין נתונים להצגה'}
+                </div>
             ) : (
                 Object.entries(groupedByMonth).map(([month, transactions]) => (
                     <div key={month} className="space-y-4">
-                        <h4 className="text-lg font-bold text-gray-700 sticky top-0 bg-white py-2 z-10 border-b">
+                        <h4 className="text-lg font-bold text-gray-700 sticky top-0 bg-white py-2 z-10 border-b text-right">
                             {month}
                         </h4>
                         <TransactionList filtered={transactions as TransactionItem[]} type={type} />
