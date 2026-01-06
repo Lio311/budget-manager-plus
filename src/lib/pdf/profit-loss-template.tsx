@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     colCategory: { width: '40%', textAlign: 'right', fontSize: 10, color: '#374151' },
-    colAmount: { width: '30%', textAlign: 'left', fontSize: 10, color: '#1f2937', fontWeight: 'bold' }, // Left align numbers for readability? usually right in hebrew but numbers are problematic.
+    colAmount: { width: '30%', textAlign: 'right', fontSize: 10, color: '#1f2937', fontWeight: 'bold' }, // Changed to right align as requested
     colPct: { width: '30%', textAlign: 'left', fontSize: 10, color: '#6b7280' },
 
     sectionTitle: {
