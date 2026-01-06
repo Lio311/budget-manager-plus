@@ -328,9 +328,9 @@ export function IncomeTab() {
     }
 
     return (
-        <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
+        <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0" dir="rtl">
             {/* Summary Card */}
-            <div className={`monday-card border-l-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-green-600' : 'border-l-[#00c875]'} dark:bg-slate-800`}>
+            <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-green-600' : 'border-r-[#00c875]'} dark:bg-slate-800`}>
                 <div className="flex justify-between items-start">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
                         {isBusiness ? 'סך מכירות/הכנסות חודשיות (נקי)' : 'סך הכנסות חודשיות'}
@@ -430,7 +430,7 @@ export function IncomeTab() {
                         </div>
                     ) : (
                         paginatedIncomes.map((income: any) => (
-                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-l-4 border-l-blue-100 dark:border-l-blue-900/50">
+                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
                                 {editingId === income.id ? (
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -457,14 +457,14 @@ export function IncomeTab() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="flex items-center justify-between gap-2 sm:gap-3">
-                                        <div className="flex items-center gap-2 sm:gap-3">
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
+                                        <div className="flex items-start gap-3 w-full sm:w-auto">
                                             <div className="shrink-0">
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
                                                     {getCategoryIcon(income.category)}
                                                 </div>
                                             </div>
-                                            <div className="flex flex-col min-w-0 gap-0.5">
+                                            <div className="flex flex-col min-w-0 gap-0.5 flex-1">
                                                 <div className="flex items-center gap-2 min-w-0">
                                                     <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
                                                     {income.isRecurring && (
@@ -499,14 +499,14 @@ export function IncomeTab() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-2 sm:gap-6 shrink-0 pl-5">
+                                        <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
                                             {isBusiness && income.vatAmount && income.vatAmount > 0 && (
                                                 <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
                                                     <span>סה"כ: {formatCurrency(income.amount, getCurrencySymbol(income.currency))}</span>
                                                     <span>מע"מ: {formatCurrency(income.vatAmount, getCurrencySymbol(income.currency))}</span>
                                                 </div>
                                             )}
-                                            <div className="text-right">
+                                            <div className="text-left sm:text-right">
                                                 <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-green-600' : 'text-green-600'}`}>
                                                     {formatCurrency(isBusiness && income.vatAmount ? (income.amount - income.vatAmount) : income.amount, getCurrencySymbol(income.currency || 'ILS'))}
                                                 </div>
@@ -515,7 +515,7 @@ export function IncomeTab() {
                                                 )}
                                             </div>
                                             <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-green-500 hover:bg-green-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
+                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
                                                 <Button variant="ghost" size="icon" onClick={() => handleDelete(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
                                             </div>
                                         </div>
@@ -526,7 +526,7 @@ export function IncomeTab() {
                     )}
 
                     {totalPages > 1 && (
-                        <div className="mt-4">
+                        <div className="mt-4 flex justify-center direction-ltr">
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
