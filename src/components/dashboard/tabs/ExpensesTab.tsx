@@ -445,9 +445,9 @@ export function ExpensesTab() {
     }
 
     return (
-        <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
+        <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0" dir="rtl">
             {/* Summary Card */}
-            <div className={`monday-card border-l-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'} dark:bg-slate-800`}>
+            <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-orange-600' : 'border-r-[#e2445c]'} dark:bg-slate-800`}>
                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך עלויות / הוצאות חודשיות (נקי)' : 'סך הוצאות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'} ${loadingExpenses ? 'animate-pulse' : ''}`}>
                     {loadingExpenses ? '...' : formatCurrency(isBusiness ? totalNetExpensesILS : totalExpensesILS, '₪')}
@@ -544,14 +544,14 @@ export function ExpensesTab() {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="flex items-center justify-between gap-1.5 sm:gap-3">
-                                            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
+                                            <div className="flex items-start gap-3 w-full sm:w-auto">
                                                 <div className="shrink-0">
                                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} shadow-sm`}>
                                                         {getCategoryIcon(exp.category)}
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-col min-w-0 gap-0.5">
+                                                <div className="flex flex-col min-w-0 gap-0.5 flex-1">
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base">{exp.description}</span>
                                                         {exp.isRecurring && (
@@ -581,14 +581,14 @@ export function ExpensesTab() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-1.5 sm:gap-6 pl-5 shrink-0">
+                                            <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
                                                 {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
                                                     <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
                                                         <span>סה"כ: {formatCurrency(exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
                                                         <span>מע"מ: {formatCurrency(exp.vatAmount, getCurrencySymbol(exp.currency || 'ILS'))}</span>
                                                     </div>
                                                 ) : null}
-                                                <div className="text-right">
+                                                <div className="text-left sm:text-right">
                                                     <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
                                                         {formatCurrency(isBusiness && exp.isDeductible && exp.vatAmount ? (exp.amount - exp.vatAmount) : exp.amount, getCurrencySymbol(exp.currency || 'ILS'))}
                                                     </div>
