@@ -189,21 +189,19 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
             <div className="mb-4 flex items-center gap-2">
                 <TrendingDown className={`h-5 w-5 rotate-180 ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`} />
                 <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד מכירה / הכנסה' : 'הוספת הכנסה'}</h3>
-                <div className="mr-auto">
-                    <CategoryManagementDialog
-                        categories={categories}
-                        type="income"
-                        scope={budgetType}
-                        onChange={() => {
-                            if (onCategoriesChange) onCategoriesChange()
-                        }}
-                        trigger={
-                            <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
-                                <Settings className="h-4 w-4" />
-                            </Button>
-                        }
-                    />
-                </div>
+                <CategoryManagementDialog
+                    categories={categories}
+                    type="income"
+                    scope={budgetType}
+                    onChange={() => {
+                        if (onCategoriesChange) onCategoriesChange()
+                    }}
+                    trigger={
+                        <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
+                            <Settings className="h-4 w-4" />
+                        </Button>
+                    }
+                />
             </div>
 
             <div className="flex flex-col gap-4">
