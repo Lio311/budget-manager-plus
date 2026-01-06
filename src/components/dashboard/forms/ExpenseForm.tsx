@@ -77,16 +77,13 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     })
 
     // Handle VAT Calculations (Backwards from Gross)
-    // Handle VAT Calculations (Backwards from Gross)
     const calculateFromGross = (gross: string, rate: string) => {
         const g = parseFloat(gross) || 0
         const r = parseFloat(rate) || 0
-
-        // User requested simplistic calculation: VAT is simply Rate * Gross
-        // (e.g. 100 * 0.18 = 18)
-        const vat = g * r
-        const net = g - vat
-
+        // Gross = Net * (1 + r)
+        // Net = Gross / (1 + r)
+        const net = g / (1 + r)
+        const vat = g - net
         return { net: net.toFixed(2), vat: vat.toFixed(2) }
     }
 
