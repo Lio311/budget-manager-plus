@@ -6,7 +6,7 @@ import { getUserSubscriptionStatus } from '@/lib/actions/user'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield } from 'lucide-react'
+import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
@@ -21,6 +21,7 @@ import { InvoicesTab } from './tabs/InvoicesTab'
 import { QuotesTab } from './tabs/QuotesTab'
 import { CreditNotesTab } from './tabs/CreditNotesTab'
 import { BudgetLimitsTab } from './tabs/BudgetLimitsTab'
+import ProfitLossTab from './tabs/ProfitLossTab'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useSWRConfig } from 'swr'
 
@@ -104,6 +105,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
         { value: 'clients', label: 'לקוחות', icon: Users, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'suppliers', label: 'ספקים', icon: Building2, activeClass: 'data-[state=active]:bg-blue-600' },
+        { value: 'profit_loss', label: 'דוח רווח והפסד', icon: TrendingUp, activeClass: 'data-[state=active]:bg-emerald-600' },
         { value: 'quotes', label: 'הצעות מחיר', icon: FileText, activeClass: 'data-[state=active]:bg-yellow-500 data-[state=active]:text-black' },
         { value: 'invoices', label: 'חשבוניות', icon: FileText, activeClass: 'data-[state=active]:bg-purple-600' },
         { value: 'credit-notes', label: 'זיכויים', icon: FileText, activeClass: 'data-[state=active]:bg-orange-600' },
@@ -224,6 +226,9 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </TabsContent>
                     <TabsContent value="suppliers" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <SuppliersTab />
+                    </TabsContent>
+                    <TabsContent value="profit_loss" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <ProfitLossTab />
                     </TabsContent>
                     <TabsContent value="invoices" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <InvoicesTab />
