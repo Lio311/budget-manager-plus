@@ -268,17 +268,6 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
 
     const formatMoney = (amount: number) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(amount)
 
-    // Reversed Column Order:
-    // Original: Date | Ref | Entity | Desc | Gross | VAT | Net
-    // New: Net | VAT | Gross | Desc | Entity | Ref | Date
-    // Note: In RTL flex/table, first child is Right.
-    // User wants "Reverse Order".
-    // If we assume they want standard Hebrew "Date on Right":
-    // The previous implementation HAD Date as first child (Right).
-    // If they want "Reverse", they might want the AMOUNTS on the Right?
-    // OR they want the logical columns to be swapped?
-    // Let's implement the reversed DOM order as requested.
-
     return (
         <div className="space-y-4">
             <div className="relative max-w-sm">
@@ -295,44 +284,36 @@ function TransactionsTable({ transactions, type }: { transactions: TransactionIt
                 <Table>
                     <TableHeader className="bg-gray-50">
                         <TableRow>
-                            {type === 'expense' && <TableHead className="text-center">מוכר?</TableHead>}
-                            <TableHead className="text-left">נטו</TableHead>
-                            <TableHead className="text-left">מע"מ</TableHead>
-                            <TableHead className="text-left">סכום ברוטו</TableHead>
-                            <TableHead className="text-right">תיאור</TableHead>
-                            <TableHead className="text-right">{type === 'income' ? 'לקוח' : 'ספק'}</TableHead>
-                            <TableHead className="text-right">אסמכתא</TableHead>
-                            <TableHead className="text-right">תאריך</TableHead>
+                            {/* Removed 'Recognized?' column */}
+                            <TableHead className="text-center w-[120px]">נטו</TableHead>
+                            <TableHead className="text-center w-[100px]">מע"מ</TableHead>
+                            <TableHead className="text-center w-[120px]">סכום ברוטו</TableHead>
+                            <TableHead className="text-center">תיאור</TableHead>
+                            <TableHead className="text-center">{type === 'income' ? 'לקוח' : 'ספק'}</TableHead>
+                            <TableHead className="text-center">אסמכתא</TableHead>
+                            <TableHead className="text-center w-[120px]">תאריך</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filtered.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                                     לא נמצאו נתונים
                                 </TableCell>
                             </TableRow>
                         ) : filtered.map((t) => (
                             <TableRow key={t.id} className="hover:bg-gray-50">
-                                {type === 'expense' && (
-                                    <TableCell className="text-center">
-                                        {t.isRecognized ? (
-                                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">כן</Badge>
-                                        ) : (
-                                            <Badge variant="outline" className="bg-gray-50 text-gray-500">לא</Badge>
-                                        )}
-                                    </TableCell>
-                                )}
-                                <TableCell className="text-left ltr font-mono font-bold">{formatMoney(t.amountNet)}</TableCell>
-                                <TableCell className="text-left ltr font-mono text-gray-500">{formatMoney(t.vat)}</TableCell>
-                                <TableCell className="text-left ltr font-mono">{formatMoney(t.amount)}</TableCell>
-                                <TableCell className="max-w-[200px] truncate" title={t.description}>{t.description}</TableCell>
-                                <TableCell>{t.entityName || '-'}</TableCell>
-                                <TableCell className="font-medium">
+                                {/* Removed 'Recognized?' cell */}
+                                <TableCell className="text-center ltr font-mono font-bold">{formatMoney(t.amountNet)}</TableCell>
+                                <TableCell className="text-center ltr font-mono text-gray-500">{formatMoney(t.vat)}</TableCell>
+                                <TableCell className="text-center ltr font-mono">{formatMoney(t.amount)}</TableCell>
+                                <TableCell className="text-center max-w-[200px] truncate" title={t.description}>{t.description}</TableCell>
+                                <TableCell className="text-center">{t.entityName || '-'}</TableCell>
+                                <TableCell className="text-center font-medium">
                                     {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200 ml-2">זיכוי</Badge>}
                                     {t.number || '-'}
                                 </TableCell>
-                                <TableCell>{new Date(t.date).toLocaleDateString('he-IL')}</TableCell>
+                                <TableCell className="text-center">{new Date(t.date).toLocaleDateString('he-IL')}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
