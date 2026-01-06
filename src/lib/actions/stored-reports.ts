@@ -3,7 +3,6 @@
 import { authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { getProfitLossData } from './reports'
-import { generateOpenFormatData } from './open-format' // Need to export this logic or refactor
 import { revalidatePath } from 'next/cache'
 
 // We need to ensure `generateOpenFormatData` is available or move the logic here.
