@@ -159,7 +159,7 @@ export default function ProfitLossTab() {
     const formatMoney = (amount: number) => new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(amount)
 
     return (
-        <div className="space-y-8 p-6" dir="rtl">
+        <div className="space-y-6 md:space-y-8 p-2 md:p-6" dir="rtl">
             <div className="flex flex-col gap-2">
                 <h1 className="text-3xl font-bold">דוחות רווח והפסד</h1>
                 <p className="text-gray-500">צפייה והורדת דוחות שנתיים עבור העסק</p>
