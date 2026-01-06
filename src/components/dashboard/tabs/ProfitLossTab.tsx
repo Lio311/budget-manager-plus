@@ -226,7 +226,7 @@ function ReportDetailView({ data }: { data: ProfitLossReport }) {
 
             {/* Detailed Tables */}
             <Tabs defaultValue="incomes" className="w-full">
-                <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 overflow-x-auto hide-scrollbar">
+                <TabsList className="w-full justify-end border-b rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 overflow-x-auto hide-scrollbar">
                     <TabsTrigger value="incomes" className="data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
                         הכנסות ({data.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE').length})
                     </TabsTrigger>
