@@ -391,16 +391,16 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                             </TableRow>
                         ) : filtered.map((t) => (
                             <TableRow key={t.id} className="hover:bg-gray-50">
-                                <TableCell className="text-center ltr font-mono font-bold">{formatMoney(t.amountNet)}</TableCell>
-                                <TableCell className="text-center ltr font-mono text-gray-500">{formatMoney(t.vat)}</TableCell>
-                                <TableCell className="text-center ltr font-mono">{formatMoney(t.amount)}</TableCell>
+                                <TableCell className="text-center font-bold">{formatMoney(t.amountNet)}</TableCell>
+                                <TableCell className="text-center text-gray-500">{formatMoney(t.vat)}</TableCell>
+                                <TableCell className="text-center text-muted-foreground line-through decoration-red-500/30 decoration-1">{formatMoney(t.amount)}</TableCell>
                                 <TableCell className="text-center max-w-[200px] truncate" title={t.description}>{t.description}</TableCell>
                                 <TableCell className="text-center">{t.entityName || '-'}</TableCell>
                                 <TableCell className="text-center font-medium">
                                     {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200 ml-2">זיכוי</Badge>}
                                     {t.number || '-'}
                                 </TableCell>
-                                <TableCell className="text-center">{new Date(t.date).toLocaleDateString('he-IL')}</TableCell>
+                                <TableCell className="text-center text-gray-500">{new Date(t.date).toLocaleDateString('he-IL')}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
