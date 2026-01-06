@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react'
 import * as XLSX from 'xlsx'
-import { Upload, FileSpreadsheet, Check, AlertCircle, X, Loader2, ArrowRight } from 'lucide-react'
+import { Upload, FileSpreadsheet, Check, AlertCircle, X, Loader2, ArrowRight, Camera, Image as ImageIcon } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
 import { cn, formatCurrency } from '@/lib/utils'
+import { scanInvoiceImage } from '@/lib/actions/scan-invoice'
 
 interface BankImportModalProps {
     onImport: (data: any[]) => Promise<void>
@@ -28,7 +30,9 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
     const [loading, setLoading] = useState(false)
     const [importing, setImporting] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const imageInputRef = useRef<HTMLInputElement>(null)
     const [error, setError] = useState<string | null>(null)
+    const [activeTab, setActiveTab] = useState("file")
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault()
@@ -44,7 +48,16 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
         e.preventDefault()
         setDragging(false)
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFile(e.dataTransfer.files[0])
+            const droppedFile = e.dataTransfer.files[0]
+            if (activeTab === 'scan' && !droppedFile.type.startsWith('image/')) {
+                toast.error("נא להעלות קובץ תמונה בלבד")
+                return
+            }
+            if (activeTab === 'file' && !droppedFile.name.match(/\.(xlsx|xls|csv)$/)) {
+                toast.error("נא להעלות קובץ Excel או CSV בלבד")
+                return
+            }
+            handleFile(droppedFile)
         }
     }
 
@@ -58,7 +71,42 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
         setFile(selectedFile)
         setLoading(true)
         setError(null)
+        setPreviewData([])
 
+        if (activeTab === 'scan') {
+            // Handle Image Scan
+            try {
+                const formData = new FormData()
+                formData.append('file', selectedFile)
+
+                const result = await scanInvoiceImage(formData)
+
+                if (result.success && result.data) {
+                    const scannedExpense: ParsedExpense = {
+                        date: result.data.date || format(new Date(), 'yyyy-MM-dd'),
+                        description: result.data.businessName,
+                        amount: result.data.amount,
+                        billingAmount: result.data.amount,
+                        paymentMethod: 'כרטיס אשראי',
+                        branchName: 'חשבוניות סרוקות' // As requested
+                    }
+                    setPreviewData([scannedExpense])
+                } else {
+                    setError(result.error || 'סריקת החשבונית נכשלה')
+                    toast.error("שגיאה בסריקה", { description: result.error })
+                    setFile(null)
+                }
+            } catch (err) {
+                console.error(err)
+                setError('שגיאה לא צפויה בעת הסריקה')
+                setFile(null)
+            } finally {
+                setLoading(false)
+            }
+            return
+        }
+
+        // Handle Excel/CSV Import (Existing Logic)
         try {
             const data = await selectedFile.arrayBuffer()
             const workbook = XLSX.read(data, { type: 'array' })
@@ -275,14 +323,13 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
         setImporting(true)
         setError(null)
 
-
-
         try {
             await onImport(previewData)
 
             setOpen(false)
             setFile(null)
             setPreviewData([])
+            toast.success("הנתונים נשמרו בהצלחה")
         } catch (error: any) {
             console.error(error)
             const msg = error.message || "שגיאה בשמירת הנתונים"
@@ -293,105 +340,161 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
         }
     }
 
+    const resetModal = () => {
+        setFile(null)
+        setPreviewData([])
+        setError(null)
+        setLoading(false)
+    }
+
     return (
-        <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) { setFile(null); setPreviewData([]); setError(null) } }}>
+        <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) resetModal(); }}>
             <DialogTrigger asChild>
                 <Button variant="outline" className="gap-2 border-dashed flex-row-reverse">
                     <Upload className="h-4 w-4" />
                     ייבוא
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-2xl" dir="rtl">
-                <DialogHeader className="text-right sm:text-right">
-                    <DialogTitle className="text-xl font-bold text-gray-900">ייבוא נתונים</DialogTitle>
+            <DialogContent className="sm:max-w-2xl px-6" dir="rtl">
+                <DialogHeader className="text-right sm:text-right pb-2">
+                    <DialogTitle className="text-xl font-bold text-gray-900">ייבוא / סריקה</DialogTitle>
                     <DialogDescription>
-                        טען קובץ Excel או CSV לייבוא הוצאות.
+                        ייבוא הוצאות מקובץ Excel/CSV או סריקת חשבונית
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-4">
-                    {!file ? (
-                        <div
-                            className={cn(
-                                "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors",
-                                dragging ? "border-orange-500 bg-orange-50" : "border-gray-200 hover:border-gray-300"
-                            )}
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            <FileSpreadsheet className="h-10 w-10 mx-auto text-gray-400 mb-3" />
-                            <p className="text-sm font-medium text-gray-700">
-                                לחץ לבחירת קובץ או גרור אותו לכאן
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                                תומך בקבצי Excel (.xlsx, .xls) ו-CSV
-                            </p>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept=".xlsx,.xls,.csv"
-                                className="hidden"
-                                onChange={onFileSelect}
-                            />
-                        </div>
-                    ) : (
+                <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); resetModal(); }} className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 mb-4">
+                        <TabsTrigger value="file">קובץ Excel/CSV</TabsTrigger>
+                        <TabsTrigger value="scan">סריקת חשבונית (AI)</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="file" className="space-y-4">
+                        {!file ? (
+                            <div
+                                className={cn(
+                                    "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors",
+                                    dragging ? "border-orange-500 bg-orange-50" : "border-gray-200 hover:border-gray-300"
+                                )}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <FileSpreadsheet className="h-10 w-10 mx-auto text-gray-400 mb-3" />
+                                <p className="text-sm font-medium text-gray-700">
+                                    לחץ לבחירת קובץ או גרור אותו לכאן
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    תומך בקבצי Excel (.xlsx, .xls) ו-CSV
+                                </p>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept=".xlsx,.xls,.csv"
+                                    className="hidden"
+                                    onChange={onFileSelect}
+                                />
+                            </div>
+                        ) : null}
+                    </TabsContent>
+
+                    <TabsContent value="scan" className="space-y-4">
+                        {!file ? (
+                            <div
+                                className={cn(
+                                    "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors",
+                                    dragging ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"
+                                )}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                                onClick={() => imageInputRef.current?.click()}
+                            >
+                                <div className="flex justify-center gap-4 mb-3">
+                                    <Camera className="h-10 w-10 text-gray-400" />
+                                    <ImageIcon className="h-10 w-10 text-gray-400" />
+                                </div>
+                                <p className="text-sm font-medium text-gray-700">
+                                    לחץ להעלאת צילום חשבונית
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    תומך בקבצי JPG, PNG, WEBP
+                                </p>
+                                <input
+                                    ref={imageInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={onFileSelect}
+                                />
+                            </div>
+                        ) : null}
+                    </TabsContent>
+                </Tabs>
+
+
+                {/* Shared Preview / Loading UI */}
+                <div className="space-y-4 mt-2">
+                    {file && (
                         <div className="border border-gray-200 rounded-lg p-3 flex items-center justify-between bg-gray-50">
                             <div className="flex items-center gap-3">
-                                <div className="bg-green-100 p-2 rounded-lg">
-                                    <FileSpreadsheet className="h-5 w-5 text-green-600" />
+                                <div className={cn("p-2 rounded-lg", activeTab === 'scan' ? "bg-blue-100" : "bg-green-100")}>
+                                    {activeTab === 'scan' ? <ImageIcon className="h-5 w-5 text-blue-600" /> : <FileSpreadsheet className="h-5 w-5 text-green-600" />}
                                 </div>
                                 <div className="text-sm">
                                     <div className="font-bold text-gray-800">{file.name}</div>
                                     <div className="text-gray-500">{(file.size / 1024).toFixed(1)} KB</div>
                                 </div>
                             </div>
-                            <Button variant="ghost" size="icon" onClick={() => { setFile(null); setPreviewData([]) }}>
+                            <Button variant="ghost" size="icon" onClick={resetModal} disabled={loading}>
                                 <X className="h-4 w-4 text-gray-500" />
                             </Button>
                         </div>
                     )}
 
                     {loading && (
-                        <div className="py-10 flex flex-col items-center justify-center text-gray-500">
-                            <Loader2 className="h-8 w-8 animate-spin mb-2" />
-                            <span className="text-sm">קורא נתונים...</span>
+                        <div className="py-8 flex flex-col items-center justify-center text-gray-500 animate-in fade-in zoom-in duration-300">
+                            <Loader2 className="h-8 w-8 animate-spin mb-3 text-blue-600" />
+                            <span className="text-sm font-medium">{activeTab === 'scan' ? 'מפענח חשבונית באמצעות AI...' : 'וקורא נתונים...'}</span>
                         </div>
                     )}
 
                     {previewData.length > 0 && (
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <h4 className="text-sm font-bold text-gray-700">תצוגה מקדימה ({previewData.length} רשומות)</h4>
+                                <h4 className="text-sm font-bold text-gray-700">
+                                    {activeTab === 'scan' ? 'תוצאות סריקה' : `תצוגה מקדימה (${previewData.length} רשומות)`}
+                                </h4>
                             </div>
-                            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
+
+                            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg bg-white">
                                 <table className="w-full text-xs text-right">
-                                    <thead className="bg-gray-50 sticky top-0">
+                                    <thead className="bg-gray-50 sticky top-0 text-gray-500">
                                         <tr>
                                             <th className="p-2 border-b">תאריך</th>
-                                            <th className="p-2 border-b">בית עסק</th>
-                                            <th className="p-2 border-b">סכום חיוב</th>
+                                            <th className="p-2 border-b">תיאור / עסק</th>
+                                            <th className="p-2 border-b">קטגוריה</th>
+                                            <th className="p-2 border-b">סכום</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {previewData.slice(0, 5).map((row, idx) => (
-                                            <tr key={idx} className="border-b last:border-0 hover:bg-gray-50">
+                                    <tbody className="divide-y divide-gray-100">
+                                        {previewData.slice(0, 50).map((row, idx) => (
+                                            <tr key={idx} className="hover:bg-blue-50/50 transition-colors">
                                                 <td className="p-2 text-gray-600">{row.date}</td>
                                                 <td className="p-2 font-medium">{row.description}</td>
-                                                <td className="p-2 font-bold text-red-600">{formatCurrency(row.billingAmount)}</td>
+                                                <td className="p-2 text-gray-500">{row.branchName || '-'}</td>
+                                                <td className="p-2 font-bold text-red-600" dir="ltr">{formatCurrency(row.billingAmount)}</td>
                                             </tr>
                                         ))}
-                                        {previewData.length > 5 && (
-                                            <tr>
-                                                <td colSpan={3} className="p-2 text-center text-gray-400 italic">
-                                                    ועוד {previewData.length - 5} רשומות...
-                                                </td>
-                                            </tr>
-                                        )}
                                     </tbody>
                                 </table>
                             </div>
+                            {activeTab === 'scan' && (
+                                <p className="text-xs text-gray-400 text-center pt-1">
+                                    * הנתונים הופקו באמצעות בינה מלאכותית, מומלץ לוודא את נכונותם.
+                                </p>
+                            )}
                         </div>
                     )}
 
@@ -402,16 +505,19 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                         </div>
                     )}
 
-                    <div className="flex justify-end gap-2 pt-2">
+                    <div className="flex justify-end gap-2 pt-2 border-t mt-4">
+                        <Button variant="outline" onClick={() => setOpen(false)}>ביטול</Button>
                         <Button
                             onClick={handleImport}
-                            disabled={previewData.length === 0 || importing}
-                            className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                            disabled={previewData.length === 0 || importing || loading}
+                            className={cn(
+                                "text-white gap-2",
+                                activeTab === 'scan' ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
+                            )}
                         >
-                            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                            ייבוא
+                            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                            {activeTab === 'scan' ? 'שמור חשבונית' : 'ייבוא נתונים'}
                         </Button>
-                        <Button variant="outline" onClick={() => setOpen(false)}>ביטול</Button>
                     </div>
                 </div>
             </DialogContent>
