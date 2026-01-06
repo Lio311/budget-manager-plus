@@ -267,7 +267,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     }
 
     return (
-        <div className="space-y-6 pb-20 animate-in fade-in-50 duration-500 font-sans" dir="rtl">
+        <div className="space-y-6 pb-20 animate-in fade-in-50 duration-500 font-sans px-2 md:px-0" dir="rtl">
 
             {/* Header & Action Buttons Row */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -345,7 +345,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'מכירות' : 'סך הכנסות'}</CardTitle>
                         <TrendingUp className="h-4 w-4 text-green-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-3 md:p-6">
                         <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
                             {loading ? '...' : <AnimatedNumber value={totalIncome} currency="₪" />}
                         </div>
@@ -361,7 +361,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'הוצאות תפעול' : 'סך הוצאות'}</CardTitle>
                         <TrendingDown className="h-4 w-4 text-red-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-3 md:p-6">
                         <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
                             {loading ? '...' : <AnimatedNumber value={totalExpenses} currency="₪" />}
                         </div>
@@ -377,7 +377,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'רווח נקי' : 'יתרה חודשית'}</CardTitle>
                         <PiggyBank className="h-4 w-4 text-blue-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-3 md:p-6">
                         <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
                             {loading ? '...' : <AnimatedNumber value={monthlySavingsCalculated} currency="₪" />}
                         </div>
@@ -399,7 +399,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'שווי העסק' : 'יתרת חשבונות'}</CardTitle>
                         <Wallet className="h-4 w-4 text-orange-500" />
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-3 md:p-6">
                         <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
                             {/* If Business -> Net Worth. If Personal -> Bills to Pay (Unpaid) */}
                             {loading ? '...' : <AnimatedNumber value={isBusiness ? currentNetWorth : currentBillsDisplay} currency="₪" />}

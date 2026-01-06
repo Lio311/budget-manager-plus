@@ -195,7 +195,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
             {/* Main Content Area */}
             <div className="flex-1 w-full md:max-w-[calc(100%-18rem)] overflow-y-auto bg-white dark:bg-transparent min-h-[calc(100vh-65px)]">
-                <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">
+                <div className="p-2 md:p-8 max-w-6xl mx-auto space-y-6">
                     {/* Content Wrappers - Added strict widths to prevent overflow */}
                     <TabsContent value="overview" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <OverviewTab onNavigateToTab={handleTabChange} />

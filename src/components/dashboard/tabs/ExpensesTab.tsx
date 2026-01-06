@@ -447,7 +447,7 @@ export function ExpensesTab() {
     return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0">
             {/* Summary Card */}
-            <div className={`monday-card border-l-4 p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'} dark:bg-slate-800`}>
+            <div className={`monday-card border-l-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-l-orange-600' : 'border-l-[#e2445c]'} dark:bg-slate-800`}>
                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך עלויות / הוצאות חודשיות (נקי)' : 'סך הוצאות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'} ${loadingExpenses ? 'animate-pulse' : ''}`}>
                     {loadingExpenses ? '...' : formatCurrency(isBusiness ? totalNetExpensesILS : totalExpensesILS, '₪')}
