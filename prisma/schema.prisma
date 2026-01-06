@@ -431,6 +431,20 @@ model AIAdviceCache {
   @@map("ai_advice_cache")
 }
 
+model StoredReport {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  year      Int
+  type      String   // e.g., "BKMVDATA", "PDF_REF"
+  data      String   @db.Text // The actual content (or reference)
+  fileName  String?  // Suggested filename
+  createdAt DateTime @default(now())
+
+  @@index([userId, year, type])
+  @@map("stored_reports")
+}
+
 model SiteSettings {
   id              String   @id @default("site_settings")
   maintenanceMode Boolean  @default(false)
