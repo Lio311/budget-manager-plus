@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
         // 2. Process Image & Scope
         const formData = await request.formData()
-        const fileEntry = formData.get('file')
+        const fileEntry = formData.get('file') || formData.get('image') // Support both keys
         const scopeParam = formData.get('scope') as string | null
 
         console.log(`[API Scan] File entry:`, fileEntry)
