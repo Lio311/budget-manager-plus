@@ -195,7 +195,7 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
                 type: 'INCOME', // General Income
                 description: inc.source || inc.category,
                 category: inc.category,
-                entityName: inc.client?.name || inc.payer,
+                entityName: inc.client?.name || inc.payer || undefined,
                 amount: totalILS,
                 amountNet: netILS,
                 vat: vatILS
