@@ -432,7 +432,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         </select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ' : 'סכום כולל'}</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום (כולל מע"מ)' : 'סכום כולל'}</label>
                         <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
                     </div>
                 </div>
@@ -445,15 +445,15 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     />
                 </div>
 
-                {isBusiness && (
+                {isBusiness && newExpense.isDeductible && (
                     <div className="grid grid-cols-2 gap-3 p-3 bg-red-50/50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/50">
                         <div>
                             <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">מע"מ מוכר (18%)</label>
                             <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
                         </div>
                         <div>
-                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">סכום כולל (לתשלום)</label>
-                            <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency((parseFloat(newExpense.amount) || 0) + (parseFloat(newExpense.vatAmount) || 0), getCurrencySymbol(newExpense.currency))}</div>
+                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">סכום לפני מע"מ</label>
+                            <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</div>
                         </div>
                     </div>
                 )}
