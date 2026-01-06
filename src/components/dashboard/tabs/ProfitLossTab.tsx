@@ -226,27 +226,35 @@ function ReportDetailView({ data }: { data: ProfitLossReport }) {
 
             {/* Detailed Tables */}
             <Tabs defaultValue="incomes" className="w-full">
-                <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-6">
-                    <TabsTrigger value="incomes" className="data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 border-b-2 border-transparent rounded-none pb-4 text-lg">
+                <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 overflow-x-auto hide-scrollbar">
+                    <TabsTrigger value="incomes" className="data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
                         הכנסות ({data.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE').length})
                     </TabsTrigger>
-                    <TabsTrigger value="expenses" className="data-[state=active]:border-red-500 data-[state=active]:text-red-600 border-b-2 border-transparent rounded-none pb-4 text-lg">
+                    <TabsTrigger value="expenses" className="data-[state=active]:border-red-500 data-[state=active]:text-red-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
                         הוצאות ({data.transactions.filter(t => t.type === 'EXPENSE').length})
                     </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="incomes" className="mt-6">
-                    <TransactionsTable
-                        transactions={data.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE')}
-                        type="income"
-                    />
+                    <div className="overflow-x-auto -mx-2 sm:mx-0">
+                        <div className="min-w-[600px] p-1">
+                            <TransactionsTable
+                                transactions={data.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE')}
+                                type="income"
+                            />
+                        </div>
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="expenses" className="mt-6">
-                    <TransactionsTable
-                        transactions={data.transactions.filter(t => t.type === 'EXPENSE')}
-                        type="expense"
-                    />
+                    <div className="overflow-x-auto -mx-2 sm:mx-0">
+                        <div className="min-w-[600px] p-1">
+                            <TransactionsTable
+                                transactions={data.transactions.filter(t => t.type === 'EXPENSE')}
+                                type="expense"
+                            />
+                        </div>
+                    </div>
                 </TabsContent>
             </Tabs>
         </div>
