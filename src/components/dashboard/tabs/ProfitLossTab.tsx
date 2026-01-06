@@ -11,7 +11,11 @@ import {
     FileText,
     AlertCircle,
     Save,
-    Search
+    Search,
+    Check, Loader2, Pencil, Plus, Trash2, X,
+    ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn,
+    Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane, RefreshCw,
+    Umbrella, Dumbbell, Shield
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -39,6 +43,50 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { saveBkmvData } from '@/lib/actions/stored-reports'
 
 // ...
+
+// Helper functions for icons and colors
+const getCategoryIcon = (name: string) => {
+    const trimmed = name?.trim() || '';
+
+    // Fuzzy matching for common variations
+    if (trimmed.includes('אפליקציות') || trimmed.includes('מינוי')) return <Smartphone className="h-4 w-4" />
+    if (trimmed.includes('ביטוח')) return <Shield className="h-4 w-4" />
+    if (trimmed.includes('ביגוד') || trimmed.includes('בגדים')) return <ShoppingCart className="h-4 w-4" />
+    if (trimmed.includes('אוכל') || trimmed.includes('מזון') || trimmed.includes('מסעדה')) return <Utensils className="h-4 w-4" />
+    if (trimmed.includes('מסיבה') || trimmed.includes('בילוי')) return <Popcorn className="h-4 w-4" />
+    if (trimmed.includes('קבוע')) return <RefreshCw className="h-4 w-4" />
+
+    switch (trimmed) {
+        case 'תחבורה': return <Bus className="h-4 w-4" />
+        case 'קניות': return <ShoppingCart className="h-4 w-4" />
+        case 'בריאות': return <Heart className="h-4 w-4" />
+        case 'חינוך': return <GraduationCap className="h-4 w-4" />
+        case 'דלק': return <Fuel className="h-4 w-4" />
+        case 'חנייה': return <Car className="h-4 w-4" />
+        case 'תקשורת': return <Phone className="h-4 w-4" />
+        case 'משכורת': return <Briefcase className="h-4 w-4" />
+        case 'חשמל': return <Zap className="h-4 w-4" />
+        case 'שכירות': return <Home className="h-4 w-4" />
+        case 'חופשה': return <Plane className="h-4 w-4" />
+        case 'ספורט': return <Dumbbell className="h-4 w-4" />
+        default: return <span className="text-xs font-bold">{typeof name === 'string' ? name.charAt(0) : '?'}</span>
+    }
+}
+
+const getCategoryColor = (catName: string) => {
+    const trimmed = catName?.trim() || '';
+
+    // Specific colors
+    if (trimmed.includes('ספורט')) return 'bg-green-500 text-white border-green-600';
+    if (trimmed.includes('ביטוח')) return 'bg-blue-500 text-white border-blue-600';
+    if (trimmed.includes('אפליקציות') || trimmed.includes('מינוי')) return 'bg-purple-500 text-white border-purple-600';
+    if (trimmed.includes('מזון') || trimmed.includes('אוכל')) return 'bg-red-500 text-white border-red-600';
+    if (trimmed.includes('תחבורה')) return 'bg-cyan-500 text-white border-cyan-600';
+    if (trimmed.includes('בילוי')) return 'bg-pink-500 text-white border-pink-600';
+
+    // Default fallback
+    return 'bg-gray-500 text-white border-gray-600';
+}
 
 export default function ProfitLossTab() {
     const [selectedYear, setSelectedYear] = useState<number | null>(null)
@@ -356,35 +404,46 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                         לא נמצאו נתונים
                     </div>
                 ) : filtered.map((t) => (
-                    <div key={t.id} className="bg-white p-4 rounded-xl border shadow-sm space-y-3">
-                        <div className="flex justify-between items-start flex-row-reverse">
-                            <div className="text-left w-[40%]" dir="ltr">
-                                <div className="font-bold font-mono text-lg flex gap-1 items-center justify-start text-gray-900">
-                                    <span className="text-sm">₪</span>
-                                    <span>{t.amount.toLocaleString()}</span>
+                    <div key={t.id} className="glass-panel p-3 sm:p-4 rounded-xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-all">
+                        <div className="flex items-center justify-between gap-3">
+                            {/* Left Side: Icon & Info */}
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <div className="shrink-0">
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${t.category ? getCategoryColor(t.category) : 'bg-gray-100 text-gray-500'}`}>
+                                        {t.category ? getCategoryIcon(t.category) : <FileText size={16} />}
+                                    </div>
                                 </div>
-                                <div className="text-xs text-gray-400 font-mono flex gap-1 justify-start">
-                                    <span>נטו:</span>
-                                    <span>₪{t.amountNet.toLocaleString()}</span>
+                                <div className="flex flex-col min-w-0 gap-0.5">
+                                    <div className="font-bold text-gray-900 text-sm truncate">
+                                        {t.description}
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                                        <span>{new Date(t.date).toLocaleDateString('he-IL')}</span>
+                                        {t.category && (
+                                            <>
+                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                <span className="truncate max-w-[100px]">{t.category}</span>
+                                            </>
+                                        )}
+                                        {t.entityName && (
+                                            <>
+                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                <span className="truncate max-w-[100px]">{t.entityName}</span>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="text-right flex-1">
-                                <div className="font-bold text-gray-900 line-clamp-1">{t.description}</div>
-                                <div className="text-sm text-gray-500 truncate">{t.entityName || '-'}</div>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-between items-center text-sm pt-2 border-t border-gray-100">
-                            <div className="text-gray-500">
-                                {new Date(t.date).toLocaleDateString('he-IL')}
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200">זיכוי</Badge>}
-                                {t.number && (
-                                    <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-mono text-xs">
-                                        #{t.number}
-                                    </span>
+                            {/* Right Side: Amount */}
+                            <div className="flex flex-col items-end shrink-0 pl-1">
+                                <div className={`text-base font-bold ${t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' ? 'text-emerald-600' : 'text-red-600'}`}>
+                                    {formatMoney(t.amount)}
+                                </div>
+                                {(t.vat > 0 || t.amountNet !== t.amount) && (
+                                    <div className="text-[10px] text-gray-400">
+                                        נטו: {formatMoney(t.amountNet)}
+                                    </div>
                                 )}
                             </div>
                         </div>
