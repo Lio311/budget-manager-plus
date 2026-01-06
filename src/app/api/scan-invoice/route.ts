@@ -42,10 +42,17 @@ export async function POST(request: NextRequest) {
         const file = formData.get('file') as File
         const scopeParam = formData.get('scope') as string | null
 
-        // Normalize scope (default to PERSONAL if missing or invalid)
-        const targetScope = (scopeParam === 'BUSINESS') ? 'BUSINESS' : 'PERSONAL'
+        // Normalize scope (handle Hebrew from iPhone Shortcut)
+        let targetScope: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 
-        console.log(`[API Scan] Processing for scope: ${targetScope}`)
+        if (scopeParam) {
+            const normalized = scopeParam.trim()
+            if (['BUSINESS', 'עסקית', 'עסקי', 'Business'].includes(normalized)) {
+                targetScope = 'BUSINESS'
+            }
+        }
+
+        console.log(`[API Scan] Raw scope: "${scopeParam}", Resolved: ${targetScope}`)
 
         if (!file) {
             return NextResponse.json(
