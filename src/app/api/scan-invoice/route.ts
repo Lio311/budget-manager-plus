@@ -145,6 +145,29 @@ export async function POST(request: NextRequest) {
             }
         })
 
+        // Check for duplicates
+        // We consider it a duplicate if: same amount, same date, same description, same budget
+        const duplicate = await prisma.expense.findFirst({
+            where: {
+                budgetId: budget.id,
+                amount: extractedData.amount || 0,
+                // Compare dates by day to avoid time differences
+                date: {
+                    gte: new Date(expenseDate.setHours(0, 0, 0, 0)),
+                    lt: new Date(expenseDate.setHours(23, 59, 59, 999))
+                },
+                description: extractedData.businessName || 'הוצאה סרוקה'
+            }
+        })
+
+        if (duplicate) {
+            console.log(`[API Scan] Duplicate found: ${duplicate.id}`)
+            return NextResponse.json(
+                { success: false, error: 'חשבונית כפולה: הוצאה זו כבר קיימת במערכת.' },
+                { status: 409 }
+            )
+        }
+
         // Create Expense
         const expense = await prisma.expense.create({
             data: {
