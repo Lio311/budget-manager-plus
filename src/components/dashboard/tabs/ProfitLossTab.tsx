@@ -188,20 +188,18 @@ export default function ProfitLossTab() {
                                     צפה בדוח שנתי
                                 </Button>
                             ) : (
-                                <Button
-                                    variant="outline"
-                                    className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
-                                    onClick={() => handleYearSelect(year)}
-                                >
-                                    צפה בנתונים (זמן אמת)
-                                </Button>
+                                <div className="text-center py-2 text-sm text-gray-400 bg-gray-50 rounded-md">
+                                    הדו"ח יהיה זמין בסוף השנה
+                                </div>
                             )}
                         </div>
 
                         {/* Footer with Logo */}
-                        <div className="mt-6 pt-4 border-t flex justify-between items-center opacity-60 text-xs">
-                            <span>הופק ע"י Keseflow בתאריך {new Date().toLocaleDateString('he-IL')}</span>
-                        </div>
+                        {isYearCompleted(year) && (
+                            <div className="mt-6 pt-4 border-t flex justify-between items-center opacity-60 text-xs">
+                                <span>הופק ע"י Keseflow בתאריך {new Date().toLocaleDateString('he-IL')}</span>
+                            </div>
+                        )}
                     </Card>
                 ))}
             </div>
