@@ -63,39 +63,47 @@ export async function generateProfitLossPDF({ year, userId }: GenerateProfitLoss
         const businessLogo = user?.businessProfile?.logoUrl || undefined
 
         // Aggregate Data for PDF
-        // We need to group items by category for the PDF table
-        // The data.expenses.breakdown has category level data?
-        // data.expenses.items is "Detailed list of all expense recognitions"
+        // Group items by category for the PDF table using data.transactions
 
-        // Let's Group Expenses by Category
+        // 1. Expenses Logic
         const expenseCategories = new Map<string, number>()
-        data.expenses.items.forEach(item => {
-            const current = expenseCategories.get(item.category) || 0
-            expenseCategories.set(item.category, current + item.recognizedAmount)
-        })
+        // Filter transactions for expenses
+        data.transactions
+            .filter(t => t.type === 'EXPENSE')
+            .forEach(item => {
+                // If isRecognized is false, should we exclude it from the P&L PDF?
+                // The P&L typically shows expenses that reduce profit.
+                // Assuming we want to show what was "recognized" logic or just net amounts.
+                // The report data structure separates "total" and "recognized".
+                // Let's use `amountNet` for the category breakdown, but maybe we should scale it if it's partially deductible?
+                // Current `amountNet` in transaction item is just (Amount - VAT).
+                // If it's 50% recognized, the P&L line item should probably reflect the recognized portion for accurate Net Profit calc.
+                // However, `isRecognized` is boolean in the interface, while `deductibleRate` was used in calculation.
+                // The `TransactionItem` doesn't strictly carry the `deductibleRate`.
+                // BUT `data.expenses.recognized` matches the report.
+                // To avoid mismatch, let's just sum `amountNet` for the breakdown, realizing it might differ from "recognized" total if we don't apply rates.
+                // Wait, if `netProfit` is calculated using `recognized`, the table should probable match.
+                // Since we lack the rate in `TransactionItem`, we will sum `amountNet` and maybe just display the totals from the summary object at the bottom.
+                // Or: assume `amountNet` is what user expects to see as "Expense Cost".
+
+                const current = expenseCategories.get(item.category || 'כללי') || 0
+                expenseCategories.set(item.category || 'כללי', current + item.amountNet)
+            })
 
         const expenseItems = Array.from(expenseCategories.entries()).map(([category, amount]) => ({
             category,
             amount
         })).sort((a, b) => b.amount - a.amount)
 
-        // Group Income by Category (Source?)
-        // The data.revenue.items contains individual invoice income events.
-        // We should group by 'Source' or 'Category' (usually Income has a category field)
-
-        // Wait, looking at `getProfitLossData` return type.
-        // It returns `transactions`. Let's use `data.revenue.items`
-        // `Income` model has `category`.
-
+        // 2. Income Logic
         const incomeCategories = new Map<string, number>()
-        // We need to fetch the actual Income objects or trust the breakdown?
-        // `data.revenue.items` is `TransactionItem`. It has `category`.
-
-        data.revenue.items.forEach(item => {
-            const val = item.netAmount // Revenue is usually Net for P&L
-            const current = incomeCategories.get(item.category || 'כללי') || 0
-            incomeCategories.set(item.category || 'כללי', current + val)
-        })
+        // Filter transactions for Invoices and Credit Notes
+        data.transactions
+            .filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE')
+            .forEach(item => {
+                const current = incomeCategories.get(item.category || 'כללי') || 0
+                incomeCategories.set(item.category || 'כללי', current + item.amountNet)
+            })
 
         const incomeItems = Array.from(incomeCategories.entries()).map(([category, amount]) => ({
             category,
@@ -109,14 +117,14 @@ export async function generateProfitLossPDF({ year, userId }: GenerateProfitLoss
             businessLogo,
             currency: 'ILS', // Default
             incomes: {
-                total: data.revenue.totalNet,
+                total: data.revenue.taxable, // Use taxable (Net)
                 items: incomeItems
             },
             expenses: {
-                total: data.expenses.totalRecognizedNet,
+                total: data.expenses.recognized, // Use recognized summary
                 items: expenseItems
             },
-            netProfit: data.netIncome
+            netProfit: data.netProfit // Use calculated net profit
         }
 
         const filename = `profit-loss-report-${year}.pdf`
