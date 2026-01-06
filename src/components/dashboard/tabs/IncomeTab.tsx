@@ -499,7 +499,7 @@ export function IncomeTab() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-2 sm:gap-6 shrink-0 pl-1">
+                                        <div className="flex items-center gap-2 sm:gap-6 shrink-0 pl-4">
                                             {isBusiness && income.vatAmount && income.vatAmount > 0 && (
                                                 <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
                                                     <span>סה"כ: {formatCurrency(income.amount, getCurrencySymbol(income.currency))}</span>
