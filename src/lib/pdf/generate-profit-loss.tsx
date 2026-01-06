@@ -66,49 +66,29 @@ export async function generateProfitLossPDF({ year, userId }: GenerateProfitLoss
         // Group items by category for the PDF table using data.transactions
 
         // 1. Expenses Logic
-        const expenseCategories = new Map<string, number>()
-        // Filter transactions for expenses
-        data.transactions
+        // 1. Expenses Logic
+        // Detailed list with Date
+        const expenseItems = data.transactions
             .filter(t => t.type === 'EXPENSE')
-            .forEach(item => {
-                // If isRecognized is false, should we exclude it from the P&L PDF?
-                // The P&L typically shows expenses that reduce profit.
-                // Assuming we want to show what was "recognized" logic or just net amounts.
-                // The report data structure separates "total" and "recognized".
-                // Let's use `amountNet` for the category breakdown, but maybe we should scale it if it's partially deductible?
-                // Current `amountNet` in transaction item is just (Amount - VAT).
-                // If it's 50% recognized, the P&L line item should probably reflect the recognized portion for accurate Net Profit calc.
-                // However, `isRecognized` is boolean in the interface, while `deductibleRate` was used in calculation.
-                // The `TransactionItem` doesn't strictly carry the `deductibleRate`.
-                // BUT `data.expenses.recognized` matches the report.
-                // To avoid mismatch, let's just sum `amountNet` for the breakdown, realizing it might differ from "recognized" total if we don't apply rates.
-                // Wait, if `netProfit` is calculated using `recognized`, the table should probable match.
-                // Since we lack the rate in `TransactionItem`, we will sum `amountNet` and maybe just display the totals from the summary object at the bottom.
-                // Or: assume `amountNet` is what user expects to see as "Expense Cost".
-
-                const current = expenseCategories.get(item.category || 'כללי') || 0
-                expenseCategories.set(item.category || 'כללי', current + item.amountNet)
-            })
-
-        const expenseItems = Array.from(expenseCategories.entries()).map(([category, amount]) => ({
-            category,
-            amount
-        })).sort((a, b) => b.amount - a.amount)
+            .map(item => ({
+                date: item.date,
+                description: item.description,
+                category: item.category || 'כללי',
+                amount: item.amountNet
+            }))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
         // 2. Income Logic
-        const incomeCategories = new Map<string, number>()
-        // Filter transactions for Invoices and Credit Notes
-        data.transactions
-            .filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE')
-            .forEach(item => {
-                const current = incomeCategories.get(item.category || 'כללי') || 0
-                incomeCategories.set(item.category || 'כללי', current + item.amountNet)
-            })
-
-        const incomeItems = Array.from(incomeCategories.entries()).map(([category, amount]) => ({
-            category,
-            amount
-        })).sort((a, b) => b.amount - a.amount)
+        // Detailed list with Date
+        const incomeItems = data.transactions
+            .filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME')
+            .map(item => ({
+                date: item.date,
+                description: item.description,
+                category: item.category || 'כללי',
+                amount: item.amountNet
+            }))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
 
         const pdfData = {
