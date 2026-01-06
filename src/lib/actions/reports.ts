@@ -73,12 +73,11 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
 
         // 3. Fetch Expenses
         // Filter by Business Budget to ensure we don't mix personal expenses
+        // REVERTED: User reported missing expenses. It seems not all business expenses are on a BUSINESS budget yet.
+        // Fetching all for now.
         const expenses = await db.expense.findMany({
             where: {
-                budget: {
-                    userId,
-                    type: 'BUSINESS'
-                },
+                budget: { userId },
                 date: {
                     gte: startDate,
                     lte: endDate
@@ -86,6 +85,14 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
             },
             include: { supplier: true }
         })
+
+        console.log(`[P&L Debug] User: ${userId}, Year: ${year}`)
+        console.log(`[P&L Debug] Expenses found: ${expenses.length}`)
+        console.log(`[P&L Debug] Query Range: ${startDate.toISOString()} - ${endDate.toISOString()}`)
+
+        console.log(`[P&L Debug] User: ${userId}, Year: ${year}`)
+        console.log(`[P&L Debug] Expenses found: ${expenses.length}`)
+        console.log(`[P&L Debug] Query Range: ${startDate.toISOString()} - ${endDate.toISOString()}`)
 
         // --- Aggregation ---
 
