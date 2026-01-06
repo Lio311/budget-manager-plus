@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         if (!apiKey) {
             return NextResponse.json(
                 { success: false, error: 'Unauthorized: Missing API key' },
-                { status: 401 }
+                { status: 200 } // Changed from 401 to debugging
             )
         }
 
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         if (!user) {
             return NextResponse.json(
                 { success: false, error: 'Unauthorized: Invalid API key' },
-                { status: 401 }
+                { status: 200 } // Changed from 401 for debugging
             )
         }
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
             console.error('GEMINI_API_KEY is not set')
             return NextResponse.json(
                 { success: false, error: 'Server Configuration Error: Missing AI Key' },
-                { status: 500 }
+                { status: 200 } // Changed from 500 for debugging
             )
         }
 
