@@ -13,7 +13,8 @@ import {
     eachDayOfInterval,
     isToday,
     subDays,
-    addMonths
+    addMonths,
+    getDay
 } from 'date-fns'
 import { he } from 'date-fns/locale'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
