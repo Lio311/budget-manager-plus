@@ -52,11 +52,11 @@ export function BusinessExpensesTable({
     const [formData, setFormData] = useState({
         description: '',
         amount: '',
-        category: 'Marketing',
+        category: 'פיתוח',
         date: new Date()
     })
 
-    const categories = ['Marketing', 'Hosting', 'Legal', 'Consulting', 'Software', 'Office', 'Travel', 'Other']
+    const categories = ['פיתוח', 'אבטחה', 'בדיקות', 'שיווק', 'פיתוח עסקי']
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -221,7 +221,7 @@ export function BusinessExpensesTable({
                                             <SelectTrigger>
                                                 <SelectValue />
                                             </SelectTrigger>
-                                            <SelectContent dir="rtl">
+                                            <SelectContent dir="rtl" className="text-right">
                                                 {categories.map(c => (
                                                     <SelectItem key={c} value={c}>{c}</SelectItem>
                                                 ))}
@@ -265,7 +265,7 @@ export function BusinessExpensesTable({
                                                 setFormData({
                                                     description: '',
                                                     amount: '',
-                                                    category: 'Marketing',
+                                                    category: 'פיתוח',
                                                     date: new Date()
                                                 })
                                             }}
