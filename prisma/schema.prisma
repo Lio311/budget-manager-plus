@@ -24,6 +24,7 @@ enum VatType {
 model User {
   id        String   @id 
   email     String   @unique
+  city      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
    
@@ -41,6 +42,7 @@ model User {
   userPaymentMethods UserPaymentMethod[]
   workEvents WorkEvent[]
   storedReports StoredReport[]
+  createdTasks ProjectTask[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -703,4 +705,53 @@ model WorkEvent {
   
   @@index([userId, start])
   @@map("work_events")
+}
+
+// Management Dashboard Enums & Models
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+  STUCK
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Department {
+  DEV
+  SECURITY
+  QA
+  MARKETING
+  BIZ_DEV
+}
+
+model ProjectTask {
+  id          String      @id @default(cuid())
+  title       String
+  description String?      @db.Text
+  status      TaskStatus  @default(TODO)
+  priority    Priority    @default(MEDIUM)
+  department  Department
+  
+  assignee    String?
+  
+  dueDate     DateTime?
+  
+  createdBy   String
+  creator     User        @relation(fields: [createdBy], references: [id])
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@index([department])
+  @@index([assignee])
+  @@index([status])
+  @@map("project_tasks")
 }
