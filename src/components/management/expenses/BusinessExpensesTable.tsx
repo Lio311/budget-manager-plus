@@ -221,9 +221,9 @@ export function BusinessExpensesTable({
                                             <SelectTrigger>
                                                 <SelectValue />
                                             </SelectTrigger>
-                                            <SelectContent dir="rtl" className="text-right">
+                                            <SelectContent dir="rtl" className="text-right min-w-[150px]">
                                                 {categories.map(c => (
-                                                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                                                    <SelectItem key={c} value={c} className="pr-8">{c}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
@@ -300,10 +300,10 @@ export function BusinessExpensesTable({
                             <Filter size={16} className="text-gray-500" />
                             <SelectValue placeholder="סינון" />
                         </SelectTrigger>
-                        <SelectContent dir="rtl">
-                            <SelectItem value="ALL">כל הקטגוריות</SelectItem>
+                        <SelectContent dir="rtl" className="text-right min-w-[150px]">
+                            <SelectItem value="ALL" className="pr-8">כל הקטגוריות</SelectItem>
                             {categories.map(c => (
-                                <SelectItem key={c} value={c}>{c}</SelectItem>
+                                <SelectItem key={c} value={c} className="pr-8">{c}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
