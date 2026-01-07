@@ -35,11 +35,18 @@ export function NewCampaignDialog() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (!formData.startDate) {
+            toast.error('נא לבחור תאריך התחלה')
+            return
+        }
+
         setLoading(true)
 
         try {
             const res = await createCampaign({
                 ...formData,
+                startDate: formData.startDate,
                 cost: formData.cost ? parseFloat(formData.cost) : 0
             })
 
@@ -100,7 +107,7 @@ export function NewCampaignDialog() {
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent dir="rtl">
+                                <SelectContent>
                                     <SelectItem value="SOCIAL">Social Media</SelectItem>
                                     <SelectItem value="PPC">PPC / ממומן</SelectItem>
                                     <SelectItem value="COLLABORATION">שיתוף פעולה</SelectItem>
@@ -188,7 +195,7 @@ export function NewCampaignDialog() {
                                 <SelectTrigger>
                                     <SelectValue placeholder="בחר" />
                                 </SelectTrigger>
-                                <SelectContent dir="rtl">
+                                <SelectContent>
                                     <SelectItem value="CREDIT_CARD">אשראי</SelectItem>
                                     <SelectItem value="BANK_TRANSFER">העברה בנקאית</SelectItem>
                                     <SelectItem value="BIT">ביט/פייבוקס</SelectItem>
@@ -206,7 +213,7 @@ export function NewCampaignDialog() {
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent dir="rtl">
+                                <SelectContent>
                                     <SelectItem value="LOW">נמוכה</SelectItem>
                                     <SelectItem value="MEDIUM">בינונית</SelectItem>
                                     <SelectItem value="HIGH">גבוהה</SelectItem>
