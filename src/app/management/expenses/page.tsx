@@ -14,7 +14,7 @@ export default async function ExpensesPage() {
                 </p>
             </div>
 
-            <BusinessExpensesTable initialExpenses={expenses} />
+            <BusinessExpensesTable initialExpenses={expenses || []} />
         </div>
     )
 }
