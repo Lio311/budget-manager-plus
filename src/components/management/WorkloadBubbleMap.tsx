@@ -22,6 +22,14 @@ const DEPARTMENT_COLORS: Record<string, string> = {
     'BIZ_DEV': 'bg-green-500'
 }
 
+const DEPARTMENT_NAMES: Record<string, string> = {
+    'DEV': 'פיתוח',
+    'SECURITY': 'אבטחה',
+    'QA': 'בדיקות',
+    'MARKETING': 'שיווק',
+    'BIZ_DEV': 'פיתוח עסקי'
+}
+
 export function WorkloadBubbleMap({ data }: WorkloadBubbleMapProps) {
     // Find max value for scaling
     const maxCount = Math.max(...data.map(d => d._count.id), 1)
@@ -52,11 +60,11 @@ export function WorkloadBubbleMap({ data }: WorkloadBubbleMapProps) {
                                         }}
                                     >
                                         <span className="font-bold text-lg leading-none">{count}</span>
-                                        <span className="text-[10px] opacity-90 truncate max-w-[90%] px-1 font-medium">{dept.department}</span>
+                                        <span className="text-[10px] opacity-90 truncate max-w-[90%] px-1 font-medium">{DEPARTMENT_NAMES[dept.department] || dept.department}</span>
                                     </div>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p className="font-bold">{dept.department}</p>
+                                    <p className="font-bold">{DEPARTMENT_NAMES[dept.department] || dept.department}</p>
                                     <p>{count} משימות פעילות</p>
                                 </TooltipContent>
                             </Tooltip>
@@ -73,7 +81,7 @@ export function WorkloadBubbleMap({ data }: WorkloadBubbleMapProps) {
                 {sortedData.map(d => (
                     <div key={d.department} className="flex items-center gap-1">
                         <div className={`w-2 h-2 rounded-full ${DEPARTMENT_COLORS[d.department] || 'bg-gray-400'}`} />
-                        <span>{d.department}</span>
+                        <span>{DEPARTMENT_NAMES[d.department] || d.department}</span>
                     </div>
                 ))}
             </div>
