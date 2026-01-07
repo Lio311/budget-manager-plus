@@ -13,10 +13,11 @@ interface EmployeeStat {
 
 interface User {
     id: string
-    firstName: string | null
-    lastName: string | null
-    email: string
-    image: string | null
+    firstName?: string | null
+    lastName?: string | null
+    email?: string
+    image?: string | null
+    [key: string]: any
 }
 
 interface TeamPerformanceBubbleMapProps {
