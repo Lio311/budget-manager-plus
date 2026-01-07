@@ -254,23 +254,26 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                 </div>
                                 {/* Actions Column */}
                                 <div className="col-span-1 hidden sm:flex justify-end">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                <MoreHorizontal className="h-4 w-4 text-gray-400" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => setEditingTask(task)}>
-                                                <Edit className="ml-2 h-4 w-4" />
-                                                ערוך
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleDeleteTask(task.id)} className="text-red-600 focus:text-red-600">
-                                                <Trash2 className="ml-2 h-4 w-4" />
-                                                מחק
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    <div className="flex items-center justify-end gap-1">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-8 w-8 p-0 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                                            onClick={() => setEditingTask(task)}
+                                            title="ערוך"
+                                        >
+                                            <Edit className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                                            onClick={() => handleDeleteTask(task.id)}
+                                            title="מחק"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                             </motion.div>
                         ))}
