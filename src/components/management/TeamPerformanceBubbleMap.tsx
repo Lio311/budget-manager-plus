@@ -65,7 +65,7 @@ export function TeamPerformanceBubbleMap({ data, users }: TeamPerformanceBubbleM
 
     return (
         <Card className="p-6 h-full min-h-[300px] flex flex-col">
-            <h3 className="text-lg font-bold mb-6 text-right">ביצועי צוות (משימות שהושלמו)</h3>
+            <h3 className="text-lg font-bold mb-6 text-right">משימות שהושלמו</h3>
 
             <div className="flex-1 flex flex-wrap items-center justify-center content-center gap-6 p-4">
                 {sortedData.map((stat) => {

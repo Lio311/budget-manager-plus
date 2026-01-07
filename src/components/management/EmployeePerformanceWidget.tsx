@@ -23,7 +23,7 @@ export function EmployeePerformance({ data }: { data: any[] }) {
 
     return (
         <Card className="p-6 h-[400px] shadow-sm">
-            <h3 className="text-lg font-bold mb-4 text-gray-800">ביצועי צוות (משימות שהושלמו)</h3>
+            <h3 className="text-lg font-bold mb-4 text-gray-800">משימות שהושלמו</h3>
             <div className="h-[320px] w-full" dir="ltr">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
