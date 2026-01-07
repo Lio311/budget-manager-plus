@@ -44,6 +44,7 @@ model User {
   storedReports StoredReport[]
   createdTasks ProjectTask[]
   marketingCampaigns MarketingCampaign[]
+  marketingExpenses  MarketingExpense[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -250,15 +251,14 @@ model Expense {
   supplierId        String?
   supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   
-  marketingCampaignId String?
-  marketingCampaign   MarketingCampaign? @relation(fields: [marketingCampaignId], references: [id], onDelete: SetNull)
+  expenseType       ExpenseType? @default(OPEX)
   amountBeforeVat   Float?
   vatRate           Float?   @default(0) // 0.17 etc.
   vatAmount         Float?
   vatType           VatType? @default(FULL)
   isDeductible      Boolean? @default(true) // For income tax recognition
   deductibleRate    Float?   @default(1.0) // 1.0 = 100%, 0.45 = 45% etc.
-  expenseType       ExpenseType? @default(OPEX)
+
   invoiceDate       DateTime? // Tax event date
   paymentDate       DateTime? // Cash flow date
   paymentMethod     String?    // Changed from Enum to String for flexibility
@@ -781,11 +781,39 @@ model MarketingCampaign {
   notes       String?   @db.Text
   
   // Relations
-  expenses    Expense[]
+//   expenses    Expense[] // REMOVED relation to main Expense
+  marketingExpenses MarketingExpense[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   @@index([userId])
   @@map("marketing_campaigns")
+}
+
+model MarketingExpense {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title       String
+  amount      Float
+  currency    String   @default("ILS")
+  date        DateTime @default(now())
+  
+  category    String   @default("General")
+  
+  // Relation to Campaign (Optional, can be standalone site expense)
+  marketingCampaignId String?
+  marketingCampaign   MarketingCampaign? @relation(fields: [marketingCampaignId], references: [id], onDelete: SetNull)
+  
+  paymentMethod String?
+  notes       String?  @db.Text
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([marketingCampaignId])
+  @@map("marketing_expenses")
 }

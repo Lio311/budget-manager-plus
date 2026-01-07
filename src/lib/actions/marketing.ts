@@ -3,10 +3,8 @@
 import { prisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
-import { convertToILS } from '@/lib/currency'
 
-// Define types locally if Prisma types aren't generated yet
-// import { MarketingCampaign } from '@prisma/client'
+// --- Campaigns ---
 
 export async function getCampaigns() {
     try {
@@ -17,7 +15,7 @@ export async function getCampaigns() {
             where: { userId },
             orderBy: { createdAt: 'desc' },
             include: {
-                expenses: true
+                marketingExpenses: true
             }
         })
 
@@ -41,43 +39,24 @@ export async function createCampaign(data: any) {
             }
         })
 
-        // 2. If valid cost, create Expense
+        // 2. If valid cost, create MarketingExpense (Separate from Business Budget)
         if (data.cost && data.cost > 0) {
-            // Find current Business Budget
-            const now = new Date()
-            const month = now.getMonth() + 1
-            const year = now.getFullYear()
-
-            let budget = await prisma.budget.findFirst({
-                where: {
+            await prisma.marketingExpense.create({
+                data: {
                     userId,
-                    month,
-                    year,
-                    type: 'BUSINESS'
+                    title: `קמפיין: ${data.name}`,
+                    amount: parseFloat(data.cost),
+                    currency: data.currency || 'ILS',
+                    date: data.startDate || new Date(),
+                    category: 'קמפיינים',
+                    marketingCampaignId: campaign.id,
+                    paymentMethod: data.paymentMethod,
+                    notes: data.notes
                 }
             })
-
-            // If no budget exists, we might need to create one or skip expense
-            // For now, we'll try to find it. If not found, we skip auto-expense (or logic to create budget)
-            if (budget) {
-                await prisma.expense.create({
-                    data: {
-                        budgetId: budget.id,
-                        category: 'שיווק', // Default category
-                        amount: data.cost,
-                        currency: data.currency || 'ILS',
-                        description: `קמפיין: ${data.name}`,
-                        date: data.startDate || now,
-                        expenseType: 'OPEX',
-                        marketingCampaignId: campaign.id,
-                        paymentMethod: data.paymentMethod
-                    }
-                })
-            }
         }
 
         revalidatePath('/management/marketing')
-        revalidatePath('/management/expenses')
         return { success: true, data: campaign }
     } catch (error) {
         console.error('Error creating campaign:', error)
@@ -89,6 +68,9 @@ export async function deleteCampaign(id: string) {
     try {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
+
+        // MarketingExpenses will be set to null or deleted depending on requirement.
+        // Currently Schema says SetNull for relation. We might want to keep independent expenses.
 
         await prisma.marketingCampaign.delete({
             where: { id }
@@ -117,5 +99,73 @@ export async function updateCampaign(id: string, data: any) {
     } catch (error) {
         console.error('Error updating campaign:', error)
         return { success: false, error: 'Failed to update campaign' }
+    }
+}
+
+// --- Marketing Expenses ---
+
+export async function getMarketingExpenses() {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const expenses = await prisma.marketingExpense.findMany({
+            where: { userId },
+            orderBy: { date: 'desc' },
+            include: {
+                marketingCampaign: {
+                    select: { name: true }
+                }
+            }
+        })
+
+        return { success: true, data: expenses }
+    } catch (error) {
+        console.error('Error fetching marketing expenses:', error)
+        return { success: false, error: 'Failed to fetch marketing expenses' }
+    }
+}
+
+export async function createMarketingExpense(data: any) {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const expense = await prisma.marketingExpense.create({
+            data: {
+                userId,
+                title: data.title,
+                amount: parseFloat(data.amount),
+                currency: data.currency || 'ILS',
+                date: data.date || new Date(),
+                category: data.category || 'כללי',
+                paymentMethod: data.paymentMethod,
+                notes: data.notes,
+                marketingCampaignId: data.marketingCampaignId || undefined
+            }
+        })
+
+        revalidatePath('/management/marketing')
+        return { success: true, data: expense }
+    } catch (error) {
+        console.error('Error creating marketing expense:', error)
+        return { success: false, error: 'Failed to create marketing expense' }
+    }
+}
+
+export async function deleteMarketingExpense(id: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        await prisma.marketingExpense.delete({
+            where: { id }
+        })
+
+        revalidatePath('/management/marketing')
+        return { success: true }
+    } catch (error) {
+        console.error('Error deleting marketing expense:', error)
+        return { success: false, error: 'Failed to delete marketing expense' }
     }
 }
