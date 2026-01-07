@@ -45,8 +45,15 @@ interface ManagementGanttProps {
     onTaskClick?: (task: any) => void
 }
 
+import { fixTaskTitle } from '@/lib/actions/management'
+
 export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
-    // 1. Calculate Date Range
+    useEffect(() => {
+        fixTaskTitle().then(res => {
+            if (res.success) console.log('Task title fixed:', res.fixed)
+        })
+    }, [])
+
     // 1. Calculate Date Range (Show exactly 10 days around today)
     const today = new Date()
     const minDate = subDays(today, 2)
@@ -75,7 +82,17 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
     const getMember = (name: string) => TEAM_MEMBERS.find(m => m.name === name)
 
     return (
-        <Card className="flex h-[700px] border-none shadow-sm overflow-hidden bg-white">
+        <Card className="flex h-[700px] border-none shadow-sm overflow-hidden bg-white relative">
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .hide-scrollbar [data-radix-scroll-area-viewport] {
+                    scrollbar-width: none !important;
+                    -ms-overflow-style: none !important;
+                }
+                .hide-scrollbar [data-radix-scroll-area-viewport]::-webkit-scrollbar {
+                    display: none !important;
+                }
+            `}} />
             {/* LEFT SIDEBAR: Task List */}
             <div
                 className="flex-shrink-0 border-l border-gray-200 bg-white z-20 flex flex-col shadow-[4px_0_10px_-5px_rgba(0,0,0,0.1)]"
@@ -90,7 +107,7 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
                 </div>
 
                 {/* Rows */}
-                <ScrollArea className="flex-1">
+                <ScrollArea className="flex-1 hide-scrollbar">
                     <div className="flex flex-col">
                         {tasks.map((task) => (
                             <div
@@ -121,7 +138,7 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
             </div>
 
             {/* RIGHT SIDE (TIMELINE): Scrollable */}
-            <ScrollArea className="flex-1 relative" dir="ltr">
+            <ScrollArea className="flex-1 relative hide-scrollbar" dir="ltr">
                 <div className="flex flex-col min-w-max">
                     {/* Timeline Header */}
                     <div className="sticky top-0 z-10 bg-white border-b flex">

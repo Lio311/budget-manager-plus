@@ -253,3 +253,30 @@ export async function getUserLocations() {
         return { success: false, error: 'Failed to fetch map data' }
     }
 }
+export async function fixTaskTitle() {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const wrongTitle = "וכתיבת תוכנית יישום ISO מעבר על תקני אבטחה יישום"
+        const correctTitle = "מעבר על תקני אבטחה ISO וכתיבת תוכנית יישום"
+
+        const task = await prisma.projectTask.findFirst({
+            where: { title: { contains: "ISO" } } // Broad search to be sure
+        })
+
+        if (task) {
+            await prisma.projectTask.update({
+                where: { id: task.id },
+                data: { title: correctTitle }
+            })
+            revalidatePath('/management')
+            return { success: true, fixed: task.title }
+        }
+
+        return { success: false, error: 'Task not found' }
+    } catch (error) {
+        console.error('Error fixing task title:', error)
+        return { success: false, error: 'Failed' }
+    }
+}
