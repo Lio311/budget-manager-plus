@@ -59,10 +59,10 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                     <NewTaskDialog />
                     <div className="relative">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
                             placeholder="חיפוש..."
-                            className="pr-10 pl-4 w-40 sm:w-64 bg-gray-50 border-gray-200 text-right"
+                            className="pl-10 pr-4 w-40 sm:w-64 bg-gray-50 border-gray-200 text-right"
                             dir="rtl"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
