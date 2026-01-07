@@ -167,11 +167,12 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                 {/* Header */}
                 <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase sticky top-0 z-10">
                     <div className="col-span-1"></div> {/* Selection/Color */}
-                    <div className="col-span-11 sm:col-span-4 text-right">משימה</div>
+                    <div className="col-span-11 sm:col-span-3 text-right">משימה</div>
                     <div className="col-span-2 text-center hidden sm:block">נוצר ב</div>
                     <div className="col-span-2 text-center hidden sm:block">תאריך יעד</div>
                     <div className="col-span-1 text-center hidden sm:block">אחראי</div>
                     <div className="col-span-2 text-center hidden sm:block">סטטוס</div>
+                    <div className="col-span-1 text-center hidden sm:block">פעולות</div>
                 </div>
 
                 {/* Rows */}
@@ -189,7 +190,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                 <div className="col-span-1 flex justify-center">
                                     <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }} />
                                 </div>
-                                <div className="col-span-11 sm:col-span-4 flex items-center gap-3">
+                                <div className="col-span-11 sm:col-span-3 flex items-center gap-3">
                                     <span className="font-medium text-gray-800 text-sm">{task.title}</span>
                                 </div>
 
