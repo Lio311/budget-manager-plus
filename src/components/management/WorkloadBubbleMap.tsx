@@ -77,11 +77,11 @@ export function WorkloadBubbleMap({ data }: WorkloadBubbleMapProps) {
                 )}
             </div>
 
-            <div className="mt-4 flex flex-wrap justify-center gap-2 text-xs text-gray-500">
+            <div className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-gray-500" dir="rtl">
                 {sortedData.map(d => (
-                    <div key={d.department} className="flex flex-row-reverse items-center gap-1">
-                        <div className={`w-2 h-2 rounded-full ${DEPARTMENT_COLORS[d.department] || 'bg-gray-400'}`} />
-                        <span>{DEPARTMENT_NAMES[d.department] || d.department}</span>
+                    <div key={d.department} className="flex items-center gap-2">
+                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${DEPARTMENT_COLORS[d.department] || 'bg-gray-400'}`} />
+                        <span className="font-medium text-slate-600">{DEPARTMENT_NAMES[d.department] || d.department}</span>
                     </div>
                 ))}
             </div>

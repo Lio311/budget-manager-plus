@@ -130,9 +130,22 @@ export function TaskAnalytics({ tasks }: TaskAnalyticsProps) {
                             <Legend
                                 verticalAlign="bottom"
                                 height={36}
-                                iconType="circle"
-                                formatter={(value, entry: any) => <span className="text-sm font-medium text-slate-600 px-2">{value}</span>}
-                                wrapperStyle={{ paddingTop: '20px' }}
+                                content={(props) => {
+                                    const { payload } = props;
+                                    return (
+                                        <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4" dir="rtl">
+                                            {payload?.map((entry: any, index: number) => (
+                                                <li key={`item-${index}`} className="flex items-center gap-2">
+                                                    <div
+                                                        className="w-2.5 h-2.5 rounded-full"
+                                                        style={{ backgroundColor: entry.color }}
+                                                    />
+                                                    <span className="text-sm font-medium text-slate-600">{entry.value}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    );
+                                }}
                             />
                         </PieChart>
                     </ResponsiveContainer>

@@ -34,7 +34,7 @@ export function PriorityBreakdown({ data }: { data: any[] }) {
 
     return (
         <Card className="p-6 h-[400px] shadow-sm">
-            <h3 className="text-lg font-bold mb-4 text-gray-800">התפלגות עדיפויות (משימות פתוחות)</h3>
+            <h3 className="text-lg font-bold mb-4 text-gray-800">משימות פתוחות</h3>
             <div className="h-[320px] w-full" dir="ltr">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -59,7 +59,26 @@ export function PriorityBreakdown({ data }: { data: any[] }) {
                             contentStyle={{ direction: 'rtl', textAlign: 'right', borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                             itemStyle={{ direction: 'rtl', textAlign: 'right' }}
                         />
-                        <Legend verticalAlign="bottom" height={36} wrapperStyle={{ paddingTop: '20px' }} />
+                        <Legend
+                            verticalAlign="bottom"
+                            height={36}
+                            content={(props) => {
+                                const { payload } = props;
+                                return (
+                                    <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4" dir="rtl">
+                                        {payload?.map((entry: any, index: number) => (
+                                            <li key={`item-${index}`} className="flex items-center gap-2">
+                                                <div
+                                                    className="w-2.5 h-2.5 rounded-full"
+                                                    style={{ backgroundColor: entry.color }}
+                                                />
+                                                <span className="text-sm font-medium text-slate-600">{entry.value}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                );
+                            }}
+                        />
                     </PieChart>
                 </ResponsiveContainer>
             </div>
