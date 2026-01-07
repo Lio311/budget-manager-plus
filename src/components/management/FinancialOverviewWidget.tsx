@@ -1,7 +1,7 @@
 'use client'
 
 import { Card } from '@/components/ui/card'
-import { ArrowUpRight, ArrowDownRight, DollarSign, Wallet } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, Wallet, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { formatNumberWithCommas } from '@/lib/utils'
 
