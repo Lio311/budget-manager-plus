@@ -49,14 +49,11 @@ export function MarketingCampaigns({ campaigns }: { campaigns: any[] }) {
         CRITICAL: 'קריטית'
     }
 
-    const typeMap: Record<string, string> = {
-        SOCIAL: 'רשתות חברתיות',
-        PPC: 'PPC / ממומן',
-        COLLABORATION: 'שיתוף פעולה',
-        INFLUENCER: 'משפיענים',
-        PR: 'יח"צ',
-        EMAIL: 'שיווק במייל',
-        OTHER: 'אחר'
+    const statusMap: Record<string, string> = {
+        ACTIVE: 'פעיל',
+        PAUSED: 'מושהה',
+        ENDED: 'הסתיים',
+        PLANNED: 'מתוכנן'
     }
 
     return (
@@ -125,12 +122,12 @@ export function MarketingCampaigns({ campaigns }: { campaigns: any[] }) {
                             </div>
 
                             <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
-                                <span>{campaign.status}</span>
-                                {campaign.expenses?.length > 0 && (
+                                {campaign.expenses?.length > 0 ? (
                                     <Badge variant="secondary" className="bg-green-50 text-green-700 hover:bg-green-100">
                                         קושר להוצאה
                                     </Badge>
-                                )}
+                                ) : <span></span>}
+                                <span>{statusMap[campaign.status] || campaign.status}</span>
                             </div>
                         </Card>
                     </motion.div>
