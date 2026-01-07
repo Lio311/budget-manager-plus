@@ -92,8 +92,8 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
         const oldTasks = [...tasks]
 
         // We update status AND updatedAt so analytics reflect "Done now"
-        const now = new Date().toISOString()
-        setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus, updatedAt: now } : t))
+        const now = new Date()
+        setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus as Task['status'], updatedAt: now } : t))
 
         const res = await updateTask(taskId, { status: newStatus as any })
         if (!res.success) {
