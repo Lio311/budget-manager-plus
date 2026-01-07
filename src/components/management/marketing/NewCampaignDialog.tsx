@@ -108,12 +108,12 @@ export function NewCampaignDialog() {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="SOCIAL">Social Media</SelectItem>
+                                    <SelectItem value="SOCIAL">רשתות חברתיות</SelectItem>
                                     <SelectItem value="PPC">PPC / ממומן</SelectItem>
                                     <SelectItem value="COLLABORATION">שיתוף פעולה</SelectItem>
                                     <SelectItem value="INFLUENCER">משפיענים</SelectItem>
                                     <SelectItem value="PR">יח"צ</SelectItem>
-                                    <SelectItem value="EMAIL">Email Marketing</SelectItem>
+                                    <SelectItem value="EMAIL">שיווק במייל</SelectItem>
                                     <SelectItem value="OTHER">אחר</SelectItem>
                                 </SelectContent>
                             </Select>
