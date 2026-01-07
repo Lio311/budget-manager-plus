@@ -59,7 +59,23 @@ export function ManagementCalendar({ tasks }: { tasks: any[] }) {
                 culture="he"
                 messages={messages}
                 rtl={true}
-                views={['month', 'week']}
+                views={['month']}
+                components={{
+                    toolbar: (props: any) => {
+                        return (
+                            <div className="rbc-toolbar">
+                                <span className="rbc-btn-group">
+                                    <button type="button" onClick={() => props.onNavigate('PREV')}>הקודם</button>
+                                    <button type="button" onClick={() => props.onNavigate('NEXT')}>הבא</button>
+                                </span>
+                                <span className="rbc-toolbar-label">{props.label}</span>
+                                <span className="rbc-btn-group">
+                                    {/* Month/Week buttons removed */}
+                                </span>
+                            </div>
+                        )
+                    }
+                }}
                 eventPropGetter={(event) => {
                     const statusColors: any = {
                         'DONE': '#00C875',

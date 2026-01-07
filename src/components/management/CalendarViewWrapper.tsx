@@ -16,13 +16,11 @@ export function CalendarViewWrapper({ tasks }: CalendarViewWrapperProps) {
     return (
         <div className="space-y-6">
             <div className="flex justify-end">
-                <ToggleGroup type="single" value={view} onValueChange={(v) => v && setView(v as 'calendar' | 'gantt')} className="bg-white p-1 rounded-lg border shadow-sm">
+                <ToggleGroup type="single" value={view} onValueChange={(v: string) => v && setView(v as 'calendar' | 'gantt')} className="bg-white p-1 rounded-lg border shadow-sm">
                     <ToggleGroupItem value="calendar" aria-label="Calendar View" className="data-[state=on]:bg-blue-50 data-[state=on]:text-blue-600">
-                        <CalendarIcon className="h-4 w-4 ml-2" />
                         <span className="text-xs font-medium">לוח שנה</span>
                     </ToggleGroupItem>
                     <ToggleGroupItem value="gantt" aria-label="Gantt View" className="data-[state=on]:bg-blue-50 data-[state=on]:text-blue-600">
-                        <BarChartHorizontal className="h-4 w-4 ml-2" />
                         <span className="text-xs font-medium">גאנט</span>
                     </ToggleGroupItem>
                 </ToggleGroup>
