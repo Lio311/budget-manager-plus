@@ -4,7 +4,7 @@ import { ForceLightMode } from '@/components/ForceLightMode'
 import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
 
-const ADMIN_EMAILS = ['lior31197@gmail.com', 'ron.kor97@gmail.com']
+const ADMIN_EMAILS = ['lior31197@gmail.com', 'ron.kor97@gmail.com', 'leonpiatti@tuta.com']
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
     const user = await currentUser()

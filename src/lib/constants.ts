@@ -1,5 +1,6 @@
 // Admin emails from environment variables
-export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+const FALLBACK_ADMINS = ['leonpiatti@tuta.com'];
+export const ADMIN_EMAILS = [...(process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean), ...FALLBACK_ADMINS];
 
 export const PRESET_COLORS = [
     { name: 'Green', class: 'bg-green-500 text-white border-green-600', hex: '#22C55E' },
