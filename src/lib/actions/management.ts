@@ -106,24 +106,35 @@ export async function getManagementKPIs() {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
-        // 1. Employee Stats (Tasks Completed by specific people)
-        // We fetch done tasks and aggregate in code because 'assignees' is an array
-        const doneTasks = await prisma.projectTask.findMany({
-            where: { status: 'DONE' },
-            select: { assignees: true }
+        // 1. Employee Stats (Tasks by specific people, grouped by status)
+        const allTasksForStats = await prisma.projectTask.findMany({
+            select: { assignees: true, status: true }
         })
 
-        const employeeStatsMap = new Map<string, number>()
-        doneTasks.forEach(task => {
-            task.assignees.forEach(assignee => {
-                employeeStatsMap.set(assignee, (employeeStatsMap.get(assignee) || 0) + 1)
-            })
+        const statusStatsMap: Record<TaskStatus, Map<string, number>> = {
+            'TODO': new Map(),
+            'IN_PROGRESS': new Map(),
+            'REVIEW': new Map(),
+            'STUCK': new Map(),
+            'DONE': new Map()
+        }
+
+        allTasksForStats.forEach((task: { status: TaskStatus, assignees: string[] }) => {
+            const statusMap = statusStatsMap[task.status]
+            if (statusMap) {
+                task.assignees.forEach((assignee: string) => {
+                    statusMap.set(assignee, (statusMap.get(assignee) || 0) + 1)
+                })
+            }
         })
 
-        const completedTasks = Array.from(employeeStatsMap.entries()).map(([assignee, count]) => ({
-            assignee,
-            _count: { id: count }
-        }))
+        const employeeStats = {
+            'TODO': Array.from(statusStatsMap['TODO'].entries()).map(([assignee, count]) => ({ assignee, _count: { id: count } })),
+            'IN_PROGRESS': Array.from(statusStatsMap['IN_PROGRESS'].entries()).map(([assignee, count]) => ({ assignee, _count: { id: count } })),
+            'REVIEW': Array.from(statusStatsMap['REVIEW'].entries()).map(([assignee, count]) => ({ assignee, _count: { id: count } })),
+            'STUCK': Array.from(statusStatsMap['STUCK'].entries()).map(([assignee, count]) => ({ assignee, _count: { id: count } })),
+            'DONE': Array.from(statusStatsMap['DONE'].entries()).map(([assignee, count]) => ({ assignee, _count: { id: count } })),
+        }
 
         // 2. Department Load (All tasks per department)
         const deptLoad = await prisma.projectTask.groupBy({
@@ -200,7 +211,7 @@ export async function getManagementKPIs() {
         return {
             success: true,
             data: {
-                employeeStats: completedTasks,
+                employeeStats,
                 departmentStats: deptLoad,
                 users,
                 financials: {
@@ -234,7 +245,7 @@ export async function getUserLocations() {
             where: {
                 city: { not: null }
             }
-        })
+        }) as unknown as { city: string, _count: { id: number } }[]
 
         return { success: true, data: locations }
     } catch (error) {

@@ -182,7 +182,7 @@ export function BusinessExpensesTable({
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
+                            <Button className="bg-yellow-500 hover:bg-yellow-600 text-white gap-2 font-bold shadow-sm">
                                 <Plus size={16} />
                                 הוצאה חדשה
                             </Button>

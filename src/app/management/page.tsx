@@ -38,10 +38,43 @@ async function DashboardContent() {
 
             {/* Middle Row: Employee & Dept Stats */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <TeamPerformanceBubbleMap data={employeeStats} users={users || []} />
-
-                {/* Bubble Map Workload (Replaces old bar chart) */}
-                <div className="h-full">
+                {/* Team Performance Split into 5 statuses */}
+                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <TeamPerformanceBubbleMap
+                        data={employeeStats['DONE'] || []}
+                        users={users || []}
+                        title="משימות שהושלמו"
+                        badgeColor="bg-green-500"
+                        countLabel="משימות הושלמו"
+                    />
+                    <TeamPerformanceBubbleMap
+                        data={employeeStats['IN_PROGRESS'] || []}
+                        users={users || []}
+                        title="בעבודה"
+                        badgeColor="bg-orange-400"
+                        countLabel="משימות בעבודה"
+                    />
+                    <TeamPerformanceBubbleMap
+                        data={employeeStats['REVIEW'] || []}
+                        users={users || []}
+                        title="בבדיקה"
+                        badgeColor="bg-purple-500"
+                        countLabel="משימות בבדיקה"
+                    />
+                    <TeamPerformanceBubbleMap
+                        data={employeeStats['STUCK'] || []}
+                        users={users || []}
+                        title="תקוע"
+                        badgeColor="bg-red-500"
+                        countLabel="משימות תקועות"
+                    />
+                    <TeamPerformanceBubbleMap
+                        data={employeeStats['TODO'] || []}
+                        users={users || []}
+                        title="לביצוע"
+                        badgeColor="bg-gray-400"
+                        countLabel="משימות לביצוע"
+                    />
                     <WorkloadBubbleMap data={departmentStats} />
                 </div>
             </div>

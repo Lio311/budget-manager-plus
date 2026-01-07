@@ -23,9 +23,12 @@ interface User {
 interface TeamPerformanceBubbleMapProps {
     data: EmployeeStat[]
     users: User[]
+    title: string
+    badgeColor?: string
+    countLabel?: string
 }
 
-export function TeamPerformanceBubbleMap({ data, users }: TeamPerformanceBubbleMapProps) {
+export function TeamPerformanceBubbleMap({ data, users, title, badgeColor = 'bg-green-500', countLabel = 'משימות הושלמו' }: TeamPerformanceBubbleMapProps) {
     // Filter out unassigned tasks if necessary, or label them "Unassigned"
     const filteredData = data.filter(d => d.assignee)
 
@@ -65,7 +68,7 @@ export function TeamPerformanceBubbleMap({ data, users }: TeamPerformanceBubbleM
 
     return (
         <Card className="p-6 h-full min-h-[300px] flex flex-col">
-            <h3 className="text-lg font-bold mb-6 text-right">משימות שהושלמו</h3>
+            <h3 className="text-lg font-bold mb-6 text-right">{title}</h3>
 
             <div className="flex-1 flex flex-wrap items-center justify-center content-center gap-6 p-4">
                 {sortedData.map((stat) => {
@@ -103,7 +106,7 @@ export function TeamPerformanceBubbleMap({ data, users }: TeamPerformanceBubbleM
                                         </div>
 
                                         {/* Count Badge */}
-                                        <div className="absolute -top-1 -right-1 bg-green-500 text-white text-sm font-bold w-7 h-7 flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10">
+                                        <div className={`absolute -top-1 -right-1 ${badgeColor} text-white text-sm font-bold w-7 h-7 flex items-center justify-center rounded-full border-2 border-white shadow-sm z-10`}>
                                             {count}
                                         </div>
 
@@ -114,7 +117,7 @@ export function TeamPerformanceBubbleMap({ data, users }: TeamPerformanceBubbleM
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p className="font-bold text-right">{stat.assignee}</p>
-                                    <p className="text-right">{count} משימות הושלמו</p>
+                                    <p className="text-right">{count} {countLabel}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>

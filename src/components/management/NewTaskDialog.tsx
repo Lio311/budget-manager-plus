@@ -18,6 +18,12 @@ import { he } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
+const TEAM_MEMBERS = [
+    { name: 'Lior', avatar: '/lior-profile.jpg', color: 'blue' },
+    { name: 'Ron', avatar: '/team/ron.png', color: 'green' },
+    { name: 'Leon', avatar: '/avatars/leon.png', color: 'purple' },
+]
+
 export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen, onOpenChange }: {
     onTaskCreated?: (task: any) => void;
     taskToEdit?: any;
@@ -175,23 +181,34 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                         <Label className="text-right block">אחראים (ניתן לבחור יותר מאחד)</Label>
                         <div className="flex gap-2 justify-end">
                             <ToggleGroup type="multiple" value={formData.assignees} onValueChange={(val: string[]) => setFormData({ ...formData, assignees: val })}>
-                                <ToggleGroupItem value="Lior" aria-label="Toggle Lior" className="p-1 h-auto rounded-full data-[state=on]:bg-blue-100 data-[state=on]:ring-2 data-[state=on]:ring-blue-500">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-                                        L
-                                    </div>
-                                </ToggleGroupItem>
-                                <ToggleGroupItem value="Ron" aria-label="Toggle Ron" className="p-1 h-auto rounded-full data-[state=on]:bg-green-100 data-[state=on]:ring-2 data-[state=on]:ring-green-500">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-semibold text-sm">
-                                        R
-                                    </div>
-                                </ToggleGroupItem>
-                                <ToggleGroupItem value="Leon" aria-label="Toggle Leon" className="p-1 h-auto rounded-full data-[state=on]:bg-purple-100 data-[state=on]:ring-2 data-[state=on]:ring-purple-500">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
-                                        L
-                                    </div>
-                                </ToggleGroupItem>
-                            </ToggleGroup>
-                        </div>
+                                {TEAM_MEMBERS.map((member) => (
+                                    <ToggleGroupItem
+                                        key={member.name}
+                                        value={member.name}
+                                        aria-label={`Toggle ${member.name}`}
+                                        className={cn(
+                                            "p-1 h-auto rounded-full transition-all",
+                                            `data-[state=on]:bg-${member.color}-100 data-[state=on]:ring-2 data-[state=on]:ring-${member.color}-500`
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden border-2 border-white shadow-sm",
+                                            `bg-gradient-to-br from-${member.color}-400 to-${member.color}-600`
+                                        )}>
+                                            <img
+                                                src={member.avatar}
+                                                alt={member.name}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    // Fallback to initial if image fails
+                                                    (e.target as HTMLImageElement).style.display = 'none';
+                                                    (e.target as HTMLImageElement).parentElement!.textContent = member.name.charAt(0);
+                                                }}
+                                            />
+                                        </div>
+                                    </ToggleGroupItem>
+                                ))}
+                            </ToggleGroup>                                    </div>
                     </div>
 
                     <div className="pt-4 flex justify-end">
