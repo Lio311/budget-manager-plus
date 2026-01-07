@@ -42,6 +42,23 @@ export function MarketingCampaigns({ campaigns }: { campaigns: any[] }) {
         }
     }
 
+    const priorityMap: Record<string, string> = {
+        LOW: 'נמוכה',
+        MEDIUM: 'בינונית',
+        HIGH: 'גבוהה',
+        CRITICAL: 'קריטית'
+    }
+
+    const typeMap: Record<string, string> = {
+        SOCIAL: 'רשתות חברתיות',
+        PPC: 'PPC / ממומן',
+        COLLABORATION: 'שיתוף פעולה',
+        INFLUENCER: 'משפיענים',
+        PR: 'יח"צ',
+        EMAIL: 'שיווק במייל',
+        OTHER: 'אחר'
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -69,10 +86,10 @@ export function MarketingCampaigns({ campaigns }: { campaigns: any[] }) {
                                         <h3 className="font-bold text-gray-900 line-clamp-1" title={campaign.name}>{campaign.name}</h3>
                                         <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
                                             <Badge variant="outline" className="text-xs py-0 h-5 font-normal">
-                                                {campaign.type}
+                                                {typeMap[campaign.type] || campaign.type}
                                             </Badge>
                                             <span className={`text-xs px-2 py-0.5 rounded-full border ${getPriorityColor(campaign.priority)}`}>
-                                                {campaign.priority}
+                                                {priorityMap[campaign.priority] || campaign.priority}
                                             </span>
                                         </div>
                                     </div>
