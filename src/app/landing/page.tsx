@@ -23,7 +23,7 @@ export default function LandingPage() {
             bgColor: 'from-slate-900 via-slate-800 to-slate-900',
             textColor: 'text-white',
             accentColor: 'emerald',
-            image: '/screenshots/personal/budget_mockup.png'
+            image: '/assets/dashboard_mockup.png'
         },
         {
             id: 1,
