@@ -129,7 +129,7 @@ export function IntegrationsSettings() {
                     </a>
 
                     <a
-                        href="https://www.icloud.com/shortcuts/24322e6b7170484293b8828f910a88cf"
+                        href="https://www.icloud.com/shortcuts/f0243411e3e94f1ebfaaa940ce486387"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block group"
