@@ -10,7 +10,7 @@ export function FinancialOverview({ data }: { data: any }) {
 
     return (
         <Card className="p-6 h-full shadow-sm hover:shadow-md transition-shadow duration-300">
-            <h3 className="text-xl font-bold mb-6 text-gray-800">פיננסי (פרויקט כולל)</h3>
+            <h3 className="text-xl font-bold mb-6 text-gray-800">נתונים כספיים</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Revenue - Green */}
