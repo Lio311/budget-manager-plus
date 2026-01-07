@@ -138,8 +138,7 @@ export function TaskAnalytics({ tasks }: TaskAnalyticsProps) {
                     </ResponsiveContainer>
 
                     {/* Centered Label */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mb-8">
-                        {/* mb-8 to account for legend space roughly */}
+                    <div className="absolute top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center pointer-events-none">
                         <div className="text-3xl font-bold text-slate-800">
                             {onTimeRate}%
                         </div>
