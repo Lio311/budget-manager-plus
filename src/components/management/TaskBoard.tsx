@@ -111,7 +111,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                 </div>
                 <div className="flex items-center gap-2">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[110px] h-9 gap-2">
+                        <SelectTrigger className="w-[150px] h-9 gap-2">
                             <Filter size={16} className="text-gray-500" />
                             <SelectValue placeholder="סינון" />
                         </SelectTrigger>
@@ -126,7 +126,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                     </Select>
 
                     <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
-                        <SelectTrigger className="w-[110px] h-9 gap-2">
+                        <SelectTrigger className="w-[150px] h-9 gap-2">
                             <UserIcon size={16} className="text-gray-500" />
                             <SelectValue placeholder="אחראי" />
                         </SelectTrigger>
@@ -217,7 +217,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                         >
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent dir="rtl">
                                             <SelectItem value="TODO">לביצוע</SelectItem>
                                             <SelectItem value="IN_PROGRESS">בעבודה</SelectItem>
                                             <SelectItem value="REVIEW">בבדיקה</SelectItem>
