@@ -59,8 +59,12 @@ export function FinancialOverview({ data }: { data: any }) {
                     </div>
                     <div>
                         <p className="text-gray-500 text-sm font-medium">רווח לפני מס</p>
-                        <span className="text-2xl font-bold text-blue-600 whitespace-nowrap">{formatNumberWithCommas(profit.toFixed(2))} ₪</span>
-                        <p className="text-blue-600/70 text-xs mt-1">מתוך סה"כ הכנסות: <span dir="ltr" className="inline-block">{((profit / revenue) * 100 || 0).toFixed(1)}%</span></p>
+                        <span className="text-2xl font-bold text-blue-600 whitespace-nowrap" dir="rtl">
+                            {profit < 0 ? `-${formatNumberWithCommas(Math.abs(profit).toFixed(2))}` : formatNumberWithCommas(profit.toFixed(2))} ₪
+                        </span>
+                        {profit >= 0 && revenue > 0 && (
+                            <p className="text-blue-600/70 text-xs mt-1">מתוך סה"כ הכנסות: <span dir="ltr" className="inline-block">{((profit / revenue) * 100 || 0).toFixed(1)}%</span></p>
+                        )}
                     </div>
                 </motion.div>
             </div>

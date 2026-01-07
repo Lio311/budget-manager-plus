@@ -29,9 +29,9 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Label } from '@/components/ui/label'
-import { Plus, Trash2, Search, Filter, Loader2, Calendar as CalendarIcon } from 'lucide-react'
+import { Plus, Trash2, Search, Filter, Loader2, Calendar as CalendarIcon, Edit } from 'lucide-react'
 import { toast } from 'sonner'
-import { createBusinessExpense, deleteBusinessExpense } from '@/lib/actions/business-expenses'
+import { createBusinessExpense, deleteBusinessExpense, updateBusinessExpense } from '@/lib/actions/business-expenses'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
@@ -46,6 +46,7 @@ export function BusinessExpensesTable({
     const [categoryFilter, setCategoryFilter] = useState('ALL')
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [editingExpense, setEditingExpense] = useState<any | null>(null)
 
     // New Expense Form State
     const [formData, setFormData] = useState({
@@ -89,6 +90,40 @@ export function BusinessExpensesTable({
         }
     }
 
+    const handleUpdate = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!editingExpense) return
+        setLoading(true)
+
+        try {
+            const res = await updateBusinessExpense(editingExpense.id, {
+                description: formData.description,
+                amount: parseFloat(formData.amount),
+                category: formData.category,
+                date: formData.date
+            })
+
+            if (res.success) {
+                toast.success('ההוצאה עודכנה בהצלחה')
+                setExpenses(expenses.map(e => e.id === editingExpense.id ? res.data : e))
+                setIsDialogOpen(false)
+                setEditingExpense(null)
+                setFormData({
+                    description: '',
+                    amount: '',
+                    category: 'Marketing',
+                    date: new Date()
+                })
+            } else {
+                toast.error('שגיאה בעדכון ההוצאה')
+            }
+        } catch (error) {
+            toast.error('שגיאה לא צפויה')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const handleDelete = async (id: string) => {
         if (!confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) return
 
@@ -102,6 +137,17 @@ export function BusinessExpensesTable({
         } else {
             toast.success('ההוצאה נמחקה')
         }
+    }
+
+    const handleEdit = (expense: any) => {
+        setEditingExpense(expense)
+        setFormData({
+            description: expense.description,
+            amount: expense.amount.toString(),
+            category: expense.category,
+            date: new Date(expense.date)
+        })
+        setIsDialogOpen(true)
     }
 
     const filteredExpenses = expenses.filter(e => {
@@ -143,9 +189,9 @@ export function BusinessExpensesTable({
                         </DialogTrigger>
                         <DialogContent dir="rtl">
                             <DialogHeader className="text-right">
-                                <DialogTitle>הוספת הוצאה עסקית</DialogTitle>
+                                <DialogTitle>{editingExpense ? 'עריכת הוצאה' : 'הוספת הוצאה עסקית'}</DialogTitle>
                             </DialogHeader>
-                            <form onSubmit={handleCreate} className="space-y-4 mt-4">
+                            <form onSubmit={editingExpense ? handleUpdate : handleCreate} className="space-y-4 mt-4">
                                 <div className="space-y-2">
                                     <Label className="text-right block">תיאור</Label>
                                     <Input
@@ -208,10 +254,28 @@ export function BusinessExpensesTable({
                                         </PopoverContent>
                                     </Popover>
                                 </div>
-                                <div className="pt-4 flex justify-end">
+                                <div className="pt-4 flex justify-end gap-2">
+                                    {editingExpense && (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => {
+                                                setEditingExpense(null)
+                                                setIsDialogOpen(false)
+                                                setFormData({
+                                                    description: '',
+                                                    amount: '',
+                                                    category: 'Marketing',
+                                                    date: new Date()
+                                                })
+                                            }}
+                                        >
+                                            ביטול
+                                        </Button>
+                                    )}
                                     <Button type="submit" disabled={loading} className="bg-blue-600">
                                         {loading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null}
-                                        שמור הוצאה
+                                        {editingExpense ? 'עדכן הוצאה' : 'שמור הוצאה'}
                                     </Button>
                                 </div>
                             </form>
@@ -251,7 +315,7 @@ export function BusinessExpensesTable({
                 <Table>
                     <TableHeader className="bg-gray-50">
                         <TableRow>
-                            <TableHead className="text-right w-[50px]"></TableHead>
+                            <TableHead className="text-right w-[100px]">פעולות</TableHead>
                             <TableHead className="text-right">תאריך</TableHead>
                             <TableHead className="text-right">תיאור</TableHead>
                             <TableHead className="text-right">קטגוריה</TableHead>
@@ -270,14 +334,28 @@ export function BusinessExpensesTable({
                             filteredExpenses.map((expense) => (
                                 <TableRow key={expense.id} className="group">
                                     <TableCell>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={() => handleDelete(expense.id)}
-                                        >
-                                            <Trash2 size={14} />
-                                        </Button>
+                                        <div className="flex items-center gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 px-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                onClick={() => handleEdit(expense)}
+                                                title="ערוך"
+                                            >
+                                                <span className="text-xs">ערוך</span>
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 px-2 text-gray-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                onClick={() => handleDelete(expense.id)}
+                                                title="מחק"
+                                            >
+                                                <span className="text-xs">מחק</span>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                     <TableCell>{format(new Date(expense.date), 'dd/MM/yyyy')}</TableCell>
                                     <TableCell className="font-medium">{expense.description}</TableCell>

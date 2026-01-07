@@ -192,3 +192,35 @@ export async function deleteBusinessExpense(id: string) {
         return { success: false, error: 'Failed to delete business expense' }
     }
 }
+
+export async function updateBusinessExpense(id: string, data: any) {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const expense = await prisma.businessExpense.update({
+            where: { id },
+            data: {
+                description: data.description,
+                amount: parseFloat(data.amount),
+                currency: data.currency || 'ILS',
+                date: data.date,
+                category: data.category,
+                paymentMethod: data.paymentMethod,
+                notes: data.notes,
+            },
+            include: {
+                campaign: {
+                    select: { name: true }
+                }
+            }
+        })
+
+        revalidatePath('/management/expenses')
+        revalidatePath('/management/marketing')
+        return { success: true, data: expense }
+    } catch (error) {
+        console.error('Error updating business expense:', error)
+        return { success: false, error: 'Failed to update business expense' }
+    }
+}
