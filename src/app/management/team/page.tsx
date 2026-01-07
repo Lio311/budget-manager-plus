@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { CheckCircle, Mail, Phone, Shield, User, Plus } from 'lucide-react'
+import { CheckCircle, Mail, Phone, Shield, User, Plus, Trash2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner' // Assuming sonner is available (used in NewTaskDialog)
 
@@ -48,6 +48,11 @@ export default function TeamPage() {
         toast.success('חבר צוות נוסף בהצלחה')
         setIsDialogOpen(false)
         setFormData({ name: '', role: '', email: '', department: 'Development' })
+    }
+
+    const handleDeleteMember = (id: number) => {
+        setMembers(members.filter(m => m.id !== id))
+        toast.success('העובד הוסר בהצלחה')
     }
 
     return (
@@ -109,7 +114,7 @@ export default function TeamPage() {
                                     </SelectTrigger>
                                     <SelectContent dir="rtl">
                                         <SelectItem value="Development">פיתוח</SelectItem>
-                                        <SelectItem value="Marketing & QA">שיווק ו-QA</SelectItem>
+                                        <SelectItem value="Marketing & QA">שיווק ובדיקות</SelectItem>
                                         <SelectItem value="Security">אבטחה</SelectItem>
                                         <SelectItem value="Sales">מכירות</SelectItem>
                                     </SelectContent>
@@ -140,6 +145,14 @@ export default function TeamPage() {
                             <div className={`absolute top-4 right-4 ${member.color} text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm`}>
                                 {member.department}
                             </div>
+
+                            <button
+                                onClick={() => handleDeleteMember(member.id)}
+                                className="absolute top-4 left-4 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+                                title="מחק עובד"
+                            >
+                                <Trash2 size={18} />
+                            </button>
 
                             <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white mb-4 border-4 border-white shadow-md ${member.color} overflow-hidden`}>
                                 {member.avatar.length > 2 && member.avatar.startsWith('/') ? (
