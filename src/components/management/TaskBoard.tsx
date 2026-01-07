@@ -143,14 +143,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                     )}
                 </div>
 
-                {/* Helper / Add New Row Button */}
-                <div className="p-2 border-t border-gray-100">
-                    <input
-                        type="text"
-                        placeholder="+ הוסף משימה חדשה..."
-                        className="w-full p-2 text-sm bg-transparent outline-none placeholder-gray-400"
-                    />
-                </div>
+
             </div>
         </div>
     )

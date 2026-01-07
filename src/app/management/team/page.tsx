@@ -1,17 +1,55 @@
 'use client'
 
+import { useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { CheckCircle, Mail, Phone, Shield, User } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { CheckCircle, Mail, Phone, Shield, User, Plus } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { toast } from 'sonner' // Assuming sonner is available (used in NewTaskDialog)
 
 // Mock Data - In real app, fetch from `clerk` or `prisma.user`
-const TEAM_MEMBERS = [
+const INITIAL_TEAM = [
     { id: 1, name: 'Lior', role: 'Full Stack Developer', email: 'lior31197@gmail.com', avatar: '/lior-profile.jpg', department: 'Development', color: 'bg-blue-500' },
     { id: 2, name: 'Ron', role: 'QA & Marketing', email: 'ron.kor97@gmail.com', avatar: 'R', department: 'Marketing & QA', color: 'bg-orange-500' },
     { id: 3, name: 'Leon', role: 'Security Engineer', email: 'leon@example.com', avatar: 'L', department: 'Security', color: 'bg-red-500' },
 ]
 
 export default function TeamPage() {
+    const [members, setMembers] = useState(INITIAL_TEAM)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [formData, setFormData] = useState({
+        name: '',
+        role: '',
+        email: '',
+        department: 'Development'
+    })
+
+    const handleAddMember = (e: React.FormEvent) => {
+        e.preventDefault()
+
+        let color = 'bg-gray-500'
+        if (formData.department === 'Development') color = 'bg-blue-500'
+        if (formData.department === 'Marketing & QA') color = 'bg-orange-500'
+        if (formData.department === 'Security') color = 'bg-red-500'
+        if (formData.department === 'Sales') color = 'bg-green-500'
+
+        const newMember = {
+            id: members.length + 1,
+            ...formData,
+            avatar: formData.name.charAt(0).toUpperCase(),
+            color
+        }
+
+        setMembers([...members, newMember])
+        toast.success('חבר צוות נוסף בהצלחה')
+        setIsDialogOpen(false)
+        setFormData({ name: '', role: '', email: '', department: 'Development' })
+    }
+
     return (
         <div className="space-y-8 animate-fade-in" dir="rtl">
             <div className="flex items-center justify-between">
@@ -19,10 +57,76 @@ export default function TeamPage() {
                     <h2 className="text-2xl font-bold text-gray-900">ניהול צוות</h2>
                     <p className="text-gray-500">חברי הצוות וההרשאות שלהם</p>
                 </div>
+
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
+                            <Plus size={18} />
+                            הוסף עובד
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]" dir="rtl">
+                        <DialogHeader className="text-right">
+                            <DialogTitle>הוספת עובד חדש</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleAddMember} className="space-y-4 mt-4">
+                            <div className="space-y-2">
+                                <Label className="text-right block">שם מלא</Label>
+                                <Input
+                                    required
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="שם העובד..."
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-right block">תפקיד</Label>
+                                <Input
+                                    required
+                                    value={formData.role}
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                    placeholder="מפתח, משווק, וכו'..."
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-right block">אימייל</Label>
+                                <Input
+                                    required
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    placeholder="email@example.com"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-right block">מחלקה</Label>
+                                <Select
+                                    value={formData.department}
+                                    onValueChange={(val) => setFormData({ ...formData, department: val })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent dir="rtl">
+                                        <SelectItem value="Development">פיתוח</SelectItem>
+                                        <SelectItem value="Marketing & QA">שיווק ו-QA</SelectItem>
+                                        <SelectItem value="Security">אבטחה</SelectItem>
+                                        <SelectItem value="Sales">מכירות</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="pt-4 flex justify-end">
+                                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 w-full">
+                                    הוסף לצוות
+                                </Button>
+                            </div>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {TEAM_MEMBERS.map((member, index) => (
+                {members.map((member, index) => (
                     <motion.div
                         key={member.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -38,7 +142,7 @@ export default function TeamPage() {
                             </div>
 
                             <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white mb-4 border-4 border-white shadow-md ${member.color} overflow-hidden`}>
-                                {member.avatar.length > 2 ? (
+                                {member.avatar.length > 2 && member.avatar.startsWith('/') ? (
                                     <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
                                 ) : (
                                     <span>{member.avatar}</span>

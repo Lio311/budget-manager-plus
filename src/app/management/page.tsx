@@ -1,10 +1,7 @@
-// cleaned import
-import { IsraelMapWidget } from '@/components/management/IsraelMapWidget'
 import { EmployeePerformance } from '@/components/management/EmployeePerformanceWidget'
 import { FinancialOverview } from '@/components/management/FinancialOverviewWidget'
 import { PriorityBreakdown } from '@/components/management/PriorityBreakdownWidget'
 import { TaskVelocity } from '@/components/management/TaskVelocityWidget'
-import { RecentActivity } from '@/components/management/RecentActivityWidget'
 import { getManagementKPIs, getUserLocations } from '@/lib/actions/management'
 import { Loader2 } from 'lucide-react'
 import { Suspense } from 'react'
@@ -86,9 +83,7 @@ export default function ManagementPage() {
                     <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
                         דוח חודשי
                     </button>
-                    <button className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
-                        ייצוא נתונים
-                    </button>
+
                 </div>
             </div>
 

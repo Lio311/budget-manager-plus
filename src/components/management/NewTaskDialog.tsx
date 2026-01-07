@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Loader2 } from 'lucide-react'
 import { createTask } from '@/lib/actions/management'
 import { toast } from 'sonner'
-import { TaskStatus, Priority, Department } from '@prisma/client'
+type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+type Department = 'DEV' | 'SECURITY' | 'QA' | 'MARKETING' | 'BIZ_DEV';
 
 export function NewTaskDialog() {
     const [open, setOpen] = useState(false)
@@ -111,11 +112,19 @@ export function NewTaskDialog() {
 
                     <div className="space-y-2">
                         <Label className="text-right block">אחראי (אופציונלי)</Label>
-                        <Input
-                            placeholder="שם האחראי..."
+                        <Select
                             value={formData.assignee}
-                            onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
-                        />
+                            onValueChange={(val) => setFormData({ ...formData, assignee: val })}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="בחר אחראי..." />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl">
+                                <SelectItem value="Lior">Lior</SelectItem>
+                                <SelectItem value="Ron">Ron</SelectItem>
+                                <SelectItem value="Leon">Leon</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="pt-4 flex justify-end">
