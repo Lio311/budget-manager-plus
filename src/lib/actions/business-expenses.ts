@@ -195,6 +195,7 @@ export async function deleteBusinessExpense(id: string) {
 
         revalidatePath('/management/expenses')
         revalidatePath('/management/marketing')
+        revalidatePath('/management')
         return { success: true }
     } catch (error) {
         console.error('Error deleting business expense:', error)
