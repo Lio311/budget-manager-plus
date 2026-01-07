@@ -156,7 +156,11 @@ export default function TeamPage() {
 
                             <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white mb-4 border-4 border-white shadow-md ${member.color} overflow-hidden`}>
                                 {member.avatar.length > 2 && member.avatar.startsWith('/') ? (
-                                    <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
+                                    <img
+                                        src={member.avatar}
+                                        alt={member.name}
+                                        className={`w-full h-full object-cover ${member.name === 'Lior' ? 'object-top' : ''}`}
+                                    />
                                 ) : (
                                     <span>{member.avatar}</span>
                                 )}
