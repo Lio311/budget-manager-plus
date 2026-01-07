@@ -56,7 +56,19 @@ export function BusinessExpensesTable({
         date: new Date()
     })
 
-    const categories = ['פיתוח', 'אבטחה', 'בדיקות', 'שיווק', 'פיתוח עסקי']
+    const categories = ['פיתוח', 'אבטחה', 'בדיקות', 'שיווק', 'פיתוח עסקי', 'General', 'Marketing', 'Hosting', 'Legal', 'Office']
+
+    const categoryMap: Record<string, string> = {
+        'Marketing': 'שיווק',
+        'General': 'כללי',
+        'Hosting': 'אחסון/שרתים',
+        'Legal': 'משפטי',
+        'Office': 'משרדי',
+        'Development': 'פיתוח',
+        'Security': 'אבטחה',
+        'QA': 'בדיקות',
+        'BizDev': 'פיתוח עסקי'
+    }
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -336,7 +348,7 @@ export function BusinessExpensesTable({
                                     <TableCell className="font-medium">{expense.description}</TableCell>
                                     <TableCell>
                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                            {expense.category}
+                                            {categoryMap[expense.category] || expense.category}
                                         </span>
                                     </TableCell>
                                     <TableCell className="text-muted-foreground text-sm">
