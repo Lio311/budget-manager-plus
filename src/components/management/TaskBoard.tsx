@@ -193,7 +193,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                     <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }} />
                                 </div>
                                 <div className="col-span-11 sm:col-span-3 flex items-center gap-3">
-                                    <span className="font-medium text-gray-800 text-sm truncate" title={task.title}>{task.title}</span>
+                                    <span className="font-medium text-gray-800 text-sm line-clamp-2 leading-tight" title={task.title}>{task.title}</span>
                                 </div>
 
                                 <div className="col-span-3 hidden lg:flex items-center">
