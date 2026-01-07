@@ -8,7 +8,6 @@ import {
     LayoutDashboard,
     CheckSquare,
     BarChart3,
-    Map as MapIcon,
     Settings,
     LogOut,
     ChevronLeft,
@@ -16,7 +15,9 @@ import {
     Search,
     Bell,
     Users,
-    Calendar as CalendarIcon
+    Calendar as CalendarIcon,
+    MapPin, // Added missing imports
+    CreditCard // Added missing imports
 } from 'lucide-react'
 
 // Monday.com style sidebar
@@ -32,12 +33,13 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
     }
 
     const menuItems = [
-        { label: 'דשבורד ראשי', icon: LayoutDashboard, href: '/management' },
-        { label: 'לוח משימות', icon: CheckSquare, href: '/management/tasks' },
-        { label: 'לוח שנה', icon: CalendarIcon, href: '/management/calendar' },
-        { label: 'צוות', icon: Users, href: '/management/team' },
-        { label: 'מפת משתמשים', icon: MapIcon, href: '/management/map' },
-        { label: 'דוחות', icon: BarChart3, href: '/management/reports' },
+        { icon: LayoutDashboard, label: 'מבט על', href: '/management', color: 'text-blue-500', activeBg: 'bg-blue-50' },
+        { icon: CheckSquare, label: 'משימות', href: '/management/tasks', color: 'text-emerald-500', activeBg: 'bg-emerald-50' },
+        { icon: Users, label: 'צוות', href: '/management/team', color: 'text-purple-500', activeBg: 'bg-purple-50' },
+        { icon: CalendarIcon, label: 'לוח שנה', href: '/management/calendar', color: 'text-orange-500', activeBg: 'bg-orange-50' },
+        { icon: BarChart3, label: 'דוחות', href: '/management/reports', color: 'text-rose-500', activeBg: 'bg-rose-50' },
+        { icon: MapPin, label: 'מפה', href: '/management/map', color: 'text-cyan-500', activeBg: 'bg-cyan-50' },
+        { icon: CreditCard, label: 'הוצאות', href: '/management/expenses', color: 'text-yellow-500', activeBg: 'bg-yellow-50' },
     ]
 
     return (
@@ -80,14 +82,19 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`
-                                    flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all
-                                    ${isActive ? 'bg-[#3E4957] text-white' : 'text-gray-400 hover:bg-[#3E4957]/50 hover:text-gray-100'}
-                                    ${collapsed ? 'justify-center' : ''}
-                                `}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden ${isActive
+                                    ? `${item.activeBg} ${item.color} font-bold shadow-sm`
+                                    : 'text-gray-600 hover:bg-gray-50'
+                                    }`}
                                 title={collapsed ? item.label : undefined}
                             >
-                                <item.icon size={20} />
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="activeTab"
+                                        className={`absolute left-0 top-0 bottom-0 w-1 ${item.color.replace('text-', 'bg-')}`}
+                                    />
+                                )}
+                                <item.icon size={20} className={`transition-transform group-hover:scale-110 ${isActive ? 'scale-110' : 'opacity-70 group-hover:opacity-100'} ${item.color}`} />
                                 {!collapsed && (
                                     <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>
                                 )}

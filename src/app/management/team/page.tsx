@@ -6,9 +6,9 @@ import { motion } from 'framer-motion'
 
 // Mock Data - In real app, fetch from `clerk` or `prisma.user`
 const TEAM_MEMBERS = [
-    { id: 1, name: 'Lior', role: 'Manager', email: 'lior@example.com', avatar: 'L', department: 'Management' },
-    { id: 2, name: 'Ron', role: 'Developer', email: 'ron@example.com', avatar: 'R', department: 'Development' },
-    { id: 3, name: 'Leon', role: 'Designer', email: 'leon@example.com', avatar: 'L', department: 'Design' },
+    { id: 1, name: 'Lior', role: 'Full Stack Developer', email: 'lior@example.com', avatar: 'L', department: 'Development', color: 'bg-blue-500' },
+    { id: 2, name: 'Ron', role: 'QA & Marketing', email: 'ron@example.com', avatar: 'R', department: 'Marketing & QA', color: 'bg-orange-500' },
+    { id: 3, name: 'Leon', role: 'Security Engineer', email: 'leon@example.com', avatar: 'L', department: 'Security', color: 'bg-red-500' },
 ]
 
 export default function TeamPage() {
@@ -29,27 +29,30 @@ export default function TeamPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
                     >
-                        <Card className="p-6 flex flex-col items-center text-center hover:shadow-lg transition-shadow border-t-4 border-t-blue-500 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">
+                        <Card className={`p-6 flex flex-col items-center text-center hover:shadow-lg transition-shadow relative overflow-hidden group`}>
+                            {/* Top Color Bar */}
+                            <div className={`absolute top-0 left-0 right-0 h-2 ${member.color}`} />
+
+                            <div className={`absolute top-4 right-4 ${member.color} text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm`}>
                                 {member.department}
                             </div>
 
-                            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-600 mb-4 border-4 border-white shadow-sm">
+                            <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white mb-4 border-4 border-white shadow-md ${member.color}`}>
                                 {member.avatar}
                             </div>
 
-                            <h3 className="text-lg font-bold text-gray-900">{member.name}</h3>
-                            <p className="text-sm text-blue-600 font-medium mb-4">{member.role}</p>
+                            <h3 className="text-xl font-bold text-gray-900">{member.name}</h3>
+                            <p className={`text-sm font-bold mb-6 opacity-80 ${member.color.replace('bg-', 'text-')}`}>{member.role}</p>
 
                             <div className="w-full space-y-3">
-                                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-sm">
-                                    <span className="text-gray-500 flex items-center gap-2"><Mail size={14} /> אימייל</span>
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm hover:bg-gray-100 transition-colors">
+                                    <span className="text-gray-500 flex items-center gap-2"><Mail size={16} className={`${member.color.replace('bg-', 'text-')}`} /> אימייל</span>
                                     <span className="font-medium text-gray-800 dir-ltr">{member.email}</span>
                                 </div>
-                                <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-sm">
-                                    <span className="text-gray-500 flex items-center gap-2"><Shield size={14} /> הרשאות</span>
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm hover:bg-gray-100 transition-colors">
+                                    <span className="text-gray-500 flex items-center gap-2"><Shield size={16} className={`${member.color.replace('bg-', 'text-')}`} /> הרשאות</span>
                                     <span className="font-medium text-gray-800 flex items-center gap-1">
-                                        <CheckCircle size={12} className="text-green-500" />
+                                        <CheckCircle size={14} className="text-green-500" />
                                         פעיל
                                     </span>
                                 </div>
