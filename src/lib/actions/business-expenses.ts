@@ -177,6 +177,7 @@ export async function createBusinessExpense(data: any) {
 
         revalidatePath('/management/expenses')
         revalidatePath('/management/marketing')
+        revalidatePath('/management') // Update overview stats
         return { success: true, data: expense }
     } catch (error) {
         console.error('Error creating business expense:', error)
