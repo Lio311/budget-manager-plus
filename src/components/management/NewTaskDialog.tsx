@@ -6,9 +6,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Loader2 } from 'lucide-react'
+import { Plus, Loader2, CalendarIcon } from 'lucide-react'
 import { createTask } from '@/lib/actions/management'
 import { toast } from 'sonner'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
+import { format } from 'date-fns'
+import { he } from 'date-fns/locale'
+import { cn } from '@/lib/utils'
+
 type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 type Department = 'DEV' | 'SECURITY' | 'QA' | 'MARKETING' | 'BIZ_DEV';
 
@@ -19,7 +25,8 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
         title: '',
         priority: 'MEDIUM' as Priority,
         department: 'DEV' as Department,
-        assignee: ''
+        assignee: '',
+        dueDate: undefined as Date | undefined
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -32,7 +39,8 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
                 priority: formData.priority,
                 department: formData.department,
                 status: 'TODO',
-                assignee: formData.assignee || undefined
+                assignee: formData.assignee || undefined,
+                dueDate: formData.dueDate
             })
 
             if (res.success) {
@@ -41,7 +49,7 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
                     onTaskCreated(res.data)
                 }
                 setOpen(false)
-                setFormData({ title: '', priority: 'MEDIUM', department: 'DEV', assignee: '' })
+                setFormData({ title: '', priority: 'MEDIUM', department: 'DEV', assignee: '', dueDate: undefined })
             } else {
                 toast.error('שגיאה ביצירת המשימה')
             }
@@ -56,7 +64,7 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 gap-2">
-                    <Plus size={18} className="order-last" /> {/* RTL: Icon on left visually if order-last? No, order-last makes it right in LTR. In RTL environment, we want icon to left of text. Text is First, Icon Second. So default Flex is Row. In RTL, first item is Right. So Text Right, Icon Left. We want Icon Left. So Icon should be second in DOM? No. Flex row in RTL: First item maps to Right. Second item maps to Left. So: [Text, Icon] -> Text (R), Icon (L). */}
+                    <Plus size={18} className="order-last" />
                     <span>משימה חדשה</span>
                 </Button>
             </DialogTrigger>
@@ -114,6 +122,32 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
                     </div>
 
                     <div className="space-y-2">
+                        <Label className="text-right block">תאריך יעד (אופציונלי)</Label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "w-full justify-start text-right font-normal",
+                                        !formData.dueDate && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="ml-2 h-4 w-4" />
+                                    {formData.dueDate ? format(formData.dueDate, "PPP", { locale: he }) : <span>בחר תאריך</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={formData.dueDate}
+                                    onSelect={(date) => setFormData({ ...formData, dueDate: date })}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+
+                    <div className="space-y-2">
                         <Label className="text-right block">אחראי (אופציונלי)</Label>
                         <Select
                             value={formData.assignee}
@@ -141,3 +175,4 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
         </Dialog>
     )
 }
+

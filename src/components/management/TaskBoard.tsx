@@ -12,7 +12,8 @@ import {
     Flag,
     MoreHorizontal,
     Search,
-    Filter
+    Filter,
+    Clock
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { he } from 'date-fns/locale'
@@ -31,6 +32,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { TaskAnalytics } from './TaskAnalytics'
 
 // Mock types if Prisma logic isn't fully picked up yet
 type Task = {
@@ -41,6 +43,8 @@ type Task = {
     department: string;
     assignee?: string | null;
     dueDate?: Date | string | null;
+    createdAt: Date | string;
+    updatedAt: Date | string;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -49,14 +53,6 @@ const STATUS_COLORS: Record<string, string> = {
     'STUCK': '#E2445C',
     'TODO': '#C4C4C4',
     'REVIEW': '#579BFC'
-}
-
-const STATUS_LABELS: Record<string, string> = {
-    'DONE': 'בוצע',
-    'IN_PROGRESS': 'בעבודה',
-    'STUCK': 'תקוע',
-    'TODO': 'לביצוע',
-    'REVIEW': 'בבדיקה'
 }
 
 export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
@@ -72,7 +68,10 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
     const handleStatusChange = async (taskId: string, newStatus: string) => {
         // Optimistic update
         const oldTasks = [...tasks]
-        setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t))
+
+        // We update status AND updatedAt so analytics reflect "Done now"
+        const now = new Date().toISOString()
+        setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus, updatedAt: now } : t))
 
         const res = await updateTask(taskId, { status: newStatus as any })
         if (!res.success) {
@@ -93,6 +92,8 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
 
     return (
         <div className="space-y-6">
+            <TaskAnalytics tasks={tasks} />
+
             {/* Action Bar */}
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -144,8 +145,10 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                 {/* Header */}
                 <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase sticky top-0 z-10">
                     <div className="col-span-1"></div> {/* Selection/Color */}
-                    <div className="col-span-11 sm:col-span-7 text-right">משימה</div>
-                    <div className="col-span-2 text-center hidden sm:block">אחראי</div>
+                    <div className="col-span-11 sm:col-span-4 text-right">משימה</div>
+                    <div className="col-span-2 text-center hidden sm:block">נוצר ב</div>
+                    <div className="col-span-2 text-center hidden sm:block">תאריך יעד</div>
+                    <div className="col-span-1 text-center hidden sm:block">אחראי</div>
                     <div className="col-span-2 text-center hidden sm:block">סטטוס</div>
                 </div>
 
@@ -164,10 +167,27 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                 <div className="col-span-1 flex justify-center">
                                     <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }} />
                                 </div>
-                                <div className="col-span-11 sm:col-span-7 flex items-center gap-3">
+                                <div className="col-span-11 sm:col-span-4 flex items-center gap-3">
                                     <span className="font-medium text-gray-800 text-sm">{task.title}</span>
                                 </div>
+
+                                <div className="col-span-2 hidden sm:flex justify-center flex-col items-center">
+                                    <span className="text-xs text-gray-500">{format(new Date(task.createdAt), 'dd/MM/yy')}</span>
+                                    <span className="text-[10px] text-gray-400">{format(new Date(task.createdAt), 'HH:mm')}</span>
+                                </div>
+
                                 <div className="col-span-2 hidden sm:flex justify-center">
+                                    {task.dueDate ? (
+                                        <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded text-xs text-gray-600">
+                                            <CalendarIcon size={12} className="text-gray-400" />
+                                            {format(new Date(task.dueDate), 'dd/MM/yy')}
+                                        </div>
+                                    ) : (
+                                        <span className="text-gray-300 text-xs">-</span>
+                                    )}
+                                </div>
+
+                                <div className="col-span-1 hidden sm:flex justify-center">
                                     {task.assignee ? (
                                         <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold border border-white shadow-sm" title={task.assignee}>
                                             {task.assignee.charAt(0)}
@@ -214,3 +234,4 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
         </div>
     )
 }
+
