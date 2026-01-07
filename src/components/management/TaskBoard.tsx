@@ -12,6 +12,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {
     Plus,
     Calendar as CalendarIcon,
     User as UserIcon,
@@ -25,7 +32,33 @@ import {
 } from 'lucide-react'
 import { updateTask, deleteTask } from '@/lib/actions/management'
 
-// ...
+import { toast } from 'sonner'
+import { TaskAnalytics } from '@/components/management/TaskAnalytics'
+import { format } from 'date-fns'
+import { NewTaskDialog } from '@/components/management/NewTaskDialog'
+
+interface Task {
+    id: string
+    title: string
+    status: 'TODO' | 'IN_PROGRESS' | 'DONE' | 'STUCK' | 'REVIEW'
+    priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
+    department: string
+    assignee?: string
+    dueDate?: Date
+    createdAt: Date
+    updatedAt: Date
+    creator?: {
+        email: string
+    }
+}
+
+const STATUS_COLORS: Record<string, string> = {
+    'TODO': '#C4C4C4',
+    'IN_PROGRESS': '#FDAB3D',
+    'REVIEW': '#A25DDC',
+    'DONE': '#00C875',
+    'STUCK': '#E2445C',
+}
 
 export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
