@@ -1,7 +1,7 @@
-import { TeamPerformanceBubbleMap } from '@/components/management/TeamPerformanceBubbleMap'
 import { FinancialOverview } from '@/components/management/FinancialOverviewWidget'
 import { PriorityBreakdown } from '@/components/management/PriorityBreakdownWidget'
 import { TaskVelocity } from '@/components/management/TaskVelocityWidget'
+import { UnifiedTeamPerformance } from '@/components/management/UnifiedTeamPerformance'
 import { WorkloadBubbleMap } from '@/components/management/WorkloadBubbleMap'
 import { getManagementKPIs, getUserLocations } from '@/lib/actions/management'
 import { Loader2 } from 'lucide-react'
@@ -37,50 +37,18 @@ async function DashboardContent() {
             </div>
 
             {/* Middle Row: Employee & Dept Stats */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Team Performance Split into 5 statuses */}
-                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <TeamPerformanceBubbleMap
-                        data={employeeStats['DONE'] || []}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Team Performance Consolidated */}
+                <div className="lg:col-span-3">
+                    <UnifiedTeamPerformance
+                        employeeStats={employeeStats || {}}
                         users={users || []}
-                        title="משימות שהושלמו"
-                        badgeColor="bg-green-500"
-                        countLabel="משימות הושלמו"
                     />
-                    <TeamPerformanceBubbleMap
-                        data={employeeStats['IN_PROGRESS'] || []}
-                        users={users || []}
-                        title="בעבודה"
-                        badgeColor="bg-orange-400"
-                        countLabel="משימות בעבודה"
-                    />
-                    <TeamPerformanceBubbleMap
-                        data={employeeStats['REVIEW'] || []}
-                        users={users || []}
-                        title="בבדיקה"
-                        badgeColor="bg-purple-500"
-                        countLabel="משימות בבדיקה"
-                    />
-                    <TeamPerformanceBubbleMap
-                        data={employeeStats['STUCK'] || []}
-                        users={users || []}
-                        title="תקוע"
-                        badgeColor="bg-red-500"
-                        countLabel="משימות תקועות"
-                    />
-                    <TeamPerformanceBubbleMap
-                        data={employeeStats['TODO'] || []}
-                        users={users || []}
-                        title="לביצוע"
-                        badgeColor="bg-gray-400"
-                        countLabel="משימות לביצוע"
-                    />
+                </div>
+
+                <div className="lg:col-span-1">
                     <WorkloadBubbleMap data={departmentStats} />
                 </div>
-            </div>
-
-            {/* Bottom Row: Advanced Metrics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="lg:col-span-1">
                     <PriorityBreakdown data={priorityStats || []} />
                 </div>

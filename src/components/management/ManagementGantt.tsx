@@ -34,11 +34,18 @@ interface Task {
     }
 }
 
+const TEAM_MEMBERS = [
+    { name: 'Lior', avatar: '/lior-profile.jpg', color: 'blue' },
+    { name: 'Ron', avatar: '/team/ron.png', color: 'green' },
+    { name: 'Leon', avatar: '/avatars/leon.png', color: 'purple' },
+]
+
 interface ManagementGanttProps {
     tasks: Task[]
+    onTaskClick?: (task: any) => void
 }
 
-export function ManagementGantt({ tasks }: ManagementGanttProps) {
+export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
     // 1. Calculate Date Range
     // Find min start date and max end date from tasks, with some buffer
     const today = new Date()
@@ -72,6 +79,9 @@ export function ManagementGantt({ tasks }: ManagementGanttProps) {
         }
     }
 
+    // Helper to get member details
+    const getMember = (name: string) => TEAM_MEMBERS.find(m => m.name === name)
+
     return (
         <Card className="flex h-[700px] border-none shadow-sm overflow-hidden bg-white">
             {/* LEFT SIDEBAR: Task List */}
@@ -93,20 +103,21 @@ export function ManagementGantt({ tasks }: ManagementGanttProps) {
                         {tasks.map((task) => (
                             <div
                                 key={task.id}
-                                className="flex items-center px-4 border-b hover:bg-gray-50 transition-colors group relative"
+                                className="flex items-center px-4 border-b hover:bg-gray-50 transition-colors group relative cursor-pointer"
                                 style={{ height: ROW_HEIGHT }}
+                                onClick={() => onTaskClick?.(task)}
                             >
                                 <div className="flex items-center gap-3 w-full overflow-hidden">
                                     {/* Color indicator strip */}
                                     <div className={cn("w-1.5 h-8 rounded-full flex-shrink-0", getStatusColor(task.status))} />
 
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-medium text-gray-900 truncate" title={task.title}>
+                                        <div className="text-sm font-semibold text-gray-900 truncate" title={task.title}>
                                             {task.title}
                                         </div>
                                         <div className="text-[10px] text-gray-500 flex items-center gap-2">
                                             {task.dueDate && (
-                                                <span>{format(new Date(task.dueDate), 'd MMM', { locale: he })}</span>
+                                                <span className="font-medium">{format(new Date(task.dueDate), 'd MMM', { locale: he })}</span>
                                             )}
                                         </div>
                                     </div>
@@ -136,7 +147,7 @@ export function ManagementGantt({ tasks }: ManagementGanttProps) {
                                     style={{ width: DAY_WIDTH, height: HEADER_HEIGHT }}
                                 >
                                     <span className="text-[10px] uppercase font-bold text-gray-400">
-                                        {format(day, 'EEE')}
+                                        {format(day, 'EEE', { locale: he })}
                                     </span>
                                     <span className="text-sm">
                                         {format(day, 'd')}
@@ -186,20 +197,37 @@ export function ManagementGantt({ tasks }: ManagementGanttProps) {
                                         {/* The Gantt Bar */}
                                         <div
                                             className={cn(
-                                                "absolute h-6 rounded-full shadow-sm flex items-center justify-center text-[10px] text-white font-medium px-2 whitespace-nowrap overflow-hidden transition-all hover:brightness-110 cursor-pointer",
+                                                "absolute h-7 rounded-full shadow-sm flex items-center justify-between text-[11px] text-white font-bold px-3 whitespace-nowrap transition-all hover:brightness-110 cursor-pointer group/bar",
                                                 getStatusColor(task.status)
                                             )}
                                             style={{
                                                 left: daysFromStart * DAY_WIDTH + 2, // +2 for spacing
                                                 width: durationDays * DAY_WIDTH - 4, // -4 for spacing
                                             }}
-                                            title={`${task.title} (${differenceInDays(endDate, startDate)} days)`}
+                                            onClick={() => onTaskClick?.(task)}
+                                            title={`${task.title} (${durationDays} ימים)`}
                                         >
-                                            {durationDays > 2 && (
-                                                <span className="truncate w-full text-center px-1">
-                                                    {differenceInDays(endDate, startDate)} ימים
-                                                </span>
-                                            )}
+                                            <div className="flex items-center gap-1.5 overflow-hidden">
+                                                {/* Avatars */}
+                                                <div className="flex -space-x-2 mr-1">
+                                                    {task.assignees.map((name, i) => {
+                                                        const member = getMember(name)
+                                                        return (
+                                                            <Avatar key={i} className="h-5 w-5 border border-white shadow-sm hover:scale-125 transition-transform">
+                                                                <AvatarImage src={member?.avatar} />
+                                                                <AvatarFallback className="text-[8px] bg-slate-200 text-slate-700">
+                                                                    {name[0]}
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            {/* Duration Label */}
+                                            <span className="flex-shrink-0 ml-2">
+                                                {durationDays} ימים
+                                            </span>
                                         </div>
                                     </div>
                                 )

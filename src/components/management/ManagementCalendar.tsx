@@ -35,7 +35,7 @@ const messages = {
     showMore: (total: number) => `+${total} נוספים`,
 }
 
-export function ManagementCalendar({ tasks }: { tasks: any[] }) {
+export function ManagementCalendar({ tasks, onTaskClick }: { tasks: any[], onTaskClick?: (task: any) => void }) {
     // Map tasks to events
     const events = tasks
         .filter(t => t.dueDate)
@@ -60,6 +60,7 @@ export function ManagementCalendar({ tasks }: { tasks: any[] }) {
                 messages={messages}
                 rtl={true}
                 views={['month']}
+                onSelectEvent={(event: any) => onTaskClick?.(event.resource)}
                 components={{
                     toolbar: (props: any) => {
                         return (

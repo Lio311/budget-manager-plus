@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { ManagementCalendar } from '@/components/management/ManagementCalendar'
 import { ManagementGantt } from '@/components/management/ManagementGantt'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { NewTaskDialog } from '@/components/management/NewTaskDialog'
 import { Calendar as CalendarIcon, BarChartHorizontal } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface CalendarViewWrapperProps {
     tasks: any[]
@@ -12,6 +14,20 @@ interface CalendarViewWrapperProps {
 
 export function CalendarViewWrapper({ tasks }: CalendarViewWrapperProps) {
     const [view, setView] = useState<'calendar' | 'gantt'>('calendar')
+    const [selectedTask, setSelectedTask] = useState<any>(null)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const router = useRouter()
+
+    const handleTaskClick = (task: any) => {
+        setSelectedTask(task)
+        setIsDialogOpen(true)
+    }
+
+    const handleTaskUpdated = () => {
+        router.refresh()
+        setIsDialogOpen(false)
+        setSelectedTask(null)
+    }
 
     return (
         <div className="space-y-6">
@@ -27,12 +43,21 @@ export function CalendarViewWrapper({ tasks }: CalendarViewWrapperProps) {
             </div>
 
             <div className={`transition-opacity duration-300 ${view === 'calendar' ? 'block' : 'hidden'}`}>
-                <ManagementCalendar tasks={tasks} />
+                <ManagementCalendar tasks={tasks} onTaskClick={handleTaskClick} />
             </div>
 
             <div className={`transition-opacity duration-300 ${view === 'gantt' ? 'block' : 'hidden'}`}>
-                <ManagementGantt tasks={tasks} />
+                <ManagementGantt tasks={tasks} onTaskClick={handleTaskClick} />
             </div>
+
+            {isDialogOpen && (
+                <NewTaskDialog
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                    taskToEdit={selectedTask}
+                    onTaskCreated={handleTaskUpdated}
+                />
+            )}
         </div>
     )
 }
