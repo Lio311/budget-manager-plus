@@ -15,7 +15,6 @@ export async function getCampaigns() {
         if (!userId) return { success: false, error: 'Unauthorized' }
 
         const campaigns = await prisma.marketingCampaign.findMany({
-            where: { userId },
             orderBy: { startDate: 'desc' },
             include: {
                 expenses: true // BusinessExpense[]
@@ -146,7 +145,6 @@ export async function getBusinessExpenses() {
         if (!userId) return { success: false, error: 'Unauthorized' }
 
         const expenses = await prisma.businessExpense.findMany({
-            where: { userId },
             orderBy: { date: 'desc' },
             include: {
                 campaign: {
