@@ -294,7 +294,8 @@ export default function BusinessLandingPage() {
                         <p>© 2026 Keseflow. כל הזכויות שמורות.</p>
                         <div className="flex gap-6">
                             <Link href="/terms" className="hover:text-white transition">תנאי שימוש</Link>
-                            <Link href="/privacy" className="hover:text-white transition">פרטיות</Link>
+                            <Link href="/security" className="hover:text-white transition">אבטחת מידע</Link>
+                            <Link href="/accessibility" className="hover:text-white transition">הצהרת נגישות</Link>
                             <Link href="/contact" className="hover:text-white transition">צור קשר</Link>
                         </div>
                     </div>
