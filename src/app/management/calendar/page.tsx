@@ -1,17 +1,9 @@
-import { ManagementCalendar } from '@/components/management/ManagementCalendar'
+import { CalendarViewWrapper } from '@/components/management/CalendarViewWrapper'
 import { getTasks } from '@/lib/actions/management'
 import { Loader2 } from 'lucide-react'
 import { Suspense } from 'react'
 
-async function CalendarContent() {
-    const { success, data, error } = await getTasks()
 
-    if (!success) {
-        return <div className="p-4 text-red-500">Error loading tasks for calendar: {String(error)}</div>
-    }
-
-    return <ManagementCalendar tasks={data || []} />
-}
 
 export default function CalendarPage() {
     return (
@@ -28,4 +20,17 @@ export default function CalendarPage() {
             </Suspense>
         </div>
     )
+}
+
+async function CalendarContent() {
+    const { success, data, error } = await getTasks()
+
+    if (!success) {
+        return <div className="p-4 text-red-500">Error loading tasks for calendar: {String(error)}</div>
+    }
+
+    // Sort by createdAt just in case, though API does it
+    const sortedTasks = data?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) || []
+
+    return <CalendarViewWrapper tasks={sortedTasks} />
 }
