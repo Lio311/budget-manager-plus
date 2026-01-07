@@ -87,11 +87,20 @@ export async function updateTask(id: string, data: Partial<ProjectTask>) {
         revalidatePath('/management')
 
         // Trigger Notification if status changed
+        // Trigger Notification if status changed
         if (data.status) {
+            const statusLabels: Record<string, string> = {
+                'TODO': 'לביצוע',
+                'IN_PROGRESS': 'בביצוע',
+                'DONE': 'בוצע',
+                'BACKLOG': 'מצבור'
+            }
+            const statusLabel = statusLabels[task.status] || task.status
+
             await createManagementNotification({
                 type: 'TASK_STATUS_CHANGED',
                 title: 'סטטוס משימה עודכן',
-                message: `הסטטוס של המשימה "${task.title}" עודכן ל: ${task.status}`,
+                message: `הסטטוס של המשימה "${task.title}" עודכן ל: ${statusLabel}`,
                 link: '/management/tasks'
             })
         }
