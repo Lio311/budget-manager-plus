@@ -37,12 +37,18 @@ const DEFAULT_SETTINGS = {
 };
 
 export default function AccessibilityWidget() {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [settings, setSettings] = useState(DEFAULT_SETTINGS);
     const [readingGuideY, setReadingGuideY] = useState(0);
 
     const [isVisible, setIsVisible] = useState(true);
     const widgetRef = useRef<HTMLDivElement>(null);
+
+    // Hide on management pages
+    if (pathname?.startsWith('/management')) {
+        return null;
+    }
 
     // --- Click Outside Logic ---
     useEffect(() => {

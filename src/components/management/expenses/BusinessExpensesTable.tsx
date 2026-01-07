@@ -310,17 +310,16 @@ export function BusinessExpensesTable({
                 </div>
             </div>
 
-            {/* Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <Table>
                     <TableHeader className="bg-gray-50">
                         <TableRow>
-                            <TableHead className="text-right w-[100px]">פעולות</TableHead>
                             <TableHead className="text-right">תאריך</TableHead>
                             <TableHead className="text-right">תיאור</TableHead>
                             <TableHead className="text-right">קטגוריה</TableHead>
                             <TableHead className="text-right">קמפיין מקושר</TableHead>
                             <TableHead className="text-right">סכום</TableHead>
+                            <TableHead className="text-left w-[100px]">פעולות</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -333,8 +332,21 @@ export function BusinessExpensesTable({
                         ) : (
                             filteredExpenses.map((expense) => (
                                 <TableRow key={expense.id} className="group">
+                                    <TableCell>{format(new Date(expense.date), 'dd/MM/yyyy')}</TableCell>
+                                    <TableCell className="font-medium">{expense.description}</TableCell>
                                     <TableCell>
-                                        <div className="flex items-center gap-1">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {expense.category}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground text-sm">
+                                        {expense.campaign ? expense.campaign.name : '-'}
+                                    </TableCell>
+                                    <TableCell className="font-bold text-gray-900">
+                                        ₪{expense.amount.toLocaleString()}
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center justify-start gap-1">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -356,19 +368,6 @@ export function BusinessExpensesTable({
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
-                                    </TableCell>
-                                    <TableCell>{format(new Date(expense.date), 'dd/MM/yyyy')}</TableCell>
-                                    <TableCell className="font-medium">{expense.description}</TableCell>
-                                    <TableCell>
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                            {expense.category}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="text-muted-foreground text-sm">
-                                        {expense.campaign ? expense.campaign.name : '-'}
-                                    </TableCell>
-                                    <TableCell className="font-bold text-gray-900">
-                                        ₪{expense.amount.toLocaleString()}
                                     </TableCell>
                                 </TableRow>
                             ))
