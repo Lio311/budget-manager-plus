@@ -355,7 +355,6 @@ export function BusinessExpensesTable({
                                                 title="ערוך"
                                             >
                                                 <span className="text-xs">ערוך</span>
-                                                <Edit className="h-4 w-4" />
                                             </Button>
                                             <Button
                                                 variant="ghost"
@@ -365,7 +364,6 @@ export function BusinessExpensesTable({
                                                 title="מחק"
                                             >
                                                 <span className="text-xs">מחק</span>
-                                                <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     </TableCell>

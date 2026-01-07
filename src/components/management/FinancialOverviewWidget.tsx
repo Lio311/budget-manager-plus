@@ -55,12 +55,12 @@ export function FinancialOverview({ data }: { data: any }) {
                     className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-blue-500 flex items-center gap-4 hover:shadow-md transition-shadow"
                 >
                     <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 shrink-0">
-                        <DollarSign size={24} />
+                        <Wallet size={24} />
                     </div>
                     <div>
                         <p className="text-gray-500 text-sm font-medium">רווח לפני מס</p>
                         <span className="text-2xl font-bold text-blue-600 whitespace-nowrap" dir="rtl">
-                            {profit < 0 ? `-${formatNumberWithCommas(Math.abs(profit).toFixed(2))}` : formatNumberWithCommas(profit.toFixed(2))} ₪
+                            {profit < 0 ? `${formatNumberWithCommas(Math.abs(profit).toFixed(2))}-` : formatNumberWithCommas(profit.toFixed(2))} ₪
                         </span>
                         {profit >= 0 && revenue > 0 && (
                             <p className="text-blue-600/70 text-xs mt-1">מתוך סה"כ הכנסות: <span dir="ltr" className="inline-block">{((profit / revenue) * 100 || 0).toFixed(1)}%</span></p>
