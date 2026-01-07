@@ -15,16 +15,11 @@ interface WorkloadBubbleMapProps {
 }
 
 const DEPARTMENT_COLORS: Record<string, string> = {
-    'Development': 'bg-blue-500',
-    'Marketing': 'bg-pink-500',
-    'Design': 'bg-purple-500',
-    'Sales': 'bg-green-500',
-    'Support': 'bg-orange-500',
-    'Management': 'bg-slate-700',
-    'HR': 'bg-red-400',
-    'Finance': 'bg-emerald-600',
-    'Legal': 'bg-yellow-600',
-    'Other': 'bg-gray-400'
+    'DEV': 'bg-blue-500',
+    'SECURITY': 'bg-slate-600',
+    'QA': 'bg-orange-500',
+    'MARKETING': 'bg-pink-500',
+    'BIZ_DEV': 'bg-green-500'
 }
 
 export function WorkloadBubbleMap({ data }: WorkloadBubbleMapProps) {
