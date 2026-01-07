@@ -228,6 +228,7 @@ export async function updateBusinessExpense(id: string, data: any) {
 
         revalidatePath('/management/expenses')
         revalidatePath('/management/marketing')
+        revalidatePath('/management')
         return { success: true, data: expense }
     } catch (error) {
         console.error('Error updating business expense:', error)
