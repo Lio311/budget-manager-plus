@@ -744,7 +744,7 @@ model ProjectTask {
   priority    Priority    @default(MEDIUM)
   department  Department
   
-  assignee    String?
+  assignees   String[]
   
   dueDate     DateTime?
   
@@ -755,7 +755,7 @@ model ProjectTask {
   updatedAt   DateTime    @updatedAt
   
   @@index([department])
-  @@index([assignee])
+
   @@index([status])
   @@map("project_tasks")
 }

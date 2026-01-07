@@ -25,7 +25,7 @@ interface Task {
     title: string
     status: 'TODO' | 'IN_PROGRESS' | 'DONE' | 'STUCK'
     priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
-    assignee?: string
+    assignees: string[]
     dueDate?: Date
     createdAt: Date
     updatedAt: Date
@@ -47,8 +47,11 @@ export function ManagementGantt({ tasks }: ManagementGanttProps) {
         t.dueDate ? new Date(t.dueDate) : today
     ])
 
-    const minDate = subDays(new Date(Math.min(...taskDates.map(d => d.getTime()))), 7)
-    const maxDate = addMonths(new Date(Math.max(...taskDates.map(d => d.getTime()))), 1)
+    const minTime = taskDates.length > 0 ? Math.min(...taskDates.map(d => d.getTime())) : today.getTime()
+    const maxTime = taskDates.length > 0 ? Math.max(...taskDates.map(d => d.getTime())) : today.getTime()
+
+    const minDate = subDays(new Date(minTime), 7)
+    const maxDate = addMonths(new Date(maxTime), 1)
 
     const days = eachDayOfInterval({ start: minDate, end: maxDate })
 
@@ -109,13 +112,15 @@ export function ManagementGantt({ tasks }: ManagementGanttProps) {
                                     </div>
 
                                     {/* Assignee Avatar (Small) */}
-                                    {task.assignee && (
-                                        <Avatar className="h-6 w-6 border-2 border-white shadow-sm flex-shrink-0">
-                                            <AvatarFallback className="text-[9px] bg-indigo-100 text-indigo-700">
-                                                {task.assignee.substring(0, 2).toUpperCase()}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    )}
+                                    <div className="flex -space-x-1 space-x-reverse">
+                                        {task.assignees && task.assignees.map((assignee, idx) => (
+                                            <Avatar key={idx} className="h-6 w-6 border-2 border-white shadow-sm flex-shrink-0">
+                                                <AvatarFallback className="text-[9px] bg-indigo-100 text-indigo-700">
+                                                    {assignee.substring(0, 2).toUpperCase()}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -130,7 +135,6 @@ export function ManagementGantt({ tasks }: ManagementGanttProps) {
                     <div className="sticky top-0 z-10 bg-white border-b flex">
                         {days.map((day) => {
                             const isCurrentDay = isToday(day)
-                            const isWeekend = day.getDay() === 5 || day.getDay() === 6 // Fri/Sat in some contexts, but let's assume Fri/Sat for now or Fri/Sat as weekend visual
 
                             return (
                                 <div

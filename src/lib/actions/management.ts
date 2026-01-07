@@ -38,7 +38,7 @@ export async function createTask(data: {
     status: TaskStatus;
     priority: Priority;
     department: Department;
-    assignee?: string;
+    assignees?: string[];
     dueDate?: Date;
 }) {
     try {
@@ -48,6 +48,7 @@ export async function createTask(data: {
         const task = await prisma.projectTask.create({
             data: {
                 ...data,
+                assignees: data.assignees || [], // Handle array
                 createdBy: userId
             }
         })
@@ -64,6 +65,9 @@ export async function updateTask(id: string, data: Partial<ProjectTask>) {
     try {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
+
+        // Sanitize data -> Remove unsupported fields if any
+        // But since data is Partial<ProjectTask>, it handles assignees natively now.
 
         const task = await prisma.projectTask.update({
             where: { id },
@@ -103,12 +107,23 @@ export async function getManagementKPIs() {
         if (!userId) return { success: false, error: 'Unauthorized' }
 
         // 1. Employee Stats (Tasks Completed by specific people)
-        // We filter by status=DONE and group by assignee
-        const completedTasks = await prisma.projectTask.groupBy({
-            by: ['assignee'],
+        // We fetch done tasks and aggregate in code because 'assignees' is an array
+        const doneTasks = await prisma.projectTask.findMany({
             where: { status: 'DONE' },
-            _count: { id: true }
+            select: { assignees: true }
         })
+
+        const employeeStatsMap = new Map<string, number>()
+        doneTasks.forEach(task => {
+            task.assignees.forEach(assignee => {
+                employeeStatsMap.set(assignee, (employeeStatsMap.get(assignee) || 0) + 1)
+            })
+        })
+
+        const completedTasks = Array.from(employeeStatsMap.entries()).map(([assignee, count]) => ({
+            assignee,
+            _count: { id: count }
+        }))
 
         // 2. Department Load (All tasks per department)
         const deptLoad = await prisma.projectTask.groupBy({

@@ -43,7 +43,7 @@ interface Task {
     status: 'TODO' | 'IN_PROGRESS' | 'DONE' | 'STUCK' | 'REVIEW'
     priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
     department: string
-    assignee?: string
+    assignees: string[]
     dueDate?: Date
     createdAt: Date
     updatedAt: Date
@@ -107,7 +107,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
     // Filter tasks
     const filteredTasks = tasks.filter(t => {
         const matchSearch = t.title.toLowerCase().includes(search.toLowerCase())
-        const matchAssignee = assigneeFilter === 'ALL' || t.assignee === assigneeFilter
+        const matchAssignee = assigneeFilter === 'ALL' || (t.assignees && t.assignees.includes(assigneeFilter))
         const matchStatus = statusFilter === 'ALL' || t.status === statusFilter
         return matchSearch && matchAssignee && matchStatus
     })
@@ -209,19 +209,21 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                     )}
                                 </div>
 
-                                <div className="col-span-1 hidden sm:flex justify-center">
-                                    {task.assignee ? (
-                                        <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm" title={task.assignee}>
-                                            {task.assignee === 'Leon' ? (
-                                                <img src="/avatars/leon.png" alt="Leon" className="w-full h-full object-cover" />
-                                            ) : task.assignee === 'Lior' ? (
-                                                <img src="/lior-profile.jpg" alt="Lior" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
-                                                    {task.assignee.charAt(0)}
-                                                </div>
-                                            )}
-                                        </div>
+                                <div className="col-span-1 hidden sm:flex justify-center -space-x-2 space-x-reverse">
+                                    {task.assignees && task.assignees.length > 0 ? (
+                                        task.assignees.map((assignee, idx) => (
+                                            <div key={idx} className="relative w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm" title={assignee}>
+                                                {assignee === 'Leon' ? (
+                                                    <img src="/avatars/leon.png" alt="Leon" className="w-full h-full object-cover" />
+                                                ) : assignee === 'Lior' ? (
+                                                    <img src="/lior-profile.jpg" alt="Lior" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                                                        {assignee.charAt(0)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
                                     ) : (
                                         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 border border-dashed border-gray-300">
                                             <UserIcon size={14} />
@@ -256,7 +258,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                                 <MoreHorizontal className="h-4 w-4 text-gray-400" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" dir="rtl">
+                                        <DropdownMenuContent align="end">
                                             <DropdownMenuItem onClick={() => setEditingTask(task)}>
                                                 <Edit className="ml-2 h-4 w-4" />
                                                 ערוך

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Plus, Loader2, CalendarIcon } from 'lucide-react'
 import { updateTask, createTask } from '@/lib/actions/management'
 import { Priority, Department } from '@prisma/client'
@@ -32,7 +33,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
         title: taskToEdit?.title || '',
         priority: (taskToEdit?.priority || 'MEDIUM') as Priority,
         department: (taskToEdit?.department || 'DEV') as Department,
-        assignee: taskToEdit?.assignee || '',
+        assignees: taskToEdit?.assignees || [],
         dueDate: taskToEdit?.dueDate ? new Date(taskToEdit.dueDate) : undefined
     })
 
@@ -47,7 +48,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                     title: formData.title,
                     priority: formData.priority,
                     department: formData.department,
-                    assignee: formData.assignee || null,
+                    assignees: formData.assignees,
                     dueDate: formData.dueDate
                 })
             } else {
@@ -56,7 +57,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                     priority: formData.priority,
                     department: formData.department,
                     status: 'TODO',
-                    assignee: formData.assignee || undefined,
+                    assignees: formData.assignees,
                     dueDate: formData.dueDate
                 })
             }
@@ -68,7 +69,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                 }
                 setOpen(false)
                 if (!taskToEdit) {
-                    setFormData({ title: '', priority: 'MEDIUM', department: 'DEV', assignee: '', dueDate: undefined })
+                    setFormData({ title: '', priority: 'MEDIUM', department: 'DEV', assignees: [], dueDate: undefined })
                 }
             } else {
                 toast.error('שגיאה בשמירת המשימה')
@@ -116,7 +117,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent dir="rtl">
+                                <SelectContent>
                                     <SelectItem value="LOW">נמוכה</SelectItem>
                                     <SelectItem value="MEDIUM">בינונית</SelectItem>
                                     <SelectItem value="HIGH">גבוהה</SelectItem>
@@ -133,7 +134,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                                 <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent dir="rtl">
+                                <SelectContent>
                                     <SelectItem value="DEV">פיתוח</SelectItem>
                                     <SelectItem value="SECURITY">אבטחה</SelectItem>
                                     <SelectItem value="QA">בדיקות</SelectItem>
@@ -171,20 +172,20 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-right block">אחראי (אופציונלי)</Label>
-                        <Select
-                            value={formData.assignee}
-                            onValueChange={(val) => setFormData({ ...formData, assignee: val })}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="בחר אחראי" />
-                            </SelectTrigger>
-                            <SelectContent dir="rtl">
-                                <SelectItem value="Lior">Lior</SelectItem>
-                                <SelectItem value="Ron">Ron</SelectItem>
-                                <SelectItem value="Leon">Leon</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <Label className="text-right block">אחראים (ניתן לבחור יותר מאחד)</Label>
+                        <div className="flex gap-2 justify-end">
+                            <ToggleGroup type="multiple" value={formData.assignees} onValueChange={(val) => setFormData({ ...formData, assignees: val })}>
+                                <ToggleGroupItem value="Lior" aria-label="Toggle Lior">
+                                    Lior
+                                </ToggleGroupItem>
+                                <ToggleGroupItem value="Ron" aria-label="Toggle Ron">
+                                    Ron
+                                </ToggleGroupItem>
+                                <ToggleGroupItem value="Leon" aria-label="Toggle Leon">
+                                    Leon
+                                </ToggleGroupItem>
+                            </ToggleGroup>
+                        </div>
                     </div>
 
                     <div className="pt-4 flex justify-end">
