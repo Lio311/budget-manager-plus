@@ -99,7 +99,7 @@ export function TaskAnalytics({ tasks }: TaskAnalyticsProps) {
                 </div>
 
                 {/* Chart */}
-                <div className="h-[250px] w-full flex items-center justify-center">
+                <div className="h-[250px] w-full flex items-center justify-center relative">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
