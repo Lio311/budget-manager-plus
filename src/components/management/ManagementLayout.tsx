@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -24,11 +24,43 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+import { getManagementNotifications, markAllNotificationsAsRead, markNotificationAsRead } from '@/lib/actions/notifications'
+import { formatDistanceToNow } from 'date-fns'
+import { he } from 'date-fns/locale'
 
 // Monday.com style sidebar
 export function ManagementLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     const [collapsed, setCollapsed] = useState(false)
+    const [notifications, setNotifications] = useState<any[]>([])
+    const [unreadCount, setUnreadCount] = useState(0)
+
+    const fetchNotifications = async () => {
+        const res = await getManagementNotifications()
+        if (res.success && res.data) {
+            setNotifications(res.data.notifications)
+            setUnreadCount(res.data.unreadCount)
+        }
+    }
+
+    useEffect(() => {
+        fetchNotifications()
+        // Poll every 30 seconds for new notifications
+        const interval = setInterval(fetchNotifications, 30000)
+        return () => clearInterval(interval)
+    }, [])
+
+    const handleMarkAllRead = async () => {
+        await markAllNotificationsAsRead()
+        fetchNotifications()
+    }
+
+    const handleMarkRead = async (id: string, link?: string | null) => {
+        await markNotificationAsRead(id)
+        if (link) window.location.href = link
+        else fetchNotifications()
+    }
 
     // Example User
     const user = {
@@ -124,16 +156,60 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
                             <PopoverTrigger asChild>
                                 <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition outline-none">
                                     <Bell size={20} />
-                                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                                    {unreadCount > 0 && (
+                                        <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white font-bold">
+                                            {unreadCount}
+                                        </span>
+                                    )}
                                 </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80 p-0" align="end">
-                                <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+                            <PopoverContent className="w-96 p-0" align="end">
+                                <div className="p-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
                                     <h4 className="font-semibold text-gray-900">התראות</h4>
+                                    {unreadCount > 0 && (
+                                        <button
+                                            onClick={handleMarkAllRead}
+                                            className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                                        >
+                                            סמן הכל כנקרא
+                                        </button>
+                                    )}
                                 </div>
-                                <div className="p-8 text-center text-gray-500 text-sm">
-                                    <Bell size={32} className="mx-auto mb-3 text-gray-300" />
-                                    <p>אין התראות חדשות</p>
+                                <div className="max-h-[400px] overflow-y-auto">
+                                    {notifications.length > 0 ? (
+                                        <div className="flex flex-col">
+                                            {notifications.map((notif) => (
+                                                <div
+                                                    key={notif.id}
+                                                    onClick={() => handleMarkRead(notif.id, notif.link)}
+                                                    className={cn(
+                                                        "p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer relative",
+                                                        !notif.isRead && "bg-blue-50/30"
+                                                    )}
+                                                >
+                                                    {!notif.isRead && (
+                                                        <div className="absolute top-4 left-4 w-2 h-2 bg-blue-500 rounded-full" />
+                                                    )}
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="text-sm font-bold text-gray-900 pr-2">
+                                                            {notif.title}
+                                                        </div>
+                                                        <div className="text-sm text-gray-600 pr-2">
+                                                            {notif.message}
+                                                        </div>
+                                                        <div className="text-[10px] text-gray-400 mt-1 pr-2">
+                                                            {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true, locale: he })}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="p-8 text-center text-gray-500 text-sm">
+                                            <Bell size={32} className="mx-auto mb-3 text-gray-300" />
+                                            <p>אין התראות חדשות</p>
+                                        </div>
+                                    )}
                                 </div>
                             </PopoverContent>
                         </Popover>

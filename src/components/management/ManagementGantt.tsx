@@ -82,7 +82,7 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
     const getMember = (name: string) => TEAM_MEMBERS.find(m => m.name === name)
 
     return (
-        <Card className="h-[700px] border-none shadow-sm overflow-hidden bg-white relative">
+        <Card className="flex h-[700px] border-none shadow-sm overflow-hidden bg-white relative">
             <style dangerouslySetInnerHTML={{
                 __html: `
                 .hide-scrollbar [data-radix-scroll-area-viewport] {
@@ -93,110 +93,131 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
                     display: none !important;
                 }
             `}} />
+            {/* LEFT SIDEBAR: Task List */}
+            <div
+                className="flex-shrink-0 border-l border-gray-200 bg-white z-20 flex flex-col shadow-[4px_0_10px_-5px_rgba(0,0,0,0.1)]"
+                style={{ width: SIDEBAR_WIDTH }}
+            >
+                {/* Header */}
+                <div
+                    className="flex items-center px-4 border-b bg-gray-50/50 font-bold text-gray-700 text-sm"
+                    style={{ height: HEADER_HEIGHT }}
+                >
+                    משימה
+                </div>
 
-            <ScrollArea className="h-full hide-scrollbar" dir="rtl">
-                <div className="min-w-max">
-                    {/* Header Row */}
-                    <div className="sticky top-0 z-50 flex bg-white border-b">
-                        {/* Sidebar Header Corner */}
-                        <div
-                            className="sticky right-0 z-50 flex items-center px-4 border-l bg-gray-50/50 font-bold text-gray-700 text-sm flex-shrink-0"
-                            style={{ width: SIDEBAR_WIDTH, height: HEADER_HEIGHT }}
-                        >
-                            משימה
-                        </div>
+                {/* Rows */}
+                <ScrollArea className="flex-1 hide-scrollbar">
+                    <div className="flex flex-col">
+                        {tasks.map((task) => (
+                            <div
+                                key={task.id}
+                                className="flex items-center px-4 border-b hover:bg-gray-50 transition-colors group relative cursor-pointer"
+                                style={{ height: ROW_HEIGHT }}
+                                onClick={() => onTaskClick?.(task)}
+                            >
+                                <div className="flex items-center gap-3 w-full overflow-hidden flex-row-reverse text-right">
+                                    {/* Color indicator strip on the right */}
+                                    <div className={cn("w-1.5 h-8 rounded-full flex-shrink-0", getStatusColor(task.status))} />
 
-                        {/* Timeline Header */}
-                        <div className="flex">
-                            {days.map((day) => {
-                                const isCurrentDay = isToday(day)
-                                return (
-                                    <div
-                                        key={day.toISOString()}
-                                        className={cn(
-                                            "flex flex-col items-center justify-center border-l text-xs flex-shrink-0 select-none",
-                                            isCurrentDay ? "bg-blue-50 text-blue-700 font-bold" : "text-gray-500",
-                                            getDay(day) === 6 ? "bg-gray-50/50" : ""
-                                        )}
-                                        style={{ width: DAY_WIDTH, height: HEADER_HEIGHT }}
-                                    >
-                                        <span className="text-[10px] uppercase font-bold text-gray-400">
-                                            {format(day, 'EEE', { locale: he })}
-                                        </span>
-                                        <span className="text-sm">
-                                            {format(day, 'd')}
-                                        </span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight h-[2.5rem]" title={task.title}>
+                                            {task.title}
+                                        </div>
+                                        <div className="text-[10px] text-gray-500 font-medium h-4">
+                                            {task.dueDate && (
+                                                <span>{format(new Date(task.dueDate), 'd MMM', { locale: he })}</span>
+                                            )}
+                                        </div>
                                     </div>
-                                )
-                            })}
-                        </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
+                </ScrollArea>
+            </div>
 
-                    {/* Body Rows */}
-                    <div className="relative">
-                        {tasks.map((task) => {
-                            // Calculate Bar Position
-                            const taskStart = task.createdAt ? new Date(task.createdAt) : new Date()
-                            const taskEnd = task.dueDate ? new Date(task.dueDate) : new Date()
-                            const startDate = taskStart < taskEnd ? taskStart : taskEnd
-                            const endDate = taskEnd > taskStart ? taskEnd : taskStart
-                            const daysFromStart = differenceInDays(startDate, minDate)
-                            const durationDays = Math.max(1, differenceInDays(endDate, startDate) + 1)
+            {/* RIGHT SIDE (TIMELINE): Scrollable */}
+            <ScrollArea className="flex-1 relative hide-scrollbar" dir="ltr">
+                <div className="flex flex-col min-w-max">
+                    {/* Timeline Header */}
+                    <div className="sticky top-0 z-10 bg-white border-b flex">
+                        {days.map((day) => {
+                            const isCurrentDay = isToday(day)
 
                             return (
-                                <div key={task.id} className="flex border-b hover:bg-gray-50/30 transition-colors group">
-                                    {/* Sticky Sidebar Item */}
+                                <div
+                                    key={day.toISOString()}
+                                    className={cn(
+                                        "flex flex-col items-center justify-center border-r text-xs flex-shrink-0 select-none",
+                                        isCurrentDay ? "bg-blue-50 text-blue-700 font-bold" : "text-gray-500",
+                                        getDay(day) === 6 ? "bg-gray-50/50" : "" // Saturday highlight
+                                    )}
+                                    style={{ width: DAY_WIDTH, height: HEADER_HEIGHT }}
+                                >
+                                    <span className="text-[10px] uppercase font-bold text-gray-400">
+                                        {format(day, 'EEE', { locale: he })}
+                                    </span>
+                                    <span className="text-sm">
+                                        {format(day, 'd')}
+                                    </span>
+                                </div>
+                            )
+                        })}
+                    </div>
+
+                    {/* Timeline Grid & Bars */}
+                    <div className="relative">
+                        {/* Background Grid Lines */}
+                        <div className="absolute inset-0 flex pointer-events-none">
+                            {days.map((day) => (
+                                <div
+                                    key={`grid-${day.toISOString()}`}
+                                    className={cn(
+                                        "border-r h-full flex-shrink-0",
+                                        getDay(day) === 6 ? "bg-gray-50/50" : "" // Saturday
+                                    )}
+                                    style={{ width: DAY_WIDTH }}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Task Rows */}
+                        <div className="flex flex-col relative z-0">
+                            {tasks.map((task) => {
+                                // Calculate Bar Position
+                                const taskStart = task.createdAt ? new Date(task.createdAt) : new Date()
+                                const taskEnd = task.dueDate ? new Date(task.dueDate) : new Date()
+
+                                // Ensure start comes before end
+                                const startDate = taskStart < taskEnd ? taskStart : taskEnd
+                                const endDate = taskEnd > taskStart ? taskEnd : taskStart
+
+                                // Days from timeline start
+                                const daysFromStart = differenceInDays(startDate, minDate)
+                                const durationDays = Math.max(1, differenceInDays(endDate, startDate) + 1)
+
+                                return (
                                     <div
-                                        className="sticky right-0 z-40 flex items-center pr-4 border-l bg-white flex-shrink-0 group-hover:bg-gray-50 transition-colors cursor-pointer"
-                                        style={{ width: SIDEBAR_WIDTH, height: ROW_HEIGHT }}
-                                        onClick={() => onTaskClick?.(task)}
+                                        key={`timeline-${task.id}`}
+                                        className="border-b relative flex items-center hover:bg-gray-50/30 transition-colors"
+                                        style={{ height: ROW_HEIGHT }}
                                     >
-                                        <div className="flex items-center gap-3 w-full overflow-hidden flex-row-reverse text-right">
-                                            <div className={cn("w-1.5 h-8 rounded-full flex-shrink-0", getStatusColor(task.status))} />
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight h-[2.5rem]" title={task.title}>
-                                                    {task.title}
-                                                </div>
-                                                <div className="text-[10px] text-gray-500 font-medium h-4">
-                                                    {task.dueDate && (
-                                                        <span>{format(new Date(task.dueDate), 'd MMM', { locale: he })}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Timeline Row Content */}
-                                    <div className="relative flex-1" style={{ height: ROW_HEIGHT }}>
-                                        {/* Background Grid Lines */}
-                                        <div className="absolute inset-0 flex pointer-events-none">
-                                            {days.map((day) => (
-                                                <div
-                                                    key={`grid-${day.toISOString()}`}
-                                                    className={cn(
-                                                        "border-l h-full flex-shrink-0",
-                                                        getDay(day) === 6 ? "bg-gray-50/50" : ""
-                                                    )}
-                                                    style={{ width: DAY_WIDTH }}
-                                                />
-                                            ))}
-                                        </div>
-
                                         {/* The Gantt Bar */}
                                         <div
                                             className={cn(
-                                                "absolute h-7 rounded-full shadow-sm flex items-center justify-between text-[11px] text-white font-bold px-3 whitespace-nowrap transition-all hover:brightness-110 cursor-pointer group/bar z-10",
+                                                "absolute h-7 rounded-full shadow-sm flex items-center justify-between text-[11px] text-white font-bold px-3 whitespace-nowrap transition-all hover:brightness-110 cursor-pointer group/bar",
                                                 getStatusColor(task.status)
                                             )}
                                             style={{
-                                                right: daysFromStart * DAY_WIDTH + 2,
+                                                left: daysFromStart * DAY_WIDTH + 2,
                                                 width: durationDays * DAY_WIDTH - 4,
-                                                top: (ROW_HEIGHT - 28) / 2
                                             }}
                                             onClick={() => onTaskClick?.(task)}
                                             title={`${task.title} (${durationDays} ימים)`}
                                         >
                                             <div className="flex items-center gap-1.5 overflow-hidden">
+                                                {/* Avatars */}
                                                 <div className="flex -space-x-2 mr-1">
                                                     {task.assignees.map((name, i) => {
                                                         const member = getMember(name)
@@ -211,33 +232,32 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
                                                     })}
                                                 </div>
                                             </div>
+
+                                            {/* Duration Label */}
                                             <span className="flex-shrink-0 ml-2">
                                                 {durationDays} ימים
                                             </span>
                                         </div>
                                     </div>
-                                </div>
-                            )
-                        })}
+                                )
+                            })}
+                        </div>
 
-                        {/* Current Time Line Overlay */}
-                        {(isSameDay(today, minDate) || (today > minDate && today < maxDate)) && (
+                        {/* Current Time Line */}
+                        {isSameDay(today, minDate) || today > minDate && today < maxDate ? (
                             <div
-                                className="absolute top-[-50px] bottom-0 border-r-2 border-blue-500 z-30 pointer-events-none shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-                                style={{
-                                    right: (differenceInDays(today, minDate) * DAY_WIDTH + (DAY_WIDTH / 2)) + SIDEBAR_WIDTH,
-                                    height: 'calc(100% + 50px)'
-                                }}
+                                className="absolute top-0 bottom-0 border-l-2 border-blue-500 z-10 pointer-events-none shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                                style={{ left: differenceInDays(today, minDate) * DAY_WIDTH + (DAY_WIDTH / 2) }}
                             >
-                                <div className="bg-blue-500 text-white text-[9px] px-1 py-0.5 rounded-full absolute -top-2 -right-3 font-bold">
+                                <div className="bg-blue-500 text-white text-[9px] px-1 py-0.5 rounded-full absolute -top-2 -left-3 font-bold">
                                     היום
                                 </div>
                             </div>
-                        )}
+                        ) : null}
+
                     </div>
                 </div>
                 <ScrollBar orientation="horizontal" />
-                <ScrollBar orientation="vertical" />
             </ScrollArea>
         </Card>
     )

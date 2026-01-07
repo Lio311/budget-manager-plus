@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { createManagementNotification } from './notifications'
 import { TaskStatus, Priority, Department, ProjectTask, User } from '@prisma/client'
 import { subDays, format } from 'date-fns'
 import { convertToILS } from '@/lib/currency'
@@ -54,6 +55,15 @@ export async function createTask(data: {
         })
 
         revalidatePath('/management')
+
+        // Trigger Notification
+        await createManagementNotification({
+            type: 'TASK_CREATED',
+            title: 'משימה חדשה נוצרה',
+            message: `נוצרה משימה חדשה בשם: "${task.title}"`,
+            link: '/management/tasks'
+        })
+
         return { success: true, data: task }
     } catch (error) {
         console.error('Error creating task:', error)
@@ -75,6 +85,17 @@ export async function updateTask(id: string, data: Partial<ProjectTask>) {
         })
 
         revalidatePath('/management')
+
+        // Trigger Notification if status changed
+        if (data.status) {
+            await createManagementNotification({
+                type: 'TASK_STATUS_CHANGED',
+                title: 'סטטוס משימה עודכן',
+                message: `הסטטוס של המשימה "${task.title}" עודכן ל: ${task.status}`,
+                link: '/management/tasks'
+            })
+        }
+
         return { success: true, data: task }
     } catch (error) {
         console.error('Error updating task:', error)

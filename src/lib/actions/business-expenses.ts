@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { createManagementNotification } from './notifications'
 
 // --- Campaigns ---
 
@@ -79,6 +80,14 @@ export async function createCampaign(data: {
 
         revalidatePath('/management/marketing')
         revalidatePath('/management/expenses')
+
+        // Trigger Notification
+        await createManagementNotification({
+            type: 'CAMPAIGN_CREATED',
+            title: 'קמפיין חדש נוצר',
+            message: `נוצר קמפיין שיווק חדש: "${data.name}"`,
+            link: '/management/marketing'
+        })
         return { success: true, data: campaign }
     } catch (error) {
         console.error('Error creating campaign:', error)

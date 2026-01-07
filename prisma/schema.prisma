@@ -45,6 +45,7 @@ model User {
   createdTasks ProjectTask[]
   marketingCampaigns MarketingCampaign[]
   businessExpenses   BusinessExpense[]
+  managementNotifications ManagementNotification[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -816,4 +817,19 @@ model BusinessExpense {
   @@index([userId])
   @@index([campaignId])
   @@map("business_expenses")
+}
+
+model ManagementNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // TASK_CREATED, TASK_STATUS_CHANGED, CAMPAIGN_CREATED, EXPENSE_CREATED
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("management_notifications")
 }
