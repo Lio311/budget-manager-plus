@@ -7,7 +7,6 @@ import { motion } from 'framer-motion'
 import {
     LayoutDashboard,
     CheckSquare,
-    BarChart3,
     Settings,
     LogOut,
     ChevronLeft,
@@ -41,12 +40,11 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
     const menuItems = [
         { icon: LayoutDashboard, label: 'מבט על', href: '/management', color: 'text-blue-500', activeBg: 'bg-blue-50' },
         { icon: CheckSquare, label: 'משימות', href: '/management/tasks', color: 'text-emerald-500', activeBg: 'bg-emerald-50' },
-        { icon: Users, label: 'צוות', href: '/management/team', color: 'text-purple-500', activeBg: 'bg-purple-50' },
-        { icon: CalendarIcon, label: 'לוח שנה', href: '/management/calendar', color: 'text-orange-500', activeBg: 'bg-orange-50' },
-        { icon: BarChart3, label: 'דוחות', href: '/management/reports', color: 'text-rose-500', activeBg: 'bg-rose-50' },
-        { icon: MapPin, label: 'מפה', href: '/management/map', color: 'text-cyan-500', activeBg: 'bg-cyan-50' },
         { icon: Megaphone, label: 'שיווק', href: '/management/marketing', color: 'text-pink-500', activeBg: 'bg-pink-50' },
         { icon: CreditCard, label: 'הוצאות', href: '/management/expenses', color: 'text-yellow-500', activeBg: 'bg-yellow-50' },
+        { icon: CalendarIcon, label: 'לוח שנה', href: '/management/calendar', color: 'text-orange-500', activeBg: 'bg-orange-50' },
+        { icon: Users, label: 'צוות', href: '/management/team', color: 'text-purple-500', activeBg: 'bg-purple-50' },
+        { icon: MapPin, label: 'מפה', href: '/management/map', color: 'text-cyan-500', activeBg: 'bg-cyan-50' },
     ]
 
     return (

@@ -1,7 +1,8 @@
-import { EmployeePerformance } from '@/components/management/EmployeePerformanceWidget'
+import { TeamPerformanceBubbleMap } from '@/components/management/TeamPerformanceBubbleMap'
 import { FinancialOverview } from '@/components/management/FinancialOverviewWidget'
 import { PriorityBreakdown } from '@/components/management/PriorityBreakdownWidget'
 import { TaskVelocity } from '@/components/management/TaskVelocityWidget'
+import { WorkloadBubbleMap } from '@/components/management/WorkloadBubbleMap'
 import { getManagementKPIs, getUserLocations } from '@/lib/actions/management'
 import { Loader2 } from 'lucide-react'
 import { Suspense } from 'react'
@@ -17,13 +18,14 @@ async function DashboardContent() {
         return <div className="p-4 text-red-500">Error loading dashboard data.</div>
     }
 
-    const { employeeStats, departmentStats, financials, priorityStats, recentActivity, velocityStats } = kpis.data || {
+    const { employeeStats, departmentStats, financials, priorityStats, recentActivity, velocityStats, users } = kpis.data || {
         employeeStats: [],
         departmentStats: [],
         financials: { revenue: 0, expenses: 0, profit: 0 },
         priorityStats: [],
         recentActivity: [],
-        velocityStats: []
+        velocityStats: [],
+        users: []
     }
     const locationData = locations.data || []
 
@@ -36,26 +38,12 @@ async function DashboardContent() {
 
             {/* Middle Row: Employee & Dept Stats */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <EmployeePerformance data={employeeStats} />
+                <TeamPerformanceBubbleMap data={employeeStats} users={users || []} />
 
-                {/* Department Stats Card (Simple for now) */}
-                <Card className="p-6">
-                    <h3 className="text-lg font-bold mb-4">עומס עבודה לפי מחלקה</h3>
-                    <div className="space-y-4">
-                        {departmentStats.map((dept: any) => (
-                            <div key={dept.department} className="flex items-center gap-4">
-                                <span className="w-24 font-medium text-sm">{dept.department}</span>
-                                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-blue-500 rounded-full"
-                                        style={{ width: `${Math.min(dept._count.id * 10, 100)}%` }} // Arbitrary scaling
-                                    />
-                                </div>
-                                <span className="text-sm font-bold w-6 text-left">{dept._count.id}</span>
-                            </div>
-                        ))}
-                    </div>
-                </Card>
+                {/* Bubble Map Workload (Replaces old bar chart) */}
+                <div className="h-full">
+                    <WorkloadBubbleMap data={departmentStats} />
+                </div>
             </div>
 
             {/* Bottom Row: Advanced Metrics */}

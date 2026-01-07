@@ -6,6 +6,8 @@ import { revalidatePath } from 'next/cache'
 
 // --- Campaigns ---
 
+// --- Campaigns ---
+
 export async function getCampaigns() {
     try {
         const { userId } = await auth()
@@ -13,9 +15,9 @@ export async function getCampaigns() {
 
         const campaigns = await prisma.marketingCampaign.findMany({
             where: { userId },
-            orderBy: { createdAt: 'desc' },
+            orderBy: { startDate: 'desc' },
             include: {
-                marketingExpenses: true
+                expenses: true // BusinessExpense[]
             }
         })
 
@@ -26,7 +28,18 @@ export async function getCampaigns() {
     }
 }
 
-export async function createCampaign(data: any) {
+export async function createCampaign(data: {
+    name: string;
+    type: string; // Changed from platform
+    startDate: Date;
+    endDate?: Date;
+    cost?: number; // Budget/Cost
+    status: string;
+    priority: string;
+    currency: string;
+    paymentMethod: string;
+    notes: string;
+}) {
     try {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
@@ -34,29 +47,38 @@ export async function createCampaign(data: any) {
         // 1. Create Campaign
         const campaign = await prisma.marketingCampaign.create({
             data: {
-                ...data,
-                userId
+                userId,
+                name: data.name,
+                type: data.type,
+                status: data.status,
+                priority: data.priority,
+                startDate: data.startDate,
+                endDate: data.endDate,
+                cost: data.cost,
+                currency: data.currency,
+                paymentMethod: data.paymentMethod,
+                notes: data.notes
             }
         })
 
-        // 2. If valid cost, create MarketingExpense (Separate from Business Budget)
+        // 2. If valid cost, create BusinessExpense
         if (data.cost && data.cost > 0) {
-            await prisma.marketingExpense.create({
+            await prisma.businessExpense.create({
                 data: {
                     userId,
-                    title: `קמפיין: ${data.name}`,
-                    amount: parseFloat(data.cost),
-                    currency: data.currency || 'ILS',
+                    description: `קמפיין: ${data.name}`,
+                    amount: parseFloat(data.cost.toString()),
+                    currency: data.currency || 'ILS', // Use campaign currency
                     date: data.startDate || new Date(),
-                    category: 'קמפיינים',
-                    marketingCampaignId: campaign.id,
+                    category: 'Marketing',
+                    campaignId: campaign.id,
                     paymentMethod: data.paymentMethod,
-                    notes: data.notes
                 }
             })
         }
 
         revalidatePath('/management/marketing')
+        revalidatePath('/management/expenses')
         return { success: true, data: campaign }
     } catch (error) {
         console.error('Error creating campaign:', error)
@@ -69,14 +91,12 @@ export async function deleteCampaign(id: string) {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
-        // MarketingExpenses will be set to null or deleted depending on requirement.
-        // Currently Schema says SetNull for relation. We might want to keep independent expenses.
-
         await prisma.marketingCampaign.delete({
             where: { id }
         })
 
         revalidatePath('/management/marketing')
+        revalidatePath('/management/expenses')
         return { success: true }
     } catch (error) {
         console.error('Error deleting campaign:', error)
@@ -95,6 +115,7 @@ export async function updateCampaign(id: string, data: any) {
         })
 
         revalidatePath('/management/marketing')
+        revalidatePath('/management/expenses')
         return { success: true, data: campaign }
     } catch (error) {
         console.error('Error updating campaign:', error)
@@ -102,18 +123,18 @@ export async function updateCampaign(id: string, data: any) {
     }
 }
 
-// --- Marketing Expenses ---
+// --- Business Expenses ---
 
-export async function getMarketingExpenses() {
+export async function getBusinessExpenses() {
     try {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
-        const expenses = await prisma.marketingExpense.findMany({
+        const expenses = await prisma.businessExpense.findMany({
             where: { userId },
             orderBy: { date: 'desc' },
             include: {
-                marketingCampaign: {
+                campaign: {
                     select: { name: true }
                 }
             }
@@ -121,51 +142,53 @@ export async function getMarketingExpenses() {
 
         return { success: true, data: expenses }
     } catch (error) {
-        console.error('Error fetching marketing expenses:', error)
-        return { success: false, error: 'Failed to fetch marketing expenses' }
+        console.error('Error fetching business expenses:', error)
+        return { success: false, error: 'Failed to fetch business expenses' }
     }
 }
 
-export async function createMarketingExpense(data: any) {
+export async function createBusinessExpense(data: any) {
     try {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
-        const expense = await prisma.marketingExpense.create({
+        const expense = await prisma.businessExpense.create({
             data: {
                 userId,
-                title: data.title,
+                description: data.description,
                 amount: parseFloat(data.amount),
                 currency: data.currency || 'ILS',
                 date: data.date || new Date(),
-                category: data.category || 'כללי',
+                category: data.category || 'General',
                 paymentMethod: data.paymentMethod,
                 notes: data.notes,
-                marketingCampaignId: data.marketingCampaignId || undefined
+                campaignId: data.campaignId || undefined // Was marketingCampaignId
             }
         })
 
+        revalidatePath('/management/expenses')
         revalidatePath('/management/marketing')
         return { success: true, data: expense }
     } catch (error) {
-        console.error('Error creating marketing expense:', error)
-        return { success: false, error: 'Failed to create marketing expense' }
+        console.error('Error creating business expense:', error)
+        return { success: false, error: 'Failed to create business expense' }
     }
 }
 
-export async function deleteMarketingExpense(id: string) {
+export async function deleteBusinessExpense(id: string) {
     try {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
-        await prisma.marketingExpense.delete({
+        await prisma.businessExpense.delete({
             where: { id }
         })
 
+        revalidatePath('/management/expenses')
         revalidatePath('/management/marketing')
         return { success: true }
     } catch (error) {
-        console.error('Error deleting marketing expense:', error)
-        return { success: false, error: 'Failed to delete marketing expense' }
+        console.error('Error deleting business expense:', error)
+        return { success: false, error: 'Failed to delete business expense' }
     }
 }

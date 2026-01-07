@@ -117,55 +117,35 @@ export async function getManagementKPIs() {
         })
 
         // 3. Financial Overview (Global Business Aggregation)
-        // Fetch all business budgets for the user
-        const businessBudgets = await prisma.budget.findMany({
-            where: {
-                userId,
-                type: 'BUSINESS'
-            },
-            include: {
-                incomes: true,
-                expenses: true
-            }
+        // REVENUE: Fetch from PaymentHistory (Admin source of truth)
+        const revenueAgg = await prisma.paymentHistory.aggregate({
+            _sum: { amount: true }
         })
+        const totalRevenue = revenueAgg._sum.amount || 0
 
-        let totalRevenue = 0
-        let totalExpenses = 0
+        // EXPENSES: Fetch from BusinessExpenses
+        const expensesAgg = await prisma.businessExpense.aggregate({
+            _sum: { amount: true }
+        })
+        const totalExpenses = expensesAgg._sum.amount || 0
 
-        for (const budget of businessBudgets) {
-            // Process Incomes
-            const incomePromises = budget.incomes.map(async (curr) => {
-                const amount = await convertToILS(curr.amount, curr.currency || 'ILS')
-                return amount
-            })
-
-            // Process Expenses
-            const expensePromises = budget.expenses.map(async (curr) => {
-                const amount = await convertToILS(curr.amount, curr.currency || 'ILS')
-
-                let expenseValue = amount
-
-                // If deductible, convert amountBeforeVat if available
-                if (curr.isDeductible && curr.amountBeforeVat) {
-                    expenseValue = await convertToILS(curr.amountBeforeVat, curr.currency || 'ILS')
+        // 4. Priority Breakdown & Users for Avatars
+        const [priorityStats, users] = await Promise.all([
+            prisma.projectTask.groupBy({
+                by: ['priority'],
+                _count: { id: true },
+                where: { status: { not: 'DONE' } }
+            }),
+            prisma.user.findMany({
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    image: true
                 }
-
-                return expenseValue
             })
-
-            const incomeResults = await Promise.all(incomePromises)
-            const expenseResults = await Promise.all(expensePromises)
-
-            totalRevenue += incomeResults.reduce((a, b) => a + b, 0)
-            totalExpenses += expenseResults.reduce((a, b) => a + b, 0)
-        }
-
-        // 4. Priority Breakdown
-        const priorityStats = await prisma.projectTask.groupBy({
-            by: ['priority'],
-            _count: { id: true },
-            where: { status: { not: 'DONE' } } // Active tasks only
-        })
+        ])
 
         // 5. Recent Activity (Last 5 updated tasks)
         const recentActivity = await prisma.projectTask.findMany({
@@ -191,12 +171,12 @@ export async function getManagementKPIs() {
         // Initialize last 30 days with 0
         for (let i = 29; i >= 0; i--) {
             const date = subDays(new Date(), i)
-            velocityMap.set(format(date, 'MM/dd'), 0)
+            velocityMap.set(format(date, 'dd/MM/yy'), 0)
         }
 
         // Fill actual data
         completedRecently.forEach(task => {
-            const dateStr = format(task.updatedAt, 'MM/dd')
+            const dateStr = format(task.updatedAt, 'dd/MM/yy')
             if (velocityMap.has(dateStr)) {
                 velocityMap.set(dateStr, (velocityMap.get(dateStr) || 0) + 1)
             }
@@ -209,6 +189,7 @@ export async function getManagementKPIs() {
             data: {
                 employeeStats: completedTasks,
                 departmentStats: deptLoad,
+                users,
                 financials: {
                     revenue: totalRevenue,
                     expenses: totalExpenses,

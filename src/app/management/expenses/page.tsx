@@ -1,24 +1,20 @@
-'use client'
+import { BusinessExpensesTable } from "@/components/management/expenses/BusinessExpensesTable"
+import { getBusinessExpenses } from "@/lib/actions/business-expenses"
 
-import { Card } from '@/components/ui/card'
-import { ExpensesTab } from '@/components/dashboard/tabs/ExpensesTab'
-import { BudgetProvider } from '@/contexts/BudgetContext'
+export default async function ExpensesPage() {
+    const result = await getBusinessExpenses()
+    const expenses = result.success ? result.data : []
 
-export default function ManagementExpensesPage() {
     return (
-        <div className="space-y-8 animate-fade-in" dir="rtl">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900">הוצאות העסק</h2>
-                    <p className="text-gray-500">ניהול ומעקב אחרי הוצאות שוטפות</p>
-                </div>
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">ניהול הוצאות עסקיות</h1>
+                <p className="text-muted-foreground">
+                    מעקב וניהול אחר הוצאות העסק השוטפות (שיווק, שרתים, ועוד)
+                </p>
             </div>
 
-            <BudgetProvider initialPlan="BUSINESS">
-                <Card className="p-6 shadow-sm bg-white min-h-[600px] management-expenses-wrapper">
-                    <ExpensesTab />
-                </Card>
-            </BudgetProvider>
+            <BusinessExpensesTable initialExpenses={expenses} />
         </div>
     )
 }

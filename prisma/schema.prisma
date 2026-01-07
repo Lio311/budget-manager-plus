@@ -44,7 +44,7 @@ model User {
   storedReports StoredReport[]
   createdTasks ProjectTask[]
   marketingCampaigns MarketingCampaign[]
-  marketingExpenses  MarketingExpense[]
+  businessExpenses   BusinessExpense[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -782,7 +782,7 @@ model MarketingCampaign {
   
   // Relations
 //   expenses    Expense[] // REMOVED relation to main Expense
-  marketingExpenses MarketingExpense[]
+  expenses    BusinessExpense[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -791,21 +791,21 @@ model MarketingCampaign {
   @@map("marketing_campaigns")
 }
 
-model MarketingExpense {
+model BusinessExpense {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  title       String
+  description String   @map("title") // Map description to title to match the column name or just rename field
   amount      Float
   currency    String   @default("ILS")
   date        DateTime @default(now())
   
-  category    String   @default("General")
+  category    String   @default("General") // Marketing, Hosting, etc.
   
-  // Relation to Campaign (Optional, can be standalone site expense)
-  marketingCampaignId String?
-  marketingCampaign   MarketingCampaign? @relation(fields: [marketingCampaignId], references: [id], onDelete: SetNull)
+  // Relation to Campaign
+  campaignId  String?  @map("marketingCampaignId")
+  campaign    MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
   
   paymentMethod String?
   notes       String?  @db.Text
@@ -814,6 +814,6 @@ model MarketingExpense {
   updatedAt   DateTime @updatedAt
   
   @@index([userId])
-  @@index([marketingCampaignId])
-  @@map("marketing_expenses")
+  @@index([campaignId])
+  @@map("business_expenses")
 }
