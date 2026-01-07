@@ -189,8 +189,16 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
 
                                 <div className="col-span-1 hidden sm:flex justify-center">
                                     {task.assignee ? (
-                                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold border border-white shadow-sm" title={task.assignee}>
-                                            {task.assignee.charAt(0)}
+                                        <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm" title={task.assignee}>
+                                            {task.assignee === 'Leon' ? (
+                                                <img src="/avatars/leon.png" alt="Leon" className="w-full h-full object-cover" />
+                                            ) : task.assignee === 'Lior' ? (
+                                                <img src="/lior-profile.jpg" alt="Lior" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                                                    {task.assignee.charAt(0)}
+                                                </div>
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 border border-dashed border-gray-300">
