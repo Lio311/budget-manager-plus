@@ -117,7 +117,11 @@ export function TaskAnalytics({ tasks }: TaskAnalyticsProps) {
                                 formatter={(value: number) => [value, 'משימות']}
                                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                             />
-                            <Legend verticalAlign="bottom" height={36} />
+                            <Legend
+                                verticalAlign="bottom"
+                                height={36}
+                                formatter={(value) => <span className="px-2 font-medium text-gray-600">{value}</span>}
+                            />
                         </PieChart>
                     </ResponsiveContainer>
                     {/* Center Text Overlay (Optional) */}
