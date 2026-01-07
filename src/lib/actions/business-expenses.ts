@@ -100,6 +100,12 @@ export async function deleteCampaign(id: string) {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
+        // 1. Delete associated expenses first (since relation is setNull but we want cleanup)
+        await prisma.businessExpense.deleteMany({
+            where: { campaignId: id }
+        })
+
+        // 2. Delete the campaign
         await prisma.marketingCampaign.delete({
             where: { id }
         })
