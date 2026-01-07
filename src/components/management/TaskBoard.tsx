@@ -254,8 +254,8 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                     </Select>
                                 </div>
                                 {/* Actions Column */}
-                                <div className="col-span-1 hidden sm:flex justify-end">
-                                    <div className="flex flex-col items-end gap-1">
+                                <div className="col-span-1 hidden sm:flex justify-center">
+                                    <div className="flex items-center gap-1">
                                         <Button
                                             variant="ghost"
                                             size="icon"

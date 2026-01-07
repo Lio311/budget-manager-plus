@@ -319,7 +319,7 @@ export function BusinessExpensesTable({
                             <TableHead className="text-right">קטגוריה</TableHead>
                             <TableHead className="text-right">קמפיין מקושר</TableHead>
                             <TableHead className="text-right">סכום</TableHead>
-                            <TableHead className="text-left w-[100px]">פעולות</TableHead>
+                            <TableHead className="text-center w-[100px]">פעולות</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -346,11 +346,11 @@ export function BusinessExpensesTable({
                                         ₪{expense.amount.toLocaleString()}
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex flex-col items-start gap-1">
+                                        <div className="flex items-center justify-center gap-1">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-7 w-7 text-gray-400 hover:text-blue-600 hover:bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="h-7 w-7 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                                                 onClick={() => handleEdit(expense)}
                                                 title="ערוך"
                                             >
@@ -359,7 +359,7 @@ export function BusinessExpensesTable({
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                                                 onClick={() => handleDelete(expense.id)}
                                                 title="מחק"
                                             >
