@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -37,6 +38,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
         title: taskToEdit?.title || '',
+        description: taskToEdit?.description || '',
         priority: (taskToEdit?.priority || 'MEDIUM') as Priority,
         department: (taskToEdit?.department || 'DEV') as Department,
         assignees: taskToEdit?.assignees || [],
@@ -52,6 +54,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
             if (taskToEdit) {
                 res = await updateTask(taskToEdit.id, {
                     title: formData.title,
+                    description: formData.description,
                     priority: formData.priority,
                     department: formData.department,
                     assignees: formData.assignees,
@@ -60,6 +63,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
             } else {
                 res = await createTask({
                     title: formData.title,
+                    description: formData.description,
                     priority: formData.priority,
                     department: formData.department,
                     status: 'TODO',
@@ -75,7 +79,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                 }
                 setOpen(false)
                 if (!taskToEdit) {
-                    setFormData({ title: '', priority: 'MEDIUM', department: 'DEV', assignees: [], dueDate: undefined })
+                    setFormData({ title: '', description: '', priority: 'MEDIUM', department: 'DEV', assignees: [], dueDate: undefined })
                 }
             } else {
                 toast.error('שגיאה בשמירת המשימה')
@@ -110,6 +114,16 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             required
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-right block">תיאור/הערות (אופציונלי)</Label>
+                        <Textarea
+                            placeholder="פרטים נוספים..."
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className="bg-gray-50/50 resize-y min-h-[80px]"
                         />
                     </div>
 

@@ -40,6 +40,7 @@ import { NewTaskDialog } from '@/components/management/NewTaskDialog'
 interface Task {
     id: string
     title: string
+    description?: string | null
     status: 'TODO' | 'IN_PROGRESS' | 'DONE' | 'STUCK' | 'REVIEW'
     priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
     department: string
@@ -168,10 +169,11 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                 <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase sticky top-0 z-10">
                     <div className="col-span-1"></div> {/* Selection/Color */}
                     <div className="col-span-11 sm:col-span-3 text-right">משימה</div>
-                    <div className="col-span-2 text-center hidden sm:block">נוצר ב</div>
-                    <div className="col-span-2 text-center hidden sm:block">תאריך יעד</div>
+                    <div className="col-span-3 text-right hidden lg:block">הערות</div>
+                    <div className="col-span-1 text-center hidden sm:block">נוצר</div>
+                    <div className="col-span-1 text-center hidden sm:block">יעד</div>
                     <div className="col-span-1 text-center hidden sm:block">אחראי</div>
-                    <div className="col-span-2 text-center hidden sm:block">סטטוס</div>
+                    <div className="col-span-1 text-center hidden sm:block">סטטוס</div>
                     <div className="col-span-1 text-center hidden sm:block">פעולות</div>
                 </div>
 
@@ -191,19 +193,23 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                     <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }} />
                                 </div>
                                 <div className="col-span-11 sm:col-span-3 flex items-center gap-3">
-                                    <span className="font-medium text-gray-800 text-sm">{task.title}</span>
+                                    <span className="font-medium text-gray-800 text-sm truncate" title={task.title}>{task.title}</span>
                                 </div>
 
-                                <div className="col-span-2 hidden sm:flex justify-center flex-col items-center">
-                                    <span className="text-xs text-gray-500">{format(new Date(task.createdAt), 'dd/MM/yy')}</span>
-                                    <span className="text-[10px] text-gray-400">{format(new Date(task.createdAt), 'HH:mm')}</span>
+                                <div className="col-span-3 hidden lg:flex items-center">
+                                    <span className="text-xs text-gray-500 truncate" title={task.description || ''}>
+                                        {task.description || '-'}
+                                    </span>
                                 </div>
 
-                                <div className="col-span-2 hidden sm:flex justify-center">
+                                <div className="col-span-1 hidden sm:flex justify-center flex-col items-center">
+                                    <span className="text-xs text-gray-500">{format(new Date(task.createdAt), 'dd/MM')}</span>
+                                </div>
+
+                                <div className="col-span-1 hidden sm:flex justify-center">
                                     {task.dueDate ? (
                                         <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded text-xs text-gray-600">
-                                            <CalendarIcon size={12} className="text-gray-400" />
-                                            {format(new Date(task.dueDate), 'dd/MM/yy')}
+                                            {format(new Date(task.dueDate), 'dd/MM')}
                                         </div>
                                     ) : (
                                         <span className="text-gray-300 text-xs">-</span>
@@ -233,13 +239,13 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                         </div>
                                     )}
                                 </div>
-                                <div className="col-span-2 hidden sm:block">
+                                <div className="col-span-1 hidden sm:block">
                                     <Select
                                         value={task.status}
                                         onValueChange={(val) => handleStatusChange(task.id, val)}
                                     >
                                         <SelectTrigger
-                                            className="h-8 w-full border-none text-white text-xs font-bold px-2"
+                                            className="h-7 w-full border-none text-white text-[10px] font-bold px-1 justify-center rounded-sm"
                                             style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }}
                                         >
                                             <SelectValue />
