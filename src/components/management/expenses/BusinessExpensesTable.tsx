@@ -346,24 +346,24 @@ export function BusinessExpensesTable({
                                         ₪{expense.amount.toLocaleString()}
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex items-center justify-start gap-1">
+                                        <div className="flex flex-col items-start gap-1">
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
-                                                className="h-8 px-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                size="icon"
+                                                className="h-7 w-7 text-gray-400 hover:text-blue-600 hover:bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 onClick={() => handleEdit(expense)}
                                                 title="ערוך"
                                             >
-                                                <span className="text-xs">ערוך</span>
+                                                <Edit className="h-4 w-4" />
                                             </Button>
                                             <Button
                                                 variant="ghost"
-                                                size="sm"
-                                                className="h-8 px-2 text-gray-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                size="icon"
+                                                className="h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 onClick={() => handleDelete(expense.id)}
                                                 title="מחק"
                                             >
-                                                <span className="text-xs">מחק</span>
+                                                <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     </TableCell>
