@@ -5,6 +5,7 @@ import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { TaskStatus, Priority, Department, ProjectTask, User } from '@prisma/client'
 import { subDays, format } from 'date-fns'
+import { convertToILS } from '@/lib/currency'
 
 // --- TASKS ---
 
@@ -131,10 +132,33 @@ export async function getManagementKPIs() {
         let totalRevenue = 0
         let totalExpenses = 0
 
-        businessBudgets.forEach(budget => {
-            totalRevenue += budget.incomes.reduce((acc, curr) => acc + curr.amount, 0)
-            totalExpenses += budget.expenses.reduce((acc, curr) => acc + curr.amount, 0)
-        })
+        for (const budget of businessBudgets) {
+            // Process Incomes
+            const incomePromises = budget.incomes.map(async (curr) => {
+                const amount = await convertToILS(curr.amount, curr.currency || 'ILS')
+                return amount
+            })
+
+            // Process Expenses
+            const expensePromises = budget.expenses.map(async (curr) => {
+                const amount = await convertToILS(curr.amount, curr.currency || 'ILS')
+
+                let expenseValue = amount
+
+                // If deductible, convert amountBeforeVat if available
+                if (curr.isDeductible && curr.amountBeforeVat) {
+                    expenseValue = await convertToILS(curr.amountBeforeVat, curr.currency || 'ILS')
+                }
+
+                return expenseValue
+            })
+
+            const incomeResults = await Promise.all(incomePromises)
+            const expenseResults = await Promise.all(expensePromises)
+
+            totalRevenue += incomeResults.reduce((a, b) => a + b, 0)
+            totalExpenses += expenseResults.reduce((a, b) => a + b, 0)
+        }
 
         // 4. Priority Breakdown
         const priorityStats = await prisma.projectTask.groupBy({

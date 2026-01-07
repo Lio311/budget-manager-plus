@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { he } from 'date-fns/locale'
+import { NewTaskDialog } from './NewTaskDialog'
 
 // Mock types if Prisma logic isn't fully picked up yet
 type Task = {
@@ -56,15 +57,13 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
             {/* Action Bar */}
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 gap-2">
-                        <Plus size={18} />
-                        משימה חדשה
-                    </Button>
+                    <NewTaskDialog />
                     <div className="relative">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
                             placeholder="חיפוש..."
-                            className="pr-9 w-40 sm:w-64 bg-gray-50 border-gray-200"
+                            className="pr-10 pl-4 w-40 sm:w-64 bg-gray-50 border-gray-200 text-right"
+                            dir="rtl"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />

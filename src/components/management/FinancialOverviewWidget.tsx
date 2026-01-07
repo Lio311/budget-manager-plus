@@ -25,7 +25,7 @@ export function FinancialOverview({ data }: { data: any }) {
                         </div>
                     </div>
                     <div>
-                        <span className="text-2xl font-bold text-emerald-700">₪ {formatNumberWithCommas(revenue.toFixed(2))}</span>
+                        <span className="text-2xl font-bold text-emerald-700">{formatNumberWithCommas(revenue.toFixed(2))} ₪</span>
                         <p className="text-emerald-600/70 text-xs mt-1">+12% מחודש שעבר</p>
                     </div>
                 </motion.div>
@@ -42,7 +42,7 @@ export function FinancialOverview({ data }: { data: any }) {
                         </div>
                     </div>
                     <div>
-                        <span className="text-2xl font-bold text-rose-700">₪ {formatNumberWithCommas(expenses.toFixed(2))}</span>
+                        <span className="text-2xl font-bold text-rose-700">{formatNumberWithCommas(expenses.toFixed(2))} ₪</span>
                         <p className="text-rose-600/70 text-xs mt-1">+5% מחודש שעבר</p>
                     </div>
                 </motion.div>
@@ -59,7 +59,7 @@ export function FinancialOverview({ data }: { data: any }) {
                         </div>
                     </div>
                     <div>
-                        <span className="text-2xl font-bold text-blue-700">₪ {formatNumberWithCommas(profit.toFixed(2))}</span>
+                        <span className="text-2xl font-bold text-blue-700">{formatNumberWithCommas(profit.toFixed(2))} ₪</span>
                         <p className="text-blue-600/70 text-xs mt-1">מרווח נקי: {((profit / revenue) * 100 || 0).toFixed(1)}%</p>
                     </div>
                 </motion.div>
