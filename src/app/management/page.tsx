@@ -32,14 +32,9 @@ async function DashboardContent() {
 
     return (
         <div className="space-y-6">
-            {/* Top Row: Financial & Map */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                    <FinancialOverview data={financials} />
-                </div>
-                <div className="lg:col-span-1">
-                    <IsraelMapWidget locations={locationData} />
-                </div>
+            {/* Top Row: Financial Only */}
+            <div className="w-full">
+                <FinancialOverview data={financials} />
             </div>
 
             {/* Middle Row: Employee & Dept Stats */}
@@ -67,15 +62,12 @@ async function DashboardContent() {
             </div>
 
             {/* Bottom Row: Advanced Metrics */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="lg:col-span-1">
                     <PriorityBreakdown data={priorityStats || []} />
                 </div>
                 <div className="lg:col-span-1">
                     <TaskVelocity data={velocityStats || []} />
-                </div>
-                <div className="lg:col-span-1">
-                    <RecentActivity data={recentActivity || []} />
                 </div>
             </div>
         </div>

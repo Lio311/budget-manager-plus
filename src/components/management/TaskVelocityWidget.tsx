@@ -25,9 +25,12 @@ export function TaskVelocity({ data }: { data: any[] }) {
                         <XAxis dataKey="date" tick={{ fontSize: 10 }} minTickGap={30} />
                         <YAxis allowDecimals={false} />
                         <Tooltip
-                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                            contentStyle={{ direction: 'rtl', textAlign: 'right', borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                            itemStyle={{ direction: 'rtl', textAlign: 'right' }}
+                            formatter={(value: number) => [`${value} משימות`, 'הושלמו']}
+                            labelFormatter={(label) => `תאריך: ${label}`}
                         />
-                        <Area type="monotone" dataKey="count" stroke="#00C875" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" />
+                        <Area type="monotone" dataKey="count" name="הושלמו" stroke="#00C875" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" />
                     </AreaChart>
                 </ResponsiveContainer>
             </div>

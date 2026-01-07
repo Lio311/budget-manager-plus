@@ -32,7 +32,16 @@ export default function ReportsPage() {
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <XAxis dataKey="name" />
                                 <YAxis />
-                                <Tooltip />
+                                <Tooltip
+                                    contentStyle={{
+                                        direction: 'rtl',
+                                        textAlign: 'right',
+                                        borderRadius: '8px',
+                                        border: 'none',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                    }}
+                                    itemStyle={{ direction: 'rtl', textAlign: 'right' }}
+                                />
                                 <Bar dataKey="income" fill="#10B981" name="הכנסות" radius={[4, 4, 0, 0]} />
                                 <Bar dataKey="expenses" fill="#EF4444" name="הוצאות" radius={[4, 4, 0, 0]} />
                             </BarChart>
@@ -48,8 +57,17 @@ export default function ReportsPage() {
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <XAxis dataKey="name" />
                                 <YAxis />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="income" stroke="#10B981" strokeWidth={2} />
+                                <Tooltip
+                                    contentStyle={{
+                                        direction: 'rtl',
+                                        textAlign: 'right',
+                                        borderRadius: '8px',
+                                        border: 'none',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                    }}
+                                    itemStyle={{ direction: 'rtl', textAlign: 'right' }}
+                                />
+                                <Line type="monotone" dataKey="income" stroke="#10B981" strokeWidth={2} name="הכנסות" />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>

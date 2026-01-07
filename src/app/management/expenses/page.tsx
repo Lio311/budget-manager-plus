@@ -2,22 +2,7 @@
 
 import { Card } from '@/components/ui/card'
 import { ExpensesTab } from '@/components/dashboard/tabs/ExpensesTab'
-import { Loader2 } from 'lucide-react'
-import { Suspense } from 'react'
-// Note: We are reusing the existing ExpensesTab logic but wrapping it for management context if needed. 
-// For now, simpler is better: Re-use the ExpensesTab but we need to ensure it works contextually. 
-// Actually, ExpensesTab depends on `OverviewTab` data via SWR. It might be better to create a simplified version or just embed it.
-// Given strict instructions NOT to break things, let's look at `ExpensesTab` dependencies. 
-// It uses `useBudget` context. If we provide `BudgetProvider` in layout, it should work. `ManagementLayout` does not seem to wrap in `BudgetProvider`.
-// Let's create a visual placeholder that LOOKS like the expenses tab but maybe simpler for now, OR fetch real data.
-// User said: "אין עמוד הוצאות לא קיים" implies they WANT it.
-// I'll create a new simplified 'ManagementExpenses' component that fetches via server action.
-
-import { getManagementKPIs } from '@/lib/actions/management'
-
-// ... Actually, for speed and safety, let's stick to a "Coming Soon" styling but with actual data list if possible.
-// Wait, the user said "ExpensesTab" exists.
-// Let's reuse components if possible.
+import { BudgetProvider } from '@/contexts/BudgetContext'
 
 export default function ManagementExpensesPage() {
     return (
@@ -29,9 +14,11 @@ export default function ManagementExpensesPage() {
                 </div>
             </div>
 
-            <Card className="p-8 text-center min-h-[400px] flex flex-col items-center justify-center text-gray-400">
-                <p>רכיב הוצאות בבנייה - יחוברו נתוני אמת בקרוב</p>
-            </Card>
+            <BudgetProvider initialPlan="BUSINESS">
+                <Card className="p-6 shadow-sm bg-white min-h-[600px] management-expenses-wrapper">
+                    <ExpensesTab />
+                </Card>
+            </BudgetProvider>
         </div>
     )
 }

@@ -19,6 +19,11 @@ import {
     MapPin, // Added missing imports
     CreditCard // Added missing imports
 } from 'lucide-react'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 
 // Monday.com style sidebar
 export function ManagementLayout({ children }: { children: React.ReactNode }) {
@@ -58,21 +63,8 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
                     {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                 </button>
 
-                {/* Logo Area */}
-                <div className="mb-8 px-4 w-full flex items-center gap-3 overflow-hidden">
-                    <div className="w-8 h-8 rounded bg-blue-500 flex items-center justify-center shrink-0">
-                        <span className="font-bold text-white">M</span>
-                    </div>
-                    {!collapsed && (
-                        <motion.span
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="font-bold text-lg whitespace-nowrap"
-                        >
-                            Manager
-                        </motion.span>
-                    )}
-                </div>
+                <div className="mt-8" />
+
 
                 {/* Menu Items */}
                 <div className="flex-1 w-full px-2 space-y-1">
@@ -125,22 +117,26 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
                         </h1>
                     </div>
 
+
+
                     <div className="flex items-center gap-4">
-                        <div className="relative">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                            <input
-                                type="text"
-                                placeholder="חיפוש..."
-                                className="pr-9 pl-4 py-1.5 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-blue-500 w-64 transition-all"
-                            />
-                        </div>
-                        <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition">
-                            <Bell size={20} />
-                            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                        </button>
-                        <div className="w-8 h-8 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm cursor-pointer hover:shadow-lg transition">
-                            {user.initial}
-                        </div>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition outline-none">
+                                    <Bell size={20} />
+                                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                                </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80 p-0" align="end">
+                                <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+                                    <h4 className="font-semibold text-gray-900">התראות</h4>
+                                </div>
+                                <div className="p-8 text-center text-gray-500 text-sm">
+                                    <Bell size={32} className="mx-auto mb-3 text-gray-300" />
+                                    <p>אין התראות חדשות</p>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 </header>
 
