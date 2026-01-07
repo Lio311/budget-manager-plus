@@ -154,10 +154,8 @@ export async function getManagementKPIs() {
             prisma.user.findMany({
                 select: {
                     id: true,
-                    firstName: true,
-                    lastName: true,
                     email: true,
-                    image: true
+                    city: true
                 }
             })
         ])
