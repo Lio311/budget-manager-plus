@@ -1,3 +1,4 @@
+import { MarketingCampaigns } from "@/components/management/marketing/MarketingCampaigns"
 import { getCampaigns, getMarketingBudget } from "@/lib/actions/business-expenses"
 import { BudgetCard } from "@/components/management/marketing/BudgetCard"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
