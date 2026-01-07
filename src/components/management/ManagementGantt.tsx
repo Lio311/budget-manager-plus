@@ -110,24 +110,6 @@ export function ManagementGantt({ tasks }: ManagementGanttProps) {
                                             )}
                                         </div>
                                     </div>
-
-                                    {/* Assignee Avatar (Small) */}
-                                    <div className="flex -space-x-1 space-x-reverse">
-                                        {task.assignees && task.assignees.map((assignee, idx) => (
-                                            <Avatar key={idx} className="h-6 w-6 border-2 border-white shadow-sm flex-shrink-0">
-                                                {assignee === 'Lior' ? (
-                                                    <AvatarImage src="/lior-profile.jpg" alt="Lior" className="object-cover object-top" />
-                                                ) : assignee === 'Ron' ? (
-                                                    <AvatarImage src="/team/ron.png" alt="Ron" className="object-cover" />
-                                                ) : assignee === 'Leon' ? (
-                                                    <AvatarImage src="/avatars/leon.png" alt="Leon" className="object-cover" />
-                                                ) : null}
-                                                <AvatarFallback className="text-[9px] bg-indigo-100 text-indigo-700">
-                                                    {assignee.substring(0, 2).toUpperCase()}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        ))}
-                                    </div>
                                 </div>
                             </div>
                         ))}
