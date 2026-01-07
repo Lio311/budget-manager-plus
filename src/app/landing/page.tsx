@@ -214,6 +214,17 @@ export default function LandingPage() {
                     </div>
                 </motion.div>
             )}
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .custom-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                .custom-scrollbar {
+                    -ms-overflow-style: none;  /* IE and Edge */
+                    scrollbar-width: none;  /* Firefox */
+                }
+            `}} />
         </div>
     )
 }
