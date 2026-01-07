@@ -99,8 +99,8 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
                                 style={{ height: ROW_HEIGHT }}
                                 onClick={() => onTaskClick?.(task)}
                             >
-                                <div className="flex items-center gap-3 w-full overflow-hidden">
-                                    {/* Color indicator strip */}
+                                <div className="flex items-center gap-3 w-full overflow-hidden flex-row-reverse text-right">
+                                    {/* Color indicator strip on the right */}
                                     <div className={cn("w-1.5 h-8 rounded-full flex-shrink-0", getStatusColor(task.status))} />
 
                                     <div className="flex-1 min-w-0">
