@@ -18,8 +18,8 @@ async function DashboardContent() {
         return <div className="p-4 text-red-500">Error loading dashboard data.</div>
     }
 
-    const { employeeStats, departmentStats, financials, priorityStats, recentActivity, velocityStats, users } = kpis.data || {
-        employeeStats: [],
+    const { employeeStats, departmentStats, financials, priorityStats, recentActivity, velocityStats, users } = (kpis.data as any) || {
+        employeeStats: {} as any,
         departmentStats: [],
         financials: { revenue: 0, expenses: 0, profit: 0 },
         priorityStats: [],
