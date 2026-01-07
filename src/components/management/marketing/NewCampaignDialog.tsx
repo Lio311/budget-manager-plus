@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { format } from 'date-fns'
+import { he } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import { CalendarIcon } from 'lucide-react'
 
@@ -125,7 +126,7 @@ export function NewCampaignDialog() {
                                         )}
                                     >
                                         <CalendarIcon className="ml-2 h-4 w-4" />
-                                        {formData.startDate ? format(formData.startDate, "PPP") : <span>בחר תאריך</span>}
+                                        {formData.startDate ? format(formData.startDate, "PPP", { locale: he }) : <span>בחר תאריך</span>}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="end">
@@ -150,7 +151,7 @@ export function NewCampaignDialog() {
                                         )}
                                     >
                                         <CalendarIcon className="ml-2 h-4 w-4" />
-                                        {formData.endDate ? format(formData.endDate, "PPP") : <span>בחר תאריך</span>}
+                                        {formData.endDate ? format(formData.endDate, "PPP", { locale: he }) : <span>בחר תאריך</span>}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0" align="end">

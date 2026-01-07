@@ -12,7 +12,7 @@ import { toast } from 'sonner'
 type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 type Department = 'DEV' | 'SECURITY' | 'QA' | 'MARKETING' | 'BIZ_DEV';
 
-export function NewTaskDialog() {
+export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) => void }) {
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
@@ -37,6 +37,9 @@ export function NewTaskDialog() {
 
             if (res.success) {
                 toast.success('המשימה נוצרה בהצלחה')
+                if (onTaskCreated && res.data) {
+                    onTaskCreated(res.data)
+                }
                 setOpen(false)
                 setFormData({ title: '', priority: 'MEDIUM', department: 'DEV', assignee: '' })
             } else {

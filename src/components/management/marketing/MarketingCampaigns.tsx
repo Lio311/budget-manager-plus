@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Trash2, Edit2, Calendar, DollarSign, Tag, Globe, User, ExternalLink } from 'lucide-react'
 import { format } from 'date-fns'
+import { he } from 'date-fns/locale'
 import { deleteCampaign } from '@/lib/actions/marketing'
 import { toast } from 'sonner'
 import { NewCampaignDialog } from './NewCampaignDialog'
@@ -88,11 +89,11 @@ export function MarketingCampaigns({ campaigns }: { campaigns: any[] }) {
                             <div className="space-y-3 flex-1">
                                 <div className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded-md">
                                     <span className="text-gray-500 flex items-center gap-1"><Calendar size={14} /> התחלה:</span>
-                                    <span className="font-medium">{campaign.startDate ? format(new Date(campaign.startDate), 'dd/MM/yyyy') : '-'}</span>
+                                    <span className="font-medium">{campaign.startDate ? format(new Date(campaign.startDate), 'dd/MM/yyyy', { locale: he }) : '-'}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded-md">
                                     <span className="text-gray-500 flex items-center gap-1"><Calendar size={14} /> סיום:</span>
-                                    <span className="font-medium">{campaign.endDate ? format(new Date(campaign.endDate), 'dd/MM/yyyy') : 'לא מוגדר'}</span>
+                                    <span className="font-medium">{campaign.endDate ? format(new Date(campaign.endDate), 'dd/MM/yyyy', { locale: he }) : 'לא מוגדר'}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded-md">
                                     <span className="text-gray-500 flex items-center gap-1"><DollarSign size={14} /> עלות:</span>

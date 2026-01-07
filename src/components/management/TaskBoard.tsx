@@ -17,6 +17,20 @@ import {
 import { format } from 'date-fns'
 import { he } from 'date-fns/locale'
 import { NewTaskDialog } from './NewTaskDialog'
+import { updateTask } from '@/lib/actions/management'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { toast } from 'sonner'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 
 // Mock types if Prisma logic isn't fully picked up yet
 type Task = {
@@ -48,16 +62,41 @@ const STATUS_LABELS: Record<string, string> = {
 export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
     const [search, setSearch] = useState('')
+    const [assigneeFilter, setAssigneeFilter] = useState<string>('ALL')
+    const [statusFilter, setStatusFilter] = useState<string>('ALL')
+
+    const handleTaskCreated = (newTask: any) => {
+        setTasks([newTask, ...tasks])
+    }
+
+    const handleStatusChange = async (taskId: string, newStatus: string) => {
+        // Optimistic update
+        const oldTasks = [...tasks]
+        setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t))
+
+        const res = await updateTask(taskId, { status: newStatus as any })
+        if (!res.success) {
+            toast.error('שגיאה בעדכון סטטוס')
+            setTasks(oldTasks)
+        } else {
+            toast.success('סטטוס עודכן')
+        }
+    }
 
     // Filter tasks
-    const filteredTasks = tasks.filter(t => t.title.includes(search))
+    const filteredTasks = tasks.filter(t => {
+        const matchSearch = t.title.toLowerCase().includes(search.toLowerCase())
+        const matchAssignee = assigneeFilter === 'ALL' || t.assignee === assigneeFilter
+        const matchStatus = statusFilter === 'ALL' || t.status === statusFilter
+        return matchSearch && matchAssignee && matchStatus
+    })
 
     return (
         <div className="space-y-6">
             {/* Action Bar */}
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <NewTaskDialog />
+                    <NewTaskDialog onTaskCreated={handleTaskCreated} />
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
@@ -70,14 +109,33 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="gap-2 text-gray-600">
-                        <Filter size={16} />
-                        סינון
-                    </Button>
-                    <Button variant="outline" size="sm" className="gap-2 text-gray-600">
-                        <UserIcon size={16} />
-                        אחראי
-                    </Button>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-[110px] h-9 gap-2">
+                            <Filter size={16} className="text-gray-500" />
+                            <SelectValue placeholder="סינון" />
+                        </SelectTrigger>
+                        <SelectContent dir="rtl">
+                            <SelectItem value="ALL">כל הסטטוסים</SelectItem>
+                            <SelectItem value="TODO">לביצוע</SelectItem>
+                            <SelectItem value="IN_PROGRESS">בעבודה</SelectItem>
+                            <SelectItem value="REVIEW">בבדיקה</SelectItem>
+                            <SelectItem value="DONE">בוצע</SelectItem>
+                            <SelectItem value="STUCK">תקוע</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
+                        <SelectTrigger className="w-[110px] h-9 gap-2">
+                            <UserIcon size={16} className="text-gray-500" />
+                            <SelectValue placeholder="אחראי" />
+                        </SelectTrigger>
+                        <SelectContent dir="rtl">
+                            <SelectItem value="ALL">כל הצוות</SelectItem>
+                            <SelectItem value="Lior">Lior</SelectItem>
+                            <SelectItem value="Ron">Ron</SelectItem>
+                            <SelectItem value="Leon">Leon</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
@@ -86,10 +144,9 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                 {/* Header */}
                 <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase sticky top-0 z-10">
                     <div className="col-span-1"></div> {/* Selection/Color */}
-                    <div className="col-span-5 text-right">משימה</div>
-                    <div className="col-span-2 text-center">אחראי</div>
-                    <div className="col-span-2 text-center">סטטוס</div>
-                    <div className="col-span-2 text-center">תאריך יעד</div>
+                    <div className="col-span-11 sm:col-span-7 text-right">משימה</div>
+                    <div className="col-span-2 text-center hidden sm:block">אחראי</div>
+                    <div className="col-span-2 text-center hidden sm:block">סטטוס</div>
                 </div>
 
                 {/* Rows */}
@@ -107,10 +164,10 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                 <div className="col-span-1 flex justify-center">
                                     <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }} />
                                 </div>
-                                <div className="col-span-5 flex items-center gap-3">
+                                <div className="col-span-11 sm:col-span-7 flex items-center gap-3">
                                     <span className="font-medium text-gray-800 text-sm">{task.title}</span>
                                 </div>
-                                <div className="col-span-2 flex justify-center">
+                                <div className="col-span-2 hidden sm:flex justify-center">
                                     {task.assignee ? (
                                         <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold border border-white shadow-sm" title={task.assignee}>
                                             {task.assignee.charAt(0)}
@@ -121,16 +178,25 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                         </div>
                                     )}
                                 </div>
-                                <div className="col-span-2">
-                                    <div
-                                        className="h-8 w-full flex items-center justify-center text-white text-xs font-bold px-2 cursor-pointer hover:opacity-90 transition-opacity"
-                                        style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }}
+                                <div className="col-span-2 hidden sm:block">
+                                    <Select
+                                        value={task.status}
+                                        onValueChange={(val) => handleStatusChange(task.id, val)}
                                     >
-                                        {STATUS_LABELS[task.status] || task.status}
-                                    </div>
-                                </div>
-                                <div className="col-span-2 flex justify-center text-gray-500 text-sm">
-                                    {task.dueDate ? format(new Date(task.dueDate), 'd MMM', { locale: he }) : '-'}
+                                        <SelectTrigger
+                                            className="h-8 w-full border-none text-white text-xs font-bold px-2"
+                                            style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }}
+                                        >
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="TODO">לביצוע</SelectItem>
+                                            <SelectItem value="IN_PROGRESS">בעבודה</SelectItem>
+                                            <SelectItem value="REVIEW">בבדיקה</SelectItem>
+                                            <SelectItem value="STUCK">תקוע</SelectItem>
+                                            <SelectItem value="DONE">בוצע</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </motion.div>
                         ))}
