@@ -8,7 +8,7 @@ export default async function MapPage() {
         <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-900">מפת משתמשים</h2>
             <div className="h-[600px]">
-                <IsraelMapWidget locations={success ? data : []} />
+                <IsraelMapWidget locations={success && data ? data : []} />
             </div>
         </div>
     )
