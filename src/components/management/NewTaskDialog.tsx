@@ -160,7 +160,7 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                                     {formData.dueDate ? format(formData.dueDate, "PPP", { locale: he }) : <span>בחר תאריך</span>}
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
+                            <PopoverContent className="w-auto p-0" align="center" side="bottom" sideOffset={8}>
                                 <Calendar
                                     mode="single"
                                     selected={formData.dueDate}
@@ -174,15 +174,21 @@ export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen,
                     <div className="space-y-2">
                         <Label className="text-right block">אחראים (ניתן לבחור יותר מאחד)</Label>
                         <div className="flex gap-2 justify-end">
-                            <ToggleGroup type="multiple" value={formData.assignees} onValueChange={(val) => setFormData({ ...formData, assignees: val })}>
-                                <ToggleGroupItem value="Lior" aria-label="Toggle Lior">
-                                    Lior
+                            <ToggleGroup type="multiple" value={formData.assignees} onValueChange={(val: string[]) => setFormData({ ...formData, assignees: val })}>
+                                <ToggleGroupItem value="Lior" aria-label="Toggle Lior" className="p-1 h-auto rounded-full data-[state=on]:bg-blue-100 data-[state=on]:ring-2 data-[state=on]:ring-blue-500">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+                                        L
+                                    </div>
                                 </ToggleGroupItem>
-                                <ToggleGroupItem value="Ron" aria-label="Toggle Ron">
-                                    Ron
+                                <ToggleGroupItem value="Ron" aria-label="Toggle Ron" className="p-1 h-auto rounded-full data-[state=on]:bg-green-100 data-[state=on]:ring-2 data-[state=on]:ring-green-500">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-semibold text-sm">
+                                        R
+                                    </div>
                                 </ToggleGroupItem>
-                                <ToggleGroupItem value="Leon" aria-label="Toggle Leon">
-                                    Leon
+                                <ToggleGroupItem value="Leon" aria-label="Toggle Leon" className="p-1 h-auto rounded-full data-[state=on]:bg-purple-100 data-[state=on]:ring-2 data-[state=on]:ring-purple-500">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                                        L
+                                    </div>
                                 </ToggleGroupItem>
                             </ToggleGroup>
                         </div>
