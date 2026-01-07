@@ -65,7 +65,7 @@ export default function TeamPage() {
 
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
+                        <Button className="bg-purple-600 hover:bg-purple-700 text-white gap-2">
                             <Plus size={18} />
                             הוסף עובד
                         </Button>
@@ -121,7 +121,7 @@ export default function TeamPage() {
                                 </Select>
                             </div>
                             <div className="pt-4 flex justify-end">
-                                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 w-full">
+                                <Button type="submit" className="bg-purple-600 hover:bg-purple-700 w-full">
                                     הוסף לצוות
                                 </Button>
                             </div>
