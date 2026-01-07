@@ -49,6 +49,16 @@ export function MarketingCampaigns({ campaigns }: { campaigns: any[] }) {
         CRITICAL: 'קריטית'
     }
 
+    const typeMap: Record<string, string> = {
+        SOCIAL: 'רשתות חברתיות',
+        PPC: 'PPC / ממומן',
+        COLLABORATION: 'שיתוף פעולה',
+        INFLUENCER: 'משפיענים',
+        PR: 'יח"צ',
+        EMAIL: 'שיווק במייל',
+        OTHER: 'אחר'
+    }
+
     const statusMap: Record<string, string> = {
         ACTIVE: 'פעיל',
         PAUSED: 'מושהה',
