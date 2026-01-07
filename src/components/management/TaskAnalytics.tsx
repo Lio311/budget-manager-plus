@@ -57,7 +57,9 @@ export function TaskAnalytics({ tasks }: TaskAnalyticsProps) {
         { name: 'בתהליך', value: pending, color: '#3B82F6' }, // blue-500
     ]
 
-    const onTimeRate = Math.round((onTime / (onTime + late)) * 100) || 0
+    // Calculate rate: (Total - Late) / Total * 100
+    // This considers 'pending' tasks as 'on track' (100% compliance so far)
+    const onTimeRate = Math.round(((totalTasks - late) / totalTasks) * 100) || 0
 
     return (
         <Card className="p-4 mb-6 bg-white shadow-sm border-none">
