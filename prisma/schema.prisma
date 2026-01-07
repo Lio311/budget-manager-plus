@@ -43,6 +43,7 @@ model User {
   workEvents WorkEvent[]
   storedReports StoredReport[]
   createdTasks ProjectTask[]
+  marketingCampaigns MarketingCampaign[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -248,6 +249,9 @@ model Expense {
   // Business Fields
   supplierId        String?
   supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  
+  marketingCampaignId String?
+  marketingCampaign   MarketingCampaign? @relation(fields: [marketingCampaignId], references: [id], onDelete: SetNull)
   amountBeforeVat   Float?
   vatRate           Float?   @default(0) // 0.17 etc.
   vatAmount         Float?
@@ -754,4 +758,34 @@ model ProjectTask {
   @@index([assignee])
   @@index([status])
   @@map("project_tasks")
+}
+
+model MarketingCampaign {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  type        String   // e.g. PPC, Collaboration, Social
+  status      String   @default("ACTIVE") // ACTIVE, PAUSED, ENDED
+  priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH
+  
+  startDate   DateTime?
+  endDate     DateTime?
+  
+  cost        Float?    // Budget/Cost
+  currency    String    @default("ILS")
+  paymentMethod String?
+  paymentFrequency String? // "ONE_TIME", "MONTHLY"
+  
+  notes       String?   @db.Text
+  
+  // Relations
+  expenses    Expense[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@map("marketing_campaigns")
 }

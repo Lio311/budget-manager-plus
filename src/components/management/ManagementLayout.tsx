@@ -16,8 +16,9 @@ import {
     Bell,
     Users,
     Calendar as CalendarIcon,
-    MapPin, // Added missing imports
-    CreditCard // Added missing imports
+    MapPin,
+    CreditCard,
+    Megaphone // Added marketing icon
 } from 'lucide-react'
 import {
     Popover,
@@ -44,6 +45,7 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
         { icon: CalendarIcon, label: 'לוח שנה', href: '/management/calendar', color: 'text-orange-500', activeBg: 'bg-orange-50' },
         { icon: BarChart3, label: 'דוחות', href: '/management/reports', color: 'text-rose-500', activeBg: 'bg-rose-50' },
         { icon: MapPin, label: 'מפה', href: '/management/map', color: 'text-cyan-500', activeBg: 'bg-cyan-50' },
+        { icon: Megaphone, label: 'שיווק', href: '/management/marketing', color: 'text-pink-500', activeBg: 'bg-pink-50' },
         { icon: CreditCard, label: 'הוצאות', href: '/management/expenses', color: 'text-yellow-500', activeBg: 'bg-yellow-50' },
     ]
 
