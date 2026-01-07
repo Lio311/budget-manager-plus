@@ -217,6 +217,8 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                                     <img src="/avatars/leon.png" alt="Leon" className="w-full h-full object-cover" />
                                                 ) : assignee === 'Lior' ? (
                                                     <img src="/lior-profile.jpg" alt="Lior" className="w-full h-full object-cover object-top" />
+                                                ) : assignee === 'Ron' ? (
+                                                    <img src="/team/ron.png" alt="Ron" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="w-full h-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
                                                         {assignee.charAt(0)}

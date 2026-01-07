@@ -35,11 +35,23 @@ export function TeamPerformanceBubbleMap({ data, users }: TeamPerformanceBubbleM
     // Sort by count descending
     const sortedData = [...filteredData].sort((a, b) => b._count.id - a._count.id)
 
+    // Hardcoded avatars for known team members (since DB User doesn't have image field yet)
+    const KNOWN_AVATARS: Record<string, string> = {
+        'Lior': '/lior-profile.jpg',
+        'Ron': '/team/ron.png',
+        'Leon': '/avatars/leon.png'
+    }
+
     // Helper to find user details
     const getUserDetails = (nameOrId: string | null) => {
         if (!nameOrId) return null
 
-        // Try to find by exact name match first (since assignee is currently a name string)
+        // 1. Check hardcoded avatars
+        if (KNOWN_AVATARS[nameOrId]) {
+            return { firstName: nameOrId, lastName: '', image: KNOWN_AVATARS[nameOrId], email: '' }
+        }
+
+        // 2. Try to find by exact name match first
         const userByName = users.find(u =>
             u.firstName === nameOrId ||
             `${u.firstName} ${u.lastName}` === nameOrId ||
