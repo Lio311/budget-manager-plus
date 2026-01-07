@@ -120,13 +120,13 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
                                     {/* Color indicator strip on the right */}
                                     <div className={cn("w-1.5 h-8 rounded-full flex-shrink-0", getStatusColor(task.status))} />
 
-                                    <div className="flex-1 min-w-0">
+                                    <div className="flex-1 min-w-0 text-right">
                                         <div className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight h-[2.5rem]" title={task.title}>
                                             {task.title}
                                         </div>
-                                        <div className="text-[10px] text-gray-500 font-medium h-4">
+                                        <div className="text-[10px] text-gray-500 font-medium h-4 flex justify-start flex-row-reverse gap-1">
                                             {task.dueDate && (
-                                                <span>{format(new Date(task.dueDate), 'd MMM', { locale: he })}</span>
+                                                <span dir="rtl">{format(new Date(task.dueDate), 'd MMM', { locale: he })}</span>
                                             )}
                                         </div>
                                     </div>
@@ -234,7 +234,7 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
                                             </div>
 
                                             {/* Duration Label */}
-                                            <span className="flex-shrink-0 ml-2">
+                                            <span className="flex-shrink-0 ml-2" dir="rtl">
                                                 {durationDays} ימים
                                             </span>
                                         </div>
