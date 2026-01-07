@@ -258,19 +258,21 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="h-8 w-8 p-0 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                                            className="h-8 px-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 flex items-center gap-1"
                                             onClick={() => setEditingTask(task)}
                                             title="ערוך"
                                         >
+                                            <span className="text-xs">ערוך</span>
                                             <Edit className="h-4 w-4" />
                                         </Button>
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                                            className="h-8 px-2 text-gray-400 hover:text-red-600 hover:bg-red-50 flex items-center gap-1"
                                             onClick={() => handleDeleteTask(task.id)}
                                             title="מחק"
                                         >
+                                            <span className="text-xs">מחק</span>
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </div>
