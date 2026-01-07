@@ -38,11 +38,11 @@ export function UnifiedTeamPerformance({ employeeStats, users }: UnifiedTeamPerf
             <div className="flex flex-col lg:flex-row lg:divide-x lg:divide-x-reverse divide-gray-100">
                 {statuses.map((status, index) => (
                     <div key={status.key} className="flex-1 px-4 mb-8 lg:mb-0">
-                        <div className="flex items-center justify-between mb-4 px-2">
+                        <div className="flex items-center justify-start gap-2 mb-4 px-2">
+                            <h4 className="font-bold text-gray-700">{status.label}</h4>
                             <div className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${status.badgeColor}`}>
                                 {employeeStats[status.key]?.reduce((acc, curr) => acc + curr._count.id, 0) || 0}
                             </div>
-                            <h4 className="font-bold text-gray-700">{status.label}</h4>
                         </div>
                         <PerformanceBubbles
                             data={employeeStats[status.key] || []}

@@ -47,25 +47,17 @@ interface ManagementGanttProps {
 
 export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
     // 1. Calculate Date Range
-    // Find min start date and max end date from tasks, with some buffer
+    // 1. Calculate Date Range (Show exactly 10 days around today)
     const today = new Date()
-    const taskDates = tasks.flatMap(t => [
-        t.createdAt ? new Date(t.createdAt) : today,
-        t.dueDate ? new Date(t.dueDate) : today
-    ])
-
-    const minTime = taskDates.length > 0 ? Math.min(...taskDates.map(d => d.getTime())) : today.getTime()
-    const maxTime = taskDates.length > 0 ? Math.max(...taskDates.map(d => d.getTime())) : today.getTime()
-
-    const minDate = subDays(new Date(minTime), 7)
-    const maxDate = addMonths(new Date(maxTime), 1)
+    const minDate = subDays(today, 2)
+    const maxDate = addDays(today, 7)
 
     const days = eachDayOfInterval({ start: minDate, end: maxDate })
 
     // 2. Constants for layout
-    const DAY_WIDTH = 40
+    const DAY_WIDTH = 80
     const HEADER_HEIGHT = 50
-    const ROW_HEIGHT = 50
+    const ROW_HEIGHT = 64
     const SIDEBAR_WIDTH = 300
 
     // 3. Status Colors
@@ -112,12 +104,12 @@ export function ManagementGantt({ tasks, onTaskClick }: ManagementGanttProps) {
                                     <div className={cn("w-1.5 h-8 rounded-full flex-shrink-0", getStatusColor(task.status))} />
 
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-semibold text-gray-900 truncate" title={task.title}>
+                                        <div className="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight h-[2.5rem]" title={task.title}>
                                             {task.title}
                                         </div>
-                                        <div className="text-[10px] text-gray-500 flex items-center gap-2">
+                                        <div className="text-[10px] text-gray-500 font-medium h-4">
                                             {task.dueDate && (
-                                                <span className="font-medium">{format(new Date(task.dueDate), 'd MMM', { locale: he })}</span>
+                                                <span>{format(new Date(task.dueDate), 'd MMM', { locale: he })}</span>
                                             )}
                                         </div>
                                     </div>
