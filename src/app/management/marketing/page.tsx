@@ -8,8 +8,8 @@ export default async function MarketingPage() {
     const campaignsRes = await getCampaigns()
     const expensesRes = await getMarketingExpenses()
 
-    const campaigns = campaignsRes.success ? campaignsRes.data : []
-    const expenses = expensesRes.success ? expensesRes.data : []
+    const campaigns = campaignsRes.success && campaignsRes.data ? campaignsRes.data : []
+    const expenses = expensesRes.success && expensesRes.data ? expensesRes.data : []
 
     // Calculate stats
     const totalCampaigns = campaigns.length
