@@ -7,26 +7,27 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus, Loader2, CalendarIcon } from 'lucide-react'
-import { createTask } from '@/lib/actions/management'
-import { toast } from 'sonner'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
-import { format } from 'date-fns'
-import { he } from 'date-fns/locale'
-import { cn } from '@/lib/utils'
+import { updateTask } from '@/lib/actions/management'
 
-type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-type Department = 'DEV' | 'SECURITY' | 'QA' | 'MARKETING' | 'BIZ_DEV';
+// ... imports
 
-export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) => void }) {
-    const [open, setOpen] = useState(false)
+export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen, onOpenChange }: {
+    onTaskCreated?: (task: any) => void;
+    taskToEdit?: any;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+}) {
+    const [internalOpen, setInternalOpen] = useState(false)
+    const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+    const setOpen = onOpenChange || setInternalOpen
+
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
-        title: '',
-        priority: 'MEDIUM' as Priority,
-        department: 'DEV' as Department,
-        assignee: '',
-        dueDate: undefined as Date | undefined
+        title: taskToEdit?.title || '',
+        priority: (taskToEdit?.priority || 'MEDIUM') as Priority,
+        department: (taskToEdit?.department || 'DEV') as Department,
+        assignee: taskToEdit?.assignee || '',
+        dueDate: taskToEdit?.dueDate ? new Date(taskToEdit.dueDate) : undefined
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -34,24 +35,37 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
         setLoading(true)
 
         try {
-            const res = await createTask({
-                title: formData.title,
-                priority: formData.priority,
-                department: formData.department,
-                status: 'TODO',
-                assignee: formData.assignee || undefined,
-                dueDate: formData.dueDate
-            })
+            let res;
+            if (taskToEdit) {
+                res = await updateTask(taskToEdit.id, {
+                    title: formData.title,
+                    priority: formData.priority,
+                    department: formData.department,
+                    assignee: formData.assignee || null,
+                    dueDate: formData.dueDate
+                })
+            } else {
+                res = await createTask({
+                    title: formData.title,
+                    priority: formData.priority,
+                    department: formData.department,
+                    status: 'TODO',
+                    assignee: formData.assignee || undefined,
+                    dueDate: formData.dueDate
+                })
+            }
 
             if (res.success) {
-                toast.success('המשימה נוצרה בהצלחה')
+                toast.success(taskToEdit ? 'המשימה עודכנה בהצלחה' : 'המשימה נוצרה בהצלחה')
                 if (onTaskCreated && res.data) {
                     onTaskCreated(res.data)
                 }
                 setOpen(false)
-                setFormData({ title: '', priority: 'MEDIUM', department: 'DEV', assignee: '', dueDate: undefined })
+                if (!taskToEdit) {
+                    setFormData({ title: '', priority: 'MEDIUM', department: 'DEV', assignee: '', dueDate: undefined })
+                }
             } else {
-                toast.error('שגיאה ביצירת המשימה')
+                toast.error('שגיאה בשמירת המשימה')
             }
         } catch (error) {
             toast.error('שגיאה לא צפויה')
@@ -62,17 +76,20 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 gap-2">
-                    <Plus size={18} className="order-last" />
-                    <span>משימה חדשה</span>
-                </Button>
-            </DialogTrigger>
+            {!taskToEdit && (
+                <DialogTrigger asChild>
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 gap-2">
+                        <Plus size={18} className="order-last" />
+                        <span>משימה חדשה</span>
+                    </Button>
+                </DialogTrigger>
+            )}
             <DialogContent className="sm:max-w-[425px]" dir="rtl">
                 <DialogHeader className="text-right">
-                    <DialogTitle>צור משימה חדשה</DialogTitle>
+                    <DialogTitle>{taskToEdit ? 'ערוך משימה' : 'צור משימה חדשה'}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                    {/* ... (rest of form fields stay mostly same, just verify values) ... */}
                     <div className="space-y-2">
                         <Label className="text-right block">כותרת המשימה</Label>
                         <Input
@@ -154,7 +171,7 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
                             onValueChange={(val) => setFormData({ ...formData, assignee: val })}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="בחר אחראי..." />
+                                <SelectValue placeholder="בחר אחראי" />
                             </SelectTrigger>
                             <SelectContent dir="rtl">
                                 <SelectItem value="Lior">Lior</SelectItem>
@@ -167,7 +184,7 @@ export function NewTaskDialog({ onTaskCreated }: { onTaskCreated?: (task: any) =
                     <div className="pt-4 flex justify-end">
                         <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
                             {loading ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null}
-                            צור משימה
+                            {taskToEdit ? 'שמור שינויים' : 'צור משימה'}
                         </Button>
                     </div>
                 </form>

@@ -6,6 +6,12 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
     Plus,
     Calendar as CalendarIcon,
     User as UserIcon,
@@ -13,53 +19,36 @@ import {
     MoreHorizontal,
     Search,
     Filter,
-    Clock
+    Clock,
+    Trash2,
+    Edit
 } from 'lucide-react'
-import { format } from 'date-fns'
-import { he } from 'date-fns/locale'
-import { NewTaskDialog } from './NewTaskDialog'
-import { updateTask } from '@/lib/actions/management'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { toast } from 'sonner'
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { TaskAnalytics } from './TaskAnalytics'
+import { updateTask, deleteTask } from '@/lib/actions/management'
 
-// Mock types if Prisma logic isn't fully picked up yet
-type Task = {
-    id: string;
-    title: string;
-    status: string; // 'TODO', 'IN_PROGRESS', 'REVIEW', 'DONE', 'STUCK'
-    priority: string;
-    department: string;
-    assignee?: string | null;
-    dueDate?: Date | string | null;
-    createdAt: Date | string;
-    updatedAt: Date | string;
-}
-
-const STATUS_COLORS: Record<string, string> = {
-    'DONE': '#00C875',
-    'IN_PROGRESS': '#FDAB3D',
-    'STUCK': '#E2445C',
-    'TODO': '#C4C4C4',
-    'REVIEW': '#579BFC'
-}
+// ...
 
 export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
     const [search, setSearch] = useState('')
     const [assigneeFilter, setAssigneeFilter] = useState<string>('ALL')
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
+    const [editingTask, setEditingTask] = useState<Task | null>(null)
+
+    const handleDeleteTask = async (taskId: string) => {
+        if (!confirm('האם אתה בטוח שברצונך למחוק משימה זו?')) return
+
+        // Optimistic delete
+        const oldTasks = [...tasks]
+        setTasks(tasks.filter(t => t.id !== taskId))
+
+        const res = await deleteTask(taskId)
+        if (!res.success) {
+            toast.error('שגיאה במחיקת המשימה')
+            setTasks(oldTasks)
+        } else {
+            toast.success('המשימה נמחקה')
+        }
+    }
 
     const handleTaskCreated = (newTask: any) => {
         setTasks([newTask, ...tasks])
@@ -226,6 +215,26 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                {/* Actions Column */}
+                                <div className="col-span-1 hidden sm:flex justify-end">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <MoreHorizontal className="h-4 w-4 text-gray-400" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" dir="rtl">
+                                            <DropdownMenuItem onClick={() => setEditingTask(task)}>
+                                                <Edit className="ml-2 h-4 w-4" />
+                                                ערוך
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleDeleteTask(task.id)} className="text-red-600 focus:text-red-600">
+                                                <Trash2 className="ml-2 h-4 w-4" />
+                                                מחק
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </motion.div>
                         ))}
                     </AnimatePresence>
@@ -236,9 +245,20 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                         </div>
                     )}
                 </div>
-
-
             </div>
+
+            {/* Edit Dialog */}
+            {editingTask && (
+                <NewTaskDialog
+                    open={true}
+                    onOpenChange={(open) => !open && setEditingTask(null)}
+                    taskToEdit={editingTask}
+                    onTaskCreated={(updatedTask) => {
+                        setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t))
+                        setEditingTask(null)
+                    }}
+                />
+            )}
         </div>
     )
 }

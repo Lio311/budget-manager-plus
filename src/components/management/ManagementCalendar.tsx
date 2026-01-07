@@ -59,6 +59,7 @@ export function ManagementCalendar({ tasks }: { tasks: any[] }) {
                 culture="he"
                 messages={messages}
                 rtl={true}
+                views={['month', 'week']}
                 eventPropGetter={(event) => {
                     const statusColors: any = {
                         'DONE': '#00C875',
