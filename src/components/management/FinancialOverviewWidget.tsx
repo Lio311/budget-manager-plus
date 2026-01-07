@@ -26,7 +26,6 @@ export function FinancialOverview({ data }: { data: any }) {
                     <div>
                         <p className="text-gray-500 text-sm font-medium">הכנסות</p>
                         <span className="text-2xl font-bold text-emerald-600 whitespace-nowrap">{formatNumberWithCommas(revenue.toFixed(2))} ₪</span>
-                        <p className="text-emerald-600/70 text-xs mt-1"><span dir="ltr" className="inline-block">+12%</span> מחודש שעבר</p>
                     </div>
                 </motion.div>
 
@@ -43,7 +42,6 @@ export function FinancialOverview({ data }: { data: any }) {
                     <div>
                         <p className="text-gray-500 text-sm font-medium">הוצאות</p>
                         <span className="text-2xl font-bold text-rose-600 whitespace-nowrap">{formatNumberWithCommas(expenses.toFixed(2))} ₪</span>
-                        <p className="text-rose-600/70 text-xs mt-1"><span dir="ltr" className="inline-block">+5%</span> מחודש שעבר</p>
                     </div>
                 </motion.div>
 
