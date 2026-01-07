@@ -57,6 +57,7 @@ export default function LandingPage() {
                 { title: 'הכנסות והוצאות', desc: 'ניהול תזרים מלא לעסק' },
                 { title: 'דוחות מע״מ', desc: 'חישוב מע״מ ודוחות בזמן אמת' },
                 { title: 'הוצאות מוכרות', desc: 'סיווג וניהול הוצאות לצרכי מס' },
+                { title: 'דוח רווח והפסד', desc: 'תמונת מצב עסקית מדויקת בכל רגע' },
                 { title: 'הצעות מחיר', desc: 'הפקה ושליחה של הצעות מחיר' },
                 { title: 'חשבוניות', desc: 'הפקת מסמכים חשבונאיים דיגיטליים' },
                 { title: 'לקוחות', desc: 'ניהול כרטסת לקוחות וגבייה' }
@@ -83,6 +84,18 @@ export default function LandingPage() {
 
     const handleWheel = (e: WheelEvent) => {
         if (isScrolling) return
+        // Check if we are inside a scrollable container that has specialized scrolling needs
+        const target = e.target as HTMLElement;
+        const scrollableContainer = target.closest('.custom-scrollbar');
+
+        if (scrollableContainer) {
+            const { scrollTop, scrollHeight, clientHeight } = scrollableContainer;
+            // If scrolling up and not at top, or scrolling down and not at bottom, allow default scroll
+            if ((e.deltaY < 0 && scrollTop > 0) || (e.deltaY > 0 && scrollTop + clientHeight < scrollHeight - 1)) {
+                return; // Let the container scroll naturally
+            }
+        }
+
         e.preventDefault()
         setIsScrolling(true)
 
@@ -101,6 +114,9 @@ export default function LandingPage() {
     }
     const handleTouchEnd = (e: TouchEvent) => {
         if (isScrolling || touchStart.current === null) return
+
+        // Similar check for touch scrolling within containers could be added here if needed
+
         const touchEnd = e.changedTouches[0].clientY
         const deltaY = touchStart.current - touchEnd
         if (Math.abs(deltaY) > 50) {
@@ -241,17 +257,18 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                             <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-8 max-w-xl">{section.description}</motion.p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[60vh] p-2 custom-scrollbar">
+                        {/* Modified grid to grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 to fit more items and reduced padding */}
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto max-h-[70vh] p-2 custom-scrollbar content-start">
                             {section.features.map((feature: any, idx: number) => (
                                 <motion.div
                                     key={idx}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={isActive ? { opacity: 1, y: 0 } : {}}
                                     transition={{ delay: 0.4 + idx * 0.1 }}
-                                    className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 hover:bg-white/20 transition-colors"
+                                    className="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/10 hover:bg-white/20 transition-colors"
                                 >
-                                    <h4 className="text-xl font-bold text-white mb-2">{feature.title}</h4>
-                                    <p className="text-white/60 text-sm">{feature.desc}</p>
+                                    <h4 className="text-lg font-bold text-white mb-2">{feature.title}</h4>
+                                    <p className="text-white/60 text-xs">{feature.desc}</p>
                                 </motion.div>
                             ))}
                         </div>
@@ -311,20 +328,45 @@ function FeatureCard({ icon, title, desc, delay, isActive }: any) {
 
 function FAQContent() {
     const faqData = [
-        { q: "למי המערכת מתאימה?", a: "לכולם - מיחידים, משפחות ועד עסקים קטנים." },
-        { q: "האם המידע מאובטח?", a: "כן, אנו משתמשים בהצפנה מתקדמת (SSL/TLS) ולא שומרים פרטי אשראי." },
-        { q: "האם יש תקופת ניסיון?", a: "כן, חודשיים ראשונים חינם ללא התחייבות." },
-        { q: "האם ניתן להפיק חשבוניות?", a: "כן, המנוי העסקי כולל הפקת חשבוניות ירוקות מלאה." },
-        { q: "האם ניתן לנהל תקציב משותף?", a: "כן, ניתן לצרף בני זוג ושותפים בקלות." }
+        { q: "למי המערכת מתאימה?", a: "לכולם - מיחידים, משפחות ועד עסקים קטנים. המערכת גמישה ומאפשרת התאמה אישית לכל צורך." },
+        { q: "האם המידע מאובטח?", a: "כן, אנו משתמשים בהצפנה מתקדמת (SSL/TLS) ולא שומרים פרטי אשראי בשרתים שלנו. אבטחת המידע היא בראש סדר העדיפויות שלנו." },
+        { q: "האם יש תקופת ניסיון?", a: "כן, אנחנו מציעים חודשיים ראשונים חינם ללא התחייבות, כדי שתוכלו להתנסות במערכת ולוודא שהיא מתאימה לכם." },
+        { q: "האם ניתן להפיק חשבוניות?", a: "כן, המנוי העסקי כולל מערכת מלאה להפקת חשבוניות ירוקות (דיגיטליות), קבלות, הצעות מחיר ועוד, הכל מוכר לצרכי מס." },
+        { q: "האם ניתן לנהל תקציב משותף?", a: "כן, ניתן לצרף בני זוג ושותפים לחשבון בקלות, ולנהל את התקציב או העסק ביחד בשקיפות מלאה." }
     ]
+
+    const [openIndex, setOpenIndex] = useState<number | null>(null)
 
     return (
         <div className="space-y-4">
             {faqData.map((item, idx) => (
-                <div key={idx} className="bg-white/5 rounded-xl border border-white/10 p-4">
-                    <h4 className="font-bold text-white text-lg mb-2">{item.q}</h4>
-                    <p className="text-white/70">{item.a}</p>
-                </div>
+                <motion.div
+                    key={idx}
+                    initial={false}
+                    className={`bg-white/5 rounded-xl border border-white/10 overflow-hidden transition-colors ${openIndex === idx ? 'bg-white/10' : 'hover:bg-white/10'}`}
+                >
+                    <button
+                        onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+                        className="w-full text-right p-4 flex items-center justify-between gap-4"
+                    >
+                        <span className="font-bold text-white text-lg">{item.q}</span>
+                        <ChevronDown className={`text-white/60 transition-transform duration-300 ${openIndex === idx ? 'rotate-180' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                        {openIndex === idx && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <div className="p-4 pt-0 text-white/70 leading-relaxed border-t border-white/10">
+                                    {item.a}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
             ))}
         </div>
     )
