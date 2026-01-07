@@ -58,9 +58,9 @@ export function FinancialOverview({ data }: { data: any }) {
                         <DollarSign size={24} />
                     </div>
                     <div>
-                        <p className="text-gray-500 text-sm font-medium">רווח נקי</p>
+                        <p className="text-gray-500 text-sm font-medium">רווח לפני מס</p>
                         <span className="text-2xl font-bold text-blue-600 whitespace-nowrap">{formatNumberWithCommas(profit.toFixed(2))} ₪</span>
-                        <p className="text-blue-600/70 text-xs mt-1">מרווח נקי: {((profit / revenue) * 100 || 0).toFixed(1)}%</p>
+                        <p className="text-blue-600/70 text-xs mt-1">מתוך סה"כ הכנסות: {((profit / revenue) * 100 || 0).toFixed(1)}%</p>
                     </div>
                 </motion.div>
             </div>
