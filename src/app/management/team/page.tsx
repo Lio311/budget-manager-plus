@@ -6,8 +6,8 @@ import { motion } from 'framer-motion'
 
 // Mock Data - In real app, fetch from `clerk` or `prisma.user`
 const TEAM_MEMBERS = [
-    { id: 1, name: 'Lior', role: 'Full Stack Developer', email: 'lior@example.com', avatar: 'L', department: 'Development', color: 'bg-blue-500' },
-    { id: 2, name: 'Ron', role: 'QA & Marketing', email: 'ron@example.com', avatar: 'R', department: 'Marketing & QA', color: 'bg-orange-500' },
+    { id: 1, name: 'Lior', role: 'Full Stack Developer', email: 'lior31197@gmail.com', avatar: '/lior-profile.jpg', department: 'Development', color: 'bg-blue-500' },
+    { id: 2, name: 'Ron', role: 'QA & Marketing', email: 'ron.kor97@gmail.com', avatar: 'R', department: 'Marketing & QA', color: 'bg-orange-500' },
     { id: 3, name: 'Leon', role: 'Security Engineer', email: 'leon@example.com', avatar: 'L', department: 'Security', color: 'bg-red-500' },
 ]
 
@@ -37,8 +37,12 @@ export default function TeamPage() {
                                 {member.department}
                             </div>
 
-                            <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white mb-4 border-4 border-white shadow-md ${member.color}`}>
-                                {member.avatar}
+                            <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white mb-4 border-4 border-white shadow-md ${member.color} overflow-hidden`}>
+                                {member.avatar.length > 2 ? (
+                                    <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span>{member.avatar}</span>
+                                )}
                             </div>
 
                             <h3 className="text-xl font-bold text-gray-900">{member.name}</h3>
