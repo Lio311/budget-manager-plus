@@ -88,6 +88,7 @@ model BusinessProfile {
   email       String?  // Business email
   signatureUrl String? // Digital signature (base64)
   taxRate     Float    @default(0) // Income Tax Rate %
+  marketingBudget Float @default(0) // Total Marketing Budget
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   

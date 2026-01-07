@@ -240,3 +240,47 @@ export async function updateBusinessExpense(id: string, data: any) {
         return { success: false, error: 'Failed to update business expense' }
     }
 }
+// --- Marketing Budget ---
+
+export async function getMarketingBudget() {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const profile = await prisma.businessProfile.findUnique({
+            where: { userId },
+            select: { marketingBudget: true }
+        })
+
+        return { success: true, data: profile?.marketingBudget || 0 }
+    } catch (error) {
+        console.error('Error fetching marketing budget:', error)
+        return { success: false, error: 'Failed to fetch marketing budget' }
+    }
+}
+
+export async function updateMarketingBudget(amount: number) {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        await prisma.businessProfile.upsert({
+            where: { userId },
+            create: {
+                userId,
+                companyName: 'My Business', // Default/Placeholder if creating
+                marketingBudget: amount,
+                vatStatus: 'EXEMPT' // Default
+            },
+            update: {
+                marketingBudget: amount
+            }
+        })
+
+        revalidatePath('/management/marketing')
+        return { success: true }
+    } catch (error) {
+        console.error('Error updating marketing budget:', error)
+        return { success: false, error: 'Failed to update marketing budget' }
+    }
+}

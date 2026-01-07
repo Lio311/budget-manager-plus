@@ -1,13 +1,16 @@
-import { MarketingCampaigns } from "@/components/management/marketing/MarketingCampaigns"
-import { getCampaigns } from "@/lib/actions/business-expenses"
+import { getCampaigns, getMarketingBudget } from "@/lib/actions/business-expenses"
+import { BudgetCard } from "@/components/management/marketing/BudgetCard"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, TrendingUp, Target } from "lucide-react"
+import { TrendingUp, Target } from "lucide-react"
 
 export default async function MarketingPage() {
     const { data: campaigns } = await getCampaigns()
+    const { data: marketingBudget } = await getMarketingBudget()
 
     const activeCampaigns = campaigns?.filter((c: any) => c.status === 'active') || []
-    const totalBudget = campaigns?.reduce((sum: number, c: any) => sum + (c.budget || 0), 0) || 0
+
+    // Total budget is now manageable via BudgetCard, fallback to 0 if not set
+    const totalBudget = marketingBudget || 0
 
     // Calculate total spent from connected expenses across all campaigns
     const totalSpent = campaigns?.reduce((sum: number, c: any) => {
@@ -24,15 +27,7 @@ export default async function MarketingPage() {
 
             {/* Stats Overview */}
             <div className="grid gap-4 md:grid-cols-3">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">תקציב כולל</CardTitle>
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">₪{totalBudget.toLocaleString()}</div>
-                    </CardContent>
-                </Card>
+                <BudgetCard initialBudget={totalBudget} />
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">נוצל בפועל</CardTitle>
