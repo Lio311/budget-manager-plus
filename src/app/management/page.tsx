@@ -2,6 +2,9 @@
 import { IsraelMapWidget } from '@/components/management/IsraelMapWidget'
 import { EmployeePerformance } from '@/components/management/EmployeePerformanceWidget'
 import { FinancialOverview } from '@/components/management/FinancialOverviewWidget'
+import { PriorityBreakdown } from '@/components/management/PriorityBreakdownWidget'
+import { TaskVelocity } from '@/components/management/TaskVelocityWidget'
+import { RecentActivity } from '@/components/management/RecentActivityWidget'
 import { getManagementKPIs, getUserLocations } from '@/lib/actions/management'
 import { Loader2 } from 'lucide-react'
 import { Suspense } from 'react'
@@ -17,10 +20,13 @@ async function DashboardContent() {
         return <div className="p-4 text-red-500">Error loading dashboard data.</div>
     }
 
-    const { employeeStats, departmentStats, financials } = kpis.data || {
+    const { employeeStats, departmentStats, financials, priorityStats, recentActivity, velocityStats } = kpis.data || {
         employeeStats: [],
         departmentStats: [],
-        financials: { revenue: 0, expenses: 0, profit: 0 }
+        financials: { revenue: 0, expenses: 0, profit: 0 },
+        priorityStats: [],
+        recentActivity: [],
+        velocityStats: []
     }
     const locationData = locations.data || []
 
@@ -58,6 +64,19 @@ async function DashboardContent() {
                         ))}
                     </div>
                 </Card>
+            </div>
+
+            {/* Bottom Row: Advanced Metrics */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1">
+                    <PriorityBreakdown data={priorityStats || []} />
+                </div>
+                <div className="lg:col-span-1">
+                    <TaskVelocity data={velocityStats || []} />
+                </div>
+                <div className="lg:col-span-1">
+                    <RecentActivity data={recentActivity || []} />
+                </div>
             </div>
         </div>
     )
