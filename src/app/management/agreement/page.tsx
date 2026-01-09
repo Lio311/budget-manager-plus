@@ -28,6 +28,8 @@ export default function AgreementPage() {
     })
     const [signature, setSignature] = useState('')
 
+    const [userEmail, setUserEmail] = useState<string | undefined>(undefined)
+
     useEffect(() => {
         loadStatus()
     }, [])
@@ -36,6 +38,8 @@ export default function AgreementPage() {
         try {
             const res = await getAgreementStatus()
             if (res.success && res.data) {
+                if (res.data.email) setUserEmail(res.data.email)
+
                 setStatus(res.data.status as any)
                 if (res.data.status === 'SIGNED') {
                     setSignedInfo(res.data)
@@ -62,11 +66,7 @@ export default function AgreementPage() {
             return
         }
 
-        // Basic validation - check if crucial fields are filled?
-        if (!filledValues.employeeName || !filledValues.employeeId) {
-            toast({ title: 'שגיאה', description: 'אנא מלא את כל הפרטים הנדרשים בטופס', variant: 'destructive' })
-            return
-        }
+        // Allow partial filling as per user request
 
         setSubmitting(true)
         try {
@@ -105,12 +105,13 @@ export default function AgreementPage() {
 
                     <div className="bg-gray-50 p-8 rounded-lg mb-8 border border-gray-100">
                         {/* Read Only View */}
-                        <AgreementContent values={filledValues} onChange={() => { }} readOnly={true} />
-
-                        <div className="mt-8 pt-6 border-t border-gray-200">
-                            <p className="text-sm text-gray-500 mb-2">חתימת העובד:</p>
-                            <img src={signedInfo.signature} alt="Signature" className="h-16 border rounded bg-white p-1" />
-                        </div>
+                        <AgreementContent
+                            values={filledValues}
+                            onChange={() => { }}
+                            readOnly={true}
+                            userEmail={userEmail}
+                            signature={signedInfo.signature}
+                        />
                     </div>
                 </Card>
             </div>
@@ -125,8 +126,14 @@ export default function AgreementPage() {
             </div>
 
             <Card className="p-8 bg-white shadow-lg">
-                {/* Editable View */}
-                <AgreementContent values={filledValues} onChange={handleFieldChange} readOnly={false} />
+                {/* Editable View - Pass signature to show it live in the box */}
+                <AgreementContent
+                    values={filledValues}
+                    onChange={handleFieldChange}
+                    readOnly={false}
+                    userEmail={userEmail}
+                    signature={signature}
+                />
 
                 <div className="mt-12 bg-blue-50 p-6 rounded-xl border border-blue-100">
                     <h3 className="font-bold text-lg mb-4 text-blue-900">חתימה דיגיטלית</h3>

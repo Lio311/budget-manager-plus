@@ -9,9 +9,32 @@ interface AgreementContentProps {
     values: any
     onChange: (key: string, value: string) => void
     readOnly?: boolean
+    userEmail?: string
+    signature?: string | null
 }
 
-export function AgreementContent({ values, onChange, readOnly = false }: AgreementContentProps) {
+const EMAILS = {
+    LIOR: 'lior31197@gmail.com',
+    RON: 'ron.kor97@gmail.com',
+    LEON: 'leonpiatti@tuta.com'
+}
+
+export function AgreementContent({ values, onChange, readOnly = false, userEmail, signature }: AgreementContentProps) {
+
+    const isLior = userEmail === EMAILS.LIOR
+    const isRon = userEmail === EMAILS.RON
+    const isLeon = userEmail === EMAILS.LEON
+
+    const isFieldDisabled = (fieldName: string) => {
+        if (readOnly) return true
+        if (!userEmail) return false // Fallback
+
+        if (isLior) return !['liorId', 'day', 'month', 'year'].includes(fieldName)
+        if (isRon) return !['ronId', 'day', 'month', 'year'].includes(fieldName)
+        if (isLeon) return !['leonId', 'day', 'month', 'year'].includes(fieldName)
+
+        return true
+    }
 
     const InlineInput = ({ name, placeholder, width = "120px" }: { name: string, placeholder?: string, width?: string }) => {
         if (readOnly) {
@@ -21,13 +44,15 @@ export function AgreementContent({ values, onChange, readOnly = false }: Agreeme
                 </span>
             )
         }
+        const disabled = isFieldDisabled(name)
         return (
             <input
                 type="text"
                 value={values[name] || ''}
                 onChange={(e) => onChange(name, e.target.value)}
                 placeholder={placeholder}
-                className="inline-block border-b border-black focus:outline-none focus:border-blue-500 bg-transparent px-1 mx-1 text-center font-bold placeholder:font-normal placeholder:text-gray-400"
+                disabled={disabled}
+                className={`inline-block border-b border-black focus:outline-none focus:border-blue-500 bg-transparent px-1 mx-1 text-center font-bold placeholder:font-normal placeholder:text-gray-400 ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}`}
                 style={{ width }}
             />
         )
@@ -105,20 +130,22 @@ export function AgreementContent({ values, onChange, readOnly = false }: Agreeme
 
                 <div className="flex justify-between items-end gap-4 mt-8">
                     <div className="text-center w-1/3">
-                        <div className="h-20 border-b border-black mb-2 flex items-end justify-center pb-2 font-handwriting text-lg">
-                            {/* Placeholder for manual signature or digital */}
+                        <div className="h-20 border-b border-black mb-2 flex items-end justify-center pb-2 font-handwriting text-lg relative">
+                            {(readOnly && isLior && signature) && <img src={signature} alt="Signature" className="h-full object-contain" />}
                         </div>
                         <strong>ליאור צפריר</strong>
                     </div>
 
                     <div className="text-center w-1/3">
-                        <div className="h-20 border-b border-black mb-2 flex items-end justify-center pb-2 font-handwriting text-lg">
+                        <div className="h-20 border-b border-black mb-2 flex items-end justify-center pb-2 font-handwriting text-lg relative">
+                            {(readOnly && isRon && signature) && <img src={signature} alt="Signature" className="h-full object-contain" />}
                         </div>
                         <strong>רון קור</strong>
                     </div>
 
                     <div className="text-center w-1/3">
-                        <div className="h-20 border-b border-black mb-2 flex items-end justify-center pb-2 font-handwriting text-lg">
+                        <div className="h-20 border-b border-black mb-2 flex items-end justify-center pb-2 font-handwriting text-lg relative">
+                            {(readOnly && isLeon && signature) && <img src={signature} alt="Signature" className="h-full object-contain" />}
                         </div>
                         <strong>לאון פיאטיגורסקי</strong>
                     </div>

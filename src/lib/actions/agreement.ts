@@ -9,12 +9,23 @@ export async function getAgreementStatus() {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
-        const agreement = await prisma.employeeAgreement.findUnique({
-            where: { userId }
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { agreement: true }
         })
 
+        if (!user) return { success: false, error: 'User not found' }
+
+        const agreement = user.agreement
+
         if (!agreement) {
-            return { success: true, data: { status: 'NOT_SIGNED' } }
+            return {
+                success: true,
+                data: {
+                    status: 'NOT_SIGNED',
+                    email: user.email
+                }
+            }
         }
 
         return {
@@ -24,7 +35,8 @@ export async function getAgreementStatus() {
                 version: agreement.version,
                 signedAt: agreement.signedAt,
                 signature: agreement.signature,
-                filledValues: agreement.filledValues
+                filledValues: agreement.filledValues,
+                email: user.email
             }
         }
 
