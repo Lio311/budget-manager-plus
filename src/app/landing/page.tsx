@@ -256,8 +256,8 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
 
                 {(section.type === 'personal' || section.type === 'business') && (
                     <div className="grid md:grid-cols-2 gap-2 md:gap-12 items-center w-full h-full pt-20 pb-10 md:pb-20">
-                        <div className="text-right flex flex-col justify-center">
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={isActive ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.3 }} className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white/80 text-sm mb-4 border border-white/20 w-fit">
+                        <div className="text-center md:text-right flex flex-col justify-center items-center md:items-start">
+                            <motion.div initial={{ opacity: 0, x: 20 }} animate={isActive ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.3 }} className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white/80 text-sm mb-4 border border-white/20 w-fit mx-auto md:mx-0">
                                 {section.type === 'personal' ? 'למשקי בית' : 'לעסקים ועצמאיים'}
                             </motion.div>
                             <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-4xl md:text-6xl font-black text-white mb-2 md:mb-4">{section.title}</motion.h2>
