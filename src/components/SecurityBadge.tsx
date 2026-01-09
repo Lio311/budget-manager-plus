@@ -32,7 +32,7 @@ export default function SecurityBadge({ className = "" }: { className?: string }
             {/* Modal Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 stop-landing-scroll"
                     onClick={() => setIsOpen(false)}
                     onWheel={(e) => e.stopPropagation()}
                     onTouchMove={(e) => e.stopPropagation()}

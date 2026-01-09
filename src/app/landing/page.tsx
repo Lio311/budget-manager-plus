@@ -87,8 +87,13 @@ export default function LandingPage() {
 
     const handleWheel = (e: WheelEvent) => {
         if (isScrolling) return
+
         // Check if we are inside a scrollable container that has specialized scrolling needs
         const target = e.target as HTMLElement;
+
+        // CRITICAL FIX: Ignore scrolling events from the Security Popup (or any element with stop-landing-scroll)
+        if (target.closest('.stop-landing-scroll')) return;
+
         const scrollableContainer = target.closest('.custom-scrollbar');
 
         if (scrollableContainer) {
