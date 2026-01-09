@@ -265,18 +265,18 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                             <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-4 md:mb-8 max-w-xl">{section.description}</motion.p>
                         </div>
 
-                        {/* Modified grid to grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 to fit more items and reduced padding */}
-                        <div className="grid grid-cols-3 lg:grid-cols-3 gap-2 md:gap-4 overflow-y-auto max-h-[70vh] p-1 custom-scrollbar content-start">
+                        {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
+                        <div className="grid grid-cols-3 lg:grid-cols-3 gap-2 md:gap-6 overflow-y-auto max-h-[70vh] p-1 custom-scrollbar content-start">
                             {section.features.map((feature: any, idx: number) => (
                                 <motion.div
                                     key={idx}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={isActive ? { opacity: 1, y: 0 } : {}}
                                     transition={{ delay: 0.4 + idx * 0.1 }}
-                                    className="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 hover:bg-white/20 transition-colors flex flex-col items-center text-center"
+                                    className="bg-white/10 backdrop-blur-md p-2 md:p-6 rounded-xl md:rounded-2xl border border-white/10 hover:bg-white/20 transition-colors flex flex-col items-center text-center shadow-lg"
                                 >
-                                    <h4 className="text-sm font-bold text-white mb-1 leading-tight">{feature.title}</h4>
-                                    <p className="text-white/60 text-[10px] leading-tight block">{feature.desc}</p>
+                                    <h4 className="text-xs md:text-lg font-bold text-white mb-1 md:mb-3 leading-tight">{feature.title}</h4>
+                                    <p className="text-white/60 text-[10px] md:text-sm leading-tight block">{feature.desc}</p>
                                 </motion.div>
                             ))}
                         </div>
