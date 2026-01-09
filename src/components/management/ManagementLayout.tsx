@@ -19,6 +19,7 @@ import {
     CreditCard,
     Megaphone // Added marketing icon
 } from 'lucide-react'
+import Image from 'next/image'
 import {
     Popover,
     PopoverContent,
@@ -147,6 +148,26 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
                         <h1 className="text-xl font-bold text-gray-800">
                             {menuItems.find(i => i.href === pathname)?.label || 'ניהול'}
                         </h1>
+                    </div>
+
+                    {/* Center Section - Logo */}
+                    <div className="hidden md:flex flex-1 justify-center items-center opacity-80 hover:opacity-100 transition-opacity">
+                        <Image
+                            src="/images/branding/K-LOGO.png"
+                            alt="Kesefly"
+                            width={120}
+                            height={40}
+                            className="h-8 w-auto object-contain drop-shadow-sm dark:hidden"
+                            priority
+                        />
+                        <Image
+                            src="/images/branding/K-LOGO2.png"
+                            alt="Kesefly"
+                            width={120}
+                            height={40}
+                            className="h-8 w-auto object-contain drop-shadow-sm hidden dark:block"
+                            priority
+                        />
                     </div>
 
 
