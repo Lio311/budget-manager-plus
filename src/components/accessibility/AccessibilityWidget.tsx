@@ -254,15 +254,10 @@ export default function AccessibilityWidget() {
                     {/* Floating Button */}
                     <button
                         onClick={() => setIsOpen(true)}
-                        className="fixed bottom-4 left-4 z-50 p-0 rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white border border-gray-200"
+                        className="fixed bottom-4 left-4 z-50 p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-110 transition-all duration-300 group border-0"
                         aria-label="פתח תפריט נגישות"
-                        style={{ width: '45px', height: '45px' }}
                     >
-                        <img
-                            src="/images/accessibility.png"
-                            alt="Accessibility"
-                            className="w-full h-full object-cover rounded-full"
-                        />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 group-hover:rotate-12 transition-transform"><circle cx="12" cy="5" r="1" /><path d="m9 20 3-6 3 6" /><path d="m6 8 6 2 6-2" /><path d="M12 10v4" /></svg>
                     </button>
                 </div>
 
@@ -274,11 +269,15 @@ export default function AccessibilityWidget() {
                         style={{ filter: 'none', color: '#1f2937' }} // Explicit colors to override high contrast
                     >
                         {/* Header */}
-                        <div className="bg-gray-50/80 p-3 border-b flex justify-between items-center">
-                            <h2 className="text-base font-bold text-gray-800 flex items-center gap-2">
+                        <div className="bg-gray-50/80 p-4 border-b relative flex items-center justify-center">
+                            <h2 className="text-base font-bold text-gray-800">
                                 תפריט נגישות
                             </h2>
-                            <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-red-500 transition p-1 rounded-full hover:bg-gray-200">
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-500 hover:text-red-500 transition p-1.5 rounded-full hover:bg-gray-200 z-50"
+                                aria-label="סגור תפריט"
+                            >
                                 <Icons.Close />
                             </button>
                         </div>
