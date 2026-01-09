@@ -253,7 +253,6 @@ export default function AccessibilityWidget() {
 
                     {/* Floating Button */}
                     <button
-                        ref={buttonRef}
                         onClick={() => setIsOpen(true)}
                         className="fixed bottom-4 left-4 z-50 p-0 rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white border border-gray-200"
                         aria-label="פתח תפריט נגישות"
