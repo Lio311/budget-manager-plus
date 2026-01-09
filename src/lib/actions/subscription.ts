@@ -335,3 +335,21 @@ export async function validateCoupon(code: string, userEmail: string, planType: 
         message: 'קופון הופעל בהצלחה!'
     }
 }
+
+export async function getMySubscriptionStatus() {
+    const user = await currentUser()
+    if (!user) return { success: false, error: 'User not authenticated' }
+
+    // Check Personal
+    const personalStatus = await getSubscriptionStatus(user.id, 'PERSONAL')
+    const businessStatus = await getSubscriptionStatus(user.id, 'BUSINESS')
+
+    return {
+        success: true,
+        data: {
+            personal: personalStatus,
+            business: businessStatus,
+            userEmail: user.emailAddresses[0]?.emailAddress
+        }
+    }
+}

@@ -3,12 +3,13 @@
 import { UserButton } from '@clerk/nextjs'
 import { useBudget } from '@/contexts/BudgetContext'
 import { getMonthName } from '@/lib/utils'
-import { ChevronLeft, ChevronRight, Menu } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Menu, CreditCard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { ModeToggle } from '@/components/mode-toggle'
 import { MonthYearPicker } from './MonthYearPicker'
 import Image from 'next/image'
+import { SubscriptionStatus } from './UserProfile/SubscriptionStatus'
 
 export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PERSONAL', hasPersonalAccess = true, hasBusinessAccess = false }: any) {
     const { month, year, budgetType, setMonth, setYear, setBudgetType } = useBudget()
@@ -126,7 +127,15 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         <UserButton
                             userProfileProps={userProfileProps}
                             appearance={userButtonAppearance}
-                        />
+                        >
+                            <UserButton.UserProfilePage
+                                label="מנוי"
+                                url="subscription"
+                                labelIcon={<CreditCard className="w-4 h-4" />}
+                            >
+                                <SubscriptionStatus />
+                            </UserButton.UserProfilePage>
+                        </UserButton>
 
                         <div className="mr-2">
                             <ModeToggle />
@@ -204,7 +213,15 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         <UserButton
                             userProfileProps={userProfileProps}
                             appearance={userButtonAppearance}
-                        />
+                        >
+                            <UserButton.UserProfilePage
+                                label="מנוי"
+                                url="subscription"
+                                labelIcon={<CreditCard className="w-4 h-4" />}
+                            >
+                                <SubscriptionStatus />
+                            </UserButton.UserProfilePage>
+                        </UserButton>
                     </div>
                 </div>
             </div>
