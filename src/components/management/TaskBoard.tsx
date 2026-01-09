@@ -209,7 +209,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                 <div className="col-span-1 hidden sm:flex justify-center">
                                     {task.dueDate ? (
                                         (() => {
-                                            const isOverdue = isBefore(new Date(task.dueDate), startOfDay(new Date())) && task.status !== 'DONE'
+                                            const isOverdue = isBefore(new Date(task.dueDate), startOfDay(new Date()))
                                             return (
                                                 <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${isOverdue ? 'text-red-600 font-bold bg-red-50' : 'text-gray-600 bg-gray-50'}`}>
                                                     {format(new Date(task.dueDate), 'dd/MM')}
