@@ -85,7 +85,7 @@ export default function LandingPage() {
                             transition={{ type: "spring", stiffness: 300 }}
                         >
                             <Image
-                                src="/images/branding/homepage-logo.png"
+                                src="/images/branding/K-LOGO2.png"
                                 alt="Kesefly"
                                 width={600}
                                 height={180}

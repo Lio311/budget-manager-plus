@@ -161,7 +161,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
                         <Link href="/">
-                            <Image src="/images/branding/homepage-logo.png" alt="Kesefly" width={140} height={40} className="h-14 w-auto brightness-0 invert" />
+                            <Image src="/images/branding/K-LOGO2.png" alt="Kesefly" width={140} height={40} className="h-14 w-auto brightness-0 invert" />
                         </Link>
                     </motion.div>
                     <div className="hidden md:flex items-center gap-6">

@@ -90,9 +90,9 @@ export const metadata: Metadata = {
         },
     },
     icons: {
-        icon: '/images/branding/K-ICON.png',
+        icon: '/images/branding/K-LOGO.png',
         apple: '/images/branding/apple-touch-icon.png',
-        shortcut: '/images/branding/K-ICON.png',
+        shortcut: '/images/branding/K-LOGO.png',
     },
     appleWebApp: {
         capable: true,
