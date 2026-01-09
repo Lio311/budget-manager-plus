@@ -51,6 +51,7 @@ interface Task {
     creator?: {
         email: string
     }
+    completedAt?: Date | null
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -209,9 +210,21 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                 <div className="col-span-1 hidden sm:flex justify-center">
                                     {task.dueDate ? (
                                         (() => {
-                                            const isOverdue = isBefore(new Date(task.dueDate), startOfDay(new Date()))
+                                            const overdue = (() => {
+                                                const due = new Date(task.dueDate)
+                                                // If task is done, compare completedAt vs due date
+                                                // If completedAt is missing (legacy tasks), we treat as on time or maybe check updatedAt? 
+                                                // Let's assume if done and no completedAt -> not overdue (safe fallback)
+                                                if (task.status === 'DONE') {
+                                                    if (!task.completedAt) return false
+                                                    return isBefore(due, startOfDay(new Date(task.completedAt)))
+                                                }
+                                                // If not done, compare now vs due date
+                                                return isBefore(due, startOfDay(new Date()))
+                                            })()
+
                                             return (
-                                                <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${isOverdue ? 'text-red-600 font-bold bg-red-50' : 'text-gray-600 bg-gray-50'}`}>
+                                                <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${overdue ? 'text-red-600 font-bold bg-red-50' : 'text-gray-600 bg-gray-50'}`}>
                                                     {format(new Date(task.dueDate), 'dd/MM')}
                                                 </div>
                                             )
