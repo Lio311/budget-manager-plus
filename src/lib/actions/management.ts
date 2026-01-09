@@ -267,13 +267,20 @@ export async function getUserLocations() {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
-        // Aggregate count by city
-        // Note: city is nullable, so we handle that
-        const locations = await prisma.user.groupBy({
+        // Weekly Reset Logic: Get the start of the current week (Sunday)
+        const now = new Date()
+        const dayOfWeek = now.getDay() // 0 = Sunday, 1 = Monday...
+        const diff = now.getDate() - dayOfWeek
+        const lastSunday = new Date(now.setDate(diff))
+        lastSunday.setHours(0, 0, 0, 0)
+
+        const locations = await prisma.visitorLog.groupBy({
             by: ['city'],
             _count: { id: true },
             where: {
-                city: { not: null }
+                createdAt: {
+                    gte: lastSunday
+                }
             }
         }) as unknown as { city: string, _count: { id: number } }[]
 

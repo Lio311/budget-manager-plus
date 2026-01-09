@@ -798,21 +798,33 @@ model MarketingCampaign {
 
 model EmployeeAgreement {
   id           String   @id @default(cuid())
-  userId       String
+  userId       String   @unique
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  signature    String   @db.Text
   version      Int      @default(1)
-  
-  // Stores field values: { fullName: "...", idNumber: "...", ... }
-  filledValues Json? 
-  
+  status       String   @default("SIGNED") 
+  signature    String?  @db.Text // base64
   signedAt     DateTime @default(now())
-  ipAddress    String?
   
-  @@unique([userId])
+  filledValues Json?    // Stores the inputs user filled
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   @@map("employee_agreements")
 }
+
+model VisitorLog {
+  id        String   @id @default(uuid())
+  city      String
+  country   String?
+  createdAt DateTime @default(now())
+
+  @@index([city])
+  @@index([createdAt])
+  @@map("visitor_logs")
+}
+
 
 model BusinessExpense {
   id          String   @id @default(cuid())

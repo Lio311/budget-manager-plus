@@ -14,6 +14,7 @@ import { getSubscriptionStatus } from '@/lib/actions/subscription'
 import { differenceInDays } from 'date-fns'
 import AccessibilityWidget from '@/components/accessibility/AccessibilityWidget'
 import { ConfirmDialogProvider } from '@/hooks/useConfirm'
+import { VisitorLocationTracker } from '@/components/tracking/VisitorLocationTracker'
 
 const rubik = Rubik({
     subsets: ['hebrew', 'latin'],
@@ -200,6 +201,7 @@ export default async function RootLayout({
                         </div>
                         <ReactivationPopup shouldShow={shouldShowReactivation} />
                         <AccessibilityWidget />
+                        <VisitorLocationTracker />
                         <Toaster />
                         <SonnerToaster />
                         <ConfirmDialogProvider />
