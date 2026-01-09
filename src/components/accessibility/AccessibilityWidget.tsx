@@ -236,28 +236,28 @@ export default function AccessibilityWidget() {
                 />
             )}
 
-            {/* Trigger Button - Reduced Size, Custom Image Icon */}
-            <div ref={widgetRef} className="fixed bottom-6 z-[9999] font-sans rtl group acc-widget-ignore right-6 md:right-auto md:left-6">
+            {/* Trigger Button & Close Button Wrapper */}
+            <div ref={widgetRef} className="fixed bottom-4 left-4 z-[9999] font-sans rtl group acc-widget-ignore">
                 <div className="relative">
-                    {/* Close X Button for the Widget */}
+                    {/* Floating Button (Main Trigger) */}
+                    <button
+                        onClick={() => setIsOpen(true)}
+                        className="relative z-50 p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-110 transition-all duration-300 border-0 block"
+                        aria-label="פתח תפריט נגישות"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 group-hover:rotate-12 transition-transform"><circle cx="12" cy="5" r="1" /><path d="m9 20 3-6 3 6" /><path d="m6 8 6 2 6-2" /><path d="M12 10v4" /></svg>
+                    </button>
+
+                    {/* Close X Button for the Widget - Positioned Absolute Relative to Container */}
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             setIsVisible(false);
                         }}
-                        className="absolute -top-2 -right-2 bg-gray-200 text-gray-600 hover:bg-red-500 hover:text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-50 w-5 h-5 flex items-center justify-center"
+                        className="absolute -top-1 -right-1 bg-gray-200 text-gray-600 hover:bg-red-500 hover:text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-[60] w-6 h-6 flex items-center justify-center border border-white"
                         title="סגור נגישות"
                     >
                         <Icons.Close />
-                    </button>
-
-                    {/* Floating Button */}
-                    <button
-                        onClick={() => setIsOpen(true)}
-                        className="fixed bottom-4 left-4 z-50 p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-110 transition-all duration-300 group border-0"
-                        aria-label="פתח תפריט נגישות"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 group-hover:rotate-12 transition-transform"><circle cx="12" cy="5" r="1" /><path d="m9 20 3-6 3 6" /><path d="m6 8 6 2 6-2" /><path d="M12 10v4" /></svg>
                     </button>
                 </div>
 
