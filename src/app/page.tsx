@@ -32,6 +32,7 @@ export default function LandingPage() {
             title: 'הממשק האישי',
             subtitle: 'כל הכסף של המשפחה במקום אחד',
             description: 'מערכת מקיפה וחכמה לניהול כל ההיבטים הפיננסיים של התא המשפחתי, המעניקה לכם שליטה מלאה, בקרה ושקט נפשי. עקבו בקלות אחר כל ההוצאות וההכנסות, נהלו תקציב חודשי מותאם אישית, וקבלו תובנות חכמות שיעזרו לכם לחסוך כסף ולשפר את ההתנהלות הכלכלית. הממשק הידידותי מרכז את כל המידע ממקום אחד, כולל ניהול חובות והלוואות, ומאפשר לכם לתכנן את העתיד הכלכלי של המשפחה בביטחון.',
+            shortDescription: 'שליטה מלאה על כלכלת המשפחה: מעקב הוצאות, ניהול תקציב, חסכונות וחובות במקום אחד. קבלו תובנות חכמות ושקט נפשי לעתיד הכלכלי שלכם.',
             bgColor: 'from-blue-600 via-blue-700 to-blue-900',
             textColor: 'text-white',
             accentColor: 'blue',
@@ -51,6 +52,7 @@ export default function LandingPage() {
             title: 'הממשק העסקי',
             subtitle: 'המשרד הדיגיטלי שלך',
             description: 'פתרון מושלם לעצמאיים ועסקים קטנים המרכז את כל הכלים לניהול העסק במקום אחד, בצורה מסונכרנת ומסודרת. הפיקו חשבוניות דיגיטליות בקלות, נהלו מעקב מדויק אחר הוצאות והכנסות, וקבלו תמונת מצב פיננסית בזמן אמת עם דוחות מתקדמים. המערכת מייעלת את העבודה מול לקוחות וספקים, מאפשרת ניהול תזרים מזומנים חכם, ומעניקה לכם את השקט הנפשי להתמקד בצמיחת העסק.',
+            shortDescription: 'המשרד הדיגיטלי לעצמאיים: חשבוניות דיגיטליות, ניהול תזרים, מעקב הוצאות ודוחות בזמן אמת. כל הכלים לניהול העסק וצמיחה כלכלית במקום אחד.',
             bgColor: 'from-green-600 to-emerald-800',
             textColor: 'text-white',
             accentColor: 'green',
@@ -159,7 +161,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
                         <Link href="/">
-                            <Image src="/homepage-logo.png" alt="Kesefly" width={140} height={40} className="h-14 w-auto brightness-0 invert" />
+                            <Image src="/images/branding/homepage-logo.png" alt="Kesefly" width={140} height={40} className="h-14 w-auto brightness-0 invert" />
                         </Link>
                     </motion.div>
                     <div className="hidden md:flex items-center gap-6">
@@ -268,7 +270,10 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                         <div className="text-center md:text-right flex flex-col justify-end md:justify-center items-center md:items-start">
                             <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-4xl md:text-6xl font-black text-white mb-1 md:mb-4">{section.title}</motion.h2>
                             <motion.h3 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 }} className="text-2xl text-white/80 mb-2 md:mb-6">{section.subtitle}</motion.h3>
-                            <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-2 md:mb-8 max-w-xl">{section.description}</motion.p>
+                            <motion.div initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-2 md:mb-8 max-w-xl">
+                                <p className="hidden md:block">{section.description}</p>
+                                <p className="md:hidden">{section.shortDescription || section.description}</p>
+                            </motion.div>
                         </div>
 
                         {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
