@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'מדיניות אבטחת מידע | Keseflow',
+    title: 'מדיניות אבטחת מידע | Kesefly',
     description: 'מדיניות אבטחת מידע, פרטיות וארכיטקטורה',
     robots: {
         index: false,
@@ -21,7 +21,7 @@ export default function SecurityPage() {
                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg shadow-red-200">
                                 <span className="text-white font-bold text-lg">K</span>
                             </div>
-                            <span className="font-bold text-xl text-gray-800 tracking-tight">Keseflow</span>
+                            <span className="font-bold text-xl text-gray-800 tracking-tight">Kesefly</span>
                         </div>
                         <a href="/" className="text-sm font-medium text-gray-500 hover:text-red-600 transition-colors">
                             חזרה לדף הבית
@@ -45,7 +45,7 @@ export default function SecurityPage() {
                         <article className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-800 prose-p:text-gray-600 prose-li:text-gray-600 prose-strong:text-gray-900 prose-a:text-red-600 hover:prose-a:text-red-700">
 
                             <p className="lead text-xl md:text-2xl font-medium text-gray-700 leading-relaxed mb-10">
-                                ב-Keseflow, אבטחת המידע שלכם היא בראש סדר העדיפויות שלנו.
+                                ב-Kesefly, אבטחת המידע שלכם היא בראש סדר העדיפויות שלנו.
                                 <br />
                                 <span className="text-base text-gray-500 font-normal mt-2 block">
                                     מסמך זה מפרט את הארכיטקטורה הטכנולוגית, מנגנוני ההגנה, והאופן בו אנו שומרים על פרטיות הנתונים הפיננסיים שלכם.
@@ -82,7 +82,7 @@ export default function SecurityPage() {
                                     <div className="bg-red-50/50 p-6 rounded-2xl border border-red-100 my-4">
                                         <ol className="list-decimal pr-5 space-y-2 m-0">
                                             <li>בעת תשלום, ה-Shortcut רץ <strong>מקומית</strong> על המכשיר שלכם.</li>
-                                            <li>הנתונים (סכום ושם עסק) מועברים ישירות לאפליקציית Keseflow בדפדפן שלכם דרך Deep Link.</li>
+                                            <li>הנתונים (סכום ושם עסק) מועברים ישירות לאפליקציית Kesefly בדפדפן שלכם דרך Deep Link.</li>
                                             <li><strong>השרתים שלנו אינם חשופים</strong> לפרטי כרטיס האשראי שלכם או לנתוני הארנק הדיגיטלי (Apple Wallet), אלא רק לטקסט הסופי שאתם מאשרים לשמירה.</li>
                                         </ol>
                                     </div>
@@ -93,7 +93,7 @@ export default function SecurityPage() {
                                         4.1 הגישה למערכת מוגבלת אך ורק למשתמש המורשה (ולמשתמשים נוספים שהוגדרו על ידו, כגון בן/בת זוג).
                                     </p>
                                     <p>
-                                        4.2 צוות הפיתוח והתמיכה של Keseflow אינו ניגש לנתונים הפיננסיים שלכם באופן שוטף. גישה כזו תתבצע רק במקרים חריגים של תמיכה טכנית מורכבת, ורק לאחר קבלת אישור מפורש וזמני מכם.
+                                        4.2 צוות הפיתוח והתמיכה של Kesefly אינו ניגש לנתונים הפיננסיים שלכם באופן שוטף. גישה כזו תתבצע רק במקרים חריגים של תמיכה טכנית מורכבת, ורק לאחר קבלת אישור מפורש וזמני מכם.
                                     </p>
                                 </Section>
 

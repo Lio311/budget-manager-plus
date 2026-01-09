@@ -85,8 +85,8 @@ export default function LandingPage() {
                             transition={{ type: "spring", stiffness: 300 }}
                         >
                             <Image
-                                src="/K-LOGO.png"
-                                alt="Keseflow"
+                                src="/homepage-logo.png"
+                                alt="Kesefly"
                                 width={600}
                                 height={180}
                                 className="h-20 md:h-32 w-auto"
@@ -495,7 +495,7 @@ export default function LandingPage() {
                         </Link>
                     </div>
                     <p className="text-xs text-gray-400 mt-4">
-                        © {new Date().getFullYear()} Keseflow. כל הזכויות שמורות.
+                        © {new Date().getFullYear()} Kesefly. כל הזכויות שמורות.
                     </p>
                 </motion.div >
 

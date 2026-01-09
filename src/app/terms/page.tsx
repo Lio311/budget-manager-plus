@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 
 
 export const metadata: Metadata = {
-    title: 'תקנון ומדיניות פרטיות | Keseflow',
+    title: 'תקנון ומדיניות פרטיות | Kesefly',
     description: 'תקנון ומדיניות שימוש באתר ובמוצר',
     robots: {
         index: false,
@@ -22,7 +22,7 @@ export default function TermsPage() {
                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-200">
                                 <span className="text-white font-bold text-lg">K</span>
                             </div>
-                            <span className="font-bold text-xl text-gray-800 tracking-tight">Keseflow</span>
+                            <span className="font-bold text-xl text-gray-800 tracking-tight">Kesefly</span>
                         </div>
                         <a href="/" className="text-sm font-medium text-gray-500 hover:text-green-600 transition-colors">
                             חזרה לדף הבית
@@ -46,7 +46,7 @@ export default function TermsPage() {
                         <article className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-800 prose-p:text-gray-600 prose-li:text-gray-600 prose-strong:text-gray-900 prose-a:text-green-600 hover:prose-a:text-green-700">
 
                             <p className="lead text-xl md:text-2xl font-medium text-gray-700 leading-relaxed mb-10">
-                                ברוכים הבאים ל-Keseflow, המערכת החכמה לניהול תקציב.
+                                ברוכים הבאים ל-Kesefly, המערכת החכמה לניהול תקציב.
                                 <br />
                                 <span className="text-base text-gray-500 font-normal mt-2 block">
                                     תקנון זה מנוסח בלשון זכר לצורך נוחות בלבד, אך מתייחס לשני המינים באופן שווה. השימוש באתר ובמערכת כפופים להסכמתך לתנאים הבאים.
@@ -57,7 +57,7 @@ export default function TermsPage() {
                                 <Section title="1. הגדרות" number="01">
                                     <ul className="list-none space-y-3 p-0 m-0">
                                         <Definition term="החברה/המפעיל" desc="מפעיל האתר והשירות, המציע שירותי ניהול תקציב דיגיטליים (SaaS)." />
-                                        <Definition term="האתר/המערכת" desc="פלטפורמת Keseflow המקוונת לניהול פיננסי." />
+                                        <Definition term="האתר/המערכת" desc="פלטפורמת Kesefly המקוונת לניהול פיננסי." />
                                         <Definition term="הלקוח/המשתמש" desc="כל אדם שעושה שימוש בשירותי המערכת, בין אם בחינם ובין אם בתשלום." />
                                         <Definition term="השירות" desc="מערכת לניהול תקציב, מעקב הוצאות וכלים פיננסיים נלווים." />
                                     </ul>
@@ -135,7 +135,7 @@ export default function TermsPage() {
 
                                 <Section title="8. קניין רוחני" number="08">
                                     <p>
-                                        כל הזכויות על הקוד, העיצוב, המותג "Keseflow" והתכנים במערכת שמורות למפעיל. אין להעתיק או לעשות בהם שימוש ללא רשות.
+                                        כל הזכויות על הקוד, העיצוב, המותג "Kesefly" והתכנים במערכת שמורות למפעיל. אין להעתיק או לעשות בהם שימוש ללא רשות.
                                     </p>
                                 </Section>
                             </div>
@@ -146,7 +146,7 @@ export default function TermsPage() {
                                     צור קשר עם התמיכה
                                 </a>
                                 <p className="text-sm text-gray-400 mt-8">
-                                    תודה שבחרת ב-Keseflow ❤️
+                                    תודה שבחרת ב-Kesefly ❤️
                                 </p>
                             </div>
 

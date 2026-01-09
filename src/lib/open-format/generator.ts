@@ -84,8 +84,8 @@ export async function generateBkmvData(year: number) {
     // ...
     const iniContent = `[MivneAhid]
 CodMivne=1.31
-Yezern=Keseflow
-ShemYezern=Keseflow Software
+Yezern=Kesefly
+ShemYezern=Kesefly Software
 ...
 [Isuk]
 OsekMorha=${business.companyId || '000000000'}

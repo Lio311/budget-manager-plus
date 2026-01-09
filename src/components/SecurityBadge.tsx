@@ -59,7 +59,7 @@ export default function SecurityBadge({ className = "" }: { className?: string }
                                     <Shield className="w-12 h-12" />
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl font-bold mb-2">אבטחת המידע ב-Keseflow</h2>
+                                    <h2 className="text-3xl font-bold mb-2">אבטחת המידע ב-Kesefly</h2>
                                     <p className="text-green-100">7 שכבות הגנה מתקדמות לנתונים הפיננסיים שלך</p>
                                 </div>
                             </div>

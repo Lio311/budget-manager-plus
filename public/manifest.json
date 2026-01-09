@@ -1,6 +1,6 @@
 {
-    "name": "Keseflow",
-    "short_name": "Keseflow",
+    "name": "Kesefly",
+    "short_name": "Kesefly",
     "description": "מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות",
     "start_url": "/",
     "display": "standalone",

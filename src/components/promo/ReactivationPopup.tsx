@@ -59,7 +59,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
                             <div className="relative w-full aspect-video">
                                 <Image
                                     src="/keseflow-pop.png"
-                                    alt="Keseflow Offer"
+                                    alt="Kesefly Offer"
                                     fill
                                     className="object-contain object-center"
                                     priority

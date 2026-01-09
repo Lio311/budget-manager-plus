@@ -203,7 +203,7 @@ export default function ProfitLossTab() {
                         {/* Footer with Logo */}
                         {isYearCompleted(year) && (
                             <div className="mt-6 pt-4 border-t flex justify-between items-center opacity-60 text-xs">
-                                <span>הופק ע"י Keseflow בתאריך {new Date().toLocaleDateString('he-IL')}</span>
+                                <span>הופק ע"י Kesefly בתאריך {new Date().toLocaleDateString('he-IL')}</span>
                             </div>
                         )}
                     </Card>
@@ -319,7 +319,7 @@ export default function ProfitLossTab() {
                     )}
 
                     <div className="mt-8 pt-4 border-t flex items-center justify-center text-gray-400 text-sm gap-1">
-                        <span>הופק ע"י Keseflow</span>
+                        <span>הופק ע"י Kesefly</span>
                         <span>•</span>
                         <span>{new Date().toLocaleDateString('he-IL')}</span>
                     </div>

@@ -2,7 +2,7 @@ export function WebApplicationJsonLd() {
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'WebApplication',
-        name: 'Keseflow',
+        name: 'Kesefly',
         description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות',
         url: 'https://keseflow.vercel.app',
         applicationCategory: 'FinanceApplication',

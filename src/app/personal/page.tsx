@@ -279,7 +279,7 @@ export default function PersonalLandingPage() {
                     className="fixed bottom-0 left-0 right-0 bg-black/30 backdrop-blur-md border-t border-white/10 py-6 z-40"
                 >
                     <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-white/60 text-sm">
-                        <p>© 2026 Keseflow. כל הזכויות שמורות.</p>
+                        <p>© 2026 Kesefly. כל הזכויות שמורות.</p>
                         <div className="flex gap-6">
                             <Link href="/terms" className="hover:text-white transition">תנאי שימוש</Link>
                             <Link href="/security" className="hover:text-white transition">אבטחת מידע</Link>

@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: "הצהרת נגישות | Keseflow",
-    description: "הצהרת הנגישות של אתר Keseflow - מחויבים לחווית גלישה שוויונית ונגישה לכולם.",
+    title: "הצהרת נגישות | Kesefly",
+    description: "הצהרת הנגישות של אתר Kesefly - מחויבים לחווית גלישה שוויונית ונגישה לכולם.",
 };
 
 export default function AccessibilityPage() {
@@ -16,7 +16,7 @@ export default function AccessibilityPage() {
                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200">
                                 <span className="text-white font-bold text-lg">K</span>
                             </div>
-                            <span className="font-bold text-xl text-gray-800 tracking-tight">Keseflow</span>
+                            <span className="font-bold text-xl text-gray-800 tracking-tight">Kesefly</span>
                         </div>
                         <a href="/" className="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
                             חזרה לדף הבית

@@ -39,15 +39,15 @@ export const viewport = {
 
 export const metadata: Metadata = {
     title: {
-        default: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
-        template: '%s | Keseflow'
+        default: 'Kesefly - ניהול תקציב אישי ומשפחתי חכם',
+        template: '%s | Kesefly'
     },
     description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות. לוח שנה אינטראקטיבי, תזכורות תשלומים וניתוח פיננסי מתקדם.',
     keywords: ['ניהול תקציב', 'תקציב אישי', 'תקציב משפחתי', 'ניהול כספים', 'חיסכון', 'הוצאות', 'הכנסות', 'תזכורות תשלומים', 'לוח שנה פיננסי'],
-    authors: [{ name: 'Keseflow' }],
-    creator: 'Keseflow',
-    publisher: 'Keseflow',
-    applicationName: 'Keseflow',
+    authors: [{ name: 'Kesefly' }],
+    creator: 'Kesefly',
+    publisher: 'Kesefly',
+    applicationName: 'Kesefly',
     metadataBase: new URL('https://keseflow.vercel.app'),
     manifest: '/manifest.json',
     alternates: {
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
         title: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
         description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות',
         url: 'https://keseflow.vercel.app',
-        siteName: 'Keseflow',
+        siteName: 'Kesefly',
         locale: 'he_IL',
         type: 'website',
         images: [
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
                 url: '/og-image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Keseflow - ניהול תקציב חכם',
+                alt: 'Kesefly - ניהול תקציב חכם',
             },
         ],
     },
@@ -97,7 +97,7 @@ export const metadata: Metadata = {
     appleWebApp: {
         capable: true,
         statusBarStyle: 'default',
-        title: 'Keseflow',
+        title: 'Kesefly',
     },
     formatDetection: {
         telephone: false,

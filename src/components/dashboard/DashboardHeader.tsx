@@ -179,7 +179,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                 <div className="hidden md:flex flex-1 justify-center items-center opacity-80 hover:opacity-100 transition-opacity">
                     <Image
                         src="/K-LOGO.png"
-                        alt="Keseflow"
+                        alt="Kesefly"
                         width={120}
                         height={40}
                         className="h-8 w-auto object-contain drop-shadow-sm dark:hidden"
@@ -187,7 +187,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     />
                     <Image
                         src="/K-LOGO2.png"
-                        alt="Keseflow"
+                        alt="Kesefly"
                         width={120}
                         height={40}
                         className="h-8 w-auto object-contain drop-shadow-sm hidden dark:block"
