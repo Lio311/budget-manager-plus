@@ -5,22 +5,109 @@ import { motion } from 'framer-motion'
 
 // Simple map visualization using dot positions (mocked relative positions for key cities)
 const CITY_COORDS: Record<string, { x: number, y: number }> = {
+    // Center / Gush Dan
     'Tel Aviv': { x: 45, y: 45 },
     'Tel Aviv-Yafo': { x: 45, y: 45 },
-    'Jerusalem': { x: 55, y: 55 },
-    'Haifa': { x: 48, y: 25 },
-    'Eilat': { x: 50, y: 95 },
-    'Beer Sheva': { x: 40, y: 70 },
-    'Netanya': { x: 46, y: 40 },
-    'Ashdod': { x: 42, y: 52 },
-    'Rishon LeZion': { x: 44, y: 48 },
+    'Ramat Gan': { x: 46, y: 45 },
+    'Givatayim': { x: 46, y: 45 },
+    'Bnei Brak': { x: 46, y: 44 },
     'Petah Tikva': { x: 47, y: 44 },
     'Holon': { x: 44, y: 47 },
-    'Bnei Brak': { x: 46, y: 44 },
-    'Ramat Gan': { x: 46, y: 45 },
-    'Rehovot': { x: 44, y: 50 },
     'Bat Yam': { x: 43, y: 46 },
+    'Rishon LeZion': { x: 44, y: 48 },
+    'Rehovot': { x: 44, y: 50 },
+    'Ness Ziona': { x: 44, y: 49 },
+    'Yavne': { x: 43, y: 51 },
     'Herzliya': { x: 45, y: 42 },
+    'Ramat HaSharon': { x: 46, y: 42 },
+    'Hod HaSharon': { x: 47, y: 41 },
+    'Kfar Saba': { x: 48, y: 41 },
+    'Ra\'anana': { x: 46, y: 41 },
+
+    // Sharon / North Coast
+    'Netanya': { x: 45, y: 38 },
+    'Hadera': { x: 46, y: 34 },
+    'Zikhron Ya\'akov': { x: 46, y: 30 },
+    'Caesarea': { x: 45, y: 32 },
+
+    // North
+    'Haifa': { x: 48, y: 25 },
+    'Kiryat Ata': { x: 50, y: 24 },
+    'Kiryat Bialik': { x: 50, y: 23 },
+    'Kiryat Motzkin': { x: 49, y: 23 },
+    'Kiryat Yam': { x: 48, y: 23 },
+    'Acre': { x: 49, y: 20 },
+    'Akko': { x: 49, y: 20 },
+    'Nahariya': { x: 49, y: 15 },
+    'Karmiel': { x: 53, y: 20 },
+    'Tiberias': { x: 60, y: 25 },
+    'Nazareth': { x: 53, y: 28 },
+    'Afula': { x: 53, y: 32 },
+    'Safed': { x: 58, y: 18 },
+    'Kiryat Shmona': { x: 58, y: 10 },
+
+    // Jerusalem Area
+    'Jerusalem': { x: 55, y: 55 },
+    'Beit Shemesh': { x: 50, y: 56 },
+    'Modi\'in': { x: 50, y: 50 },
+    'Modi\'in-Maccabim-Re\'ut': { x: 50, y: 50 },
+
+    // South
+    'Ashdod': { x: 42, y: 53 },
+    'Ashkelon': { x: 40, y: 58 },
+    'Sderot': { x: 38, y: 64 },
+    'Netivot': { x: 38, y: 68 },
+    'Ofakim': { x: 36, y: 70 },
+    'Beer Sheva': { x: 45, y: 72 },
+    'Dimona': { x: 50, y: 75 },
+    'Arad': { x: 55, y: 72 },
+    'Mitzpe Ramon': { x: 45, y: 85 },
+    'Eilat': { x: 50, y: 95 },
+}
+
+const CITY_TRANSLATIONS: Record<string, string> = {
+    'Tel Aviv': 'תל אביב',
+    'Tel Aviv-Yafo': 'תל אביב',
+    'Jerusalem': 'ירושלים',
+    'Haifa': 'חיפה',
+    'Rishon LeZion': 'ראשון לציון',
+    'Petah Tikva': 'פתח תקווה',
+    'Ashdod': 'אשדוד',
+    'Netanya': 'נתניה',
+    'Beer Sheva': 'באר שבע',
+    'Holon': 'חולון',
+    'Bnei Brak': 'בני ברק',
+    'Ramat Gan': 'רמת גן',
+    'Rehovot': 'רחובות',
+    'Bat Yam': 'בת ים',
+    'Herzliya': 'הרצליה',
+    'Kfar Saba': 'כפר סבא',
+    'Modi\'in': 'מודיעין',
+    'Modi\'in-Maccabim-Re\'ut': 'מודיעין',
+    'Hadera': 'חדרה',
+    'Ashkelon': 'אשקלון',
+    'Ra\'anana': 'רעננה',
+    'Hod HaSharon': 'הוד השרון',
+    'Ramat HaSharon': 'רמת השרון',
+    'Nahariya': 'נהריה',
+    'Kiryat Ata': 'קרית אתא',
+    'Givatayim': 'גבעתיים',
+    'Acre': 'עכו',
+    'Akko': 'עכו',
+    'Eilat': 'אילת',
+    'Nazareth': 'נצרת',
+    'Afula': 'עפולה',
+    'Karmiel': 'כרמיאל',
+    'Tiberias': 'טבריה',
+    'Safed': 'צפת',
+    'Kiryat Shmona': 'קרית שמונה',
+    'Beit Shemesh': 'בית שמש',
+    'Sderot': 'שדרות',
+    'Dimona': 'דימונה',
+    'Yavne': 'יבנה',
+    'Ness Ziona': 'נס ציונה',
+    'Kiryat Gat': 'קרית גת',
+    // ... add more as needed
 }
 
 const COLORS = ['#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899']
@@ -86,7 +173,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     fill="#1E293B"
                                     fontWeight="bold"
                                 >
-                                    {loc.city} ({loc._count.id})
+                                    {CITY_TRANSLATIONS[loc.city] || loc.city} ({loc._count.id})
                                 </text>
                             </motion.g>
                         )
