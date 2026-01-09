@@ -85,7 +85,7 @@ export const metadata: Metadata = {
     },
     icons: {
         icon: '/K-ICON.png',
-        apple: '/K-ICON.png',
+        apple: '/apple-touch-icon.png',
         shortcut: '/K-ICON.png',
     },
     appleWebApp: {
