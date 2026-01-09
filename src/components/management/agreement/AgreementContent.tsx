@@ -19,6 +19,38 @@ const EMAILS = {
     LEON: 'leonpiatti@tuta.com'
 }
 
+interface InlineInputProps {
+    name: string
+    placeholder?: string
+    width?: string
+    values: any
+    onChange: (key: string, value: string) => void
+    readOnly: boolean
+    isFieldDisabled: (name: string) => boolean
+}
+
+const InlineInput = ({ name, placeholder, width = "120px", values, onChange, readOnly, isFieldDisabled }: InlineInputProps) => {
+    if (readOnly) {
+        return (
+            <span className="font-bold border-b border-black px-2 inline-block text-center mx-1">
+                {values[name] || "_______"}
+            </span>
+        )
+    }
+    const disabled = isFieldDisabled(name)
+    return (
+        <input
+            type="text"
+            value={values[name] || ''}
+            onChange={(e) => onChange(name, e.target.value)}
+            placeholder={placeholder}
+            disabled={disabled}
+            className={`inline-block border-b border-black focus:outline-none focus:border-blue-500 bg-transparent px-1 mx-1 text-center font-bold placeholder:font-normal placeholder:text-gray-400 ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}`}
+            style={{ width }}
+        />
+    )
+}
+
 export function AgreementContent({ values, onChange, readOnly = false, userEmail, signature }: AgreementContentProps) {
 
     const isLior = userEmail === EMAILS.LIOR
@@ -36,46 +68,24 @@ export function AgreementContent({ values, onChange, readOnly = false, userEmail
         return true
     }
 
-    const InlineInput = ({ name, placeholder, width = "120px" }: { name: string, placeholder?: string, width?: string }) => {
-        if (readOnly) {
-            return (
-                <span className="font-bold border-b border-black px-2 inline-block text-center mx-1">
-                    {values[name] || "_______"}
-                </span>
-            )
-        }
-        const disabled = isFieldDisabled(name)
-        return (
-            <input
-                type="text"
-                value={values[name] || ''}
-                onChange={(e) => onChange(name, e.target.value)}
-                placeholder={placeholder}
-                disabled={disabled}
-                className={`inline-block border-b border-black focus:outline-none focus:border-blue-500 bg-transparent px-1 mx-1 text-center font-bold placeholder:font-normal placeholder:text-gray-400 ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}`}
-                style={{ width }}
-            />
-        )
-    }
-
     return (
         <div className="prose max-w-none text-right leading-relaxed text-gray-800 font-open-sans" dir="rtl">
             <h1 className="text-2xl font-bold text-center mb-6 underline">מסמך עקרונות והבנות – מיזם מערכת לניהול כספים</h1>
 
             <p className="mb-6 text-center">
-                נערך ונחתם ביום <InlineInput name="day" placeholder="יום" width="50px" /> לחודש <InlineInput name="month" placeholder="חודש" width="80px" /> שנת <InlineInput name="year" placeholder="שנה" width="60px" />
+                נערך ונחתם ביום <InlineInput name="day" placeholder="יום" width="50px" values={values} onChange={onChange} readOnly={readOnly} isFieldDisabled={isFieldDisabled} /> לחודש <InlineInput name="month" placeholder="חודש" width="80px" values={values} onChange={onChange} readOnly={readOnly} isFieldDisabled={isFieldDisabled} /> שנת <InlineInput name="year" placeholder="שנה" width="60px" values={values} onChange={onChange} readOnly={readOnly} isFieldDisabled={isFieldDisabled} />
             </p>
 
             <h3 className="text-lg font-bold mb-2">הצדדים:</h3>
             <ul className="list-disc pr-6 mb-6 space-y-2">
                 <li>
-                    ליאור צפריר ת.ז <InlineInput name="liorId" placeholder="מס' ת.ז" width="120px" /> (להלן: "<strong>ליאור</strong>")
+                    ליאור צפריר ת.ז <InlineInput name="liorId" placeholder="מס' ת.ז" width="120px" values={values} onChange={onChange} readOnly={readOnly} isFieldDisabled={isFieldDisabled} /> (להלן: "<strong>ליאור</strong>")
                 </li>
                 <li>
-                    רון קור ת.ז <InlineInput name="ronId" placeholder="מס' ת.ז" width="120px" /> (להלן: "<strong>רון</strong>")
+                    רון קור ת.ז <InlineInput name="ronId" placeholder="מס' ת.ז" width="120px" values={values} onChange={onChange} readOnly={readOnly} isFieldDisabled={isFieldDisabled} /> (להלן: "<strong>רון</strong>")
                 </li>
                 <li>
-                    לאון פיאטיגורסקי ת.ז <InlineInput name="leonId" placeholder="מס' ת.ז" width="120px" /> (להלן: "<strong>לאון</strong>")
+                    לאון פיאטיגורסקי ת.ז <InlineInput name="leonId" placeholder="מס' ת.ז" width="120px" values={values} onChange={onChange} readOnly={readOnly} isFieldDisabled={isFieldDisabled} /> (להלן: "<strong>לאון</strong>")
                 </li>
             </ul>
             <p className="mb-6 font-bold">להלן ביחד: "הצדדים" או "השותפים"</p>
