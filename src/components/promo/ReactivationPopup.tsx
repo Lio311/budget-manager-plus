@@ -19,6 +19,10 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
         if (shouldShow) {
             const hasSeenPopup = localStorage.getItem('hide_reactivation_popup')
             if (!hasSeenPopup) {
+                // Preload image
+                const img = new window.Image()
+                img.src = '/images/marketing/keseflow-pop.png'
+
                 // Delay to allow page to load a bit before popping up
                 const timer = setTimeout(() => setIsOpen(true), 2000)
                 return () => clearTimeout(timer)
