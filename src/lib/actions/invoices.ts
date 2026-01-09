@@ -49,7 +49,59 @@ const InvoiceSchema = z.object({
     })).min(1, 'חובה להוסיף לפחות שורה אחת')
 })
 
-// ... (getInvoices, getInvoice kept same) ...
+export async function getInvoices(scope: string = 'BUSINESS') {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        const invoices = await db.invoice.findMany({
+            where: {
+                userId,
+                scope
+            },
+            include: {
+                client: true
+            },
+            orderBy: {
+                issueDate: 'desc'
+            }
+        })
+
+        return { success: true, data: invoices }
+    } catch (error) {
+        console.error('getInvoices error:', error)
+        return { success: false, error: 'Failed to fetch invoices' }
+    }
+}
+
+export async function getInvoice(id: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        const invoice = await db.invoice.findUnique({
+            where: { id },
+            include: {
+                client: true,
+                incomes: true,
+                lineItems: true
+            }
+        })
+
+        if (!invoice || invoice.userId !== userId) {
+            throw new Error('Invoice not found')
+        }
+
+        return { success: true, data: invoice }
+    } catch (error) {
+        console.error('getInvoice error:', error)
+        return { success: false, error: 'Failed to fetch invoice' }
+    }
+}
 
 import { getCurrentBudget } from './budget' // Import this
 import { convertToILS } from '@/lib/currency' // Might need this if we do currency conversion, but for now assuming ILS or same currency
