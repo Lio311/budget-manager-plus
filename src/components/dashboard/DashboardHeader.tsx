@@ -10,8 +10,11 @@ import { ModeToggle } from '@/components/mode-toggle'
 import { MonthYearPicker } from './MonthYearPicker'
 import Image from 'next/image'
 import { SubscriptionStatus } from './UserProfile/SubscriptionStatus'
+import { useState } from 'react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PERSONAL', hasPersonalAccess = true, hasBusinessAccess = false }: any) {
+    const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false)
     const { month, year, budgetType, setMonth, setYear, setBudgetType } = useBudget()
     const router = useRouter()
 
@@ -128,6 +131,13 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             userProfileProps={userProfileProps}
                             appearance={userButtonAppearance}
                         >
+                            <UserButton.MenuItems>
+                                <UserButton.Action
+                                    label="מנוי"
+                                    labelIcon={<CreditCard className="w-4 h-4" />}
+                                    onClick={() => setIsSubscriptionOpen(true)}
+                                />
+                            </UserButton.MenuItems>
                             <UserButton.UserProfilePage
                                 label="מנוי"
                                 url="subscription"
@@ -214,6 +224,13 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             userProfileProps={userProfileProps}
                             appearance={userButtonAppearance}
                         >
+                            <UserButton.MenuItems>
+                                <UserButton.Action
+                                    label="מנוי"
+                                    labelIcon={<CreditCard className="w-4 h-4" />}
+                                    onClick={() => setIsSubscriptionOpen(true)}
+                                />
+                            </UserButton.MenuItems>
                             <UserButton.UserProfilePage
                                 label="מנוי"
                                 url="subscription"
@@ -225,6 +242,19 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     </div>
                 </div>
             </div>
+
+            <Dialog open={isSubscriptionOpen} onOpenChange={setIsSubscriptionOpen}>
+                <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden bg-white dark:bg-slate-900 border-none shadow-xl rounded-3xl" dir="rtl">
+                    <div className="p-6">
+                        <SubscriptionStatus />
+                        <div className="mt-6 flex justify-center">
+                            <Button variant="outline" onClick={() => setIsSubscriptionOpen(false)} className="w-full sm:w-auto">
+                                סגור
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
