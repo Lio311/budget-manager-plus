@@ -3,15 +3,15 @@
 import { useState } from 'react'
 import { Shield, X, Lock, Database, Eye, CheckCircle2, Server, Activity } from 'lucide-react'
 
-export default function SecurityBadge() {
+export default function SecurityBadge({ className = "" }: { className?: string }) {
     const [isOpen, setIsOpen] = useState(false)
 
     return (
         <>
-            {/* Security Badge - Fixed position in top right */}
+            {/* Security Badge - Fixed position */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed top-6 right-6 z-50 p-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-full shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:scale-110 transition-all duration-300 group border-0"
+                className={`fixed z-50 p-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-full shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:scale-110 transition-all duration-300 group border-0 ${className || 'top-6 right-6'}`}
                 aria-label="אבטחת מידע"
             >
                 <Shield className="w-6 h-6 group-hover:rotate-12 transition-transform" />

@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Menu, X, ArrowLeft, LayoutDashboard, PieChart, Calendar, BarChart3, CreditCard, Receipt, ShieldCheck, Smartphone } from 'lucide-react'
+import { ShieldCheck, ArrowLeft, Check, Menu, X, ChevronDown, LayoutDashboard, PieChart, Calendar, BarChart3, CreditCard, Receipt, Smartphone, Lock, Shield } from 'lucide-react'
+import SecurityBadge from '@/components/SecurityBadge'
 import { Button } from '@/components/ui/button'
 
 export default function LandingPage() {
@@ -194,6 +195,9 @@ export default function LandingPage() {
                     </motion.div>
                 </motion.div>
             )}
+
+            {/* Security Badge */}
+            <SecurityBadge className="bottom-4 right-4" />
 
             {/* Custom Footer */}
             {currentSection === sections.length - 1 && (
