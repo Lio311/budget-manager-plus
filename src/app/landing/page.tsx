@@ -31,7 +31,7 @@ export default function LandingPage() {
             type: 'personal',
             title: 'הממשק האישי',
             subtitle: 'כל הכסף של המשפחה במקום אחד',
-            description: 'מערכת מקיפה לניהול כל ההיבטים הפיננסיים של התא המשפחתי. שליטה, בקרה ושקט נפשי.',
+            description: 'מערכת מקיפה וחכמה לניהול כל ההיבטים הפיננסיים של התא המשפחתי, המעניקה לכם שליטה מלאה, בקרה ושקט נפשי. עקבו בקלות אחר כל ההוצאות וההכנסות, נהלו תקציב חודשי מותאם אישית, וקבלו תובנות חכמות שיעזרו לכם לחסוך כסף ולשפר את ההתנהלות הכלכלית. הממשק הידידותי מרכז את כל המידע ממקום אחד, כולל ניהול חובות והלוואות, ומאפשר לכם לתכנן את העתיד הכלכלי של המשפחה בביטחון.',
             bgColor: 'from-blue-600 via-blue-700 to-blue-900',
             textColor: 'text-white',
             accentColor: 'blue',
@@ -261,12 +261,9 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                 {(section.type === 'personal' || section.type === 'business') && (
                     <div className="grid md:grid-cols-2 gap-2 md:gap-12 items-center w-full h-full pt-20 pb-10 md:pb-20">
                         <div className="text-center md:text-right flex flex-col justify-center items-center md:items-start">
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={isActive ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.3 }} className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white/80 text-sm mb-4 border border-white/20 w-fit mx-auto md:mx-0">
-                                {section.type === 'personal' ? 'למשקי בית' : 'לעסקים ועצמאיים'}
-                            </motion.div>
-                            <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-4xl md:text-6xl font-black text-white mb-2 md:mb-4">{section.title}</motion.h2>
-                            <motion.h3 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 }} className="text-2xl text-white/80 mb-4 md:mb-6">{section.subtitle}</motion.h3>
-                            <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-4 md:mb-8 max-w-xl">{section.description}</motion.p>
+                            <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-4xl md:text-6xl font-black text-white mb-1 md:mb-4">{section.title}</motion.h2>
+                            <motion.h3 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 }} className="text-2xl text-white/80 mb-2 md:mb-6">{section.subtitle}</motion.h3>
+                            <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-2 md:mb-8 max-w-xl">{section.description}</motion.p>
                         </div>
 
                         {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
