@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/card'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 import { CheckCircle, AlertCircle, Clock } from 'lucide-react'
 
+import { isBefore, startOfDay } from 'date-fns'
+
 // Define types for task analytics props
 interface TaskAnalyticsProps {
     tasks: any[]
@@ -14,36 +16,40 @@ export function TaskAnalytics({ tasks }: TaskAnalyticsProps) {
     const totalTasks = tasks.length
     if (totalTasks === 0) return null
 
-    const now = new Date()
-
     let onTime = 0
     let late = 0
     let pending = 0
 
     tasks.forEach(task => {
         const dueDate = task.dueDate ? new Date(task.dueDate) : null
-        const isDone = task.status === 'DONE'
-        const updatedAt = new Date(task.updatedAt)
 
         if (!dueDate) {
             // If no due date, we consider it pending or onTime if done
-            if (isDone) onTime++
+            if (task.status === 'DONE') onTime++
             else pending++
             return
         }
 
-        if (isDone) {
+        const due = startOfDay(dueDate)
+        const today = startOfDay(new Date())
+
+        if (task.status === 'DONE') {
             // Task completed. Check if it was done before due date.
-            // Comparison: Set times to midnight to avoid hour sensitivity if needed,
-            // but exact comparison is safer for "deadline". 
-            if (updatedAt <= dueDate) {
+            // If completedAt exists, use it. If not (legacy), assume on time.
+            if (!task.completedAt) {
                 onTime++
             } else {
-                late++
+                const completedTime = new Date(task.completedAt)
+                // If completed AFTER due date -> Late
+                if (isBefore(due, startOfDay(completedTime))) {
+                    late++
+                } else {
+                    onTime++
+                }
             }
         } else {
-            // Task NOT done. Check if due date passed.
-            if (now > dueDate) {
+            // Task NOT done. Check if due date passed (strictly before today).
+            if (isBefore(due, today)) {
                 late++
             } else {
                 pending++
@@ -59,7 +65,7 @@ export function TaskAnalytics({ tasks }: TaskAnalyticsProps) {
 
     // Calculate rate: (Total - Late) / Total * 100
     // This considers 'pending' tasks as 'on track' (100% compliance so far)
-    const onTimeRate = Math.round(((totalTasks - late) / totalTasks) * 100) || 0
+    const onTimeRate = totalTasks > 0 ? Math.round(((totalTasks - late) / totalTasks) * 100) : 0
 
     return (
         <Card className="p-4 mb-6 bg-white shadow-sm border-none">
