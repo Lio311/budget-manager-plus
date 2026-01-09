@@ -3,66 +3,91 @@
 import { Card } from '@/components/ui/card'
 import { motion } from 'framer-motion'
 
-// Simple map visualization using dot positions (mocked relative positions for key cities)
-const CITY_COORDS: Record<string, { x: number, y: number }> = {
+// Real-world coordinates only, we will project them dynamically
+const CITY_LOCATIONS: Record<string, { lat: number, lng: number }> = {
     // Center / Gush Dan
-    'Tel Aviv': { x: 45, y: 45 },
-    'Tel Aviv-Yafo': { x: 45, y: 45 },
-    'Ramat Gan': { x: 46, y: 45 },
-    'Givatayim': { x: 46, y: 45 },
-    'Bnei Brak': { x: 46, y: 44 },
-    'Petah Tikva': { x: 47, y: 44 },
-    'Holon': { x: 44, y: 47 },
-    'Bat Yam': { x: 43, y: 46 },
-    'Rishon LeZion': { x: 44, y: 48 },
-    'Rehovot': { x: 44, y: 50 },
-    'Ness Ziona': { x: 44, y: 49 },
-    'Yavne': { x: 43, y: 51 },
-    'Herzliya': { x: 45, y: 42 },
-    'Ramat HaSharon': { x: 46, y: 42 },
-    'Hod HaSharon': { x: 47, y: 41 },
-    'Kfar Saba': { x: 48, y: 41 },
-    'Ra\'anana': { x: 46, y: 41 },
+    'Tel Aviv': { lat: 32.0853, lng: 34.7818 },
+    'Tel Aviv-Yafo': { lat: 32.0853, lng: 34.7818 },
+    'Ramat Gan': { lat: 32.0684, lng: 34.8264 },
+    'Givatayim': { lat: 32.0722, lng: 34.8089 },
+    'Bnei Brak': { lat: 32.0849, lng: 34.8352 },
+    'Petah Tikva': { lat: 32.0840, lng: 34.8878 },
+    'Holon': { lat: 32.0158, lng: 34.7874 },
+    'Bat Yam': { lat: 32.0132, lng: 34.7480 },
+    'Rishon LeZion': { lat: 31.9730, lng: 34.7925 },
+    'Rehovot': { lat: 31.8903, lng: 34.8113 },
+    'Ness Ziona': { lat: 31.9318, lng: 34.7997 },
+    'Yavne': { lat: 31.8780, lng: 34.7383 },
+    'Herzliya': { lat: 32.1624, lng: 34.8447 },
+    'Ramat HaSharon': { lat: 32.1492, lng: 34.8407 },
+    'Hod HaSharon': { lat: 32.1522, lng: 34.8932 },
+    'Kfar Saba': { lat: 32.1750, lng: 34.9069 },
+    'Ra\'anana': { lat: 32.1848, lng: 34.8713 },
 
     // Sharon / North Coast
-    'Netanya': { x: 45, y: 38 },
-    'Hadera': { x: 46, y: 34 },
-    'Zikhron Ya\'akov': { x: 46, y: 30 },
-    'Caesarea': { x: 45, y: 32 },
+    'Netanya': { lat: 32.3215, lng: 34.8532 },
+    'Hadera': { lat: 32.4340, lng: 34.9197 },
+    'Zikhron Ya\'akov': { lat: 32.5707, lng: 34.9566 },
+    'Caesarea': { lat: 32.5000, lng: 34.9000 },
 
     // North
-    'Haifa': { x: 48, y: 25 },
-    'Kiryat Ata': { x: 50, y: 24 },
-    'Kiryat Bialik': { x: 50, y: 23 },
-    'Kiryat Motzkin': { x: 49, y: 23 },
-    'Kiryat Yam': { x: 48, y: 23 },
-    'Acre': { x: 49, y: 20 },
-    'Akko': { x: 49, y: 20 },
-    'Nahariya': { x: 49, y: 15 },
-    'Karmiel': { x: 53, y: 20 },
-    'Tiberias': { x: 60, y: 25 },
-    'Nazareth': { x: 53, y: 28 },
-    'Afula': { x: 53, y: 32 },
-    'Safed': { x: 58, y: 18 },
-    'Kiryat Shmona': { x: 58, y: 10 },
+    'Haifa': { lat: 32.7940, lng: 34.9896 },
+    'Kiryat Ata': { lat: 32.8105, lng: 35.1098 },
+    'Kiryat Bialik': { lat: 32.8368, lng: 35.0743 },
+    'Kiryat Motzkin': { lat: 32.8465, lng: 35.0805 },
+    'Kiryat Yam': { lat: 32.8290, lng: 35.0684 },
+    'Acre': { lat: 32.9312, lng: 35.0818 },
+    'Akko': { lat: 32.9312, lng: 35.0818 },
+    'Nahariya': { lat: 33.0034, lng: 35.0970 },
+    'Karmiel': { lat: 32.9190, lng: 35.2901 },
+    'Tiberias': { lat: 32.7959, lng: 35.5312 },
+    'Nazareth': { lat: 32.6996, lng: 35.3035 },
+    'Afula': { lat: 32.6065, lng: 35.2901 },
+    'Safed': { lat: 32.9646, lng: 35.4960 },
+    'Kiryat Shmona': { lat: 33.2075, lng: 35.5697 },
 
     // Jerusalem Area
-    'Jerusalem': { x: 55, y: 55 },
-    'Beit Shemesh': { x: 50, y: 56 },
-    'Modi\'in': { x: 50, y: 50 },
-    'Modi\'in-Maccabim-Re\'ut': { x: 50, y: 50 },
+    'Jerusalem': { lat: 31.7683, lng: 35.2137 },
+    'Beit Shemesh': { lat: 31.7470, lng: 34.9881 },
+    'Modi\'in': { lat: 31.8906, lng: 35.0104 },
+    'Modi\'in-Maccabim-Re\'ut': { lat: 31.8906, lng: 35.0104 },
 
     // South
-    'Ashdod': { x: 42, y: 53 },
-    'Ashkelon': { x: 40, y: 58 },
-    'Sderot': { x: 38, y: 64 },
-    'Netivot': { x: 38, y: 68 },
-    'Ofakim': { x: 36, y: 70 },
-    'Beer Sheva': { x: 45, y: 72 },
-    'Dimona': { x: 50, y: 75 },
-    'Arad': { x: 55, y: 72 },
-    'Mitzpe Ramon': { x: 45, y: 85 },
-    'Eilat': { x: 50, y: 95 },
+    'Ashdod': { lat: 31.8014, lng: 34.6435 },
+    'Ashkelon': { lat: 31.6688, lng: 34.5743 },
+    'Sderot': { lat: 31.5247, lng: 34.5953 },
+    'Netivot': { lat: 31.4172, lng: 34.5828 },
+    'Ofakim': { lat: 31.3134, lng: 34.6208 },
+    'Beer Sheva': { lat: 31.2518, lng: 34.7913 },
+    'Dimona': { lat: 31.0664, lng: 35.0315 },
+    'Arad': { lat: 31.2600, lng: 35.2100 },
+    'Mitzpe Ramon': { lat: 30.6120, lng: 34.8010 },
+    'Eilat': { lat: 29.5581, lng: 34.9482 },
+}
+
+// Projection Calibration (Manually tuned for this specific SVG viewBox)
+// Map Bounds (Approx Israel + Territories)
+const MAP_BOUNDS = {
+    minLat: 29.2,  // Below Eilat
+    maxLat: 33.5,  // Above Metula
+    minLng: 34.1,  // Mediterranean
+    maxLng: 35.9   // Jordan Rift
+}
+
+// Convert Lat/Lng to SVG percent coordinates
+function project(lat: number, lng: number) {
+    const latPercent = (lat - MAP_BOUNDS.minLat) / (MAP_BOUNDS.maxLat - MAP_BOUNDS.minLat)
+    const lngPercent = (lng - MAP_BOUNDS.minLng) / (MAP_BOUNDS.maxLng - MAP_BOUNDS.minLng)
+
+    // SVG Coordinate System:
+    // x increases West -> East (Left -> Right), matches lng
+    // y increases North -> South (Top -> Bottom), INVERSE of lat
+
+    // Fine-tune offsets for specific path alignment
+    const x = (lngPercent * 100)
+    const y = ((1 - latPercent) * 100)
+
+    return { x, y }
 }
 
 const CITY_TRANSLATIONS: Record<string, string> = {
@@ -107,54 +132,82 @@ const CITY_TRANSLATIONS: Record<string, string> = {
     'Yavne': 'יבנה',
     'Ness Ziona': 'נס ציונה',
     'Kiryat Gat': 'קרית גת',
-    // ... add more as needed
+    'Netivot': 'נתיבות',
+    'Ofakim': 'אופקים',
+    'Mitzpe Ramon': 'מצפה רמון',
+    'Kiryat Bialik': 'קרית ביאליק',
+    'Kiryat Motzkin': 'קרית מוצקין',
+    'Kiryat Yam': 'קרית ים',
+    'Zikhron Ya\'akov': 'זכרון יעקב',
+    'Caesarea': 'קיסריה',
+    'Arad': 'ערד'
 }
 
 const COLORS = ['#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899']
 
 export function IsraelMapWidget({ locations }: { locations: any[] }) {
-    // Calculate max for sizing bubbles
     const maxCount = Math.max(...locations.map(l => l._count.id), 1)
 
     return (
         <Card className="p-6 h-[700px] shadow-sm relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50/50">
             <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-                {/* Placeholder for actual map bg if we had one, purely CSS shapes for now */}
                 <div className="w-48 h-96 bg-gray-400 rounded-full blur-3xl transform rotate-12"></div>
             </div>
 
             <div className="relative w-full h-full p-4 flex items-center justify-center">
-                {/* SVG Map of Israel (Simplified Path) */}
-                <svg viewBox="0 0 100 200" className="h-[95%] drop-shadow-xl overflow-visible">
+                {/* Detailed Israel Map SVG */}
+                <svg viewBox="0 0 100 230" className="h-[98%] drop-shadow-xl overflow-visible">
+                    {/* Mediterranean Sea Reference line (Optional, conceptual) */}
+
+                    {/* Land Mass */}
                     <path
-                        d="M 60,10 L 65,15 L 60,25 L 50,25 L 45,30 L 40,40 L 45,50 L 40,60 L 35,70 L 35,90 L 40,110 L 50,150 L 50,190 L 55,190 L 60,150 L 65,110 L 70,80 L 65,60 L 65,50 L 75,50 L 75,40 L 70,30 L 65,20 Z"
+                        d="M 64.5,5.5 L 61.3,9.7 L 60.1,16.2 L 54.4,19.3 L 50.8,17.9 L 48.0,19.6 L 46.1,23.4 L 47.9,32.2 L 44.9,34.9 L 45.4,43.2 L 42.1,48.5 L 39.5,60.1 L 37.3,66.8 L 33.8,70.9 L 32.1,84.0 L 32.2,95.5 L 34.0,105.1 L 28.5,108.6 L 24.1,114.2 L 24.9,122.3 L 31.9,121.7 L 34.1,128.4 L 33.7,137.9 L 35.8,145.7 L 39.6,155.0 L 41.7,169.2 L 44.1,185.3 L 45.9,208.5 L 48.2,217.4 L 51.5,217.4 L 51.8,211.2 L 53.6,193.3 L 55.4,183.1 L 58.7,175.7 L 61.1,165.7 L 63.4,151.7 L 63.2,143.6 L 68.7,136.2 L 69.3,124.7 L 65.6,115.6 L 71.9,105.2 L 80.6,105.1 L 85.3,101.9 L 85.1,96.5 L 75.8,92.1 L 70.8,90.3 L 68.7,85.2 L 70.2,74.9 L 69.3,66.7 L 70.0,61.0 L 71.4,56.8 L 74.0,46.8 L 73.0,38.1 L 69.4,32.4 L 69.3,27.1 L 73.1,23.1 L 71.7,18.0 L 75.6,10.6 Z"
                         fill="#FFFFFF"
-                        stroke="#CBD5E1"
-                        strokeWidth="1"
+                        stroke="#94A3B8"
+                        strokeWidth="0.8"
                     />
 
-                    {/* Data Points */}
+                    {/* Kinneret (Sea of Galilee) - Approx positioned around 32.8N, 35.6E */}
+                    <path
+                        d="M 69.4,32.4 C 70.8,33.5 71.5,35.5 70.3,37.2 C 69.1,38.8 68.0,37.5 67.5,35.9 C 68.0,34.5 68.5,33.0 69.4,32.4 Z"
+                        fill="#38BDF8"
+                        stroke="none"
+                    />
+
+                    {/* Dead Sea - Approx positioned around 31.5N, 35.5E */}
+                    <path
+                        d="M 70.8,90.3 L 72.5,95.1 L 72.8,103.4 L 70.0,111.9 L 68.4,115.5 L 67.8,109.8 L 68.2,100.1 L 69.5,92.5 Z"
+                        fill="#38BDF8"
+                        stroke="none"
+                    />
+
                     {locations.map((loc, i) => {
-                        // Fuzzy match or default to center if unknown (better than hiding)
-                        let coords = CITY_COORDS[loc.city]
+                        let coords = { x: 50, y: 100 } // fallback
 
-                        // Try to find a partial match if exact failed
-                        if (!coords) {
-                            const match = Object.keys(CITY_COORDS).find(k => loc.city.includes(k) || k.includes(loc.city))
-                            if (match) coords = CITY_COORDS[match]
+                        // 1. Try exact lookup
+                        const knownLoc = CITY_LOCATIONS[loc.city]
+                        if (knownLoc) {
+                            coords = project(knownLoc.lat, knownLoc.lng)
+                        } else {
+                            // 2. Fuzzy lookup
+                            const match = Object.keys(CITY_LOCATIONS).find(k =>
+                                loc.city.toLowerCase().includes(k.toLowerCase()) ||
+                                k.toLowerCase().includes(loc.city.toLowerCase())
+                            )
+                            if (match) {
+                                coords = project(CITY_LOCATIONS[match].lat, CITY_LOCATIONS[match].lng)
+                            } else {
+                                // 3. "Unknown" Pile - side of map
+                                coords = { x: 15, y: 150 + (i * 5) }
+                            }
                         }
-
-                        // If still no coords, fallback to "Unknown" pile near the sea/side (e.g., 20, 50) so they are visible but distinct
-                        const finalCoords = coords || { x: 20, y: 50 + (i * 2) }
 
                         const displayText = `${CITY_TRANSLATIONS[loc.city] || loc.city} (${loc._count.id})`
 
-                        // Dynamic sizing: Ensure circle is big enough for text
-                        // Approx: font-size 3 means ~2 width per char? Let's be generous to ensure "fitting"
+                        // Dynamic sizing
                         const textWidthEstimate = displayText.length * 1.8
                         const minRadiusForText = textWidthEstimate / 2 + 1
 
-                        // Base size from count, but at least enough for text
                         let size = 3 + (loc._count.id / maxCount) * 5
                         size = Math.max(size, minRadiusForText)
 
@@ -168,8 +221,8 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                 transition={{ delay: i * 0.1 }}
                             >
                                 <circle
-                                    cx={finalCoords.x}
-                                    cy={finalCoords.y}
+                                    cx={coords.x}
+                                    cy={coords.y}
                                     r={size}
                                     fill={color}
                                     fillOpacity="0.9"
@@ -177,9 +230,9 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     strokeWidth="0.5"
                                 />
                                 <text
-                                    x={finalCoords.x}
-                                    y={finalCoords.y}
-                                    fontSize="3"
+                                    x={coords.x}
+                                    y={coords.y}
+                                    fontSize="2.5"
                                     fill="white"
                                     fontWeight="bold"
                                     textAnchor="middle"
@@ -190,9 +243,13 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                             </motion.g>
                         )
                     })}
+
+                    {/* Legend for Unknowns if any exist */}
+                    {locations.some(l => !CITY_LOCATIONS[l.city] && !Object.keys(CITY_LOCATIONS).find(k => l.city.includes(k))) && (
+                        <text x="10" y="145" fontSize="3" fill="#64748B" fontWeight="bold">מיקומים נוספים:</text>
+                    )}
                 </svg>
 
-                {/* Legend if no data */}
                 {locations.length === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
                         אין נתוני מיקום זמינים לשבוע זה
