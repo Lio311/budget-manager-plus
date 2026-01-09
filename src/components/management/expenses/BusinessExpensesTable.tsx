@@ -329,7 +329,7 @@ export function BusinessExpensesTable({
                             <TableHead className="text-right">תאריך</TableHead>
                             <TableHead className="text-right">תיאור</TableHead>
                             <TableHead className="text-right">קטגוריה</TableHead>
-                            <TableHead className="text-right">קמפיין מקושר</TableHead>
+                            <TableHead className="text-center">קמפיין מקושר</TableHead>
                             <TableHead className="text-right">סכום</TableHead>
                             <TableHead className="text-center w-[100px]">פעולות</TableHead>
                         </TableRow>
@@ -351,7 +351,7 @@ export function BusinessExpensesTable({
                                             {categoryMap[expense.category] || expense.category}
                                         </span>
                                     </TableCell>
-                                    <TableCell className="text-muted-foreground text-sm">
+                                    <TableCell className="text-muted-foreground text-sm text-center">
                                         {expense.campaign ? expense.campaign.name : '-'}
                                     </TableCell>
                                     <TableCell className="font-bold text-gray-900">
