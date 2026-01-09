@@ -259,8 +259,8 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                 )}
 
                 {(section.type === 'personal' || section.type === 'business') && (
-                    <div className="grid md:grid-cols-2 gap-2 md:gap-12 items-center w-full h-full pt-20 pb-10 md:pb-20">
-                        <div className="text-center md:text-right flex flex-col justify-center items-center md:items-start">
+                    <div className="grid md:grid-cols-2 gap-2 md:gap-12 items-center content-center w-full h-full pt-20 pb-10 md:pb-20">
+                        <div className="text-center md:text-right flex flex-col justify-end md:justify-center items-center md:items-start">
                             <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-4xl md:text-6xl font-black text-white mb-1 md:mb-4">{section.title}</motion.h2>
                             <motion.h3 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 }} className="text-2xl text-white/80 mb-2 md:mb-6">{section.subtitle}</motion.h3>
                             <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-2 md:mb-8 max-w-xl">{section.description}</motion.p>
