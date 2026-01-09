@@ -147,7 +147,17 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                         // If still no coords, fallback to "Unknown" pile near the sea/side (e.g., 20, 50) so they are visible but distinct
                         const finalCoords = coords || { x: 20, y: 50 + (i * 2) }
 
-                        const size = 3 + (loc._count.id / maxCount) * 5 // Scale dot size
+                        const displayText = `${CITY_TRANSLATIONS[loc.city] || loc.city} (${loc._count.id})`
+
+                        // Dynamic sizing: Ensure circle is big enough for text
+                        // Approx: font-size 3 means ~2 width per char? Let's be generous to ensure "fitting"
+                        const textWidthEstimate = displayText.length * 1.8
+                        const minRadiusForText = textWidthEstimate / 2 + 1
+
+                        // Base size from count, but at least enough for text
+                        let size = 3 + (loc._count.id / maxCount) * 5
+                        size = Math.max(size, minRadiusForText)
+
                         const color = COLORS[i % COLORS.length]
 
                         return (
@@ -162,18 +172,20 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     cy={finalCoords.y}
                                     r={size}
                                     fill={color}
-                                    fillOpacity="0.8"
+                                    fillOpacity="0.9"
                                     stroke="white"
                                     strokeWidth="0.5"
                                 />
                                 <text
-                                    x={finalCoords.x + size + 2}
-                                    y={finalCoords.y + 1}
+                                    x={finalCoords.x}
+                                    y={finalCoords.y}
                                     fontSize="3"
-                                    fill="#1E293B"
+                                    fill="white"
                                     fontWeight="bold"
+                                    textAnchor="middle"
+                                    dominantBaseline="central"
                                 >
-                                    {CITY_TRANSLATIONS[loc.city] || loc.city} ({loc._count.id})
+                                    {displayText}
                                 </text>
                             </motion.g>
                         )
