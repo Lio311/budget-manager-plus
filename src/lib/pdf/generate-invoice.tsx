@@ -67,7 +67,7 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
 
         // Construct logo URL using Vercel URL or fallback
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') || 'https://budget-manager-plus.vercel.app'
-        const logoPath = `${baseUrl}/K-LOGO.png`
+        const logoPath = `${baseUrl}/images/branding/K-LOGO.png`
 
         // Use invoice's own financial data
         const vatRate = invoice.vatRate * 100 // Convert to percentage

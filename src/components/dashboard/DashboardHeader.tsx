@@ -178,7 +178,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                 {/* Center Section - Logo */}
                 <div className="hidden md:flex flex-1 justify-center items-center opacity-80 hover:opacity-100 transition-opacity">
                     <Image
-                        src="/K-LOGO.png"
+                        src="/images/branding/K-LOGO.png"
                         alt="Kesefly"
                         width={120}
                         height={40}
@@ -186,7 +186,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         priority
                     />
                     <Image
-                        src="/K-LOGO2.png"
+                        src="/images/branding/K-LOGO2.png"
                         alt="Kesefly"
                         width={120}
                         height={40}

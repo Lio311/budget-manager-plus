@@ -24,7 +24,7 @@ export default function LandingPage() {
             bgColor: 'from-slate-900 via-slate-800 to-slate-900',
             textColor: 'text-white',
             accentColor: 'emerald',
-            image: '/assets/dashboard_mockup.png'
+            image: '/images/marketing/dashboard_mockup.png'
         },
         {
             id: 1,
@@ -247,7 +247,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                 {section.type === 'hero' && (
                     <div className="grid md:grid-cols-2 gap-12 items-center w-full">
                         <div className="text-right">
-                            <motion.h1 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.3 }} className="text-6xl md:text-8xl font-black text-white mb-4 leading-none font-montserrat">{section.title}</motion.h1>
+                            <motion.h1 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.3 }} className="text-6xl md:text-8xl font-black text-white mb-4 leading-none font-alef">Kesefly</motion.h1>
                             <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-2xl md:text-4xl font-bold text-white/80 mb-6">{section.subtitle}</motion.h2>
                             <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.5 }} className="text-lg md:text-xl text-white/70 mb-8 max-w-xl leading-relaxed">{section.description}</motion.p>
                             <motion.div initial={{ opacity: 0, y: 20 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.6 }}>
@@ -260,7 +260,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                             </motion.div>
                         </div>
                         <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={isActive ? { opacity: 1, scale: 1 } : {}} transition={{ duration: 0.8, delay: 0.2 }} className="hidden md:flex justify-end relative h-[500px]">
-                            <Image src={section.image} alt="Hero" fill className="object-contain" priority />
+                            <Image src="/images/marketing/dashboard_mockup.png" alt="Hero" fill className="object-contain" priority />
                         </motion.div>
                     </div>
                 )}

@@ -13,7 +13,7 @@ import { toast } from 'sonner' // Assuming sonner is available (used in NewTaskD
 
 // Mock Data - In real app, fetch from `clerk` or `prisma.user`
 const INITIAL_TEAM = [
-    { id: 1, name: 'Lior', role: 'Full Stack Developer', email: 'lior31197@gmail.com', avatar: '/lior-profile.jpg', department: 'Development', color: 'bg-blue-500' },
+    { id: 1, name: 'Lior', role: 'Full Stack Developer', email: 'lior31197@gmail.com', avatar: '/images/team/lior-profile.jpg', department: 'Development', color: 'bg-blue-500' },
     { id: 2, name: 'Ron', role: 'QA & Marketing', email: 'ron.kor97@gmail.com', avatar: '/team/ron.png', department: 'Marketing & QA', color: 'bg-orange-500' },
     { id: 3, name: 'Leon', role: 'Security Engineer', email: 'leonpiatti@tuta.com', avatar: '/avatars/leon.png', department: 'Security', color: 'bg-red-500' },
 ]

@@ -57,7 +57,7 @@ export default function PlansPage() {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col justify-center py-4 px-4 sm:px-6 lg:px-8" dir="rtl">
             <div className="max-w-6xl mx-auto text-center mb-6">
                 <Image
-                    src="/K-LOGO.png"
+                    src="/images/branding/K-LOGO.png"
                     alt="KesefFlow"
                     width={180}
                     height={50}

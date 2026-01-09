@@ -65,7 +65,7 @@ export const metadata: Metadata = {
         type: 'website',
         images: [
             {
-                url: '/og-image.png',
+                url: '/images/marketing/og-image.png',
                 width: 1200,
                 height: 630,
                 alt: 'Kesefly - ניהול תקציב חכם',
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
         description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות',
-        images: ['/og-image.png'],
+        images: ['/images/marketing/og-image.png'],
     },
     robots: {
         index: true,
@@ -90,9 +90,9 @@ export const metadata: Metadata = {
         },
     },
     icons: {
-        icon: '/K-ICON.png',
-        apple: '/apple-touch-icon.png',
-        shortcut: '/K-ICON.png',
+        icon: '/images/branding/K-ICON.png',
+        apple: '/images/branding/apple-touch-icon.png',
+        shortcut: '/images/branding/K-ICON.png',
     },
     appleWebApp: {
         capable: true,
@@ -165,7 +165,7 @@ export default async function RootLayout({
             }}
             appearance={{
                 elements: {
-                    logoImage: "/K-LOGO.png",
+                    logoImage: "/images/branding/K-LOGO.png",
                     logoBox: {
                         height: "3rem",
                         justifyContent: "center"

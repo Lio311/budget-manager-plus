@@ -68,6 +68,7 @@ const config = {
             fontFamily: {
                 montserrat: ["var(--font-montserrat)", "sans-serif"],
                 rubik: ["var(--font-rubik)", "sans-serif"],
+                alef: ["Alef", "sans-serif"],
             },
             borderRadius: {
                 lg: "var(--radius)",

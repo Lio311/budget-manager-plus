@@ -20,9 +20,9 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 const TEAM_MEMBERS = [
-    { name: 'Lior', avatar: '/lior-profile.jpg', color: 'blue' },
-    { name: 'Ron', avatar: '/team/ron.png', color: 'green' },
-    { name: 'Leon', avatar: '/avatars/leon.png', color: 'purple' },
+    { name: 'Lior', avatar: '/images/team/lior-profile.jpg', color: 'blue' },
+    { name: 'Ron', avatar: '/images/team/ron.png', color: 'green' },
+    { name: 'Leon', avatar: '/images/team/leon.png', color: 'purple' },
 ]
 
 export function NewTaskDialog({ onTaskCreated, taskToEdit, open: controlledOpen, onOpenChange }: {

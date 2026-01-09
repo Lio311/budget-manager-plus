@@ -14,7 +14,7 @@ interface FinancialAdvisorButtonProps {
 
 const SparkleIcon = ({ className }: { className?: string }) => (
     <Image
-        src="/google-gemini.png"
+        src="/images/icons/google-gemini.png"
         alt="Gemini AI"
         width={20}
         height={20}

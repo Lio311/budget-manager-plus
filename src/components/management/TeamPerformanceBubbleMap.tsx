@@ -40,9 +40,9 @@ export function PerformanceBubbles({ data, users, badgeColor = 'bg-green-500', c
 
     // Hardcoded avatars for known team members
     const KNOWN_AVATARS: Record<string, string> = {
-        'Lior': '/lior-profile.jpg',
-        'Ron': '/team/ron.png',
-        'Leon': '/avatars/leon.png'
+        'Lior': '/images/team/lior-profile.jpg',
+        'Ron': '/images/team/ron.png',
+        'Leon': '/images/team/leon.png'
     }
 
     // Helper to find user details

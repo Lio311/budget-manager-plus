@@ -95,7 +95,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                 {/* Logo */}
                 <div className="flex justify-center mb-1 pt-6">
                     <Image
-                        src="/K-LOGO.png"
+                        src="/images/branding/K-LOGO.png"
                         alt="KesefFlow"
                         width={200}
                         height={60}

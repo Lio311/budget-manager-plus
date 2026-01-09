@@ -375,7 +375,7 @@ export default function PublicQuotePage() {
                         <p className="mb-2">הופק על ידי</p>
                         <div className="flex justify-center items-center gap-1 opacity-50 grayscale hover:grayscale-0 transition-all">
                             <Image
-                                src="/K-LOGO.png"
+                                src="/images/branding/K-LOGO.png"
                                 alt="Budget Manager"
                                 width={120}
                                 height={40}

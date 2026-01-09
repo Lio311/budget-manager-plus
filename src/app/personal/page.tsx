@@ -175,7 +175,7 @@ export default function PersonalLandingPage() {
                         className="flex items-center gap-2"
                     >
                         <Link href="/">
-                            <Image src="/K-LOGO2.png" alt="Keseflow" width={140} height={40} className="h-10 w-auto brightness-0 invert" />
+                            <Image src="/images/branding/K-LOGO2.png" alt="Keseflow" width={140} height={40} className="h-10 w-auto brightness-0 invert" />
                         </Link>
                     </motion.div>
 
