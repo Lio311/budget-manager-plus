@@ -255,14 +255,14 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                 )}
 
                 {(section.type === 'personal' || section.type === 'business') && (
-                    <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center w-full h-full pt-20 pb-10 md:pb-20">
+                    <div className="grid md:grid-cols-2 gap-2 md:gap-12 items-center w-full h-full pt-20 pb-10 md:pb-20">
                         <div className="text-right flex flex-col justify-center">
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={isActive ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.3 }} className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white/80 text-sm mb-6 border border-white/20 w-fit">
+                            <motion.div initial={{ opacity: 0, x: 20 }} animate={isActive ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.3 }} className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white/80 text-sm mb-4 border border-white/20 w-fit">
                                 {section.type === 'personal' ? 'למשקי בית' : 'לעסקים ועצמאיים'}
                             </motion.div>
-                            <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-4xl md:text-6xl font-black text-white mb-4">{section.title}</motion.h2>
-                            <motion.h3 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 }} className="text-2xl text-white/80 mb-6">{section.subtitle}</motion.h3>
-                            <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-8 max-w-xl">{section.description}</motion.p>
+                            <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-4xl md:text-6xl font-black text-white mb-2 md:mb-4">{section.title}</motion.h2>
+                            <motion.h3 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 }} className="text-2xl text-white/80 mb-4 md:mb-6">{section.subtitle}</motion.h3>
+                            <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-4 md:mb-8 max-w-xl">{section.description}</motion.p>
                         </div>
 
                         {/* Modified grid to grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 to fit more items and reduced padding */}
@@ -285,7 +285,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
 
                 {section.type === 'toolkit' && (
                     <div className="w-full h-full flex flex-col justify-center pt-24 pb-10 md:pt-20 md:pb-20">
-                        <div className="text-center mb-6 md:mb-10">
+                        <div className="text-center mb-2 md:mb-10">
                             <motion.h2 initial={{ opacity: 0, y: -20 }} animate={isActive ? { opacity: 1, y: 0 } : {}} className="text-4xl md:text-5xl font-black text-white mb-2 md:mb-4">{section.title}</motion.h2>
                             <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} className="text-xl text-white/70">{section.subtitle}</motion.p>
                         </div>
