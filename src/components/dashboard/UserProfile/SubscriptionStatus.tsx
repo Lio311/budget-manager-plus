@@ -108,7 +108,6 @@ export function SubscriptionStatus() {
         <div className="p-1 space-y-6 text-right" dir="rtl">
             <div>
                 <h2 className="text-xl font-bold mb-1 text-[#323338] dark:text-gray-100 flex items-center gap-2">
-                    <Calendar className="w-6 h-6 text-purple-600" />
                     ניהול מנוי
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
