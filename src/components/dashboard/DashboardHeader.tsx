@@ -63,7 +63,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
                 // 2. עיצוב המודל (רספונסיבי)
                 cardBox: "w-full h-full md:w-fit md:h-auto md:min-w-[700px] md:max-w-[90vw]",
-                
+
                 scrollBox: "h-full md:h-auto",
                 pageScrollBox: "h-full md:h-auto",
 
@@ -121,13 +121,13 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         >
                             <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                         </Button>
-                        
+
                         {/* Mobile User Button */}
                         <UserButton
                             userProfileProps={userProfileProps}
                             appearance={userButtonAppearance}
                         />
-                        
+
                         <div className="mr-2">
                             <ModeToggle />
                         </div>
@@ -145,8 +145,8 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                 <h2 className="text-sm font-bold whitespace-nowrap text-[#323338] dark:text-gray-200 leading-none">
                                     {getMonthName(month)} {year}
                                 </h2>
-                                <span className={`text-[10px] font-bold ${budgetType === 'BUSINESS' ? 'text-blue-600' : 'text-emerald-600'}`}>
-                                    {budgetType === 'BUSINESS' ? 'עסקי' : 'פרטי'}
+                                <span className={`text-[10px] font-bold ${budgetType === 'BUSINESS' ? 'text-green-600' : 'text-blue-600'}`}>
+                                    {budgetType === 'BUSINESS' ? 'עסקי' : 'אישי'}
                                 </span>
                             </div>
                         </div>
@@ -183,16 +183,16 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         <button
                             onClick={() => handleToggle('PERSONAL')}
                             className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'PERSONAL'
-                                ? 'bg-white text-emerald-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-emerald-400'
+                                ? 'bg-white text-blue-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-blue-400'
                                 : 'text-gray-500 hover:text-gray-900 hover:bg-white/50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-slate-700/50'
                                 }`}
                         >
-                            פרטי
+                            אישי
                         </button>
                         <button
                             onClick={() => handleToggle('BUSINESS')}
                             className={`px-4 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${budgetType === 'BUSINESS'
-                                ? 'bg-white text-blue-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-blue-400'
+                                ? 'bg-white text-green-600 shadow-md transform scale-105 dark:bg-slate-700 dark:text-green-400'
                                 : 'text-gray-500 hover:text-gray-900 hover:bg-white/50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-slate-700/50'
                                 }`}
                         >

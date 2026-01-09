@@ -270,18 +270,18 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                             <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.6 }} className="text-lg text-white/70 mb-8 max-w-xl">{section.description}</motion.p>
                         </div>
 
-                        {/* Modified grid to grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 to fit more items and reduced padding */}
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto max-h-[70vh] p-2 custom-scrollbar content-start">
+                        {/* Modified grid to grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 to fit more items and reduced padding */}
+                        <div className="grid grid-cols-3 lg:grid-cols-3 gap-2 md:gap-4 overflow-y-auto max-h-[70vh] p-1 custom-scrollbar content-start">
                             {section.features.map((feature: any, idx: number) => (
                                 <motion.div
                                     key={idx}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={isActive ? { opacity: 1, y: 0 } : {}}
                                     transition={{ delay: 0.4 + idx * 0.1 }}
-                                    className="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/10 hover:bg-white/20 transition-colors"
+                                    className="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 hover:bg-white/20 transition-colors flex flex-col items-center text-center"
                                 >
-                                    <h4 className="text-lg font-bold text-white mb-2">{feature.title}</h4>
-                                    <p className="text-white/60 text-xs">{feature.desc}</p>
+                                    <h4 className="text-sm font-bold text-white mb-1 leading-tight">{feature.title}</h4>
+                                    <p className="text-white/60 text-[10px] leading-tight hidden sm:block">{feature.desc}</p>
                                 </motion.div>
                             ))}
                         </div>
@@ -294,7 +294,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                             <motion.h2 initial={{ opacity: 0, y: -20 }} animate={isActive ? { opacity: 1, y: 0 } : {}} className="text-4xl md:text-5xl font-black text-white mb-2 md:mb-4">{section.title}</motion.h2>
                             <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} className="text-xl text-white/70">{section.subtitle}</motion.p>
                         </div>
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 overflow-y-auto max-h-[65vh] p-2 md:p-4 custom-scrollbar">
+                        <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 overflow-y-auto max-h-[65vh] p-1 md:p-4 custom-scrollbar">
                             <FeatureCard icon={<LayoutDashboard />} title="ממשק חכם" desc="חווית משתמש פשוטה ונוחה" delay={0.1} isActive={isActive} />
                             <FeatureCard icon={<PieChart />} title="מעקב הוצאות" desc="ניתוח מעמיק של הרגלי צריכה" delay={0.2} isActive={isActive} />
                             <FeatureCard icon={<Calendar />} title="לוח שנה" desc="תזכורות תשלום חכמות" delay={0.3} isActive={isActive} />
@@ -328,13 +328,16 @@ function FeatureCard({ icon, title, desc, delay, isActive }: any) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={isActive ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.4 + delay }}
-            className="bg-white/10 backdrop-blur-md p-4 md:p-6 rounded-2xl border border-white/10 text-center hover:bg-white/20 transition-all hover:-translate-y-1"
+            className="bg-white/10 backdrop-blur-md p-2 md:p-6 rounded-xl md:rounded-2xl border border-white/10 text-center hover:bg-white/20 transition-all hover:-translate-y-1 flex flex-col items-center justify-center h-full"
         >
-            <div className="bg-white/20 w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 text-white">
-                {icon}
+            <div className="bg-white/20 w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center mb-2 md:mb-4 text-white">
+                {/* Scale icon down for mobile */}
+                <div className="scale-75 md:scale-100">
+                    {icon}
+                </div>
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-            <p className="text-white/60 text-sm">{desc}</p>
+            <h3 className="text-xs md:text-lg font-bold text-white mb-1 md:mb-2 leading-tight">{title}</h3>
+            <p className="text-white/60 text-[10px] md:text-sm leading-tight hidden sm:block">{desc}</p>
         </motion.div>
     )
 }
