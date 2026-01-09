@@ -13,6 +13,7 @@ import {
     ChevronRight,
     Search,
     Bell,
+    FileText,
     Users,
     Calendar as CalendarIcon,
     MapPin,
@@ -77,6 +78,7 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
         { icon: CreditCard, label: 'הוצאות', href: '/management/expenses', color: 'text-yellow-500', activeBg: 'bg-yellow-50' },
         { icon: CalendarIcon, label: 'לוח שנה', href: '/management/calendar', color: 'text-orange-500', activeBg: 'bg-orange-50' },
         { icon: Users, label: 'צוות', href: '/management/team', color: 'text-purple-500', activeBg: 'bg-purple-50' },
+        { icon: FileText, label: 'חוזה', href: '/management/agreement', color: 'text-gray-500', activeBg: 'bg-gray-50' },
         { icon: MapPin, label: 'מפה', href: '/management/map', color: 'text-cyan-500', activeBg: 'bg-cyan-50' },
     ]
 

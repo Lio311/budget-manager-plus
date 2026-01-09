@@ -46,6 +46,7 @@ model User {
   marketingCampaigns MarketingCampaign[]
   businessExpenses   BusinessExpense[]
   managementNotifications ManagementNotification[]
+  agreement  EmployeeAgreement?
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -793,6 +794,24 @@ model MarketingCampaign {
   
   @@index([userId])
   @@map("marketing_campaigns")
+}
+
+model EmployeeAgreement {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  signature    String   @db.Text
+  version      Int      @default(1)
+  
+  // Stores field values: { fullName: "...", idNumber: "...", ... }
+  filledValues Json? 
+  
+  signedAt     DateTime @default(now())
+  ipAddress    String?
+  
+  @@unique([userId])
+  @@map("employee_agreements")
 }
 
 model BusinessExpense {

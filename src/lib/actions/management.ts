@@ -97,19 +97,6 @@ export async function updateTask(id: string, data: Partial<ProjectTask>) {
             }
             const statusLabel = statusLabels[task.status] || task.status
 
-            if (data.status === 'DONE') {
-                await prisma.projectTask.update({
-                    where: { id },
-                    data: { completedAt: new Date() }
-                })
-            } else {
-                // If moving away from DONE, clear completedAt
-                await prisma.projectTask.update({
-                    where: { id },
-                    data: { completedAt: null }
-                })
-            }
-
             await createManagementNotification({
                 type: 'TASK_STATUS_CHANGED',
                 title: 'סטטוס משימה עודכן',
