@@ -5,7 +5,7 @@ import { heIL } from '@clerk/localizations'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as SonnerToaster } from '@/components/ui/sonner'
 import { ThemeProvider } from '@/components/theme-provider'
-import { Rubik, Montserrat } from 'next/font/google'
+import { Rubik, Montserrat, Open_Sans } from 'next/font/google'
 import { WebApplicationJsonLd } from '@/components/seo/JsonLd'
 import { ReactivationPopup } from '@/components/promo/ReactivationPopup'
 import { currentUser } from '@clerk/nextjs/server'
@@ -25,6 +25,12 @@ const montserrat = Montserrat({
     subsets: ['latin'],
     display: 'swap',
     variable: '--font-montserrat'
+})
+
+const openSans = Open_Sans({
+    subsets: ['hebrew', 'latin'],
+    display: 'swap',
+    variable: '--font-open-sans'
 })
 
 export const viewport = {
@@ -173,7 +179,7 @@ export default async function RootLayout({
                 }
             }}
         >
-            <html lang="he" dir="rtl" className={`${rubik.variable} ${montserrat.variable}`}>
+            <html lang="he" dir="rtl" className={`${rubik.variable} ${montserrat.variable} ${openSans.variable}`}>
                 <head>
                     {/* Performance Hints */}
                     <link rel="preconnect" href="https://fonts.googleapis.com" />

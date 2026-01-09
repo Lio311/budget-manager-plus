@@ -144,6 +144,10 @@
     @apply border-white/60 dark:border-slate-600/60;
   }
 
+  .font-open-sans {
+    font-family: var(--font-open-sans), sans-serif;
+  }
+
   /* 🃏 Card Styles */
   .monday-card {
     @apply bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/50 dark:border-slate-700/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1;
