@@ -160,21 +160,16 @@ export default function LandingPage() {
                         <Link href="/sign-in"><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></Link>
                         <Link href="/sign-up"><Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">התחל עכשיו</Button></Link>
                     </div>
-                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-white p-2">
-                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
+                    {/* Replaced Menu with Login button for mobile */}
+                    <div className="md:hidden">
+                        <Link href="/sign-in">
+                            <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full">כניסה</Button>
+                        </Link>
+                    </div>
                 </div>
             </nav>
 
-            {/* Mobile Menu */}
-            <AnimatePresence>
-                {isMenuOpen && (
-                    <motion.div initial={{ opacity: 0, x: '100%' }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: '100%' }} className="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-40 md:hidden flex flex-col items-center justify-center gap-8">
-                        <Link href="/sign-in" onClick={() => setIsMenuOpen(false)}><Button variant="ghost" size="lg" className="text-white text-2xl rounded-2xl">כניסה</Button></Link>
-                        <Link href="/sign-up" onClick={() => setIsMenuOpen(false)}><Button size="lg" className="bg-white text-gray-900 text-2xl px-12 rounded-2xl shadow-2xl">התחל עכשיו</Button></Link>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Mobile Menu Removed/Disabled as requested */}
 
             {/* Section Indicators */}
             <div className="fixed left-8 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3">
@@ -281,7 +276,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                                     className="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 hover:bg-white/20 transition-colors flex flex-col items-center text-center"
                                 >
                                     <h4 className="text-sm font-bold text-white mb-1 leading-tight">{feature.title}</h4>
-                                    <p className="text-white/60 text-[10px] leading-tight hidden sm:block">{feature.desc}</p>
+                                    <p className="text-white/60 text-[10px] leading-tight block">{feature.desc}</p>
                                 </motion.div>
                             ))}
                         </div>
@@ -337,7 +332,7 @@ function FeatureCard({ icon, title, desc, delay, isActive }: any) {
                 </div>
             </div>
             <h3 className="text-xs md:text-lg font-bold text-white mb-1 md:mb-2 leading-tight">{title}</h3>
-            <p className="text-white/60 text-[10px] md:text-sm leading-tight hidden sm:block">{desc}</p>
+            <p className="text-white/60 text-[10px] md:text-sm leading-tight block">{desc}</p>
         </motion.div>
     )
 }
