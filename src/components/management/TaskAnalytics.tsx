@@ -37,7 +37,7 @@ export function TaskAnalytics({ tasks }: TaskAnalyticsProps) {
             // Comparison: Set times to midnight to avoid hour sensitivity if needed,
             // but exact comparison is safer for "deadline". 
             if (updatedAt <= dueDate) {
-                nTime++
+                onTime++
             } else {
                 late++
             }
