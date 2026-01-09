@@ -42,6 +42,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
         total: 0,
         paymentMethod: '',
         notes: '',
+        createIncomeFromInvoice: false,
         lineItems: []
     })
 
@@ -129,8 +130,8 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (selectedIncomeId === 'none' || !selectedIncomeId) {
-            toast.error('חובה לבחור מכירה/עסקה כדי להפיק חשבונית')
+        if ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice) {
+            toast.error('חובה לבחור מכירה/עסקה או לסמן יצירת הכנסה אוטומטית')
             return
         }
 
@@ -143,6 +144,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
             await optimisticCreateInvoice({
                 ...formData,
                 incomeId: selectedIncomeId,
+                createIncomeFromInvoice: formData.createIncomeFromInvoice,
                 lineItems
             })
             onSuccess()
@@ -217,39 +219,64 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
             </div>
 
             {/* Sale Selection */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
-                <label className="block text-sm font-bold text-blue-900 dark:text-blue-300 mb-2">
-                    בחר מכירה/עסקה (חובה)
-                </label>
-                <div dir="rtl">
-                    <Select
-                        value={selectedIncomeId}
-                        onValueChange={(value) => {
-                            setSelectedIncomeId(value)
-                            // Reset line items if "none" selected? Or keep? Let's keep for flexibility but recommend reset
-                            if (value === 'none') {
-                                setLineItems([])
-                                setFormData(prev => ({ ...prev, subtotal: 0 }))
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800 space-y-4">
+                <div className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        id="createIncome"
+                        checked={formData.createIncomeFromInvoice || false}
+                        onChange={(e) => {
+                            const checked = e.target.checked
+                            setFormData(prev => ({
+                                ...prev,
+                                createIncomeFromInvoice: checked,
+                                incomeId: checked ? undefined : 'none' // Clear income selection if creating new
+                            }))
+                            if (checked) {
+                                setSelectedIncomeId('none')
                             }
                         }}
-                    >
-                        <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-blue-300 dark:border-blue-700 text-right">
-                            <SelectValue placeholder="בחר הכנסה לחיוב" />
-                        </SelectTrigger>
-                        <SelectContent dir="rtl">
-                            <SelectItem value="none">-- בחר מכירה --</SelectItem>
-                            {availableIncomes.map((inc: any) => (
-                                <SelectItem key={inc.id} value={inc.id}>
-                                    {inc.source} | {formatCurrency(inc.amount, inc.currency)} | {inc.date ? new Date(inc.date).toLocaleDateString('he-IL') : '-'}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <label htmlFor="createIncome" className="text-sm font-bold text-blue-900 dark:text-blue-300 cursor-pointer">
+                        צור הכנסה חדשה אוטומטית (במקום לבחור קיימת)
+                    </label>
                 </div>
-                {availableIncomes.length === 0 && (
-                    <p className="text-xs text-muted-foreground mt-1 mr-1">
-                        * לא נמצאו הכנסות פתוחות (ללא חשבונית) לחודש זה / ללקוח זה.
-                    </p>
+
+                {!formData.createIncomeFromInvoice && (
+                    <div dir="rtl">
+                        <label className="block text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
+                            בחר מכירה/עסקה (חובה)
+                        </label>
+                        <Select
+                            value={selectedIncomeId}
+                            onValueChange={(value) => {
+                                setSelectedIncomeId(value)
+                                // Reset line items if "none" selected? Or keep? Let's keep for flexibility but recommend reset
+                                if (value === 'none') {
+                                    setLineItems([])
+                                    setFormData(prev => ({ ...prev, subtotal: 0 }))
+                                }
+                            }}
+                        >
+                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-blue-300 dark:border-blue-700 text-right">
+                                <SelectValue placeholder="בחר הכנסה לחיוב" />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl">
+                                <SelectItem value="none">-- בחר מכירה --</SelectItem>
+                                {availableIncomes.map((inc: any) => (
+                                    <SelectItem key={inc.id} value={inc.id}>
+                                        {inc.source} | {formatCurrency(inc.amount, inc.currency)} | {inc.date ? new Date(inc.date).toLocaleDateString('he-IL') : '-'}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {availableIncomes.length === 0 && (
+                            <p className="text-xs text-muted-foreground mt-1 mr-1">
+                                * לא נמצאו הכנסות פתוחות (ללא חשבונית) לחודש זה / ללקוח זה.
+                            </p>
+                        )}
+                    </div>
                 )}
             </div>
 
