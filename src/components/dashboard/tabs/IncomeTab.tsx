@@ -492,7 +492,20 @@ export function IncomeTab() {
                                                     {income.paymentMethod && (
                                                         <>
                                                             <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                            <span className="">{income.paymentMethod}</span>
+                                                            <span className="">
+                                                                {(() => {
+                                                                    const pm = income.paymentMethod
+                                                                    const map: Record<string, string> = {
+                                                                        'CHECK': "צ'ק",
+                                                                        'CREDIT_CARD': 'כרטיס אשראי',
+                                                                        'BANK_TRANSFER': 'העברה בנקאית',
+                                                                        'CASH': 'מזומן',
+                                                                        'BIT': 'ביט/פייבוקס',
+                                                                        'OTHER': 'אחר'
+                                                                    }
+                                                                    return map[pm] || pm
+                                                                })()}
+                                                            </span>
                                                         </>
                                                     )}
                                                 </div>
@@ -547,6 +560,6 @@ export function IncomeTab() {
                 action={pendingAction?.type || 'delete'}
                 entityName="הכנסה"
             />
-        </div>
+        </div >
     )
 }
