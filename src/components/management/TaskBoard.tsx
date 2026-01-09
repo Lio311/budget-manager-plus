@@ -47,6 +47,7 @@ interface Task {
     assignees: string[]
     dueDate?: Date
     createdAt: Date
+    completedAt?: Date | null
     updatedAt: Date
     creator?: {
         email: string
@@ -93,8 +94,14 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
         const oldTasks = [...tasks]
 
         // We update status AND updatedAt so analytics reflect "Done now"
+        // Also update completedAt if Done
         const now = new Date()
-        setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus as Task['status'], updatedAt: now } : t))
+        setTasks(tasks.map(t => t.id === taskId ? {
+            ...t,
+            status: newStatus as Task['status'],
+            updatedAt: now,
+            completedAt: newStatus === 'DONE' ? now : (newStatus !== 'DONE' ? null : t.completedAt)
+        } : t))
 
         const res = await updateTask(taskId, { status: newStatus as any })
         if (!res.success) {
@@ -209,7 +216,9 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                 <div className="col-span-1 hidden sm:flex justify-center">
                                     {task.dueDate ? (
                                         (() => {
-                                            const isOverdue = isBefore(new Date(task.dueDate), startOfDay(new Date()))
+                                            const isDone = task.status === 'DONE'
+                                            const isOverdue = !isDone && isBefore(new Date(task.dueDate), startOfDay(new Date()))
+
                                             return (
                                                 <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${isOverdue ? 'text-red-600 font-bold bg-red-50' : 'text-gray-600 bg-gray-50'}`}>
                                                     {format(new Date(task.dueDate), 'dd/MM')}

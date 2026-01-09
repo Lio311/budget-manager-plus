@@ -34,9 +34,11 @@ export function TaskAnalytics({ tasks }: TaskAnalyticsProps) {
 
         if (isDone) {
             // Task completed. Check if it was done before due date.
-            // Comparison: Set times to midnight to avoid hour sensitivity if needed,
-            // but exact comparison is safer for "deadline". 
-            if (updatedAt <= dueDate) {
+            // Use completedAt if available, otherwise fallback to updatedAt (which might be wrong if modified later)
+            // But since we backfilled completedAt, it should be correct.
+            const completionDate = task.completedAt ? new Date(task.completedAt) : updatedAt
+
+            if (completionDate <= dueDate) {
                 onTime++
             } else {
                 late++
