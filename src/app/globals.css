@@ -4,8 +4,8 @@
 
 @layer base {
   @font-face {
-    font-family: 'Alef';
-    src: url('/fonts/Alef-Regular.ttf') format('truetype');
+    font-family: 'NotoSansJP';
+    src: url('/fonts/NotoSansJP-Regular.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
   }

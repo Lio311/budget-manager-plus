@@ -407,10 +407,10 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                         !תודה על העסקה
                     </Text>
                     <View style={styles.poweredBy}>
+                        <Text style={styles.poweredByText}>הופק על ידי</Text>
                         {data.poweredByLogoPath && (
                             <Image src={data.poweredByLogoPath} style={styles.poweredByLogo} />
                         )}
-                        <Text style={styles.poweredByText}>הופק על ידי</Text>
                     </View>
                 </View>
             </Page>

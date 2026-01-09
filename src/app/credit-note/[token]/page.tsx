@@ -225,9 +225,9 @@ export default function PublicCreditNotePage() {
                     </div>
 
                     {/* Footer - Produced by */}
-                    <div className="mt-16 pt-8 text-center text-gray-400 text-xs pb-12 print:pb-0 border-t border-gray-100">
-                        <p className="mb-2">הופק על ידי</p>
-                        <div className="flex justify-center items-center gap-1 opacity-50 grayscale hover:grayscale-0 transition-all">
+                    <div className="mt-16 pt-8 text-center text-gray-400 text-xs pb-12 print:pb-0 border-t border-gray-100 flex items-center justify-center gap-2">
+                        <span>הופק על ידי</span>
+                        <div className="flex justify-center items-center opacity-50 grayscale hover:grayscale-0 transition-all">
                             <img
                                 src="/images/branding/K-LOGO.png"
                                 alt="Budget Manager"

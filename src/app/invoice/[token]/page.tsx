@@ -340,9 +340,9 @@ export default function PublicInvoicePage() {
                     </div>
 
                     {/* Footer - Powered by */}
-                    <div className="mt-16 pt-8 text-center text-gray-400 text-xs pb-12 print:pb-0">
-                        <p className="mb-2">הופק על ידי</p>
-                        <div className="flex justify-center items-center gap-1 opacity-50 grayscale hover:grayscale-0 transition-all">
+                    <div className="mt-16 pt-8 text-center text-gray-400 text-xs pb-12 print:pb-0 flex items-center justify-center gap-2">
+                        <span>הופק על ידי</span>
+                        <div className="flex justify-center items-center opacity-50 grayscale hover:grayscale-0 transition-all">
                             <Image
                                 src="/images/branding/K-LOGO.png"
                                 alt="Budget Manager"
