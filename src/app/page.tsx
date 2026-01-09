@@ -18,7 +18,7 @@ export default function LandingPage() {
         {
             id: 0,
             type: 'hero',
-            title: 'KESEFLOW',
+            title: 'KESEFly',
             subtitle: 'ניהול פיננסי אישי חכם',
             description: 'המערכת המתקדמת בישראל לניהול תקציב אישי. כל הכלים שצריך כדי לשלוט בכסף שלך, בממשק אחד יפהפה ונוח.',
             bgColor: 'from-slate-900 via-slate-800 to-slate-900',
@@ -159,7 +159,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
                         <Link href="/">
-                            <Image src="/K-LOGO2.png" alt="Keseflow" width={140} height={40} className="h-10 w-auto brightness-0 invert" />
+                            <Image src="/homepage-logo.png" alt="Kesefly" width={140} height={40} className="h-14 w-auto brightness-0 invert" />
                         </Link>
                     </motion.div>
                     <div className="hidden md:flex items-center gap-6">
@@ -245,7 +245,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                 {section.type === 'hero' && (
                     <div className="grid md:grid-cols-2 gap-12 items-center w-full">
                         <div className="text-right">
-                            <motion.h1 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.3 }} className="text-6xl md:text-8xl font-black text-white mb-4 leading-none">{section.title}</motion.h1>
+                            <motion.h1 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.3 }} className="text-6xl md:text-8xl font-black text-white mb-4 leading-none font-montserrat">{section.title}</motion.h1>
                             <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-2xl md:text-4xl font-bold text-white/80 mb-6">{section.subtitle}</motion.h2>
                             <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.5 }} className="text-lg md:text-xl text-white/70 mb-8 max-w-xl leading-relaxed">{section.description}</motion.p>
                             <motion.div initial={{ opacity: 0, y: 20 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.6 }}>

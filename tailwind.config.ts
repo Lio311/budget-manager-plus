@@ -65,6 +65,10 @@ const config = {
                     hover_gray: "#dcdfec", // Row Hover
                 },
             },
+            fontFamily: {
+                montserrat: ["var(--font-montserrat)", "sans-serif"],
+                rubik: ["var(--font-rubik)", "sans-serif"],
+            },
             borderRadius: {
                 lg: "var(--radius)",
                 md: "calc(var(--radius) - 2px)",

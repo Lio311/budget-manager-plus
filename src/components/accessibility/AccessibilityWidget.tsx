@@ -237,7 +237,10 @@ export default function AccessibilityWidget() {
             )}
 
             {/* Trigger Button & Close Button Wrapper */}
-            <div ref={widgetRef} className="fixed bottom-4 left-4 z-[9999] font-sans rtl group acc-widget-ignore">
+            <div
+                ref={widgetRef}
+                className={`fixed bottom-4 z-[9999] font-sans rtl group acc-widget-ignore transition-all duration-300 ${pathname === '/' ? 'left-4' : 'right-4'}`}
+            >
                 <div className="relative">
                     {/* Floating Button (Main Trigger) */}
                     <button
@@ -264,7 +267,7 @@ export default function AccessibilityWidget() {
                 {/* The Widget Panel - Reduced size and max-height */}
                 {isOpen && (
                     <div
-                        className="absolute bottom-16 w-[300px] bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up acc-widget-ignore text-gray-800 right-0 md:right-auto md:left-0 origin-bottom-right md:origin-bottom-left"
+                        className={`absolute bottom-16 w-[300px] bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up acc-widget-ignore text-gray-800 origin-bottom ${pathname === '/' ? 'left-0' : 'right-0'}`}
                         dir="rtl"
                         style={{ filter: 'none', color: '#1f2937' }} // Explicit colors to override high contrast
                     >
