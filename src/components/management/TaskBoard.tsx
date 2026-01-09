@@ -34,7 +34,7 @@ import { updateTask, deleteTask } from '@/lib/actions/management'
 
 import { toast } from 'sonner'
 import { TaskAnalytics } from '@/components/management/TaskAnalytics'
-import { format } from 'date-fns'
+import { format, isBefore, startOfDay } from 'date-fns'
 import { NewTaskDialog } from '@/components/management/NewTaskDialog'
 
 interface Task {
@@ -208,9 +208,14 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
 
                                 <div className="col-span-1 hidden sm:flex justify-center">
                                     {task.dueDate ? (
-                                        <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded text-xs text-gray-600">
-                                            {format(new Date(task.dueDate), 'dd/MM')}
-                                        </div>
+                                        (() => {
+                                            const isOverdue = isBefore(new Date(task.dueDate), startOfDay(new Date())) && task.status !== 'DONE'
+                                            return (
+                                                <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${isOverdue ? 'text-red-600 font-bold bg-red-50' : 'text-gray-600 bg-gray-50'}`}>
+                                                    {format(new Date(task.dueDate), 'dd/MM')}
+                                                </div>
+                                            )
+                                        })()
                                     ) : (
                                         <span className="text-gray-300 text-xs">-</span>
                                     )}
