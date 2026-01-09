@@ -251,18 +251,18 @@ export default function AccessibilityWidget() {
                         <Icons.Close />
                     </button>
 
+                    {/* Floating Button */}
                     <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="w-12 h-12 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+                        ref={buttonRef}
+                        onClick={() => setIsOpen(true)}
+                        className="fixed bottom-4 left-4 z-50 p-0 rounded-full shadow-lg hover:shadow-xl transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white border border-gray-200"
                         aria-label="פתח תפריט נגישות"
-                        style={{ filter: 'none' }} // Extra safety
+                        style={{ width: '45px', height: '45px' }}
                     >
-                        {/* Custom Accessibility Image Icon */}
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/images/accessibility.png"
                             alt="Accessibility"
-                            className="w-10 h-10 object-contain rounded-full"
+                            className="w-full h-full object-cover rounded-full"
                         />
                     </button>
                 </div>

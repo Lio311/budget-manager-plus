@@ -1,10 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Shield, X, Lock, Database, Eye, CheckCircle2, Server, Activity } from 'lucide-react'
 
 export default function SecurityBadge({ className = "" }: { className?: string }) {
     const [isOpen, setIsOpen] = useState(false)
+
+    // Prevent background scrolling when modal is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = 'unset'
+        }
+        return () => {
+            document.body.style.overflow = 'unset'
+        }
+    }, [isOpen])
 
     return (
         <>
