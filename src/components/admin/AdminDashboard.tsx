@@ -155,14 +155,14 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                                 defaultValue={sub.status}
                                                 onValueChange={(value) => handleUpdateSubscription(sub.id, { status: value })}
                                             >
-                                                <SelectTrigger className="w-full h-10">
+                                                <SelectTrigger className="w-full h-10 text-left" dir="ltr">
                                                     <SelectValue />
                                                 </SelectTrigger>
-                                                <SelectContent dir="rtl" className="text-right">
-                                                    <SelectItem value="active" className="pr-8">Active</SelectItem>
-                                                    <SelectItem value="trial" className="pr-8">Trial</SelectItem>
-                                                    <SelectItem value="expired" className="pr-8">Expired</SelectItem>
-                                                    <SelectItem value="inactive" className="pr-8">Inactive</SelectItem>
+                                                <SelectContent dir="ltr" className="text-left">
+                                                    <SelectItem value="active" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Active</SelectItem>
+                                                    <SelectItem value="trial" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Trial</SelectItem>
+                                                    <SelectItem value="expired" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Expired</SelectItem>
+                                                    <SelectItem value="inactive" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Inactive</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -174,12 +174,12 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                                 defaultValue={sub.planType}
                                                 onValueChange={(value) => handleUpdateSubscription(sub.id, { planType: value as 'PERSONAL' | 'BUSINESS' })}
                                             >
-                                                <SelectTrigger className="w-full h-10">
+                                                <SelectTrigger className="w-full h-10 text-left" dir="ltr">
                                                     <SelectValue />
                                                 </SelectTrigger>
-                                                <SelectContent dir="rtl" className="text-right">
-                                                    <SelectItem value="PERSONAL" className="pr-8">Personal</SelectItem>
-                                                    <SelectItem value="BUSINESS" className="pr-8">Business</SelectItem>
+                                                <SelectContent dir="ltr" className="text-left">
+                                                    <SelectItem value="PERSONAL" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Personal</SelectItem>
+                                                    <SelectItem value="BUSINESS" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Business</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -537,13 +537,13 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                         value={newCoupon.planType || "ALL"}
                                         onValueChange={(value) => setNewCoupon({ ...newCoupon, planType: value === "ALL" ? "" : value })}
                                     >
-                                        <SelectTrigger className="w-full h-10">
+                                        <SelectTrigger className="w-full h-10 text-left" dir="ltr">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent dir="rtl" className="text-right">
-                                            <SelectItem value="PERSONAL" className="pr-8">Personal</SelectItem>
-                                            <SelectItem value="BUSINESS" className="pr-8">Business</SelectItem>
-                                            <SelectItem value="ALL" className="pr-8">Any</SelectItem>
+                                        <SelectContent dir="ltr" className="text-left">
+                                            <SelectItem value="PERSONAL" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Personal</SelectItem>
+                                            <SelectItem value="BUSINESS" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Business</SelectItem>
+                                            <SelectItem value="ALL" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Any</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
