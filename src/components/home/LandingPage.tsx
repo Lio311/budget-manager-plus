@@ -125,66 +125,65 @@ export default function LandingPage() {
                                                     התחל בחינם
                                                 </motion.button>
                                             </Link>
-                                        </Link>
-                                        <LoginModal>
-                                            <motion.button
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-full font-bold text-lg transition-all shadow-md"
-                                            >
-                                                כניסה למערכת
-                                            </motion.button>
-                                        </LoginModal>
+                                            <LoginModal>
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-full font-bold text-lg transition-all shadow-md"
+                                                >
+                                                    כניסה למערכת
+                                                </motion.button>
+                                            </LoginModal>
+                                        </div>
                                     </div>
+                                </SignedOut>
+
+                                <SignedIn>
+                                    <Link href="/dashboard" className="flex">
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="px-10 py-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-xl transition-all inline-flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
+                                        >
+                                            כניסה לדשבורד
+                                            <LayoutDashboard className="w-6 h-6" />
+                                        </motion.button>
+                                    </Link>
+                                </SignedIn>
                             </div>
-                        </SignedOut>
 
-                        <SignedIn>
-                            <Link href="/dashboard" className="flex">
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="px-10 py-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-xl transition-all inline-flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
-                                >
-                                    כניסה לדשבורד
-                                    <LayoutDashboard className="w-6 h-6" />
-                                </motion.button>
-                            </Link>
-                        </SignedIn>
-                    </div>
-
-                    {/* Mobile Interface Toggle */}
-                    <div className="md:hidden flex p-1 gap-1 bg-white/40 backdrop-blur-md border border-white/20 rounded-full shadow-lg mt-2">
-                        <Link href="/personal">
-                            <Button
-                                variant="ghost"
-                                className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
-                            >
-                                ממשק אישי
-                            </Button>
-                        </Link>
-                        <Link href="/business">
-                            <Button
-                                variant="ghost"
-                                className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
-                            >
-                                ממשק עסקי
-                            </Button>
-                        </Link>
-                    </div>
-            </div>
-        </motion.div>
+                            {/* Mobile Interface Toggle */}
+                            <div className="md:hidden flex p-1 gap-1 bg-white/40 backdrop-blur-md border border-white/20 rounded-full shadow-lg mt-2">
+                                <Link href="/personal">
+                                    <Button
+                                        variant="ghost"
+                                        className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
+                                    >
+                                        ממשק אישי
+                                    </Button>
+                                </Link>
+                                <Link href="/business">
+                                    <Button
+                                        variant="ghost"
+                                        className="rounded-full bg-transparent hover:bg-emerald-500/20 hover:text-emerald-700 transition-all text-slate-800 font-bold px-4 h-9 text-xs border-0"
+                                    >
+                                        ממשק עסקי
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </motion.div>
                 </motion.div >
 
-        {/* Personal Solution Section */ }
-        < motion.div
-    initial = "hidden"
-    whileInView = "visible"
-    viewport = {{ once: true, margin: "-100px" }
-}
-variants = { itemVariants }
-className = "mb-20 bg-blue-50 p-8 md:p-12 rounded-3xl border border-blue-200 relative overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-500"
-    >           <div className="absolute top-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mt-32 animate-pulse"></div>
+                {/* Personal Solution Section */}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }
+                    }
+                    variants={itemVariants}
+                    className="mb-20 bg-blue-50 p-8 md:p-12 rounded-3xl border border-blue-200 relative overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-500"
+                >           <div className="absolute top-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mt-32 animate-pulse"></div>
                     <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-200 rounded-full blur-3xl opacity-20 -mr-32 -mb-32 animate-pulse"></div>
 
                     <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
@@ -264,14 +263,14 @@ className = "mb-20 bg-blue-50 p-8 md:p-12 rounded-3xl border border-blue-200 rel
                     </div>
                 </motion.div >
 
-    {/* Business Solution Section */ }
-    < motion.div
-initial = "hidden"
-whileInView = "visible"
-viewport = {{ once: true, margin: "-100px" }}
-variants = { itemVariants }
-className = "mb-20 bg-green-50 p-8 md:p-12 rounded-3xl border border-green-200 relative overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-500"
-    >
+                {/* Business Solution Section */}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={itemVariants}
+                    className="mb-20 bg-green-50 p-8 md:p-12 rounded-3xl border border-green-200 relative overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-500"
+                >
                     <div className="absolute top-0 right-0 w-64 h-64 bg-green-200 rounded-full blur-3xl opacity-20 -mr-32 -mt-32 animate-pulse duration-1000"></div>
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mb-32 animate-pulse duration-1000"></div>
 
@@ -371,14 +370,14 @@ className = "mb-20 bg-green-50 p-8 md:p-12 rounded-3xl border border-green-200 r
                 </motion.div >
 
 
-    {/* Features List - REDESIGNED */ }
-    < motion.div
-initial = "hidden"
-whileInView = "visible"
-viewport = {{ once: true, margin: "-100px" }}
-variants = { containerVariants }
-className = "mt-12 max-w-6xl mx-auto"
-    >
+                {/* Features List - REDESIGNED */}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={containerVariants}
+                    className="mt-12 max-w-6xl mx-auto"
+                >
                     <motion.h3 variants={itemVariants} className="text-3xl font-bold text-center mb-16 text-gray-900">
                         כל מה שאתם צריכים כדי להצליח
                     </motion.h3>
@@ -427,17 +426,17 @@ className = "mt-12 max-w-6xl mx-auto"
                     </div>
                 </motion.div >
 
-    {/* FAQ Section */ }
-    < FAQ />
+                {/* FAQ Section */}
+                <FAQ />
 
-    {/* CTA Section */ }
-    < motion.div
-initial = {{ opacity: 0, scale: 0.9 }}
-whileInView = {{ opacity: 1, scale: 1 }}
-viewport = {{ once: true }}
-transition = {{ duration: 0.8 }}
-className = "text-center mt-2"
-    >
+                {/* CTA Section */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                    className="text-center mt-2"
+                >
                     <SignedOut>
                         <div className="space-y-6">
                             <h2 className="text-4xl font-bold mb-2">מוכנים להתחיל?</h2>
@@ -483,13 +482,13 @@ className = "text-center mt-2"
                     </SignedIn>
                 </motion.div >
 
-    {/* Footer Section - Terms & Privacy */ }
-    < motion.div
-initial = {{ opacity: 0 }}
-whileInView = {{ opacity: 1 }}
-viewport = {{ once: true }}
-className = "mt-8 pt-6 border-t border-gray-200 text-center"
-    >
+                {/* Footer Section - Terms & Privacy */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    className="mt-8 pt-6 border-t border-gray-200 text-center"
+                >
                     <div className="flex justify-center gap-6">
                         <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900 transition-colors underline decoration-gray-300 hover:decoration-gray-900 underline-offset-4">
                             תקנון ותנאי שימוש
@@ -507,7 +506,7 @@ className = "mt-8 pt-6 border-t border-gray-200 text-center"
                 </motion.div >
 
             </div >
-    <SecurityBadge />
+            <SecurityBadge />
         </div >
     )
 }
