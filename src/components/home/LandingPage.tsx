@@ -134,10 +134,6 @@ export default function LandingPage() {
                                                 </motion.button>
                                             </SignInButton>
                                         </div>
-                                        <Link href="/demo" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors underline decoration-dotted underline-offset-4">
-                                            המשך כאורח (דמו)
-                                        </Link>
-                                    </div>
                                 </SignedOut>
 
                                 <SignedIn>
