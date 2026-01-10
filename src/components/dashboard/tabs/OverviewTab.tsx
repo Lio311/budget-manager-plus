@@ -100,7 +100,14 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         previous: { incomes: [], expenses: [], bills: [], debts: [], savings: [] },
         categories: [],
         netWorthHistory: [],
-        user: {}
+        user: {
+            initialBalance: 0,
+            initialSavings: 0,
+            businessInitialBalance: 0,
+            businessInitialSavings: 0,
+            monthlyBalanceOverride: null,
+            monthlySavingsOverride: null
+        }
     } : realOverviewData
 
     useEffect(() => {
