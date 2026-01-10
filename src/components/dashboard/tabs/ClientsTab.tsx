@@ -99,7 +99,7 @@ export function ClientsTab() {
         e.preventDefault()
 
         if (!validateForm()) {
-            toast.error('אנא דאג לתקן את השגיאות בטופס')
+            toast.error('נא למלא את שדות החובה המסומנים')
             return
         }
 
@@ -220,12 +220,17 @@ export function ClientsTab() {
                                 </label>
                                 <input
                                     type="text"
-                                    required
                                     value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, name: e.target.value })
+                                        if (e.target.value) setErrors(prev => {
+                                            const newErrors = { ...prev }
+                                            delete newErrors.name
+                                            return newErrors
+                                        })
+                                    }}
                                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                                 />
-                                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -242,7 +247,6 @@ export function ClientsTab() {
                                     }}
                                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.taxId ? 'border-red-500' : 'border-gray-300'}`}
                                 />
-                                {errors.taxId && <p className="text-red-500 text-xs mt-1">{errors.taxId}</p>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -254,7 +258,6 @@ export function ClientsTab() {
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                                 />
-                                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -272,7 +275,6 @@ export function ClientsTab() {
                                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
                                     dir="rtl"
                                 />
-                                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                             </div>
                         </div>
                         <div>
@@ -285,7 +287,6 @@ export function ClientsTab() {
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                 className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                             />
-                            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -297,7 +298,6 @@ export function ClientsTab() {
                                 rows={3}
                                 className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.notes ? 'border-red-500' : 'border-gray-300'}`}
                             />
-                            {errors.notes && <p className="text-red-500 text-xs mt-1">{errors.notes}</p>}
                         </div>
                         <div className="flex gap-2">
                             <Button type="submit" className="bg-green-600 hover:bg-green-700">
