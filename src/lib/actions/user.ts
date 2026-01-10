@@ -154,11 +154,30 @@ export async function getOnboardingStatus() {
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { hasSeenOnboarding: true }
+            select: {
+                hasSeenOnboarding: true,
+                createdAt: true
+            }
         })
 
-        return user?.hasSeenOnboarding || false
+        if (!user) return true // User not found, treat as seen to avoid errors
+
+        // If already seen, return true (seen)
+        if (user.hasSeenOnboarding) return true
+
+        // check if created today
+        const now = new Date()
+        const created = new Date(user.createdAt)
+        const isCreatedToday =
+            now.getDate() === created.getDate() &&
+            now.getMonth() === created.getMonth() &&
+            now.getFullYear() === created.getFullYear()
+
+        // If NOT created today, return true (treat as seen/don't show)
+        if (!isCreatedToday) return true
+
+        return false // Not seen AND created today -> Show popup
     } catch (error) {
-        return false
+        return true // Error -> treat as seen
     }
 }

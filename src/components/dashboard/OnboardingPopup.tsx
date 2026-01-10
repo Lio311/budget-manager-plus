@@ -124,7 +124,7 @@ export function OnboardingPopup({ isOpen, onClose }: OnboardingPopupProps) {
                         onClick={handleClose}
                         className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-6 text-lg rounded-xl shadow-lg transition-transform hover:-translate-y-1"
                     >
-                        מתחילים! 🚀
+                        מתחילים!
                     </Button>
                 </div>
 
