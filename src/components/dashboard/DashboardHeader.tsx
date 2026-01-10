@@ -233,9 +233,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     <div className="pl-2">
                         {isDemo ? (
                             <div className="flex items-center gap-2">
-                                <div className="px-3 py-1 bg-gray-100 dark:bg-slate-800 rounded-full text-xs font-bold text-gray-500">
-                                    מצב דמה
-                                </div>
+                                {/* Badge removed per user request */}
                                 <Link href="/sign-in">
                                     <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-md transition-all px-6">
                                         התחברות למערכת

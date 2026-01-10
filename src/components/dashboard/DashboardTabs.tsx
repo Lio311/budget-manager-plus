@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { WelcomePopup } from './WelcomePopup'
 import { getUserSubscriptionStatus } from '@/lib/actions/user'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -65,6 +65,8 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     const { budgetType } = useBudget()
     const { mutate: globalMutate } = useSWRConfig()
 
+    const pathname = usePathname()
+
     // Get tab from URL or default to 'overview'
     const urlTab = searchParams.get('tab') || 'overview'
     const [activeTab, setActiveTab] = useState(urlTab)
@@ -85,10 +87,10 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     useEffect(() => {
         if (budgetType !== prevBudgetType) {
             setActiveTab('overview')
-            router.push('/dashboard?tab=overview', { scroll: false })
+            router.push(`${pathname}?tab=overview`, { scroll: false })
             setPrevBudgetType(budgetType)
         }
-    }, [budgetType, prevBudgetType, router])
+    }, [budgetType, prevBudgetType, router, pathname])
 
     const personalTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
@@ -121,7 +123,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         setMobileMenuOpen(false)
 
         // Update URL without page reload
-        router.push(`/dashboard?tab=${value}`, { scroll: false })
+        router.push(`${pathname}?tab=${value}`, { scroll: false })
 
         // Refresh SWR data for the new tab
         globalMutate(key => typeof key === 'string' && key.includes(value))
