@@ -62,7 +62,7 @@ export function GlobalLoginModal() {
                         ) : (
                             <>
                                 <Image
-                                    src="https://www.svgrepo.com/show/475656/google-color.svg"
+                                    src="/images/icons/google.svg"
                                     alt="Google"
                                     width={20}
                                     height={20}
