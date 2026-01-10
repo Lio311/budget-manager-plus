@@ -58,8 +58,6 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     const endOfMonth = new Date(year, month, 0)
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
-    const { mutate: globalMutate } = useSWRConfig()
-    const isBusiness = budgetType === 'BUSINESS'
     const { isDemo, interceptAction } = useDemo()
 
     const [submitting, setSubmitting] = useState(false)
