@@ -392,6 +392,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         className={`h-10 ${errors.description ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}
                         placeholder={isBusiness ? "עבור מה התשלום? (למשל: ציוד משרדי)" : "תיאור ההוצאה"}
                         value={newExpense.description}
+                        onFocus={() => isDemo && interceptAction()}
                         onChange={(e) => {
                             setNewExpense({ ...newExpense, description: e.target.value })
                             if (e.target.value) setErrors(prev => ({ ...prev, description: false }))
@@ -405,6 +406,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         <Select
                             value={newExpense.supplierId}
                             onValueChange={(value) => setNewExpense({ ...newExpense, supplierId: value })}
+                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
                         >
                             <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-red-500/20">
                                 <SelectValue placeholder="ללא ספק ספציפי" />
@@ -428,6 +430,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                                 setNewExpense({ ...newExpense, category: value })
                                 if (value) setErrors(prev => ({ ...prev, category: false }))
                             }}
+                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
                         >
                             <SelectTrigger className={`w-full h-10 border bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${errors.category ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-slate-700'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}>
                                 <SelectValue placeholder="בחר קטגוריה" />
@@ -450,7 +453,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                                 if (onCategoriesChange) onCategoriesChange()
                             }}
                             trigger={
-                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800" title="ניהול קטגוריות">
+                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800" title="ניהול קטגוריות" onClick={() => isDemo && interceptAction()}>
                                     <Plus className="h-4 w-4" />
                                 </Button>
                             }
@@ -464,6 +467,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         <Select
                             value={newExpense.currency}
                             onValueChange={(value) => setNewExpense({ ...newExpense, currency: value })}
+                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
                         >
                             <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100">
                                 <SelectValue />
@@ -481,6 +485,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}
                             placeholder="0.00"
                             value={newExpense.amount}
+                            onFocus={() => isDemo && interceptAction()}
                             onChange={(e) => {
                                 setNewExpense({ ...newExpense, amount: e.target.value })
                                 if (e.target.value) setErrors(prev => ({ ...prev, amount: false }))
@@ -492,7 +497,10 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 <div className="w-full">
                     <PaymentMethodSelector
                         value={newExpense.paymentMethod}
-                        onChange={(val) => setNewExpense({ ...newExpense, paymentMethod: val })}
+                        onChange={(val) => {
+                            if (isDemo) { interceptAction(); return; }
+                            setNewExpense({ ...newExpense, paymentMethod: val })
+                        }}
                         color={isBusiness ? 'red' : 'red'}
                     />
                 </div>
@@ -514,7 +522,10 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הוצאה</label>
                     <DatePicker
                         date={newExpense.date ? new Date(newExpense.date) : undefined}
-                        setDate={(date) => setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                        setDate={(date) => {
+                            if (isDemo) { interceptAction(); return; }
+                            setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })
+                        }}
                         fromDate={startOfMonth}
                         toDate={endOfMonth}
                     />
@@ -522,7 +533,10 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
                 {isBusiness && (
                     <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700">
-                        <Checkbox id="is-deductible" checked={newExpense.isDeductible} onCheckedChange={(checked) => setNewExpense({ ...newExpense, isDeductible: checked as boolean })} className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600" />
+                        <Checkbox id="is-deductible" checked={newExpense.isDeductible} onCheckedChange={(checked) => {
+                            if (isDemo) { interceptAction(); return; }
+                            setNewExpense({ ...newExpense, isDeductible: checked as boolean })
+                        }} className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600" />
                         <label htmlFor="is-deductible" className="text-xs font-bold text-[#323338] dark:text-gray-100 cursor-pointer">הוצאה מוכרת לצורכי מס</label>
                     </div>
                 )}
@@ -533,6 +547,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             id="recurring-expense"
                             checked={newExpense.isRecurring}
                             onCheckedChange={(checked) => {
+                                if (isDemo) { interceptAction(); return; }
                                 const isRecurring = checked as boolean
                                 setNewExpense(prev => ({
                                     ...prev,
@@ -562,11 +577,11 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 <Button
                     onClick={handleAdd}
                     className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md 
-                        ${(!newExpense.description || !newExpense.amount || !newExpense.category)
+                        ${(!newExpense.description || !newExpense.amount || !newExpense.category) && !isDemo
                             ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
                             : (isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d43f55]')
                         }`}
-                    disabled={submitting || !newExpense.description || !newExpense.amount || !newExpense.category}
+                    disabled={!isDemo && (submitting || !newExpense.description || !newExpense.amount || !newExpense.category)}
                 >
                     {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הוצאה' : 'הוסף')}
                 </Button>

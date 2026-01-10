@@ -12,6 +12,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useDemo } from '@/contexts/DemoContext'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -57,7 +58,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     const endOfMonth = new Date(year, month, 0)
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
+    const { mutate: globalMutate } = useSWRConfig()
     const isBusiness = budgetType === 'BUSINESS'
+    const { isDemo, interceptAction } = useDemo()
 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
@@ -227,6 +230,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         className={`h-10 focus:ring-green-500/20 ${errors.source ? 'border-red-500' : 'border-gray-200'}`}
                         placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"}
                         value={newIncome.source}
+                        onFocus={() => isDemo && interceptAction()}
                         onChange={(e) => {
                             setNewIncome({ ...newIncome, source: e.target.value })
                             if (e.target.value) setErrors(prev => ({ ...prev, source: false }))
@@ -240,6 +244,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         <Select
                             value={newIncome.clientId}
                             onValueChange={(value) => setNewIncome({ ...newIncome, clientId: value })}
+                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
                         >
                             <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
                                 <SelectValue placeholder="ללא לקוח ספציפי" />
@@ -264,6 +269,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 setNewIncome({ ...newIncome, category: value })
                                 if (value) setErrors(prev => ({ ...prev, category: false }))
                             }}
+                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
                         >
                             <SelectTrigger className={`w-full text-right h-11 md:h-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 focus:ring-green-500/20 focus:border-green-500 rounded-lg ${errors.category ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : ''}`}>
                                 <SelectValue placeholder="בחר קטגוריה" />
@@ -284,7 +290,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 if (onCategoriesChange) onCategoriesChange()
                             }}
                             trigger={
-                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800" title="ניהול קטגוריות">
+                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800" title="ניהול קטגוריות" onClick={() => isDemo && interceptAction()}>
                                     <Plus className="h-4 w-4" />
                                 </Button>
                             }
@@ -298,6 +304,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         <Select
                             value={newIncome.currency}
                             onValueChange={(value) => setNewIncome({ ...newIncome, currency: value })}
+                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
                         >
                             <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
                                 <SelectValue />
@@ -315,6 +322,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-green-500/20' : 'focus:ring-green-500/20'}`}
                             placeholder="0.00"
                             value={newIncome.amount}
+                            onFocus={() => isDemo && interceptAction()}
                             onChange={(e) => {
                                 setNewIncome({ ...newIncome, amount: e.target.value })
                                 if (e.target.value) setErrors(prev => ({ ...prev, amount: false }))
@@ -346,6 +354,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             className="h-10 border-gray-200 focus:ring-green-500/20"
                             placeholder="שם המשלם"
                             value={newIncome.payer}
+                            onFocus={() => isDemo && interceptAction()}
                             onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
                         />
                     </div>
@@ -382,7 +391,10 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 <div className="w-full">
                     <PaymentMethodSelector
                         value={newIncome.paymentMethod}
-                        onChange={(val) => setNewIncome({ ...newIncome, paymentMethod: val })}
+                        onChange={(val) => {
+                            if (isDemo) { interceptAction(); return; }
+                            setNewIncome({ ...newIncome, paymentMethod: val })
+                        }}
                         color="green"
                     />
                 </div>
@@ -391,7 +403,10 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
                     <DatePicker
                         date={newIncome.date ? new Date(newIncome.date) : undefined}
-                        setDate={(date) => setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })}
+                        setDate={(date) => {
+                            if (isDemo) { interceptAction(); return; }
+                            setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })
+                        }}
                         fromDate={startOfMonth}
                         toDate={endOfMonth}
                     />
@@ -433,11 +448,11 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 <Button
                     onClick={handleAdd}
                     className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md
-                        ${(!newIncome.source || !newIncome.amount || !newIncome.category)
+                        ${(!newIncome.source || !newIncome.amount || !newIncome.category) && !isDemo
                             ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
                             : (isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-[#00c875] hover:bg-[#00b268]')
                         }`}
-                    disabled={submitting || !newIncome.source || !newIncome.amount || !newIncome.category}
+                    disabled={!isDemo && (submitting || !newIncome.source || !newIncome.amount || !newIncome.category)}
                 >
                     {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הכנסה' : 'הוסף')}
                 </Button>

@@ -4,8 +4,8 @@ export const DEMO_DATA = {
         totalExpenses: 14200, // Monthly expenses
         balance: 4300, // Positive balance
         monthlyBudget: 15000,
-        savings: 125000, // Substantial savings
-        debts: 45000, // Car loan or similar
+        savings: 1500, // Reduced to monthly approx amount so balance is positive
+        debts: 2000,
         upcomingBills: 2400
     },
     expenses: [
