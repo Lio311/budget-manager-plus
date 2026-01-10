@@ -407,3 +407,12 @@ function FAQContent() {
         </div>
     )
 }
+
+function AuthModalTrigger({ children }: { children: React.ReactNode }) {
+    const { openModal } = useAuthModal()
+    return (
+        <span onClick={openModal} className="cursor-pointer inline-block">
+            {children}
+        </span>
+    )
+}
