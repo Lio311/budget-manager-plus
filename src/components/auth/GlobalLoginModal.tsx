@@ -2,7 +2,7 @@
 
 import { useAuthModal } from '@/contexts/AuthModalContext'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import { useSignIn, useSignUp } from '@clerk/nextjs'
+import { useSignIn, useSignUp, useAuth } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 import Image from 'next/image'
@@ -17,8 +17,18 @@ export function GlobalLoginModal() {
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
 
+    const { isSignedIn } = useAuth()
+
     const handleGoogleLogin = async () => {
         if (!isSignInLoaded || !isSignUpLoaded) return
+
+        // If already signed in, just redirect to dashboard
+        if (isSignedIn) {
+            router.push('/dashboard')
+            closeModal()
+            return
+        }
+
         setIsLoading(true)
         try {
             await signIn.authenticateWithRedirect({
@@ -26,8 +36,15 @@ export function GlobalLoginModal() {
                 redirectUrl: '/sso-callback',
                 redirectUrlComplete: '/dashboard'
             })
-        } catch (err) {
+        } catch (err: any) {
             console.error('Login error:', err)
+            // Handle specific "already signed in" error from Clerk
+            if (err?.errors?.[0]?.code === 'session_exists' ||
+                err?.message?.includes('already signed in') ||
+                JSON.stringify(err).includes('already signed in')) {
+                router.push('/dashboard')
+                closeModal()
+            }
             setIsLoading(false)
         }
     }
