@@ -151,29 +151,37 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                         {/* Status */}
                                         <div className="space-y-2">
                                             <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</Label>
-                                            <select
-                                                className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-medium"
+                                            <Select
                                                 defaultValue={sub.status}
-                                                onChange={(e) => handleUpdateSubscription(sub.id, { status: e.target.value })}
+                                                onValueChange={(value) => handleUpdateSubscription(sub.id, { status: value })}
                                             >
-                                                <option value="active">Active</option>
-                                                <option value="trial">Trial</option>
-                                                <option value="expired">Expired</option>
-                                                <option value="inactive">Inactive</option>
-                                            </select>
+                                                <SelectTrigger className="w-full h-10">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent dir="rtl" className="text-right">
+                                                    <SelectItem value="active" className="pr-8">Active</SelectItem>
+                                                    <SelectItem value="trial" className="pr-8">Trial</SelectItem>
+                                                    <SelectItem value="expired" className="pr-8">Expired</SelectItem>
+                                                    <SelectItem value="inactive" className="pr-8">Inactive</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
 
                                         {/* Plan Type */}
                                         <div className="space-y-2">
                                             <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Plan Type</Label>
-                                            <select
-                                                className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-medium"
+                                            <Select
                                                 defaultValue={sub.planType}
-                                                onChange={(e) => handleUpdateSubscription(sub.id, { planType: e.target.value as 'PERSONAL' | 'BUSINESS' })}
+                                                onValueChange={(value) => handleUpdateSubscription(sub.id, { planType: value as 'PERSONAL' | 'BUSINESS' })}
                                             >
-                                                <option value="PERSONAL">Personal</option>
-                                                <option value="BUSINESS">Business</option>
-                                            </select>
+                                                <SelectTrigger className="w-full h-10">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent dir="rtl" className="text-right">
+                                                    <SelectItem value="PERSONAL" className="pr-8">Personal</SelectItem>
+                                                    <SelectItem value="BUSINESS" className="pr-8">Business</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
 
                                         {/* Start Date */}
@@ -525,15 +533,19 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-left block">Plan Type</Label>
-                                    <select
-                                        className="w-full border rounded-md p-2 h-10"
-                                        value={newCoupon.planType}
-                                        onChange={e => setNewCoupon({ ...newCoupon, planType: e.target.value })}
+                                    <Select
+                                        value={newCoupon.planType || "ALL"}
+                                        onValueChange={(value) => setNewCoupon({ ...newCoupon, planType: value === "ALL" ? "" : value })}
                                     >
-                                        <option value="PERSONAL">Personal</option>
-                                        <option value="BUSINESS">Business</option>
-                                        <option value="">Any</option>
-                                    </select>
+                                        <SelectTrigger className="w-full h-10">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent dir="rtl" className="text-right">
+                                            <SelectItem value="PERSONAL" className="pr-8">Personal</SelectItem>
+                                            <SelectItem value="BUSINESS" className="pr-8">Business</SelectItem>
+                                            <SelectItem value="ALL" className="pr-8">Any</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <Button onClick={handleCreateOrUpdateCoupon}>{editingId ? 'Update' : 'Create'}</Button>
                             </div>

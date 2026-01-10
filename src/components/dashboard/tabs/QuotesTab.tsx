@@ -336,12 +336,12 @@ export function QuotesTab() {
                                         )}>
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent dir="rtl">
-                                            <SelectItem value="DRAFT">טיוטה</SelectItem>
-                                            <SelectItem value="SENT">נשלח</SelectItem>
-                                            <SelectItem value="ACCEPTED">נחתם</SelectItem>
-                                            <SelectItem value="EXPIRED">פג תוקף</SelectItem>
-                                            <SelectItem value="CANCELLED">בוטל</SelectItem>
+                                        <SelectContent dir="rtl" className="text-right">
+                                            <SelectItem value="DRAFT" className="pr-8">טיוטה</SelectItem>
+                                            <SelectItem value="SENT" className="pr-8">נשלח</SelectItem>
+                                            <SelectItem value="ACCEPTED" className="pr-8">נחתם</SelectItem>
+                                            <SelectItem value="EXPIRED" className="pr-8">פג תוקף</SelectItem>
+                                            <SelectItem value="CANCELLED" className="pr-8">בוטל</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -364,12 +364,12 @@ export function QuotesTab() {
                                             <SelectValue />
                                         </span>
                                     </SelectTrigger>
-                                    <SelectContent dir="rtl">
-                                        <SelectItem value="DRAFT">טיוטה</SelectItem>
-                                        <SelectItem value="SENT">נשלח</SelectItem>
-                                        <SelectItem value="ACCEPTED">נחתם</SelectItem>
-                                        <SelectItem value="EXPIRED">פג תוקף</SelectItem>
-                                        <SelectItem value="CANCELLED">בוטל</SelectItem>
+                                    <SelectContent dir="rtl" className="text-right">
+                                        <SelectItem value="DRAFT" className="pr-8">טיוטה</SelectItem>
+                                        <SelectItem value="SENT" className="pr-8">נשלח</SelectItem>
+                                        <SelectItem value="ACCEPTED" className="pr-8">נחתם</SelectItem>
+                                        <SelectItem value="EXPIRED" className="pr-8">פג תוקף</SelectItem>
+                                        <SelectItem value="CANCELLED" className="pr-8">בוטל</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

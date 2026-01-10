@@ -19,6 +19,13 @@ import { RecurringEndDatePicker } from '@/components/ui/recurring-end-date-picke
 import { formatCurrency } from '@/lib/utils'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '../PaymentMethodSelector'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { useRef } from 'react'
 import { addExpense, importExpenses, deleteAllMonthlyExpenses } from '@/lib/actions/expense'
 import { Trash2 } from 'lucide-react'
@@ -371,35 +378,41 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 {isBusiness && (
                     <div className="w-full">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">ספק</label>
-                        <select
-                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 focus:ring-orange-500/20 outline-none"
+                        <Select
                             value={newExpense.supplierId}
-                            onChange={(e) => setNewExpense({ ...newExpense, supplierId: e.target.value })}
+                            onValueChange={(value) => setNewExpense({ ...newExpense, supplierId: value })}
                         >
-                            <option value="">ללא ספק ספציפי</option>
-                            {suppliers.map(s => (
-                                <option key={s.id} value={s.id}>{s.name}</option>
-                            ))}
-                        </select>
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-orange-500/20">
+                                <SelectValue placeholder="ללא ספק ספציפי" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="NO_SUPPLIER">ללא ספק ספציפי</SelectItem>
+                                {suppliers.map(s => (
+                                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 )}
 
                 <div className="flex gap-2 w-full">
                     <div className="flex-1">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה</label>
-                        <select
-                            className={`w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'} outline-none`}
+                        <Select
                             value={newExpense.category}
-                            onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
-                            style={{ position: 'relative' }}
+                            onValueChange={(value) => setNewExpense({ ...newExpense, category: value })}
                         >
-                            <option value="" disabled>בחר קטגוריה</option>
-                            {categories.map(cat => (
-                                <option key={cat.id} value={cat.name}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger className={`w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`}>
+                                <SelectValue placeholder="בחר קטגוריה" />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-[200px]">
+                                {categories.map(cat => (
+                                    <SelectItem key={cat.id} value={cat.name}>
+                                        {cat.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="pt-6">
                         <CategoryManagementDialog
@@ -421,15 +434,19 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 <div className="grid grid-cols-3 gap-3 w-full">
                     <div className="col-span-1">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">מטבע</label>
-                        <select
-                            className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none"
+                        <Select
                             value={newExpense.currency}
-                            onChange={(e) => setNewExpense({ ...newExpense, currency: e.target.value })}
+                            onValueChange={(value) => setNewExpense({ ...newExpense, currency: value })}
                         >
-                            {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
-                                <option key={code} value={code}>{code} ({symbol})</option>
-                            ))}
-                        </select>
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                    <SelectItem key={code} value={code}>{code} ({symbol})</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="col-span-2">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום (כולל מע"מ)' : 'סכום כולל'}</label>

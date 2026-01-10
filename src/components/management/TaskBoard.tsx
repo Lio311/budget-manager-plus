@@ -42,7 +42,7 @@ interface Task {
     title: string
     description?: string | null
     status: 'TODO' | 'IN_PROGRESS' | 'DONE' | 'STUCK' | 'REVIEW'
-    priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
+    priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
     department: string
     assignees: string[]
     dueDate?: Date
@@ -67,6 +67,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
     const [search, setSearch] = useState('')
     const [assigneeFilter, setAssigneeFilter] = useState<string>('ALL')
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
+    const [priorityFilter, setPriorityFilter] = useState<string>('ALL')
     const [editingTask, setEditingTask] = useState<Task | null>(null)
 
     const handleDeleteTask = async (taskId: string) => {
@@ -112,12 +113,35 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
         }
     }
 
-    // Filter tasks
+    // Helper for sorting priorities
+    const getPriorityWeight = (priority: string) => {
+        switch (priority) {
+            case 'CRITICAL': return 4
+            case 'HIGH': return 3
+            case 'MEDIUM': return 2
+            case 'LOW': return 1
+            default: return 0
+        }
+    }
+
+    // Filter and Sort tasks
     const filteredTasks = tasks.filter(t => {
         const matchSearch = t.title.toLowerCase().includes(search.toLowerCase())
         const matchAssignee = assigneeFilter === 'ALL' || (t.assignees && t.assignees.includes(assigneeFilter))
         const matchStatus = statusFilter === 'ALL' || t.status === statusFilter
-        return matchSearch && matchAssignee && matchStatus
+        const matchPriority = priorityFilter === 'ALL' || t.priority === priorityFilter
+        return matchSearch && matchAssignee && matchStatus && matchPriority
+    }).sort((a, b) => {
+        // 1. Move Completed (DONE) tasks to the bottom
+        const aDone = a.status === 'DONE'
+        const bDone = b.status === 'DONE'
+        if (aDone && !bDone) return 1
+        if (!aDone && bDone) return -1
+
+        // 2. Sort by Priority (Higher first)
+        const weightA = getPriorityWeight(a.priority)
+        const weightB = getPriorityWeight(b.priority)
+        return weightB - weightA
     })
 
     return (
@@ -140,12 +164,26 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
+                    <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                        <SelectTrigger className="w-[130px] h-9 gap-2">
+                            <Flag size={16} className="text-gray-500" />
+                            <SelectValue placeholder="דחיפות" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="ALL">כל החשיבויות</SelectItem>
+                            <SelectItem value="CRITICAL">קריטי</SelectItem>
+                            <SelectItem value="HIGH">גבוה</SelectItem>
+                            <SelectItem value="MEDIUM">בינוני</SelectItem>
+                            <SelectItem value="LOW">נמוך</SelectItem>
+                        </SelectContent>
+                    </Select>
+
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[150px] h-9 gap-2">
+                        <SelectTrigger className="w-[130px] h-9 gap-2">
                             <Filter size={16} className="text-gray-500" />
                             <SelectValue placeholder="סינון" />
                         </SelectTrigger>
-                        <SelectContent dir="rtl">
+                        <SelectContent>
                             <SelectItem value="ALL">כל הסטטוסים</SelectItem>
                             <SelectItem value="TODO">לביצוע</SelectItem>
                             <SelectItem value="IN_PROGRESS">בעבודה</SelectItem>
@@ -156,11 +194,11 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                     </Select>
 
                     <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
-                        <SelectTrigger className="w-[150px] h-9 gap-2">
+                        <SelectTrigger className="w-[130px] h-9 gap-2">
                             <UserIcon size={16} className="text-gray-500" />
                             <SelectValue placeholder="אחראי" />
                         </SelectTrigger>
-                        <SelectContent dir="rtl">
+                        <SelectContent>
                             <SelectItem value="ALL">כל הצוות</SelectItem>
                             <SelectItem value="Lior">Lior</SelectItem>
                             <SelectItem value="Ron">Ron</SelectItem>
@@ -196,8 +234,12 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 className="grid grid-cols-12 gap-4 p-3 items-center hover:bg-gray-50/50 transition-colors group"
                             >
-                                <div className="col-span-1 flex justify-center">
+                                <div className="col-span-1 flex justify-center flex-col items-center gap-1">
                                     <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }} />
+                                    {/* Priority Indicator */}
+                                    {task.priority === 'CRITICAL' && (
+                                        <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse" title="דחיפות קריטית!" />
+                                    )}
                                 </div>
                                 <div className="col-span-11 sm:col-span-3 flex items-center gap-3">
                                     <span className="font-medium text-gray-800 text-sm line-clamp-2 leading-tight" title={task.title}>{task.title}</span>
@@ -264,7 +306,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                                         >
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent dir="rtl">
+                                        <SelectContent>
                                             <SelectItem value="TODO">לביצוע</SelectItem>
                                             <SelectItem value="IN_PROGRESS">בעבודה</SelectItem>
                                             <SelectItem value="REVIEW">בבדיקה</SelectItem>

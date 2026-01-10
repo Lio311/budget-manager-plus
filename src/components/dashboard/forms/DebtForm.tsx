@@ -17,6 +17,13 @@ import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelec
 import { addDebt } from '@/lib/actions/debts'
 import { DEBT_TYPES } from '@/lib/constants/debt-types'
 import { DatePicker } from '@/components/ui/date-picker'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 interface DebtFormProps {
     isMobile?: boolean
@@ -154,16 +161,20 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
                     <div>
                         <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">מטבע</label>
-                        <select
-                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none"
+                        <Select
                             value={newDebt.currency}
-                            onChange={(e) => setNewDebt({ ...newDebt, currency: e.target.value })}
+                            onValueChange={(value) => setNewDebt({ ...newDebt, currency: value })}
                             disabled={submitting}
                         >
-                            {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
-                                <option key={code} value={code}>{code}</option>
-                            ))}
-                        </select>
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl" className="text-right">
+                                {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                    <SelectItem key={code} value={code} className="pr-8">{code}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div>
                         <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל</label>

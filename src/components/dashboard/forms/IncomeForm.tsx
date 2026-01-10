@@ -21,6 +21,13 @@ import { formatCurrency } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { addIncome } from '@/lib/actions/income'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { CategoryManagementDialog } from './CategoryManagementDialog'
@@ -214,16 +221,20 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 {isBusiness && (
                     <div className="w-full">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">לקוח</label>
-                        <select
-                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
+                        <Select
                             value={newIncome.clientId}
-                            onChange={(e) => setNewIncome({ ...newIncome, clientId: e.target.value })}
+                            onValueChange={(value) => setNewIncome({ ...newIncome, clientId: value })}
                         >
-                            <option value="">ללא לקוח ספציפי</option>
-                            {clients.map(client => (
-                                <option key={client.id} value={client.id}>{client.name}</option>
-                            ))}
-                        </select>
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20">
+                                <SelectValue placeholder="ללא לקוח ספציפי" />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl" className="text-right">
+                                <SelectItem value="NO_CLIENT" className="pr-8">ללא לקוח ספציפי</SelectItem>
+                                {clients.map(client => (
+                                    <SelectItem key={client.id} value={client.id} className="pr-8">{client.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 )}
 
@@ -231,16 +242,19 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 <div className="flex gap-2 w-full">
                     <div className="flex-1">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה</label>
-                        <select
-                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
+                        <Select
                             value={newIncome.category}
-                            onChange={(e) => setNewIncome({ ...newIncome, category: e.target.value })}
+                            onValueChange={(value) => setNewIncome({ ...newIncome, category: value })}
                         >
-                            <option value="" disabled>בחר קטגוריה</option>
-                            {categories.map(cat => (
-                                <option key={cat.id} value={cat.name}>{cat.name}</option>
-                            ))}
-                        </select>
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20">
+                                <SelectValue placeholder="בחר קטגוריה" />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl" className="text-right max-h-[200px]">
+                                {categories.map(cat => (
+                                    <SelectItem key={cat.id} value={cat.name} className="pr-8">{cat.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="pt-6">
                         <CategoryManagementDialog
@@ -262,15 +276,19 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 <div className="grid grid-cols-3 gap-3 w-full">
                     <div className="col-span-1">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">מטבע</label>
-                        <select
-                            className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none"
+                        <Select
                             value={newIncome.currency}
-                            onChange={(e) => setNewIncome({ ...newIncome, currency: e.target.value })}
+                            onValueChange={(value) => setNewIncome({ ...newIncome, currency: value })}
                         >
-                            {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
-                                <option key={code} value={code}>{code} ({symbol})</option>
-                            ))}
-                        </select>
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl" className="text-right">
+                                {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                    <SelectItem key={code} value={code} className="pr-8">{code} ({symbol})</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="col-span-2">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ' : 'סכום כולל'}</label>
