@@ -25,10 +25,10 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
     let title = 'מנוי פרטי'
     if (initialPlan === 'BUSINESS') {
         basePrice = 129
-        title = 'מנוי עסקי (SMB)'
+        title = 'בחר בתוכנית העסקית'
     } else if (initialPlan === 'COMBINED') {
         basePrice = 169
-        title = 'משולב - פרטי ועסקי'
+        title = 'משולב - אישי ועסקי'
     }
 
     const [price, setPrice] = useState(basePrice)
@@ -245,7 +245,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                             }
                         }}
                     >
-                        התנסות בתוכנית ה-{initialPlan === 'COMBINED' ? 'משולבת' : initialPlan === 'BUSINESS' ? 'עסקית' : 'פרטית'} לחודשיים
+                        בחר בתוכנית {initialPlan === 'COMBINED' ? 'המשולבת' : initialPlan === 'BUSINESS' ? 'העסקית' : 'האישית'} - חודשיים חינם
                     </Button>
                 )}
 

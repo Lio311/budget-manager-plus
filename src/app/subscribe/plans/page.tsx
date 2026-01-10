@@ -11,7 +11,8 @@ export default function PlansPage() {
     const plans = [
         {
             id: 'PERSONAL',
-            name: 'פרטי',
+            name: 'אישי',
+            title: 'בחר בתוכנית האישית',
             price: 89,
             description: 'ניהול תקציב למשק בית',
             features: [
@@ -26,6 +27,7 @@ export default function PlansPage() {
         {
             id: 'BUSINESS',
             name: 'עסקי (SMB)',
+            title: 'בחר בתוכנית העסקית',
             price: 129,
             description: 'ניהול פיננסי מלא לעסק',
             features: [
@@ -39,7 +41,8 @@ export default function PlansPage() {
         },
         {
             id: 'COMBINED',
-            name: 'משולב - פרטי ועסקי',
+            name: 'משולב - אישי ועסקי',
+            title: 'בחר בתוכנית המשולבת',
             price: 169,
             description: 'גישה מלאה לשני הממשקים',
             features: [
@@ -105,7 +108,7 @@ export default function PlansPage() {
                                     : 'bg-gray-800 hover:bg-gray-900'
                                     }`}
                             >
-                                בחר בתוכנית {plan.name}
+                                {plan.title}
                             </Button>
                         </div>
                     </div>
