@@ -113,24 +113,31 @@ export default function LandingPage() {
                         <div className="flex flex-col items-center gap-4 w-fit mx-auto">
                             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                                 <SignedOut>
-                                    <Link href="/get-started">
-                                        <motion.button
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
-                                        >
-                                            התחל בחינם
-                                        </motion.button>
-                                    </Link>
-                                    <SignInButton mode="modal">
-                                        <motion.button
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-full font-bold text-lg transition-all shadow-md"
-                                        >
-                                            כניסה למערכת
-                                        </motion.button>
-                                    </SignInButton>
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div className="flex gap-4">
+                                            <Link href="/get-started">
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
+                                                >
+                                                    התחל בחינם
+                                                </motion.button>
+                                            </Link>
+                                            <SignInButton mode="modal">
+                                                <motion.button
+                                                    whileHover={{ scale: 1.05 }}
+                                                    whileTap={{ scale: 0.95 }}
+                                                    className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-full font-bold text-lg transition-all shadow-md"
+                                                >
+                                                    כניסה למערכת
+                                                </motion.button>
+                                            </SignInButton>
+                                        </div>
+                                        <Link href="/demo" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors underline decoration-dotted underline-offset-4">
+                                            המשך כאורח (דמו)
+                                        </Link>
+                                    </div>
                                 </SignedOut>
 
                                 <SignedIn>
