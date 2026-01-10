@@ -155,13 +155,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                         onClick={() => setIsSubscriptionOpen(true)}
                                     />
                                 </UserButton.MenuItems>
-                                <UserButton.UserProfilePage
-                                    label="מנוי"
-                                    url="subscription"
-                                    labelIcon={<CreditCard className="w-4 h-4" />}
-                                >
-                                    <SubscriptionStatus />
-                                </UserButton.UserProfilePage>
+
                             </UserButton>
                         )}
 
@@ -257,13 +251,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                         onClick={() => setIsSubscriptionOpen(true)}
                                     />
                                 </UserButton.MenuItems>
-                                <UserButton.UserProfilePage
-                                    label="מנוי"
-                                    url="subscription"
-                                    labelIcon={<CreditCard className="w-4 h-4" />}
-                                >
-                                    <SubscriptionStatus />
-                                </UserButton.UserProfilePage>
+
                             </UserButton>
                         )}
                     </div>
