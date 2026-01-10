@@ -56,7 +56,7 @@ export function OnboardingPopup({ isOpen, onClose }: OnboardingPopupProps) {
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="sm:max-w-xl p-0 overflow-hidden bg-white dark:bg-slate-900 border-none shadow-2xl rounded-3xl" dir="rtl">
+            <DialogContent className="sm:max-w-xl p-0 overflow-hidden bg-white dark:bg-slate-900 border-none shadow-2xl rounded-3xl [&>button]:hidden" dir="rtl">
 
                 {/* Header Background */}
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 h-32 relative flex items-center justify-center overflow-hidden">
