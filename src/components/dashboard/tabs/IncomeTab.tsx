@@ -30,6 +30,7 @@ import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelec
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
 import { Briefcase, DollarSign, TrendingUp, Gift, Home, Landmark, PiggyBank, Wallet } from 'lucide-react'
 import { useConfirm } from '@/hooks/useConfirm'
+import { useDemo } from '@/contexts/DemoContext'
 
 const getCategoryIcon = (categoryName: string) => {
     const name = categoryName.toLowerCase()
@@ -82,6 +83,7 @@ export function IncomeTab() {
     const { mutate: globalMutate } = useSWRConfig()
     const confirm = useConfirm()
     const isBusiness = budgetType === 'BUSINESS'
+    const { isDemo, data: demoData, interceptAction } = useDemo()
 
     const [taxRate, setTaxRate] = useState(0)
     const [isTaxDialogOpen, setIsTaxDialogOpen] = useState(false)
@@ -100,6 +102,7 @@ export function IncomeTab() {
     }, [isBusiness])
 
     const handleUpdateTaxRate = async () => {
+        if (isDemo) { interceptAction(); return; }
         const rate = parseFloat(taxRateInput)
         if (isNaN(rate) || rate < 0 || rate > 100) return
 
@@ -134,13 +137,13 @@ export function IncomeTab() {
     }
 
     const { data, isLoading: loadingIncomes, mutate: mutateIncomes } = useSWR<IncomeData>(
-        ['incomes', month, year, budgetType],
+        isDemo ? null : ['incomes', month, year, budgetType],
         fetcherIncomes,
         { revalidateOnFocus: false }
     )
 
-    const incomes = data?.incomes || []
-    const totalIncomeILS = data?.totalILS || 0
+    const incomes = isDemo ? demoData.incomes : (data?.incomes || [])
+    const totalIncomeILS = isDemo ? demoData.overview.totalIncome : (data?.totalILS || 0)
     const totalNetILS = data?.totalNetILS || 0
 
     const fetcherClients = async () => {

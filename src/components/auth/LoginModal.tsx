@@ -35,7 +35,7 @@ export function LoginModal({ children }: LoginModalProps) {
                         onClick={() => setOpen(false)}
                         className="text-white font-medium hover:text-emerald-200 transition-colors underline decoration-dotted underline-offset-4"
                     >
-                        המשך כאורח (דמו)
+                        התנסות במערכת כאורח
                     </Link>
                 </div>
             </DialogContent>

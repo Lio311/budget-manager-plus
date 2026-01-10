@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { saveBkmvData } from '@/lib/actions/stored-reports'
+import { useDemo } from '@/contexts/DemoContext'
 
 // ...
 
@@ -98,6 +99,8 @@ export default function ProfitLossTab() {
     const currentYear = new Date().getFullYear()
     const availableYears = [2025, 2026]
 
+    const { isDemo, data: demoData, interceptAction } = useDemo()
+
     useEffect(() => {
         if (selectedYear) {
             fetchReport(selectedYear)
@@ -106,6 +109,15 @@ export default function ProfitLossTab() {
 
     const fetchReport = async (year: number) => {
         setIsLoading(true)
+        if (isDemo) {
+            // Simulate network delay
+            setTimeout(() => {
+                setReportData(demoData.profitLoss as any)
+                setIsLoading(false)
+            }, 600)
+            return
+        }
+
         try {
             const result = await getProfitLossData(year)
             if (result.success && result.data) {
@@ -121,6 +133,7 @@ export default function ProfitLossTab() {
     }
 
     const handleDownloadPDF = async (year: number) => {
+        if (isDemo) { interceptAction(); return; }
         try {
             const response = await fetch(`/api/reports/profit-loss/${year}/pdf`)
             if (!response.ok) throw new Error('Download failed')
@@ -140,6 +153,7 @@ export default function ProfitLossTab() {
     }
 
     const handleSaveReport = async (year: number) => {
+        if (isDemo) { interceptAction(); return; }
         toast.info('שומר דוח במערכת...')
         const result = await saveBkmvData(year)
         if (result.success) {

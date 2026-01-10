@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
 import { z } from 'zod'
 import { useConfirm } from '@/hooks/useConfirm'
+import { useDemo } from '@/contexts/DemoContext'
 
 const SupplierSchema = z.object({
     name: z.string().min(2, 'שם הספק חייב להכיל לפחות 2 תווים').max(100, 'שם הספק ארוך מדי'),
@@ -57,7 +58,19 @@ export function SuppliersTab() {
         return result.data || []
     }
 
-    const { data: suppliers = [], isLoading, mutate } = useSWR(['suppliers', budgetType], fetcher)
+    const { isDemo, data: demoData, interceptAction } = useDemo()
+    const { data: suppliersData = [], isLoading, mutate } = useSWR(isDemo ? null : ['suppliers', budgetType], fetcher)
+
+    const suppliers = isDemo ? demoData.suppliers.map((s: any) => ({
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        phone: s.phone,
+        taxId: '512345678', // Fake tax ID
+        notes: s.category,
+        totalExpenses: 2500, // Fake amount
+        _count: { expenses: 3 } // Fake count
+    })) : suppliersData
 
     const filteredSuppliers = suppliers.filter((supplier: any) =>
         (supplier.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
@@ -97,6 +110,7 @@ export function SuppliersTab() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (isDemo) { interceptAction(); return; }
 
         if (!validateForm()) {
             toast.error('נא למלא את שדות החובה המסומנים')
@@ -140,6 +154,7 @@ export function SuppliersTab() {
     }
 
     const handleDelete = async (id: string) => {
+        if (isDemo) { interceptAction(); return; }
         const confirmed = await confirm('האם אתה בטוח שברצונך למחוק ספק זה?', 'מחיקת ספק')
         if (!confirmed) return
 

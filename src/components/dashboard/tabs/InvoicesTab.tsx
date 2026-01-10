@@ -23,6 +23,7 @@ import {
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { InvoiceForm } from '@/components/dashboard/forms/InvoiceForm'
+import { useDemo } from '@/contexts/DemoContext'
 
 const statusConfig = {
     DRAFT: { label: 'טיוטה', icon: FileText, color: 'text-gray-600', bg: 'bg-gray-100' },
@@ -51,6 +52,8 @@ export function InvoicesTab() {
     const [searchTerm, setSearchTerm] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
 
+    const { isDemo, data: demoData, interceptAction } = useDemo()
+
     // Dialog states for desktop and mobile
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
@@ -78,12 +81,27 @@ export function InvoicesTab() {
         return result.data || []
     }
 
-    const { data: invoices = [], isLoading, mutate } = useSWR<Invoice[]>(
-        ['invoices', budgetType],
+    const { data: invoicesData = [], isLoading, mutate } = useSWR<Invoice[]>(
+        isDemo ? null : ['invoices', budgetType],
         invoicesFetcher,
         { revalidateOnFocus: false }
     )
-    const { data: clients = [] } = useSWR(['clients', budgetType], clientsFetcher)
+    const { data: clientsData = [] } = useSWR(isDemo ? null : ['clients', budgetType], clientsFetcher)
+
+    const invoices = isDemo ? demoData.invoices.map((inv: any) => ({
+        id: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        clientName: inv.clientName,
+        clientId: 'demo-client',
+        date: inv.date,
+        dueDate: inv.dueDate,
+        status: inv.status,
+        totalAmount: inv.amount,
+        vatAmount: inv.amount * 0.17, // approximation
+        items: []
+    })) : invoicesData
+
+    const clients = isDemo ? demoData.clients : clientsData
 
     const filteredInvoices = invoices.filter(inv =>
         (inv.clientName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
@@ -237,6 +255,7 @@ export function InvoicesTab() {
                     <Button
                         className="bg-purple-600 hover:bg-purple-700"
                         onClick={() => {
+                            if (isDemo) { interceptAction(); return; }
                             if (!clients || clients.length === 0) {
                                 toast.error('אין לקוחות פעילים, לא ניתן לייצר חשבונית')
                                 return

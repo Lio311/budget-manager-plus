@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { useBudget } from '@/contexts/BudgetContext'
 import { z } from 'zod'
 import { useConfirm } from '@/hooks/useConfirm'
+import { useDemo } from '@/contexts/DemoContext'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -57,7 +58,19 @@ export function ClientsTab() {
         return result.data || []
     }
 
-    const { data: clients = [], isLoading, mutate } = useSWR(['clients', budgetType], fetcher)
+    const { isDemo, data: demoData, interceptAction } = useDemo()
+    const { data: clientsData = [], isLoading, mutate } = useSWR(isDemo ? null : ['clients', budgetType], fetcher)
+
+    const clients = isDemo ? demoData.clients.map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        email: c.email,
+        phone: c.phone,
+        taxId: '519876543', // Fake tax ID
+        notes: 'לקוח דמו',
+        totalRevenue: c.totalRevenue,
+        _count: { incomes: 5 } // Fake count
+    })) : clientsData
 
     const filteredClients = clients.filter((client: any) =>
         (client.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
@@ -97,6 +110,7 @@ export function ClientsTab() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (isDemo) { interceptAction(); return; }
 
         if (!validateForm()) {
             toast.error('נא למלא את שדות החובה המסומנים')
@@ -140,6 +154,7 @@ export function ClientsTab() {
     }
 
     const handleDelete = async (id: string) => {
+        if (isDemo) { interceptAction(); return; }
         const confirmed = await confirm('האם אתה בטוח שברצונך למחוק לקוח זה?', 'מחיקת לקוח')
         if (!confirmed) return
 

@@ -23,6 +23,7 @@ import {
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { QuoteForm } from '@/components/dashboard/forms/QuoteForm'
+import { useDemo } from '@/contexts/DemoContext'
 
 const statusConfig = {
     DRAFT: { label: 'טיוטה', icon: FileText, color: 'text-gray-600', bg: 'bg-gray-100' },
@@ -50,6 +51,8 @@ export function QuotesTab() {
     const { budgetType } = useBudget()
     const [searchTerm, setSearchTerm] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
+
+    const { isDemo, data: demoData, interceptAction } = useDemo()
 
     // Dialog states for desktop and mobile
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -79,8 +82,28 @@ export function QuotesTab() {
         return result.data || []
     }
 
-    const { data: quotes = [], isLoading, mutate } = useSWR<Quote[]>(['quotes', budgetType], quotesFetcher, { revalidateOnFocus: false })
-    const { data: clients = [] } = useSWR(['clients', budgetType], clientsFetcher)
+    const { data: quotesData = [], isLoading, mutate } = useSWR<Quote[]>(
+        isDemo ? null : ['quotes', budgetType],
+        quotesFetcher,
+        { revalidateOnFocus: false }
+    )
+    const { data: clientsData = [] } = useSWR(isDemo ? null : ['clients', budgetType], clientsFetcher)
+
+    const quotes = isDemo ? demoData.quotes.map((q: any) => ({
+        id: q.id,
+        quoteNumber: q.quoteNumber,
+        clientName: q.clientName,
+        clientId: 'demo-client',
+        date: q.date,
+        validUntil: q.validUntil,
+        status: q.status,
+        totalAmount: q.amount,
+        vatAmount: q.amount * 0.17,
+        isSigned: q.status === 'ACCEPTED',
+        items: []
+    })) : quotesData
+
+    const clients = isDemo ? demoData.clients : clientsData
 
     const filteredQuotes = quotes.filter((q: any) =>
         (q.clientName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
@@ -232,7 +255,15 @@ export function QuotesTab() {
                 <div className="hidden md:block">
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-yellow-500 hover:bg-yellow-600 text-white dark:text-black">
+                            <Button
+                                className="bg-yellow-500 hover:bg-yellow-600 text-white dark:text-black"
+                                onClick={(e) => {
+                                    if (isDemo) {
+                                        e.preventDefault()
+                                        interceptAction()
+                                    }
+                                }}
+                            >
                                 <Plus className="h-4 w-4 ml-2" />
                                 הצעת מחיר חדשה
                             </Button>

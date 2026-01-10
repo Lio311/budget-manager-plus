@@ -30,6 +30,7 @@ import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { SavingForm } from '@/components/dashboard/forms/SavingForm'
+import { useDemo } from '@/contexts/DemoContext'
 
 interface Saving {
     id: string
@@ -65,6 +66,8 @@ export function SavingsTab() {
 
     // --- Data Fetching ---
 
+    const { isDemo, data: demoData, interceptAction } = useDemo()
+
     // Savings Fetcher
     const fetcherSavings = async () => {
         const result = await getSavings(month, year, budgetType)
@@ -73,13 +76,28 @@ export function SavingsTab() {
     }
 
     const { data: savingsData, isLoading: loadingSavings, mutate: mutateSavings } = useSWR<SavingsData>(
-        ['savings', month, year, budgetType],
+        isDemo ? null : ['savings', month, year, budgetType],
         fetcherSavings,
         { revalidateOnFocus: false }
     )
 
-    const savings = savingsData?.savings || []
-    const stats = savingsData?.stats || { totalMonthlyDepositILS: 0, count: 0 }
+    const savings = isDemo ? demoData.savings.map((s: any) => ({
+        id: s.id,
+        category: 'כללי', // Default for demo
+        name: s.name,
+        monthlyDeposit: s.monthlyDeposit,
+        currency: s.currency,
+        notes: s.name,
+        targetDate: s.goalDate ? new Date(s.goalDate) : new Date(),
+        createdAt: new Date(),
+        paymentMethod: 'BANK_TRANSFER',
+        isRecurring: true
+    })) : (savingsData?.savings || [])
+
+    const stats = isDemo ? {
+        totalMonthlyDepositILS: demoData.savings.reduce((acc: number, s: any) => acc + s.monthlyDeposit, 0),
+        count: demoData.savings.length
+    } : (savingsData?.stats || { totalMonthlyDepositILS: 0, count: 0 })
 
     // Categories Fetcher
     const fetcherCategories = async () => {

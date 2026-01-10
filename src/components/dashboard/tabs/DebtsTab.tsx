@@ -23,6 +23,7 @@ import { DEBT_TYPES, DEBT_TYPE_LABELS, CREDITOR_LABELS } from '@/lib/constants/d
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
+import { useDemo } from '@/contexts/DemoContext'
 
 interface Debt {
     id: string
@@ -55,6 +56,7 @@ export function DebtsTab() {
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    const { isDemo, data: demoData, interceptAction } = useDemo()
 
     const fetcher = async () => {
         const result = await getDebts(month, year, budgetType)
@@ -62,7 +64,7 @@ export function DebtsTab() {
         throw new Error(result.error || 'Failed to fetch debts')
     }
 
-    const { data: debtsData, isLoading: loading, mutate } = useSWR<DebtsData>(['debts', month, year, budgetType], fetcher, {
+    const { data: debtsData, isLoading: loading, mutate } = useSWR<DebtsData>(isDemo ? null : ['debts', month, year, budgetType], fetcher, {
         revalidateOnFocus: false,
         onError: (err) => {
             toast({
@@ -74,8 +76,17 @@ export function DebtsTab() {
         }
     })
 
-    const debts = debtsData?.debts || []
-    const stats = debtsData?.stats || {
+    const debts = isDemo ? demoData.debts : (debtsData?.debts || [])
+    const stats = isDemo ? {
+        totalOwedByMeILS: demoData.overview.debts, // simplified for demo
+        totalOwedToMeILS: 0,
+        netDebtILS: demoData.overview.debts,
+        monthlyPaymentOwedByMeILS: 1200, // approximation based on demo data
+        monthlyPaymentOwedToMeILS: 0,
+        netMonthlyPaymentILS: 1200,
+        paidThisMonthILS: 500,
+        unpaidThisMonthILS: 700
+    } : (debtsData?.stats || {
         totalOwedByMeILS: 0,
         totalOwedToMeILS: 0,
         netDebtILS: 0,
@@ -84,7 +95,7 @@ export function DebtsTab() {
         netMonthlyPaymentILS: 0,
         paidThisMonthILS: 0,
         unpaidThisMonthILS: 0
-    }
+    })
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)

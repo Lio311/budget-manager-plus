@@ -18,13 +18,14 @@ import { PaymentMethodSelector } from '../PaymentMethodSelector'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { BillForm } from '@/components/dashboard/forms/BillForm'
+import { useDemo } from '@/contexts/DemoContext'
 
 interface Bill {
     id: string
     name: string
     amount: number
     currency: string
-    dueDate: Date
+    dueDate: Date | string
     isPaid: boolean
     paymentMethod?: string | null
     isRecurring: boolean
@@ -41,6 +42,7 @@ export function BillsTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
+    const { isDemo, data: demoData, interceptAction } = useDemo()
 
     // Mobile Dialog State
     const [isMobileOpen, setIsMobileOpen] = useState(false)
@@ -51,7 +53,7 @@ export function BillsTab() {
         throw new Error(result.error || 'Failed to fetch bills')
     }
 
-    const { data, isLoading: loading, mutate } = useSWR<BillData>(['bills', month, year, budgetType], fetcher, {
+    const { data, isLoading: loading, mutate } = useSWR<BillData>(isDemo ? null : ['bills', month, year, budgetType], fetcher, {
         revalidateOnFocus: false,
         onError: (err) => {
             toast({
@@ -63,10 +65,10 @@ export function BillsTab() {
         }
     })
 
-    const bills = data?.bills || []
-    const totalBillsILS = data?.totalILS || 0
-    const totalPaidILS = data?.totalPaidILS || 0
-    const totalUnpaidILS = data?.totalUnpaidILS || 0
+    const bills = isDemo ? demoData.bills : (data?.bills || [])
+    const totalBillsILS = isDemo ? demoData.overview.upcomingBills : (data?.totalILS || 0)
+    const totalPaidILS = isDemo ? demoData.bills.filter(b => b.isPaid).reduce((sum, b) => sum + b.amount, 0) : (data?.totalPaidILS || 0)
+    const totalUnpaidILS = isDemo ? demoData.bills.filter(b => !b.isPaid).reduce((sum, b) => sum + b.amount, 0) : (data?.totalUnpaidILS || 0)
 
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editData, setEditData] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
