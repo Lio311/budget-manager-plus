@@ -17,7 +17,10 @@ const isPublicRoute = createRouteMatcher([
     '/api/v1/expenses(.*)',
     '/api/quick-add(.*)',
     '/api/quick-stats(.*)', // iOS Shortcut API with API key auth
-    '/api/scan-invoice(.*)'
+    '/api/scan-invoice(.*)',
+    '/terms(.*)',
+    '/security(.*)',
+    '/accessibility(.*)'
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

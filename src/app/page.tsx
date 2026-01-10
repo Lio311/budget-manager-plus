@@ -215,7 +215,7 @@ export default function LandingPage() {
                             <Link href="/terms" className="hover:text-white transition">תנאי שימוש</Link>
                             <Link href="/security" className="hover:text-white transition">אבטחת מידע</Link>
                             <Link href="/accessibility" className="hover:text-white transition">הצהרת נגישות</Link>
-                            <Link href="/contact" className="hover:text-white transition">צור קשר</Link>
+
                         </div>
                     </div>
                 </motion.div>
