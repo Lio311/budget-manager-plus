@@ -146,7 +146,6 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 onClose={() => setShowWelcome(false)}
                 trialEndsAt={subscriptionStatus?.trialEndsAt}
                 activeSubscription={subscriptionStatus?.activeSubscription}
-                activeSubscription={subscriptionStatus?.activeSubscription}
             />
 
             <OnboardingPopup
