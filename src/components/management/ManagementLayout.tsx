@@ -242,5 +242,4 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
             </div>
         </ThemeProvider>
     )
-    )
 }
