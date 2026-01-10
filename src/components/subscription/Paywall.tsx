@@ -5,6 +5,7 @@ import { useAuth, useUser, SignedIn } from '@clerk/nextjs'
 import { Check, Tag, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { validateCoupon, getSubscriptionStatus, startTrial } from '@/lib/actions/subscription'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,7 @@ import { toast } from 'sonner'
 export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) {
     const { userId } = useAuth()
     const { user } = useUser()
+    const router = useRouter()
     const [couponCode, setCouponCode] = useState('')
     const [discount, setDiscount] = useState(0)
 
@@ -83,7 +85,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => window.history.back()}
+                            onClick={() => router.back()}
                             className="text-gray-500 hover:text-gray-900 gap-1"
                         >
                             <ArrowRight className="h-4 w-4" />
