@@ -43,6 +43,8 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
     const { mutate: globalMutate } = useSWRConfig()
 
     const [submitting, setSubmitting] = useState(false)
+    const [errors, setErrors] = useState<Record<string, boolean>>({})
+
     const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
     const [newCategoryName, setNewCategoryName] = useState('')
     const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
@@ -98,10 +100,17 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
     )
 
     async function handleAdd() {
-        if (!newSaving.category || !newSaving.description || !newSaving.monthlyDeposit) {
+        const newErrors: Record<string, boolean> = {}
+        if (!newSaving.category) newErrors.category = true
+        if (!newSaving.description) newErrors.description = true
+        if (!newSaving.monthlyDeposit) newErrors.monthlyDeposit = true
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
             toast({ title: 'שגיאה', description: 'נא למלא את כל השדות החובה', variant: 'destructive' })
             return
         }
+        setErrors({})
 
         if (newSaving.isRecurring && newSaving.recurringEndDate) {
             const start = new Date(newSaving.date)
@@ -198,12 +207,15 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
 
             <div className="flex flex-wrap gap-4 items-end">
                 <div className="w-full space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">קטגוריה</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">קטגוריה *</label>
                     <div className="flex gap-2">
                         <select
-                            className="w-full p-2.5 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm focus:ring-2 focus:ring-[#00c875]/20 focus:border-[#00c875] outline-none transition-all"
+                            className={`w-full p-2.5 border rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none transition-all ${errors.category ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'} focus:ring-2 focus:ring-[#00c875]/20 focus:border-[#00c875]`}
                             value={newSaving.category}
-                            onChange={(e) => setNewSaving({ ...newSaving, category: e.target.value })}
+                            onChange={(e) => {
+                                setNewSaving({ ...newSaving, category: e.target.value })
+                                if (e.target.value) setErrors(prev => ({ ...prev, category: false }))
+                            }}
                             disabled={submitting}
                         >
                             <option value="" disabled>בחר סוג</option>
@@ -245,12 +257,15 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 </div>
 
                 <div className="w-full space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תיאור</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תיאור *</label>
                     <Input
                         placeholder="תיאור"
-                        className="h-10 border-gray-200 focus:ring-[#00c875]/20 focus:border-[#00c875]"
+                        className={`h-10 focus:ring-[#00c875]/20 focus:border-[#00c875] ${errors.description ? 'border-red-500' : 'border-gray-200'}`}
                         value={newSaving.description}
-                        onChange={(e) => setNewSaving({ ...newSaving, description: e.target.value })}
+                        onChange={(e) => {
+                            setNewSaving({ ...newSaving, description: e.target.value })
+                            if (e.target.value) setErrors(prev => ({ ...prev, description: false }))
+                        }}
                     />
                 </div>
 
@@ -269,13 +284,16 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
 
                 <div className="w-full grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">הפקדה</label>
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">הפקדה *</label>
                         <Input
                             type="number"
                             placeholder="0.00"
-                            className="h-10 border-gray-200 focus:ring-[#00c875]/20 focus:border-[#00c875] w-full"
+                            className={`h-10 focus:ring-[#00c875]/20 focus:border-[#00c875] w-full ${errors.monthlyDeposit ? 'border-red-500' : 'border-gray-200'}`}
                             value={newSaving.monthlyDeposit}
-                            onChange={(e) => setNewSaving({ ...newSaving, monthlyDeposit: e.target.value })}
+                            onChange={(e) => {
+                                setNewSaving({ ...newSaving, monthlyDeposit: e.target.value })
+                                if (e.target.value) setErrors(prev => ({ ...prev, monthlyDeposit: false }))
+                            }}
                         />
                     </div>
 

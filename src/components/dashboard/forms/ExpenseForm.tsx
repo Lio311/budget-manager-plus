@@ -65,6 +65,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     const isBusiness = budgetType === 'BUSINESS'
 
     const [submitting, setSubmitting] = useState(false)
+    const [errors, setErrors] = useState<Record<string, boolean>>({})
 
     const [newExpense, setNewExpense] = useState({
         description: '',
@@ -220,10 +221,16 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     )
 
     async function handleAdd() {
-        if (!newExpense.amount || !newExpense.category) {
-            toast({ title: 'שגיאה', description: 'נא למלא סכום וקטגוריה', variant: 'destructive' })
+        const newErrors: Record<string, boolean> = {}
+        if (!newExpense.amount) newErrors.amount = true
+        if (!newExpense.category) newErrors.category = true
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            toast({ title: 'שגיאה', description: 'נא למלא את שדות החובה המסומנים', variant: 'destructive' })
             return
         }
+        setErrors({})
 
         if (newExpense.isRecurring && newExpense.recurringEndDate) {
             const start = new Date(newExpense.date)
@@ -397,12 +404,15 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
                 <div className="flex gap-2 w-full">
                     <div className="flex-1">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה *</label>
                         <Select
                             value={newExpense.category}
-                            onValueChange={(value) => setNewExpense({ ...newExpense, category: value })}
+                            onValueChange={(value) => {
+                                setNewExpense({ ...newExpense, category: value })
+                                if (value) setErrors(prev => ({ ...prev, category: false }))
+                            }}
                         >
-                            <SelectTrigger className={`w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}>
+                            <SelectTrigger className={`w-full h-10 border bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${errors.category ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}>
                                 <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                             <SelectContent className="max-h-[200px]">
@@ -449,8 +459,16 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         </Select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום (כולל מע"מ)' : 'סכום כולל'}</label>
-                        <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`} placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום (כולל מע"מ) *' : 'סכום כולל *'}</label>
+                        <FormattedNumberInput
+                            className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}
+                            placeholder="0.00"
+                            value={newExpense.amount}
+                            onChange={(e) => {
+                                setNewExpense({ ...newExpense, amount: e.target.value })
+                                if (e.target.value) setErrors(prev => ({ ...prev, amount: false }))
+                            }}
+                        />
                     </div>
                 </div>
 

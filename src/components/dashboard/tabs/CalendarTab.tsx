@@ -62,6 +62,7 @@ export function CalendarTab() {
         clientId: 'none',
         incomeId: 'none'
     })
+    const [errors, setErrors] = useState<Record<string, boolean>>({})
 
     const isBusiness = budgetType === 'BUSINESS'
 
@@ -74,7 +75,7 @@ export function CalendarTab() {
 
     // Work Mode Fetchers
     const fetchWorkEvents = async () => (await getWorkEvents(month, year)).data || []
-    const fetchClients = async () => (await getClients()).data || []
+    const fetchClients = async () => (await getClients(budgetType)).data || []
 
     // SWR Hooks
     const { data: bills = [], mutate: mutateBills } = useSWR(['bills', month, year, budgetType], fetchBills)
@@ -88,7 +89,7 @@ export function CalendarTab() {
         fetchWorkEvents
     )
     const { data: clients = [] } = useSWR(
-        isBusiness ? ['clients'] : null,
+        isBusiness ? ['clients', budgetType] : null,
         fetchClients
     )
 
@@ -134,6 +135,21 @@ export function CalendarTab() {
         const [endHour, endMinute] = newEvent.endTime.split(':')
         endDateTime.setHours(parseInt(endHour), parseInt(endMinute))
 
+        const [endHour, endMinute] = newEvent.endTime.split(':')
+        endDateTime.setHours(parseInt(endHour), parseInt(endMinute))
+
+        const newErrors: Record<string, boolean> = {}
+        if (!newEvent.title) newErrors.title = true
+        if (!newEvent.startTime) newErrors.startTime = true
+        if (!newEvent.endTime) newErrors.endTime = true
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            toast({ title: 'שגיאה', description: 'נא למלא את שדות החובה', variant: 'destructive' })
+            return
+        }
+        setErrors({})
+
         let result;
 
         if (editingEventId) {
@@ -160,10 +176,10 @@ export function CalendarTab() {
 
         if (result.success) {
             mutateWorkEvents()
-            mutateWorkEvents()
             setIsEventDialogOpen(false)
             setEditingEventId(null)
             setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
+            setErrors({})
             toast({ title: editingEventId ? 'עודכן בהצלחה' : 'נוסף בהצלחה', description: editingEventId ? 'האירוע עודכן' : 'האירוע נוסף ליומן' })
         } else {
             toast({ title: 'שגיאה', description: 'שגיאה בהוספת האירוע', variant: 'destructive' })
@@ -297,6 +313,7 @@ export function CalendarTab() {
                                             setIsEventDialogOpen(true)
                                             setEditingEventId(null)
                                             setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
+                                            setErrors({})
                                         }
                                     }}
                                     className={`h-[80px] md:h-auto md:min-h-[100px] p-2 border rounded-lg overflow-hidden cursor-pointer hover:bg-accent transition-colors
@@ -384,6 +401,7 @@ export function CalendarTab() {
                         setSelectedDay(null)
                         setEditingEventId(null)
                         setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
+                        setErrors({})
                     }
                 }}>
                     <DialogContent dir="rtl" className="max-w-lg max-h-[85vh] overflow-y-auto">
@@ -427,22 +445,41 @@ export function CalendarTab() {
                                 )}
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-right block">כותרת האירוע</Label>
+                                <Label className="text-right block">כותרת האירוע *</Label>
                                 <Input
-                                    className="text-right"
+                                    className={`text-right ${errors.title ? 'border-red-500' : ''}`}
                                     value={newEvent.title}
-                                    onChange={e => setNewEvent({ ...newEvent, title: e.target.value })}
+                                    onChange={e => {
+                                        setNewEvent({ ...newEvent, title: e.target.value })
+                                        if (e.target.value) setErrors(prev => ({ ...prev, title: false }))
+                                    }}
                                     placeholder="שם הפגישה/עבודה"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-right block">שעת התחלה</Label>
-                                    <Input className="text-right" type="time" value={newEvent.startTime} onChange={e => setNewEvent({ ...newEvent, startTime: e.target.value })} />
+                                    <Label className="text-right block">שעת התחלה *</Label>
+                                    <Input
+                                        className={`text-right ${errors.startTime ? 'border-red-500' : ''}`}
+                                        type="time"
+                                        value={newEvent.startTime}
+                                        onChange={e => {
+                                            setNewEvent({ ...newEvent, startTime: e.target.value })
+                                            if (e.target.value) setErrors(prev => ({ ...prev, startTime: false }))
+                                        }}
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-right block">שעת סיום</Label>
-                                    <Input className="text-right" type="time" value={newEvent.endTime} onChange={e => setNewEvent({ ...newEvent, endTime: e.target.value })} />
+                                    <Label className="text-right block">שעת סיום *</Label>
+                                    <Input
+                                        className={`text-right ${errors.endTime ? 'border-red-500' : ''}`}
+                                        type="time"
+                                        value={newEvent.endTime}
+                                        onChange={e => {
+                                            setNewEvent({ ...newEvent, endTime: e.target.value })
+                                            if (e.target.value) setErrors(prev => ({ ...prev, endTime: false }))
+                                        }}
+                                    />
                                 </div>
                             </div>
 

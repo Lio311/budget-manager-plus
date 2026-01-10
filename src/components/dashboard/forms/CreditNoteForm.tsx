@@ -30,7 +30,9 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
 
     const [loadingNumber, setLoadingNumber] = useState(false)
     const [selectedInvoice, setSelectedInvoice] = useState<any>(null)
+    const [selectedInvoice, setSelectedInvoice] = useState<any>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [errors, setErrors] = useState<Record<string, boolean>>({})
 
     // Fetch invoices
     const { data: invoicesData } = useSWR(['invoices', budgetType], async () => {
@@ -89,15 +91,17 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!formData.invoiceId) {
-            toast.error('יש לבחור חשבונית')
-            return
-        }
+        const newErrors: Record<string, boolean> = {}
+        if (!formData.invoiceId) newErrors.invoiceId = true
+        if (formData.creditAmount <= 0) newErrors.creditAmount = true
 
-        if (formData.creditAmount <= 0) {
-            toast.error('סכום הזיכוי חייב להיות גדול מ-0')
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            if (newErrors.invoiceId) toast.error('יש לבחור חשבונית')
+            else if (newErrors.creditAmount) toast.error('סכום הזיכוי חייב להיות גדול מ-0')
             return
         }
+        setErrors({})
 
         if (selectedInvoice && formData.creditAmount > selectedInvoice.total) {
             toast.error('סכום הזיכוי לא יכול להיות גדול מסכום החשבונית')
@@ -147,7 +151,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                             value={formData.invoiceId}
                             onValueChange={(value) => setFormData((prev) => ({ ...prev, invoiceId: value }))}
                         >
-                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.invoiceId ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'}`}>
                                 <SelectValue placeholder="בחר חשבונית" />
                             </SelectTrigger>
                             <SelectContent dir="rtl">
@@ -176,8 +180,11 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                     <FormattedNumberInput
                         value={formData.creditAmount}
                         onChange={(e) => { }}
-                        onValueChange={(value) => setFormData(prev => ({ ...prev, creditAmount: value }))}
-                        className="w-full"
+                        onValueChange={(value) => {
+                            setFormData(prev => ({ ...prev, creditAmount: value }))
+                            if (value > 0) setErrors(prev => ({ ...prev, creditAmount: false }))
+                        }}
+                        className={`w-full ${errors.creditAmount ? 'border-red-500' : ''}`}
                         disabled={!selectedInvoice}
                     />
                     {selectedInvoice && (

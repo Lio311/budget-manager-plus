@@ -46,6 +46,8 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
         lineItems: []
     })
 
+    const [errors, setErrors] = useState<Record<string, boolean>>({})
+
     const [loadingNumber, setLoadingNumber] = useState(false)
     const { year, month } = useBudget()
 
@@ -130,15 +132,28 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        const newErrors: Record<string, boolean> = {}
+
         if ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice) {
-            toast.error('חובה לבחור מכירה/עסקה או לסמן יצירת הכנסה אוטומטית')
-            return
+            newErrors.income = true
         }
 
         if (lineItems.length === 0) {
-            toast.error('חובה להוסיף לפחות שורה אחת לפירוט החשבונית')
+            newErrors.lineItems = true
+        }
+
+        if (!formData.clientId) {
+            newErrors.clientId = true
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            if (newErrors.income) toast.error('חובה לבחור מכירה/עסקה או לסמן יצירת הכנסה אוטומטית')
+            else if (newErrors.lineItems) toast.error('חובה להוסיף לפחות שורה אחת לפירוט החשבונית')
+            else toast.error('אנא מלא את שדות החובה המסומנים')
             return
         }
+        setErrors({})
 
         try {
             await optimisticCreateInvoice({
@@ -196,6 +211,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                                 ))}
                             </SelectContent>
                         </Select>
+                        {errors.clientId && <p className="text-red-500 text-xs text-right mt-1">שדה חובה</p>}
                     </div>
                 </div>
                 <div>
@@ -259,7 +275,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                                 }
                             }}
                         >
-                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-blue-300 dark:border-blue-700 text-right">
+                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.income ? 'border-red-500' : 'border-blue-300 dark:border-blue-700'}`}>
                                 <SelectValue placeholder="בחר הכנסה לחיוב" />
                             </SelectTrigger>
                             <SelectContent dir="rtl">
@@ -283,9 +299,9 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
             {/* Line Items Table */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    פירוט העסקה
+                    פירוט העסקה *
                 </label>
-                <div className="border rounded-lg overflow-hidden dark:border-slate-700">
+                <div className={`border rounded-lg overflow-hidden dark:border-slate-700 ${errors.lineItems ? 'border-red-500' : ''}`}>
                     <table className="w-full text-right text-sm">
                         <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 font-medium">
                             <tr>

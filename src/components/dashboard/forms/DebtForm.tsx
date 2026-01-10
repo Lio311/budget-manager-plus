@@ -37,7 +37,10 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
 
+    const { mutate: globalMutate } = useSWRConfig()
+
     const [submitting, setSubmitting] = useState(false)
+    const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [newDebt, setNewDebt] = useState<{
         creditor: string
         debtType: string
@@ -60,27 +63,23 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
 
     const handleAdd = async () => {
         // Validate required fields
-        if (!newDebt.creditor || !newDebt.creditor.trim()) {
-            toast({ title: 'שגיאה', description: 'יש למלא שם מלווה', variant: 'destructive' })
-            return
-        }
-
-        if (!newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0) {
-            toast({ title: 'שגיאה', description: 'יש למלא סכום כולל תקין', variant: 'destructive' })
-            return
-        }
-
-        if (!newDebt.date) { // New validation for date
-            toast({ title: 'שגיאה', description: 'יש לבחור תאריך הלוואה', variant: 'destructive' })
-            return
-        }
+        const newErrors: Record<string, boolean> = {}
+        if (!newDebt.creditor || !newDebt.creditor.trim()) newErrors.creditor = true
+        if (!newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0) newErrors.totalAmount = true
+        if (!newDebt.date) newErrors.date = true
 
         if (newDebt.isRecurring) {
             if (!newDebt.numberOfInstallments || parseInt(newDebt.numberOfInstallments) < 1) {
-                toast({ title: 'שגיאה', description: 'מספר תשלומים חייב להיות לפחות 1', variant: 'destructive' })
-                return
+                newErrors.numberOfInstallments = true
             }
         }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            toast({ title: 'שגיאה', description: 'נא למלא את שדות החובה המסומנים', variant: 'destructive' })
+            return
+        }
+        setErrors({})
 
         setSubmitting(true)
         try {
@@ -146,13 +145,17 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
 
             <div className="flex flex-col gap-4">
                 {/* Creditor Name - Full Width */}
+                {/* Creditor Name - Full Width */}
                 <div className="w-full">
-                    <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">שם המלווה / לווה</label>
+                    <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">שם המלווה / לווה *</label>
                     <Input
                         placeholder="שם..."
-                        className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
+                        className={`h-10 focus:ring-purple-500/20 focus:border-purple-500 ${errors.creditor ? 'border-red-500' : 'border-gray-200'}`}
                         value={newDebt.creditor}
-                        onChange={(e) => setNewDebt({ ...newDebt, creditor: e.target.value })}
+                        onChange={(e) => {
+                            setNewDebt({ ...newDebt, creditor: e.target.value })
+                            if (e.target.value) setErrors(prev => ({ ...prev, creditor: false }))
+                        }}
                         disabled={submitting}
                     />
                 </div>
@@ -177,12 +180,15 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                         </Select>
                     </div>
                     <div>
-                        <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל</label>
+                        <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל *</label>
                         <FormattedNumberInput
                             placeholder="סכום כולל"
-                            className="h-10 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
+                            className={`h-10 focus:ring-purple-500/20 focus:border-purple-500 ${errors.totalAmount ? 'border-red-500' : 'border-gray-200'}`}
                             value={newDebt.totalAmount}
-                            onChange={(e) => setNewDebt({ ...newDebt, totalAmount: e.target.value })}
+                            onChange={(e) => {
+                                setNewDebt({ ...newDebt, totalAmount: e.target.value })
+                                if (e.target.value) setErrors(prev => ({ ...prev, totalAmount: false }))
+                            }}
                             disabled={submitting}
                             dir="ltr"
                         />
@@ -191,13 +197,18 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
 
                 {/* Due Day - Full Width */}
                 <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הלוואה</label>
-                    <DatePicker
-                        date={newDebt.date ? new Date(newDebt.date) : undefined}
-                        setDate={(date) => setNewDebt({ ...newDebt, date: date ? format(date, 'yyyy-MM-dd') : '' })}
-                        fromDate={startOfMonth}
-                        toDate={endOfMonth}
-                    />
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הלוואה *</label>
+                    <div className={errors.date ? 'border border-red-500 rounded-md' : ''}>
+                        <DatePicker
+                            date={newDebt.date ? new Date(newDebt.date) : undefined}
+                            setDate={(date) => {
+                                setNewDebt({ ...newDebt, date: date ? format(date, 'yyyy-MM-dd') : '' })
+                                if (date) setErrors(prev => ({ ...prev, date: false }))
+                            }}
+                            fromDate={startOfMonth}
+                            toDate={endOfMonth}
+                        />
+                    </div>
                 </div>
 
                 {/* Payment Method - Full Width */}

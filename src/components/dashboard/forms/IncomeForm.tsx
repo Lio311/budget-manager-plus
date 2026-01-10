@@ -60,6 +60,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     const isBusiness = budgetType === 'BUSINESS'
 
     const [submitting, setSubmitting] = useState(false)
+    const [errors, setErrors] = useState<Record<string, boolean>>({})
 
     const [newIncome, setNewIncome] = useState({
         source: '',
@@ -128,10 +129,17 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     )
 
     async function handleAdd() {
-        if (!newIncome.source || !newIncome.amount || !newIncome.category) {
-            toast({ title: 'שגיאה', description: 'נא למלא את כל השדות', variant: 'destructive' })
+        const newErrors: Record<string, boolean> = {}
+        if (!newIncome.source) newErrors.source = true
+        if (!newIncome.amount) newErrors.amount = true
+        if (!newIncome.category) newErrors.category = true
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            toast({ title: 'שגיאה', description: 'נא למלא את שדות החובה המסומנים', variant: 'destructive' })
             return
         }
+        setErrors({})
 
         if (newIncome.isRecurring && newIncome.recurringEndDate) {
             const start = new Date(newIncome.date || new Date())
@@ -214,8 +222,16 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
             <div className="flex flex-col gap-4">
                 {/* Source Input */}
                 <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור / מקור</label>
-                    <Input className="h-10 border-gray-200 focus:ring-green-500/20" placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"} value={newIncome.source} onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })} />
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור / מקור *</label>
+                    <Input
+                        className={`h-10 focus:ring-green-500/20 ${errors.source ? 'border-red-500' : 'border-gray-200'}`}
+                        placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"}
+                        value={newIncome.source}
+                        onChange={(e) => {
+                            setNewIncome({ ...newIncome, source: e.target.value })
+                            if (e.target.value) setErrors(prev => ({ ...prev, source: false }))
+                        }}
+                    />
                 </div>
 
                 {isBusiness && (
@@ -241,12 +257,15 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 {/* Category Select */}
                 <div className="flex gap-2 w-full">
                     <div className="flex-1">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה *</label>
                         <Select
                             value={newIncome.category}
-                            onValueChange={(value) => setNewIncome({ ...newIncome, category: value })}
+                            onValueChange={(value) => {
+                                setNewIncome({ ...newIncome, category: value })
+                                if (value) setErrors(prev => ({ ...prev, category: false }))
+                            }}
                         >
-                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
+                            <SelectTrigger className={`w-full h-10 border bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20 ${errors.category ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'}`}>
                                 <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                             <SelectContent dir="rtl" className="text-right max-h-[200px]">
@@ -291,8 +310,16 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         </Select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ' : 'סכום כולל'}</label>
-                        <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-green-500/20' : 'focus:ring-green-500/20'}`} placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ *' : 'סכום כולל *'}</label>
+                        <FormattedNumberInput
+                            className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-green-500/20' : 'focus:ring-green-500/20'}`}
+                            placeholder="0.00"
+                            value={newIncome.amount}
+                            onChange={(e) => {
+                                setNewIncome({ ...newIncome, amount: e.target.value })
+                                if (e.target.value) setErrors(prev => ({ ...prev, amount: false }))
+                            }}
+                        />
                     </div>
                 </div>
 

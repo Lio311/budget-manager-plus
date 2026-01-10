@@ -30,6 +30,8 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
     const { mutate: globalMutate } = useSWRConfig()
 
     const [submitting, setSubmitting] = useState(false)
+    const [errors, setErrors] = useState<Record<string, boolean>>({})
+
     const [formData, setFormData] = useState<{
         name: string
         amount: string
@@ -51,10 +53,16 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
     })
 
     async function handleSubmit() {
-        if (!formData.name || !formData.amount || !formData.dueDay) {
+        const newErrors: Record<string, boolean> = {}
+        if (!formData.name) newErrors.name = true
+        if (!formData.amount) newErrors.amount = true
+        if (!formData.dueDay) newErrors.dueDay = true
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
             toast({
                 title: 'שגיאה',
-                description: 'נא למלא את כל השדות',
+                description: 'נא למלא את כל שדות החובה המסומנים',
                 variant: 'destructive'
             })
             return
@@ -136,12 +144,15 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">שם החשבון</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">שם החשבון *</label>
                 <Input
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) => {
+                        setFormData({ ...formData, name: e.target.value })
+                        if (e.target.value) setErrors(prev => ({ ...prev, name: false }))
+                    }}
                     placeholder="לדוגמה: ארנונה"
-                    className="h-10 text-right"
+                    className={`h-10 text-right ${errors.name ? 'border-red-500' : ''}`}
                 />
             </div>
             <div className="grid grid-cols-3 gap-3">
@@ -158,25 +169,31 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                     </select>
                 </div>
                 <div className="col-span-2 space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום *</label>
                     <FormattedNumberInput
                         placeholder="0.00"
                         value={formData.amount}
-                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                        className="h-10 text-right"
+                        onChange={(e) => {
+                            setFormData({ ...formData, amount: e.target.value })
+                            if (e.target.value) setErrors(prev => ({ ...prev, amount: false }))
+                        }}
+                        className={`h-10 text-right ${errors.amount ? 'border-red-500' : ''}`}
                     />
                 </div>
             </div>
             <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">יום בחודש לתשלום</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">יום בחודש לתשלום *</label>
                 <Input
                     type="number"
                     min="1"
                     max="31"
                     value={formData.dueDay}
-                    onChange={(e) => setFormData({ ...formData, dueDay: e.target.value })}
+                    onChange={(e) => {
+                        setFormData({ ...formData, dueDay: e.target.value })
+                        if (e.target.value) setErrors(prev => ({ ...prev, dueDay: false }))
+                    }}
                     placeholder="1-31"
-                    className="h-10 text-right"
+                    className={`h-10 text-right ${errors.dueDay ? 'border-red-500' : ''}`}
                 />
             </div>
 

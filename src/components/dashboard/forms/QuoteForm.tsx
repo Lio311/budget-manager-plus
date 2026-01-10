@@ -19,6 +19,7 @@ interface QuoteFormProps {
 export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
     const { budgetType } = useBudget()
     const [loadingNumber, setLoadingNumber] = useState(false)
+    const [errors, setErrors] = useState<Record<string, boolean>>({})
 
     const [formData, setFormData] = useState<QuoteFormData>({
         clientId: '',
@@ -89,6 +90,17 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        const newErrors: Record<string, boolean> = {}
+        if (!formData.clientId) newErrors.clientId = true
+        if (!formData.items || formData.items.length === 0) newErrors.items = true
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            toast.error('נא למלא את שדות החובה המסומנים')
+            return
+        }
+        setErrors({})
+
         try {
             await optimisticCreateQuote(formData)
             onSuccess()
@@ -129,9 +141,12 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                     <div dir="rtl">
                         <Select
                             value={formData.clientId}
-                            onValueChange={(value) => setFormData((prev) => ({ ...prev, clientId: value }))}
+                            onValueChange={(value) => {
+                                setFormData((prev) => ({ ...prev, clientId: value }))
+                                if (value) setErrors(prev => ({ ...prev, clientId: false }))
+                            }}
                         >
-                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.clientId ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'}`}>
                                 <SelectValue placeholder="בחר לקוח" />
                             </SelectTrigger>
                             <SelectContent dir="rtl">
@@ -165,11 +180,11 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                 <div className="md:col-span-2 space-y-4">
                     <div className="flex justify-between items-center">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            פירוט העסקה
+                            פירוט העסקה *
                         </label>
                     </div>
 
-                    <div className="border rounded-lg overflow-hidden bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800">
+                    <div className={`border rounded-lg overflow-hidden bg-white dark:bg-slate-900 ${errors.items ? 'border-red-500' : 'border-gray-200 dark:border-slate-800'}`}>
                         <table className="w-full text-right">
                             <thead className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700">
                                 <tr>
