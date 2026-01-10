@@ -191,14 +191,19 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     </div>
                 </div>
 
-                {/* Center Section - Logo */}
-                <div className="hidden md:flex flex-1 justify-center items-center opacity-80 hover:opacity-100 transition-opacity">
+                {/* Logo - Centered */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105"
+                    onClick={() => {
+                        const params = new URLSearchParams(searchParams)
+                        params.set('tab', 'overview')
+                        router.push(`${pathname}?${params.toString()}`)
+                    }}>
                     <Image
                         src="/images/branding/K-LOGO.png"
                         alt="Logo"
                         width={120}
                         height={120}
-                        className="h-full w-auto object-contain"
+                        className="h-14 w-auto object-contain"
                         priority
                     />
                 </div>
