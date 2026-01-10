@@ -60,6 +60,30 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
         fetchNotifications()
     }
 
+    // Aggressively force light mode
+    useEffect(() => {
+        const forceLight = () => {
+            document.documentElement.classList.remove('dark')
+            document.documentElement.classList.add('light')
+            document.documentElement.style.colorScheme = 'light'
+        }
+
+        forceLight()
+
+        // Watch for changes and revert them if something tries to add dark mode
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class' && document.documentElement.classList.contains('dark')) {
+                    forceLight()
+                }
+            })
+        })
+
+        observer.observe(document.documentElement, { attributes: true })
+
+        return () => observer.disconnect()
+    }, [])
+
     const handleMarkRead = async (id: string, link?: string | null) => {
         await markNotificationAsRead(id)
         if (link) window.location.href = link
