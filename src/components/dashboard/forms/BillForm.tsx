@@ -156,7 +156,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 />
             </div>
             <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-1">
+                <div className="col-span-1 space-y-2">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-200">מטבע</label>
                     <select
                         className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 text-sm outline-none"
