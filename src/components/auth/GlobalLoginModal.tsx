@@ -39,11 +39,11 @@ export function GlobalLoginModal() {
                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden p-8 flex flex-col items-center">
                     <div className="mb-6">
                         <Image
-                            src="/images/branding/K-LOGO2.png"
+                            src="/images/branding/K-LOGO.png"
                             alt="Kesefly"
                             width={150}
                             height={45}
-                            className="h-12 w-auto"
+                            className="h-16 w-auto"
                         />
                     </div>
 
