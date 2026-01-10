@@ -62,7 +62,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     const endOfMonth = new Date(year, month, 0)
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
-    const confirm = useConfirm()
+
     const confirm = useConfirm()
     const isBusiness = budgetType === 'BUSINESS'
     const { isDemo, interceptAction } = useDemo()
