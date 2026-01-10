@@ -107,9 +107,9 @@ export function OnboardingPopup({ isOpen, onClose }: OnboardingPopupProps) {
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-4 p-4 bg-indigo-50 dark:bg-slate-800/50 rounded-xl border border-indigo-100 dark:border-slate-700">
-                            <div className="bg-indigo-100 dark:bg-slate-700 p-2 rounded-lg">
-                                <CheckCircle2 className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                        <div className="flex items-start gap-4 p-4 bg-purple-50 dark:bg-slate-800/50 rounded-xl border border-purple-100 dark:border-slate-700">
+                            <div className="bg-purple-100 dark:bg-slate-700 p-2 rounded-lg">
+                                <CheckCircle2 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                             </div>
                             <div>
                                 <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-1">התחילו בקלות</h3>
