@@ -32,7 +32,7 @@ import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { getCategories } from '@/lib/actions/category'
 import { getCategoryBudgets, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
-import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
+
 import { useConfirm } from '@/hooks/useConfirm'
 import { useDemo } from '@/contexts/DemoContext'
 
@@ -112,7 +112,7 @@ export function ExpensesTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
-    const { mutate: globalMutate } = useSWRConfig()
+
     const confirm = useConfirm()
     const { isDemo, data: demoData, interceptAction } = useDemo()
 
