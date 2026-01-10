@@ -372,7 +372,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
             <div className="flex flex-col gap-4">
                 <div className="w-full">
                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור ההוצאה</label>
-                    <Input className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} placeholder="מה קנית / שילמת?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
+                    <Input className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`} placeholder="מה קנית / שילמת?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
                 </div>
 
                 {isBusiness && (
@@ -382,7 +382,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             value={newExpense.supplierId}
                             onValueChange={(value) => setNewExpense({ ...newExpense, supplierId: value })}
                         >
-                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-orange-500/20">
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-red-500/20">
                                 <SelectValue placeholder="ללא ספק ספציפי" />
                             </SelectTrigger>
                             <SelectContent>
@@ -402,7 +402,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             value={newExpense.category}
                             onValueChange={(value) => setNewExpense({ ...newExpense, category: value })}
                         >
-                            <SelectTrigger className={`w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`}>
+                            <SelectTrigger className={`w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}>
                                 <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                             <SelectContent className="max-h-[200px]">
@@ -450,7 +450,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     </div>
                     <div className="col-span-2">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום (כולל מע"מ)' : 'סכום כולל'}</label>
-                        <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-orange-500/20' : 'focus:ring-red-500/20'}`} placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
+                        <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`} placeholder="0.00" value={newExpense.amount} onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })} />
                     </div>
                 </div>
 
@@ -458,7 +458,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     <PaymentMethodSelector
                         value={newExpense.paymentMethod}
                         onChange={(val) => setNewExpense({ ...newExpense, paymentMethod: val })}
-                        color={isBusiness ? 'orange' : 'red'}
+                        color={isBusiness ? 'red' : 'red'}
                     />
                 </div>
 

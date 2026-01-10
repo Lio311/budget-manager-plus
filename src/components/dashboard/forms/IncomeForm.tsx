@@ -215,7 +215,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 {/* Source Input */}
                 <div className="w-full">
                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור / מקור</label>
-                    <Input className="h-10 border-gray-200 focus:ring-blue-500/20" placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"} value={newIncome.source} onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })} />
+                    <Input className="h-10 border-gray-200 focus:ring-green-500/20" placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"} value={newIncome.source} onChange={(e) => setNewIncome({ ...newIncome, source: e.target.value })} />
                 </div>
 
                 {isBusiness && (
@@ -225,7 +225,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             value={newIncome.clientId}
                             onValueChange={(value) => setNewIncome({ ...newIncome, clientId: value })}
                         >
-                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20">
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
                                 <SelectValue placeholder="ללא לקוח ספציפי" />
                             </SelectTrigger>
                             <SelectContent dir="rtl" className="text-right">
@@ -246,7 +246,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             value={newIncome.category}
                             onValueChange={(value) => setNewIncome({ ...newIncome, category: value })}
                         >
-                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500/20">
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
                                 <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                             <SelectContent dir="rtl" className="text-right max-h-[200px]">
@@ -292,7 +292,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     </div>
                     <div className="col-span-2">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ' : 'סכום כולל'}</label>
-                        <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-blue-500/20' : 'focus:ring-green-500/20'}`} placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
+                        <FormattedNumberInput className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-green-500/20' : 'focus:ring-green-500/20'}`} placeholder="0.00" value={newIncome.amount} onChange={(e) => setNewIncome({ ...newIncome, amount: e.target.value })} />
                     </div>
                 </div>
 
@@ -316,7 +316,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     <div className="w-full">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל מ... (אופציונלי)</label>
                         <Input
-                            className="h-10 border-gray-200 focus:ring-blue-500/20"
+                            className="h-10 border-gray-200 focus:ring-green-500/20"
                             placeholder="שם המשלם"
                             value={newIncome.payer}
                             onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
@@ -326,7 +326,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     {isBusiness && (
                         <div className="w-full">
                             <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
-                            <Input className="h-10 border-gray-200 focus:ring-blue-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
+                            <Input className="h-10 border-gray-200 focus:ring-green-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
                         </div>
                     )}
                 </div>
@@ -337,7 +337,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         <Input
                             type="number"
                             min="0"
-                            className="h-10 border-gray-200 focus:ring-blue-500/20"
+                            className="h-10 border-gray-200 focus:ring-green-500/20"
                             placeholder="לדוגמה: 90"
                             value={newIncome.workTime}
                             onChange={(e) => {
