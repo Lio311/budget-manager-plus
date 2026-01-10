@@ -5,7 +5,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { getMonthName } from '@/lib/utils'
 import { ChevronLeft, ChevronRight, Menu, CreditCard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { ModeToggle } from '@/components/mode-toggle'
 import { MonthYearPicker } from './MonthYearPicker'
 import Image from 'next/image'
@@ -20,6 +20,8 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
     const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false)
     const { month, year, budgetType, setMonth, setYear, setBudgetType } = useBudget()
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const pathname = usePathname()
     const { isDemo } = useDemo()
     const { openModal } = useAuthModal()
 
