@@ -160,4 +160,85 @@ export {
     SelectSeparator,
     SelectScrollUpButton,
     SelectScrollDownButton,
+    SelectTriggerLTR,
+    SelectContentLTR,
+    SelectItemLTR,
 }
+
+const SelectTriggerLTR = React.forwardRef<
+    React.ElementRef<typeof SelectPrimitive.Trigger>,
+    React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+    <SelectPrimitive.Trigger
+        ref={ref}
+        className={cn(
+            "flex h-10 w-full items-center justify-between rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:!bg-slate-800 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 text-left transition-all duration-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400",
+            className
+        )}
+        {...props}
+    >
+        {children}
+        <SelectPrimitive.Icon asChild>
+            <ChevronDown className="h-4 w-4 opacity-50 dark:text-gray-400" />
+        </SelectPrimitive.Icon>
+    </SelectPrimitive.Trigger>
+))
+SelectTriggerLTR.displayName = "SelectTriggerLTR"
+
+const SelectContentLTR = React.forwardRef<
+    React.ElementRef<typeof SelectPrimitive.Content>,
+    React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
+>(({ className, children, position = "popper", ...props }, ref) => (
+    <SelectPrimitive.Portal>
+        <SelectPrimitive.Content
+            ref={ref}
+            className={cn(
+                "relative z-[100] max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:!bg-slate-900 text-popover-foreground dark:text-gray-100 shadow-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 text-left",
+                position === "popper" &&
+                "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+                className
+            )}
+            position={position}
+            dir="ltr"
+            {...props}
+        >
+            <SelectScrollUpButton />
+            <SelectPrimitive.Viewport
+                className={cn(
+                    "p-1",
+                    position === "popper" &&
+                    "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+                )}
+            >
+                {children}
+            </SelectPrimitive.Viewport>
+            <SelectScrollDownButton />
+        </SelectPrimitive.Content>
+    </SelectPrimitive.Portal>
+))
+SelectContentLTR.displayName = "SelectContentLTR"
+
+const SelectItemLTR = React.forwardRef<
+    React.ElementRef<typeof SelectPrimitive.Item>,
+    React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
+>(({ className, children, ...props }, ref) => (
+    <SelectPrimitive.Item
+        ref={ref}
+        className={cn(
+            "relative flex w-full cursor-default select-none items-center rounded-lg py-2 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-left transition-colors hover:bg-gray-100 dark:hover:bg-slate-800 dark:focus:bg-slate-800 dark:text-gray-100 dark:focus:text-white",
+            className
+        )}
+        {...props}
+    >
+        <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+            <SelectPrimitive.ItemIndicator>
+                <Check className="h-4 w-4 dark:text-emerald-500" />
+            </SelectPrimitive.ItemIndicator>
+        </span>
+
+        <SelectPrimitive.ItemText asChild>
+            <span className="flex-1 text-left">{children}</span>
+        </SelectPrimitive.ItemText>
+    </SelectPrimitive.Item>
+))
+SelectItemLTR.displayName = "SelectItemLTR"

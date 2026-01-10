@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Trash2, Edit2, Construction, ShieldAlert, Globe, RefreshCcw } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectTriggerLTR, SelectContentLTR, SelectItemLTR } from "@/components/ui/select"
 import {
     Table,
     TableBody,
@@ -156,15 +156,15 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                                 defaultValue={sub.status}
                                                 onValueChange={(value) => handleUpdateSubscription(sub.id, { status: value })}
                                             >
-                                                <SelectTrigger className="w-full h-10 text-left" dir="ltr">
+                                                <SelectTriggerLTR className="w-full h-10">
                                                     <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent dir="ltr" className="text-left">
-                                                    <SelectItem value="active" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Active</SelectItem>
-                                                    <SelectItem value="trial" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Trial</SelectItem>
-                                                    <SelectItem value="expired" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Expired</SelectItem>
-                                                    <SelectItem value="inactive" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Inactive</SelectItem>
-                                                </SelectContent>
+                                                </SelectTriggerLTR>
+                                                <SelectContentLTR>
+                                                    <SelectItemLTR value="active">Active</SelectItemLTR>
+                                                    <SelectItemLTR value="trial">Trial</SelectItemLTR>
+                                                    <SelectItemLTR value="expired">Expired</SelectItemLTR>
+                                                    <SelectItemLTR value="inactive">Inactive</SelectItemLTR>
+                                                </SelectContentLTR>
                                             </Select>
                                         </div>
 
@@ -176,13 +176,13 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                                 defaultValue={sub.planType}
                                                 onValueChange={(value) => handleUpdateSubscription(sub.id, { planType: value as 'PERSONAL' | 'BUSINESS' })}
                                             >
-                                                <SelectTrigger className="w-full h-10 text-left" dir="ltr">
+                                                <SelectTriggerLTR className="w-full h-10">
                                                     <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent dir="ltr" className="text-left">
-                                                    <SelectItem value="PERSONAL" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Personal</SelectItem>
-                                                    <SelectItem value="BUSINESS" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Business</SelectItem>
-                                                </SelectContent>
+                                                </SelectTriggerLTR>
+                                                <SelectContentLTR>
+                                                    <SelectItemLTR value="PERSONAL">Personal</SelectItemLTR>
+                                                    <SelectItemLTR value="BUSINESS">Business</SelectItemLTR>
+                                                </SelectContentLTR>
                                             </Select>
                                         </div>
 
@@ -540,14 +540,14 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                         value={newCoupon.planType || "ALL"}
                                         onValueChange={(value) => setNewCoupon({ ...newCoupon, planType: value === "ALL" ? "" : value })}
                                     >
-                                        <SelectTrigger className="w-full h-10 text-left flex-row-reverse" dir="ltr">
+                                        <SelectTriggerLTR className="w-full h-10">
                                             <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent dir="ltr" className="text-left">
-                                            <SelectItem value="PERSONAL" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Personal</SelectItem>
-                                            <SelectItem value="BUSINESS" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Business</SelectItem>
-                                            <SelectItem value="ALL" className="text-left pl-8 pr-2 [&>span]:left-2 [&>span]:right-auto">Any</SelectItem>
-                                        </SelectContent>
+                                        </SelectTriggerLTR>
+                                        <SelectContentLTR>
+                                            <SelectItemLTR value="PERSONAL">Personal</SelectItemLTR>
+                                            <SelectItemLTR value="BUSINESS">Business</SelectItemLTR>
+                                            <SelectItemLTR value="ALL">Any</SelectItemLTR>
+                                        </SelectContentLTR>
                                     </Select>
                                 </div>
                                 <Button onClick={handleCreateOrUpdateCoupon}>{editingId ? 'Update' : 'Create'}</Button>
