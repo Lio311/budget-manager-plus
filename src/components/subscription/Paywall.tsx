@@ -85,13 +85,7 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => {
-                                if (window.history.length > 2) {
-                                    router.back()
-                                } else {
-                                    router.push('/dashboard')
-                                }
-                            }}
+                            onClick={() => router.push('/subscribe/plans')}
                             className="text-gray-500 hover:text-gray-900 gap-1"
                         >
                             <ArrowRight className="h-4 w-4" />
