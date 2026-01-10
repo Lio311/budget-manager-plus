@@ -224,6 +224,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         const newErrors: Record<string, boolean> = {}
         if (!newExpense.amount) newErrors.amount = true
         if (!newExpense.category) newErrors.category = true
+        if (!newExpense.description || !newExpense.description.trim()) newErrors.description = true
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors)
@@ -378,8 +379,16 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
             <div className="flex flex-col gap-4">
                 <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור ההוצאה</label>
-                    <Input className={`h-10 border-gray-200 ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`} placeholder="מה קנית / שילמת?" value={newExpense.description} onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })} />
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור ההוצאה *</label>
+                    <Input
+                        className={`h-10 ${errors.description ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}
+                        placeholder={isBusiness ? "עבור מה התשלום? (למשל: ציוד משרדי)" : "תיאור ההוצאה"}
+                        value={newExpense.description}
+                        onChange={(e) => {
+                            setNewExpense({ ...newExpense, description: e.target.value })
+                            if (e.target.value) setErrors(prev => ({ ...prev, description: false }))
+                        }}
+                    />
                 </div>
 
                 {isBusiness && (
