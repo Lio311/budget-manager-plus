@@ -113,15 +113,15 @@ export default function LandingPage() {
                         <div className="flex flex-col items-center gap-4 w-fit mx-auto">
                             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                                 <SignedOut>
-                                    <SignUpButton mode="modal">
+                                    <Link href="/get-started">
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
                                         >
-                                            הרשמה חינם
+                                            התחל בחינם
                                         </motion.button>
-                                    </SignUpButton>
+                                    </Link>
                                     <SignInButton mode="modal">
                                         <motion.button
                                             whileHover={{ scale: 1.05 }}
@@ -243,7 +243,7 @@ export default function LandingPage() {
                             </ul>
 
                             <SignedOut>
-                                <SignUpButton mode="modal">
+                                <Link href="/get-started">
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
@@ -251,7 +251,7 @@ export default function LandingPage() {
                                     >
                                         התחל בחינם
                                     </motion.button>
-                                </SignUpButton>
+                                </Link>
                             </SignedOut>
                         </motion.div>
                     </div>
@@ -289,11 +289,11 @@ export default function LandingPage() {
 
                             <motion.div whileHover={{ scale: 1.02 }}>
                                 <SignedOut>
-                                    <SignUpButton mode="modal">
+                                    <Link href="/get-started">
                                         <button className="px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg">
                                             התנסות חינם בתוכנית העסקית
                                         </button>
-                                    </SignUpButton>
+                                    </Link>
                                 </SignedOut>
                                 <SignedIn>
                                     <Link href="/subscribe/plans">
@@ -438,7 +438,7 @@ export default function LandingPage() {
                                 הצטרפו לאלפי משתמשים שכבר לקחו שליטה על העתיד הכלכלי שלהם
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <SignUpButton mode="modal">
+                                <Link href="/get-started">
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
@@ -446,7 +446,7 @@ export default function LandingPage() {
                                     >
                                         הרשמה חינם
                                     </motion.button>
-                                </SignUpButton>
+                                </Link>
                                 <SignInButton mode="modal">
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}

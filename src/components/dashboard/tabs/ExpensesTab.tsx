@@ -32,7 +32,9 @@ import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { getCategories } from '@/lib/actions/category'
 import { getCategoryBudgets, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
+import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
 import { useConfirm } from '@/hooks/useConfirm'
+import { useDemo } from '@/contexts/DemoContext'
 
 
 interface Category {
@@ -110,7 +112,9 @@ export function ExpensesTab() {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
+    const { mutate: globalMutate } = useSWRConfig()
     const confirm = useConfirm()
+    const { isDemo, data: demoData, interceptAction } = useDemo()
 
     const isBusiness = budgetType === 'BUSINESS'
 
@@ -122,15 +126,15 @@ export function ExpensesTab() {
         throw new Error(result.error || 'Failed to fetch expenses')
     }
 
-    const { data, isLoading: loadingExpenses, mutate: mutateExpenses } = useSWR<ExpenseData>(
-        ['expenses', month, year, budgetType],
+    const { data: realData, isLoading: loadingExpenses, mutate: mutateExpenses } = useSWR<ExpenseData>(
+        isDemo ? null : ['expenses', month, year, budgetType],
         fetcherExpenses,
         { revalidateOnFocus: false }
     )
 
-    const expenses = data?.expenses || []
-    const totalExpensesILS = data?.totalILS || 0
-    const totalNetExpensesILS = data?.totalNetILS || 0
+    const expenses = isDemo ? demoData.expenses as any[] : (realData?.expenses || [])
+    const totalExpensesILS = isDemo ? demoData.overview.totalExpenses : (realData?.totalILS || 0)
+    const totalNetExpensesILS = isDemo ? demoData.overview.totalExpenses : (realData?.totalNetILS || 0)
 
     const fetcherSuppliers = async () => {
         const result = await getSuppliers()
@@ -217,6 +221,8 @@ export function ExpensesTab() {
     )
 
     async function handleDelete(exp: Expense) {
+        if (isDemo) { interceptAction(); return; }
+
         if (exp.isRecurring) {
             setPendingAction({ type: 'delete', id: exp.id })
             setRecurrenceDialogOpen(true)
@@ -235,6 +241,7 @@ export function ExpensesTab() {
     }
 
     function handleEdit(exp: any) {
+        if (isDemo) { interceptAction(); return; }
         setEditingId(exp.id)
         setEditData({
             description: exp.description || '',
@@ -470,7 +477,10 @@ export function ExpensesTab() {
                 <div className="lg:hidden">
                     <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                         <DialogTrigger asChild>
-                            <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-red-600' : 'bg-[#e2445c]'} label="הוסף הוצאה" />
+                            <FloatingActionButton onClick={() => {
+                                if (isDemo) { interceptAction(); return; }
+                                setIsMobileOpen(true)
+                            }} colorClass={isBusiness ? 'bg-red-600' : 'bg-[#e2445c]'} label="הוסף הוצאה" />
                         </DialogTrigger>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
                             <DialogTitle className="sr-only">הוספת הוצאה</DialogTitle>

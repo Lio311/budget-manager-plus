@@ -13,6 +13,7 @@ import { getHexFromClass, PRESET_COLORS } from '@/lib/constants'
 import { getCurrentBudget, updateBudgetBalances } from '@/lib/actions/budget'
 import { NetWorthChart } from '../charts/NetWorthChart'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog'
+import { useDemo } from '@/contexts/DemoContext'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -58,6 +59,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const { month, year, currency, budgetType } = useBudget()
     const router = useRouter()
     const isBusiness = budgetType === 'BUSINESS'
+    const { isDemo, data: demoData, interceptAction } = useDemo()
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [initialBalance, setInitialBalance] = useState('')
@@ -80,11 +82,26 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         throw new Error(result.error || 'Failed to fetch overview data')
     }, [month, year, budgetType])
 
-    const { data: overviewData, isLoading: loading, mutate: mutateOverview } = useSWR(
-        ['overview', month, year, budgetType],
+    const { data: realOverviewData, isLoading: loading, mutate: mutateOverview } = useSWR(
+        isDemo ? null : ['overview', month, year, budgetType],
         fetchOverviewData,
         swrConfig
     )
+
+    // Merge logic: use demo data if isDemo, else real data
+    const overviewData = isDemo ? {
+        current: {
+            incomes: [{ amountILS: demoData.overview.totalIncome, vatAmountILS: 0 }],
+            expenses: [{ amountILS: demoData.overview.totalExpenses, vatAmountILS: 0 }],
+            bills: [{ amountILS: demoData.overview.upcomingBills, isPaid: false }],
+            debts: [{ monthlyPaymentILS: demoData.overview.debts }],
+            savings: [{ monthlyDepositILS: demoData.overview.savings }]
+        },
+        previous: { incomes: [], expenses: [], bills: [], debts: [], savings: [] },
+        categories: [],
+        netWorthHistory: [],
+        user: {}
+    } : realOverviewData
 
     useEffect(() => {
         mutateOverview()
@@ -284,6 +301,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         variant="outline"
                         size="icon"
                         onClick={() => {
+                            if (isDemo) { interceptAction(); return; }
                             if (isBusiness) setActiveSettingsTab('details')
                             setIsSettingsOpen(true)
                         }}
@@ -299,6 +317,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             variant="outline"
                             size="icon"
                             onClick={() => {
+                                if (isDemo) { interceptAction(); return; }
                                 setIsIntegrationsOpen(true)
                             }}
                             className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground md:hidden"
@@ -319,7 +338,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => setIsReferralOpen(true)}
+                            onClick={() => {
+                                if (isDemo) { interceptAction(); return; }
+                                setIsReferralOpen(true)
+                            }}
                             className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
                             title="חבר מביא חבר"
                         >

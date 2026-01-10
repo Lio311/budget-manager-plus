@@ -20,7 +20,9 @@ const isPublicRoute = createRouteMatcher([
     '/api/scan-invoice(.*)',
     '/terms(.*)',
     '/security(.*)',
-    '/accessibility(.*)'
+    '/accessibility(.*)',
+    '/get-started',
+    '/demo'
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

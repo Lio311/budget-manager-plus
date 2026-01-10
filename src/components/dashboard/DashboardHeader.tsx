@@ -12,11 +12,14 @@ import Image from 'next/image'
 import { SubscriptionStatus } from './UserProfile/SubscriptionStatus'
 import { useState } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { useDemo } from '@/contexts/DemoContext'
+import Link from 'next/link'
 
 export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PERSONAL', hasPersonalAccess = true, hasBusinessAccess = false }: any) {
     const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false)
     const { month, year, budgetType, setMonth, setYear, setBudgetType } = useBudget()
     const router = useRouter()
+    const { isDemo } = useDemo()
 
     const handleToggle = (type: 'PERSONAL' | 'BUSINESS') => {
         if (type === 'BUSINESS' && !hasBusinessAccess) {
@@ -126,26 +129,34 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                         </Button>
 
-                        {/* Mobile User Button */}
-                        <UserButton
-                            userProfileProps={userProfileProps}
-                            appearance={userButtonAppearance}
-                        >
-                            <UserButton.MenuItems>
-                                <UserButton.Action
-                                    label="מנוי"
-                                    labelIcon={<CreditCard className="w-4 h-4" />}
-                                    onClick={() => setIsSubscriptionOpen(true)}
-                                />
-                            </UserButton.MenuItems>
-                            <UserButton.UserProfilePage
-                                label="מנוי"
-                                url="subscription"
-                                labelIcon={<CreditCard className="w-4 h-4" />}
+                        {/* Mobile User Button / Guest Indicator */}
+                        {isDemo ? (
+                            <Link href="/sign-in">
+                                <Button variant="outline" size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600 h-8 self-center ml-2">
+                                    התחבר
+                                </Button>
+                            </Link>
+                        ) : (
+                            <UserButton
+                                userProfileProps={userProfileProps}
+                                appearance={userButtonAppearance}
                             >
-                                <SubscriptionStatus />
-                            </UserButton.UserProfilePage>
-                        </UserButton>
+                                <UserButton.MenuItems>
+                                    <UserButton.Action
+                                        label="מנוי"
+                                        labelIcon={<CreditCard className="w-4 h-4" />}
+                                        onClick={() => setIsSubscriptionOpen(true)}
+                                    />
+                                </UserButton.MenuItems>
+                                <UserButton.UserProfilePage
+                                    label="מנוי"
+                                    url="subscription"
+                                    labelIcon={<CreditCard className="w-4 h-4" />}
+                                >
+                                    <SubscriptionStatus />
+                                </UserButton.UserProfilePage>
+                            </UserButton>
+                        )}
 
                         <div className="mr-2">
                             <ModeToggle />
@@ -220,25 +231,38 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     </div>
 
                     <div className="pl-2">
-                        <UserButton
-                            userProfileProps={userProfileProps}
-                            appearance={userButtonAppearance}
-                        >
-                            <UserButton.MenuItems>
-                                <UserButton.Action
-                                    label="מנוי"
-                                    labelIcon={<CreditCard className="w-4 h-4" />}
-                                    onClick={() => setIsSubscriptionOpen(true)}
-                                />
-                            </UserButton.MenuItems>
-                            <UserButton.UserProfilePage
-                                label="מנוי"
-                                url="subscription"
-                                labelIcon={<CreditCard className="w-4 h-4" />}
+                        {isDemo ? (
+                            <div className="flex items-center gap-2">
+                                <div className="px-3 py-1 bg-gray-100 dark:bg-slate-800 rounded-full text-xs font-bold text-gray-500">
+                                    מצב דמה
+                                </div>
+                                <Link href="/sign-in">
+                                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-md transition-all px-6">
+                                        התחברות למערכת
+                                    </Button>
+                                </Link>
+                            </div>
+                        ) : (
+                            <UserButton
+                                userProfileProps={userProfileProps}
+                                appearance={userButtonAppearance}
                             >
-                                <SubscriptionStatus />
-                            </UserButton.UserProfilePage>
-                        </UserButton>
+                                <UserButton.MenuItems>
+                                    <UserButton.Action
+                                        label="מנוי"
+                                        labelIcon={<CreditCard className="w-4 h-4" />}
+                                        onClick={() => setIsSubscriptionOpen(true)}
+                                    />
+                                </UserButton.MenuItems>
+                                <UserButton.UserProfilePage
+                                    label="מנוי"
+                                    url="subscription"
+                                    labelIcon={<CreditCard className="w-4 h-4" />}
+                                >
+                                    <SubscriptionStatus />
+                                </UserButton.UserProfilePage>
+                            </UserButton>
+                        )}
                     </div>
                 </div>
             </div>

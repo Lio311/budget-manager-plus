@@ -34,6 +34,7 @@ import { BankImportModal } from '../BankImportModal'
 import { CategoryManagementDialog } from './CategoryManagementDialog'
 import { useConfirm } from '@/hooks/useConfirm'
 import { findMatchingCategory } from '@/lib/category-utils'
+import { useDemo } from '@/contexts/DemoContext'
 
 interface Category {
     id: string
@@ -62,7 +63,9 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
     const confirm = useConfirm()
+    const confirm = useConfirm()
     const isBusiness = budgetType === 'BUSINESS'
+    const { isDemo, interceptAction } = useDemo()
 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
@@ -221,6 +224,8 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     )
 
     async function handleAdd() {
+        if (isDemo) { interceptAction(); return; }
+
         const newErrors: Record<string, boolean> = {}
         if (!newExpense.amount) newErrors.amount = true
         if (!newExpense.category) newErrors.category = true
@@ -295,6 +300,8 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
     }
 
     const handleDeleteAll = async () => {
+        if (isDemo) { interceptAction(); return; }
+
         const confirmed = await confirm('האם אתה בטוח שברצונך למחוק את כל ההוצאות של אותו חודש?', 'מחיקת הוצאות')
         if (!confirmed) return
 
@@ -364,6 +371,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                         type="expense"
                         scope={budgetType}
                         onChange={() => {
+                            if (isDemo) { interceptAction(); return; }
                             if (onCategoriesChange) onCategoriesChange()
                         }}
                         trigger={
