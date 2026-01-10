@@ -195,18 +195,10 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                 <div className="hidden md:flex flex-1 justify-center items-center opacity-80 hover:opacity-100 transition-opacity">
                     <Image
                         src="/images/branding/K-LOGO.png"
-                        alt="Kesefly"
+                        alt="Logo"
                         width={120}
-                        height={40}
-                        className="h-8 w-auto object-contain drop-shadow-sm dark:hidden"
-                        priority
-                    />
-                    <Image
-                        src="/images/branding/K-LOGO2.png"
-                        alt="Kesefly"
-                        width={120}
-                        height={40}
-                        className="h-8 w-auto object-contain drop-shadow-sm hidden dark:block"
+                        height={120}
+                        className="h-full w-auto object-contain"
                         priority
                     />
                 </div>
