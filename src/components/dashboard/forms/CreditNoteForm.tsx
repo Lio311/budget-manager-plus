@@ -30,7 +30,6 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
 
     const [loadingNumber, setLoadingNumber] = useState(false)
     const [selectedInvoice, setSelectedInvoice] = useState<any>(null)
-    const [selectedInvoice, setSelectedInvoice] = useState<any>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
 

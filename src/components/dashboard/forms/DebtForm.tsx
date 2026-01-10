@@ -37,8 +37,6 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
     const { toast } = useToast()
     const { mutate: globalMutate } = useSWRConfig()
 
-    const { mutate: globalMutate } = useSWRConfig()
-
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [newDebt, setNewDebt] = useState<{

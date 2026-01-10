@@ -135,9 +135,6 @@ export function CalendarTab() {
         const [endHour, endMinute] = newEvent.endTime.split(':')
         endDateTime.setHours(parseInt(endHour), parseInt(endMinute))
 
-        const [endHour, endMinute] = newEvent.endTime.split(':')
-        endDateTime.setHours(parseInt(endHour), parseInt(endMinute))
-
         const newErrors: Record<string, boolean> = {}
         if (!newEvent.title) newErrors.title = true
         if (!newEvent.startTime) newErrors.startTime = true
