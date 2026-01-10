@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useAuthModal } from '@/contexts/AuthModalContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, ArrowLeft, Check, Menu, X, ChevronDown, LayoutDashboard, PieChart, Calendar, BarChart3, CreditCard, Receipt, Smartphone, Lock, Shield } from 'lucide-react'
 import SecurityBadge from '@/components/SecurityBadge'
@@ -171,14 +172,14 @@ export default function LandingPage() {
                         </Link>
                     </motion.div>
                     <div className="hidden md:flex items-center gap-6">
-                        <Link href="/sign-in"><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></Link>
-                        <Link href="/sign-up"><Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">התחל עכשיו</Button></Link>
+                        <AuthModalTrigger><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></AuthModalTrigger>
+                        <AuthModalTrigger><Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">התחל עכשיו</Button></AuthModalTrigger>
                     </div>
                     {/* Replaced Menu with Login button for mobile */}
                     <div className="md:hidden">
-                        <Link href="/sign-in">
+                        <AuthModalTrigger>
                             <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full">כניסה</Button>
-                        </Link>
+                        </AuthModalTrigger>
                     </div>
                 </div>
             </nav>
@@ -257,16 +258,16 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                             <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-2xl md:text-4xl font-bold text-white/80 mb-6">{section.subtitle}</motion.h2>
                             <motion.p initial={{ opacity: 0 }} animate={isActive ? { opacity: 1 } : {}} transition={{ delay: 0.5 }} className="text-lg md:text-xl text-white/70 mb-8 max-w-xl leading-relaxed">{section.description}</motion.p>
                             <motion.div initial={{ opacity: 0, y: 20 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.6 }}>
-                                <Link href="/sign-up">
+                                <AuthModalTrigger>
                                     <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-10 py-7 text-xl shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">
                                         התחל עכשיו
                                         <ArrowLeft className="mr-3" size={24} />
                                     </Button>
-                                </Link>
+                                </AuthModalTrigger>
                                 <div className="mt-4">
                                     <Link href="/demo">
                                         <Button variant="link" className="text-white/70 hover:text-white transition-colors text-sm">
-                                            או המשך כאורח (דמו)
+                                            התנסות במערכת כאורח
                                         </Button>
                                     </Link>
                                 </div>

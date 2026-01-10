@@ -15,6 +15,8 @@ import { differenceInDays } from 'date-fns'
 import AccessibilityWidget from '@/components/accessibility/AccessibilityWidget'
 import { ConfirmDialogProvider } from '@/hooks/useConfirm'
 import { VisitorLocationTracker } from '@/components/tracking/VisitorLocationTracker'
+import { AuthModalProvider } from '@/contexts/AuthModalContext'
+import { GlobalLoginModal } from '@/components/auth/GlobalLoginModal'
 
 const rubik = Rubik({
     subsets: ['hebrew', 'latin'],
@@ -195,16 +197,19 @@ export default async function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <WebApplicationJsonLd />
-                        <div id="site-content">
-                            {children}
-                        </div>
-                        <ReactivationPopup shouldShow={shouldShowReactivation} />
-                        <AccessibilityWidget />
-                        <VisitorLocationTracker />
-                        <Toaster />
-                        <SonnerToaster />
-                        <ConfirmDialogProvider />
+                        <AuthModalProvider>
+                            <GlobalLoginModal />
+                            <WebApplicationJsonLd />
+                            <div id="site-content">
+                                {children}
+                            </div>
+                            <ReactivationPopup shouldShow={shouldShowReactivation} />
+                            <AccessibilityWidget />
+                            <VisitorLocationTracker />
+                            <Toaster />
+                            <SonnerToaster />
+                            <ConfirmDialogProvider />
+                        </AuthModalProvider>
                     </ThemeProvider>
                 </body>
             </html>

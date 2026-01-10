@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { DEMO_DATA } from '@/components/dashboard/DemoData'
+import { useAuthModal } from './AuthModalContext'
 
 interface DemoContextType {
     isDemo: boolean
@@ -15,9 +16,11 @@ const DemoContext = createContext<DemoContextType | undefined>(undefined)
 export function DemoProvider({ children, isDemo = false }: { children: ReactNode, isDemo?: boolean }) {
     const router = useRouter()
 
+    const { openModal } = useAuthModal()
+
     const interceptAction = () => {
         if (isDemo) {
-            router.push('/sign-in?redirect_url=/dashboard')
+            openModal()
         }
     }
 

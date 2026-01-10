@@ -9,7 +9,8 @@ import SecurityBadge from '@/components/SecurityBadge'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import FAQ from './FAQ'
-import { LoginModal } from '@/components/auth/LoginModal'
+// import { LoginModal } from '@/components/auth/LoginModal'
+import { useAuthModal } from '@/contexts/AuthModalContext'
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -125,7 +126,7 @@ export default function LandingPage() {
                                                     התחל בחינם
                                                 </motion.button>
                                             </Link>
-                                            <LoginModal>
+                                            <AuthModalTrigger>
                                                 <motion.button
                                                     whileHover={{ scale: 1.05 }}
                                                     whileTap={{ scale: 0.95 }}
@@ -133,7 +134,7 @@ export default function LandingPage() {
                                                 >
                                                     כניסה למערכת
                                                 </motion.button>
-                                            </LoginModal>
+                                            </AuthModalTrigger>
                                         </div>
                                     </div>
                                 </SignedOut>
@@ -452,7 +453,7 @@ export default function LandingPage() {
                                         הרשמה חינם
                                     </motion.button>
                                 </Link>
-                                <LoginModal>
+                                <AuthModalTrigger>
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
@@ -460,7 +461,7 @@ export default function LandingPage() {
                                     >
                                         כניסה למערכת
                                     </motion.button>
-                                </LoginModal>
+                                </AuthModalTrigger>
                             </div>
                         </div>
                     </SignedOut>
