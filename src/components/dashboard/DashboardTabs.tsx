@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { WelcomePopup } from './WelcomePopup'
-import { getUserSubscriptionStatus } from '@/lib/actions/user'
+import { OnboardingPopup } from './OnboardingPopup'
+import { getUserSubscriptionStatus, getOnboardingStatus } from '@/lib/actions/user'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -35,6 +36,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
     // Popup State
     const [showWelcome, setShowWelcome] = useState(false)
+    const [showOnboarding, setShowOnboarding] = useState(false)
     const [subscriptionStatus, setSubscriptionStatus] = useState<{
         trialEndsAt?: Date | null
         activeSubscription?: { endDate: Date | null, planType: 'PERSONAL' | 'BUSINESS' } | null
@@ -59,6 +61,13 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 })
             }
         }
+
+        // Check for first-time onboarding
+        getOnboardingStatus().then(hasSeen => {
+            if (!hasSeen) {
+                setShowOnboarding(true)
+            }
+        })
     }, [])
 
     const searchParams = useSearchParams()
@@ -137,6 +146,12 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 onClose={() => setShowWelcome(false)}
                 trialEndsAt={subscriptionStatus?.trialEndsAt}
                 activeSubscription={subscriptionStatus?.activeSubscription}
+                activeSubscription={subscriptionStatus?.activeSubscription}
+            />
+
+            <OnboardingPopup
+                isOpen={showOnboarding}
+                onClose={() => setShowOnboarding(false)}
             />
 
             {/* Mobile Sidebar Overlay */}

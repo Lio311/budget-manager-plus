@@ -57,6 +57,9 @@ model User {
   trialEndsAt    DateTime?
   hasUsedTrial   Boolean  @default(false)
 
+  // Onboarding
+  hasSeenOnboarding Boolean  @default(false)
+
   // Google Calendar Integration
   googleCalendarRefreshToken String?
   googleCalendarId           String?

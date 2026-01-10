@@ -129,3 +129,36 @@ export async function getUserSubscriptionStatus() {
         return null
     }
 }
+
+export async function markOnboardingSeen() {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false }
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { hasSeenOnboarding: true }
+        })
+
+        return { success: true }
+    } catch (error) {
+        console.error('Error marking onboarding seen:', error)
+        return { success: false }
+    }
+}
+
+export async function getOnboardingStatus() {
+    try {
+        const { userId } = await auth()
+        if (!userId) return false
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { hasSeenOnboarding: true }
+        })
+
+        return user?.hasSeenOnboarding || false
+    } catch (error) {
+        return false
+    }
+}
