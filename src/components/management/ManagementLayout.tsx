@@ -84,7 +84,6 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
     ]
 
     return (
-    return (
         <ThemeProvider attribute="class" forcedTheme="light" enableSystem={false}>
             <div className="flex h-screen bg-[#F5F6F8] direction-rtl" dir="rtl">
                 {/* Sidebar */}
