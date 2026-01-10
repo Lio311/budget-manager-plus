@@ -66,26 +66,40 @@ const CITY_LOCATIONS: Record<string, { lat: number, lng: number }> = {
 }
 
 // Projection Calibration (Manually tuned for this specific SVG viewBox)
-// Map Bounds (Approx Israel + Territories)
 const MAP_BOUNDS = {
-    minLat: 29.2,  // Below Eilat
-    maxLat: 33.5,  // Above Metula
-    minLng: 34.1,  // Mediterranean
-    maxLng: 35.9   // Jordan Rift
+    minLat: 29.50, // Eilat
+    maxLat: 33.30, // Metula
+    minLng: 34.20, // Coast
+    maxLng: 35.90  // Eastern border
 }
 
-// Convert Lat/Lng to SVG percent coordinates
+// SVG Coordinate Mapping
+// calibrated based on the SVG path nodes:
+// Top (Metula): ~Y=10
+// Bottom (Eilat): ~Y=215
+// West (Coast): ~X=35
+// East (Golan): ~X=75
+const SVG_RANGES = {
+    minY: 215, // South (Higher Y value)
+    maxY: 10,  // North (Lower Y value)
+    minX: 30,  // West
+    maxX: 80   // East
+}
+
+// Convert Lat/Lng to SVG coordinates
 function project(lat: number, lng: number) {
+    // Normalize 0-1
     const latPercent = (lat - MAP_BOUNDS.minLat) / (MAP_BOUNDS.maxLat - MAP_BOUNDS.minLat)
     const lngPercent = (lng - MAP_BOUNDS.minLng) / (MAP_BOUNDS.maxLng - MAP_BOUNDS.minLng)
 
-    // SVG Coordinate System:
-    // x increases West -> East (Left -> Right), matches lng
-    // y increases North -> South (Top -> Bottom), INVERSE of lat
+    // Map to SVG Range
+    // Y is inverted (North is Low Y, South is High Y)
+    // latPercent 0 (South) -> should be minY (215)
+    // latPercent 1 (North) -> should be maxY (10)
+    const y = SVG_RANGES.minY - (latPercent * (SVG_RANGES.minY - SVG_RANGES.maxY))
 
-    // Fine-tune offsets for specific path alignment
-    const x = (lngPercent * 100)
-    const y = ((1 - latPercent) * 100)
+    // X is normal (West is Low X, East is High X)
+    const x = SVG_RANGES.minX + (lngPercent * (SVG_RANGES.maxX - SVG_RANGES.minX))
 
     return { x, y }
 }
