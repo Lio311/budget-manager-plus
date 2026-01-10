@@ -14,12 +14,14 @@ import { useState } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useDemo } from '@/contexts/DemoContext'
 import Link from 'next/link'
+import { useAuthModal } from '@/contexts/AuthModalContext'
 
 export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PERSONAL', hasPersonalAccess = true, hasBusinessAccess = false }: any) {
     const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false)
     const { month, year, budgetType, setMonth, setYear, setBudgetType } = useBudget()
     const router = useRouter()
     const { isDemo } = useDemo()
+    const { openModal } = useAuthModal()
 
     const handleToggle = (type: 'PERSONAL' | 'BUSINESS') => {
         if (type === 'BUSINESS' && !hasBusinessAccess) {
@@ -131,11 +133,14 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
                         {/* Mobile User Button / Guest Indicator */}
                         {isDemo ? (
-                            <Link href="/sign-in">
-                                <Button variant="outline" size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600 h-8 self-center ml-2">
-                                    התחבר
-                                </Button>
-                            </Link>
+                            <Button
+                                onClick={openModal}
+                                variant="outline"
+                                size="sm"
+                                className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600 h-8 self-center ml-2"
+                            >
+                                התחבר
+                            </Button>
                         ) : (
                             <UserButton
                                 userProfileProps={userProfileProps}
@@ -234,11 +239,12 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         {isDemo ? (
                             <div className="flex items-center gap-2">
                                 {/* Badge removed per user request */}
-                                <Link href="/sign-in">
-                                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-md transition-all px-6">
-                                        התחברות למערכת
-                                    </Button>
-                                </Link>
+                                <Button
+                                    onClick={openModal}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-md transition-all px-6"
+                                >
+                                    התחברות למערכת
+                                </Button>
                             </div>
                         ) : (
                             <UserButton
