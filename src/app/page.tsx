@@ -120,9 +120,15 @@ export default function LandingPage() {
 
     const touchStart = useRef<number | null>(null)
     const handleTouchStart = (e: TouchEvent) => {
+        // CRITICAL FIX: Ignore scrolling events from the Security Popup on mobile
+        if ((e.target as HTMLElement).closest('.stop-landing-scroll')) return;
+
         touchStart.current = e.touches[0].clientY
     }
     const handleTouchEnd = (e: TouchEvent) => {
+        // CRITICAL FIX: Ignore scrolling events from the Security Popup on mobile
+        if ((e.target as HTMLElement).closest('.stop-landing-scroll')) return;
+
         if (isScrolling || touchStart.current === null) return
 
         // Similar check for touch scrolling within containers could be added here if needed
