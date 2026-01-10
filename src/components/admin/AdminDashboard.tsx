@@ -152,6 +152,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                         <div className="space-y-2">
                                             <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</Label>
                                             <Select
+                                                dir="ltr"
                                                 defaultValue={sub.status}
                                                 onValueChange={(value) => handleUpdateSubscription(sub.id, { status: value })}
                                             >
@@ -171,6 +172,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                         <div className="space-y-2">
                                             <Label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Plan Type</Label>
                                             <Select
+                                                dir="ltr"
                                                 defaultValue={sub.planType}
                                                 onValueChange={(value) => handleUpdateSubscription(sub.id, { planType: value as 'PERSONAL' | 'BUSINESS' })}
                                             >
@@ -534,6 +536,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                 <div className="space-y-2">
                                     <Label className="text-left block">Plan Type</Label>
                                     <Select
+                                        dir="ltr"
                                         value={newCoupon.planType || "ALL"}
                                         onValueChange={(value) => setNewCoupon({ ...newCoupon, planType: value === "ALL" ? "" : value })}
                                     >
