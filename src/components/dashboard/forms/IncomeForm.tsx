@@ -280,7 +280,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             value={newIncome.currency}
                             onValueChange={(value) => setNewIncome({ ...newIncome, currency: value })}
                         >
-                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100">
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent dir="rtl" className="text-right">
@@ -356,7 +356,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     <PaymentMethodSelector
                         value={newIncome.paymentMethod}
                         onChange={(val) => setNewIncome({ ...newIncome, paymentMethod: val })}
-                        color={isBusiness ? 'blue' : 'green'}
+                        color="green"
                     />
                 </div>
 
