@@ -540,7 +540,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                         value={newCoupon.planType || "ALL"}
                                         onValueChange={(value) => setNewCoupon({ ...newCoupon, planType: value === "ALL" ? "" : value })}
                                     >
-                                        <SelectTrigger className="w-full h-10 text-left" dir="ltr">
+                                        <SelectTrigger className="w-full h-10 text-left flex-row-reverse" dir="ltr">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent dir="ltr" className="text-left">
