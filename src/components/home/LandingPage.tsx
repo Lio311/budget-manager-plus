@@ -173,14 +173,13 @@ export default function LandingPage() {
                             </div>
                         </div>
                     </motion.div>
-                </motion.div >
+                </motion.div>
 
                 {/* Personal Solution Section */}
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }
-                    }
+                    viewport={{ once: true, margin: "-100px" }}
                     variants={itemVariants}
                     className="mb-20 bg-blue-50 p-8 md:p-12 rounded-3xl border border-blue-200 relative overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-500"
                 >           <div className="absolute top-0 left-0 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-20 -ml-32 -mt-32 animate-pulse"></div>
@@ -261,7 +260,7 @@ export default function LandingPage() {
                             </SignedOut>
                         </motion.div>
                     </div>
-                </motion.div >
+                </motion.div>
 
                 {/* Business Solution Section */}
                 <motion.div
@@ -367,7 +366,7 @@ export default function LandingPage() {
                             </div>
                         </motion.div>
                     </div>
-                </motion.div >
+                </motion.div>
 
 
                 {/* Features List - REDESIGNED */}
@@ -424,7 +423,7 @@ export default function LandingPage() {
                             description="גישה מלאה לנתונים מהמחשב, מהטאבלט ומהנייד"
                         />
                     </div>
-                </motion.div >
+                </motion.div>
 
                 {/* FAQ Section */}
                 <FAQ />
@@ -480,7 +479,7 @@ export default function LandingPage() {
                             </Link>
                         </div>
                     </SignedIn>
-                </motion.div >
+                </motion.div>
 
                 {/* Footer Section - Terms & Privacy */}
                 <motion.div
@@ -503,11 +502,11 @@ export default function LandingPage() {
                     <p className="text-xs text-gray-400 mt-4">
                         © {new Date().getFullYear()} Kesefly. כל הזכויות שמורות.
                     </p>
-                </motion.div >
+                </motion.div>
 
-            </div >
+            </div>
             <SecurityBadge />
-        </div >
+        </div>
     )
 }
 
