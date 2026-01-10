@@ -263,6 +263,13 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                                         <ArrowLeft className="mr-3" size={24} />
                                     </Button>
                                 </Link>
+                                <div className="mt-4">
+                                    <Link href="/demo">
+                                        <Button variant="link" className="text-white/70 hover:text-white transition-colors text-sm">
+                                            או המשך כאורח (דמו)
+                                        </Button>
+                                    </Link>
+                                </div>
                             </motion.div>
                         </div>
                         <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={isActive ? { opacity: 1, scale: 1 } : {}} transition={{ duration: 0.8, delay: 0.2 }} className="hidden md:flex justify-end relative h-[500px]">

@@ -146,7 +146,7 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                                 if (value) setErrors(prev => ({ ...prev, clientId: false }))
                             }}
                         >
-                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.clientId ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'}`}>
+                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.clientId ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-300 dark:border-slate-700'}`}>
                                 <SelectValue placeholder="בחר לקוח" />
                             </SelectTrigger>
                             <SelectContent dir="rtl">
@@ -184,7 +184,7 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                         </label>
                     </div>
 
-                    <div className={`border rounded-lg overflow-hidden bg-white dark:bg-slate-900 ${errors.items ? 'border-red-500' : 'border-gray-200 dark:border-slate-800'}`}>
+                    <div className={`border rounded-lg overflow-hidden bg-white dark:bg-slate-900 ${errors.items ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200 dark:border-slate-800'}`}>
                         <table className="w-full text-right">
                             <thead className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700">
                                 <tr>
@@ -299,7 +299,14 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
             </div>
 
             <div className="flex gap-2 pt-2">
-                <Button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white w-full md:w-auto">
+                <Button
+                    type="submit"
+                    className={`w-full md:w-auto transition-all ${(!formData.clientId || !formData.items || formData.items.length === 0)
+                        ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                        : 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                        }`}
+                    disabled={!formData.clientId || !formData.items || formData.items.length === 0}
+                >
                     צור הצעת מחיר
                 </Button>
             </div>

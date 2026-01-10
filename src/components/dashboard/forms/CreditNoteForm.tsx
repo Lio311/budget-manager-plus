@@ -150,7 +150,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                             value={formData.invoiceId}
                             onValueChange={(value) => setFormData((prev) => ({ ...prev, invoiceId: value }))}
                         >
-                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.invoiceId ? 'border-red-500' : 'border-gray-300 dark:border-slate-700'}`}>
+                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.invoiceId ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-300 dark:border-slate-700'}`}>
                                 <SelectValue placeholder="בחר חשבונית" />
                             </SelectTrigger>
                             <SelectContent dir="rtl">
@@ -183,7 +183,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                             setFormData(prev => ({ ...prev, creditAmount: value }))
                             if (value > 0) setErrors(prev => ({ ...prev, creditAmount: false }))
                         }}
-                        className={`w-full ${errors.creditAmount ? 'border-red-500' : ''}`}
+                        className={`w-full ${errors.creditAmount ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : ''}`}
                         disabled={!selectedInvoice}
                     />
                     {selectedInvoice && (
@@ -229,8 +229,11 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
             <div className="flex gap-2 pt-2">
                 <Button
                     type="submit"
-                    className="bg-orange-600 hover:bg-orange-700 text-white w-full md:w-auto"
-                    disabled={isSubmitting || !formData.invoiceId}
+                    className={`w-full md:w-auto transition-all ${(isSubmitting || !formData.invoiceId || formData.creditAmount <= 0 || (selectedInvoice && formData.creditAmount > selectedInvoice.total))
+                        ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                        : 'bg-orange-600 hover:bg-orange-700 text-white'
+                        }`}
+                    disabled={isSubmitting || !formData.invoiceId || formData.creditAmount <= 0 || (selectedInvoice && formData.creditAmount > selectedInvoice.total)}
                 >
                     {isSubmitting ? (
                         <>

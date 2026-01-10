@@ -265,7 +265,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 if (value) setErrors(prev => ({ ...prev, category: false }))
                             }}
                         >
-                            <SelectTrigger className={`w-full h-10 border bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20 ${errors.category ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'}`}>
+                            <SelectTrigger className={`w-full text-right h-11 md:h-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 focus:ring-green-500/20 focus:border-green-500 rounded-lg ${errors.category ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : ''}`}>
                                 <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                             <SelectContent dir="rtl" className="text-right max-h-[200px]">
@@ -430,7 +430,15 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     )}
                 </div>
 
-                <Button onClick={handleAdd} className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md ${isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-[#00c875] hover:bg-[#00b268]'}`} disabled={submitting}>
+                <Button
+                    onClick={handleAdd}
+                    className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md
+                        ${(!newIncome.source || !newIncome.amount || !newIncome.category)
+                            ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                            : (isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-[#00c875] hover:bg-[#00b268]')
+                        }`}
+                    disabled={submitting || !newIncome.source || !newIncome.amount || !newIncome.category}
+                >
                     {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הכנסה' : 'הוסף')}
                 </Button>
             </div>

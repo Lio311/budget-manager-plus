@@ -152,7 +152,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                         if (e.target.value) setErrors(prev => ({ ...prev, name: false }))
                     }}
                     placeholder="לדוגמה: ארנונה"
-                    className={`h-10 text-right ${errors.name ? 'border-red-500' : ''}`}
+                    className={`h-10 text-right focus:ring-orange-500/20 focus:border-orange-500 ${errors.name ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200 dark:border-slate-700'}`}
                 />
             </div>
             <div className="grid grid-cols-3 gap-3">
@@ -171,13 +171,15 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 <div className="col-span-2 space-y-2">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום *</label>
                     <FormattedNumberInput
-                        placeholder="0.00"
+                        placeholder="סכום"
+                        className={`h-10 focus:ring-orange-500/20 focus:border-orange-500 ${errors.amount ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200 dark:border-slate-700'}`}
                         value={formData.amount}
                         onChange={(e) => {
                             setFormData({ ...formData, amount: e.target.value })
                             if (e.target.value) setErrors(prev => ({ ...prev, amount: false }))
                         }}
-                        className={`h-10 text-right ${errors.amount ? 'border-red-500' : ''}`}
+                        disabled={submitting}
+                        dir="ltr"
                     />
                 </div>
             </div>
@@ -257,9 +259,13 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
             }
 
             <Button
-                className="w-full bg-orange-500 hover:bg-orange-600 h-10 shadow-sm mt-2 font-medium"
+                className={`w-full h-10 shadow-sm mt-2 font-medium transition-all
+                    ${(!formData.name || !formData.amount || !formData.dueDay)
+                        ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                        : 'bg-orange-500 hover:bg-orange-600'
+                    }`}
                 onClick={handleSubmit}
-                disabled={submitting}
+                disabled={submitting || !formData.name || !formData.amount || !formData.dueDay}
             >
                 {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : "הוסף"}
             </Button>

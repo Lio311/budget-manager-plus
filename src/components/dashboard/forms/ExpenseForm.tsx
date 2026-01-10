@@ -429,7 +429,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                                 if (value) setErrors(prev => ({ ...prev, category: false }))
                             }}
                         >
-                            <SelectTrigger className={`w-full h-10 border bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${errors.category ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}>
+                            <SelectTrigger className={`w-full h-10 border bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${errors.category ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-slate-700'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}>
                                 <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                             <SelectContent className="max-h-[200px]">
@@ -559,7 +559,15 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     )}
                 </div>
 
-                <Button onClick={handleAdd} className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md ${isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d43f55]'}`} disabled={submitting}>
+                <Button
+                    onClick={handleAdd}
+                    className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md 
+                        ${(!newExpense.description || !newExpense.amount || !newExpense.category)
+                            ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                            : (isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d43f55]')
+                        }`}
+                    disabled={submitting || !newExpense.description || !newExpense.amount || !newExpense.category}
+                >
                     {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הוצאה' : 'הוסף')}
                 </Button>
             </div>

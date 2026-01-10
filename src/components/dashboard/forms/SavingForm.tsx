@@ -210,7 +210,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-200">קטגוריה *</label>
                     <div className="flex gap-2">
                         <select
-                            className={`w-full p-2.5 border rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none transition-all ${errors.category ? 'border-red-500' : 'border-gray-200 dark:border-slate-700'} focus:ring-2 focus:ring-[#00c875]/20 focus:border-[#00c875]`}
+                            className={`w-full p-2.5 border rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none transition-all ${errors.category ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200 dark:border-slate-700'} focus:ring-2 focus:ring-[#00c875]/20 focus:border-[#00c875]`}
                             value={newSaving.category}
                             onChange={(e) => {
                                 setNewSaving({ ...newSaving, category: e.target.value })
@@ -260,7 +260,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תיאור *</label>
                     <Input
                         placeholder="תיאור"
-                        className={`h-10 focus:ring-[#00c875]/20 focus:border-[#00c875] ${errors.description ? 'border-red-500' : 'border-gray-200'}`}
+                        className={`h-10 focus:ring-[#00c875]/20 focus:border-[#00c875] ${errors.description ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200'}`}
                         value={newSaving.description}
                         onChange={(e) => {
                             setNewSaving({ ...newSaving, description: e.target.value })
@@ -288,7 +288,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                         <Input
                             type="number"
                             placeholder="0.00"
-                            className={`h-10 focus:ring-[#00c875]/20 focus:border-[#00c875] w-full ${errors.monthlyDeposit ? 'border-red-500' : 'border-gray-200'}`}
+                            className={`h-10 focus:ring-[#00c875]/20 focus:border-[#00c875] w-full ${errors.monthlyDeposit ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200'}`}
                             value={newSaving.monthlyDeposit}
                             onChange={(e) => {
                                 setNewSaving({ ...newSaving, monthlyDeposit: e.target.value })
@@ -362,8 +362,12 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
 
                 <Button
                     onClick={handleAdd}
-                    className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition-all hover:shadow-md mt-2"
-                    disabled={submitting}
+                    className={`w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md mt-2
+                        ${(!newSaving.category || !newSaving.description || !newSaving.monthlyDeposit)
+                            ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        }`}
+                    disabled={submitting || !newSaving.category || !newSaving.description || !newSaving.monthlyDeposit}
                 >
                     {submitting ? (
                         <Loader2 className="h-4 w-4 animate-rainbow-spin" />

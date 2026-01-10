@@ -202,7 +202,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                             value={formData.clientId}
                             onValueChange={(value) => setFormData((prev) => ({ ...prev, clientId: value }))}
                         >
-                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.clientId ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-300 dark:border-slate-700'}`}>
                                 <SelectValue placeholder="בחר לקוח" />
                             </SelectTrigger>
                             <SelectContent dir="rtl">
@@ -275,7 +275,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                                 }
                             }}
                         >
-                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.income ? 'border-red-500' : 'border-blue-300 dark:border-blue-700'}`}>
+                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.income ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-blue-300 dark:border-blue-700'}`}>
                                 <SelectValue placeholder="בחר הכנסה לחיוב" />
                             </SelectTrigger>
                             <SelectContent dir="rtl">
@@ -301,7 +301,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     פירוט העסקה *
                 </label>
-                <div className={`border rounded-lg overflow-hidden dark:border-slate-700 ${errors.lineItems ? 'border-red-500' : ''}`}>
+                <div className={`border rounded-lg overflow-hidden dark:border-slate-700 ${errors.lineItems ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : ''}`}>
                     <table className="w-full text-right text-sm">
                         <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 font-medium">
                             <tr>
@@ -478,7 +478,14 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
             </div>
 
             <div className="flex gap-2 pt-2">
-                <Button type="submit" className="bg-purple-600 hover:bg-purple-700 w-full md:w-auto">
+                <Button
+                    type="submit"
+                    className={`w-full md:w-auto transition-all ${(!formData.clientId || !formData.invoiceNumber || lineItems.length === 0 || ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice))
+                        ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                        : 'bg-purple-600 hover:bg-purple-700'
+                        }`}
+                    disabled={!formData.clientId || !formData.invoiceNumber || lineItems.length === 0 || ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice)}
+                >
                     צור חשבונית
                 </Button>
             </div>

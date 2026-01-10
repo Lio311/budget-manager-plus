@@ -148,7 +148,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                     <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">שם המלווה / לווה *</label>
                     <Input
                         placeholder="שם..."
-                        className={`h-10 focus:ring-purple-500/20 focus:border-purple-500 ${errors.creditor ? 'border-red-500' : 'border-gray-200'}`}
+                        className={`h-10 focus:ring-purple-500/20 focus:border-purple-500 ${errors.creditor ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200'}`}
                         value={newDebt.creditor}
                         onChange={(e) => {
                             setNewDebt({ ...newDebt, creditor: e.target.value })
@@ -181,7 +181,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                         <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">סכום כולל *</label>
                         <FormattedNumberInput
                             placeholder="סכום כולל"
-                            className={`h-10 focus:ring-purple-500/20 focus:border-purple-500 ${errors.totalAmount ? 'border-red-500' : 'border-gray-200'}`}
+                            className={`h-10 focus:ring-purple-500/20 focus:border-purple-500 ${errors.totalAmount ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200'}`}
                             value={newDebt.totalAmount}
                             onChange={(e) => {
                                 setNewDebt({ ...newDebt, totalAmount: e.target.value })
@@ -196,7 +196,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                 {/* Due Day - Full Width */}
                 <div className="w-full">
                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הלוואה *</label>
-                    <div className={errors.date ? 'border border-red-500 rounded-md' : ''}>
+                    <div className={errors.date ? '!border !border-red-500 dark:!border-red-500 rounded-md ring-1 ring-red-500/20' : ''}>
                         <DatePicker
                             date={newDebt.date ? new Date(newDebt.date) : undefined}
                             setDate={(date) => {
@@ -261,8 +261,12 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
 
                     <Button
                         onClick={handleAdd}
-                        className="w-full h-10 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium shadow-sm transition-all hover:shadow-md"
-                        disabled={submitting}
+                        className={`w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md
+                            ${(!newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date)
+                                ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                                : 'bg-purple-600 hover:bg-purple-700'
+                            }`}
+                        disabled={submitting || !newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date}
                     >
                         {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
                     </Button>
