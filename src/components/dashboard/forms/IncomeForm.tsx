@@ -347,149 +347,185 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     </div>
                 )}
 
-                {/* Three fields in one row for Business, or just Payer for Personal */}
-                {/* Three fields in one row for Business, or just Payer for Personal */}
-                <div className={`grid gap-3 w-full ${isBusiness ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
-                    {/* Payer Input */}
+                {/* Personal Mode: Date is Mandatory, so show it here */}
+                {!isBusiness && (
                     <div className="w-full">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל מ... (אופציונלי)</label>
-                        <Input
-                            className="h-10 border-gray-200 focus:ring-green-500/20"
-                            placeholder="שם המשלם"
-                            value={newIncome.payer}
-                            onFocus={() => isDemo && interceptAction()}
-                            onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
-                        />
-                    </div>
-
-                    {isBusiness && (
-                        <div className="w-full">
-                            <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
-                            <Input className="h-10 border-gray-200 focus:ring-green-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
-                        </div>
-                    )}
-                </div>
-
-                {isBusiness && (
-                    <div className="w-full">
-                        <div className="flex items-center justify-between mb-1.5">
-                            <label className="text-xs font-bold text-[#676879] dark:text-gray-300">זמן עבודה</label>
-
-                            {/* Custom Toggle */}
-                            <div className="bg-gray-100 dark:bg-slate-800 p-0.5 rounded-lg flex rtl:flex-row-reverse border border-gray-200 dark:border-slate-700">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        if (timeUnit === 'hours') return
-                                        setTimeUnit('hours')
-                                        // Convert Minutes to Hours
-                                        const val = parseFloat(newIncome.workTime)
-                                        if (!isNaN(val)) {
-                                            setNewIncome(prev => ({ ...prev, workTime: (val / 60).toFixed(2).replace(/\.00$/, '') }))
-                                        }
-                                    }}
-                                    className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'hours'
-                                        ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-                                        }`}
-                                >
-                                    שעות
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        if (timeUnit === 'minutes') return
-                                        setTimeUnit('minutes')
-                                        // Convert Hours to Minutes
-                                        const val = parseFloat(newIncome.workTime)
-                                        if (!isNaN(val)) {
-                                            setNewIncome(prev => ({ ...prev, workTime: (val * 60).toFixed(0) }))
-                                        }
-                                    }}
-                                    className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'minutes'
-                                        ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-                                        }`}
-                                >
-                                    דקות
-                                </button>
-                            </div>
-                        </div>
-                        <Input
-                            type="number"
-                            step={timeUnit === 'hours' ? "0.1" : "1"}
-                            min="0"
-                            className="h-10 border-gray-200 focus:ring-green-500/20"
-                            placeholder={timeUnit === 'hours' ? "לדוגמה: 1.5" : "לדוגמה: 90"}
-                            value={newIncome.workTime}
-                            onChange={(e) => {
-                                // Allow decimals only if in hours mode
-                                const val = e.target.value;
-                                if (val === '' || (timeUnit === 'hours' ? /^\d*\.?\d*$/ : /^\d+$/).test(val)) {
-                                    setNewIncome({ ...newIncome, workTime: val });
-                                }
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
+                        <DatePicker
+                            date={newIncome.date ? new Date(newIncome.date) : undefined}
+                            setDate={(date) => {
+                                if (isDemo) { interceptAction(); return; }
+                                setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })
                             }}
+                            fromDate={startOfMonth}
+                            toDate={endOfMonth}
                         />
                     </div>
                 )}
 
-                {/* Payment Method Selector */}
-                <div className="w-full">
-                    <PaymentMethodSelector
-                        value={newIncome.paymentMethod}
-                        onChange={(val) => {
-                            if (isDemo) { interceptAction(); return; }
-                            setNewIncome({ ...newIncome, paymentMethod: val })
-                        }}
-                        color="green"
-                    />
-                </div>
+                {/* Personal Mode: Advanced Settings Toggle */}
+                {!isBusiness && (
+                    <button
+                        type="button"
+                        onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                        className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-full py-2"
+                    >
+                        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAdvancedOpen ? 'rotate-180' : ''}`} />
+                        הגדרות מתקדמות (מומלץ)
+                    </button>
+                )}
 
-                <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
-                    <DatePicker
-                        date={newIncome.date ? new Date(newIncome.date) : undefined}
-                        setDate={(date) => {
-                            if (isDemo) { interceptAction(); return; }
-                            setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })
-                        }}
-                        fromDate={startOfMonth}
-                        toDate={endOfMonth}
-                    />
-                </div>
+                {/* Business Mode (Normal Flow) OR Personal Mode (Advanced & Open) */}
+                {(isBusiness || isAdvancedOpen) && (
+                    <div className={`space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 ${!isBusiness ? 'p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50' : ''}`}>
 
-                {/* Recurring Checkbox */}
-                <div className="flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full">
-                    <div className="flex items-center gap-2">
-                        <Checkbox
-                            id="recurring-income"
-                            checked={newIncome.isRecurring}
-                            onCheckedChange={(checked) => {
-                                const isRecurring = checked as boolean
-                                setNewIncome(prev => ({
-                                    ...prev,
-                                    isRecurring,
-                                    recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
-                                }))
-                            }}
-                            className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                        />
-                        <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הכנסה קבועה</label>
-                    </div>
-                    {newIncome.isRecurring && (
-                        <div className="flex gap-4 flex-1">
-                            <div className="space-y-2 w-full">
-                                <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <RecurringEndDatePicker
-                                    date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
-                                    setDate={(date) => setNewIncome(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
-                                    fromDate={startOfMonth}
-                                    placeholder="בחר תאריך סיום"
+                        {/* Payer / Accepted By */}
+                        <div className={`grid gap-3 w-full ${isBusiness ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+                            {/* Payer Input */}
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל מ... (אופציונלי)</label>
+                                <Input
+                                    className="h-10 border-gray-200 focus:ring-green-500/20 bg-white dark:bg-slate-800"
+                                    placeholder="שם המשלם"
+                                    value={newIncome.payer}
+                                    onFocus={() => isDemo && interceptAction()}
+                                    onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
                                 />
                             </div>
+
+                            {isBusiness && (
+                                <div className="w-full">
+                                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
+                                    <Input className="h-10 border-gray-200 focus:ring-green-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
+                                </div>
+                            )}
                         </div>
-                    )}
-                </div>
+
+                        {isBusiness && (
+                            <div className="w-full">
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="text-xs font-bold text-[#676879] dark:text-gray-300">זמן עבודה</label>
+
+                                    {/* Custom Toggle */}
+                                    <div className="bg-gray-100 dark:bg-slate-800 p-0.5 rounded-lg flex border border-gray-200 dark:border-slate-700">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (timeUnit === 'minutes') return
+                                                setTimeUnit('minutes')
+                                                // Convert Hours to Minutes
+                                                const val = parseFloat(newIncome.workTime)
+                                                if (!isNaN(val)) {
+                                                    setNewIncome(prev => ({ ...prev, workTime: (val * 60).toFixed(0) }))
+                                                }
+                                            }}
+                                            className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'minutes'
+                                                    ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                                                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                                                }`}
+                                        >
+                                            דקות
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (timeUnit === 'hours') return
+                                                setTimeUnit('hours')
+                                                // Convert Minutes to Hours
+                                                const val = parseFloat(newIncome.workTime)
+                                                if (!isNaN(val)) {
+                                                    setNewIncome(prev => ({ ...prev, workTime: (val / 60).toFixed(2).replace(/\.00$/, '') }))
+                                                }
+                                            }}
+                                            className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'hours'
+                                                    ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                                                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                                                }`}
+                                        >
+                                            שעות
+                                        </button>
+                                    </div>
+                                </div>
+                                <Input
+                                    type="number"
+                                    step={timeUnit === 'hours' ? "0.1" : "1"}
+                                    min="0"
+                                    className="h-10 border-gray-200 focus:ring-green-500/20"
+                                    placeholder={timeUnit === 'hours' ? "לדוגמה: 1.5" : "לדוגמה: 90"}
+                                    value={newIncome.workTime}
+                                    onChange={(e) => {
+                                        // Allow decimals only if in hours mode
+                                        const val = e.target.value;
+                                        if (val === '' || (timeUnit === 'hours' ? /^\d*\.?\d*$/ : /^\d+$/).test(val)) {
+                                            setNewIncome({ ...newIncome, workTime: val });
+                                        }
+                                    }}
+                                />
+                            </div>
+                        )}
+
+                        {/* Payment Method Selector */}
+                        <div className="w-full">
+                            <PaymentMethodSelector
+                                value={newIncome.paymentMethod}
+                                onChange={(val) => {
+                                    if (isDemo) { interceptAction(); return; }
+                                    setNewIncome({ ...newIncome, paymentMethod: val })
+                                }}
+                                color="green"
+                            />
+                        </div>
+
+                        {/* Business Mode: Date is here (bottom) */}
+                        {isBusiness && (
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
+                                <DatePicker
+                                    date={newIncome.date ? new Date(newIncome.date) : undefined}
+                                    setDate={(date) => {
+                                        if (isDemo) { interceptAction(); return; }
+                                        setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })
+                                    }}
+                                    fromDate={startOfMonth}
+                                    toDate={endOfMonth}
+                                />
+                            </div>
+                        )}
+
+                        {/* Recurring Checkbox */}
+                        <div className={`flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full ${!isBusiness ? 'bg-white dark:bg-slate-800' : ''}`}>
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    id="recurring-income"
+                                    checked={newIncome.isRecurring}
+                                    onCheckedChange={(checked) => {
+                                        const isRecurring = checked as boolean
+                                        setNewIncome(prev => ({
+                                            ...prev,
+                                            isRecurring,
+                                            recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
+                                        }))
+                                    }}
+                                    className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                                />
+                                <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הכנסה קבועה</label>
+                            </div>
+                            {newIncome.isRecurring && (
+                                <div className="flex gap-4 flex-1">
+                                    <div className="space-y-2 w-full">
+                                        <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
+                                        <RecurringEndDatePicker
+                                            date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
+                                            setDate={(date) => setNewIncome(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
+                                            fromDate={startOfMonth}
+                                            placeholder="בחר תאריך סיום"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 <Button
                     onClick={handleAdd}
