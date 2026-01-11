@@ -113,10 +113,17 @@ export function LinkedEmails() {
                             setReLoginRequired(false)
                             setIsLoading(true)
                             try {
-                                await user.createExternalAccount({
+                                const res = await user.createExternalAccount({
                                     strategy: 'oauth_google',
                                     redirectUrl: '/dashboard?tab=overview&openProfile=true'
                                 })
+
+                                if (res.verification?.externalVerificationRedirectURL) {
+                                    window.location.href = res.verification.externalVerificationRedirectURL.toString()
+                                } else {
+                                    setIsLoading(false)
+                                    toast.error('לא התקבל קישור לאימות. נסה שנית.')
+                                }
                             } catch (err: any) {
                                 setIsLoading(false)
                                 console.error('Google Link Error:', err)
