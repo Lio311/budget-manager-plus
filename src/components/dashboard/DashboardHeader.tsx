@@ -252,6 +252,13 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                 userProfileProps={userProfileProps}
                                 appearance={userButtonAppearance}
                             >
+                                <UserButton.UserProfilePage
+                                    label="מיילים מקושרים"
+                                    labelIcon={<Mail className="w-4 h-4" />}
+                                    url="linked-emails"
+                                >
+                                    <LinkedEmails />
+                                </UserButton.UserProfilePage>
                                 <UserButton.MenuItems>
                                     <UserButton.Action
                                         label="מנוי"
