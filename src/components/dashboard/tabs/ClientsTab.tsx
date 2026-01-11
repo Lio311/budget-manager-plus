@@ -379,22 +379,7 @@ export function ClientsTab() {
                                 className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                מיקום האירוע / שירות (אופציונלי)
-                            </label>
-                            <div className="relative">
-                                <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                                <input
-                                    type="text"
-                                    value={formData.eventLocation || ''}
-                                    onChange={(e) => setFormData({ ...formData, eventLocation: e.target.value })}
-                                    placeholder="לדוגמה: אולם אירועים, משרדי החברה"
-                                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                                />
-                            </div>
-                            <p className="text-xs text-gray-500 mt-1">מלא רק במידה והשירות ניתן פיזית במיקום מסויים</p>
-                        </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 הערות
@@ -570,6 +555,23 @@ export function ClientsTab() {
                                             className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.taxId ? 'border-red-500' : 'border-gray-300'}`}
                                         />
                                         <p className="text-xs text-gray-500 mt-1">שדה רשות - נדרש רק עבור הפקת חשבוניות מס ללקוח עסקי</p>
+                                    </div>
+
+                                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            מיקום האירוע / שירות (אופציונלי)
+                                        </label>
+                                        <div className="relative">
+                                            <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                            <input
+                                                type="text"
+                                                value={formData.eventLocation || ''}
+                                                onChange={(e) => setFormData({ ...formData, eventLocation: e.target.value })}
+                                                placeholder="לדוגמה: אולם אירועים, משרדי החברה"
+                                                className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                                            />
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">מלא רק במידה והשירות ניתן פיזית במיקום מסויים</p>
                                     </div>
                                 </div>
                             )}
