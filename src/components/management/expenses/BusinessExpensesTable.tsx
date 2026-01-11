@@ -53,7 +53,6 @@ export function BusinessExpensesTable({
         description: '',
         amount: '',
         category: 'פיתוח',
-        category: 'פיתוח',
         date: new Date(),
         responsibles: ['RON']
     })
@@ -81,8 +80,6 @@ export function BusinessExpensesTable({
                 description: formData.description,
                 amount: parseFloat(formData.amount),
                 category: formData.category,
-                amount: parseFloat(formData.amount),
-                category: formData.category,
                 date: formData.date,
                 responsibles: formData.responsibles
             })
@@ -94,7 +91,6 @@ export function BusinessExpensesTable({
                 setFormData({
                     description: '',
                     amount: '',
-                    category: 'Marketing',
                     category: 'Marketing',
                     date: new Date(),
                     responsibles: ['RON']
@@ -119,8 +115,6 @@ export function BusinessExpensesTable({
                 description: formData.description,
                 amount: parseFloat(formData.amount),
                 category: formData.category,
-                amount: parseFloat(formData.amount),
-                category: formData.category,
                 date: formData.date,
                 responsibles: formData.responsibles
             })
@@ -133,7 +127,6 @@ export function BusinessExpensesTable({
                 setFormData({
                     description: '',
                     amount: '',
-                    category: 'Marketing',
                     category: 'Marketing',
                     date: new Date(),
                     responsibles: ['RON']
@@ -168,7 +161,6 @@ export function BusinessExpensesTable({
         setFormData({
             description: expense.description,
             amount: expense.amount.toString(),
-            category: expense.category,
             category: expense.category,
             date: new Date(expense.date),
             responsibles: expense.responsibles || ['RON']
