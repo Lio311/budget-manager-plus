@@ -140,7 +140,14 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
         if (aDone && !bDone) return 1
         if (!aDone && bDone) return -1
 
-        // 2. Sort by Priority (Higher first)
+        // 2. If both are DONE, sort by completedAt (Newest first)
+        if (aDone && bDone) {
+            const dateA = a.completedAt ? new Date(a.completedAt).getTime() : 0
+            const dateB = b.completedAt ? new Date(b.completedAt).getTime() : 0
+            return dateB - dateA
+        }
+
+        // 3. If both are Active, Sort by Priority (Higher first)
         const weightA = getPriorityWeight(a.priority)
         const weightB = getPriorityWeight(b.priority)
         return weightB - weightA

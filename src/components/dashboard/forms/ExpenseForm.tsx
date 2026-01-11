@@ -106,6 +106,12 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         }
     }, [newExpense.amount, newExpense.vatRate, isBusiness])
 
+    // Effect to auto-select first category when categories load if no category is selected
+    useEffect(() => {
+        if (!newExpense.category && categories.length > 0) {
+            setNewExpense(prev => ({ ...prev, category: categories[0].name }))
+        }
+    }, [categories])
 
 
     // Deep Linking: Pre-fill form from URL parameters
