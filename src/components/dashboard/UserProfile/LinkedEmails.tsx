@@ -43,6 +43,9 @@ export function LinkedEmails() {
                 toast.error('לא ניתן למחוק מייל זה משום שהוא מקושר לחשבון Google. יש לנתק את חשבון ה-Google קודם לכן.')
             } else if (err.errors?.[0]?.message?.includes('last')) {
                 toast.error('לא ניתן למחוק את אמצעי ההתחברות האחרון.')
+            } else if (err.errors?.[0]?.code === 'session_step_up_verification_required' || err.message?.includes('verification')) {
+                setError('למען אבטחת חשבונך, נדרשת התחברות מחדש לפני מחיקת פרטי זיהוי.')
+                setReLoginRequired(true)
             } else {
                 toast.error('שגיאה בהסרת המייל: ' + (err.errors?.[0]?.message || 'שגיאה לא ידועה'))
             }
@@ -62,7 +65,12 @@ export function LinkedEmails() {
             }
         } catch (err: any) {
             console.error('Disconnect Error:', err)
-            toast.error('שגיאה בניתוק החשבון')
+            if (err.errors?.[0]?.code === 'session_step_up_verification_required' || err.message?.includes('verification')) {
+                setError('למען אבטחת חשבונך, נדרשת התחברות מחדש לפני מחיקת חשבון מקושר.')
+                setReLoginRequired(true)
+            } else {
+                toast.error('שגיאה בניתוק החשבון')
+            }
         }
     }
 
