@@ -327,7 +327,8 @@ export function BusinessExpensesTable({
                                                     description: '',
                                                     amount: '',
                                                     category: 'פיתוח',
-                                                    date: new Date()
+                                                    date: new Date(),
+                                                    responsibles: ['RON']
                                                 })
                                             }}
                                         >
