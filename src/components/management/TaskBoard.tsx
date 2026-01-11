@@ -28,7 +28,8 @@ import {
     Filter,
     Clock,
     Trash2,
-    Edit
+    Edit,
+    ChevronDown
 } from 'lucide-react'
 import { updateTask, deleteTask } from '@/lib/actions/management'
 
@@ -69,6 +70,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
     const [statusFilter, setStatusFilter] = useState<string>('ALL')
     const [priorityFilter, setPriorityFilter] = useState<string>('ALL')
     const [editingTask, setEditingTask] = useState<Task | null>(null)
+    const [showCompleted, setShowCompleted] = useState(false)
 
     const handleDeleteTask = async (taskId: string) => {
         if (!confirm('האם אתה בטוח שברצונך למחוק משימה זו?')) return
@@ -143,6 +145,125 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
         const weightB = getPriorityWeight(b.priority)
         return weightB - weightA
     })
+
+    const activeTasks = filteredTasks.filter(t => t.status !== 'DONE')
+    const completedTasks = filteredTasks.filter(t => t.status === 'DONE')
+
+    const renderTaskRow = (task: Task) => (
+        <motion.div
+            key={task.id}
+            layout
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="grid grid-cols-12 gap-4 p-3 items-center hover:bg-gray-50/50 transition-colors group"
+        >
+            <div className="col-span-1 flex justify-center flex-col items-center gap-1">
+                <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }} />
+                {/* Priority Indicator */}
+                {task.priority === 'CRITICAL' && (
+                    <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse" title="דחיפות קריטית!" />
+                )}
+            </div>
+            <div className="col-span-11 sm:col-span-3 flex items-center gap-3">
+                <span className={`font-medium text-sm line-clamp-2 leading-tight ${task.status === 'DONE' ? 'text-gray-400 line-through' : 'text-gray-800'}`} title={task.title}>{task.title}</span>
+            </div>
+
+            <div className="col-span-3 hidden lg:flex items-center justify-center">
+                <span className="text-xs text-gray-500 truncate" title={task.description || ''}>
+                    {task.description || '-'}
+                </span>
+            </div>
+
+            <div className="col-span-1 hidden sm:flex justify-center flex-col items-center">
+                <span className="text-xs text-gray-500">{format(new Date(task.createdAt), 'dd/MM')}</span>
+            </div>
+
+            <div className="col-span-1 hidden sm:flex justify-center">
+                {task.dueDate ? (
+                    (() => {
+                        const isDone = task.status === 'DONE'
+                        const isOverdue = !isDone && isBefore(new Date(task.dueDate), startOfDay(new Date()))
+
+                        return (
+                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${isOverdue ? 'text-red-600 font-bold bg-red-50' : 'text-gray-600 bg-gray-50'}`}>
+                                {format(new Date(task.dueDate), 'dd/MM')}
+                            </div>
+                        )
+                    })()
+                ) : (
+                    <span className="text-gray-300 text-xs">-</span>
+                )}
+            </div>
+
+            <div className="col-span-1 hidden sm:flex justify-center -space-x-2 space-x-reverse">
+                {task.assignees && task.assignees.length > 0 ? (
+                    task.assignees.map((assignee, idx) => (
+                        <div key={idx} className="relative w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm" title={assignee}>
+                            {assignee === 'Leon' ? (
+                                <img src="/images/team/leon.png" alt="Leon" className="w-full h-full object-cover" />
+                            ) : assignee === 'Lior' ? (
+                                <img src="/images/team/lior-profile.jpg" alt="Lior" className="w-full h-full object-cover object-top" />
+                            ) : assignee === 'Ron' ? (
+                                <img src="/images/team/ron.png" alt="Ron" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                                    {assignee.charAt(0)}
+                                </div>
+                            )}
+                        </div>
+                    ))
+                ) : (
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 border border-dashed border-gray-300">
+                        <UserIcon size={14} />
+                    </div>
+                )}
+            </div>
+            <div className="col-span-1 hidden sm:block">
+                <Select
+                    value={task.status}
+                    onValueChange={(val) => handleStatusChange(task.id, val)}
+                >
+                    <SelectTrigger
+                        className="h-7 w-full border-none text-white text-[10px] font-bold px-1 justify-center rounded-sm"
+                        style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }}
+                    >
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="TODO">לביצוע</SelectItem>
+                        <SelectItem value="IN_PROGRESS">בעבודה</SelectItem>
+                        <SelectItem value="REVIEW">בבדיקה</SelectItem>
+                        <SelectItem value="STUCK">תקוע</SelectItem>
+                        <SelectItem value="DONE">בוצע</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            {/* Actions Column */}
+            <div className="col-span-1 hidden sm:flex justify-center">
+                <div className="flex items-center gap-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                        onClick={() => setEditingTask(task)}
+                        title="ערוך"
+                    >
+                        <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => handleDeleteTask(task.id)}
+                        title="מחק"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </div>
+            </div>
+        </motion.div>
+    )
 
     return (
         <div className="space-y-6">
@@ -225,122 +346,46 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                 {/* Rows */}
                 <div className="divide-y divide-gray-100">
                     <AnimatePresence>
-                        {filteredTasks.map((task) => (
-                            <motion.div
-                                key={task.id}
-                                layout
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="grid grid-cols-12 gap-4 p-3 items-center hover:bg-gray-50/50 transition-colors group"
-                            >
-                                <div className="col-span-1 flex justify-center flex-col items-center gap-1">
-                                    <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }} />
-                                    {/* Priority Indicator */}
-                                    {task.priority === 'CRITICAL' && (
-                                        <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse" title="דחיפות קריטית!" />
-                                    )}
-                                </div>
-                                <div className="col-span-11 sm:col-span-3 flex items-center gap-3">
-                                    <span className="font-medium text-gray-800 text-sm line-clamp-2 leading-tight" title={task.title}>{task.title}</span>
-                                </div>
-
-                                <div className="col-span-3 hidden lg:flex items-center justify-center">
-                                    <span className="text-xs text-gray-500 truncate" title={task.description || ''}>
-                                        {task.description || '-'}
-                                    </span>
-                                </div>
-
-                                <div className="col-span-1 hidden sm:flex justify-center flex-col items-center">
-                                    <span className="text-xs text-gray-500">{format(new Date(task.createdAt), 'dd/MM')}</span>
-                                </div>
-
-                                <div className="col-span-1 hidden sm:flex justify-center">
-                                    {task.dueDate ? (
-                                        (() => {
-                                            const isDone = task.status === 'DONE'
-                                            const isOverdue = !isDone && isBefore(new Date(task.dueDate), startOfDay(new Date()))
-
-                                            return (
-                                                <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs ${isOverdue ? 'text-red-600 font-bold bg-red-50' : 'text-gray-600 bg-gray-50'}`}>
-                                                    {format(new Date(task.dueDate), 'dd/MM')}
-                                                </div>
-                                            )
-                                        })()
-                                    ) : (
-                                        <span className="text-gray-300 text-xs">-</span>
-                                    )}
-                                </div>
-
-                                <div className="col-span-1 hidden sm:flex justify-center -space-x-2 space-x-reverse">
-                                    {task.assignees && task.assignees.length > 0 ? (
-                                        task.assignees.map((assignee, idx) => (
-                                            <div key={idx} className="relative w-8 h-8 rounded-full overflow-hidden border border-white shadow-sm" title={assignee}>
-                                                {assignee === 'Leon' ? (
-                                                    <img src="/images/team/leon.png" alt="Leon" className="w-full h-full object-cover" />
-                                                ) : assignee === 'Lior' ? (
-                                                    <img src="/images/team/lior-profile.jpg" alt="Lior" className="w-full h-full object-cover object-top" />
-                                                ) : assignee === 'Ron' ? (
-                                                    <img src="/images/team/ron.png" alt="Ron" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
-                                                        {assignee.charAt(0)}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 border border-dashed border-gray-300">
-                                            <UserIcon size={14} />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="col-span-1 hidden sm:block">
-                                    <Select
-                                        value={task.status}
-                                        onValueChange={(val) => handleStatusChange(task.id, val)}
-                                    >
-                                        <SelectTrigger
-                                            className="h-7 w-full border-none text-white text-[10px] font-bold px-1 justify-center rounded-sm"
-                                            style={{ backgroundColor: STATUS_COLORS[task.status] || '#ccc' }}
-                                        >
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="TODO">לביצוע</SelectItem>
-                                            <SelectItem value="IN_PROGRESS">בעבודה</SelectItem>
-                                            <SelectItem value="REVIEW">בבדיקה</SelectItem>
-                                            <SelectItem value="STUCK">תקוע</SelectItem>
-                                            <SelectItem value="DONE">בוצע</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                {/* Actions Column */}
-                                <div className="col-span-1 hidden sm:flex justify-center">
-                                    <div className="flex items-center gap-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
-                                            onClick={() => setEditingTask(task)}
-                                            title="ערוך"
-                                        >
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50"
-                                            onClick={() => handleDeleteTask(task.id)}
-                                            title="מחק"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                        {activeTasks.map((task) => renderTaskRow(task))}
                     </AnimatePresence>
+
+                    {/* Completed Tasks Accordion */}
+                    {completedTasks.length > 0 && (
+                        <div className="bg-gray-50/30">
+                            <button
+                                onClick={() => setShowCompleted(!showCompleted)}
+                                className="w-full flex items-center justify-between p-3 px-4 text-xs font-semibold text-gray-500 hover:bg-gray-100/50 transition-colors border-t border-gray-100"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <div className={`transition-transform duration-200 ${showCompleted ? 'rotate-180' : ''}`}>
+                                        <ChevronDown className="w-4 h-4" />
+                                    </div>
+                                    <span>משימות שהושלמו ({completedTasks.length})</span>
+                                </div>
+                                {!showCompleted && (
+                                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                        לחץ להצגה
+                                    </span>
+                                )}
+                            </button>
+
+                            <AnimatePresence>
+                                {showCompleted && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="overflow-hidden"
+                                    >
+                                        <div className="divide-y divide-gray-100 border-t border-gray-100">
+                                            {completedTasks.map((task) => renderTaskRow(task))}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    )}
 
                     {filteredTasks.length === 0 && (
                         <div className="p-8 text-center text-gray-400">
