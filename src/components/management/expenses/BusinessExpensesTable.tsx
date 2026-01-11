@@ -57,8 +57,6 @@ export function BusinessExpensesTable({
         responsibles: ['RON']
     })
 
-    const categories = ['פיתוח', 'אבטחה', 'בדיקות', 'שיווק', 'פיתוח עסקי', 'General', 'Marketing', 'Hosting', 'Legal', 'Office']
-
     // Team Member Data
     const TEAM_MEMBERS: Record<string, { name: string, avatar: string, color: string }> = {
         'RON': { name: 'רון', avatar: '/images/team/ron.png', color: 'bg-indigo-500' },
@@ -339,8 +337,8 @@ export function BusinessExpensesTable({
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent dir="rtl" className="text-right min-w-[150px]">
-                                                {categories.map(c => (
-                                                    <SelectItem key={c} value={c} className="pr-8">{c}</SelectItem>
+                                                {Object.entries(categoryMap).map(([key, label]) => (
+                                                    <SelectItem key={key} value={key} className="pr-8">{label}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
@@ -382,12 +380,81 @@ export function BusinessExpensesTable({
                                                     onClick={() => {
                                                         const current = formData.responsibles || ['RON']
                                                         let next = []
+
+                                                        // 1. Toggle the person
                                                         if (current.includes(person)) {
                                                             if (current.length === 1) return // Prevent empty
                                                             next = current.filter(p => p !== person)
                                                         } else {
                                                             next = [...current, person]
                                                         }
+
+                                                        // 2. Enforce Logic: "Lior can be chosen either alone or as part of a trio"
+                                                        const hasLior = next.includes('LIOR')
+                                                        const count = next.length
+
+                                                        // If Lior is present, he cannot be with just 1 other person (size 2 is invalid)
+                                                        if (hasLior && count === 2) {
+                                                            // We arrived at 2. We need 1 or 3.
+                                                            // Case A: We just ADDED someone to LIOR (was [LIOR] -> [LIOR, X])
+                                                            // Case B: We just ADDED LIOR to someone (was [X] -> [X, LIOR])
+                                                            // Solution: Upgrade to Trio ([RON, LEON, LIOR])
+                                                            next = ['RON', 'LEON', 'LIOR']
+                                                        }
+
+                                                        // If we removed someone from Trio and left with 2 including Lior (e.g. [LIOR, X]),
+                                                        // handled above? No, wait.
+                                                        // If we were [A, B, LIOR] and removed A -> [B, LIOR]. Size 2.
+                                                        // In this case, maybe we should just remove LIOR as well? Or go back to LIOR alone?
+                                                        // "Lior can be chosen either alone or as part of a trio"
+                                                        // Let's assume if we break the trio, we likely want the remaining pair WITHOUT Lior, or Lior ALONE.
+                                                        // If I uncheck Ron from [Ron, Leon, Lior], I get [Leon, Lior].
+                                                        // If I enforce rules... maybe I should just forbid Lior + 1.
+
+                                                        // Let's refine the logic block:
+                                                        if (hasLior && count === 2) {
+                                                            // If we came from 3 (Trio) -> 2:
+                                                            if (current.length === 3) {
+                                                                // User removed someone. We are left with Lior + 1.
+                                                                // Invalid state. Auto-remove Lior too? -> [1].
+                                                                // Or Auto-remove the 1? -> [Lior].
+                                                                // Let's try: If user unchecks X from Trio, they probably want the Pair without Lior (since Lior can't be in pair).
+                                                                // Wait, Lior CANNOT be in pair. 
+                                                                // So if I uncheck Ron from [Ron, Leon, Lior], I have [Leon, Lior] -> Invalid.
+                                                                // I should probably convert to [Leon] (remove Lior) or [Lior] (remove Leon).
+                                                                // Let's defaulting to [Lior] alone if we break the trio? Or the other person alone?
+                                                                // Let's stick to the "Upgrade to Trio" when building up.
+                                                                // When breaking down:
+                                                                next = ['RON', 'LEON', 'LIOR'] // Lock to trio? No, that prevents unchecking.
+
+                                                                // Better Logic:
+                                                                // If Result has Lior and length is 2:
+                                                                // Check who was clicked.
+                                                                if (person === 'LIOR') {
+                                                                    // Clicked Lior (Added him to 1 person) -> Upgrade to Trio
+                                                                    next = ['RON', 'LEON', 'LIOR']
+                                                                } else {
+                                                                    // Clicked someone else (Added them to Lior OR Removed them from Trio)
+                                                                    if (current.length === 1 && current[0] === 'LIOR') {
+                                                                        // Added X to Lior -> Upgrade to Trio
+                                                                        next = ['RON', 'LEON', 'LIOR']
+                                                                    } else if (current.length === 3) {
+                                                                        // Removed X from Trio -> Left with Lior + Y.
+                                                                        // Since Lior can't be with Y, and we explicitly removed X, 
+                                                                        // let's assume user wants to keep Y and remove Lior? 
+                                                                        // Or keep Lior and remove Y?
+                                                                        // Let's enable the "Pair" (Ron+Leon) if Lior was the one implied to leave? 
+                                                                        // No, Lior is still in `next`.
+                                                                        // Let's just remove Lior whenever strictly 2 remains?
+                                                                        next = next.filter(p => p !== 'LIOR')
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                // Came from 1 -> 2. Upgrade to 3.
+                                                                next = ['RON', 'LEON', 'LIOR']
+                                                            }
+                                                        }
+
                                                         setFormData({ ...formData, responsibles: next })
                                                     }}
                                                     className={`
@@ -427,7 +494,7 @@ export function BusinessExpensesTable({
                                                 setFormData({
                                                     description: '',
                                                     amount: '',
-                                                    category: 'פיתוח',
+                                                    category: 'Development', // Valid key
                                                     date: new Date(),
                                                     responsibles: ['RON']
                                                 })
@@ -490,8 +557,8 @@ export function BusinessExpensesTable({
                         </SelectTrigger>
                         <SelectContent dir="rtl" className="text-right min-w-[150px]">
                             <SelectItem value="ALL" className="pr-8">כל הקטגוריות</SelectItem>
-                            {categories.map(c => (
-                                <SelectItem key={c} value={c} className="pr-8">{c}</SelectItem>
+                            {Object.entries(categoryMap).map(([key, label]) => (
+                                <SelectItem key={key} value={key} className="pr-8">{label}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
