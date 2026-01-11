@@ -162,7 +162,7 @@ export function ClientsTab() {
             phone: client.phone || '',
             taxId: client.taxId || '',
             address: client.address || '',
-            address: client.address || '',
+
             notes: client.notes || '',
             packageName: client.packageName || '',
             subscriptionType: client.subscriptionType || '',
