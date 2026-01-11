@@ -222,23 +222,6 @@ export function LinkedEmails() {
                             חבר חשבון Google
                         </Button>
 
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-background px-2 text-muted-foreground">או</span>
-                            </div>
-                        </div>
-
-                        <Button
-                            variant="ghost"
-                            className="w-full border-dashed border text-muted-foreground hover:text-primary"
-                            onClick={() => setIsAdding(true)}
-                        >
-                            <Plus className="w-4 h-4 ml-2" />
-                            הוסף מייל ידנית
-                        </Button>
                     </div>
                 )}
 
