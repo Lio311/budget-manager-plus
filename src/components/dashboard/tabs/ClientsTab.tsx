@@ -48,6 +48,7 @@ export function ClientsTab() {
         subscriptionStatus: ''
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
+    const [isAddingPackage, setIsAddingPackage] = useState(false)
 
     const validateForm = () => {
         const result = ClientSchema.safeParse(formData)
@@ -224,6 +225,7 @@ export function ClientsTab() {
                         setErrors({})
                         setEditingClient(null)
                         setErrors({})
+                        setIsAddingPackage(false)
                         setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '' })
                     }}
                     className="bg-green-600 hover:bg-green-700"
@@ -344,13 +346,54 @@ export function ClientsTab() {
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                                 שם חבילה / שירות
                                             </label>
-                                            <input
-                                                type="text"
-                                                placeholder="לדוגמה: מנוי פרימיום, ריטיינר שעות"
-                                                value={formData.packageName || ''}
-                                                onChange={(e) => setFormData({ ...formData, packageName: e.target.value })}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                                            />
+                                            {isAddingPackage ? (
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="הזן שם חבילה חדש"
+                                                        value={formData.packageName || ''}
+                                                        onChange={(e) => setFormData({ ...formData, packageName: e.target.value })}
+                                                        autoFocus
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => {
+                                                            setIsAddingPackage(false)
+                                                            setFormData({ ...formData, packageName: '' })
+                                                        }}
+                                                        title="ביטול"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-gray-500" />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <Select
+                                                    value={formData.packageName || ''}
+                                                    onValueChange={(value) => {
+                                                        if (value === 'NEW') {
+                                                            setIsAddingPackage(true)
+                                                            setFormData({ ...formData, packageName: '' })
+                                                        } else {
+                                                            setFormData({ ...formData, packageName: value })
+                                                        }
+                                                    }}
+                                                >
+                                                    <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700">
+                                                        <SelectValue placeholder="בחר חבילה או צור חדשה" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {Array.from(new Set(clients.map((c: any) => c.packageName).filter(Boolean))).map((pkg: any) => (
+                                                            <SelectItem key={pkg} value={pkg}>{pkg}</SelectItem>
+                                                        ))}
+                                                        <SelectItem value="NEW" className="text-green-600 font-medium">
+                                                            + הוסף חדש
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
