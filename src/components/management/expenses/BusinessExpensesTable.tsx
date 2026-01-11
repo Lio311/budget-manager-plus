@@ -105,125 +105,6 @@ export function BusinessExpensesTable({
         return split
     }
 
-    // Calculate Totals per Person
-    const personTotals = filteredExpenses.reduce((acc, expense) => {
-        const split = calculateSplit(expense.amount, expense.responsibles || ['RON'])
-        acc['RON'] += split['RON'] || 0
-        acc['LEON'] += split['LEON'] || 0
-        acc['LIOR'] += split['LIOR'] || 0
-        return acc
-    }, { 'RON': 0, 'LEON': 0, 'LIOR': 0 })
-
-
-    const categoryMap: Record<string, string> = {
-        'Marketing': 'שיווק',
-        'General': 'כללי',
-        'Hosting': 'אחסון/שרתים',
-        'Legal': 'משפטי',
-        'Office': 'משרדי',
-        'Development': 'פיתוח',
-        'Security': 'אבטחה',
-        'QA': 'בדיקות',
-        'BizDev': 'פיתוח עסקי'
-    }
-
-    const handleCreate = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-
-        try {
-            const res = await createBusinessExpense({
-                description: formData.description,
-                amount: parseFloat(formData.amount),
-                category: formData.category,
-                date: formData.date,
-                responsibles: formData.responsibles
-            })
-
-            if (res.success) {
-                toast.success('ההוצאה נוספה בהצלחה')
-                setExpenses([res.data, ...expenses])
-                setIsDialogOpen(false)
-                setFormData({
-                    description: '',
-                    amount: '',
-                    category: 'Marketing',
-                    date: new Date(),
-                    responsibles: ['RON']
-                })
-            } else {
-                toast.error('שגיאה בהוספת ההוצאה')
-            }
-        } catch (error) {
-            toast.error('שגיאה לא צפויה')
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const handleUpdate = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!editingExpense) return
-        setLoading(true)
-
-        try {
-            const res = await updateBusinessExpense(editingExpense.id, {
-                description: formData.description,
-                amount: parseFloat(formData.amount),
-                category: formData.category,
-                date: formData.date,
-                responsibles: formData.responsibles
-            })
-
-            if (res.success) {
-                toast.success('ההוצאה עודכנה בהצלחה')
-                setExpenses(expenses.map(e => e.id === editingExpense.id ? res.data : e))
-                setIsDialogOpen(false)
-                setEditingExpense(null)
-                setFormData({
-                    description: '',
-                    amount: '',
-                    category: 'Marketing',
-                    date: new Date(),
-                    responsibles: ['RON']
-                })
-            } else {
-                toast.error('שגיאה בעדכון ההוצאה')
-            }
-        } catch (error) {
-            toast.error('שגיאה לא צפויה')
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const handleDelete = async (id: string) => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) return
-
-        const oldExpenses = [...expenses]
-        setExpenses(expenses.filter(e => e.id !== id))
-
-        const res = await deleteBusinessExpense(id)
-        if (!res.success) {
-            toast.error('שגיאה במחיקת ההוצאה')
-            setExpenses(oldExpenses)
-        } else {
-            toast.success('ההוצאה נמחקה')
-        }
-    }
-
-    const handleEdit = (expense: any) => {
-        setEditingExpense(expense)
-        setFormData({
-            description: expense.description,
-            amount: expense.amount.toString(),
-            category: expense.category,
-            date: new Date(expense.date),
-            responsibles: expense.responsibles || ['RON']
-        })
-        setIsDialogOpen(true)
-    }
-
     const filteredExpenses = expenses.filter(e => {
         const matchSearch = e.description.toLowerCase().includes(search.toLowerCase()) ||
             e.category.toLowerCase().includes(search.toLowerCase())
@@ -232,6 +113,15 @@ export function BusinessExpensesTable({
     })
 
     const totalAmount = filteredExpenses.reduce((sum, e) => sum + e.amount, 0)
+
+    // Calculate Totals per Person
+    const personTotals = filteredExpenses.reduce((acc, expense) => {
+        const split = calculateSplit(expense.amount, expense.responsibles || ['RON'])
+        acc['RON'] += split['RON'] || 0
+        acc['LEON'] += split['LEON'] || 0
+        acc['LIOR'] += split['LIOR'] || 0
+        return acc
+    }, { 'RON': 0, 'LEON': 0, 'LIOR': 0 })
 
     return (
         <div className="space-y-6">
