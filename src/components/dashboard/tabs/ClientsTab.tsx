@@ -427,8 +427,8 @@ export function ClientsTab() {
                                         </div>
 
                                     </div>
-                                    </div>
-                                    
+
+
                                     <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700">
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                             ח.פ / ע.מ (ללקוחות עסקיים)
@@ -469,108 +469,108 @@ export function ClientsTab() {
                     </form>
                 </div >
             )
-}
+            }
 
-{/* Clients List */ }
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    {filteredClients.map((client: any) => (
-        <div
-            key={client.id}
-            className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700"
-        >
-            <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-green-600" />
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{client.name}</h3>
-                </div>
-                <div className="flex gap-1">
-                    <button
-                        onClick={() => handleEdit(client)}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+            {/* Clients List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredClients.map((client: any) => (
+                    <div
+                        key={client.id}
+                        className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700"
                     >
-                        <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                    </button>
-                    <button
-                        onClick={() => handleDelete(client.id)}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
-                    >
-                        <Trash2 className="h-4 w-4 text-red-600" />
-                    </button>
-                </div>
+                        <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-2">
+                                <Building2 className="h-5 w-5 text-green-600" />
+                                <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{client.name}</h3>
+                            </div>
+                            <div className="flex gap-1">
+                                <button
+                                    onClick={() => handleEdit(client)}
+                                    className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                >
+                                    <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(client.id)}
+                                    className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                >
+                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Smart Status Badges */}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            {client.packageName && (
+                                <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                                    {client.packageName}
+                                </Badge>
+                            )}
+
+                            {client.subscriptionStatus === 'PAID' && (
+                                <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50">שולם</Badge>
+                            )}
+                            {client.subscriptionStatus === 'UNPAID' && (
+                                <Badge variant="destructive">לא שולם</Badge>
+                            )}
+                            {client.subscriptionStatus === 'PARTIAL' && (
+                                <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50">שולם חלקית</Badge>
+                            )}
+                            {client.subscriptionStatus === 'INSTALLMENTS' && (
+                                <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50">בתשלומים</Badge>
+                            )}
+
+                            {/* Expiration Warning */}
+                            {client.subscriptionEnd && (() => {
+                                const daysLeft = differenceInDays(new Date(client.subscriptionEnd), new Date())
+                                if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
+                                if (daysLeft <= 7) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
+                                if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
+                                return null
+                            })()}
+                        </div>
+
+                        {client.taxId && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ח.פ: {client.taxId}</p>
+                        )}
+
+                        {client.email && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                <Mail className="h-4 w-4" />
+                                <span>{client.email}</span>
+                            </div>
+                        )}
+
+                        {client.phone && (
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                <Phone className="h-4 w-4" />
+                                <span>{client.phone}</span>
+                            </div>
+                        )}
+
+                        <div className="border-t pt-3 mt-3 dark:border-slate-700">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600 dark:text-gray-400">סה"כ הכנסות:</span>
+                                <span className="font-semibold text-green-600">
+                                    ₪{client.totalRevenue?.toLocaleString() || 0}
+                                </span>
+                            </div>
+                            <div className="flex justify-between text-sm mt-1">
+                                <span className="text-gray-600 dark:text-gray-400">עסקאות:</span>
+                                <span className="font-semibold dark:text-gray-200">{client._count?.incomes || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
 
-            {/* Smart Status Badges */}
-            <div className="flex flex-wrap gap-2 mb-3">
-                {client.packageName && (
-                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
-                        {client.packageName}
-                    </Badge>
-                )}
-
-                {client.subscriptionStatus === 'PAID' && (
-                    <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50">שולם</Badge>
-                )}
-                {client.subscriptionStatus === 'UNPAID' && (
-                    <Badge variant="destructive">לא שולם</Badge>
-                )}
-                {client.subscriptionStatus === 'PARTIAL' && (
-                    <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50">שולם חלקית</Badge>
-                )}
-                {client.subscriptionStatus === 'INSTALLMENTS' && (
-                    <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50">בתשלומים</Badge>
-                )}
-
-                {/* Expiration Warning */}
-                {client.subscriptionEnd && (() => {
-                    const daysLeft = differenceInDays(new Date(client.subscriptionEnd), new Date())
-                    if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
-                    if (daysLeft <= 7) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
-                    if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
-                    return null
-                })()}
-            </div>
-
-            {client.taxId && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ח.פ: {client.taxId}</p>
-            )}
-
-            {client.email && (
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    <Mail className="h-4 w-4" />
-                    <span>{client.email}</span>
-                </div>
-            )}
-
-            {client.phone && (
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    <Phone className="h-4 w-4" />
-                    <span>{client.phone}</span>
-                </div>
-            )}
-
-            <div className="border-t pt-3 mt-3 dark:border-slate-700">
-                <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">סה"כ הכנסות:</span>
-                    <span className="font-semibold text-green-600">
-                        ₪{client.totalRevenue?.toLocaleString() || 0}
-                    </span>
-                </div>
-                <div className="flex justify-between text-sm mt-1">
-                    <span className="text-gray-600 dark:text-gray-400">עסקאות:</span>
-                    <span className="font-semibold dark:text-gray-200">{client._count?.incomes || 0}</span>
-                </div>
-            </div>
-        </div>
-    ))}
-</div>
-
-{
-    filteredClients.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
-            {searchTerm ? 'לא נמצאו לקוחות' : 'אין לקוחות עדיין. הוסף לקוח חדש כדי להתחיל.'}
-        </div>
-    )
-}
+            {
+                filteredClients.length === 0 && (
+                    <div className="text-center py-12 text-gray-500">
+                        {searchTerm ? 'לא נמצאו לקוחות' : 'אין לקוחות עדיין. הוסף לקוח חדש כדי להתחיל.'}
+                    </div>
+                )
+            }
         </div >
     )
 }
