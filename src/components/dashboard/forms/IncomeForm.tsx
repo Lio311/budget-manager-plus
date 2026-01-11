@@ -63,6 +63,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
+    const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes')
 
     const [newIncome, setNewIncome] = useState({
         source: '',
@@ -169,7 +170,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 vatAmount: isBusiness ? parseFloat(newIncome.vatAmount) : undefined,
                 paymentMethod: newIncome.paymentMethod || undefined,
                 payer: newIncome.payer || undefined,
-                workTime: newIncome.workTime || undefined,
+                workTime: timeUnit === 'minutes' && newIncome.workTime
+                    ? (parseFloat(newIncome.workTime) / 60).toFixed(2)
+                    : (newIncome.workTime || undefined),
                 acceptedBy: newIncome.acceptedBy || undefined
             })
 
@@ -368,17 +371,60 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
                 {isBusiness && (
                     <div className="w-full">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">זמן עבודה (דקות בלבד)</label>
+                        <div className="flex items-center justify-between mb-1.5">
+                            <label className="text-xs font-bold text-[#676879] dark:text-gray-300">זמן עבודה</label>
+
+                            {/* Custom Toggle */}
+                            <div className="bg-gray-100 dark:bg-slate-800 p-0.5 rounded-lg flex rtl:flex-row-reverse border border-gray-200 dark:border-slate-700">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (timeUnit === 'hours') return
+                                        setTimeUnit('hours')
+                                        // Convert Minutes to Hours
+                                        const val = parseFloat(newIncome.workTime)
+                                        if (!isNaN(val)) {
+                                            setNewIncome(prev => ({ ...prev, workTime: (val / 60).toFixed(2).replace(/\.00$/, '') }))
+                                        }
+                                    }}
+                                    className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'hours'
+                                        ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                                        }`}
+                                >
+                                    שעות
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (timeUnit === 'minutes') return
+                                        setTimeUnit('minutes')
+                                        // Convert Hours to Minutes
+                                        const val = parseFloat(newIncome.workTime)
+                                        if (!isNaN(val)) {
+                                            setNewIncome(prev => ({ ...prev, workTime: (val * 60).toFixed(0) }))
+                                        }
+                                    }}
+                                    className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'minutes'
+                                        ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                                        }`}
+                                >
+                                    דקות
+                                </button>
+                            </div>
+                        </div>
                         <Input
                             type="number"
+                            step={timeUnit === 'hours' ? "0.1" : "1"}
                             min="0"
                             className="h-10 border-gray-200 focus:ring-green-500/20"
-                            placeholder="לדוגמה: 90"
+                            placeholder={timeUnit === 'hours' ? "לדוגמה: 1.5" : "לדוגמה: 90"}
                             value={newIncome.workTime}
                             onChange={(e) => {
-                                // Strict validation: allow only positive integers
+                                // Allow decimals only if in hours mode
                                 const val = e.target.value;
-                                if (val === '' || /^\d+$/.test(val)) {
+                                if (val === '' || (timeUnit === 'hours' ? /^\d*\.?\d*$/ : /^\d+$/).test(val)) {
                                     setNewIncome({ ...newIncome, workTime: val });
                                 }
                             }}
