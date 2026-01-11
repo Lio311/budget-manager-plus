@@ -3,13 +3,14 @@
 import { UserButton } from '@clerk/nextjs'
 import { useBudget } from '@/contexts/BudgetContext'
 import { getMonthName } from '@/lib/utils'
-import { ChevronLeft, ChevronRight, Menu, CreditCard } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Menu, CreditCard, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { ModeToggle } from '@/components/mode-toggle'
 import { MonthYearPicker } from './MonthYearPicker'
 import Image from 'next/image'
 import { SubscriptionStatus } from './UserProfile/SubscriptionStatus'
+import { LinkedEmails } from './UserProfile/LinkedEmails'
 import { useState } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useDemo } from '@/contexts/DemoContext'
@@ -148,6 +149,13 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                 userProfileProps={userProfileProps}
                                 appearance={userButtonAppearance}
                             >
+                                <UserButton.UserProfilePage
+                                    label="מיילים מקושרים"
+                                    labelIcon={<Mail className="w-4 h-4" />}
+                                    url="linked-emails"
+                                >
+                                    <LinkedEmails />
+                                </UserButton.UserProfilePage>
                                 <UserButton.MenuItems>
                                     <UserButton.Action
                                         label="מנוי"
