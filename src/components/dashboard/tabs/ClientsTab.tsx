@@ -358,7 +358,6 @@ export function ClientsTab() {
                     {/* Sort Dropdown */}
                     <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
                         <SelectTrigger className="w-[180px] h-9 gap-2">
-                            <ArrowUpDown className="w-4 h-4 text-gray-500" />
                             <SelectValue placeholder="מיון לפי" />
                         </SelectTrigger>
                         <SelectContent>
