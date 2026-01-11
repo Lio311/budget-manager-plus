@@ -274,14 +274,15 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                 </div>
 
                 {/* Legend List Section (Left Side) */}
-                <div className="w-1/3 min-w-[150px] flex flex-col gap-2 py-4 h-full">
+                <div className="w-1/3 min-w-[200px] flex flex-col gap-2 py-4 h-full">
                     <div className="flex flex-col gap-2 mb-2 sticky top-0 z-10">
                         <h4 className="text-sm font-bold text-gray-700">ערים מובילות:</h4>
 
                         {/* Sort Control */}
-                        <div className="flex gap-1">
+                        <div className="flex items-center gap-2 justify-end">
+                            <span className="text-xs text-gray-500 font-medium whitespace-nowrap">מיון לפי:</span>
                             <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
-                                <SelectTrigger className="h-7 text-xs w-full bg-white/80">
+                                <SelectTrigger className="h-7 text-xs w-[110px] bg-white/80">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -292,7 +293,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 pr-2">
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar flex flex-col gap-2 pr-2">
                         {paginatedLocations.map((loc, i) => {
                             const originalIndex = sortedLocations.indexOf(loc)
                             const color = COLORS[originalIndex % COLORS.length]
