@@ -20,7 +20,8 @@ const ClientSchema = z.object({
     subscriptionEnd: z.union([z.date(), z.string().transform((val) => val === '' ? undefined : new Date(val))]).optional(),
     subscriptionPrice: z.union([z.number(), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
     subscriptionStatus: z.string().optional().or(z.literal('')),
-    packageName: z.string().max(100, 'שם החבילה ארוך מדי').optional().or(z.literal(''))
+    packageName: z.string().max(100, 'שם החבילה ארוך מדי').optional().or(z.literal('')),
+    eventLocation: z.string().max(200, 'המיקום ארוך מדי').optional().or(z.literal(''))
 })
 
 export interface ClientFormData {
@@ -34,10 +35,11 @@ export interface ClientFormData {
 
     subscriptionType?: string
     subscriptionStart?: Date | string
-    subscriptionEnd?: Date | string
+    subscriptionEnd?: Date
     subscriptionPrice?: number | string
     subscriptionStatus?: string
     packageName?: string
+    eventLocation?: string
 }
 
 export async function getClients(scope: string = 'BUSINESS') {
@@ -65,7 +67,7 @@ export async function getClients(scope: string = 'BUSINESS') {
             }
         })
 
-        const clientIds = clients.map(c => c.id)
+        const clientIds = clients.map((c: any) => c.id)
 
         // Bulk aggregates for better performance
         const [incomeGroups, paidInvoiceGroups, allInvoiceGroups] = await Promise.all([
@@ -87,11 +89,11 @@ export async function getClients(scope: string = 'BUSINESS') {
         ])
 
         // Create lookup maps
-        const incomeMap = new Map(incomeGroups.map(g => [g.clientId, g._sum.amount || 0]))
-        const paidInvoiceMap = new Map(paidInvoiceGroups.map(g => [g.clientId, g._sum.total || 0]))
-        const allInvoiceMap = new Map(allInvoiceGroups.map(g => [g.clientId, g._count.id || 0]))
+        const incomeMap = new Map(incomeGroups.map((g: any) => [g.clientId, g._sum.amount || 0]))
+        const paidInvoiceMap = new Map(paidInvoiceGroups.map((g: any) => [g.clientId, g._sum.total || 0]))
+        const allInvoiceMap = new Map(allInvoiceGroups.map((g: any) => [g.clientId, g._count.id || 0]))
 
-        const clientsWithStats = clients.map((client) => {
+        const clientsWithStats = clients.map((client: any) => {
             const incomeTotal = incomeMap.get(client.id) || 0
             const paidInvoiceTotal = paidInvoiceMap.get(client.id) || 0
             const allInvoicesCount = allInvoiceMap.get(client.id) || 0

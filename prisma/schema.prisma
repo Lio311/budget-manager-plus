@@ -488,6 +488,7 @@ model Client {
   subscriptionPrice  Float?
   subscriptionStatus String?   // PAID, UNPAID, PARTIAL, INSTALLMENTS
   packageName        String?
+  eventLocation      String?  // Physical location of service (optional)
   
   // Metadata
   scope     String   @default("BUSINESS")

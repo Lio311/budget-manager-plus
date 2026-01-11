@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, type ClientFormData } from '@/lib/actions/clients'
 import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
@@ -14,6 +14,8 @@ import { useDemo } from '@/contexts/DemoContext'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Label } from "@/components/ui/label"
 import { format, differenceInDays } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
 
@@ -45,10 +47,26 @@ export function ClientsTab() {
         subscriptionPrice: '',
         subscriptionStart: undefined,
         subscriptionEnd: undefined,
-        subscriptionStatus: ''
+        subscriptionEnd: undefined,
+        subscriptionStatus: '',
+        eventLocation: ''
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [isAddingPackage, setIsAddingPackage] = useState(false)
+    const [warningDays, setWarningDays] = useState(14)
+
+    // Load settings from localStorage
+    useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('clientWarningDays')
+            if (saved) setWarningDays(parseInt(saved))
+        }
+    })
+
+    const handleSaveSettings = (days: number) => {
+        setWarningDays(days)
+        localStorage.setItem('clientWarningDays', days.toString())
+    }
 
     const validateForm = () => {
         const result = ClientSchema.safeParse(formData)
@@ -139,7 +157,7 @@ export function ClientsTab() {
                     setEditingClient(null)
                     setShowForm(false)
                     setEditingClient(null)
-                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '' })
+                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '' })
                     mutate()
                 } else {
                     toast.error(result.error || 'שגיאה')
@@ -148,7 +166,7 @@ export function ClientsTab() {
                 await optimisticCreateClient(formData)
                 setShowForm(false)
                 setShowForm(false)
-                setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '' })
+                setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '' })
             }
         } catch (error) {
             // Error handled by hook or update logic
@@ -171,7 +189,8 @@ export function ClientsTab() {
             subscriptionPrice: client.subscriptionPrice || '',
             subscriptionStart: client.subscriptionStart,
             subscriptionEnd: client.subscriptionEnd,
-            subscriptionStatus: client.subscriptionStatus || ''
+            subscriptionStatus: client.subscriptionStatus || '',
+            eventLocation: client.eventLocation || ''
         })
         setShowForm(true)
     }
@@ -226,13 +245,42 @@ export function ClientsTab() {
                         setEditingClient(null)
                         setErrors({})
                         setIsAddingPackage(false)
-                        setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '' })
+                        setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '' })
                     }}
                     className="bg-green-600 hover:bg-green-700"
                 >
                     <Plus className="h-4 w-4 ml-2" />
                     לקוח חדש
                 </Button>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="outline" size="icon" className="mr-2">
+                            <Settings className="h-4 w-4" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                        <div className="grid gap-4">
+                            <div className="space-y-2">
+                                <h4 className="font-medium leading-none">הגדרות תצוגה</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    הגדר מתי להציג התראת סיום מנוי
+                                </p>
+                            </div>
+                            <div className="grid gap-2">
+                                <div className="grid grid-cols-3 items-center gap-4">
+                                    <Label htmlFor="width">ימים להתראה</Label>
+                                    <input
+                                        id="width"
+                                        type="number"
+                                        value={warningDays}
+                                        onChange={(e) => handleSaveSettings(parseInt(e.target.value))}
+                                        className="col-span-2 h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </PopoverContent>
+                </Popover>
             </div>
 
             {/* Search */}
@@ -313,6 +361,22 @@ export function ClientsTab() {
                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                 className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                             />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                מיקום האירוע / שירות (אופציונלי)
+                            </label>
+                            <div className="relative">
+                                <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                <input
+                                    type="text"
+                                    value={formData.eventLocation || ''}
+                                    onChange={(e) => setFormData({ ...formData, eventLocation: e.target.value })}
+                                    placeholder="לדוגמה: אולם אירועים, משרדי החברה"
+                                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                                />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">מלא רק במידה והשירות ניתן פיזית במיקום מסויים</p>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -567,7 +631,7 @@ export function ClientsTab() {
                             {client.subscriptionEnd && (() => {
                                 const daysLeft = differenceInDays(new Date(client.subscriptionEnd), new Date())
                                 if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
-                                if (daysLeft <= 7) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
+                                if (daysLeft <= warningDays) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
                                 if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
                                 return null
                             })()}
