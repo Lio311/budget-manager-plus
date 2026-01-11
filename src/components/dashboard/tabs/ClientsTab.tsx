@@ -356,33 +356,36 @@ export function ClientsTab() {
 
                 <div className="flex gap-2 justify-start">
                     {/* Sort Dropdown */}
-                    <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
-                        <SelectTrigger className="w-[180px] h-9 gap-2">
-                            <SelectValue placeholder="מיון לפי" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="CREATED_AT">תאריך הקמה</SelectItem>
-                            <SelectItem value="REVENUE">הכנסות</SelectItem>
-                            {/* Only show these if at least one client has subscription data */}
-                            {clients.some((c: any) => c.subscriptionEnd || c.subscriptionPrice) && (
-                                <>
-                                    <SelectItem value="EXPIRY">תוקף מנוי</SelectItem>
-                                    <SelectItem value="VALUE">משתלם ביותר</SelectItem>
-                                </>
-                            )}
-                        </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-500 font-medium">מיון לפי:</span>
+                        <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                            <SelectTrigger className="w-[140px] h-9 gap-2">
+                                <SelectValue placeholder="מיון לפי" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="CREATED_AT">תאריך הקמה</SelectItem>
+                                <SelectItem value="REVENUE">הכנסות</SelectItem>
+                                {/* Only show these if at least one client has subscription data */}
+                                {clients.some((c: any) => c.subscriptionEnd || c.subscriptionPrice) && (
+                                    <>
+                                        <SelectItem value="EXPIRY">תוקף מנוי</SelectItem>
+                                        <SelectItem value="VALUE">משתלם ביותר</SelectItem>
+                                    </>
+                                )}
+                            </SelectContent>
+                        </Select>
 
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                        className="h-9 px-3 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800"
-                        title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
-                    >
-                        {/* Dynamic Icon based on Asc/Desc */}
-                        <ArrowUpDown className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                    </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                            className="h-9 px-3 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800"
+                            title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
+                        >
+                            {/* Dynamic Icon based on Asc/Desc */}
+                            <ArrowUpDown className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                        </Button>
+                    </div>
                 </div>
             </div>
 

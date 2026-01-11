@@ -15,6 +15,8 @@ const CITY_LOCATIONS: Record<string, { lat: number, lng: number }> = {
     'Holon': { lat: 32.0158, lng: 34.7874 },
     'Bat Yam': { lat: 32.0132, lng: 34.7480 },
     'Rishon LeZion': { lat: 31.9730, lng: 34.7925 },
+    'Rishon LeTsiyyon': { lat: 31.9730, lng: 34.7925 }, // Variations
+    'Rishon LetSiyyon': { lat: 31.9730, lng: 34.7925 },
     'Rehovot': { lat: 31.8903, lng: 34.8113 },
     'Ness Ziona': { lat: 31.9318, lng: 34.7997 },
     'Yavne': { lat: 31.8780, lng: 34.7383 },
@@ -23,6 +25,7 @@ const CITY_LOCATIONS: Record<string, { lat: number, lng: number }> = {
     'Hod HaSharon': { lat: 32.1522, lng: 34.8932 },
     'Kfar Saba': { lat: 32.1750, lng: 34.9069 },
     'Ra\'anana': { lat: 32.1848, lng: 34.8713 },
+    'Or Yehuda': { lat: 32.0315, lng: 34.8560 }, // Added Or Yehuda
 
     // Sharon / North Coast
     'Netanya': { lat: 32.3215, lng: 34.8532 },
@@ -74,33 +77,18 @@ const MAP_BOUNDS = {
 }
 
 // SVG Coordinate Mapping
-// calibrated based on the SVG path nodes:
-// Top (Metula): ~Y=10
-// Bottom (Eilat): ~Y=215
-// West (Coast): ~X=35
-// East (Golan): ~X=75
 const SVG_RANGES = {
-    minY: 215, // South (Higher Y value)
-    maxY: 10,  // North (Lower Y value)
+    minY: 215, // South
+    maxY: 10,  // North
     minX: 30,  // West
     maxX: 80   // East
 }
 
-// Convert Lat/Lng to SVG coordinates
 function project(lat: number, lng: number) {
-    // Normalize 0-1
     const latPercent = (lat - MAP_BOUNDS.minLat) / (MAP_BOUNDS.maxLat - MAP_BOUNDS.minLat)
     const lngPercent = (lng - MAP_BOUNDS.minLng) / (MAP_BOUNDS.maxLng - MAP_BOUNDS.minLng)
-
-    // Map to SVG Range
-    // Y is inverted (North is Low Y, South is High Y)
-    // latPercent 0 (South) -> should be minY (215)
-    // latPercent 1 (North) -> should be maxY (10)
     const y = SVG_RANGES.minY - (latPercent * (SVG_RANGES.minY - SVG_RANGES.maxY))
-
-    // X is normal (West is Low X, East is High X)
     const x = SVG_RANGES.minX + (lngPercent * (SVG_RANGES.maxX - SVG_RANGES.minX))
-
     return { x, y }
 }
 
@@ -110,6 +98,8 @@ const CITY_TRANSLATIONS: Record<string, string> = {
     'Jerusalem': 'ירושלים',
     'Haifa': 'חיפה',
     'Rishon LeZion': 'ראשון לציון',
+    'Rishon LeTsiyyon': 'ראשון לציון',
+    'Rishon LetSiyyon': 'ראשון לציון',
     'Petah Tikva': 'פתח תקווה',
     'Ashdod': 'אשדוד',
     'Netanya': 'נתניה',
@@ -154,14 +144,40 @@ const CITY_TRANSLATIONS: Record<string, string> = {
     'Kiryat Yam': 'קרית ים',
     'Zikhron Ya\'akov': 'זכרון יעקב',
     'Caesarea': 'קיסריה',
-    'Arad': 'ערד'
+    'Arad': 'ערד',
+    'Or Yehuda': 'אור יהודה'
 }
 
 const COLORS = ['#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899']
 
+import { useState } from 'react'
+import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 export function IsraelMapWidget({ locations }: { locations: any[] }) {
-    // Sort locations by count (high to low) for the list
-    const sortedLocations = [...locations].sort((a, b) => b._count.id - a._count.id)
+    const [sortMethod, setSortMethod] = useState<'ALPHA' | 'COUNT'>('ALPHA')
+    const [currentPage, setCurrentPage] = useState(0)
+    const ITEMS_PER_PAGE = 5
+
+    // Sort locations
+    const sortedLocations = [...locations].sort((a, b) => {
+        if (sortMethod === 'COUNT') {
+            return b._count.id - a._count.id
+        }
+        // Alpha (Hebrew if possible, then English)
+        const nameA = CITY_TRANSLATIONS[a.city] || a.city
+        const nameB = CITY_TRANSLATIONS[b.city] || b.city
+        return nameA.localeCompare(nameB, 'he')
+    })
+
+    const totalPages = Math.ceil(sortedLocations.length / ITEMS_PER_PAGE)
+    const paginatedLocations = sortedLocations.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE)
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 0 && newPage < totalPages) {
+            setCurrentPage(newPage)
+        }
+    }
 
     return (
         <Card className="p-6 h-[500px] shadow-sm relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50/50">
@@ -258,35 +274,77 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                 </div>
 
                 {/* Legend List Section (Left Side) */}
-                <div className="w-1/3 min-w-[150px] overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-2 py-4">
-                    <h4 className="text-sm font-bold text-gray-700 mb-2 sticky top-0 bg-blue-50/95 p-1 z-10 backdrop-blur-sm">ערים מובילות:</h4>
-                    {sortedLocations.map((loc, i) => {
-                        const color = COLORS[i % COLORS.length]
-                        const cityName = CITY_TRANSLATIONS[loc.city] || loc.city
+                <div className="w-1/3 min-w-[150px] flex flex-col gap-2 py-4 h-full">
+                    <div className="flex flex-col gap-2 mb-2 sticky top-0 z-10">
+                        <h4 className="text-sm font-bold text-gray-700">ערים מובילות:</h4>
 
-                        return (
-                            <motion.div
-                                key={loc.city}
-                                initial={{ x: -20, opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                transition={{ delay: i * 0.05 }}
-                                className="flex items-center gap-2 p-2 rounded-lg bg-white/60 hover:bg-white border border-transparent hover:border-blue-100 transition-all shadow-sm"
+                        {/* Sort Control */}
+                        <div className="flex gap-1">
+                            <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                                <SelectTrigger className="h-7 text-xs w-full bg-white/80">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="ALPHA">לפי א-ב</SelectItem>
+                                    <SelectItem value="COUNT">לפי כמות</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 pr-2">
+                        {paginatedLocations.map((loc, i) => {
+                            const originalIndex = sortedLocations.indexOf(loc)
+                            const color = COLORS[originalIndex % COLORS.length]
+                            const cityName = CITY_TRANSLATIONS[loc.city] || loc.city
+
+                            return (
+                                <motion.div
+                                    key={loc.city}
+                                    initial={{ x: -20, opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    transition={{ delay: i * 0.05 }}
+                                    className="flex items-center gap-2 p-2 rounded-lg bg-white/60 hover:bg-white border border-transparent hover:border-blue-100 transition-all shadow-sm"
+                                >
+                                    <div
+                                        className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
+                                        style={{ backgroundColor: color }}
+                                    />
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-bold text-gray-800 line-clamp-1" title={cityName}>
+                                            {cityName}
+                                        </span>
+                                        <span className="text-[10px] text-gray-500">
+                                            {loc._count.id} מבקרים
+                                        </span>
+                                    </div>
+                                </motion.div>
+                            )
+                        })}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-between items-center bg-white/50 p-1 rounded-lg mt-auto">
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 0}
+                                className="p-1 hover:bg-white rounded-full disabled:opacity-30 transition-colors"
                             >
-                                <div
-                                    className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
-                                    style={{ backgroundColor: color }}
-                                />
-                                <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-gray-800 line-clamp-1" title={cityName}>
-                                        {cityName}
-                                    </span>
-                                    <span className="text-[10px] text-gray-500">
-                                        {loc._count.id} מבקרים
-                                    </span>
-                                </div>
-                            </motion.div>
-                        )
-                    })}
+                                <ChevronRight size={16} />
+                            </button>
+                            <span className="text-[10px] text-gray-500 font-medium">
+                                {currentPage + 1} / {totalPages}
+                            </span>
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages - 1}
+                                className="p-1 hover:bg-white rounded-full disabled:opacity-30 transition-colors"
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </Card>
