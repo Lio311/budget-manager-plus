@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
 import {
-    Loader2, Plus, TrendingDown, Settings
+    Loader2, Plus, TrendingDown, Settings, ChevronDown
 } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -64,6 +64,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes')
+    const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
 
     const [newIncome, setNewIncome] = useState({
         source: '',
