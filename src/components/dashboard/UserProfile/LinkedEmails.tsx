@@ -140,6 +140,12 @@ export function LinkedEmails() {
                                     err.toString().includes('verification')) {
                                     setError('למען אבטחת חשבונך, נדרשת התחברות מחדש לפני ביצוע פעולה זו.')
                                     setReLoginRequired(true)
+                                } else if (
+                                    err.errors?.[0]?.code === 'identifier_already_exists' ||
+                                    err.errors?.[0]?.code === 'verification_strategy_forbidden' ||
+                                    err.message?.includes('already claimed')
+                                ) {
+                                    setError('חשבון Google זה כבר מקושר למשתמש אחר במערכת.')
                                 } else {
                                     toast.error('שגיאה בחיבור חשבון גוגל')
                                 }
