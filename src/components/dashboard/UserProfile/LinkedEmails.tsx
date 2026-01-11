@@ -121,7 +121,7 @@ export function LinkedEmails() {
                         )
 
                         return (
-                            <div key={email.id} className="flex items-center justify-between p-3 rounded-lg border bg-card transition-colors">
+                            <div key={email.id} className="flex items-center justify-between p-3 rounded-lg bg-card transition-colors">
                                 <div className="flex items-center gap-3">
                                     <div className="bg-white p-2 rounded-full border shadow-sm">
                                         {linkedGoogleAccount ? (
