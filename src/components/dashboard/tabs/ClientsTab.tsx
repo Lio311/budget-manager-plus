@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, type ClientFormData } from '@/lib/actions/clients'
 import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
