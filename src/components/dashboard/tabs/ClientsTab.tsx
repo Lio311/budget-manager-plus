@@ -114,11 +114,8 @@ export function ClientsTab() {
         _count: { incomes: 5 } // Fake count
     })) : clientsData
 
-    const filteredClients = clients.filter((client: any) =>
-        (client.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-        client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.phone?.includes(searchTerm)
-    )
+    // Sorting State
+    const [sortMethod, setSortMethod] = useState<'CREATED_AT' | 'REVENUE_ASC' | 'EXPIRY' | 'VALUE'>('CREATED_AT')
 
     // Optimistic create for instant UI feedback
     const { execute: optimisticCreateClient } = useOptimisticMutation<any[], ClientFormData>(
@@ -130,7 +127,8 @@ export function ClientsTab() {
                     id: 'temp-' + Date.now(),
                     ...input,
                     totalRevenue: 0,
-                    _count: { incomes: 0 }
+                    _count: { incomes: 0 },
+                    createdAt: new Date().toISOString()
                 },
                 ...current
             ],
@@ -138,6 +136,47 @@ export function ClientsTab() {
             errorMessage: 'שגיאה בהוספת הלקוח'
         }
     )
+
+    // Helper: Calculate Normalized Monthly Value (for "Most Worthwhile")
+    const getMonthlyValue = (client: any) => {
+        if (!client.subscriptionPrice) return 0
+        const price = client.subscriptionPrice
+        switch (client.subscriptionType) {
+            case 'WEEKLY': return price * 4
+            case 'MONTHLY': return price
+            case 'YEARLY': return price / 12
+            case 'PROJECT': return price // Treat project as one-time lump sum (ranking might be skewed but acceptable)
+            default: return 0
+        }
+    }
+
+    const sortClients = (clients: any[]) => {
+        return [...clients].sort((a, b) => {
+            switch (sortMethod) {
+                case 'REVENUE_ASC':
+                    return (a.totalRevenue || 0) - (b.totalRevenue || 0)
+                case 'EXPIRY':
+                    // Closest expiry first (ignoring past/null?)
+                    const dateA = a.subscriptionEnd ? new Date(a.subscriptionEnd).getTime() : Infinity
+                    const dateB = b.subscriptionEnd ? new Date(b.subscriptionEnd).getTime() : Infinity
+                    return dateA - dateB
+                case 'VALUE':
+                    return getMonthlyValue(b) - getMonthlyValue(a) // Highest Value first
+                case 'CREATED_AT':
+                default:
+                    // Newest first
+                    const createdA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+                    const createdB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+                    return createdB - createdA
+            }
+        })
+    }
+
+    const filteredClients = sortClients(clients.filter((client: any) =>
+        (client.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.phone?.includes(searchTerm)
+    ))
 
     // Optimistic delete for instant UI feedback
     const { deleteItem: optimisticDeleteClient } = useOptimisticDelete<any[]>(
@@ -249,6 +288,25 @@ export function ClientsTab() {
                     <p className="text-sm text-gray-500 mt-1">ניהול תיקי לקוחות</p>
                 </div>
                 <div className="flex gap-2">
+                    {/* Sort Dropdown */}
+                    <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                        <SelectTrigger className="w-[140px] h-9 gap-2">
+                            <ArrowUpDown className="w-3 h-3 text-gray-500" />
+                            <SelectValue placeholder="מיון" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="CREATED_AT">תאריך הקמה</SelectItem>
+                            <SelectItem value="REVENUE_ASC">הכנסות (נמוך לגבוה)</SelectItem>
+                            {/* Only show these if at least one client has subscription data */}
+                            {clients.some((c: any) => c.subscriptionEnd || c.subscriptionPrice) && (
+                                <>
+                                    <SelectItem value="EXPIRY">תוקף מנוי (קרוב לרחוק)</SelectItem>
+                                    <SelectItem value="VALUE">משתלם ביותר</SelectItem>
+                                </>
+                            )}
+                        </SelectContent>
+                    </Select>
+
                     <Popover open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                         <PopoverTrigger asChild>
                             <Button variant="outline" size="icon">

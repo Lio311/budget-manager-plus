@@ -160,115 +160,134 @@ const CITY_TRANSLATIONS: Record<string, string> = {
 const COLORS = ['#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899']
 
 export function IsraelMapWidget({ locations }: { locations: any[] }) {
-    const maxCount = Math.max(...locations.map(l => l._count.id), 1)
+    // Sort locations by count (high to low) for the list
+    const sortedLocations = [...locations].sort((a, b) => b._count.id - a._count.id)
 
     return (
-        <Card className="p-6 h-[700px] shadow-sm relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50/50">
+        <Card className="p-6 h-[500px] shadow-sm relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50/50">
             <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
                 <div className="w-48 h-96 bg-gray-400 rounded-full blur-3xl transform rotate-12"></div>
             </div>
 
-            <div className="relative w-full h-full p-4 flex items-center justify-center">
-                {/* Detailed Israel Map SVG */}
-                <svg viewBox="0 0 100 230" className="h-[98%] drop-shadow-xl overflow-visible">
-                    {/* Mediterranean Sea Reference line (Optional, conceptual) */}
+            <div className="relative w-full h-full flex flex-row-reverse gap-4">
+                {/* Visual Map Section (Right Side) */}
+                <div className="flex-1 h-full relative flex items-center justify-center">
+                    <svg viewBox="0 0 100 230" className="h-[98%] drop-shadow-xl overflow-visible">
+                        {/* Land Mass */}
+                        <path
+                            d="M 64.5,5.5 L 61.3,9.7 L 60.1,16.2 L 54.4,19.3 L 50.8,17.9 L 48.0,19.6 L 46.1,23.4 L 47.9,32.2 L 44.9,34.9 L 45.4,43.2 L 42.1,48.5 L 39.5,60.1 L 37.3,66.8 L 33.8,70.9 L 32.1,84.0 L 32.2,95.5 L 34.0,105.1 L 28.5,108.6 L 24.1,114.2 L 24.9,122.3 L 31.9,121.7 L 34.1,128.4 L 33.7,137.9 L 35.8,145.7 L 39.6,155.0 L 41.7,169.2 L 44.1,185.3 L 45.9,208.5 L 48.2,217.4 L 51.5,217.4 L 51.8,211.2 L 53.6,193.3 L 55.4,183.1 L 58.7,175.7 L 61.1,165.7 L 63.4,151.7 L 63.2,143.6 L 68.7,136.2 L 69.3,124.7 L 65.6,115.6 L 71.9,105.2 L 80.6,105.1 L 85.3,101.9 L 85.1,96.5 L 75.8,92.1 L 70.8,90.3 L 68.7,85.2 L 70.2,74.9 L 69.3,66.7 L 70.0,61.0 L 71.4,56.8 L 74.0,46.8 L 73.0,38.1 L 69.4,32.4 L 69.3,27.1 L 73.1,23.1 L 71.7,18.0 L 75.6,10.6 Z"
+                            fill="#FFFFFF"
+                            stroke="#94A3B8"
+                            strokeWidth="0.8"
+                        />
+                        {/* Kinneret */}
+                        <path
+                            d="M 69.4,32.4 C 70.8,33.5 71.5,35.5 70.3,37.2 C 69.1,38.8 68.0,37.5 67.5,35.9 C 68.0,34.5 68.5,33.0 69.4,32.4 Z"
+                            fill="#38BDF8"
+                            stroke="none"
+                        />
+                        {/* Dead Sea */}
+                        <path
+                            d="M 70.8,90.3 L 72.5,95.1 L 72.8,103.4 L 70.0,111.9 L 68.4,115.5 L 67.8,109.8 L 68.2,100.1 L 69.5,92.5 Z"
+                            fill="#38BDF8"
+                            stroke="none"
+                        />
 
-                    {/* Land Mass */}
-                    <path
-                        d="M 64.5,5.5 L 61.3,9.7 L 60.1,16.2 L 54.4,19.3 L 50.8,17.9 L 48.0,19.6 L 46.1,23.4 L 47.9,32.2 L 44.9,34.9 L 45.4,43.2 L 42.1,48.5 L 39.5,60.1 L 37.3,66.8 L 33.8,70.9 L 32.1,84.0 L 32.2,95.5 L 34.0,105.1 L 28.5,108.6 L 24.1,114.2 L 24.9,122.3 L 31.9,121.7 L 34.1,128.4 L 33.7,137.9 L 35.8,145.7 L 39.6,155.0 L 41.7,169.2 L 44.1,185.3 L 45.9,208.5 L 48.2,217.4 L 51.5,217.4 L 51.8,211.2 L 53.6,193.3 L 55.4,183.1 L 58.7,175.7 L 61.1,165.7 L 63.4,151.7 L 63.2,143.6 L 68.7,136.2 L 69.3,124.7 L 65.6,115.6 L 71.9,105.2 L 80.6,105.1 L 85.3,101.9 L 85.1,96.5 L 75.8,92.1 L 70.8,90.3 L 68.7,85.2 L 70.2,74.9 L 69.3,66.7 L 70.0,61.0 L 71.4,56.8 L 74.0,46.8 L 73.0,38.1 L 69.4,32.4 L 69.3,27.1 L 73.1,23.1 L 71.7,18.0 L 75.6,10.6 Z"
-                        fill="#FFFFFF"
-                        stroke="#94A3B8"
-                        strokeWidth="0.8"
-                    />
+                        {locations.map((loc, i) => {
+                            let coords = { x: 50, y: 100 } // fallback
 
-                    {/* Kinneret (Sea of Galilee) - Approx positioned around 32.8N, 35.6E */}
-                    <path
-                        d="M 69.4,32.4 C 70.8,33.5 71.5,35.5 70.3,37.2 C 69.1,38.8 68.0,37.5 67.5,35.9 C 68.0,34.5 68.5,33.0 69.4,32.4 Z"
-                        fill="#38BDF8"
-                        stroke="none"
-                    />
-
-                    {/* Dead Sea - Approx positioned around 31.5N, 35.5E */}
-                    <path
-                        d="M 70.8,90.3 L 72.5,95.1 L 72.8,103.4 L 70.0,111.9 L 68.4,115.5 L 67.8,109.8 L 68.2,100.1 L 69.5,92.5 Z"
-                        fill="#38BDF8"
-                        stroke="none"
-                    />
-
-                    {locations.map((loc, i) => {
-                        let coords = { x: 50, y: 100 } // fallback
-
-                        // 1. Try exact lookup
-                        const knownLoc = CITY_LOCATIONS[loc.city]
-                        if (knownLoc) {
-                            coords = project(knownLoc.lat, knownLoc.lng)
-                        } else {
-                            // 2. Fuzzy lookup
-                            const match = Object.keys(CITY_LOCATIONS).find(k =>
-                                loc.city.toLowerCase().includes(k.toLowerCase()) ||
-                                k.toLowerCase().includes(loc.city.toLowerCase())
-                            )
-                            if (match) {
-                                coords = project(CITY_LOCATIONS[match].lat, CITY_LOCATIONS[match].lng)
+                            // 1. Try exact lookup
+                            const knownLoc = CITY_LOCATIONS[loc.city]
+                            if (knownLoc) {
+                                coords = project(knownLoc.lat, knownLoc.lng)
                             } else {
-                                // 3. "Unknown" Pile - side of map
-                                coords = { x: 15, y: 150 + (i * 5) }
+                                // 2. Fuzzy lookup
+                                const match = Object.keys(CITY_LOCATIONS).find(k =>
+                                    loc.city.toLowerCase().includes(k.toLowerCase()) ||
+                                    k.toLowerCase().includes(loc.city.toLowerCase())
+                                )
+                                if (match) {
+                                    coords = project(CITY_LOCATIONS[match].lat, CITY_LOCATIONS[match].lng)
+                                } else {
+                                    // 3. "Unknown" Pile - side of map
+                                    coords = { x: 15, y: 150 + (i * 5) }
+                                }
                             }
-                        }
 
-                        const displayText = `${CITY_TRANSLATIONS[loc.city] || loc.city} (${loc._count.id})`
+                            // Use specific color for this city index (consistent with list)
+                            const color = COLORS[i % COLORS.length]
 
-                        // Dynamic sizing
-                        const textWidthEstimate = displayText.length * 1.8
-                        const minRadiusForText = textWidthEstimate / 2 + 1
+                            return (
+                                <motion.g
+                                    key={loc.city}
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ delay: i * 0.1 }}
+                                >
+                                    {/* Small Pin / Dot */}
+                                    <circle
+                                        cx={coords.x}
+                                        cy={coords.y}
+                                        r="2" // Small fixed size "Pin"
+                                        fill={color}
+                                        stroke="white"
+                                        strokeWidth="0.5"
+                                        className="drop-shadow-md"
+                                    />
+                                    {/* Optional: Add a small pulse effect for visibility */}
+                                    <circle
+                                        cx={coords.x}
+                                        cy={coords.y}
+                                        r="3"
+                                        fill={color}
+                                        opacity="0.3"
+                                    >
+                                        <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" />
+                                        <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite" />
+                                    </circle>
+                                </motion.g>
+                            )
+                        })}
+                    </svg>
 
-                        let size = 3 + (loc._count.id / maxCount) * 5
-                        size = Math.max(size, minRadiusForText)
+                    {locations.length === 0 && (
+                        <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
+                            אין נתוני מיקום זמינים לשבוע זה
+                        </div>
+                    )}
+                </div>
 
+                {/* Legend List Section (Left Side) */}
+                <div className="w-1/3 min-w-[150px] overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-2 py-4">
+                    <h4 className="text-sm font-bold text-gray-700 mb-2 sticky top-0 bg-blue-50/95 p-1 z-10 backdrop-blur-sm">ערים מובילות:</h4>
+                    {sortedLocations.map((loc, i) => {
                         const color = COLORS[i % COLORS.length]
+                        const cityName = CITY_TRANSLATIONS[loc.city] || loc.city
 
                         return (
-                            <motion.g
+                            <motion.div
                                 key={loc.city}
-                                initial={{ scale: 0, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ delay: i * 0.1 }}
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: i * 0.05 }}
+                                className="flex items-center gap-2 p-2 rounded-lg bg-white/60 hover:bg-white border border-transparent hover:border-blue-100 transition-all shadow-sm"
                             >
-                                <circle
-                                    cx={coords.x}
-                                    cy={coords.y}
-                                    r={size}
-                                    fill={color}
-                                    fillOpacity="0.9"
-                                    stroke="white"
-                                    strokeWidth="0.5"
+                                <div
+                                    className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
+                                    style={{ backgroundColor: color }}
                                 />
-                                <text
-                                    x={coords.x}
-                                    y={coords.y}
-                                    fontSize="2.5"
-                                    fill="white"
-                                    fontWeight="bold"
-                                    textAnchor="middle"
-                                    dominantBaseline="central"
-                                >
-                                    {displayText}
-                                </text>
-                            </motion.g>
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-gray-800 line-clamp-1" title={cityName}>
+                                        {cityName}
+                                    </span>
+                                    <span className="text-[10px] text-gray-500">
+                                        {loc._count.id} מבקרים
+                                    </span>
+                                </div>
+                            </motion.div>
                         )
                     })}
-
-                    {/* Legend for Unknowns if any exist */}
-                    {locations.some(l => !CITY_LOCATIONS[l.city] && !Object.keys(CITY_LOCATIONS).find(k => l.city.includes(k))) && (
-                        <text x="10" y="145" fontSize="3" fill="#64748B" fontWeight="bold">מיקומים נוספים:</text>
-                    )}
-                </svg>
-
-                {locations.length === 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
-                        אין נתוני מיקום זמינים לשבוע זה
-                    </div>
-                )}
+                </div>
             </div>
         </Card>
     )
