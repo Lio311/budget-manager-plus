@@ -207,7 +207,9 @@ export function LinkedEmails() {
                                 } else if (
                                     err.errors?.[0]?.code === 'identifier_already_exists' ||
                                     err.errors?.[0]?.code === 'verification_strategy_forbidden' ||
-                                    err.message?.includes('already claimed')
+                                    err.message?.includes('already claimed') ||
+                                    err.message?.includes('already connected') ||
+                                    err.errors?.[0]?.message?.includes('already connected')
                                 ) {
                                     setError('חשבון Google זה כבר מקושר למשתמש אחר במערכת.')
                                 } else {
