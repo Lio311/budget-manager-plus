@@ -45,7 +45,7 @@ export function LinkedEmails() {
             } else if (err.errors && err.errors[0]?.code === 'form_param_format_invalid') {
                 setError('כתובת מייל לא תקינה')
             } else {
-                setError('אירעה שגיאה בוספת המייל. נסה שנית.')
+                setError('אירעה שגיאה בהוספת המייל. נסה שנית.')
             }
         } finally {
             setIsLoading(false)
