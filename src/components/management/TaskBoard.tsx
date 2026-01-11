@@ -200,9 +200,9 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="ALL">כל הצוות</SelectItem>
-                            <SelectItem value="Lior">Lior</SelectItem>
-                            <SelectItem value="Ron">Ron</SelectItem>
-                            <SelectItem value="Leon">Leon</SelectItem>
+                            <SelectItem value="Lior">ליאור</SelectItem>
+                            <SelectItem value="Ron">רון</SelectItem>
+                            <SelectItem value="Leon">לאון</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
