@@ -44,6 +44,10 @@ export function LinkedEmails() {
                 setError('כתובת המייל הזו כבר רשומה במערכת לחשבון אחר')
             } else if (err.errors && err.errors[0]?.code === 'form_param_format_invalid') {
                 setError('כתובת מייל לא תקינה')
+            } else if (err.errors && err.errors[0]?.message?.includes('verification')) {
+                setError('נדרש אימות אבטחה נוסף. אנא התחבר מחדש למערכת ונסה שוב.')
+            } else if (err.message && err.message.includes('verification')) {
+                setError('נדרש אימות אבטחה נוסף. אנא התחבר מחדש למערכת ונסה שוב.')
             } else {
                 setError('אירעה שגיאה בהוספת המייל. נסה שנית.')
             }
