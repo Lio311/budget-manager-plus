@@ -116,7 +116,7 @@ export function LinkedEmails() {
                     {user.emailAddresses.map((email) => {
                         // Check if this email is linked to a Google account
                         const linkedGoogleAccount = user.externalAccounts.find(
-                            acc => (acc.provider === 'google' || acc.provider === 'oauth_google') &&
+                            acc => acc.provider === 'google' &&
                                 acc.emailAddress === email.emailAddress
                         )
 
