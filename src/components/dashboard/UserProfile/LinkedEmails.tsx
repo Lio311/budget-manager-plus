@@ -10,8 +10,13 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
+import { useClerk } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
+
 export function LinkedEmails() {
     const { user, isLoaded } = useUser()
+    const { signOut } = useClerk()
+    const router = useRouter()
     const [isAdding, setIsAdding] = useState(false)
     const [emailAddress, setEmailAddress] = useState('')
     const [verifying, setVerifying] = useState(false)
