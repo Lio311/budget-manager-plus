@@ -211,7 +211,7 @@ export function LinkedEmails() {
                                     err.message?.includes('already connected') ||
                                     err.errors?.[0]?.message?.includes('already connected')
                                 ) {
-                                    setError('חשבון Google זה כבר מקושר למשתמש אחר במערכת.')
+                                    setError('חשבון Google זה כבר קיים במערכת (ייתכן שהוא כבר מקושר לחשבונך, או למשתמש אחר).')
                                 } else {
                                     toast.error('שגיאה בחיבור חשבון גוגל')
                                 }
