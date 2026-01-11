@@ -23,20 +23,7 @@ import { Badge } from '@/components/ui/badge'
 
 // Inside ClientsTab component:
 
-const [warningDays, setWarningDays] = useState(14)
 
-// Load settings from localStorage
-useEffect(() => {
-    if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem('clientWarningDays')
-        if (saved) setWarningDays(parseInt(saved))
-    }
-}, [])
-
-const handleSaveSettings = (days: number) => {
-    setWarningDays(days)
-    localStorage.setItem('clientWarningDays', days.toString())
-}
 
 // ...
 
