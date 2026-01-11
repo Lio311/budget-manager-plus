@@ -54,7 +54,7 @@ export function LinkedEmails() {
         }
     }
 
-    const handleDisconnectExternal = async (accountId: string) => {
+    const handleDisconnectExternal = async (accountId: string, emailIdToDelete?: string) => {
         if (!confirm('האם אתה בטוח שברצונך לנתק חשבון זה?')) return
 
         try {
@@ -62,7 +62,21 @@ export function LinkedEmails() {
             if (accountToDelete) {
                 await accountToDelete.destroy()
                 toast.success('החשבון נותק בהצלחה')
-                // Refresh to ensure email list state is consistent (sometimes email remains as distinct resource)
+
+                // If an email ID was provided, try to delete the email resource as well
+                // This ensures the user sees the entire row disappear, "really" deleting access
+                if (emailIdToDelete) {
+                    const emailToDelete = user.emailAddresses.find(e => e.id === emailIdToDelete)
+                    if (emailToDelete && user.primaryEmailAddressId !== emailToDelete.id) {
+                        try {
+                            await emailToDelete.destroy()
+                        } catch (emailErr) {
+                            console.error('Failed to auto-delete email after disconnect:', emailErr)
+                            // Ignore error here, as the main action (disconnect) succeeded
+                        }
+                    }
+                }
+
                 user.reload()
             }
         } catch (err: any) {
@@ -158,7 +172,7 @@ export function LinkedEmails() {
                                         className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                                         onClick={() => {
                                             if (linkedGoogleAccount) {
-                                                handleDisconnectExternal(linkedGoogleAccount.id)
+                                                handleDisconnectExternal(linkedGoogleAccount.id, email.id)
                                             } else {
                                                 handleDeleteEmail(email.id)
                                             }
