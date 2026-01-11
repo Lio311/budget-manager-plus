@@ -159,18 +159,45 @@ export function LinkedEmails() {
                 {/* Add New Email Options */}
                 {!isAdding && !verifying && (
                     <div className="space-y-3">
+                        {error && (
+                            <Alert variant="destructive" className="py-2 flex flex-col gap-2 mb-4">
+                                <div className="flex items-center gap-2">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertDescription className="text-xs">{error}</AlertDescription>
+                                </div>
+                                {error.includes('אימות אבטחה') && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full bg-white/10 hover:bg-white/20 border-white/20 text-xs h-7"
+                                        onClick={() => signOut(() => router.push('/sign-in'))}
+                                    >
+                                        התחבר מחדש לאימות
+                                    </Button>
+                                )}
+                            </Alert>
+                        )}
+
                         <Button
                             variant="outline"
                             className="w-full py-6 gap-3 bg-white hover:bg-gray-50 text-gray-700 border-gray-200 shadow-sm transition-all hover:shadow-md"
                             onClick={async () => {
+                                setError(null)
                                 try {
                                     await user.createExternalAccount({
                                         strategy: 'oauth_google',
                                         redirectUrl: '/dashboard?tab=overview&openProfile=true'
                                     })
-                                } catch (err) {
+                                } catch (err: any) {
                                     console.error('Google Link Error:', err)
-                                    toast.error('שגיאה בחיבור חשבון גוגל')
+                                    if (err.errors?.[0]?.code === 'session_step_up_verification_required' ||
+                                        err.message?.includes('verification') ||
+                                        err.toString().includes('verification')) {
+                                        setError('למען אבטחת חשבונך, נדרשת התחברות מחדש לפני ביצוע פעולה זו.')
+                                    } else {
+                                        toast.error('שגיאה בחיבור חשבון גוגל')
+                                    }
                                 }
                             }}
                         >
