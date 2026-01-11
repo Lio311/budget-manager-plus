@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, type ClientFormData } from '@/lib/actions/clients'
@@ -16,8 +16,42 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
-import { format, differenceInDays } from 'date-fns'
+import { format, differenceInDays, startOfDay } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
+
+// ... existing imports ...
+
+// Inside ClientsTab component:
+
+const [warningDays, setWarningDays] = useState(14)
+
+// Load settings from localStorage
+useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('clientWarningDays')
+        if (saved) setWarningDays(parseInt(saved))
+    }
+}, [])
+
+const handleSaveSettings = (days: number) => {
+    setWarningDays(days)
+    localStorage.setItem('clientWarningDays', days.toString())
+}
+
+// ...
+
+{
+    client.subscriptionEnd && (() => {
+        const end = startOfDay(new Date(client.subscriptionEnd))
+        const today = startOfDay(new Date())
+        const daysLeft = differenceInDays(end, today)
+
+        if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
+        if (daysLeft <= warningDays) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
+        if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
+        return null
+    })()
+}
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -56,12 +90,12 @@ export function ClientsTab() {
     const [warningDays, setWarningDays] = useState(14)
 
     // Load settings from localStorage
-    useState(() => {
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('clientWarningDays')
             if (saved) setWarningDays(parseInt(saved))
         }
-    })
+    }, [])
 
     const handleSaveSettings = (days: number) => {
         setWarningDays(days)
@@ -629,7 +663,10 @@ export function ClientsTab() {
 
                             {/* Expiration Warning */}
                             {client.subscriptionEnd && (() => {
-                                const daysLeft = differenceInDays(new Date(client.subscriptionEnd), new Date())
+                                const end = startOfDay(new Date(client.subscriptionEnd))
+                                const today = startOfDay(new Date())
+                                const daysLeft = differenceInDays(end, today)
+
                                 if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
                                 if (daysLeft <= warningDays) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
                                 if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
