@@ -81,7 +81,6 @@ export function ClientsTab() {
         subscriptionPrice: '',
         subscriptionStart: undefined,
         subscriptionEnd: undefined,
-        subscriptionEnd: undefined,
         subscriptionStatus: '',
         eventLocation: ''
     })
