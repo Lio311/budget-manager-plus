@@ -89,6 +89,27 @@ export function LinkedEmails() {
             </CardHeader>
             <CardContent className="px-0 space-y-6">
 
+                {/* Error Alert */}
+                {error && (
+                    <Alert variant="destructive" className="py-2 flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertDescription className="text-xs">{error}</AlertDescription>
+                        </div>
+                        {reLoginRequired && (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="w-full bg-white/10 hover:bg-white/20 border-white/20 text-xs h-7"
+                                onClick={() => signOut(() => router.push('/sign-in'))}
+                            >
+                                התחבר מחדש לאימות
+                            </Button>
+                        )}
+                    </Alert>
+                )}
+
                 {/* External Accounts (Google) */}
                 {user.externalAccounts.length > 0 && (
                     <div className="space-y-3">
@@ -169,25 +190,7 @@ export function LinkedEmails() {
 
                 {/* Add New Email Options */}
                 <div className="space-y-3">
-                    {error && (
-                        <Alert variant="destructive" className="py-2 flex flex-col gap-2 mb-4">
-                            <div className="flex items-center gap-2">
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertDescription className="text-xs">{error}</AlertDescription>
-                            </div>
-                            {reLoginRequired && (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    className="w-full bg-white/10 hover:bg-white/20 border-white/20 text-xs h-7"
-                                    onClick={() => signOut(() => router.push('/sign-in'))}
-                                >
-                                    התחבר מחדש לאימות
-                                </Button>
-                            )}
-                        </Alert>
-                    )}
+
 
                     <Button
                         variant="outline"
