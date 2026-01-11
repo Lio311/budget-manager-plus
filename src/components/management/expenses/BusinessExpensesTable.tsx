@@ -59,6 +59,62 @@ export function BusinessExpensesTable({
 
     const categories = ['פיתוח', 'אבטחה', 'בדיקות', 'שיווק', 'פיתוח עסקי', 'General', 'Marketing', 'Hosting', 'Legal', 'Office']
 
+    // Team Member Data
+    const TEAM_MEMBERS: Record<string, { name: string, avatar: string, color: string }> = {
+        'RON': { name: 'רון', avatar: '/images/team/ron.png', color: 'bg-indigo-500' },
+        'LEON': { name: 'לאון', avatar: '/images/team/leon.png', color: 'bg-orange-500' },
+        'LIOR': { name: 'ליאור', avatar: '/images/team/lior-profile.jpg', color: 'bg-blue-500' },
+    }
+
+    const calculateSplit = (amount: number, responsibles: string[]) => {
+        const split: Record<string, number> = { 'RON': 0, 'LEON': 0, 'LIOR': 0 }
+
+        if (!responsibles || responsibles.length === 0) {
+            split['RON'] = amount // Default to Ron
+            return split
+        }
+
+        if (responsibles.length === 1) {
+            split[responsibles[0]] = amount
+            return split
+        }
+
+        const hasRon = responsibles.includes('RON')
+        const hasLeon = responsibles.includes('LEON')
+        const hasLior = responsibles.includes('LIOR')
+
+        // Specific Rules
+        if (hasRon && hasLeon && responsibles.length === 2) {
+            split['RON'] = amount * 0.70
+            split['LEON'] = amount * 0.30
+            return split
+        }
+
+        if (hasRon && hasLeon && hasLior && responsibles.length === 3) {
+            split['RON'] = amount * 0.40
+            split['LIOR'] = amount * 0.40
+            split['LEON'] = amount * 0.20
+            return split
+        }
+
+        // Fallback: Equal Split
+        const share = amount / responsibles.length
+        responsibles.forEach(p => {
+            split[p] = share
+        })
+        return split
+    }
+
+    // Calculate Totals per Person
+    const personTotals = filteredExpenses.reduce((acc, expense) => {
+        const split = calculateSplit(expense.amount, expense.responsibles || ['RON'])
+        acc['RON'] += split['RON'] || 0
+        acc['LEON'] += split['LEON'] || 0
+        acc['LIOR'] += split['LIOR'] || 0
+        return acc
+    }, { 'RON': 0, 'LEON': 0, 'LIOR': 0 })
+
+
     const categoryMap: Record<string, string> = {
         'Marketing': 'שיווק',
         'General': 'כללי',
@@ -180,19 +236,33 @@ export function BusinessExpensesTable({
     return (
         <div className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardContent className="pt-6">
                         <div className="text-2xl font-bold">{filteredExpenses.length}</div>
                         <p className="text-xs text-muted-foreground">סה״כ הוצאות</p>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="text-2xl font-bold">₪{totalAmount.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground">סה״כ לתקופה</p>
-                    </CardContent>
-                </Card>
+
+                {/* Individual Person Cards */}
+                {['RON', 'LEON', 'LIOR'].map(personKey => (
+                    <Card key={personKey} className="relative overflow-hidden">
+                        <div className={`absolute top-0 right-0 w-1 h-full ${TEAM_MEMBERS[personKey].color}`} />
+                        <CardContent className="pt-6 flex justify-between items-center">
+                            <div>
+                                <div className="text-2xl font-bold">₪{Math.round(personTotals[personKey as keyof typeof personTotals]).toLocaleString()}</div>
+                                <p className="text-xs text-muted-foreground">{TEAM_MEMBERS[personKey].name}</p>
+                            </div>
+                            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                                <img
+                                    src={TEAM_MEMBERS[personKey].avatar}
+                                    alt={TEAM_MEMBERS[personKey].name}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
 
             {/* Actions Bar */}
@@ -274,7 +344,7 @@ export function BusinessExpensesTable({
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-right block mb-2">אחריות (חלוקת הוצאה)</Label>
-                                    <div className="flex gap-4 justify-end">
+                                    <div className="flex gap-4 justify-start" dir="rtl"> {/* Align Right (RTL Start) */}
                                         {['RON', 'LEON', 'LIOR'].map((person) => {
                                             const isSelected = formData.responsibles?.includes(person)
                                             return (
@@ -300,15 +370,17 @@ export function BusinessExpensesTable({
                                                      `}
                                                 >
                                                     <div className={`
-                                                         w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white shadow-sm
-                                                         ${person === 'RON' ? 'bg-indigo-500' : ''}
-                                                         ${person === 'LEON' ? 'bg-orange-500' : ''}
-                                                         ${person === 'LIOR' ? 'bg-emerald-500' : ''}
+                                                         w-12 h-12 rounded-full overflow-hidden flex items-center justify-center font-bold text-sm text-white shadow-sm border-2
+                                                         ${isSelected ? 'border-blue-500' : 'border-transparent'}
                                                      `}>
-                                                        {person === 'RON' ? 'RO' : (person === 'LEON' ? 'LE' : 'LI')}
+                                                        <img
+                                                            src={TEAM_MEMBERS[person].avatar}
+                                                            alt={TEAM_MEMBERS[person].name}
+                                                            className="w-full h-full object-cover"
+                                                        />
                                                     </div>
                                                     <span className="text-[10px] font-bold text-gray-600">
-                                                        {person === 'RON' ? 'רון' : (person === 'LEON' ? 'לאון' : 'ליאור')}
+                                                        {TEAM_MEMBERS[person].name}
                                                     </span>
                                                 </div>
                                             )
@@ -380,6 +452,7 @@ export function BusinessExpensesTable({
                             <TableHead className="text-right">תיאור</TableHead>
                             <TableHead className="text-right">קטגוריה</TableHead>
                             <TableHead className="text-center">קמפיין מקושר</TableHead>
+                            <TableHead className="text-center">חברי צוות</TableHead>
                             <TableHead className="text-right">סכום</TableHead>
                             <TableHead className="text-center w-[100px]">פעולות</TableHead>
                         </TableRow>
@@ -387,7 +460,7 @@ export function BusinessExpensesTable({
                     <TableBody>
                         {filteredExpenses.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
+                                <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
                                     לא נמצאו הוצאות
                                 </TableCell>
                             </TableRow>
@@ -403,6 +476,19 @@ export function BusinessExpensesTable({
                                     </TableCell>
                                     <TableCell className="text-muted-foreground text-sm text-center">
                                         {expense.campaign ? expense.campaign.name : '-'}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <div className="flex justify-center -space-x-2 space-x-reverse">
+                                            {(expense.responsibles || ['RON']).map((r: string) => (
+                                                <div key={r} className="w-6 h-6 rounded-full border border-white overflow-hidden" title={TEAM_MEMBERS[r]?.name}>
+                                                    <img
+                                                        src={TEAM_MEMBERS[r]?.avatar}
+                                                        alt={TEAM_MEMBERS[r]?.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
                                     </TableCell>
                                     <TableCell className="font-bold text-gray-900">
                                         ₪{expense.amount.toLocaleString()}
