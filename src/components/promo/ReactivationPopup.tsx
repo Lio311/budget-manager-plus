@@ -8,15 +8,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { SignUpButton } from '@clerk/nextjs'
 
+import { useDemo } from '@/contexts/DemoContext'
+
 interface ReactivationPopupProps {
     shouldShow: boolean
 }
 
 export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
     const [isOpen, setIsOpen] = useState(false)
+    const { isDemo } = useDemo()
 
     useEffect(() => {
-        if (shouldShow) {
+        if (shouldShow && !isDemo) {
             const hasSeenPopup = localStorage.getItem('hide_reactivation_popup')
             if (!hasSeenPopup) {
                 // Preload image
@@ -28,14 +31,14 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
                 return () => clearTimeout(timer)
             }
         }
-    }, [shouldShow])
+    }, [shouldShow, isDemo])
 
     const handleClose = () => {
         setIsOpen(false)
         localStorage.setItem('hide_reactivation_popup', 'true')
     }
 
-    if (!shouldShow) return null
+    if (!shouldShow || isDemo) return null
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
