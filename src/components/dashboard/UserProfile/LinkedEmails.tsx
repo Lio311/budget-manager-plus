@@ -1,7 +1,7 @@
 'use client'
 
 import { useUser, useClerk } from '@clerk/nextjs'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Trash2, Mail, AlertCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -17,6 +17,14 @@ export function LinkedEmails() {
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [reLoginRequired, setReLoginRequired] = useState(false)
+
+    // Force reload user data when this component mounts to ensure we show the latest emails
+    // This is critical after returning from a Google OAuth redirect
+    useEffect(() => {
+        if (user) {
+            user.reload().catch(console.error)
+        }
+    }, [])
 
     if (!isLoaded || !user) return null
 

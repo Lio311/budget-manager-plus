@@ -1,6 +1,6 @@
 'use client'
 
-import { UserButton } from '@clerk/nextjs'
+import { UserButton, useClerk } from '@clerk/nextjs'
 import { useBudget } from '@/contexts/BudgetContext'
 import { getMonthName } from '@/lib/utils'
 import { ChevronLeft, ChevronRight, Menu, CreditCard, Mail } from 'lucide-react'
@@ -11,7 +11,7 @@ import { MonthYearPicker } from './MonthYearPicker'
 import Image from 'next/image'
 import { SubscriptionStatus } from './UserProfile/SubscriptionStatus'
 import { LinkedEmails } from './UserProfile/LinkedEmails'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useDemo } from '@/contexts/DemoContext'
 import Link from 'next/link'
@@ -25,6 +25,16 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
     const pathname = usePathname()
     const { isDemo } = useDemo()
     const { openModal } = useAuthModal()
+    const { openUserProfile } = useClerk()
+
+    useEffect(() => {
+        if (searchParams.get('openProfile') === 'true') {
+            // Give it a small delay to ensure Clerk is ready and hydration is complete
+            setTimeout(() => {
+                openUserProfile()
+            }, 500)
+        }
+    }, [searchParams])
 
     const handleToggle = (type: 'PERSONAL' | 'BUSINESS') => {
         if (type === 'BUSINESS' && !hasBusinessAccess) {
