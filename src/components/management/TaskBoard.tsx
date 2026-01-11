@@ -142,9 +142,11 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
 
         // 2. If both are DONE, sort by completedAt (Newest first)
         if (aDone && bDone) {
-            const dateA = a.completedAt ? new Date(a.completedAt).getTime() : 0
-            const dateB = b.completedAt ? new Date(b.completedAt).getTime() : 0
-            return dateB - dateA
+            const getDate = (t: Task) => {
+                if (t.completedAt) return new Date(t.completedAt).getTime()
+                return new Date(t.updatedAt).getTime() // Fallback if completedAt is missing
+            }
+            return getDate(b) - getDate(a)
         }
 
         // 3. If both are Active, Sort by Priority (Higher first)

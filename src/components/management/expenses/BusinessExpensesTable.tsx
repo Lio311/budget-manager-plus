@@ -29,7 +29,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Label } from '@/components/ui/label'
-import { Plus, Trash2, Search, Filter, Loader2, Calendar as CalendarIcon, Edit } from 'lucide-react'
+import { Plus, Trash2, Search, Filter, Loader2, Calendar as CalendarIcon, Edit, ArrowUpDown } from 'lucide-react'
 import { toast } from 'sonner'
 import { createBusinessExpense, deleteBusinessExpense, updateBusinessExpense } from '@/lib/actions/business-expenses'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -105,12 +105,43 @@ export function BusinessExpensesTable({
         return split
     }
 
-    const filteredExpenses = expenses.filter(e => {
+    // Sorting State
+    const [sortMethod, setSortMethod] = useState<'AMOUNT' | 'DESCRIPTION' | 'CATEGORY' | 'PAYMENT'>('AMOUNT')
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+
+    const sortExpenses = (items: any[]) => {
+        return [...items].sort((a, b) => {
+            let diff = 0
+            switch (sortMethod) {
+                case 'AMOUNT':
+                    diff = a.amount - b.amount
+                    break
+                case 'DESCRIPTION':
+                    diff = (a.description || '').localeCompare(b.description || '', 'he')
+                    break
+                case 'CATEGORY':
+                    const catA = categoryMap[a.category] || a.category
+                    const catB = categoryMap[b.category] || b.category
+                    diff = catA.localeCompare(catB, 'he')
+                    break
+                case 'PAYMENT':
+                    const payA = a.paymentMethod || ''
+                    const payB = b.paymentMethod || ''
+                    diff = payA.localeCompare(payB, 'he')
+                    break
+                default:
+                    diff = 0
+            }
+            return sortDirection === 'asc' ? diff : -diff
+        })
+    }
+
+    const filteredExpenses = sortExpenses(expenses.filter(e => {
         const matchSearch = e.description.toLowerCase().includes(search.toLowerCase()) ||
             e.category.toLowerCase().includes(search.toLowerCase())
         const matchCategory = categoryFilter === 'ALL' || e.category === categoryFilter
         return matchSearch && matchCategory
-    })
+    }))
 
     const totalAmount = filteredExpenses.reduce((sum, e) => sum + e.amount, 0)
 
@@ -427,6 +458,31 @@ export function BusinessExpensesTable({
                 </div>
 
                 <div className="flex items-center gap-2">
+                    {/* Sort Controls */}
+                    <div className="flex items-center gap-2 pl-2 border-l border-gray-200 ml-2">
+                        <span className="text-sm text-gray-500 font-medium whitespace-nowrap hidden lg:inline">מיון לפי:</span>
+                        <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                            <SelectTrigger className="w-[120px] h-9 gap-2">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl">
+                                <SelectItem value="AMOUNT">סכום</SelectItem>
+                                <SelectItem value="DESCRIPTION">תיאור</SelectItem>
+                                <SelectItem value="CATEGORY">קטגוריה</SelectItem>
+                                <SelectItem value="PAYMENT">אמצעי תשלום</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                            className="h-9 w-9 p-0 border border-gray-200 bg-gray-50 hover:bg-white"
+                            title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
+                        >
+                            <ArrowUpDown className={`w-4 h-4 text-gray-500 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                        </Button>
+                    </div>
+
                     <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                         <SelectTrigger className="w-[150px] h-9 gap-2">
                             <Filter size={16} className="text-gray-500" />

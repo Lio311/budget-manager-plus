@@ -277,7 +277,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                 <div className="w-1/3 min-w-[200px] flex flex-col gap-2 py-4 h-full">
                     <div className="flex flex-col gap-2 mb-2 sticky top-0 z-10 w-full">
                         {/* Sort Control */}
-                        <div className="flex items-center gap-2 justify-end w-full">
+                        <div className="flex items-center gap-2 justify-start w-full">
                             <span className="text-xs text-gray-500 font-medium whitespace-nowrap">מיון לפי:</span>
                             <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
                                 <SelectTrigger className="h-7 text-xs w-[110px] bg-white/80">
