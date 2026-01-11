@@ -161,7 +161,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     // VAT Calculations
     const totalVatCollected = current.incomes.reduce((sum: number, item: any) => sum + (item.vatAmountILS || 0), 0)
-    const totalVatPaid = current.expenses.reduce((sum: number, item: any) => sum + (item.vatAmountILS || 0), 0)
+    // Fix: Only sum VAT for expenses that are deductible (recognized for tax/VAT)
+    const totalVatPaid = current.expenses.reduce((sum: number, item: any) => {
+        if (isBusiness && item.isDeductible === false) return sum
+        return sum + (item.vatAmountILS || 0)
+    }, 0)
 
     // Net Worth / Balance Logic
     const currentNetWorth = netWorthHistory.length > 0 ? netWorthHistory[netWorthHistory.length - 1].accumulatedNetWorth : 0
