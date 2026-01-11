@@ -111,7 +111,7 @@ export async function addExpense(
                 paymentMethod: validatedData.paymentMethod,
 
                 paymentTerms: validatedData.paymentTerms,
-                responsibles: validatedData.responsibles || ["RON"] // Default to RON
+
             }
         })
 
@@ -126,8 +126,7 @@ export async function addExpense(
                 data.currency,
                 startDate,
                 data.recurringEndDate,
-                type,
-                validatedData.responsibles || ["RON"] // Pass responsibles
+                type
             )
         }
 
@@ -148,7 +147,7 @@ async function createRecurringExpenses(
     startDateStr: string,
     endDateStr: string,
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL',
-    responsibles: string[] = ["RON"]
+
 ) {
     const startDate = new Date(startDateStr)
     const endDate = new Date(endDateStr)
@@ -203,7 +202,7 @@ async function createRecurringExpenses(
                         recurringSourceId: sourceId,
                         recurringStartDate: startDate,
                         recurringEndDate: endDate,
-                        responsibles: responsibles
+
                     }
                 })
             }

@@ -175,7 +175,8 @@ export async function createBusinessExpense(data: any) {
                 category: data.category || 'General',
                 paymentMethod: data.paymentMethod,
                 notes: data.notes,
-                campaignId: data.campaignId || undefined // Was marketingCampaignId
+                campaignId: data.campaignId || undefined, // Was marketingCampaignId
+                responsibles: data.responsibles || ["RON"]
             }
         })
 
@@ -223,6 +224,7 @@ export async function updateBusinessExpense(id: string, data: any) {
                 category: data.category,
                 paymentMethod: data.paymentMethod,
                 notes: data.notes,
+                responsibles: data.responsibles,
             },
             include: {
                 campaign: {

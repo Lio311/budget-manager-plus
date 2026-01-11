@@ -53,7 +53,9 @@ export function BusinessExpensesTable({
         description: '',
         amount: '',
         category: 'פיתוח',
-        date: new Date()
+        category: 'פיתוח',
+        date: new Date(),
+        responsibles: ['RON']
     })
 
     const categories = ['פיתוח', 'אבטחה', 'בדיקות', 'שיווק', 'פיתוח עסקי', 'General', 'Marketing', 'Hosting', 'Legal', 'Office']
@@ -79,7 +81,10 @@ export function BusinessExpensesTable({
                 description: formData.description,
                 amount: parseFloat(formData.amount),
                 category: formData.category,
-                date: formData.date
+                amount: parseFloat(formData.amount),
+                category: formData.category,
+                date: formData.date,
+                responsibles: formData.responsibles
             })
 
             if (res.success) {
@@ -90,7 +95,9 @@ export function BusinessExpensesTable({
                     description: '',
                     amount: '',
                     category: 'Marketing',
-                    date: new Date()
+                    category: 'Marketing',
+                    date: new Date(),
+                    responsibles: ['RON']
                 })
             } else {
                 toast.error('שגיאה בהוספת ההוצאה')
@@ -112,7 +119,10 @@ export function BusinessExpensesTable({
                 description: formData.description,
                 amount: parseFloat(formData.amount),
                 category: formData.category,
-                date: formData.date
+                amount: parseFloat(formData.amount),
+                category: formData.category,
+                date: formData.date,
+                responsibles: formData.responsibles
             })
 
             if (res.success) {
@@ -124,7 +134,9 @@ export function BusinessExpensesTable({
                     description: '',
                     amount: '',
                     category: 'Marketing',
-                    date: new Date()
+                    category: 'Marketing',
+                    date: new Date(),
+                    responsibles: ['RON']
                 })
             } else {
                 toast.error('שגיאה בעדכון ההוצאה')
@@ -157,7 +169,9 @@ export function BusinessExpensesTable({
             description: expense.description,
             amount: expense.amount.toString(),
             category: expense.category,
-            date: new Date(expense.date)
+            category: expense.category,
+            date: new Date(expense.date),
+            responsibles: expense.responsibles || ['RON']
         })
         setIsDialogOpen(true)
     }
@@ -265,6 +279,49 @@ export function BusinessExpensesTable({
                                             />
                                         </PopoverContent>
                                     </Popover>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-right block mb-2">אחריות (חלוקת הוצאה)</Label>
+                                    <div className="flex gap-4 justify-end">
+                                        {['RON', 'LEON', 'LIOR'].map((person) => {
+                                            const isSelected = formData.responsibles?.includes(person)
+                                            return (
+                                                <div
+                                                    key={person}
+                                                    onClick={() => {
+                                                        const current = formData.responsibles || ['RON']
+                                                        let next = []
+                                                        if (current.includes(person)) {
+                                                            if (current.length === 1) return // Prevent empty
+                                                            next = current.filter(p => p !== person)
+                                                        } else {
+                                                            next = [...current, person]
+                                                        }
+                                                        setFormData({ ...formData, responsibles: next })
+                                                    }}
+                                                    className={`
+                                                         cursor-pointer flex flex-col items-center gap-2 transition-all p-2 rounded-xl border-2
+                                                         ${isSelected
+                                                            ? 'border-blue-500 bg-blue-50 scale-105'
+                                                            : 'border-transparent hover:bg-gray-50 opacity-60 hover:opacity-100'
+                                                        }
+                                                     `}
+                                                >
+                                                    <div className={`
+                                                         w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white shadow-sm
+                                                         ${person === 'RON' ? 'bg-indigo-500' : ''}
+                                                         ${person === 'LEON' ? 'bg-orange-500' : ''}
+                                                         ${person === 'LIOR' ? 'bg-emerald-500' : ''}
+                                                     `}>
+                                                        {person === 'RON' ? 'RO' : (person === 'LEON' ? 'LE' : 'LI')}
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-gray-600">
+                                                        {person === 'RON' ? 'רון' : (person === 'LEON' ? 'לאון' : 'ליאור')}
+                                                    </span>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
                                 </div>
                                 <div className="pt-4 flex justify-end gap-2">
                                     {editingExpense && (
