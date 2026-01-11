@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2 } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, type ClientFormData } from '@/lib/actions/clients'
 import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
@@ -11,6 +11,10 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { z } from 'zod'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useDemo } from '@/contexts/DemoContext'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { format } from 'date-fns'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -27,13 +31,20 @@ export function ClientsTab() {
     const [searchTerm, setSearchTerm] = useState('')
     const [showForm, setShowForm] = useState(false)
     const [editingClient, setEditingClient] = useState<any>(null)
+    const [showAdvanced, setShowAdvanced] = useState(false)
     const [formData, setFormData] = useState<ClientFormData>({
         name: '',
         email: '',
         phone: '',
         taxId: '',
         address: '',
-        notes: ''
+        notes: '',
+        packageName: '',
+        subscriptionType: '',
+        subscriptionPrice: '',
+        subscriptionStart: undefined,
+        subscriptionEnd: undefined,
+        subscriptionStatus: ''
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -124,7 +135,9 @@ export function ClientsTab() {
                     toast.success('לקוח עודכן בהצלחה')
                     setShowForm(false)
                     setEditingClient(null)
-                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '' })
+                    setShowForm(false)
+                    setEditingClient(null)
+                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '' })
                     mutate()
                 } else {
                     toast.error(result.error || 'שגיאה')
@@ -132,7 +145,8 @@ export function ClientsTab() {
             } else {
                 await optimisticCreateClient(formData)
                 setShowForm(false)
-                setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '' })
+                setShowForm(false)
+                setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '' })
             }
         } catch (error) {
             // Error handled by hook or update logic
@@ -148,7 +162,14 @@ export function ClientsTab() {
             phone: client.phone || '',
             taxId: client.taxId || '',
             address: client.address || '',
-            notes: client.notes || ''
+            address: client.address || '',
+            notes: client.notes || '',
+            packageName: client.packageName || '',
+            subscriptionType: client.subscriptionType || '',
+            subscriptionPrice: client.subscriptionPrice || '',
+            subscriptionStart: client.subscriptionStart,
+            subscriptionEnd: client.subscriptionEnd,
+            subscriptionStatus: client.subscriptionStatus || ''
         })
         setShowForm(true)
     }
@@ -200,7 +221,9 @@ export function ClientsTab() {
                         setShowForm(true)
                         setEditingClient(null)
                         setErrors({})
-                        setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '' })
+                        setEditingClient(null)
+                        setErrors({})
+                        setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '' })
                     }}
                     className="bg-green-600 hover:bg-green-700"
                 >
@@ -313,6 +336,113 @@ export function ClientsTab() {
                                 rows={3}
                                 className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.notes ? 'border-red-500' : 'border-gray-300'}`}
                             />
+                        </div>
+
+                        {/* Advanced Settings Accordion */}
+                        <div className="border rounded-lg overflow-hidden border-gray-200 dark:border-slate-700">
+                            <button
+                                type="button"
+                                onClick={() => setShowAdvanced(!showAdvanced)}
+                                className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors text-sm font-semibold text-gray-700 dark:text-gray-300"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showAdvanced ? 'rotate-180' : ''}`} />
+                                    הגדרות מתקדמות (ניהול מנוי / ריטיינר)
+                                </span>
+                            </button>
+
+                            {showAdvanced && (
+                                <div className="p-4 bg-gray-50/50 dark:bg-slate-800/50 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                שם חבילה / שירות
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder="לדוגמה: מנוי פרימיום, ריטיינר שעות"
+                                                value={formData.packageName || ''}
+                                                onChange={(e) => setFormData({ ...formData, packageName: e.target.value })}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                סוג מנוי
+                                            </label>
+                                            <Select
+                                                value={formData.subscriptionType || ''}
+                                                onValueChange={(value) => setFormData({ ...formData, subscriptionType: value })}
+                                            >
+                                                <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700">
+                                                    <SelectValue placeholder="בחר סוג מנוי" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="WEEKLY">שבועי</SelectItem>
+                                                    <SelectItem value="MONTHLY">חודשי</SelectItem>
+                                                    <SelectItem value="YEARLY">שנתי</SelectItem>
+                                                    <SelectItem value="PROJECT">פרויקט חד פעמי</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                תאריך התחלה
+                                            </label>
+                                            <div className="w-full">
+                                                <DatePicker
+                                                    date={formData.subscriptionStart ? new Date(formData.subscriptionStart) : undefined}
+                                                    setDate={(date) => setFormData({ ...formData, subscriptionStart: date })}
+                                                    placeholder="בחר תאריך התחלה"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                תאריך סיום (אופציונלי)
+                                            </label>
+                                            <div className="w-full">
+                                                <DatePicker
+                                                    date={formData.subscriptionEnd ? new Date(formData.subscriptionEnd) : undefined}
+                                                    setDate={(date) => setFormData({ ...formData, subscriptionEnd: date })}
+                                                    placeholder="בחר תאריך סיום"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                מחיר מנוי / עסקה
+                                            </label>
+                                            <FormattedNumberInput
+                                                value={formData.subscriptionPrice?.toString() || ''}
+                                                onChange={(e) => setFormData({ ...formData, subscriptionPrice: e.target.value ? parseFloat(e.target.value) : undefined })}
+                                                placeholder="0.00"
+                                                className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                                סטטוס תשלום
+                                            </label>
+                                            <Select
+                                                value={formData.subscriptionStatus || ''}
+                                                onValueChange={(value) => setFormData({ ...formData, subscriptionStatus: value })}
+                                            >
+                                                <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700">
+                                                    <SelectValue placeholder="בחר סטטוס" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="PAID">שולם</SelectItem>
+                                                    <SelectItem value="UNPAID">לא שולם</SelectItem>
+                                                    <SelectItem value="PARTIAL">שולם חלקית</SelectItem>
+                                                    <SelectItem value="INSTALLMENTS">בתשלומים</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         <div className="flex gap-2">
                             <Button type="submit" className="bg-green-600 hover:bg-green-700">

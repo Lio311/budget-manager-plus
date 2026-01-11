@@ -12,7 +12,15 @@ const ClientSchema = z.object({
     taxId: z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional().or(z.literal('')),
     address: z.string().max(200, 'הכתובת ארוכה מדי').optional().or(z.literal('')),
     notes: z.string().max(500, 'הערות ארוכות מדי').optional().or(z.literal('')),
-    isActive: z.boolean().optional()
+    isActive: z.boolean().optional(),
+
+    // SaaS Fields
+    subscriptionType: z.string().optional().or(z.literal('')),
+    subscriptionStart: z.union([z.date(), z.string().transform((val) => val === '' ? undefined : new Date(val))]).optional(),
+    subscriptionEnd: z.union([z.date(), z.string().transform((val) => val === '' ? undefined : new Date(val))]).optional(),
+    subscriptionPrice: z.union([z.number(), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
+    subscriptionStatus: z.string().optional().or(z.literal('')),
+    packageName: z.string().max(100, 'שם החבילה ארוך מדי').optional().or(z.literal(''))
 })
 
 export interface ClientFormData {
@@ -23,6 +31,13 @@ export interface ClientFormData {
     address?: string
     notes?: string
     isActive?: boolean
+
+    subscriptionType?: string
+    subscriptionStart?: Date | string
+    subscriptionEnd?: Date | string
+    subscriptionPrice?: number | string
+    subscriptionStatus?: string
+    packageName?: string
 }
 
 export async function getClients(scope: string = 'BUSINESS') {
@@ -157,7 +172,15 @@ export async function createClient(data: ClientFormData, scope: string = 'BUSINE
                 taxId: validData.taxId || null,
                 address: validData.address || null,
                 notes: validData.notes || null,
-                isActive: validData.isActive ?? true
+                isActive: validData.isActive ?? true,
+
+                // SaaS Fields
+                subscriptionType: validData.subscriptionType || null,
+                subscriptionStart: validData.subscriptionStart ? new Date(validData.subscriptionStart) : null,
+                subscriptionEnd: validData.subscriptionEnd ? new Date(validData.subscriptionEnd) : null,
+                subscriptionPrice: validData.subscriptionPrice || null,
+                subscriptionStatus: validData.subscriptionStatus || null,
+                packageName: validData.packageName || null
             }
         })
 
@@ -201,7 +224,15 @@ export async function updateClient(id: string, data: ClientFormData) {
                 taxId: validData.taxId || null,
                 address: validData.address || null,
                 notes: validData.notes || null,
-                isActive: validData.isActive
+                isActive: validData.isActive,
+
+                // SaaS Fields
+                subscriptionType: validData.subscriptionType || null,
+                subscriptionStart: validData.subscriptionStart ? new Date(validData.subscriptionStart) : null,
+                subscriptionEnd: validData.subscriptionEnd ? new Date(validData.subscriptionEnd) : null,
+                subscriptionPrice: validData.subscriptionPrice || null,
+                subscriptionStatus: validData.subscriptionStatus || null,
+                packageName: validData.packageName || null
             }
         })
 

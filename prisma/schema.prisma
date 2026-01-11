@@ -481,6 +481,14 @@ model Client {
   address   String?
   notes     String?  @db.Text
   
+  // SaaS / Subscription Fields
+  subscriptionType   String?   // WEEKLY, MONTHLY, YEARLY
+  subscriptionStart  DateTime?
+  subscriptionEnd    DateTime?
+  subscriptionPrice  Float?
+  subscriptionStatus String?   // PAID, UNPAID, PARTIAL, INSTALLMENTS
+  packageName        String?
+  
   // Metadata
   scope     String   @default("BUSINESS")
   isActive  Boolean  @default(true)
