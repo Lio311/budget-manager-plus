@@ -7,7 +7,7 @@ import { getUserSubscriptionStatus, getOnboardingStatus } from '@/lib/actions/us
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BarChart3, Calendar, CreditCard, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator } from 'lucide-react'
+import { BarChart3, Calendar, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
@@ -344,8 +344,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </TabsContent>
                 </div>
             </div>
-        </div>
-            { subscriptionDialog }
+            {subscriptionDialog}
         </Tabs >
     )
 }
