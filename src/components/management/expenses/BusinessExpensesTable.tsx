@@ -364,64 +364,16 @@ export function BusinessExpensesTable({
                                                         const hasLior = next.includes('LIOR')
                                                         const count = next.length
 
-                                                        // If Lior is present, he cannot be with just 1 other person (size 2 is invalid)
+                                                        // If Lior is present and count is 2, we need to fix it
                                                         if (hasLior && count === 2) {
-                                                            // We arrived at 2. We need 1 or 3.
-                                                            // Case A: We just ADDED someone to LIOR (was [LIOR] -> [LIOR, X])
-                                                            // Case B: We just ADDED LIOR to someone (was [X] -> [X, LIOR])
-                                                            // Solution: Upgrade to Trio ([RON, LEON, LIOR])
-                                                            next = ['RON', 'LEON', 'LIOR']
-                                                        }
-
-                                                        // If we removed someone from Trio and left with 2 including Lior (e.g. [LIOR, X]),
-                                                        // handled above? No, wait.
-                                                        // If we were [A, B, LIOR] and removed A -> [B, LIOR]. Size 2.
-                                                        // In this case, maybe we should just remove LIOR as well? Or go back to LIOR alone?
-                                                        // "Lior can be chosen either alone or as part of a trio"
-                                                        // Let's assume if we break the trio, we likely want the remaining pair WITHOUT Lior, or Lior ALONE.
-                                                        // If I uncheck Ron from [Ron, Leon, Lior], I get [Leon, Lior].
-                                                        // If I enforce rules... maybe I should just forbid Lior + 1.
-
-                                                        // Let's refine the logic block:
-                                                        if (hasLior && count === 2) {
-                                                            // If we came from 3 (Trio) -> 2:
+                                                            // We came from either 1 or 3
                                                             if (current.length === 3) {
-                                                                // User removed someone. We are left with Lior + 1.
-                                                                // Invalid state. Auto-remove Lior too? -> [1].
-                                                                // Or Auto-remove the 1? -> [Lior].
-                                                                // Let's try: If user unchecks X from Trio, they probably want the Pair without Lior (since Lior can't be in pair).
-                                                                // Wait, Lior CANNOT be in pair. 
-                                                                // So if I uncheck Ron from [Ron, Leon, Lior], I have [Leon, Lior] -> Invalid.
-                                                                // I should probably convert to [Leon] (remove Lior) or [Lior] (remove Leon).
-                                                                // Let's defaulting to [Lior] alone if we break the trio? Or the other person alone?
-                                                                // Let's stick to the "Upgrade to Trio" when building up.
-                                                                // When breaking down:
-                                                                next = ['RON', 'LEON', 'LIOR'] // Lock to trio? No, that prevents unchecking.
-
-                                                                // Better Logic:
-                                                                // If Result has Lior and length is 2:
-                                                                // Check who was clicked.
-                                                                if (person === 'LIOR') {
-                                                                    // Clicked Lior (Added him to 1 person) -> Upgrade to Trio
-                                                                    next = ['RON', 'LEON', 'LIOR']
-                                                                } else {
-                                                                    // Clicked someone else (Added them to Lior OR Removed them from Trio)
-                                                                    if (current.length === 1 && current[0] === 'LIOR') {
-                                                                        // Added X to Lior -> Upgrade to Trio
-                                                                        next = ['RON', 'LEON', 'LIOR']
-                                                                    } else if (current.length === 3) {
-                                                                        // Removed X from Trio -> Left with Lior + Y.
-                                                                        // Since Lior can't be with Y, and we explicitly removed X, 
-                                                                        // let's assume user wants to keep Y and remove Lior? 
-                                                                        // Or keep Lior and remove Y?
-                                                                        // Let's enable the "Pair" (Ron+Leon) if Lior was the one implied to leave? 
-                                                                        // No, Lior is still in `next`.
-                                                                        // Let's just remove Lior whenever strictly 2 remains?
-                                                                        next = next.filter(p => p !== 'LIOR')
-                                                                    }
-                                                                }
+                                                                // Removed someone from trio, left with Lior + 1
+                                                                // Remove Lior to leave just the pair
+                                                                next = next.filter(p => p !== 'LIOR')
                                                             } else {
-                                                                // Came from 1 -> 2. Upgrade to 3.
+                                                                // Added someone to Lior (or added Lior to someone)
+                                                                // Upgrade to full trio
                                                                 next = ['RON', 'LEON', 'LIOR']
                                                             }
                                                         }
