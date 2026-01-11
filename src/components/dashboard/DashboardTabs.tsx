@@ -25,6 +25,14 @@ import { BudgetLimitsTab } from './tabs/BudgetLimitsTab'
 import ProfitLossTab from './tabs/ProfitLossTab'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useSWRConfig } from 'swr'
+import { UserButton } from '@clerk/nextjs'
+import { ModeToggle } from '@/components/mode-toggle'
+import { useDemo } from '@/contexts/DemoContext'
+import { useAuthModal } from '@/contexts/AuthModalContext'
+import { LinkedEmails } from './UserProfile/LinkedEmails'
+import { SubscriptionStatus } from './UserProfile/SubscriptionStatus'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Mail, CreditCard } from 'lucide-react'
 
 interface DashboardTabsProps {
     mobileMenuOpen: boolean
@@ -37,6 +45,49 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     // Popup State
     const [showWelcome, setShowWelcome] = useState(false)
     const [showOnboarding, setShowOnboarding] = useState(false)
+    const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false)
+    const { isDemo } = useDemo()
+    const { openModal } = useAuthModal()
+
+    const subscriptionDialog = (
+        <Dialog open={isSubscriptionOpen} onOpenChange={setIsSubscriptionOpen}>
+            <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden bg-white dark:bg-slate-900 border-none shadow-xl rounded-3xl" dir="rtl">
+                <div className="p-6">
+                    <SubscriptionStatus />
+                    <div className="mt-6 flex justify-center">
+                        <Button variant="outline" onClick={() => setIsSubscriptionOpen(false)} className="w-full sm:w-auto">
+                            סגור
+                        </Button>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    )
+
+    // User Profile Props (Copied from Header for consistency)
+    const userProfileProps = {
+        appearance: {
+            elements: {
+                profileSection__emailAddresses: "hidden",
+                profileSection__connectedAccounts: "hidden",
+                cardBox: "w-full h-full md:w-fit md:h-auto md:min-w-[700px] md:max-w-[90vw]",
+                scrollBox: "h-full md:h-auto",
+                pageScrollBox: "h-full md:h-auto",
+                "profileSectionPrimaryButton:hover": {
+                    border: "none",
+                    boxShadow: "none",
+                    outline: "none"
+                }
+            }
+        }
+    }
+
+    const userButtonAppearance = {
+        elements: {
+            userButtonPopoverActionButton__manageAccount: "hidden md:flex"
+        }
+    }
+
     const [subscriptionStatus, setSubscriptionStatus] = useState<{
         trialEndsAt?: Date | null
         activeSubscription?: { endDate: Date | null, planType: 'PERSONAL' | 'BUSINESS' } | null
@@ -174,10 +225,46 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white/40 dark:md:bg-slate-900/40 md:backdrop-blur-md border-l md:border border-white/50 dark:border-slate-800/50 shadow-2xl
             `}>
                 <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10 dark:border-white/5">
-                    <span className="font-bold text-lg text-[#323338] dark:text-gray-100">תפריט</span>
-                    <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-[#323338] dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/10">
-                        <X className="h-5 w-5" />
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-[#323338] dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/10">
+                            <X className="h-5 w-5" />
+                        </Button>
+                        <span className="font-bold text-lg text-[#323338] dark:text-gray-100">תפריט</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <ModeToggle />
+                        {isDemo ? (
+                            <Button
+                                onClick={openModal}
+                                variant="outline"
+                                size="sm"
+                                className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600 h-8"
+                            >
+                                התחבר
+                            </Button>
+                        ) : (
+                            <UserButton
+                                userProfileProps={userProfileProps}
+                                appearance={userButtonAppearance}
+                            >
+                                <UserButton.UserProfilePage
+                                    label="מיילים מקושרים"
+                                    labelIcon={<Mail className="w-4 h-4" />}
+                                    url="linked-emails"
+                                >
+                                    <LinkedEmails />
+                                </UserButton.UserProfilePage>
+                                <UserButton.MenuItems>
+                                    <UserButton.Action
+                                        label="מנוי"
+                                        labelIcon={<CreditCard className="w-4 h-4" />}
+                                        onClick={() => setIsSubscriptionOpen(true)}
+                                    />
+                                </UserButton.MenuItems>
+                            </UserButton>
+                        )}
+                    </div>
                 </div>
 
                 <div className="p-3 overflow-y-auto flex-1 scrollbar-hide">
@@ -257,6 +344,8 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </TabsContent>
                 </div>
             </div>
+        </div>
+            { subscriptionDialog }
         </Tabs >
     )
 }

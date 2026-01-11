@@ -133,43 +133,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         >
                             <Menu className={`h-5 w-5 ${menuOpen ? 'text-black' : 'text-white'}`} />
                         </Button>
-
-                        {/* Mobile User Button / Guest Indicator */}
-                        {isDemo ? (
-                            <Button
-                                onClick={openModal}
-                                variant="outline"
-                                size="sm"
-                                className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600 h-8 self-center ml-2"
-                            >
-                                התחבר
-                            </Button>
-                        ) : (
-                            <UserButton
-                                userProfileProps={userProfileProps}
-                                appearance={userButtonAppearance}
-                            >
-                                <UserButton.UserProfilePage
-                                    label="מיילים מקושרים"
-                                    labelIcon={<Mail className="w-4 h-4" />}
-                                    url="linked-emails"
-                                >
-                                    <LinkedEmails />
-                                </UserButton.UserProfilePage>
-                                <UserButton.MenuItems>
-                                    <UserButton.Action
-                                        label="מנוי"
-                                        labelIcon={<CreditCard className="w-4 h-4" />}
-                                        onClick={() => setIsSubscriptionOpen(true)}
-                                    />
-                                </UserButton.MenuItems>
-
-                            </UserButton>
-                        )}
-
-                        <div className="mr-2">
-                            <ModeToggle />
-                        </div>
                     </div>
 
                     <div className="flex items-center gap-1 bg-white/50 dark:bg-slate-800/50 rounded-full p-1 border border-white/40 dark:border-slate-700/50 shadow-sm">
