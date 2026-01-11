@@ -151,7 +151,7 @@ export function LinkedEmails() {
                                     </div>
                                 </div>
 
-                                {user.primaryEmailAddressId !== email.id && (
+                                {user.primaryEmailAddressId !== email.id && user.emailAddresses.length > 1 && (
                                     <Button
                                         variant="ghost"
                                         size="icon"

@@ -83,7 +83,11 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     // Require authentication for all other routes
-    await auth.protect();
+    // Require authentication for all other routes
+    const { userId } = await auth();
+    if (!userId) {
+        return NextResponse.redirect(new URL('/', req.url));
+    }
 });
 
 export const config = {
