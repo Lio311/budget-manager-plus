@@ -41,6 +41,8 @@ export function LinkedEmails() {
             console.error('Delete Email Error:', err)
             if (err.errors?.[0]?.code === 'resource_associated_with_external_account') {
                 toast.error('לא ניתן למחוק מייל זה משום שהוא מקושר לחשבון Google. יש לנתק את חשבון ה-Google קודם לכן.')
+            } else if (err.errors?.[0]?.message?.includes('Connected Accounts') || err.message?.includes('Connected Accounts')) {
+                toast.error('המייל הזה מקושר לחשבון Google המופיע ברשימה למעלה. יש לנתק את חשבון ה-Google קודם לכן.')
             } else if (err.errors?.[0]?.message?.includes('last')) {
                 toast.error('לא ניתן למחוק את אמצעי ההתחברות האחרון.')
             } else if (err.errors?.[0]?.code === 'session_step_up_verification_required' || err.message?.includes('verification')) {
