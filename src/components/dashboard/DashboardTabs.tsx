@@ -216,7 +216,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 h-[100dvh] md:h-fit md:max-h-[calc(100vh-120px)]
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
-                z-[100] md:z-50
+                z-40 md:z-50
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                 flex flex-col
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}

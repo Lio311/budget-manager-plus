@@ -135,6 +135,23 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         </Button>
                     </div>
 
+                    {/* Logo - Centered in flow */}
+                    <div className="cursor-pointer transition-transform hover:scale-105"
+                        onClick={() => {
+                            const params = new URLSearchParams(searchParams)
+                            params.set('tab', 'overview')
+                            router.push(`${pathname}?${params.toString()}`)
+                        }}>
+                        <Image
+                            src="/images/branding/K-LOGO.png"
+                            alt="Logo"
+                            width={100}
+                            height={100}
+                            className="h-10 w-auto object-contain"
+                            priority
+                        />
+                    </div>
+
                     <div className="flex items-center gap-1 bg-white/50 dark:bg-slate-800/50 rounded-full p-1 border border-white/40 dark:border-slate-700/50 shadow-sm">
                         <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-8 w-8 rounded-full dark:text-gray-200 dark:hover:bg-slate-700">
                             <ChevronRight className="h-4 w-4" />
@@ -159,7 +176,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                 </div>
 
                 {/* Logo - Centered */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105"
+                <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105"
                     onClick={() => {
                         const params = new URLSearchParams(searchParams)
                         params.set('tab', 'overview')
