@@ -62,7 +62,7 @@ export function ClientsTab() {
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [isAddingPackage, setIsAddingPackage] = useState(false)
-    const [isAddingPackage, setIsAddingPackage] = useState(false)
+
     const [warningDays, setWarningDays] = useState(14)
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
