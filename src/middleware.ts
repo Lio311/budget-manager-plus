@@ -59,6 +59,9 @@ export default clerkMiddleware(async (auth, req) => {
         // console.warn('Maintenance check skipped (timeout/error)');
     }
 
+    // FORCE DISABLE MAINTENANCE MODE (User Request)
+    isMaintenance = false;
+
     if (isMaintenance) {
         // Allow admins to bypass
         if (isAdmin) {
