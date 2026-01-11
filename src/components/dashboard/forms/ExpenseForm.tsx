@@ -85,7 +85,10 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         vatAmount: '',
         isDeductible: true,
         deductibleRate: '1.0',
-        paymentMethod: ''
+        isDeductible: true,
+        deductibleRate: '1.0',
+        paymentMethod: '',
+        responsibles: ['RON']
     })
 
     // Handle VAT Calculations (Backwards from Gross)
@@ -213,7 +216,9 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             vatAmount: input.vatAmount || 0,
                             isDeductible: input.isDeductible ?? true,
                             paymentMethod: input.paymentMethod || '',
-                            isRecurring: input.isRecurring || false
+                            paymentMethod: input.paymentMethod || '',
+                            isRecurring: input.isRecurring || false,
+                            responsibles: input.responsibles || ['RON']
                         },
                         ...(current.expenses || [])
                     ]
@@ -272,7 +277,9 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 vatAmount: isBusiness ? parseFloat(vat) : undefined,
                 isDeductible: isBusiness ? newExpense.isDeductible : undefined,
                 deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
-                paymentMethod: newExpense.paymentMethod || undefined
+                deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
+                paymentMethod: newExpense.paymentMethod || undefined,
+                responsibles: newExpense.responsibles
             })
 
             // Reset form
@@ -588,6 +595,63 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     </div>
                 )}
 
+                {/* Team Responsibility Section - Always visible or under advanced? User said "in form". Let's put it at bottom of advanced or main. 
+                   Actually, usually split is important. Let's put it inside Advanced for now to avoid clutter, or maybe a separate toggle. 
+                   Let's put it in Advanced Section. */}
+                {isAdvancedOpen && (
+                    <div className="p-4 bg-gray-50/50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50 w-full">
+                        <label className="text-xs font-bold mb-3 block text-[#676879] dark:text-gray-300">אחריות (חלוקת הוצאה)</label>
+                        <div className="flex gap-4 justify-start">
+                            {['RON', 'LEON', 'LIOR'].map((person) => {
+                                const isSelected = newExpense.responsibles?.includes(person)
+                                return (
+                                    <div
+                                        key={person}
+                                        onClick={() => {
+                                            if (isDemo) { interceptAction(); return; }
+                                            const current = newExpense.responsibles || ['RON']
+                                            let next = []
+                                            if (current.includes(person)) {
+                                                if (current.length === 1) return // Prevent empty
+                                                next = current.filter(p => p !== person)
+                                            } else {
+                                                next = [...current, person]
+                                            }
+                                            setNewExpense({ ...newExpense, responsibles: next })
+                                        }}
+                                        className={`
+                                            cursor-pointer flex flex-col items-center gap-2 transition-all p-2 rounded-xl border-2
+                                            ${isSelected
+                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-105'
+                                                : 'border-transparent hover:bg-gray-100 dark:hover:bg-slate-700 opacity-60 hover:opacity-100'
+                                            }
+                                        `}
+                                    >
+                                        <div className={`
+                                            w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm
+                                            ${person === 'RON' ? 'bg-indigo-100 text-indigo-600' : ''}
+                                            ${person === 'LEON' ? 'bg-orange-100 text-orange-600' : ''}
+                                            ${person === 'LIOR' ? 'bg-emerald-100 text-emerald-600' : ''}
+                                        `}>
+                                            {person === 'RON' ? 'RO' : (person === 'LEON' ? 'LE' : 'LI')}
+                                        </div>
+                                        <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300">
+                                            {person === 'RON' ? 'רון' : (person === 'LEON' ? 'לאון' : 'ליאור')}
+                                        </span>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                        {/* Description of split */}
+                        <div className="mt-3 text-xs text-gray-400 text-right">
+                            {newExpense.responsibles?.length > 1
+                                ? `ההוצאה תחולק שווה בשווה (${newExpense.responsibles.length} משתתפים)`
+                                : `ההוצאה מלאה על ${(newExpense.responsibles?.[0] === 'RON' ? 'רון' : (newExpense.responsibles?.[0] === 'LEON' ? 'לאון' : 'ליאור'))}`
+                            }
+                        </div>
+                    </div>
+                )}
+
                 <Button
                     onClick={handleAdd}
                     className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md 
@@ -600,6 +664,6 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הוצאה' : 'הוסף')}
                 </Button>
             </div>
-        </div>
+        </div >
     )
 }

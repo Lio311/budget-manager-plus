@@ -270,6 +270,7 @@ model Expense {
   paymentMethod     String?    // Changed from Enum to String for flexibility
   paymentTerms      Int?     @default(0)
   
+  responsibles      String[] @default(["RON"]) // For expense splitting logic  
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   @@index([budgetId])

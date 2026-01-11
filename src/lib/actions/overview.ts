@@ -54,7 +54,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 select: {
                     id: true,
                     incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true } },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true, responsibles: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },
@@ -69,7 +69,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 select: {
                     id: true,
                     incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true } },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
+                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true, responsibles: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },

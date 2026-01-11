@@ -23,7 +23,9 @@ export const expenseSchema = z.object({
     invoiceDate: z.string().optional().nullable(),
     paymentDate: z.string().optional().nullable(),
     paymentMethod: z.any().optional(),
-    paymentTerms: z.number().optional()
+    paymentTerms: z.number().optional(),
+    responsibles: z.array(z.string()).optional(),
+
 })
 
 export type ExpenseFormData = z.infer<typeof expenseSchema>
