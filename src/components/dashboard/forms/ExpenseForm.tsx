@@ -85,8 +85,6 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         vatAmount: '',
         isDeductible: true,
         deductibleRate: '1.0',
-        isDeductible: true,
-        deductibleRate: '1.0',
         paymentMethod: '',
         responsibles: ['RON']
     })
@@ -216,7 +214,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                             vatAmount: input.vatAmount || 0,
                             isDeductible: input.isDeductible ?? true,
                             paymentMethod: input.paymentMethod || '',
-                            paymentMethod: input.paymentMethod || '',
+
                             isRecurring: input.isRecurring || false,
                             responsibles: input.responsibles || ['RON']
                         },
@@ -277,7 +275,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 vatAmount: isBusiness ? parseFloat(vat) : undefined,
                 isDeductible: isBusiness ? newExpense.isDeductible : undefined,
                 deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
-                deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
+
                 paymentMethod: newExpense.paymentMethod || undefined,
                 responsibles: newExpense.responsibles
             })
@@ -297,7 +295,8 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 vatAmount: '',
                 isDeductible: true,
                 deductibleRate: '1.0',
-                paymentMethod: ''
+                paymentMethod: '',
+                responsibles: ['RON']
             })
 
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
