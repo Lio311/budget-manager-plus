@@ -98,7 +98,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         const today = new Date()
         const isSunday = today.getDay() === 0
 
-        if (isSunday) {
+        if (isSunday && !isDemo) {
             const todayDateString = today.toDateString()
             const lastShownDate = localStorage.getItem('welcome_popup_last_shown')
 
