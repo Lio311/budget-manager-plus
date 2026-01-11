@@ -14,7 +14,8 @@ import { useDemo } from '@/contexts/DemoContext'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { format } from 'date-fns'
+import { format, differenceInDays } from 'date-fns'
+import { Badge } from '@/components/ui/badge'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -490,6 +491,37 @@ export function ClientsTab() {
                                     <Trash2 className="h-4 w-4 text-red-600" />
                                 </button>
                             </div>
+                        </div>
+
+                        {/* Smart Status Badges */}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            {client.packageName && (
+                                <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                                    {client.packageName}
+                                </Badge>
+                            )}
+
+                            {client.subscriptionStatus === 'PAID' && (
+                                <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50">שולם</Badge>
+                            )}
+                            {client.subscriptionStatus === 'UNPAID' && (
+                                <Badge variant="destructive">לא שולם</Badge>
+                            )}
+                            {client.subscriptionStatus === 'PARTIAL' && (
+                                <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50">שולם חלקית</Badge>
+                            )}
+                            {client.subscriptionStatus === 'INSTALLMENTS' && (
+                                <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50">בתשלומים</Badge>
+                            )}
+
+                            {/* Expiration Warning */}
+                            {client.subscriptionEnd && (() => {
+                                const daysLeft = differenceInDays(new Date(client.subscriptionEnd), new Date())
+                                if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
+                                if (daysLeft <= 7) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
+                                if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
+                                return null
+                            })()}
                         </div>
 
                         {client.taxId && (
