@@ -62,7 +62,9 @@ export function ClientsTab() {
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [isAddingPackage, setIsAddingPackage] = useState(false)
+    const [isAddingPackage, setIsAddingPackage] = useState(false)
     const [warningDays, setWarningDays] = useState(14)
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
     // Load settings from localStorage
     useEffect(() => {
@@ -246,50 +248,56 @@ export function ClientsTab() {
                     <h2 className="text-2xl font-bold text-gray-900">לקוחות</h2>
                     <p className="text-sm text-gray-500 mt-1">ניהול תיקי לקוחות</p>
                 </div>
-                <Button
-                    onClick={() => {
-                        setShowForm(true)
-                        setEditingClient(null)
-                        setErrors({})
-                        setEditingClient(null)
-                        setErrors({})
-                        setIsAddingPackage(false)
-                        setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '' })
-                    }}
-                    className="bg-green-600 hover:bg-green-700"
-                >
-                    <Plus className="h-4 w-4 ml-2" />
-                    לקוח חדש
-                </Button>
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button variant="outline" size="icon" className="mr-2">
-                            <Settings className="h-4 w-4" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80">
-                        <div className="grid gap-4">
-                            <div className="space-y-2">
-                                <h4 className="font-medium leading-none">הגדרות תצוגה</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    הגדר מתי להציג התראת סיום מנוי
-                                </p>
-                            </div>
-                            <div className="grid gap-2">
-                                <div className="grid grid-cols-3 items-center gap-4">
-                                    <Label htmlFor="width">ימים להתראה</Label>
-                                    <input
-                                        id="width"
-                                        type="number"
-                                        value={warningDays}
-                                        onChange={(e) => handleSaveSettings(parseInt(e.target.value))}
-                                        className="col-span-2 h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                    />
+                <div className="flex gap-2">
+                    <Popover open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" size="icon">
+                                <Settings className="h-4 w-4" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80">
+                            <div className="grid gap-4">
+                                <div className="space-y-2">
+                                    <h4 className="font-medium leading-none">הגדרות תצוגה</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        הגדר מתי להציג התראת סיום מנוי
+                                    </p>
+                                </div>
+                                <div className="grid gap-2">
+                                    <div className="grid grid-cols-3 items-center gap-4">
+                                        <Label htmlFor="width">ימים להתראה</Label>
+                                        <input
+                                            id="width"
+                                            type="number"
+                                            value={warningDays}
+                                            onChange={(e) => handleSaveSettings(parseInt(e.target.value))}
+                                            className="col-span-2 h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                        />
+                                    </div>
+                                    <Button onClick={() => setIsSettingsOpen(false)} className="w-full mt-2">
+                                        שמור וסגור
+                                    </Button>
                                 </div>
                             </div>
-                        </div>
-                    </PopoverContent>
-                </Popover>
+                        </PopoverContent>
+                    </Popover>
+
+                    <Button
+                        onClick={() => {
+                            setShowForm(true)
+                            setEditingClient(null)
+                            setErrors({})
+                            setEditingClient(null)
+                            setErrors({})
+                            setIsAddingPackage(false)
+                            setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '' })
+                        }}
+                        className="bg-green-600 hover:bg-green-700"
+                    >
+                        <Plus className="h-4 w-4 ml-2" />
+                        לקוח חדש
+                    </Button>
+                </div>
             </div>
 
             {/* Search */}
