@@ -98,204 +98,126 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
             const { total, vat } = calculateFromNet(newIncome.amount, newIncome.vatRate)
             setNewIncome(prev => ({ ...prev, amountBeforeVat: newIncome.amount, vatAmount: vat }))
         }
-    }
-        }
     }, [newIncome.amount, newIncome.vatRate, isBusiness])
 
-// Effect to auto-select first category when categories load if no category is selected
-useEffect(() => {
-    if (!newIncome.category && categories.length > 0) {
-        setNewIncome(prev => ({ ...prev, category: categories[0].name }))
-    }
-}, [categories])
+    // Effect to auto-select first category when categories load if no category is selected
+    useEffect(() => {
+        if (!newIncome.category && categories.length > 0) {
+            setNewIncome(prev => ({ ...prev, category: categories[0].name }))
+        }
+    }, [categories])
 
-// Optimistic add for instant UI feedback
-const { execute: optimisticAddIncome } = useOptimisticMutation<any, any>(
-    ['incomes', month, year, budgetType],
-    (input) => addIncome(month, year, input, budgetType),
-    {
-        getOptimisticData: (current, input) => {
-            if (!current) return current
-            return {
-                ...current,
-                incomes: [
-                    {
-                        id: 'temp-' + Date.now(),
-                        source: input.source,
-                        category: input.category,
-                        amount: input.amount,
-                        currency: input.currency || budgetCurrency,
-                        date: input.date ? new Date(input.date) : new Date(),
-                        client: isBusiness && input.clientId ? { id: input.clientId, name: '...' } : null,
-                        vatAmount: input.vatAmount || 0,
-                        payer: input.payer || '',
-                        paymentMethod: input.paymentMethod || '',
-                        isRecurring: input.isRecurring || false
-                    },
-                    ...(current.incomes || [])
-                ]
-            }
-        },
-        successMessage: 'ההכנסה נוספה בהצלחה',
-        errorMessage: 'שגיאה בהוספת ההכנסה'
-    }
-)
+    // Optimistic add for instant UI feedback
+    const { execute: optimisticAddIncome } = useOptimisticMutation<any, any>(
+        ['incomes', month, year, budgetType],
+        (input) => addIncome(month, year, input, budgetType),
+        {
+            getOptimisticData: (current, input) => {
+                if (!current) return current
+                return {
+                    ...current,
+                    incomes: [
+                        {
+                            id: 'temp-' + Date.now(),
+                            source: input.source,
+                            category: input.category,
+                            amount: input.amount,
+                            currency: input.currency || budgetCurrency,
+                            date: input.date ? new Date(input.date) : new Date(),
+                            client: isBusiness && input.clientId ? { id: input.clientId, name: '...' } : null,
+                            vatAmount: input.vatAmount || 0,
+                            payer: input.payer || '',
+                            paymentMethod: input.paymentMethod || '',
+                            isRecurring: input.isRecurring || false
+                        },
+                        ...(current.incomes || [])
+                    ]
+                }
+            },
+            successMessage: 'ההכנסה נוספה בהצלחה',
+            errorMessage: 'שגיאה בהוספת ההכנסה'
+        }
+    )
 
-async function handleAdd() {
-    const newErrors: Record<string, boolean> = {}
-    if (!newIncome.source) newErrors.source = true
-    if (!newIncome.amount) newErrors.amount = true
-    if (!newIncome.category) newErrors.category = true
+    async function handleAdd() {
+        const newErrors: Record<string, boolean> = {}
+        if (!newIncome.source) newErrors.source = true
+        if (!newIncome.amount) newErrors.amount = true
+        if (!newIncome.category) newErrors.category = true
 
-    if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors)
-        toast({ title: 'שגיאה', description: 'נא למלא את שדות החובה המסומנים', variant: 'destructive' })
-        return
-    }
-    setErrors({})
-
-    if (newIncome.isRecurring && newIncome.recurringEndDate) {
-        const start = new Date(newIncome.date || new Date())
-        start.setHours(0, 0, 0, 0)
-        const end = new Date(newIncome.recurringEndDate)
-        end.setHours(0, 0, 0, 0)
-        if (end < start) {
-            toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההכנסה', variant: 'destructive' })
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors)
+            toast({ title: 'שגיאה', description: 'נא למלא את שדות החובה המסומנים', variant: 'destructive' })
             return
+        }
+        setErrors({})
+
+        if (newIncome.isRecurring && newIncome.recurringEndDate) {
+            const start = new Date(newIncome.date || new Date())
+            start.setHours(0, 0, 0, 0)
+            const end = new Date(newIncome.recurringEndDate)
+            end.setHours(0, 0, 0, 0)
+            if (end < start) {
+                toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההכנסה', variant: 'destructive' })
+                return
+            }
+        }
+
+        try {
+            await optimisticAddIncome({
+                source: newIncome.source,
+                category: newIncome.category,
+                amount: parseFloat(newIncome.amount),
+                currency: newIncome.currency,
+                date: newIncome.date || undefined,
+                isRecurring: newIncome.isRecurring,
+                recurringEndDate: newIncome.isRecurring ? newIncome.recurringEndDate : undefined,
+                clientId: isBusiness ? newIncome.clientId || undefined : undefined,
+                amountBeforeVat: isBusiness ? parseFloat(newIncome.amountBeforeVat) : undefined,
+                vatRate: isBusiness ? parseFloat(newIncome.vatRate) : undefined,
+                vatAmount: isBusiness ? parseFloat(newIncome.vatAmount) : undefined,
+                paymentMethod: newIncome.paymentMethod || undefined,
+                payer: newIncome.payer || undefined,
+                workTime: timeUnit === 'minutes' && newIncome.workTime
+                    ? (parseFloat(newIncome.workTime) / 60).toFixed(2)
+                    : (newIncome.workTime || undefined),
+                acceptedBy: newIncome.acceptedBy || undefined
+            })
+
+            // Reset form
+            setNewIncome({
+                source: '',
+                category: categories.length > 0 ? categories[0].name : '',
+                amount: '',
+                currency: budgetCurrency,
+                date: format(new Date(), 'yyyy-MM-dd'),
+                isRecurring: false,
+                recurringEndDate: undefined,
+                clientId: '',
+                amountBeforeVat: '',
+                vatRate: '0.18',
+                vatAmount: '',
+                paymentMethod: '',
+                payer: '',
+                workTime: '',
+                acceptedBy: ''
+            })
+
+            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
+            if (onSuccess) onSuccess()
+        } catch (error) {
+            // Error managed by hook
         }
     }
 
-    try {
-        await optimisticAddIncome({
-            source: newIncome.source,
-            category: newIncome.category,
-            amount: parseFloat(newIncome.amount),
-            currency: newIncome.currency,
-            date: newIncome.date || undefined,
-            isRecurring: newIncome.isRecurring,
-            recurringEndDate: newIncome.isRecurring ? newIncome.recurringEndDate : undefined,
-            clientId: isBusiness ? newIncome.clientId || undefined : undefined,
-            amountBeforeVat: isBusiness ? parseFloat(newIncome.amountBeforeVat) : undefined,
-            vatRate: isBusiness ? parseFloat(newIncome.vatRate) : undefined,
-            vatAmount: isBusiness ? parseFloat(newIncome.vatAmount) : undefined,
-            paymentMethod: newIncome.paymentMethod || undefined,
-            payer: newIncome.payer || undefined,
-            workTime: timeUnit === 'minutes' && newIncome.workTime
-                ? (parseFloat(newIncome.workTime) / 60).toFixed(2)
-                : (newIncome.workTime || undefined),
-            acceptedBy: newIncome.acceptedBy || undefined
-        })
-
-        // Reset form
-        setNewIncome({
-            source: '',
-            category: categories.length > 0 ? categories[0].name : '',
-            amount: '',
-            currency: budgetCurrency,
-            date: format(new Date(), 'yyyy-MM-dd'),
-            isRecurring: false,
-            recurringEndDate: undefined,
-            clientId: '',
-            amountBeforeVat: '',
-            vatRate: '0.18',
-            vatAmount: '',
-            paymentMethod: '',
-            payer: '',
-            workTime: '',
-            acceptedBy: ''
-        })
-
-        globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        if (onSuccess) onSuccess()
-    } catch (error) {
-        // Error managed by hook
-    }
-}
 
 
-
-return (
-    <div>
-        <div className="mb-4 flex items-center gap-2">
-            <TrendingDown className={`h-5 w-5 rotate-180 ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`} />
-            <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד מכירה / הכנסה' : 'הוספת הכנסה'}</h3>
-            <div className="mr-auto">
-                <CategoryManagementDialog
-                    categories={categories}
-                    type="income"
-                    scope={budgetType}
-                    onChange={() => {
-                        if (onCategoriesChange) onCategoriesChange()
-                    }}
-                    trigger={
-                        <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
-                            <Settings className="h-4 w-4" />
-                        </Button>
-                    }
-                />
-            </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-            {/* Source Input */}
-            <div className="w-full">
-                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור / מקור *</label>
-                <Input
-                    className={`h-10 focus:ring-green-500/20 ${errors.source ? 'border-red-500' : 'border-gray-200'}`}
-                    placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"}
-                    value={newIncome.source}
-                    onFocus={() => isDemo && interceptAction()}
-                    onChange={(e) => {
-                        setNewIncome({ ...newIncome, source: e.target.value })
-                        if (e.target.value) setErrors(prev => ({ ...prev, source: false }))
-                    }}
-                />
-            </div>
-
-            {isBusiness && (
-                <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">לקוח</label>
-                    <Select
-                        value={newIncome.clientId}
-                        onValueChange={(value) => setNewIncome({ ...newIncome, clientId: value })}
-                        onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
-                    >
-                        <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
-                            <SelectValue placeholder="ללא לקוח ספציפי" />
-                        </SelectTrigger>
-                        <SelectContent dir="rtl" className="text-right">
-                            <SelectItem value="NO_CLIENT" className="pr-8">ללא לקוח ספציפי</SelectItem>
-                            {clients.map(client => (
-                                <SelectItem key={client.id} value={client.id} className="pr-8">{client.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            )}
-
-            {/* Category Select */}
-            <div className="flex gap-2 w-full">
-                <div className="flex-1">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה *</label>
-                    <Select
-                        value={newIncome.category}
-                        onValueChange={(value) => {
-                            setNewIncome({ ...newIncome, category: value })
-                            if (value) setErrors(prev => ({ ...prev, category: false }))
-                        }}
-                        onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
-                    >
-                        <SelectTrigger className={`w-full text-right h-11 md:h-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 focus:ring-green-500/20 focus:border-green-500 rounded-lg ${errors.category ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : ''}`}>
-                            <SelectValue placeholder="בחר קטגוריה" />
-                        </SelectTrigger>
-                        <SelectContent dir="rtl" className="text-right max-h-[200px]">
-                            {categories.map(cat => (
-                                <SelectItem key={cat.id} value={cat.name} className="pr-8">{cat.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="pt-6">
+    return (
+        <div>
+            <div className="mb-4 flex items-center gap-2">
+                <TrendingDown className={`h-5 w-5 rotate-180 ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`} />
+                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד מכירה / הכנסה' : 'הוספת הכנסה'}</h3>
+                <div className="mr-auto">
                     <CategoryManagementDialog
                         categories={categories}
                         type="income"
@@ -304,230 +226,306 @@ return (
                             if (onCategoriesChange) onCategoriesChange()
                         }}
                         trigger={
-                            <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800" title="ניהול קטגוריות" onClick={() => isDemo && interceptAction()}>
-                                <Plus className="h-4 w-4" />
+                            <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
+                                <Settings className="h-4 w-4" />
                             </Button>
                         }
                     />
                 </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 w-full">
-                <div className="col-span-1">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">מטבע</label>
-                    <Select
-                        value={newIncome.currency}
-                        onValueChange={(value) => setNewIncome({ ...newIncome, currency: value })}
-                        onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
-                    >
-                        <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent dir="rtl" className="text-right">
-                            {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
-                                <SelectItem key={code} value={code} className="pr-8">{code} ({symbol})</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="col-span-2">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ *' : 'סכום כולל *'}</label>
-                    <FormattedNumberInput
-                        className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-green-500/20' : 'focus:ring-green-500/20'}`}
-                        placeholder="0.00"
-                        value={newIncome.amount}
+            <div className="flex flex-col gap-4">
+                {/* Source Input */}
+                <div className="w-full">
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור / מקור *</label>
+                    <Input
+                        className={`h-10 focus:ring-green-500/20 ${errors.source ? 'border-red-500' : 'border-gray-200'}`}
+                        placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"}
+                        value={newIncome.source}
                         onFocus={() => isDemo && interceptAction()}
                         onChange={(e) => {
-                            setNewIncome({ ...newIncome, amount: e.target.value })
-                            if (e.target.value) setErrors(prev => ({ ...prev, amount: false }))
+                            setNewIncome({ ...newIncome, source: e.target.value })
+                            if (e.target.value) setErrors(prev => ({ ...prev, source: false }))
                         }}
                     />
                 </div>
-            </div>
 
-            {isBusiness && (
-                <div className="grid grid-cols-2 gap-3 p-3 bg-green-50/50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800/50">
-                    <div>
-                        <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">מע"מ (18%)</label>
-                        <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency(parseFloat(newIncome.vatAmount) || 0, getCurrencySymbol(newIncome.currency))}</div>
+                {isBusiness && (
+                    <div className="w-full">
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">לקוח</label>
+                        <Select
+                            value={newIncome.clientId}
+                            onValueChange={(value) => setNewIncome({ ...newIncome, clientId: value })}
+                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
+                        >
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
+                                <SelectValue placeholder="ללא לקוח ספציפי" />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl" className="text-right">
+                                <SelectItem value="NO_CLIENT" className="pr-8">ללא לקוח ספציפי</SelectItem>
+                                {clients.map(client => (
+                                    <SelectItem key={client.id} value={client.id} className="pr-8">{client.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
-                    <div>
-                        <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">סכום כולל</label>
-                        <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency((parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0), getCurrencySymbol(newIncome.currency))}</div>
+                )}
+
+                {/* Category Select */}
+                <div className="flex gap-2 w-full">
+                    <div className="flex-1">
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה *</label>
+                        <Select
+                            value={newIncome.category}
+                            onValueChange={(value) => {
+                                setNewIncome({ ...newIncome, category: value })
+                                if (value) setErrors(prev => ({ ...prev, category: false }))
+                            }}
+                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
+                        >
+                            <SelectTrigger className={`w-full text-right h-11 md:h-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 focus:ring-green-500/20 focus:border-green-500 rounded-lg ${errors.category ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : ''}`}>
+                                <SelectValue placeholder="בחר קטגוריה" />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl" className="text-right max-h-[200px]">
+                                {categories.map(cat => (
+                                    <SelectItem key={cat.id} value={cat.name} className="pr-8">{cat.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="pt-6">
+                        <CategoryManagementDialog
+                            categories={categories}
+                            type="income"
+                            scope={budgetType}
+                            onChange={() => {
+                                if (onCategoriesChange) onCategoriesChange()
+                            }}
+                            trigger={
+                                <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800" title="ניהול קטגוריות" onClick={() => isDemo && interceptAction()}>
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                            }
+                        />
                     </div>
                 </div>
-            )}
 
-            {/* Date Selection (Always Visible for both now) */}
-            <div className="w-full">
-                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
-                <DatePicker
-                    date={newIncome.date ? new Date(newIncome.date) : undefined}
-                    setDate={(date) => {
-                        if (isDemo) { interceptAction(); return; }
-                        setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })
-                    }}
-                    fromDate={startOfMonth}
-                    toDate={endOfMonth}
-                />
-            </div>
+                <div className="grid grid-cols-3 gap-3 w-full">
+                    <div className="col-span-1">
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">מטבע</label>
+                        <Select
+                            value={newIncome.currency}
+                            onValueChange={(value) => setNewIncome({ ...newIncome, currency: value })}
+                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
+                        >
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl" className="text-right">
+                                {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                    <SelectItem key={code} value={code} className="pr-8">{code} ({symbol})</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="col-span-2">
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ *' : 'סכום כולל *'}</label>
+                        <FormattedNumberInput
+                            className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-green-500/20' : 'focus:ring-green-500/20'}`}
+                            placeholder="0.00"
+                            value={newIncome.amount}
+                            onFocus={() => isDemo && interceptAction()}
+                            onChange={(e) => {
+                                setNewIncome({ ...newIncome, amount: e.target.value })
+                                if (e.target.value) setErrors(prev => ({ ...prev, amount: false }))
+                            }}
+                        />
+                    </div>
+                </div>
 
-            <button
-                type="button"
-                onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-                className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-full py-2"
-            >
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAdvancedOpen ? 'rotate-180' : ''}`} />
-                הגדרות מתקדמות (מומלץ)
-            </button>
+                {isBusiness && (
+                    <div className="grid grid-cols-2 gap-3 p-3 bg-green-50/50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800/50">
+                        <div>
+                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">מע"מ (18%)</label>
+                            <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency(parseFloat(newIncome.vatAmount) || 0, getCurrencySymbol(newIncome.currency))}</div>
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">סכום כולל</label>
+                            <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency((parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0), getCurrencySymbol(newIncome.currency))}</div>
+                        </div>
+                    </div>
+                )}
 
-            {isAdvancedOpen && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50">
+                {/* Date Selection (Always Visible for both now) */}
+                <div className="w-full">
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
+                    <DatePicker
+                        date={newIncome.date ? new Date(newIncome.date) : undefined}
+                        setDate={(date) => {
+                            if (isDemo) { interceptAction(); return; }
+                            setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })
+                        }}
+                        fromDate={startOfMonth}
+                        toDate={endOfMonth}
+                    />
+                </div>
 
-                    {/* Payer / Accepted By */}
-                    <div className={`grid gap-3 w-full ${isBusiness ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
-                        {/* Payer Input */}
-                        <div className="w-full">
-                            <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל מ... (אופציונלי)</label>
-                            <Input
-                                className="h-10 border-gray-200 focus:ring-green-500/20 bg-white dark:bg-slate-800"
-                                placeholder="שם המשלם"
-                                value={newIncome.payer}
-                                onFocus={() => isDemo && interceptAction()}
-                                onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
-                            />
+                <button
+                    type="button"
+                    onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                    className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-full py-2"
+                >
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAdvancedOpen ? 'rotate-180' : ''}`} />
+                    הגדרות מתקדמות (מומלץ)
+                </button>
+
+                {isAdvancedOpen && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50">
+
+                        {/* Payer / Accepted By */}
+                        <div className={`grid gap-3 w-full ${isBusiness ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+                            {/* Payer Input */}
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל מ... (אופציונלי)</label>
+                                <Input
+                                    className="h-10 border-gray-200 focus:ring-green-500/20 bg-white dark:bg-slate-800"
+                                    placeholder="שם המשלם"
+                                    value={newIncome.payer}
+                                    onFocus={() => isDemo && interceptAction()}
+                                    onChange={(e) => setNewIncome({ ...newIncome, payer: e.target.value })}
+                                />
+                            </div>
+
+                            {isBusiness && (
+                                <div className="w-full">
+                                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
+                                    <Input className="h-10 border-gray-200 focus:ring-green-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
+                                </div>
+                            )}
                         </div>
 
                         {isBusiness && (
                             <div className="w-full">
-                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
-                                <Input className="h-10 border-gray-200 focus:ring-green-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="text-xs font-bold text-[#676879] dark:text-gray-300">זמן עבודה</label>
+
+                                    {/* Custom Toggle */}
+                                    <div className="bg-gray-100 dark:bg-slate-800 p-0.5 rounded-lg flex border border-gray-200 dark:border-slate-700">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (timeUnit === 'minutes') return
+                                                setTimeUnit('minutes')
+                                                // Convert Hours to Minutes
+                                                const val = parseFloat(newIncome.workTime)
+                                                if (!isNaN(val)) {
+                                                    setNewIncome(prev => ({ ...prev, workTime: (val * 60).toFixed(0) }))
+                                                }
+                                            }}
+                                            className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'minutes'
+                                                ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                                                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                                                }`}
+                                        >
+                                            דקות
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (timeUnit === 'hours') return
+                                                setTimeUnit('hours')
+                                                // Convert Minutes to Hours
+                                                const val = parseFloat(newIncome.workTime)
+                                                if (!isNaN(val)) {
+                                                    setNewIncome(prev => ({ ...prev, workTime: (val / 60).toFixed(2).replace(/\.00$/, '') }))
+                                                }
+                                            }}
+                                            className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'hours'
+                                                ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                                                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                                                }`}
+                                        >
+                                            שעות
+                                        </button>
+                                    </div>
+                                </div>
+                                <Input
+                                    type="number"
+                                    step={timeUnit === 'hours' ? "0.1" : "1"}
+                                    min="0"
+                                    className="h-10 border-gray-200 focus:ring-green-500/20"
+                                    placeholder={timeUnit === 'hours' ? "לדוגמה: 1.5" : "לדוגמה: 90"}
+                                    value={newIncome.workTime}
+                                    onChange={(e) => {
+                                        // Allow decimals only if in hours mode
+                                        const val = e.target.value;
+                                        if (val === '' || (timeUnit === 'hours' ? /^\d*\.?\d*$/ : /^\d+$/).test(val)) {
+                                            setNewIncome({ ...newIncome, workTime: val });
+                                        }
+                                    }}
+                                />
                             </div>
                         )}
-                    </div>
 
-                    {isBusiness && (
+                        {/* Payment Method Selector */}
                         <div className="w-full">
-                            <div className="flex items-center justify-between mb-1.5">
-                                <label className="text-xs font-bold text-[#676879] dark:text-gray-300">זמן עבודה</label>
-
-                                {/* Custom Toggle */}
-                                <div className="bg-gray-100 dark:bg-slate-800 p-0.5 rounded-lg flex border border-gray-200 dark:border-slate-700">
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            if (timeUnit === 'minutes') return
-                                            setTimeUnit('minutes')
-                                            // Convert Hours to Minutes
-                                            const val = parseFloat(newIncome.workTime)
-                                            if (!isNaN(val)) {
-                                                setNewIncome(prev => ({ ...prev, workTime: (val * 60).toFixed(0) }))
-                                            }
-                                        }}
-                                        className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'minutes'
-                                            ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-                                            }`}
-                                    >
-                                        דקות
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            if (timeUnit === 'hours') return
-                                            setTimeUnit('hours')
-                                            // Convert Minutes to Hours
-                                            const val = parseFloat(newIncome.workTime)
-                                            if (!isNaN(val)) {
-                                                setNewIncome(prev => ({ ...prev, workTime: (val / 60).toFixed(2).replace(/\.00$/, '') }))
-                                            }
-                                        }}
-                                        className={`px-3 py-0.5 text-xs font-medium rounded-md transition-all ${timeUnit === 'hours'
-                                            ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-                                            }`}
-                                    >
-                                        שעות
-                                    </button>
-                                </div>
-                            </div>
-                            <Input
-                                type="number"
-                                step={timeUnit === 'hours' ? "0.1" : "1"}
-                                min="0"
-                                className="h-10 border-gray-200 focus:ring-green-500/20"
-                                placeholder={timeUnit === 'hours' ? "לדוגמה: 1.5" : "לדוגמה: 90"}
-                                value={newIncome.workTime}
-                                onChange={(e) => {
-                                    // Allow decimals only if in hours mode
-                                    const val = e.target.value;
-                                    if (val === '' || (timeUnit === 'hours' ? /^\d*\.?\d*$/ : /^\d+$/).test(val)) {
-                                        setNewIncome({ ...newIncome, workTime: val });
-                                    }
+                            <PaymentMethodSelector
+                                value={newIncome.paymentMethod}
+                                onChange={(val) => {
+                                    if (isDemo) { interceptAction(); return; }
+                                    setNewIncome({ ...newIncome, paymentMethod: val })
                                 }}
+                                color="green"
                             />
                         </div>
-                    )}
 
-                    {/* Payment Method Selector */}
-                    <div className="w-full">
-                        <PaymentMethodSelector
-                            value={newIncome.paymentMethod}
-                            onChange={(val) => {
-                                if (isDemo) { interceptAction(); return; }
-                                setNewIncome({ ...newIncome, paymentMethod: val })
-                            }}
-                            color="green"
-                        />
-                    </div>
-
-                    {/* Recurring Checkbox */}
-                    <div className={`flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full ${!isBusiness ? 'bg-white dark:bg-slate-800' : ''}`}>
-                        <div className="flex items-center gap-2">
-                            <Checkbox
-                                id="recurring-income"
-                                checked={newIncome.isRecurring}
-                                onCheckedChange={(checked) => {
-                                    const isRecurring = checked as boolean
-                                    setNewIncome(prev => ({
-                                        ...prev,
-                                        isRecurring,
-                                        recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
-                                    }))
-                                }}
-                                className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                            />
-                            <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הכנסה קבועה</label>
-                        </div>
-                        {newIncome.isRecurring && (
-                            <div className="flex gap-4 flex-1">
-                                <div className="space-y-2 w-full">
-                                    <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                    <RecurringEndDatePicker
-                                        date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
-                                        setDate={(date) => setNewIncome(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
-                                        fromDate={startOfMonth}
-                                        placeholder="בחר תאריך סיום"
-                                    />
-                                </div>
+                        {/* Recurring Checkbox */}
+                        <div className={`flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full ${!isBusiness ? 'bg-white dark:bg-slate-800' : ''}`}>
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    id="recurring-income"
+                                    checked={newIncome.isRecurring}
+                                    onCheckedChange={(checked) => {
+                                        const isRecurring = checked as boolean
+                                        setNewIncome(prev => ({
+                                            ...prev,
+                                            isRecurring,
+                                            recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
+                                        }))
+                                    }}
+                                    className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                                />
+                                <label htmlFor="recurring-income" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הכנסה קבועה</label>
                             </div>
-                        )}
+                            {newIncome.isRecurring && (
+                                <div className="flex gap-4 flex-1">
+                                    <div className="space-y-2 w-full">
+                                        <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
+                                        <RecurringEndDatePicker
+                                            date={newIncome.recurringEndDate ? new Date(newIncome.recurringEndDate) : undefined}
+                                            setDate={(date) => setNewIncome(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
+                                            fromDate={startOfMonth}
+                                            placeholder="בחר תאריך סיום"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            <Button
-                onClick={handleAdd}
-                className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md
+                <Button
+                    onClick={handleAdd}
+                    className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md
                         ${(!newIncome.source || !newIncome.amount || !newIncome.category) && !isDemo
-                        ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
-                        : (isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-[#00c875] hover:bg-[#00b268]')
-                    }`}
-                disabled={!isDemo && (submitting || !newIncome.source || !newIncome.amount || !newIncome.category)}
-            >
-                {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הכנסה' : 'הוסף')}
-            </Button>
+                            ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                            : (isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-[#00c875] hover:bg-[#00b268]')
+                        }`}
+                    disabled={!isDemo && (submitting || !newIncome.source || !newIncome.amount || !newIncome.category)}
+                >
+                    {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הכנסה' : 'הוסף')}
+                </Button>
+            </div>
         </div>
-    </div>
-)
+    )
 }
