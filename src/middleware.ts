@@ -46,7 +46,7 @@ export default clerkMiddleware(async (auth, req) => {
             headers: {
                 cookie: req.headers.get('cookie') || ''
             },
-            signal: AbortSignal.timeout(2000)
+            signal: AbortSignal.timeout(400) // Short timeout to prevent blocking
         });
 
         if (response.ok) {
@@ -55,7 +55,8 @@ export default clerkMiddleware(async (auth, req) => {
             isAdmin = data.isAdmin || false;
         }
     } catch (error) {
-        console.error('Maintenance check failed, using fallback:', error);
+        // Fail silently/open to prevent performance impact
+        // console.warn('Maintenance check skipped (timeout/error)');
     }
 
     if (isMaintenance) {
