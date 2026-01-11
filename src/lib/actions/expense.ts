@@ -109,7 +109,7 @@ export async function addExpense(
                 invoiceDate: validatedData.invoiceDate ? new Date(validatedData.invoiceDate) : null,
                 paymentDate: validatedData.paymentDate ? new Date(validatedData.paymentDate) : null,
                 paymentMethod: validatedData.paymentMethod,
-                paymentMethod: validatedData.paymentMethod,
+
                 paymentTerms: validatedData.paymentTerms,
                 responsibles: validatedData.responsibles || ["RON"] // Default to RON
             }
