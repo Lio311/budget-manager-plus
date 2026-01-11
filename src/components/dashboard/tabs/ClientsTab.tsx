@@ -40,18 +40,7 @@ const handleSaveSettings = (days: number) => {
 
 // ...
 
-{
-    client.subscriptionEnd && (() => {
-        const end = startOfDay(new Date(client.subscriptionEnd))
-        const today = startOfDay(new Date())
-        const daysLeft = differenceInDays(end, today)
 
-        if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
-        if (daysLeft <= warningDays) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
-        if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
-        return null
-    })()
-}
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
