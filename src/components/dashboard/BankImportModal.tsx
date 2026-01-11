@@ -352,7 +352,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
             <DialogTrigger asChild>
                 <Button variant="outline" className="gap-2 border-dashed flex-row-reverse">
                     <Upload className="h-4 w-4" />
-                    ייבוא
+                    ייבוא חשבוניות
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-2xl px-6" dir="rtl">

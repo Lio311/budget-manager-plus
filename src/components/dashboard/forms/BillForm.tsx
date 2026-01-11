@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +31,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
+    const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
 
     const [formData, setFormData] = useState<{
         name: string
@@ -199,68 +200,81 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 />
             </div>
 
-            <div className="w-full">
-                <PaymentMethodSelector
-                    value={formData.paymentMethod}
-                    onChange={(val) => setFormData({ ...formData, paymentMethod: val })}
-                    color="orange"
-                />
-            </div>
+            <button
+                type="button"
+                onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-full py-2"
+            >
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAdvancedOpen ? 'rotate-180' : ''}`} />
+                הגדרות מתקדמות (מומלץ)
+            </button>
 
-            <div className="flex items-center space-x-2 space-x-reverse pt-2 border-t border-gray-100 dark:border-slate-700">
-                <Checkbox
-                    id="recurring"
-                    checked={formData.isRecurring}
-                    onCheckedChange={(checked) => {
-                        const isRecurring = checked as boolean
-                        setFormData(prev => ({
-                            ...prev,
-                            isRecurring,
-                            recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
-                        }))
-                    }}
-                />
-                <label
-                    htmlFor="recurring"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                    חשבון קבוע / חוזר
-                </label>
-            </div>
-
-            {
-                formData.isRecurring && (
-                    <div className="grid grid-cols-2 gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg animate-in slide-in-from-top-2">
-                        <div className="space-y-1">
-                            <label className="text-xs text-gray-500 dark:text-gray-400">תדירות</label>
-                            <select
-                                className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-md h-9 text-sm outline-none bg-white dark:bg-slate-800 dark:text-gray-100"
-                                value={formData.frequency}
-                                onChange={(e) => setFormData({ ...formData, frequency: e.target.value as 'MONTHLY' | 'BI_MONTHLY' })}
-                            >
-                                <option value="MONTHLY">כל חודש</option>
-                                <option value="BI_MONTHLY">דו-חודשי (כל חודשיים)</option>
-                            </select>
-                        </div>
-                        <div className="flex gap-4 flex-1">
-                            <div className="space-y-2 w-full">
-                                <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <RecurringEndDatePicker
-                                    date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
-                                    setDate={(date) => setFormData(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
-                                    fromDate={startOfMonth}
-                                    placeholder="בחר תאריך סיום"
-                                    className="w-full h-9 bg-white"
-                                />
-                            </div>
-                        </div>
+            {isAdvancedOpen && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50">
+                    <div className="w-full">
+                        <PaymentMethodSelector
+                            value={formData.paymentMethod}
+                            onChange={(val) => setFormData({ ...formData, paymentMethod: val })}
+                            color="orange"
+                        />
                     </div>
-                )
-            }
+
+                    <div className="flex items-center space-x-2 space-x-reverse pt-2 border-t border-gray-100 dark:border-slate-700">
+                        <Checkbox
+                            id="recurring"
+                            checked={formData.isRecurring}
+                            onCheckedChange={(checked) => {
+                                const isRecurring = checked as boolean
+                                setFormData(prev => ({
+                                    ...prev,
+                                    isRecurring,
+                                    recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
+                                }))
+                            }}
+                        />
+                        <label
+                            htmlFor="recurring"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                            חשבון קבוע / חוזר
+                        </label>
+                    </div>
+
+                    {
+                        formData.isRecurring && (
+                            <div className="grid grid-cols-2 gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg animate-in slide-in-from-top-2">
+                                <div className="space-y-1">
+                                    <label className="text-xs text-gray-500 dark:text-gray-400">תדירות</label>
+                                    <select
+                                        className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-md h-9 text-sm outline-none bg-white dark:bg-slate-800 dark:text-gray-100"
+                                        value={formData.frequency}
+                                        onChange={(e) => setFormData({ ...formData, frequency: e.target.value as 'MONTHLY' | 'BI_MONTHLY' })}
+                                    >
+                                        <option value="MONTHLY">כל חודש</option>
+                                        <option value="BI_MONTHLY">דו-חודשי (כל חודשיים)</option>
+                                    </select>
+                                </div>
+                                <div className="flex gap-4 flex-1">
+                                    <div className="space-y-2 w-full">
+                                        <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
+                                        <RecurringEndDatePicker
+                                            date={formData.recurringEndDate ? new Date(formData.recurringEndDate) : undefined}
+                                            setDate={(date) => setFormData(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
+                                            fromDate={startOfMonth}
+                                            placeholder="בחר תאריך סיום"
+                                            className="w-full h-9 bg-white"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
+                </div>
+            )}
 
             <Button
                 className={`w-full h-10 shadow-sm mt-2 font-medium transition-all
-                    ${(!formData.name || !formData.amount || !formData.dueDay)
+                ${(!formData.name || !formData.amount || !formData.dueDay)
                         ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
                         : 'bg-orange-500 hover:bg-orange-600'
                     }`}

@@ -12,6 +12,7 @@ export const DEFAULT_EXPENSE_CATEGORIES = [
     { name: 'חינוך', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
     { name: 'ביטוחים', color: 'bg-teal-100 text-teal-700 border-teal-200' },
     { name: 'ספורט', color: 'bg-lime-100 text-lime-700 border-lime-200' },
+    { name: 'הרשאה לחיוב החשבון', color: 'bg-slate-100 text-slate-700 border-slate-200' },
 ]
 
 export const DEFAULT_INCOME_CATEGORIES = [

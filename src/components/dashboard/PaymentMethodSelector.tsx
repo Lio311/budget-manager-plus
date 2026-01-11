@@ -60,7 +60,8 @@ const DEFAULT_METHODS = [
     { id: 'BIT', label: 'ביט' },
     { id: 'PAYBOX', label: 'פייבוקס' },
     { id: 'CHECK', label: 'צ\'ק' },
-    { id: 'DIRECT_DEBIT', label: 'הוראת קבע' }
+    { id: 'DIRECT_DEBIT', label: 'הוראת קבע' },
+    { id: 'STANDING_ORDER', label: 'הרשאה לחיוב החשבון' }
 ]
 
 export function PaymentMethodSelector({ value, onChange, className, color = 'purple' }: PaymentMethodSelectorProps) {

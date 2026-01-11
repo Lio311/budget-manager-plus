@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
-import { Loader2, Plus, PiggyBank } from 'lucide-react'
+import { Loader2, Plus, PiggyBank, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 
 import { useBudget } from '@/contexts/BudgetContext'
@@ -44,6 +44,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
+    const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
 
     const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
     const [newCategoryName, setNewCategoryName] = useState('')
@@ -298,67 +299,80 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">יעד</label>
-                        <FormattedNumberInput
-                            placeholder="מטרה"
-                            value={newSaving.goal}
-                            onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תאריך הפקדה</label>
+                        <DatePicker
+                            date={newSaving.date ? new Date(newSaving.date) : undefined}
+                            setDate={(date) => setNewSaving({ ...newSaving, date: date || new Date() })}
+                            fromDate={startOfMonth}
+                            toDate={endOfMonth}
                         />
                     </div>
                 </div>
 
-                <div className="w-full">
-                    <PaymentMethodSelector
-                        value={newSaving.paymentMethod}
-                        onChange={(val) => setNewSaving({ ...newSaving, paymentMethod: val })}
-                        color="blue"
-                    />
-                </div>
+                <button
+                    type="button"
+                    onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                    className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-full py-2"
+                >
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAdvancedOpen ? 'rotate-180' : ''}`} />
+                    הגדרות מתקדמות (מומלץ)
+                </button>
 
-                <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הפקדה</label>
-                    <DatePicker
-                        date={newSaving.date ? new Date(newSaving.date) : undefined}
-                        setDate={(date) => setNewSaving({ ...newSaving, date: date || new Date() })}
-                        fromDate={startOfMonth}
-                        toDate={endOfMonth}
-                    />
-                </div>
-
-                <div className="w-full flex items-start gap-4 p-4 mt-2 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 transition-all">
-                    <div className="flex items-center gap-2">
-                        <Checkbox
-                            id="recurring-saving"
-                            checked={newSaving.isRecurring}
-                            onCheckedChange={(checked) => {
-                                const isRecurring = checked as boolean
-                                setNewSaving(prev => ({
-                                    ...prev,
-                                    isRecurring,
-                                    recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
-                                }))
-                            }}
-                            className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                        />
-                        <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">
-                            חיסכון קבוע
-                        </label>
-                    </div>
-
-                    {newSaving.isRecurring && (
-                        <div className="flex gap-4 flex-1">
-                            <div className="space-y-2 w-full">
-                                <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <RecurringEndDatePicker
-                                    date={newSaving.recurringEndDate ? new Date(newSaving.recurringEndDate) : undefined}
-                                    setDate={(date) => setNewSaving(prev => ({ ...prev, recurringEndDate: date }))}
-                                    fromDate={startOfMonth}
-                                    placeholder="בחר תאריך סיום"
-                                />
-                            </div>
+                {isAdvancedOpen && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50 w-full">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">יעד</label>
+                            <FormattedNumberInput
+                                placeholder="מטרה"
+                                value={newSaving.goal}
+                                onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
+                            />
                         </div>
-                    )}
-                </div>
+
+                        <div className="w-full">
+                            <PaymentMethodSelector
+                                value={newSaving.paymentMethod}
+                                onChange={(val) => setNewSaving({ ...newSaving, paymentMethod: val })}
+                                color="blue"
+                            />
+                        </div>
+
+                        <div className="w-full flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 transition-all">
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    id="recurring-saving"
+                                    checked={newSaving.isRecurring}
+                                    onCheckedChange={(checked) => {
+                                        const isRecurring = checked as boolean
+                                        setNewSaving(prev => ({
+                                            ...prev,
+                                            isRecurring,
+                                            recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
+                                        }))
+                                    }}
+                                    className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                />
+                                <label htmlFor="recurring-saving" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">
+                                    חיסכון קבוע
+                                </label>
+                            </div>
+
+                            {newSaving.isRecurring && (
+                                <div className="flex gap-4 flex-1">
+                                    <div className="space-y-2 w-full">
+                                        <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
+                                        <RecurringEndDatePicker
+                                            date={newSaving.recurringEndDate ? new Date(newSaving.recurringEndDate) : undefined}
+                                            setDate={(date) => setNewSaving(prev => ({ ...prev, recurringEndDate: date }))}
+                                            fromDate={startOfMonth}
+                                            placeholder="בחר תאריך סיום"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 <Button
                     onClick={handleAdd}

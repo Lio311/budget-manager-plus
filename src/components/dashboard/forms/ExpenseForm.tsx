@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
 import { useSearchParams, useRouter } from 'next/navigation'
 import {
-    Loader2, Plus, TrendingDown, RefreshCw, Settings
+    Loader2, Plus, TrendingDown, RefreshCw, Settings, ChevronDown
 } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -69,6 +69,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
+    const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
 
     const [newExpense, setNewExpense] = useState({
         description: '',
@@ -400,27 +401,6 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     />
                 </div>
 
-                {isBusiness && (
-                    <div className="w-full">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">ספק</label>
-                        <Select
-                            value={newExpense.supplierId}
-                            onValueChange={(value) => setNewExpense({ ...newExpense, supplierId: value })}
-                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
-                        >
-                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-red-500/20">
-                                <SelectValue placeholder="ללא ספק ספציפי" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="NO_SUPPLIER">ללא ספק ספציפי</SelectItem>
-                                {suppliers.map(s => (
-                                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
-
                 <div className="flex gap-2 w-full">
                     <div className="flex-1">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">קטגוריה *</label>
@@ -495,13 +475,15 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 </div>
 
                 <div className="w-full">
-                    <PaymentMethodSelector
-                        value={newExpense.paymentMethod}
-                        onChange={(val) => {
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הוצאה</label>
+                    <DatePicker
+                        date={newExpense.date ? new Date(newExpense.date) : undefined}
+                        setDate={(date) => {
                             if (isDemo) { interceptAction(); return; }
-                            setNewExpense({ ...newExpense, paymentMethod: val })
+                            setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })
                         }}
-                        color={isBusiness ? 'red' : 'red'}
+                        fromDate={startOfMonth}
+                        toDate={endOfMonth}
                     />
                 </div>
 
@@ -518,19 +500,6 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     </div>
                 )}
 
-                <div className="w-full">
-                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך הוצאה</label>
-                    <DatePicker
-                        date={newExpense.date ? new Date(newExpense.date) : undefined}
-                        setDate={(date) => {
-                            if (isDemo) { interceptAction(); return; }
-                            setNewExpense({ ...newExpense, date: date ? format(date, 'yyyy-MM-dd') : '' })
-                        }}
-                        fromDate={startOfMonth}
-                        toDate={endOfMonth}
-                    />
-                </div>
-
                 {isBusiness && (
                     <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700">
                         <Checkbox id="is-deductible" checked={newExpense.isDeductible} onCheckedChange={(checked) => {
@@ -541,38 +510,83 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                     </div>
                 )}
 
-                <div className="flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full">
-                    <div className="flex items-center gap-2">
-                        <Checkbox
-                            id="recurring-expense"
-                            checked={newExpense.isRecurring}
-                            onCheckedChange={(checked) => {
-                                if (isDemo) { interceptAction(); return; }
-                                const isRecurring = checked as boolean
-                                setNewExpense(prev => ({
-                                    ...prev,
-                                    isRecurring,
-                                    recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
-                                }))
-                            }}
-                            className={isBusiness ? 'data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600' : 'data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]'}
-                        />
-                        <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הוצאה קבועה</label>
-                    </div>
-                    {newExpense.isRecurring && (
-                        <div className="flex gap-4 flex-1">
-                            <div className="space-y-2 w-full">
-                                <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
-                                <RecurringEndDatePicker
-                                    date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
-                                    setDate={(date) => setNewExpense(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
-                                    fromDate={startOfMonth}
-                                    placeholder="בחר תאריך סיום"
-                                />
+                <button
+                    type="button"
+                    onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                    className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-full py-2"
+                >
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAdvancedOpen ? 'rotate-180' : ''}`} />
+                    הגדרות מתקדמות (מומלץ)
+                </button>
+
+                {isAdvancedOpen && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50">
+                        {isBusiness && (
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">ספק</label>
+                                <Select
+                                    value={newExpense.supplierId}
+                                    onValueChange={(value) => setNewExpense({ ...newExpense, supplierId: value })}
+                                    onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
+                                >
+                                    <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-red-500/20">
+                                        <SelectValue placeholder="ללא ספק ספציפי" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="NO_SUPPLIER">ללא ספק ספציפי</SelectItem>
+                                        {suppliers.map(s => (
+                                            <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
+                        )}
+
+                        <div className="w-full">
+                            <PaymentMethodSelector
+                                value={newExpense.paymentMethod}
+                                onChange={(val) => {
+                                    if (isDemo) { interceptAction(); return; }
+                                    setNewExpense({ ...newExpense, paymentMethod: val })
+                                }}
+                                color={isBusiness ? 'red' : 'red'}
+                            />
                         </div>
-                    )}
-                </div>
+
+                        <div className={`flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full ${!isBusiness ? 'bg-white dark:bg-slate-800' : ''}`}>
+                            <div className="flex items-center gap-2">
+                                <Checkbox
+                                    id="recurring-expense"
+                                    checked={newExpense.isRecurring}
+                                    onCheckedChange={(checked) => {
+                                        if (isDemo) { interceptAction(); return; }
+                                        const isRecurring = checked as boolean
+                                        setNewExpense(prev => ({
+                                            ...prev,
+                                            isRecurring,
+                                            recurringEndDate: isRecurring ? prev.recurringEndDate : undefined
+                                        }))
+                                    }}
+                                    className={isBusiness ? 'data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600' : 'data-[state=checked]:bg-[#e2445c] data-[state=checked]:border-[#e2445c]'}
+                                />
+                                <label htmlFor="recurring-expense" className="text-sm font-medium cursor-pointer text-[#323338] dark:text-gray-100">הוצאה קבועה</label>
+                            </div>
+                            {newExpense.isRecurring && (
+                                <div className="flex gap-4 flex-1">
+                                    <div className="space-y-2 w-full">
+                                        <label className="text-xs font-medium text-[#676879] dark:text-gray-300">תאריך סיום</label>
+                                        <RecurringEndDatePicker
+                                            date={newExpense.recurringEndDate ? new Date(newExpense.recurringEndDate) : undefined}
+                                            setDate={(date) => setNewExpense(prev => ({ ...prev, recurringEndDate: date ? format(date, 'yyyy-MM-dd') : undefined }))}
+                                            fromDate={startOfMonth}
+                                            placeholder="בחר תאריך סיום"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 <Button
                     onClick={handleAdd}

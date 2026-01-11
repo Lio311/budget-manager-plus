@@ -349,37 +349,31 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     </div>
                 )}
 
-                {/* Personal Mode: Date is Mandatory, so show it here */}
-                {!isBusiness && (
-                    <div className="w-full">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
-                        <DatePicker
-                            date={newIncome.date ? new Date(newIncome.date) : undefined}
-                            setDate={(date) => {
-                                if (isDemo) { interceptAction(); return; }
-                                setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })
-                            }}
-                            fromDate={startOfMonth}
-                            toDate={endOfMonth}
-                        />
-                    </div>
-                )}
+                {/* Date Selection (Always Visible for both now) */}
+                <div className="w-full">
+                    <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
+                    <DatePicker
+                        date={newIncome.date ? new Date(newIncome.date) : undefined}
+                        setDate={(date) => {
+                            if (isDemo) { interceptAction(); return; }
+                            setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })
+                        }}
+                        fromDate={startOfMonth}
+                        toDate={endOfMonth}
+                    />
+                </div>
 
-                {/* Personal Mode: Advanced Settings Toggle */}
-                {!isBusiness && (
-                    <button
-                        type="button"
-                        onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-                        className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-full py-2"
-                    >
-                        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAdvancedOpen ? 'rotate-180' : ''}`} />
-                        הגדרות מתקדמות (מומלץ)
-                    </button>
-                )}
+                <button
+                    type="button"
+                    onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                    className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-full py-2"
+                >
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAdvancedOpen ? 'rotate-180' : ''}`} />
+                    הגדרות מתקדמות (מומלץ)
+                </button>
 
-                {/* Business Mode (Normal Flow) OR Personal Mode (Advanced & Open) */}
-                {(isBusiness || isAdvancedOpen) && (
-                    <div className={`space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 ${!isBusiness ? 'p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50' : ''}`}>
+                {isAdvancedOpen && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50">
 
                         {/* Payer / Accepted By */}
                         <div className={`grid gap-3 w-full ${isBusiness ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
@@ -477,22 +471,6 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 color="green"
                             />
                         </div>
-
-                        {/* Business Mode: Date is here (bottom) */}
-                        {isBusiness && (
-                            <div className="w-full">
-                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תאריך קבלה</label>
-                                <DatePicker
-                                    date={newIncome.date ? new Date(newIncome.date) : undefined}
-                                    setDate={(date) => {
-                                        if (isDemo) { interceptAction(); return; }
-                                        setNewIncome({ ...newIncome, date: date ? format(date, 'yyyy-MM-dd') : '' })
-                                    }}
-                                    fromDate={startOfMonth}
-                                    toDate={endOfMonth}
-                                />
-                            </div>
-                        )}
 
                         {/* Recurring Checkbox */}
                         <div className={`flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full ${!isBusiness ? 'bg-white dark:bg-slate-800' : ''}`}>

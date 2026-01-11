@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSWRConfig } from 'swr'
-import { Loader2, Plus, Wallet } from 'lucide-react'
+import { Loader2, Plus, Wallet, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 
 import { useBudget } from '@/contexts/BudgetContext'
@@ -39,6 +39,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
+    const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
     const [newDebt, setNewDebt] = useState<{
         creditor: string
         debtType: string
@@ -143,7 +144,6 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
 
             <div className="flex flex-col gap-4">
                 {/* Creditor Name - Full Width */}
-                {/* Creditor Name - Full Width */}
                 <div className="w-full">
                     <label className="text-xs font-medium mb-1.5 block text-[#676879] dark:text-gray-300">שם המלווה / לווה *</label>
                     <Input
@@ -209,68 +209,80 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                     </div>
                 </div>
 
-                {/* Payment Method - Full Width */}
-                <div className="w-full">
-                    <PaymentMethodSelector
-                        value={newDebt.paymentMethod}
-                        onChange={(val) => setNewDebt({ ...newDebt, paymentMethod: val })}
-                    />
-                </div>
+                <button
+                    type="button"
+                    onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                    className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors w-full py-2"
+                >
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isAdvancedOpen ? 'rotate-180' : ''}`} />
+                    הגדרות מתקדמות (מומלץ)
+                </button>
 
-                <div className="flex flex-col gap-4"> {/* Container for Checkbox and Button */}
-                    <div className="flex items-center gap-2 h-10 bg-gray-50 dark:bg-slate-800/50 px-3 rounded-lg border border-gray-100 dark:border-slate-700 w-full sm:w-auto self-start">
-                        <Checkbox
-                            id="recurring-debt"
-                            checked={newDebt.isRecurring}
-                            onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
-                            className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
-                        />
-                        <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none text-[#323338] dark:text-gray-100">
-                            תשלומים
-                        </label>
-                    </div>
+                {isAdvancedOpen && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50">
+                        {/* Payment Method - Full Width */}
+                        <div className="w-full">
+                            <PaymentMethodSelector
+                                value={newDebt.paymentMethod}
+                                onChange={(val) => setNewDebt({ ...newDebt, paymentMethod: val })}
+                            />
+                        </div>
 
-                    {newDebt.isRecurring && (
-                        <div className="p-4 pt-0 border-t border-gray-100 dark:border-slate-700 mt-2 grid gap-6 grid-cols-1 sm:grid-cols-2 animate-in slide-in-from-top-2 duration-200">
-                            <div className="space-y-1.5 mt-2">
-                                <label className="text-xs text-[#676879] dark:text-gray-300">מספר תשלומים</label>
-                                <Input
-                                    type="number"
-                                    placeholder="12"
-                                    min="1"
-                                    className="h-10 w-24 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
-                                    value={newDebt.numberOfInstallments}
-                                    onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
-                                    disabled={submitting}
-                                    dir="ltr"
+                        <div className="flex flex-col gap-4"> {/* Container for Checkbox and Button */}
+                            <div className="flex items-center gap-2 h-10 bg-gray-50 dark:bg-slate-800/50 px-3 rounded-lg border border-gray-100 dark:border-slate-700 w-full sm:w-auto self-start">
+                                <Checkbox
+                                    id="recurring-debt"
+                                    checked={newDebt.isRecurring}
+                                    onCheckedChange={(checked) => setNewDebt({ ...newDebt, isRecurring: checked as boolean })}
+                                    className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                                 />
+                                <label htmlFor="recurring-debt" className="text-sm font-medium cursor-pointer select-none text-[#323338] dark:text-gray-100">
+                                    תשלומים
+                                </label>
                             </div>
-                            {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
-                                <div className="space-y-1.5 mt-2">
-                                    <label className="text-xs text-[#676879] dark:text-gray-300">תשלום חודשי משוער</label>
-                                    <div className="h-10 px-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm flex items-center w-full font-medium text-[#323338] dark:text-gray-100">
-                                        {formatCurrency(
-                                            parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
-                                            getCurrencySymbol(newDebt.currency)
-                                        )}
+
+                            {newDebt.isRecurring && (
+                                <div className="p-4 pt-0 border-t border-gray-100 dark:border-slate-700 mt-2 grid gap-6 grid-cols-1 sm:grid-cols-2 animate-in slide-in-from-top-2 duration-200">
+                                    <div className="space-y-1.5 mt-2">
+                                        <label className="text-xs text-[#676879] dark:text-gray-300">מספר תשלומים</label>
+                                        <Input
+                                            type="number"
+                                            placeholder="12"
+                                            min="1"
+                                            className="h-10 w-24 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
+                                            value={newDebt.numberOfInstallments}
+                                            onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
+                                            disabled={submitting}
+                                            dir="ltr"
+                                        />
                                     </div>
+                                    {newDebt.totalAmount && newDebt.numberOfInstallments && parseInt(newDebt.numberOfInstallments) > 0 && (
+                                        <div className="space-y-1.5 mt-2">
+                                            <label className="text-xs text-[#676879] dark:text-gray-300">תשלום חודשי משוער</label>
+                                            <div className="h-10 px-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm flex items-center w-full font-medium text-[#323338] dark:text-gray-100">
+                                                {formatCurrency(
+                                                    parseFloat(newDebt.totalAmount) / parseInt(newDebt.numberOfInstallments),
+                                                    getCurrencySymbol(newDebt.currency)
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
-                    )}
-
-                    <Button
-                        onClick={handleAdd}
-                        className={`w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md
+                    </div>
+                )}
+                <Button
+                    onClick={handleAdd}
+                    className={`w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md
                             ${(!newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date)
-                                ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
-                                : 'bg-purple-600 hover:bg-purple-700'
-                            }`}
-                        disabled={submitting || !newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date}
-                    >
-                        {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
-                    </Button>
-                </div>
+                            ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                            : 'bg-purple-600 hover:bg-purple-700'
+                        }`}
+                    disabled={submitting || !newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date}
+                >
+                    {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
+                </Button>
             </div>
         </div>
     )
