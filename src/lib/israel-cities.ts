@@ -798,6 +798,47 @@ export const ISRAEL_CITIES: Record<string, CityData> = {
         "lng": 35.443754,
         "hebrewName": "פצאל"
     },
+    // Manual additions for missing keys
+    "Herzliya": {
+        "lat": 32.1624,
+        "lng": 34.8447,
+        "hebrewName": "הרצליה"
+    },
+    "Giv'at Shmuel": {
+        "lat": 32.0911,
+        "lng": 34.8475,
+        "hebrewName": "גבעת שמואל"
+    },
+    "Hefer Valley Regional Council": {
+        "lat": 32.3951,
+        "lng": 34.9220,
+        "hebrewName": "מועצה אזורית עמק חפר"
+    },
+    "Tel Aviv": {
+        "lat": 32.0853,
+        "lng": 34.7818,
+        "hebrewName": "תל אביב"
+    },
+    "Ramat Gan": {
+        "lat": 32.0684,
+        "lng": 34.8264,
+        "hebrewName": "רמת גן"
+    },
+    "Rishon LeZion": {
+        "lat": 31.9730,
+        "lng": 34.7925,
+        "hebrewName": "ראשון לציון"
+    },
+    "Rishon LeTsiyyon": {
+        "lat": 31.9730,
+        "lng": 34.7925,
+        "hebrewName": "ראשון לציון"
+    },
+    "Petah Tikva": {
+        "lat": 32.0840,
+        "lng": 34.8878,
+        "hebrewName": "פתח תקווה"
+    },
     "Modi'In-Makkabbim-Re": {
         "lat": 31.890266,
         "lng": 35.010398,
