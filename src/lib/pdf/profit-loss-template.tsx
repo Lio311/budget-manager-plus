@@ -114,11 +114,7 @@ const styles = StyleSheet.create({
     },
 
     footer: {
-        position: 'absolute',
-        bottom: 20,
-        left: 30,
-        right: 30,
-        textAlign: 'center',
+        marginTop: 20,
         paddingTop: 10,
         borderTop: '1px solid #e5e7eb',
         flexDirection: 'column',
