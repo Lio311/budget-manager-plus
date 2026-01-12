@@ -6845,7 +6845,7 @@ export const ISRAEL_CITIES: Record<string, CityData> = {
         "lng": 34.849866,
         "hebrewName": "עומר"
     },
-    // Final Manual Fixes
+    // Final Manual Fixes (Truly missing only)
     "Tel Aviv": {
         "lat": 32.0853,
         "lng": 34.7818,
@@ -6855,11 +6855,6 @@ export const ISRAEL_CITIES: Record<string, CityData> = {
         "lat": 32.0853,
         "lng": 34.7818,
         "hebrewName": "תל אביב"
-    },
-    "Ramat Gan": {
-        "lat": 32.0684,
-        "lng": 34.8264,
-        "hebrewName": "רמת גן"
     },
     "Petah Tikva": {
         "lat": 32.0840,
