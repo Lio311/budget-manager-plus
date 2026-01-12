@@ -154,8 +154,9 @@ export function IncomeTab() {
     }
 
     const { data: clientsData = [] } = useSWR<any[]>(
-        isBusiness ? ['clients'] : null,
-        fetcherClients
+        isBusiness ? ['clients', budgetType] : null,
+        fetcherClients,
+        { revalidateOnFocus: true }
     )
 
     const fetcherCategories = async () => {
