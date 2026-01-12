@@ -47,8 +47,63 @@ export function BudgetProvider({ children, initialPlan }: { children: React.Reac
     const setBudgetType = (type: BudgetType) => {
         setBudgetTypeInternal(type)
         localStorage.setItem('budgetType', type)
-        // Force reload to ensure all dropdowns reload properly
-        window.location.reload()
+
+        // Show loading overlay
+        const overlay = document.createElement('div')
+        overlay.id = 'budget-loading-overlay'
+        overlay.innerHTML = `
+            <style>
+                #budget-loading-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                    animation: fadeIn 0.3s ease-in;
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.1); opacity: 0.8; }
+                }
+                .spinner {
+                    width: 60px;
+                    height: 60px;
+                    border: 4px solid rgba(255,255,255,0.3);
+                    border-top-color: white;
+                    border-radius: 50%;
+                    animation: spin 0.8s linear infinite;
+                }
+                .loading-text {
+                    color: white;
+                    font-size: 18px;
+                    font-weight: 600;
+                    margin-top: 20px;
+                    animation: pulse 1.5s ease-in-out infinite;
+                }
+            </style>
+            <div class="spinner"></div>
+            <div class="loading-text">טוען ממשק ${type === 'BUSINESS' ? 'עסקי' : 'אישי'}...</div>
+        `
+        document.body.appendChild(overlay)
+
+        // Force reload after a brief delay
+        setTimeout(() => {
+            window.location.reload()
+        }, 400)
     }
 
     if (!isInitialized) {
