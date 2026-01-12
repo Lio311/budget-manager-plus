@@ -291,7 +291,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar flex flex-col gap-2 pr-2">
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar flex flex-col gap-2 pr-2 pb-0">
                         {paginatedLocations.map((loc, i) => {
                             const originalIndex = sortedLocations.indexOf(loc)
                             const color = COLORS[originalIndex % COLORS.length]
