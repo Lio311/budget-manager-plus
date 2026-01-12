@@ -303,7 +303,9 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     initial={{ x: -20, opacity: 0 }}
                                     animate={{ x: 0, opacity: 1 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className="flex items-center gap-2 p-2 rounded-lg bg-white/60 hover:bg-white border border-transparent hover:border-blue-100 transition-all shadow-sm"
+                                    className="flex items-center gap-2 p-2 rounded-lg bg-white/60 hover:bg-white border border-transparent hover:border-blue-100 transition-all shadow-sm cursor-pointer"
+                                    onMouseEnter={() => setHoveredCity(loc.city)}
+                                    onMouseLeave={() => setHoveredCity(null)}
                                 >
                                     <div
                                         className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
