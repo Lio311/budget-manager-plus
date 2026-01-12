@@ -241,7 +241,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     key={loc.city}
                                     initial={{ scale: 0, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
-                                    transition={{ delay: i * 0.1 }}
+                                    transition={{ delay: originalIndex * 0.1 }}
                                 >
                                     {/* Small Pin / Dot */}
                                     <circle
