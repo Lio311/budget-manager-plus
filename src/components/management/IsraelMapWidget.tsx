@@ -157,7 +157,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export function IsraelMapWidget({ locations }: { locations: any[] }) {
     const [sortMethod, setSortMethod] = useState<'ALPHA' | 'COUNT'>('ALPHA')
     const [currentPage, setCurrentPage] = useState(0)
-    const ITEMS_PER_PAGE = 5
+    const [hoveredCity, setHoveredCity] = useState<string | null>(null)
+    const ITEMS_PER_PAGE = 6
 
     // Sort locations
     const sortedLocations = [...locations].sort((a, b) => {
@@ -232,6 +233,8 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
 
                             // Use specific color for this city index (consistent with list)
                             const color = COLORS[i % COLORS.length]
+                            const isHovered = hoveredCity === loc.city
+                            const cityName = CITY_TRANSLATIONS[loc.city] || loc.city
 
                             return (
                                 <motion.g
@@ -244,23 +247,49 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     <circle
                                         cx={coords.x}
                                         cy={coords.y}
-                                        r="2" // Small fixed size "Pin"
+                                        r={isHovered ? 4 : 2}
                                         fill={color}
-                                        stroke="white"
-                                        strokeWidth="0.5"
-                                        className="drop-shadow-md"
+                                        stroke={isHovered ? "white" : "white"}
+                                        strokeWidth={isHovered ? "1.5" : "0.5"}
+                                        className={`drop-shadow-md transition-all duration-200 ${isHovered ? 'opacity-100' : 'opacity-80'}`}
                                     />
-                                    {/* Optional: Add a small pulse effect for visibility */}
-                                    <circle
-                                        cx={coords.x}
-                                        cy={coords.y}
-                                        r="3"
-                                        fill={color}
-                                        opacity="0.3"
-                                    >
-                                        <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" />
-                                        <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite" />
-                                    </circle>
+                                    {/* Pulse effect - only when NOT hovered */}
+                                    {!isHovered && (
+                                        <circle
+                                            cx={coords.x}
+                                            cy={coords.y}
+                                            r="3"
+                                            fill={color}
+                                            opacity="0.3"
+                                        >
+                                            <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" />
+                                            <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite" />
+                                        </circle>
+                                    )}
+                                    {/* Label on hover */}
+                                    {isHovered && (
+                                        <>
+                                            <rect
+                                                x={coords.x + 6}
+                                                y={coords.y - 10}
+                                                width={cityName.length * 6 + 8}
+                                                height="16"
+                                                fill="white"
+                                                rx="3"
+                                                className="drop-shadow-lg"
+                                            />
+                                            <text
+                                                x={coords.x + 10}
+                                                y={coords.y}
+                                                fontSize="10"
+                                                fontWeight="bold"
+                                                fill="#1f2937"
+                                                className="select-none"
+                                            >
+                                                {cityName}
+                                            </text>
+                                        </>
+                                    )}
                                 </motion.g>
                             )
                         })}
