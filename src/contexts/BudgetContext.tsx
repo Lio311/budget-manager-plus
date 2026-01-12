@@ -47,6 +47,8 @@ export function BudgetProvider({ children, initialPlan }: { children: React.Reac
     const setBudgetType = (type: BudgetType) => {
         setBudgetTypeInternal(type)
         localStorage.setItem('budgetType', type)
+        // Force reload to ensure all dropdowns reload properly
+        window.location.reload()
     }
 
     if (!isInitialized) {
