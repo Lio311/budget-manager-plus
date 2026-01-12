@@ -350,35 +350,43 @@ export function BusinessExpensesTable({
                                                     key={person}
                                                     onClick={() => {
                                                         const current = formData.responsibles || ['RON']
-                                                        let next = []
+                                                        let nextResponsibles: string[]
 
                                                         // 1. Toggle the person
                                                         if (current.includes(person)) {
-                                                            if (current.length === 1) return // Prevent empty
-                                                            next = current.filter(p => p !== person)
+                                                            if (current.length === 1) {
+                                                                // If only one person is selected, prevent unselecting them
+                                                                return
+                                                            }
+                                                            nextResponsibles = current.filter(p => p !== person)
                                                         } else {
-                                                            next = [...current, person]
+                                                            nextResponsibles = [...current, person]
                                                         }
 
                                                         // 2. Enforce Logic: "Lior can be chosen either alone or as part of a trio"
-                                                        const hasLior = next.includes('LIOR')
-                                                        const count = next.length
+                                                        const hasLior = nextResponsibles.includes('LIOR')
+                                                        const count = nextResponsibles.length
 
-                                                        // If Lior is present and count is 2, we need to fix it
-                                                        if (hasLior && count === 2) {
-                                                            // We came from either 1 or 3
-                                                            if (current.length === 3) {
-                                                                // Removed someone from trio, left with Lior + 1
-                                                                // Remove Lior to leave just the pair
-                                                                next = next.filter(p => p !== 'LIOR')
-                                                            } else {
-                                                                // Added someone to Lior (or added Lior to someone)
-                                                                // Upgrade to full trio
-                                                                next = ['RON', 'LEON', 'LIOR']
+                                                        if (hasLior) {
+                                                            if (count === 2) {
+                                                                // If Lior is present and there are 2 people, it's an invalid state.
+                                                                // We need to decide if it should become just Lior, or the full trio.
+                                                                // Heuristic: If we just added Lior, make it a trio. If we removed someone from a trio, make it just the other person.
+                                                                if (current.length === 1 && current.includes(nextResponsibles.find(p => p !== 'LIOR')!)) {
+                                                                    // Added Lior to a single person -> make it a trio
+                                                                    nextResponsibles = ['RON', 'LEON', 'LIOR']
+                                                                } else if (current.length === 3 && current.includes('LIOR')) {
+                                                                    // Removed one person from a trio (leaving Lior + 1) -> remove Lior
+                                                                    nextResponsibles = nextResponsibles.filter(p => p !== 'LIOR')
+                                                                } else {
+                                                                    // Fallback for other 2-person scenarios with Lior (e.g., if Lior was already selected alone and someone else was added)
+                                                                    // Default to making it a trio if Lior is involved in a 2-person selection
+                                                                    nextResponsibles = ['RON', 'LEON', 'LIOR']
+                                                                }
                                                             }
                                                         }
 
-                                                        setFormData({ ...formData, responsibles: next })
+                                                        setFormData({ ...formData, responsibles: nextResponsibles })
                                                     }}
                                                     className={`
                                                          cursor-pointer flex flex-col items-center gap-2 transition-all p-2 rounded-xl border-2

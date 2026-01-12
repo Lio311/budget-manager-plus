@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Pagination } from '@/components/ui/Pagination'
-import { Plus, Trash2, Loader2, Pencil, X, Check, PiggyBank } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Plus, Trash2, Loader2, Pencil, X, Check, PiggyBank, ArrowUpDown } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getSavings, addSaving, deleteSaving, updateSaving } from '@/lib/actions/savings'
@@ -130,8 +131,44 @@ export function SavingsTab() {
     const itemsPerPage = 5
     const [isMobileOpen, setIsMobileOpen] = useState(false)
 
-    useAutoPaginationCorrection(currentPage, savings.length, itemsPerPage, setCurrentPage)
-    const totalPages = Math.ceil(savings.length / itemsPerPage)
+    // Sorting State
+    const [sortMethod, setSortMethod] = useState<'DATE' | 'AMOUNT' | 'NAME' | 'CATEGORY' | 'PAYMENT'>('DATE')
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+
+    const sortSavings = (items: Saving[]) => {
+        return [...items].sort((a, b) => {
+            let diff = 0
+            switch (sortMethod) {
+                case 'DATE':
+                    const dateA = a.targetDate ? new Date(a.targetDate).getTime() : 0
+                    const dateB = b.targetDate ? new Date(b.targetDate).getTime() : 0
+                    diff = dateA - dateB
+                    break
+                case 'AMOUNT':
+                    diff = (a.monthlyDeposit || 0) - (b.monthlyDeposit || 0)
+                    break
+                case 'NAME':
+                    diff = (a.name || '').localeCompare(b.name || '', 'he')
+                    break
+                case 'CATEGORY':
+                    diff = (a.category || '').localeCompare(b.category || '', 'he')
+                    break
+                case 'PAYMENT':
+                    const payA = a.paymentMethod || ''
+                    const payB = b.paymentMethod || ''
+                    diff = payA.localeCompare(payB, 'he')
+                    break
+                default:
+                    diff = 0
+            }
+            return sortDirection === 'asc' ? diff : -diff
+        })
+    }
+
+    const sortedSavings = sortSavings(savings)
+
+    useAutoPaginationCorrection(currentPage, sortedSavings.length, itemsPerPage, setCurrentPage)
+    const totalPages = Math.ceil(sortedSavings.length / itemsPerPage)
 
     const [submitting, setSubmitting] = useState(false)
 
@@ -139,7 +176,7 @@ export function SavingsTab() {
         setCurrentPage(1)
     }, [month, year])
 
-    const paginatedSavings = savings.slice(
+    const paginatedSavings = sortedSavings.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
@@ -330,8 +367,32 @@ export function SavingsTab() {
 
                 {/* Savings List */}
                 <div className="glass-panel p-5 block">
-                    <div className="flex items-center gap-2 mb-4 px-2">
+                    <div className="flex items-center justify-between mb-4 px-2 flex-wrap gap-2">
                         <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">רשימת חסכונות</h3>
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
+                            <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                                <SelectTrigger className="h-8 text-xs w-[110px] bg-white/80 border-gray-200">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent dir="rtl">
+                                    <SelectItem value="DATE">תאריך יעד</SelectItem>
+                                    <SelectItem value="AMOUNT">סכום</SelectItem>
+                                    <SelectItem value="NAME">שם</SelectItem>
+                                    <SelectItem value="CATEGORY">קטגוריה</SelectItem>
+                                    <SelectItem value="PAYMENT">אמצעי תשלום</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                className="h-8 w-8 p-0 border border-gray-200 bg-white/80 hover:bg-white"
+                                title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
+                            >
+                                <ArrowUpDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="space-y-3">

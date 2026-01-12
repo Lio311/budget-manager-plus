@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import useSWR, { useSWRConfig } from 'swr'
-import { CreditCard, Loader2, Pencil, Trash2, Check, X } from 'lucide-react'
+import { CreditCard, Loader2, Pencil, Trash2, Check, X, ArrowUpDown } from 'lucide-react'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Pagination } from '@/components/ui/Pagination'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { getBills, updateBill, deleteBill, toggleBillPaid } from '@/lib/actions/bill'
 import { formatCurrency } from '@/lib/utils'
 import { useOptimisticToggle, useOptimisticDelete } from '@/hooks/useOptimisticMutation'
@@ -78,14 +79,50 @@ export function BillsTab() {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
 
-    useAutoPaginationCorrection(currentPage, bills.length, itemsPerPage, setCurrentPage)
-    const totalPages = Math.ceil(bills.length / itemsPerPage)
+    // Sorting State
+    const [sortMethod, setSortMethod] = useState<'DUE_DATE' | 'AMOUNT' | 'NAME' | 'STATUS' | 'PAYMENT'>('DUE_DATE')
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+
+    const sortBills = (items: Bill[]) => {
+        return [...items].sort((a, b) => {
+            let diff = 0
+            switch (sortMethod) {
+                case 'DUE_DATE':
+                    const dayA = new Date(a.dueDate).getDate()
+                    const dayB = new Date(b.dueDate).getDate()
+                    diff = dayA - dayB
+                    break
+                case 'AMOUNT':
+                    diff = a.amount - b.amount
+                    break
+                case 'NAME':
+                    diff = (a.name || '').localeCompare(b.name || '', 'he')
+                    break
+                case 'STATUS':
+                    diff = (a.isPaid === b.isPaid) ? 0 : (a.isPaid ? 1 : -1)
+                    break
+                case 'PAYMENT':
+                    const payA = a.paymentMethod || ''
+                    const payB = b.paymentMethod || ''
+                    diff = payA.localeCompare(payB, 'he')
+                    break
+                default:
+                    diff = 0
+            }
+            return sortDirection === 'asc' ? diff : -diff
+        })
+    }
+
+    const sortedBills = sortBills(bills)
+
+    useAutoPaginationCorrection(currentPage, sortedBills.length, itemsPerPage, setCurrentPage)
+    const totalPages = Math.ceil(sortedBills.length / itemsPerPage)
 
     useEffect(() => {
         setCurrentPage(1)
     }, [month, year])
 
-    const paginatedBills = bills.slice(
+    const paginatedBills = sortedBills.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
@@ -279,7 +316,33 @@ export function BillsTab() {
 
 
                 <div className="glass-panel p-5 block">
-                    <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100 mb-4">רשימת חשבונות</h3>
+                    <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">רשימת חשבונות</h3>
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
+                            <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                                <SelectTrigger className="h-8 text-xs w-[110px] bg-white/80 border-gray-200">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent dir="rtl">
+                                    <SelectItem value="DUE_DATE">תאריך תשלום</SelectItem>
+                                    <SelectItem value="AMOUNT">סכום</SelectItem>
+                                    <SelectItem value="NAME">שם</SelectItem>
+                                    <SelectItem value="STATUS">סטטוס</SelectItem>
+                                    <SelectItem value="PAYMENT">אמצעי תשלום</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                className="h-8 w-8 p-0 border border-gray-200 bg-white/80 hover:bg-white"
+                                title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
+                            >
+                                <ArrowUpDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                            </Button>
+                        </div>
+                    </div>
                     <div className="space-y-3">
                         {loading ? (
                             // Skeleton loader while loading

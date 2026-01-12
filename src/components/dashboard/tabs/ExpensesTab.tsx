@@ -550,7 +550,7 @@ export function ExpensesTab() {
                                         <SelectItem value="AMOUNT">סכום</SelectItem>
                                         <SelectItem value="DESCRIPTION">תיאור</SelectItem>
                                         <SelectItem value="CATEGORY">קטגוריה</SelectItem>
-                                        <SelectItem value="PAYMENT">תשלום</SelectItem>
+                                        <SelectItem value="PAYMENT">אמצעי תשלום</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <Button

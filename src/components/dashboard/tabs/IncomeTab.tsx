@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import useSWR, { useSWRConfig } from 'swr'
 
-import { Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X } from 'lucide-react'
+import { Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X, ArrowUpDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 
@@ -17,6 +17,7 @@ import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { IncomeForm } from '@/components/dashboard/forms/IncomeForm'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Pagination } from '@/components/ui/Pagination'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { formatCurrency } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
@@ -198,10 +199,46 @@ export function IncomeTab() {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
 
-    useAutoPaginationCorrection(currentPage, incomes.length, itemsPerPage, setCurrentPage)
-    const totalPages = Math.ceil(incomes.length / itemsPerPage)
+    // Sorting State
+    const [sortMethod, setSortMethod] = useState<'DATE' | 'AMOUNT' | 'SOURCE' | 'CATEGORY' | 'PAYMENT'>('DATE')
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
-    const paginatedIncomes = incomes.slice(
+    const sortIncomes = (items: Income[]) => {
+        return [...items].sort((a, b) => {
+            let diff = 0
+            switch (sortMethod) {
+                case 'DATE':
+                    const dateA = a.date ? new Date(a.date).getTime() : 0
+                    const dateB = b.date ? new Date(b.date).getTime() : 0
+                    diff = dateA - dateB
+                    break
+                case 'AMOUNT':
+                    diff = a.amount - b.amount
+                    break
+                case 'SOURCE':
+                    diff = (a.source || '').localeCompare(b.source || '', 'he')
+                    break
+                case 'CATEGORY':
+                    diff = (a.category || '').localeCompare(b.category || '', 'he')
+                    break
+                case 'PAYMENT':
+                    const payA = a.paymentMethod || ''
+                    const payB = b.paymentMethod || ''
+                    diff = payA.localeCompare(payB, 'he')
+                    break
+                default:
+                    diff = 0
+            }
+            return sortDirection === 'asc' ? diff : -diff
+        })
+    }
+
+    const sortedIncomes = sortIncomes(incomes)
+
+    useAutoPaginationCorrection(currentPage, sortedIncomes.length, itemsPerPage, setCurrentPage)
+    const totalPages = Math.ceil(sortedIncomes.length / itemsPerPage)
+
+    const paginatedIncomes = sortedIncomes.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
@@ -422,9 +459,38 @@ export function IncomeTab() {
 
                 {/* List View */}
                 <div className="lg:col-span-7 space-y-3">
-                    <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center justify-between px-1 flex-wrap gap-2">
                         <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'פירוט הכנסות ומכירות' : 'רשימת הכנסות'}</h3>
-                        <span className="text-xs text-gray-400 font-medium">{incomes.length} שורות</span>
+
+                        <div className="flex items-center gap-2">
+                            {/* Sort Controls */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
+                                <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                                    <SelectTrigger className="h-8 text-xs w-[110px] bg-white/80 border-gray-200">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent dir="rtl">
+                                        <SelectItem value="DATE">תאריך</SelectItem>
+                                        <SelectItem value="AMOUNT">סכום</SelectItem>
+                                        <SelectItem value="SOURCE">מקור</SelectItem>
+                                        <SelectItem value="CATEGORY">קטגוריה</SelectItem>
+                                        <SelectItem value="PAYMENT">אמצעי תשלום</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                    className="h-8 w-8 p-0 border border-gray-200 bg-white/80 hover:bg-white"
+                                    title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
+                                >
+                                    <ArrowUpDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                </Button>
+                            </div>
+
+                            <span className="text-xs text-gray-400 font-medium">{incomes.length} שורות</span>
+                        </div>
                     </div>
 
                     {incomes.length === 0 ? (

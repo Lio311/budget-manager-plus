@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
-import { Plus, Trash2, Check, Loader2, Pencil, X, TrendingDown, Wallet } from 'lucide-react'
+import { Plus, Trash2, Check, Loader2, Pencil, X, TrendingDown, Wallet, ArrowUpDown } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getDebts, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib/actions/debts'
@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { DebtForm } from '@/components/dashboard/forms/DebtForm'
 import { Pagination } from '@/components/ui/Pagination'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
 import { DEBT_TYPES, DEBT_TYPE_LABELS, CREDITOR_LABELS } from '@/lib/constants/debt-types'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
@@ -101,10 +102,47 @@ export function DebtsTab() {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
 
-    useAutoPaginationCorrection(currentPage, debts.length, itemsPerPage, setCurrentPage)
-    const totalPages = Math.ceil(debts.length / itemsPerPage)
+    // Sorting State
+    const [sortMethod, setSortMethod] = useState<'DUE_DAY' | 'AMOUNT' | 'MONTHLY' | 'CREDITOR' | 'STATUS' | 'PAYMENT'>('DUE_DAY')
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
-    const paginatedDebts = debts.slice(
+    const sortDebts = (items: Debt[]) => {
+        return [...items].sort((a, b) => {
+            let diff = 0
+            switch (sortMethod) {
+                case 'DUE_DAY':
+                    diff = a.dueDay - b.dueDay
+                    break
+                case 'AMOUNT':
+                    diff = a.totalAmount - b.totalAmount
+                    break
+                case 'MONTHLY':
+                    diff = a.monthlyPayment - b.monthlyPayment
+                    break
+                case 'CREDITOR':
+                    diff = (a.creditor || '').localeCompare(b.creditor || '', 'he')
+                    break
+                case 'STATUS':
+                    diff = (a.isPaid === b.isPaid) ? 0 : (a.isPaid ? 1 : -1)
+                    break
+                case 'PAYMENT':
+                    const payA = a.paymentMethod || ''
+                    const payB = b.paymentMethod || ''
+                    diff = payA.localeCompare(payB, 'he')
+                    break
+                default:
+                    diff = 0
+            }
+            return sortDirection === 'asc' ? diff : -diff
+        })
+    }
+
+    const sortedDebts = sortDebts(debts)
+
+    useAutoPaginationCorrection(currentPage, sortedDebts.length, itemsPerPage, setCurrentPage)
+    const totalPages = Math.ceil(sortedDebts.length / itemsPerPage)
+
+    const paginatedDebts = sortedDebts.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
@@ -303,8 +341,33 @@ export function DebtsTab() {
 
                 {/* Debts List */}
                 <div className="glass-panel p-5 block">
-                    <div className="flex items-center gap-2 mb-4 px-2">
+                    <div className="flex items-center justify-between mb-4 px-2 flex-wrap gap-2">
                         <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">רשימת הלוואות</h3>
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
+                            <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                                <SelectTrigger className="h-8 text-xs w-[120px] bg-white/80 border-gray-200">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent dir="rtl">
+                                    <SelectItem value="DUE_DAY">יום חיוב</SelectItem>
+                                    <SelectItem value="AMOUNT">סכום כולל</SelectItem>
+                                    <SelectItem value="MONTHLY">תשלום חודשי</SelectItem>
+                                    <SelectItem value="CREDITOR">מלווה</SelectItem>
+                                    <SelectItem value="STATUS">סטטוס</SelectItem>
+                                    <SelectItem value="PAYMENT">אמצעי תשלום</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                className="h-8 w-8 p-0 border border-gray-200 bg-white/80 hover:bg-white"
+                                title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
+                            >
+                                <ArrowUpDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="space-y-3">
