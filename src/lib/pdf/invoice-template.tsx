@@ -147,7 +147,8 @@ const styles = StyleSheet.create({
         right: 30, // Reduced from 40
         textAlign: 'center',
         paddingTop: 10, // Reduced from 20
-        borderTop: '1px solid #e5e7eb'
+        borderTop: '1px solid #e5e7eb',
+        alignItems: 'center'
     },
     footerText: {
         fontSize: 8, // Reduced from 9
@@ -155,19 +156,18 @@ const styles = StyleSheet.create({
         marginBottom: 3 // Reduced from 5
     },
     poweredBy: {
-        flexDirection: 'row',
+        flexDirection: 'row-reverse',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 5 // Reduced from 10
+        marginTop: 5
     },
     poweredByText: {
-        fontSize: 7, // Reduced from 8
+        fontSize: 8,
         color: '#6b7280',
-        marginLeft: 5
+        marginLeft: 4
     },
     poweredByLogo: {
-        width: 50, // Reduced from 60
-        height: 15, // Reduced from 20
+        height: 15,
         objectFit: 'contain'
     }
 })
