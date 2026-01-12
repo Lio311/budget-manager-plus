@@ -298,7 +298,7 @@ export default function ProfitLossTab() {
                                     <div className="relative w-full md:w-auto md:min-w-[300px] mb-4 md:mb-0">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                         <Input
-                                            placeholder="חיפוש לפי שם, תיאור או מספר..."
+                                            placeholder="חיפוש לפי שם, תיאור או מספר"
                                             className="pl-10"
                                             value={searchTerm}
                                             onChange={e => setSearchTerm(e.target.value)}
