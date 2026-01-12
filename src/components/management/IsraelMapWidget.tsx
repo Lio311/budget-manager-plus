@@ -324,7 +324,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
 
                     {/* Pagination Controls */}
                     {totalPages > 1 && (
-                        <div className="flex justify-between items-center bg-white/50 px-0.5 py-0.5 rounded-md mt-1">
+                        <div className="flex justify-between items-center bg-white/50 py-0.5 rounded-md mt-0.5 gap-1">
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 0}
