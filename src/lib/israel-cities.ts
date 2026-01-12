@@ -6844,5 +6844,46 @@ export const ISRAEL_CITIES: Record<string, CityData> = {
         "lat": 31.264304,
         "lng": 34.849866,
         "hebrewName": "עומר"
+    },
+    // Final Manual Fixes
+    "Tel Aviv": {
+        "lat": 32.0853,
+        "lng": 34.7818,
+        "hebrewName": "תל אביב"
+    },
+    "Tel Aviv-Yafo": {
+        "lat": 32.0853,
+        "lng": 34.7818,
+        "hebrewName": "תל אביב"
+    },
+    "Ramat Gan": {
+        "lat": 32.0684,
+        "lng": 34.8264,
+        "hebrewName": "רמת גן"
+    },
+    "Petah Tikva": {
+        "lat": 32.0840,
+        "lng": 34.8878,
+        "hebrewName": "פתח תקווה"
+    },
+    "Rishon LeZion": {
+        "lat": 31.9730,
+        "lng": 34.7925,
+        "hebrewName": "ראשון לציון"
+    },
+    "Rishon LeTsiyyon": {
+        "lat": 31.9730,
+        "lng": 34.7925,
+        "hebrewName": "ראשון לציון"
+    },
+    "Rishon LetSiyyon": {
+        "lat": 31.9730,
+        "lng": 34.7925,
+        "hebrewName": "ראשון לציון"
+    },
+    "Netanya": {
+        "lat": 32.3215,
+        "lng": 34.8532,
+        "hebrewName": "נתניה"
     }
 };
