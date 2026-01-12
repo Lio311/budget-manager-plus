@@ -210,7 +210,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                             stroke="none"
                         />
 
-                        {locations.map((loc, i) => {
+                        {sortedLocations.map((loc, originalIndex) => {
                             let coords = { x: 50, y: 100 } // fallback
 
                             // 1. Try exact lookup
@@ -227,12 +227,12 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     coords = project(CITY_LOCATIONS[match].lat, CITY_LOCATIONS[match].lng)
                                 } else {
                                     // 3. "Unknown" Pile - side of map
-                                    coords = { x: 15, y: 150 + (i * 5) }
+                                    coords = { x: 15, y: 150 + (originalIndex * 5) }
                                 }
                             }
 
-                            // Use specific color for this city index (consistent with list)
-                            const color = COLORS[i % COLORS.length]
+                            // Use same color index as in legend
+                            const color = COLORS[originalIndex % COLORS.length]
                             const isHovered = hoveredCity === loc.city
                             const cityName = CITY_TRANSLATIONS[loc.city] || loc.city
 
