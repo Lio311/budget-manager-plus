@@ -140,7 +140,6 @@ const styles = StyleSheet.create({
         marginBottom: 2
     },
     poweredByLogo: {
-        width: 20
         height: 15,
         objectFit: 'contain'
     }
