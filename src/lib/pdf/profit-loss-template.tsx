@@ -124,15 +124,16 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     poweredBy: {
-        flexDirection: 'row',
+        flexDirection: 'row-reverse', // Logo on Left, Text on Right (Item 2 on Left, Item 1 on Right)
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 5,
-        gap: 4 // Explicit small gap
+        gap: 4
     },
     poweredByText: {
         fontSize: 8,
         color: '#6b7280',
+        // No margin needed with gap
     },
     footerText: {
         fontSize: 9,
