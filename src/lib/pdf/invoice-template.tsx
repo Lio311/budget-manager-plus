@@ -151,9 +151,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     footerText: {
-        fontSize: 8, // Reduced from 9
+        fontSize: 9,
         color: '#9ca3af',
-        marginBottom: 3 // Reduced from 5
+        marginBottom: 2
     },
     poweredBy: {
         flexDirection: 'row-reverse',
@@ -395,19 +395,21 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
 
                 <View style={{ flex: 1 }} />
 
+                {/* Signature - Moved out of footer for consistent layout */}
+                {data.businessSignature && (
+                    <View style={{ position: 'absolute', bottom: 100, left: 30, right: 30, alignItems: 'center' }} wrap={false}>
+                        <Text style={{ fontSize: 8, color: '#6b7280', marginBottom: 5 }}>חתימה</Text>
+                        <Image src={data.businessSignature} style={{ width: 120, height: 40, objectFit: 'contain' }} />
+                    </View>
+                )}
+
                 {/* Footer */}
                 <View style={styles.footer} wrap={false}>
-                    {data.businessSignature && (
-                        <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                            <Text style={{ fontSize: 8, color: '#6b7280', marginBottom: 5 }}>חתימה</Text>
-                            <Image src={data.businessSignature} style={{ width: 120, height: 40, objectFit: 'contain' }} />
-                        </View>
-                    )}
                     <Text style={styles.footerText}>
                         !תודה על העסקה
                     </Text>
                     <View style={styles.poweredBy}>
-                        <Text style={styles.poweredByText}>הופק על ידי</Text>
+                        <Text style={styles.poweredByText}>מסמך זה הופק באופן אוטומטי על ידי</Text>
                         {data.poweredByLogoPath && (
                             <Image src={data.poweredByLogoPath} style={styles.poweredByLogo} />
                         )}
