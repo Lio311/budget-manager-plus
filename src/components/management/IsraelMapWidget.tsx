@@ -3,70 +3,7 @@
 import { Card } from '@/components/ui/card'
 import { motion } from 'framer-motion'
 
-// Real-world coordinates only, we will project them dynamically
-const CITY_LOCATIONS: Record<string, { lat: number, lng: number }> = {
-    // Center / Gush Dan
-    'Tel Aviv': { lat: 32.0853, lng: 34.7818 },
-    'Tel Aviv-Yafo': { lat: 32.0853, lng: 34.7818 },
-    'Ramat Gan': { lat: 32.0684, lng: 34.8264 },
-    'Givatayim': { lat: 32.0722, lng: 34.8089 },
-    'Bnei Brak': { lat: 32.0849, lng: 34.8352 },
-    'Petah Tikva': { lat: 32.0840, lng: 34.8878 },
-    'Holon': { lat: 32.0158, lng: 34.7874 },
-    'Bat Yam': { lat: 32.0132, lng: 34.7480 },
-    'Rishon LeZion': { lat: 31.9730, lng: 34.7925 },
-    'Rishon LeTsiyyon': { lat: 31.9730, lng: 34.7925 }, // Variations
-    'Rishon LetSiyyon': { lat: 31.9730, lng: 34.7925 },
-    'Rehovot': { lat: 31.8903, lng: 34.8113 },
-    'Ness Ziona': { lat: 31.9318, lng: 34.7997 },
-    'Yavne': { lat: 31.8780, lng: 34.7383 },
-    'Herzliya': { lat: 32.1624, lng: 34.8447 },
-    'Ramat HaSharon': { lat: 32.1492, lng: 34.8407 },
-    'Hod HaSharon': { lat: 32.1522, lng: 34.8932 },
-    'Kfar Saba': { lat: 32.1750, lng: 34.9069 },
-    'Ra\'anana': { lat: 32.1848, lng: 34.8713 },
-    'Or Yehuda': { lat: 32.0315, lng: 34.8560 }, // Added Or Yehuda
-
-    // Sharon / North Coast
-    'Netanya': { lat: 32.3215, lng: 34.8532 },
-    'Hadera': { lat: 32.4340, lng: 34.9197 },
-    'Zikhron Ya\'akov': { lat: 32.5707, lng: 34.9566 },
-    'Caesarea': { lat: 32.5000, lng: 34.9000 },
-
-    // North
-    'Haifa': { lat: 32.7940, lng: 34.9896 },
-    'Kiryat Ata': { lat: 32.8105, lng: 35.1098 },
-    'Kiryat Bialik': { lat: 32.8368, lng: 35.0743 },
-    'Kiryat Motzkin': { lat: 32.8465, lng: 35.0805 },
-    'Kiryat Yam': { lat: 32.8290, lng: 35.0684 },
-    'Acre': { lat: 32.9312, lng: 35.0818 },
-    'Akko': { lat: 32.9312, lng: 35.0818 },
-    'Nahariya': { lat: 33.0034, lng: 35.0970 },
-    'Karmiel': { lat: 32.9190, lng: 35.2901 },
-    'Tiberias': { lat: 32.7959, lng: 35.5312 },
-    'Nazareth': { lat: 32.6996, lng: 35.3035 },
-    'Afula': { lat: 32.6065, lng: 35.2901 },
-    'Safed': { lat: 32.9646, lng: 35.4960 },
-    'Kiryat Shmona': { lat: 33.2075, lng: 35.5697 },
-
-    // Jerusalem Area
-    'Jerusalem': { lat: 31.7683, lng: 35.2137 },
-    'Beit Shemesh': { lat: 31.7470, lng: 34.9881 },
-    'Modi\'in': { lat: 31.8906, lng: 35.0104 },
-    'Modi\'in-Maccabim-Re\'ut': { lat: 31.8906, lng: 35.0104 },
-
-    // South
-    'Ashdod': { lat: 31.8014, lng: 34.6435 },
-    'Ashkelon': { lat: 31.6688, lng: 34.5743 },
-    'Sderot': { lat: 31.5247, lng: 34.5953 },
-    'Netivot': { lat: 31.4172, lng: 34.5828 },
-    'Ofakim': { lat: 31.3134, lng: 34.6208 },
-    'Beer Sheva': { lat: 31.2518, lng: 34.7913 },
-    'Dimona': { lat: 31.0664, lng: 35.0315 },
-    'Arad': { lat: 31.2600, lng: 35.2100 },
-    'Mitzpe Ramon': { lat: 30.6120, lng: 34.8010 },
-    'Eilat': { lat: 29.5581, lng: 34.9482 },
-}
+import { ISRAEL_CITIES } from '@/lib/israel-cities'
 
 // Projection Calibration (Manually tuned for this specific SVG viewBox)
 const MAP_BOUNDS = {
@@ -92,62 +29,6 @@ function project(lat: number, lng: number) {
     return { x, y }
 }
 
-const CITY_TRANSLATIONS: Record<string, string> = {
-    'Tel Aviv': 'תל אביב',
-    'Tel Aviv-Yafo': 'תל אביב',
-    'Jerusalem': 'ירושלים',
-    'Haifa': 'חיפה',
-    'Rishon LeZion': 'ראשון לציון',
-    'Rishon LeTsiyyon': 'ראשון לציון',
-    'Rishon LetSiyyon': 'ראשון לציון',
-    'Petah Tikva': 'פתח תקווה',
-    'Ashdod': 'אשדוד',
-    'Netanya': 'נתניה',
-    'Beer Sheva': 'באר שבע',
-    'Holon': 'חולון',
-    'Bnei Brak': 'בני ברק',
-    'Ramat Gan': 'רמת גן',
-    'Rehovot': 'רחובות',
-    'Bat Yam': 'בת ים',
-    'Herzliya': 'הרצליה',
-    'Kfar Saba': 'כפר סבא',
-    'Modi\'in': 'מודיעין',
-    'Modi\'in-Maccabim-Re\'ut': 'מודיעין',
-    'Hadera': 'חדרה',
-    'Ashkelon': 'אשקלון',
-    'Ra\'anana': 'רעננה',
-    'Hod HaSharon': 'הוד השרון',
-    'Ramat HaSharon': 'רמת השרון',
-    'Nahariya': 'נהריה',
-    'Kiryat Ata': 'קרית אתא',
-    'Givatayim': 'גבעתיים',
-    'Acre': 'עכו',
-    'Akko': 'עכו',
-    'Eilat': 'אילת',
-    'Nazareth': 'נצרת',
-    'Afula': 'עפולה',
-    'Karmiel': 'כרמיאל',
-    'Tiberias': 'טבריה',
-    'Safed': 'צפת',
-    'Kiryat Shmona': 'קרית שמונה',
-    'Beit Shemesh': 'בית שמש',
-    'Sderot': 'שדרות',
-    'Dimona': 'דימונה',
-    'Yavne': 'יבנה',
-    'Ness Ziona': 'נס ציונה',
-    'Kiryat Gat': 'קרית גת',
-    'Netivot': 'נתיבות',
-    'Ofakim': 'אופקים',
-    'Mitzpe Ramon': 'מצפה רמון',
-    'Kiryat Bialik': 'קרית ביאליק',
-    'Kiryat Motzkin': 'קרית מוצקין',
-    'Kiryat Yam': 'קרית ים',
-    'Zikhron Ya\'akov': 'זכרון יעקב',
-    'Caesarea': 'קיסריה',
-    'Arad': 'ערד',
-    'Or Yehuda': 'אור יהודה'
-}
-
 const COLORS = ['#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899']
 
 import { useState } from 'react'
@@ -166,8 +47,13 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
             return b._count.id - a._count.id
         }
         // Alpha (Hebrew if possible, then English)
-        const nameA = CITY_TRANSLATIONS[a.city] || a.city
-        const nameB = CITY_TRANSLATIONS[b.city] || b.city
+        // Try to find the city in our big list
+        const cityDataA = ISRAEL_CITIES[a.city] || Object.values(ISRAEL_CITIES).find(c => c.hebrewName === a.city)
+        const cityDataB = ISRAEL_CITIES[b.city] || Object.values(ISRAEL_CITIES).find(c => c.hebrewName === b.city)
+
+        const nameA = cityDataA?.hebrewName || a.city
+        const nameB = cityDataB?.hebrewName || b.city
+
         return nameA.localeCompare(nameB, 'he')
     })
 
@@ -212,29 +98,34 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
 
                         {sortedLocations.map((loc, originalIndex) => {
                             let coords = { x: 50, y: 100 } // fallback
+                            let cityName = loc.city
 
-                            // 1. Try exact lookup
-                            const knownLoc = CITY_LOCATIONS[loc.city]
-                            if (knownLoc) {
-                                coords = project(knownLoc.lat, knownLoc.lng)
-                            } else {
-                                // 2. Fuzzy lookup
-                                const match = Object.keys(CITY_LOCATIONS).find(k =>
-                                    loc.city.toLowerCase().includes(k.toLowerCase()) ||
-                                    k.toLowerCase().includes(loc.city.toLowerCase())
+                            // 1. Try exact match in our big list
+                            let cityData = ISRAEL_CITIES[loc.city]
+
+                            // 2. If not found, try to find by hebrew name reverse lookup or case insensitive
+                            if (!cityData) {
+                                // Fuzzy / Reverse lookup
+                                const key = Object.keys(ISRAEL_CITIES).find(k =>
+                                    k.toLowerCase() === loc.city.toLowerCase() ||
+                                    ISRAEL_CITIES[k].hebrewName === loc.city
                                 )
-                                if (match) {
-                                    coords = project(CITY_LOCATIONS[match].lat, CITY_LOCATIONS[match].lng)
-                                } else {
-                                    // 3. "Unknown" Pile - side of map
-                                    coords = { x: 15, y: 150 + (originalIndex * 5) }
+                                if (key) {
+                                    cityData = ISRAEL_CITIES[key]
                                 }
+                            }
+
+                            if (cityData) {
+                                coords = project(cityData.lat, cityData.lng)
+                                cityName = cityData.hebrewName // Always show Hebrew name if available
+                            } else {
+                                // "Unknown" Pile - side of map
+                                coords = { x: 15, y: 150 + (originalIndex * 5) }
                             }
 
                             // Use same color index as in legend
                             const color = COLORS[originalIndex % COLORS.length]
                             const isHovered = hoveredCity === loc.city
-                            const cityName = CITY_TRANSLATIONS[loc.city] || loc.city
 
                             return (
                                 <motion.g
@@ -326,7 +217,10 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                         {paginatedLocations.map((loc, i) => {
                             const originalIndex = sortedLocations.indexOf(loc)
                             const color = COLORS[originalIndex % COLORS.length]
-                            const cityName = CITY_TRANSLATIONS[loc.city] || loc.city
+
+                            // Lookup name
+                            const cityData = ISRAEL_CITIES[loc.city] || Object.values(ISRAEL_CITIES).find(c => c.hebrewName === loc.city)
+                            const cityName = cityData?.hebrewName || loc.city
 
                             return (
                                 <motion.div
