@@ -59,7 +59,7 @@ export function BudgetProvider({ children, initialPlan }: { children: React.Reac
                     left: 0;
                     right: 0;
                     bottom: 0;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
                     display: flex;
                     flex-direction: column;
                     align-items: center;
