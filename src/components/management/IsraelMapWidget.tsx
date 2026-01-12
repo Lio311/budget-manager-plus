@@ -270,8 +270,8 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     {isHovered && (
                                         <>
                                             <rect
-                                                x={coords.x + 6}
-                                                y={coords.y - 10}
+                                                x={coords.x - (cityName.length * 6 + 8) / 2}
+                                                y={coords.y - 22}
                                                 width={cityName.length * 6 + 8}
                                                 height="16"
                                                 fill="white"
@@ -279,11 +279,13 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                                 className="drop-shadow-lg"
                                             />
                                             <text
-                                                x={coords.x + 10}
-                                                y={coords.y}
+                                                x={coords.x}
+                                                y={coords.y - 11}
                                                 fontSize="10"
                                                 fontWeight="bold"
                                                 fill="#1f2937"
+                                                textAnchor="middle"
+                                                dominantBaseline="middle"
                                                 className="select-none"
                                             >
                                                 {cityName}
