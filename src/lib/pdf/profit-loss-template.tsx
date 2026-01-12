@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 2
+        gap: 0
     },
     footerText: {
         fontSize: 10,
