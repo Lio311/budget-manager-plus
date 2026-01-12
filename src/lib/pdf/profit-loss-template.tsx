@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     poweredBy: {
-        flexDirection: 'row',
+        flexDirection: 'row-reverse',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 5,
@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
     poweredByText: {
         fontSize: 8,
         color: '#6b7280',
+        marginLeft: 4
     },
     footerText: {
         fontSize: 9,
@@ -141,8 +142,7 @@ const styles = StyleSheet.create({
     poweredByLogo: {
         width: 50,
         height: 15,
-        objectFit: 'contain',
-        marginRight: 4
+        objectFit: 'contain'
     }
 })
 
@@ -262,10 +262,10 @@ export const ProfitLossTemplate: React.FC<{ data: ProfitLossData }> = ({ data })
                         {new Date().toLocaleDateString('he-IL')} :תאריך הפקה
                     </Text>
                     <View style={styles.poweredBy}>
+                        <Text style={styles.poweredByText}>מסמך זה הופק באופן אוטומטי על ידי</Text>
                         {data.poweredByLogoPath && (
                             <Image src={data.poweredByLogoPath} style={styles.poweredByLogo} />
                         )}
-                        <Text style={styles.poweredByText}>מסמך זה הופק באופן אוטומטי על ידי</Text>
                     </View>
                 </View>
             </Page>
