@@ -233,7 +233,7 @@ export function IncomeTab() {
         })
     }
 
-    const sortedIncomes = sortIncomes(incomes)
+    const sortedIncomes = sortIncomes(incomes as any)
 
     useAutoPaginationCorrection(currentPage, sortedIncomes.length, itemsPerPage, setCurrentPage)
     const totalPages = Math.ceil(sortedIncomes.length / itemsPerPage)
