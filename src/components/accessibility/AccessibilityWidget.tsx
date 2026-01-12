@@ -45,13 +45,12 @@ export default function AccessibilityWidget() {
     const [isVisible, setIsVisible] = useState(true);
     const widgetRef = useRef<HTMLDivElement>(null);
 
-    // Hide on management pages
-    if (pathname?.startsWith('/management')) {
-        return null;
-    }
+    const isManagementPage = pathname?.startsWith('/management');
 
     // --- Click Outside Logic ---
     useEffect(() => {
+        if (isManagementPage) return;
+
         const handleClickOutside = (event: MouseEvent) => {
             if (widgetRef.current && !widgetRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
@@ -64,20 +63,24 @@ export default function AccessibilityWidget() {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isOpen]);
+    }, [isOpen, isManagementPage]);
 
     // --- Initialization & Persistence ---
     useEffect(() => {
+        if (isManagementPage) return;
+
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             setSettings(JSON.parse(saved));
         }
-    }, []);
+    }, [isManagementPage]);
 
     useEffect(() => {
+        if (isManagementPage) return;
+
         localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
         applySettings();
-    }, [settings]);
+    }, [settings, isManagementPage]);
 
     // --- DOM Manipulation Side Effects ---
     const applySettings = () => {
@@ -109,6 +112,7 @@ export default function AccessibilityWidget() {
 
     // --- Reading Guide Logic ---
     useEffect(() => {
+        if (isManagementPage) return;
         if (!settings.readingGuide) return;
 
         const handleMouseMove = (e: MouseEvent) => {
@@ -116,7 +120,7 @@ export default function AccessibilityWidget() {
         };
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, [settings.readingGuide]);
+    }, [settings.readingGuide, isManagementPage]);
 
     // --- Handlers ---
     const toggleSetting = (key: keyof typeof DEFAULT_SETTINGS) => {
@@ -134,7 +138,7 @@ export default function AccessibilityWidget() {
         setSettings(DEFAULT_SETTINGS);
     };
 
-    if (!isVisible) return null;
+    if (isManagementPage || !isVisible) return null;
 
     return (
         <div className="acc-widget-root">
@@ -205,7 +209,7 @@ export default function AccessibilityWidget() {
 
                 /* Big Cursor (Global on Body) - Improved Persistence */
                 body.acc-big-cursor, body.acc-big-cursor * {
-                    cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTEgMWwxMS4zMTQgMjguMjgzTDE4IDIwLjA3bDguNDg1IDguNDg1IDIuODI5LTIuODI4TDIwLjgyOCAxNy4yNCAyOSAxMS41ODYgMSAxeiIgZmlsbD0iIzAwMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=') 0 0, auto !important;
+                    cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTEwIDE1di0yaDR2MmgxejIgMnYtMmgydjJ6MTAgM3YtMmgydjJ6MjAgNHYtMmgydjJ6MTAgM3YtMmgydjJ6MTAgMXYtMmgydjJ6IiBmaWxsPSIjMDAwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==') 0 0, auto !important;
                 }
 
                 /* Stop Animations (Global on Body) */

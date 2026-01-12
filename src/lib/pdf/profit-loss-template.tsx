@@ -121,22 +121,27 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingTop: 10,
         borderTop: '1px solid #e5e7eb',
-        flexDirection: 'column',
         alignItems: 'center'
     },
-    footerRow: {
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
+    poweredBy: {
+        flexDirection: 'row',
         justifyContent: 'center',
-        gap: 0
+        alignItems: 'center',
+        marginTop: 5,
+        gap: 4 // Explicit small gap
     },
-    footerText: {
-        fontSize: 10,
+    poweredByText: {
+        fontSize: 8,
         color: '#6b7280',
     },
+    footerText: {
+        fontSize: 9,
+        color: '#9ca3af',
+        marginBottom: 2
+    },
     poweredByLogo: {
-        width: 60,
-        height: 18,
+        width: 50,
+        height: 15,
         objectFit: 'contain'
     }
 })
@@ -253,15 +258,15 @@ export const ProfitLossTemplate: React.FC<{ data: ProfitLossData }> = ({ data })
 
                 {/* Footer */}
                 <View style={styles.footer} wrap={false}>
-                    <View style={styles.footerRow}>
-                        <Text style={styles.footerText}>מסמך זה הופק באופן אוטומטי על ידי</Text>
+                    <Text style={styles.footerText}>
+                        {new Date().toLocaleDateString('he-IL')} :תאריך הפקה
+                    </Text>
+                    <View style={styles.poweredBy}>
+                        <Text style={styles.poweredByText}>מסמך זה הופק באופן אוטומטי על ידי</Text>
                         {data.poweredByLogoPath && (
                             <Image src={data.poweredByLogoPath} style={styles.poweredByLogo} />
                         )}
                     </View>
-                    <Text style={styles.footerText}>
-                        {new Date().toLocaleDateString('he-IL')} :תאריך הפקה
-                    </Text>
                 </View>
             </Page>
         </Document>
