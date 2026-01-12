@@ -132,18 +132,13 @@ export function SavingsTab() {
     const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     // Sorting State
-    const [sortMethod, setSortMethod] = useState<'DATE' | 'AMOUNT' | 'NAME' | 'CATEGORY' | 'PAYMENT'>('DATE')
+    const [sortMethod, setSortMethod] = useState<'AMOUNT' | 'NAME' | 'CATEGORY' | 'PAYMENT'>('AMOUNT')
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
     const sortSavings = (items: Saving[]) => {
         return [...items].sort((a, b) => {
             let diff = 0
             switch (sortMethod) {
-                case 'DATE':
-                    const dateA = a.targetDate ? new Date(a.targetDate).getTime() : 0
-                    const dateB = b.targetDate ? new Date(b.targetDate).getTime() : 0
-                    diff = dateA - dateB
-                    break
                 case 'AMOUNT':
                     diff = (a.monthlyDeposit || 0) - (b.monthlyDeposit || 0)
                     break
@@ -376,7 +371,6 @@ export function SavingsTab() {
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent dir="rtl">
-                                    <SelectItem value="DATE">תאריך יעד</SelectItem>
                                     <SelectItem value="AMOUNT">סכום</SelectItem>
                                     <SelectItem value="NAME">שם</SelectItem>
                                     <SelectItem value="CATEGORY">קטגוריה</SelectItem>

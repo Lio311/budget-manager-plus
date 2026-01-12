@@ -473,7 +473,7 @@ export function IncomeTab() {
                                     <SelectContent dir="rtl">
                                         <SelectItem value="DATE">תאריך</SelectItem>
                                         <SelectItem value="AMOUNT">סכום</SelectItem>
-                                        <SelectItem value="SOURCE">מקור</SelectItem>
+                                        <SelectItem value="SOURCE">תיאור</SelectItem>
                                         <SelectItem value="CATEGORY">קטגוריה</SelectItem>
                                         <SelectItem value="PAYMENT">אמצעי תשלום</SelectItem>
                                     </SelectContent>
