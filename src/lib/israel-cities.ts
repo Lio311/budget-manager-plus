@@ -6876,9 +6876,9 @@ export const ISRAEL_CITIES: Record<string, CityData> = {
         "lng": 34.7925,
         "hebrewName": "ראשון לציון"
     },
-    "Netanya": {
-        "lat": 32.3215,
-        "lng": 34.8532,
-        "hebrewName": "נתניה"
+    "Rishon LetSiyyon": {
+        "lat": 31.9730,
+        "lng": 34.7925,
+        "hebrewName": "ראשון לציון"
     }
 };

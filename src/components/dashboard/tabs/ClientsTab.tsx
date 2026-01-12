@@ -348,7 +348,7 @@ export function ClientsTab() {
                     />
                 </div>
 
-                <div className="flex gap-2 justify-start">
+                <div className="flex justify-between items-center">
                     {/* Sort Dropdown */}
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-500 font-medium">מיון לפי:</span>
@@ -381,6 +381,10 @@ export function ClientsTab() {
                             <ArrowUpDown className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                         </Button>
                     </div>
+
+                    <Badge variant="secondary" className="text-sm font-normal">
+                        סה"כ לקוחות: {clients.length}
+                    </Badge>
                 </div>
             </div>
 
