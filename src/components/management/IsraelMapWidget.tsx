@@ -324,7 +324,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
 
                     {/* Pagination Controls */}
                     {totalPages > 1 && (
-                        <div className="flex justify-between items-center bg-white/50 px-1 py-0.5 rounded-md mt-1">
+                        <div className="flex justify-between items-center bg-white/50 px-0.5 py-0.5 rounded-md mt-1">
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 0}
@@ -332,8 +332,8 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                             >
                                 <ChevronRight size={12} />
                             </button>
-                            <span className="text-[8px] text-gray-500 font-medium">
-                                {currentPage + 1} / {totalPages}
+                            <span className="text-[10px] text-gray-600 font-medium">
+                                {currentPage + 1}/{totalPages}
                             </span>
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
