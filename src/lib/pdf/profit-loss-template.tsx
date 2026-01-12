@@ -114,7 +114,11 @@ const styles = StyleSheet.create({
     },
 
     footer: {
-        marginTop: 20,
+        position: 'absolute',
+        bottom: 20,
+        left: 30,
+        right: 30,
+        textAlign: 'center',
         paddingTop: 10,
         borderTop: '1px solid #e5e7eb',
         flexDirection: 'column',
@@ -124,7 +128,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 5
+        gap: 2
     },
     footerText: {
         fontSize: 10,
