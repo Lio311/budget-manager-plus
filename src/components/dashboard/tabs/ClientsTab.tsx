@@ -487,17 +487,19 @@ export function ClientsTab() {
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     טלפון
                                 </label>
-                                <input
-                                    type="tel"
-                                    value={formData.phone}
-                                    onChange={(e) => {
-                                        const value = e.target.value
-                                        if (/^[\d-]*$/.test(value)) {
-                                            setFormData({ ...formData, phone: value })
+                                <PhoneInputWithCountry
+                                    value={formData.phone || ''}
+                                    onChange={(value) => {
+                                        setFormData({ ...formData, phone: value })
+                                        if (errors.phone) {
+                                            setErrors(prev => {
+                                                const newErrors = { ...prev }
+                                                delete newErrors.phone
+                                                return newErrors
+                                            })
                                         }
                                     }}
-                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.phone ? 'border-red-500' : 'border-gray-300'}`}
-                                    dir="rtl"
+                                    className={errors.phone ? 'border-red-500' : ''}
                                 />
                             </div>
                         </div>
