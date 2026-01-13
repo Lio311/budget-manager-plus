@@ -22,6 +22,8 @@ import { getSavings } from '@/lib/actions/savings'
 import { getWorkEvents, addWorkEvent, updateWorkEvent, deleteWorkEvent } from '@/lib/actions/work-events'
 import { getClients } from '@/lib/actions/clients'
 import { useToast } from '@/hooks/use-toast'
+import { QuickAddDialog } from '@/components/dashboard/QuickAddDialog'
+import { useRouter, useSearchParams } from 'next/navigation'
 // import { CalendarSyncButton } from '@/components/dashboard/CalendarSyncButton'
 
 interface Payment {
@@ -63,6 +65,9 @@ export function CalendarTab() {
         incomeId: 'none'
     })
     const [errors, setErrors] = useState<Record<string, boolean>>({})
+    const [isQuickAddOpen, setIsQuickAddOpen] = useState(false)
+    const router = useRouter()
+    const searchParams = useSearchParams()
 
     const isBusiness = budgetType === 'BUSINESS'
 
@@ -311,6 +316,9 @@ export function CalendarTab() {
                                             setEditingEventId(null)
                                             setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
                                             setErrors({})
+                                        } else {
+                                            // Financial mode - open quick add dialog
+                                            setIsQuickAddOpen(true)
                                         }
                                     }}
                                     className={`h-[80px] md:h-auto md:min-h-[100px] p-2 border rounded-lg overflow-hidden cursor-pointer hover:bg-accent transition-colors
@@ -545,6 +553,25 @@ export function CalendarTab() {
                     </DialogContent>
                 </Dialog>
             )}
+
+            {/* Quick Add Dialog for Financial Mode */}
+            <QuickAddDialog
+                open={isQuickAddOpen}
+                onOpenChange={setIsQuickAddOpen}
+                selectedDay={selectedDay}
+                isBusiness={isBusiness}
+                onSelectAction={(action) => {
+                    // Navigate to the appropriate tab
+                    const tabMap = {
+                        'expense': 'expenses',
+                        'income': 'income',
+                        'saving': 'savings',
+                        'debt': 'debts',
+                        'bill': 'bills'
+                    }
+                    router.push(`?tab=${tabMap[action]}`)
+                }}
+            />
         </div>
     )
 }
