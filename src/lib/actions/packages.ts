@@ -54,6 +54,7 @@ export async function createClientPackage(data: z.infer<typeof PackageSchema>) {
 
         const newPackage = await db.clientPackage.create({
             data: {
+                userId: userId,
                 name: data.name,
                 color: data.color,
                 defaultPrice: data.defaultPrice,

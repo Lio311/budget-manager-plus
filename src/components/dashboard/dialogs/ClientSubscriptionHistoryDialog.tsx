@@ -148,73 +148,67 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                         <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-slate-900 rounded-md border text-right overflow-x-auto" dir="rtl">
-                        <Table dir="rtl" className="min-w-[600px] sm:min-w-full">
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="text-right w-[100px]">תאריך</TableHead>
-                                    <TableHead className="text-right w-[100px]">סכום</TableHead>
-                                    <TableHead className="text-right min-w-[140px]">פעולות</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {incomes.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={3} className="text-center text-gray-500 py-8">
-                                            לא נמצאו רישומי מנוי
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    incomes.map((income) => (
-                                        <TableRow key={income.id}>
-                                            <TableCell className="font-medium whitespace-nowrap">
-                                                {format(new Date(income.date), 'dd/MM/yyyy')}
-                                            </TableCell>
-                                            <TableCell className="whitespace-nowrap">{formatCurrency(income.amount)}</TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <Select
-                                                        value={income.status}
-                                                        onValueChange={(val) => handleStatusChange(income.id, val)}
-                                                        disabled={updatingId === income.id}
-                                                    >
-                                                        <SelectTrigger className="w-[100px] h-8 text-xs px-2">
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="PAID">שולם</SelectItem>
-                                                            <SelectItem value="PENDING">ממתין</SelectItem>
-                                                            <SelectItem value="OVERDUE">באיחור</SelectItem>
-                                                            <SelectItem value="CANCELLED">בוטל</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <div className="flex gap-1 mr-2">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                                            onClick={() => setEditingIncome(income)}
-                                                            title="ערוך תשלום"
-                                                        >
-                                                            <Edit2 className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                            onClick={() => handleDelete(income.id)}
-                                                            title="מחק תשלום"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+                    <div className="space-y-6" dir="rtl">
+                        {/* Summary Stats or Current Status could go here */}
+
+                        {(() => {
+                            const now = new Date()
+                            now.setHours(0, 0, 0, 0)
+
+                            // Sort oldest to newest
+                            const sortedIncomes = [...incomes].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+                            const pastIncomes = sortedIncomes.filter(inc => new Date(inc.date) < now)
+                            const futureIncomes = sortedIncomes.filter(inc => new Date(inc.date) >= now)
+
+                            return (
+                                <>
+                                    {/* Past Payments - Accordion */}
+                                    {pastIncomes.length > 0 && (
+                                        <PastPaymentsAccordion incomes={pastIncomes} onStatusChange={handleStatusChange} onEdit={setEditingIncome} onDelete={handleDelete} updatingId={updatingId} />
+                                    )}
+
+                                    {/* Future Payments Table */}
+                                    <div className="bg-white dark:bg-slate-900 rounded-md border overflow-hidden">
+                                        <div className="bg-gray-50/50 p-3 border-b">
+                                            <h3 className="font-medium text-sm text-gray-700">תשלומים עתידיים</h3>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <Table dir="rtl" className="min-w-[600px] sm:min-w-full">
+                                                <TableHeader>
+                                                    <TableRow className="hover:bg-transparent">
+                                                        <TableHead className="text-right h-12">תאריך</TableHead>
+                                                        <TableHead className="text-right h-12">סכום</TableHead>
+                                                        <TableHead className="text-right h-12 w-[200px]">סטטוס</TableHead>
+                                                        <TableHead className="text-right h-12">פעולות</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {futureIncomes.length === 0 ? (
+                                                        <TableRow>
+                                                            <TableCell colSpan={4} className="text-center text-gray-500 py-8">
+                                                                אין תשלומים עתידיים
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ) : (
+                                                        futureIncomes.map((income) => (
+                                                            <IncomeRow
+                                                                key={income.id}
+                                                                income={income}
+                                                                onStatusChange={handleStatusChange}
+                                                                onEdit={setEditingIncome}
+                                                                onDelete={handleDelete}
+                                                                updatingId={updatingId}
+                                                            />
+                                                        ))
+                                                    )}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    </div>
+                                </>
+                            )
+                        })()}
                     </div>
                 )}
 
@@ -268,4 +262,110 @@ function StatusBadge({ status }: { status: string }) {
         default:
             return <Badge variant="outline">{status}</Badge>
     }
+}
+
+import { ChevronDown, ChevronUp } from "lucide-react"
+
+function PastPaymentsAccordion({ incomes, onStatusChange, onEdit, onDelete, updatingId }: any) {
+    const [isOpen, setIsOpen] = useState(false)
+
+    return (
+        <div className="border rounded-md bg-gray-50/50 dark:bg-slate-900/50 overflow-hidden">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between p-4 hover:bg-gray-100/50 dark:hover:bg-slate-800/50 transition-colors"
+            >
+                <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm text-gray-700 dark:text-gray-300">תשלומים קודמים</span>
+                    <Badge variant="secondary" className="text-xs bg-gray-200 text-gray-600">{incomes.length}</Badge>
+                </div>
+                {isOpen ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
+            </button>
+
+            {isOpen && (
+                <div className="border-t bg-white dark:bg-slate-900 animate-in slide-in-from-top-2 duration-200">
+                    <div className="overflow-x-auto">
+                        <Table dir="rtl" className="min-w-[600px] sm:min-w-full">
+                            <TableHeader>
+                                <TableRow className="hover:bg-transparent">
+                                    <TableHead className="text-right h-10 text-xs">תאריך</TableHead>
+                                    <TableHead className="text-right h-10 text-xs">סכום</TableHead>
+                                    <TableHead className="text-right h-10 text-xs w-[200px]">סטטוס</TableHead>
+                                    <TableHead className="text-right h-10 text-xs">פעולות</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {incomes.map((income: any) => (
+                                    <IncomeRow
+                                        key={income.id}
+                                        income={income}
+                                        onStatusChange={onStatusChange}
+                                        onEdit={onEdit}
+                                        onDelete={onDelete}
+                                        updatingId={updatingId}
+                                        isPast={true}
+                                    />
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
+
+function IncomeRow({ income, onStatusChange, onEdit, onDelete, updatingId, isPast }: any) {
+    return (
+        <TableRow className={isPast ? "opacity-75 hover:opacity-100 transition-opacity" : ""}>
+            <TableCell className="font-medium whitespace-nowrap py-4">
+                {format(new Date(income.date), 'dd/MM/yyyy')}
+            </TableCell>
+            <TableCell className="whitespace-nowrap py-4 text-base">
+                {formatCurrency(income.amount)}
+            </TableCell>
+            <TableCell className="py-2">
+                <Select
+                    value={income.status}
+                    onValueChange={(val) => onStatusChange(income.id, val)}
+                    disabled={updatingId === income.id}
+                >
+                    <SelectTrigger className={`w-[130px] h-9 ${income.status === 'PAID' ? 'text-green-600 border-green-200 bg-green-50' :
+                            income.status === 'PENDING' ? 'text-yellow-600 border-yellow-200 bg-yellow-50' :
+                                income.status === 'OVERDUE' ? 'text-red-600 border-red-200 bg-red-50' : ''
+                        }`}>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="PAID" className="text-green-600">שולם</SelectItem>
+                        <SelectItem value="PENDING" className="text-yellow-600">ממתין</SelectItem>
+                        <SelectItem value="OVERDUE" className="text-red-600">באיחור</SelectItem>
+                        <SelectItem value="CANCELLED" className="text-gray-500">בוטל</SelectItem>
+                    </SelectContent>
+                </Select>
+            </TableCell>
+            <TableCell className="py-2">
+                <div className="flex items-center gap-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full"
+                        onClick={() => onEdit(income)}
+                        title="ערוך תשלום"
+                    >
+                        <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
+                        onClick={() => onDelete(income.id)}
+                        title="מחק תשלום"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </div>
+            </TableCell>
+        </TableRow>
+    )
 }
