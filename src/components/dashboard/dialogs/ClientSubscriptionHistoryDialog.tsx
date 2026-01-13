@@ -154,14 +154,13 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                                 <TableRow>
                                     <TableHead className="text-right w-[100px]">תאריך</TableHead>
                                     <TableHead className="text-right w-[100px]">סכום</TableHead>
-                                    <TableHead className="text-right w-[100px]">סטטוס</TableHead>
                                     <TableHead className="text-right min-w-[140px]">פעולות</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {incomes.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="text-center text-gray-500 py-8">
+                                        <TableCell colSpan={3} className="text-center text-gray-500 py-8">
                                             לא נמצאו רישומי מנוי
                                         </TableCell>
                                     </TableRow>
@@ -173,16 +172,13 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                                             </TableCell>
                                             <TableCell className="whitespace-nowrap">{formatCurrency(income.amount)}</TableCell>
                                             <TableCell>
-                                                <StatusBadge status={income.status} />
-                                            </TableCell>
-                                            <TableCell>
                                                 <div className="flex items-center gap-2">
                                                     <Select
                                                         value={income.status}
                                                         onValueChange={(val) => handleStatusChange(income.id, val)}
                                                         disabled={updatingId === income.id}
                                                     >
-                                                        <SelectTrigger className="w-[110px] h-8 text-xs">
+                                                        <SelectTrigger className="w-[100px] h-8 text-xs px-2">
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
