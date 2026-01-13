@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     creator: 'Kesefly',
     publisher: 'Kesefly',
     applicationName: 'Kesefly',
-    metadataBase: new URL('https://keseflow.vercel.app'),
+    metadataBase: new URL('https://www.kesefly.co.il'),
     manifest: '/manifest.json',
     alternates: {
         canonical: '/',
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
         description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות',
-        url: 'https://keseflow.vercel.app',
+        url: 'https://www.kesefly.co.il',
         siteName: 'Kesefly',
         locale: 'he_IL',
         type: 'website',

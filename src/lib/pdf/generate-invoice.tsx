@@ -66,7 +66,7 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
         const businessBudget = invoice.user.budgets[0]
 
         // Construct logo URL using Vercel URL or fallback
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') || 'https://budget-manager-plus.vercel.app'
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') || 'https://www.kesefly.co.il'
         const logoPath = `${baseUrl}/images/branding/K-LOGO.png`
 
         // Use invoice's own financial data
