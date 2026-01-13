@@ -148,14 +148,14 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                         <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-slate-900 rounded-md border text-right" dir="rtl">
-                        <Table dir="rtl">
+                    <div className="bg-white dark:bg-slate-900 rounded-md border text-right overflow-x-auto" dir="rtl">
+                        <Table dir="rtl" className="min-w-[600px] sm:min-w-full">
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="text-right">תאריך</TableHead>
-                                    <TableHead className="text-right">סכום</TableHead>
-                                    <TableHead className="text-right">סטטוס</TableHead>
-                                    <TableHead className="text-right">פעולות</TableHead>
+                                    <TableHead className="text-right w-[100px]">תאריך</TableHead>
+                                    <TableHead className="text-right w-[100px]">סכום</TableHead>
+                                    <TableHead className="text-right w-[100px]">סטטוס</TableHead>
+                                    <TableHead className="text-right min-w-[140px]">פעולות</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -168,10 +168,10 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                                 ) : (
                                     incomes.map((income) => (
                                         <TableRow key={income.id}>
-                                            <TableCell className="font-medium">
+                                            <TableCell className="font-medium whitespace-nowrap">
                                                 {format(new Date(income.date), 'dd/MM/yyyy')}
                                             </TableCell>
-                                            <TableCell>{formatCurrency(income.amount)}</TableCell>
+                                            <TableCell className="whitespace-nowrap">{formatCurrency(income.amount)}</TableCell>
                                             <TableCell>
                                                 <StatusBadge status={income.status} />
                                             </TableCell>
