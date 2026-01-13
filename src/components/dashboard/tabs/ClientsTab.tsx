@@ -258,7 +258,6 @@ export function ClientsTab() {
             subscriptionStart: client.subscriptionStart,
             subscriptionEnd: client.subscriptionEnd,
             subscriptionStatus: client.subscriptionStatus || '',
-            subscriptionStatus: client.subscriptionStatus || '',
             eventLocation: client.eventLocation || '',
             isActive: client.isActive ?? true
         })
