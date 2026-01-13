@@ -446,14 +446,22 @@ export function QuotesTab() {
                                 {quote.isSigned && (
                                     <>
                                         <Button
-                                            variant="outline"
+                                            variant={quote.invoiceId ? "ghost" : "outline"}
                                             size="sm"
-                                            onClick={() => handleConvertToInvoice(quote.id)}
-                                            className="gap-2 text-green-600 border-green-200 bg-green-50 hover:bg-green-100"
-                                            title="הפוך לחשבונית"
+                                            onClick={() => !quote.invoiceId && handleConvertToInvoice(quote.id)}
+                                            disabled={!!quote.invoiceId}
+                                            className={cn(
+                                                "gap-2",
+                                                quote.invoiceId
+                                                    ? "text-gray-500 bg-gray-50 border-gray-200 cursor-not-allowed"
+                                                    : "text-green-600 border-green-200 bg-green-50 hover:bg-green-100"
+                                            )}
+                                            title={quote.invoiceId ? "החשבונית כבר הופקה" : "הפוך לחשבונית"}
                                         >
-                                            <FileText className="h-4 w-4" />
-                                            <span className="hidden md:inline">הפוך לחשבונית</span>
+                                            {quote.invoiceId ? <CheckCircle className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+                                            <span className="hidden md:inline">
+                                                {quote.invoiceId ? "הופקה חשבונית" : "הפוך לחשבונית"}
+                                            </span>
                                         </Button>
                                         <Button variant="outline" size="icon" onClick={() => handleViewQuote(quote.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100">
                                             <Eye className="h-4 w-4" />
