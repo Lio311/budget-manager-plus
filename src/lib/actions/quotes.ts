@@ -36,6 +36,29 @@ export async function getQuotes(scope: string = 'BUSINESS') {
             }
         })
 
+        // Automatic Status Update for Expired Quotes
+        const now = new Date()
+        const expiredQuotes = quotes.filter(q =>
+            q.status !== 'EXPIRED' &&
+            q.status !== 'ACCEPTED' &&
+            q.status !== 'CANCELLED' &&
+            q.validUntil &&
+            new Date(q.validUntil) < now
+        )
+
+        if (expiredQuotes.length > 0) {
+            console.log(`[Quotes] Expiring ${expiredQuotes.length} quotes for user ${userId}`)
+            await db.quote.updateMany({
+                where: {
+                    id: { in: expiredQuotes.map(q => q.id) }
+                },
+                data: { status: 'EXPIRED' }
+            })
+
+            // Refresh local list for immediate reflection
+            expiredQuotes.forEach(q => q.status = 'EXPIRED' as any)
+        }
+
         return { success: true, data: quotes }
     } catch (error) {
         console.error('getQuotes error:', error)
@@ -141,6 +164,11 @@ export async function updateQuote(id: string, data: Partial<QuoteFormData>) {
             updateData.vatRate = vatRate
             updateData.vatAmount = vatAmount
             updateData.total = total
+        }
+
+        // Fix: Explicitly handle items to ensure they are saved as Json
+        if (data.items !== undefined) {
+            updateData.items = JSON.parse(JSON.stringify(data.items))
         }
 
         const quote = await db.quote.update({
@@ -375,7 +403,7 @@ export async function convertQuoteToInvoice(quoteId: string) {
         }
 
         // 5. Link Invoice to Quote
-        await db.quote.update({
+        await (db as any).quote.update({
             where: { id: quoteId },
             data: { invoiceId: result.data.id }
         })

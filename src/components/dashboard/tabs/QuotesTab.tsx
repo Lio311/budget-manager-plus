@@ -60,6 +60,7 @@ export function QuotesTab() {
     // Dialog states for desktop and mobile
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    const [editingQuote, setEditingQuote] = useState<Quote | null>(null)
 
     const quotesFetcher = async () => {
         const result = await getQuotes(budgetType)
@@ -77,7 +78,9 @@ export function QuotesTab() {
             vatAmount: q.vatAmount,
             isSigned: q.isSigned,
             invoiceId: q.invoiceId,
-            items: []
+            items: q.items || [],
+            notes: q.notes || '',
+            vatRate: q.vatRate
         }))
     }
 
@@ -304,14 +307,34 @@ export function QuotesTab() {
                                     clients={clients}
                                     onSuccess={() => {
                                         setIsDialogOpen(false)
+                                        setEditingQuote(null)
                                         mutate()
                                     }}
+                                    initialData={editingQuote}
                                 />
                             </div>
                         </DialogContent>
                     </Dialog>
                 </div>
             </div>
+
+            {/* Edit Dialog */}
+            <Dialog open={!!editingQuote && !isMobileOpen} onOpenChange={(open) => !open && setEditingQuote(null)}>
+                <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-3xl rounded-xl" dir="rtl">
+                    <DialogTitle className="sr-only">עריכת הצעת מחיר</DialogTitle>
+                    <div className="p-2">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">עריכת הצעת מחיר #{editingQuote?.quoteNumber}</h3>
+                        <QuoteForm
+                            clients={clients}
+                            onSuccess={() => {
+                                setEditingQuote(null)
+                                mutate()
+                            }}
+                            initialData={editingQuote}
+                        />
+                    </div>
+                </DialogContent>
+            </Dialog>
 
             {/* Search */}
             <div className="relative">
@@ -439,11 +462,14 @@ export function QuotesTab() {
                                     <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">{formatCurrency(quote.totalAmount)}</div>
                                     <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(quote.totalAmount - (quote.vatAmount || 0))}</div>
                                 </div>
-                                <Button variant="outline" size="sm" onClick={() => handleCopyLink(quote.id)} className="gap-2 text-yellow-600 border-yellow-200 bg-yellow-50 hover:bg-yellow-100">
-                                    <LinkIcon className="h-4 w-4" />
-                                    <span className="md:hidden">קישור להצעה</span>
-                                    <span className="hidden md:inline">קישור להצעה</span>
-                                </Button>
+                                <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="icon" onClick={() => handleCopyLink(quote.id)} className="text-yellow-600 border-yellow-200 bg-yellow-50 hover:bg-yellow-100">
+                                        <LinkIcon className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="outline" size="icon" onClick={() => setEditingQuote(quote)} className="text-gray-600 border-gray-200 bg-gray-50 hover:bg-gray-100">
+                                        <Pencil className="h-4 w-4" />
+                                    </Button>
+                                </div>
                                 {quote.isSigned && (
                                     <>
                                         <Button

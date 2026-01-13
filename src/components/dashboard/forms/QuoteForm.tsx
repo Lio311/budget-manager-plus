@@ -5,7 +5,7 @@ import { Plus, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { getNextQuoteNumber, createQuote, type QuoteFormData } from '@/lib/actions/quotes'
+import { getNextQuoteNumber, createQuote, updateQuote, type QuoteFormData } from '@/lib/actions/quotes'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useBudget } from '@/contexts/BudgetContext'
 import { toast } from 'sonner'
@@ -14,23 +14,26 @@ import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 interface QuoteFormProps {
     clients: any[]
     onSuccess: () => void
+    initialData?: any // Added for editing
 }
 
-export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
+export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
     const { budgetType } = useBudget()
     const [loadingNumber, setLoadingNumber] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
 
     const [formData, setFormData] = useState<QuoteFormData>({
-        clientId: '',
-        quoteNumber: '',
-        issueDate: new Date(),
-        validUntil: undefined,
-        subtotal: 0,
-        vatRate: 0.18,
-        notes: '',
-        items: []
+        clientId: initialData?.clientId || '',
+        quoteNumber: initialData?.quoteNumber || '',
+        issueDate: initialData?.date ? new Date(initialData.date) : new Date(),
+        validUntil: initialData?.validUntil ? new Date(initialData.validUntil) : undefined,
+        subtotal: initialData?.totalAmount || 0,
+        vatRate: initialData?.vatRate || 0.18,
+        notes: initialData?.notes || '',
+        items: initialData?.items || []
     })
+
+    const isEditing = !!initialData
 
     const addItem = () => {
         setFormData(prev => ({
@@ -42,28 +45,30 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
     const removeItem = (id: string) => {
         setFormData(prev => ({
             ...prev,
-            items: prev.items?.filter(item => item.id !== id) || []
+            items: prev.items?.filter((item: any) => item.id !== id) || []
         }))
     }
 
     const updateItem = (id: string, field: string, value: any) => {
         setFormData(prev => ({
             ...prev,
-            items: prev.items?.map(item => item.id === id ? { ...item, [field]: value } : item) || []
+            items: prev.items?.map((item: any) => item.id === id ? { ...item, [field]: value } : item) || []
         }))
     }
 
     // Calculate totals whenever items change
     useEffect(() => {
-        const subtotal = formData.items?.reduce((sum, item) => sum + (item.quantity * item.price), 0) || 0
+        const subtotal = formData.items?.reduce((sum: number, item: any) => sum + (item.quantity * item.price), 0) || 0
         setFormData(prev => {
             if (prev.subtotal === subtotal) return prev
             return { ...prev, subtotal }
         })
     }, [formData.items])
 
-    // Fetch next quote number on mount
+    // Fetch next quote number on mount (only if not editing)
     useEffect(() => {
+        if (isEditing) return
+
         const fetchNextNumber = async () => {
             setLoadingNumber(true)
             const result = await getNextQuoteNumber()
@@ -73,17 +78,20 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
             setLoadingNumber(false)
         }
         fetchNextNumber()
-    }, [])
+    }, [isEditing])
 
     const { execute: optimisticCreateQuote } = useOptimisticMutation<any[], QuoteFormData>(
         ['quotes', budgetType],
-        (input) => createQuote(input, budgetType),
+        (input) => isEditing ? updateQuote(initialData.id, input) : createQuote(input, budgetType),
         {
             getOptimisticData: (current, input) => {
+                if (isEditing) {
+                    return current.map(q => q.id === initialData.id ? { ...q, ...input } : q)
+                }
                 return current
             },
-            successMessage: 'הצעת מחיר נוצרה בהצלחה',
-            errorMessage: 'שגיאה ביצירת הצעת המחיר'
+            successMessage: isEditing ? 'הצעת מחיר עודכנה בהצלחה' : 'הצעת מחיר נוצרה בהצלחה',
+            errorMessage: isEditing ? 'שגיאה בעדכון הצעת המחיר' : 'שגיאה ביצירת הצעת המחיר'
         }
     )
 
@@ -196,7 +204,7 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
-                                {formData.items?.map((item) => (
+                                {formData.items?.map((item: any) => (
                                     <tr key={item.id}>
                                         <td className="p-2">
                                             <input
@@ -307,7 +315,7 @@ export function QuoteForm({ clients, onSuccess }: QuoteFormProps) {
                         }`}
                     disabled={!formData.clientId || !formData.items || formData.items.length === 0}
                 >
-                    צור הצעת מחיר
+                    {isEditing ? 'עדכן הצעת מחיר' : 'צור הצעת מחיר'}
                 </Button>
             </div>
         </form >
