@@ -441,25 +441,28 @@ export function ClientsTab() {
                         {editingClient ? 'עריכת לקוח' : 'לקוח חדש'}
                     </h3>
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    שם לקוח *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.name}
-                                    onChange={(e) => {
-                                        setFormData({ ...formData, name: e.target.value })
-                                        if (e.target.value) setErrors(prev => {
-                                            const newErrors = { ...prev }
-                                            delete newErrors.name
-                                            return newErrors
-                                        })
-                                    }}
-                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
-                                />
-                                <div className="mt-4 flex items-center justify-between gap-4 border p-2 rounded-md bg-gray-50 dark:bg-slate-800/50">
+                        <div className="grid grid-cols-1 gap-4">
+                            {/* Row 1: Name and Active Status */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        שם לקוח *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => {
+                                            setFormData({ ...formData, name: e.target.value })
+                                            if (e.target.value) setErrors(prev => {
+                                                const newErrors = { ...prev }
+                                                delete newErrors.name
+                                                return newErrors
+                                            })
+                                        }}
+                                        className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                                    />
+                                </div>
+                                <div className="mt-7 flex items-center justify-between gap-4 border p-2 rounded-md bg-gray-50 dark:bg-slate-800/50 h-[42px]">
                                     <Label htmlFor="active-mode" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                         {formData.isActive ? 'לקוח פעיל' : 'לקוח לא פעיל'}
                                     </Label>
@@ -472,35 +475,39 @@ export function ClientsTab() {
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    אימייל
-                                </label>
-                                <input
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    טלפון
-                                </label>
-                                <PhoneInputWithCountry
-                                    value={formData.phone || ''}
-                                    onChange={(value) => {
-                                        setFormData({ ...formData, phone: value })
-                                        if (errors.phone) {
-                                            setErrors(prev => {
-                                                const newErrors = { ...prev }
-                                                delete newErrors.phone
-                                                return newErrors
-                                            })
-                                        }
-                                    }}
-                                    className={errors.phone ? 'border-red-500' : ''}
-                                />
+                            {/* Row 2: Email and Phone */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        אימייל
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        טלפון
+                                    </label>
+                                    <PhoneInputWithCountry
+                                        value={formData.phone || ''}
+                                        onChange={(value) => {
+                                            setFormData({ ...formData, phone: value })
+                                            if (errors.phone) {
+                                                setErrors(prev => {
+                                                    const newErrors = { ...prev }
+                                                    delete newErrors.phone
+                                                    return newErrors
+                                                })
+                                            }
+                                        }}
+                                        className={errors.phone ? 'border-red-500' : ''}
+                                    />
+                                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                                </div>
                             </div>
                         </div>
                         <div>
