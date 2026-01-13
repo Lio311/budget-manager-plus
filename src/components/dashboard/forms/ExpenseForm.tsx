@@ -135,8 +135,8 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         const paramDate = searchParams.get('date')
         const paramAutoSubmit = searchParams.get('autoSubmit') === 'true'
 
-        // Only proceed if we have at least amount or description
-        if (paramAmount || paramDesc || paramCat) {
+        // Only proceed if we have at least amount, description, category or date
+        if (paramAmount || paramDesc || paramCat || paramDate) {
             const matchedCategory = findMatchingCategory(paramCat, categories)
 
             // Construct the new expense object
