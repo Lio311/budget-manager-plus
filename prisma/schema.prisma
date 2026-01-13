@@ -35,6 +35,7 @@ model User {
   paymentHistory PaymentHistory[]
   feedbacks    Feedback[]
   clients    Client[]
+  clientPackages ClientPackage[]
   suppliers  Supplier[]
   invoices   Invoice[]
   quotes     Quote[]
@@ -499,8 +500,15 @@ model Client {
   subscriptionEnd    DateTime?
   subscriptionPrice  Float?
   subscriptionStatus String?   // PAID, UNPAID, PARTIAL, INSTALLMENTS
+  
+  // Package Relation (New Centralized Model)
+  packageId          String?
+  package            ClientPackage? @relation(fields: [packageId], references: [id])
+  
+  // Legacy Fields (Deprecated - will migrate to Package)
   packageName        String?
-  subscriptionColor  String?   // User validation color for the tag
+  subscriptionColor  String?
+
   eventLocation      String?  // Physical location of service (optional)
   
   // Metadata
@@ -519,6 +527,27 @@ model Client {
   @@index([userId, scope])
   @@unique([userId, name, scope])
   @@map("clients")
+}
+
+model ClientPackage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name      String
+  color     String   @default("#3B82F6") // Hex color
+  
+  // Default values for new clients in this package
+  defaultPrice Float?
+  defaultType  String? // WEEKLY, MONTHLY, etc.
+  
+  clients   Client[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, name])
+  @@map("client_packages")
 }
 
 model Supplier {

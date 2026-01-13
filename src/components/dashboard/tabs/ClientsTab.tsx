@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, syncClientIncomes, type ClientFormData } from '@/lib/actions/clients'
+import { getClientPackages } from '@/lib/actions/packages'
+import { PackagesManager } from '@/components/dashboard/settings/PackagesManager'
 import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import useSWR from 'swr'
 import { toast } from 'sonner'
@@ -98,10 +100,26 @@ export function ClientsTab() {
         subscriptionStatus: '',
         eventLocation: '',
         subscriptionColor: '#3B82F6',
+        packageId: '',
         isActive: true
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [isAddingPackage, setIsAddingPackage] = useState(false)
+    const [showPackagesManager, setShowPackagesManager] = useState(false)
+    const [packages, setPackages] = useState<any[]>([])
+
+    // Fetch packages
+    useEffect(() => {
+        const loadPackages = async () => {
+            const res = await getClientPackages()
+            if (res.success && res.data) {
+                setPackages(res.data)
+            }
+        }
+        if (showForm || showPackagesManager) {
+            loadPackages()
+        }
+    }, [showForm, showPackagesManager])
 
     const [warningDays, setWarningDays] = useState(14)
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -230,9 +248,11 @@ export function ClientsTab() {
                         ? (a.name || '').localeCompare(b.name || '')
                         : (b.name || '').localeCompare(a.name || '')
                 case 'PACKAGE':
+                    const pkgA = a.package?.name || a.packageName || ''
+                    const pkgB = b.package?.name || b.packageName || ''
                     return sortDirection === 'asc'
-                        ? (a.packageName || '').localeCompare(b.packageName || '')
-                        : (b.packageName || '').localeCompare(a.packageName || '')
+                        ? pkgA.localeCompare(pkgB)
+                        : pkgB.localeCompare(pkgA)
                 case 'CREATED_AT':
                 default:
                     const createdA = a.createdAt ? new Date(a.createdAt).getTime() : 0
@@ -314,6 +334,7 @@ export function ClientsTab() {
             subscriptionStatus: client.subscriptionStatus || '',
             eventLocation: client.eventLocation || '',
             subscriptionColor: client.subscriptionColor || '#3B82F6',
+            packageId: client.packageId || '',
             isActive: client.isActive ?? true
         })
         setShowForm(true)
@@ -393,6 +414,15 @@ export function ClientsTab() {
                     </Popover>
 
                     <Button
+                        onClick={() => setShowPackagesManager(true)}
+                        variant="outline"
+                        className="mr-2"
+                    >
+                        <Settings className="h-4 w-4 ml-2" />
+                        ניהול חבילות
+                    </Button>
+
+                    <Button
                         onClick={() => {
                             setShowForm(true)
                             setEditingClient(null)
@@ -400,7 +430,7 @@ export function ClientsTab() {
                             setEditingClient(null)
                             setErrors({})
                             setIsAddingPackage(false)
-                            setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', isActive: true })
+                            setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', packageId: '', isActive: true })
                         }}
                         className="bg-green-600 hover:bg-green-700"
                     >
@@ -409,6 +439,10 @@ export function ClientsTab() {
                     </Button>
                 </div>
             </div>
+
+            <Dialog open={showPackagesManager} onOpenChange={setShowPackagesManager}>
+                <PackagesManager />
+            </Dialog>
             {/* Search and Sort Section */}
             <div className="space-y-4">
                 <div className="relative">
@@ -619,67 +653,42 @@ export function ClientsTab() {
                                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                                     שם חבילה / שירות
                                                 </label>
-                                                {isAddingPackage ? (
-                                                    <div className="flex gap-2">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="הזן שם חבילה חדש"
-                                                            value={formData.packageName || ''}
-                                                            onChange={(e) => setFormData({ ...formData, packageName: e.target.value })}
-                                                            autoFocus
-                                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                                                        />
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => {
-                                                                setIsAddingPackage(false)
-                                                                setFormData({ ...formData, packageName: '' })
-                                                            }}
-                                                            title="ביטול"
-                                                        >
-                                                            <Trash2 className="h-4 w-4 text-gray-500" />
-                                                        </Button>
-                                                    </div>
-                                                ) : (
-                                                    <Select
-                                                        value={formData.packageName || ''}
-                                                        onValueChange={(value) => {
-                                                            if (value === 'NEW') {
-                                                                setIsAddingPackage(true)
-                                                                setFormData({ ...formData, packageName: '' })
-                                                            } else {
-                                                                setFormData({ ...formData, packageName: value })
+                                                <Select
+                                                    value={formData.packageId || 'NONE'}
+                                                    onValueChange={(value) => {
+                                                        if (value === 'NONE') {
+                                                            setFormData({ ...formData, packageId: '', packageName: '', subscriptionColor: '#3B82F6' })
+                                                        } else {
+                                                            const pkg = packages.find(p => p.id === value)
+                                                            if (pkg) {
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    packageId: pkg.id,
+                                                                    packageName: pkg.name,
+                                                                    subscriptionColor: pkg.color
+                                                                })
                                                             }
-                                                        }}
-                                                    >
-                                                        <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700">
-                                                            <SelectValue placeholder="בחר חבילה או צור חדשה" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {Array.from(new Set(clients.map((c: any) => c.packageName).filter(Boolean))).map((pkg: any) => (
-                                                                <SelectItem key={pkg} value={pkg}>{pkg}</SelectItem>
-                                                            ))}
-                                                            <SelectItem value="NEW" className="text-green-600 font-medium">
-                                                                + הוסף חדש
+                                                        }
+                                                    }}
+                                                >
+                                                    <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700">
+                                                        <SelectValue placeholder="בחר חבילה" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="NONE">ללא חבילה</SelectItem>
+                                                        {packages.map((pkg: any) => (
+                                                            <SelectItem key={pkg.id} value={pkg.id}>
+                                                                <div className="flex items-center gap-2">
+                                                                    <div
+                                                                        className="w-3 h-3 rounded-full"
+                                                                        style={{ backgroundColor: pkg.color }}
+                                                                    />
+                                                                    <span>{pkg.name}</span>
+                                                                </div>
                                                             </SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                                                    צבע תגית
-                                                </label>
-                                                <div className="relative">
-                                                    <input
-                                                        type="color"
-                                                        value={formData.subscriptionColor || '#3B82F6'}
-                                                        onChange={(e) => setFormData({ ...formData, subscriptionColor: e.target.value })}
-                                                        className="h-10 w-10 p-0 border border-gray-300 rounded-md cursor-pointer overflow-hidden"
-                                                    />
-                                                </div>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
                                         </div>
                                         <div>
@@ -874,9 +883,16 @@ export function ClientsTab() {
                                             לא פעיל
                                         </Badge>
                                     )}
-                                    {client.packageName && (
-                                        <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
-                                            {client.packageName}
+                                    {(client.package?.name || client.packageName) && (
+                                        <Badge
+                                            variant="secondary"
+                                            style={{
+                                                backgroundColor: (client.package?.color || client.subscriptionColor || '#3B82F6'),
+                                                color: '#ffffff'
+                                            }}
+                                            className="hover:opacity-90 transition-opacity border-transparent"
+                                        >
+                                            {client.package?.name || client.packageName}
                                         </Badge>
                                     )}
 
@@ -1004,9 +1020,16 @@ export function ClientsTab() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex flex-wrap gap-1.5">
-                                                    {client.packageName && (
-                                                        <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 text-[10px] px-1.5 py-0 h-5 whitespace-nowrap">
-                                                            {client.packageName}
+                                                    {(client.package?.name || client.packageName) && (
+                                                        <Badge
+                                                            variant="secondary"
+                                                            style={{
+                                                                backgroundColor: (client.package?.color || client.subscriptionColor || '#3B82F6'),
+                                                                color: '#ffffff'
+                                                            }}
+                                                            className="text-[10px] px-1.5 py-0 h-5 whitespace-nowrap hover:opacity-90 transition-opacity border-transparent"
+                                                        >
+                                                            {client.package?.name || client.packageName}
                                                         </Badge>
                                                     )}
                                                     {client.subscriptionStatus && (

@@ -24,6 +24,7 @@ const ClientSchema = z.object({
     subscriptionStatus: z.string().optional().or(z.literal('')),
     packageName: z.string().max(100, 'שם החבילה ארוך מדי').optional().or(z.literal('')),
     subscriptionColor: z.string().optional().or(z.literal('')),
+    packageId: z.string().optional().or(z.literal('')),
     eventLocation: z.string().max(200, 'המיקום ארוך מדי').optional().or(z.literal(''))
 })
 
@@ -43,6 +44,7 @@ export interface ClientFormData {
     subscriptionStatus?: string
     packageName?: string
     subscriptionColor?: string
+    packageId?: string
     eventLocation?: string
 }
 
@@ -59,6 +61,7 @@ export async function getClients(scope: string = 'BUSINESS') {
                 scope
             },
             include: {
+                package: true,
                 _count: {
                     select: {
                         incomes: true,
@@ -210,7 +213,8 @@ export async function createClient(data: ClientFormData, scope: string = 'BUSINE
                 subscriptionPrice: validData.subscriptionPrice || null,
                 subscriptionStatus: validData.subscriptionStatus || null,
                 packageName: validData.packageName || null,
-                subscriptionColor: validData.subscriptionColor || null
+                subscriptionColor: validData.subscriptionColor || null,
+                packageId: validData.packageId || null,
             }
         })
 
@@ -267,7 +271,8 @@ export async function updateClient(id: string, data: ClientFormData) {
                 subscriptionPrice: validData.subscriptionPrice || null,
                 subscriptionStatus: validData.subscriptionStatus || null,
                 packageName: validData.packageName || null,
-                subscriptionColor: validData.subscriptionColor || null
+                subscriptionColor: validData.subscriptionColor || null,
+                packageId: validData.packageId || null,
             }
         })
 
