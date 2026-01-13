@@ -7,7 +7,7 @@ interface AnimatedNumberProps {
     className?: string; // For text styling
 }
 
-export function AnimatedNumber({ value, currency = '', duration = 1500, className = '' }: AnimatedNumberProps) {
+export function AnimatedNumber({ value, currency = '', duration = 500, className = '' }: AnimatedNumberProps) {
     const [displayValue, setDisplayValue] = useState(0);
 
     useEffect(() => {

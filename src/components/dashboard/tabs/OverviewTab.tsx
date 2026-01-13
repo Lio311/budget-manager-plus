@@ -470,7 +470,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                             stroke="none"
                                             style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.15))' }}
                                             animationBegin={0}
-                                            animationDuration={1500}
+                                            animationDuration={800}
                                             animationEasing="ease-out"
                                         >
                                             {incomeVsExpenses.map((entry, index) => (
@@ -549,7 +549,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                 return null
                                             }}
                                         />
-                                        <Bar dataKey="value" radius={[4, 4, 0, 0]} animationDuration={1500} animationBegin={0}>
+                                        <Bar dataKey="value" radius={[4, 4, 0, 0]} animationDuration={800} animationBegin={0}>
                                             {expensesByCategoryData.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={entry.color} />
                                             ))}
