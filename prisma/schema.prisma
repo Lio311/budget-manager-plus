@@ -36,6 +36,7 @@ model User {
   feedbacks    Feedback[]
   clients    Client[]
   clientPackages ClientPackage[]
+  supplierPackages SupplierPackage[]
   suppliers  Supplier[]
   invoices   Invoice[]
   quotes     Quote[]
@@ -563,6 +564,21 @@ model Supplier {
   address   String?
   notes     String?  @db.Text
   
+  // Subscription / Package Details (Replicated from Client)
+  subscriptionType   String?   // WEEKLY, MONTHLY, YEARLY, PROJECT
+  subscriptionStart  DateTime?
+  subscriptionEnd    DateTime?
+  subscriptionPrice  Float?    // This represents COST
+  subscriptionStatus String?   // ACTIVE, INACTIVE, etc.
+  
+  // Package Relation
+  packageId          String?
+  package            SupplierPackage? @relation(fields: [packageId], references: [id])
+
+  // Legacy/Fallback
+  packageName        String?
+  subscriptionColor  String?
+
   // Metadata
   scope     String   @default("BUSINESS")
   isActive  Boolean  @default(true)
@@ -575,6 +591,27 @@ model Supplier {
   @@index([userId, scope])
   @@unique([userId, name, scope])
   @@map("suppliers")
+}
+
+model SupplierPackage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name      String
+  color     String   @default("#3B82F6") // Hex color
+  
+  // Default values for new suppliers in this package
+  defaultPrice Float?
+  defaultType  String? // WEEKLY, MONTHLY, etc.
+  
+  suppliers Supplier[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, name])
+  @@map("supplier_packages")
 }
 
 enum InvoiceStatus {

@@ -12,7 +12,16 @@ const SupplierSchema = z.object({
     taxId: z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional().or(z.literal('')),
     address: z.string().max(200, 'הכתובת ארוכה מדי').optional().or(z.literal('')),
     notes: z.string().max(500, 'הערות ארוכות מדי').optional().or(z.literal('')),
-    isActive: z.boolean().optional()
+    isActive: z.boolean().optional(),
+
+    // Package & Subscription Fields
+    packageId: z.string().optional().or(z.literal('')),
+    subscriptionType: z.string().optional().or(z.literal('')),
+    subscriptionPrice: z.any().optional(), // Allow string/number, transform later
+    subscriptionStart: z.date().optional().nullable(),
+    subscriptionEnd: z.date().optional().nullable(),
+    subscriptionStatus: z.string().optional().or(z.literal('')),
+    subscriptionColor: z.string().optional().or(z.literal(''))
 })
 
 export interface SupplierFormData {
@@ -23,6 +32,14 @@ export interface SupplierFormData {
     address?: string
     notes?: string
     isActive?: boolean
+
+    packageId?: string
+    subscriptionType?: string
+    subscriptionPrice?: number | string
+    subscriptionStart?: Date | null
+    subscriptionEnd?: Date | null
+    subscriptionStatus?: string
+    subscriptionColor?: string
 }
 
 export async function getSuppliers(scope: string = 'BUSINESS') {
@@ -38,6 +55,7 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
                 scope
             },
             include: {
+                package: true, // Include Package
                 _count: {
                     select: {
                         expenses: true
@@ -87,6 +105,7 @@ export async function getSupplier(id: string) {
         const supplier = await db.supplier.findUnique({
             where: { id },
             include: {
+                package: true, // Include Package
                 expenses: {
                     orderBy: { date: 'desc' },
                     take: 10
@@ -118,6 +137,7 @@ export async function createSupplier(data: SupplierFormData, scope: string = 'BU
             return { success: false, error: result.error.errors[0]?.message || 'נתונים לא תקינים' }
         }
         const validData = result.data
+        const price = validData.subscriptionPrice ? parseFloat(validData.subscriptionPrice.toString()) : null
 
         const supplier = await db.supplier.create({
             data: {
@@ -129,7 +149,16 @@ export async function createSupplier(data: SupplierFormData, scope: string = 'BU
                 taxId: validData.taxId || null,
                 address: validData.address || null,
                 notes: validData.notes || null,
-                isActive: validData.isActive ?? true
+                isActive: validData.isActive ?? true,
+
+                // New Fields
+                packageId: validData.packageId || null,
+                subscriptionType: validData.subscriptionType || null,
+                subscriptionPrice: price,
+                subscriptionStart: validData.subscriptionStart,
+                subscriptionEnd: validData.subscriptionEnd,
+                subscriptionStatus: validData.subscriptionStatus || null,
+                subscriptionColor: validData.subscriptionColor || null
             }
         })
 
@@ -157,6 +186,7 @@ export async function updateSupplier(id: string, data: SupplierFormData) {
             return { success: false, error: result.error.errors[0]?.message || 'נתונים לא תקינים' }
         }
         const validData = result.data
+        const price = validData.subscriptionPrice ? parseFloat(validData.subscriptionPrice.toString()) : null
 
         // Verify ownership
         const existing = await db.supplier.findUnique({ where: { id } })
@@ -173,7 +203,16 @@ export async function updateSupplier(id: string, data: SupplierFormData) {
                 taxId: validData.taxId || null,
                 address: validData.address || null,
                 notes: validData.notes || null,
-                isActive: validData.isActive
+                isActive: validData.isActive,
+
+                // New Fields
+                packageId: validData.packageId || null,
+                subscriptionType: validData.subscriptionType || null,
+                subscriptionPrice: price,
+                subscriptionStart: validData.subscriptionStart,
+                subscriptionEnd: validData.subscriptionEnd,
+                subscriptionStatus: validData.subscriptionStatus || null,
+                subscriptionColor: validData.subscriptionColor || null
             }
         })
 

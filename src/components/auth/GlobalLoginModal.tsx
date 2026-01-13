@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
 export function GlobalLoginModal() {
-    const { isOpen, closeModal } = useAuthModal()
+    const { isOpen, closeModal, redirectUrl } = useAuthModal()
     const { signIn, isLoaded: isSignInLoaded } = useSignIn()
     const { signUp, isLoaded: isSignUpLoaded } = useSignUp()
     const [isLoading, setIsLoading] = useState(false)
@@ -22,9 +22,9 @@ export function GlobalLoginModal() {
     const handleGoogleLogin = async () => {
         if (!isSignInLoaded || !isSignUpLoaded) return
 
-        // If already signed in, just redirect to dashboard
+        // If already signed in, just redirect to target
         if (isSignedIn) {
-            router.push('/dashboard')
+            router.push(redirectUrl)
             closeModal()
             return
         }
@@ -34,7 +34,7 @@ export function GlobalLoginModal() {
             await signIn.authenticateWithRedirect({
                 strategy: 'oauth_google',
                 redirectUrl: '/sso-callback',
-                redirectUrlComplete: '/dashboard'
+                redirectUrlComplete: redirectUrl
             })
         } catch (err: any) {
             console.error('Login error:', err)
@@ -42,7 +42,7 @@ export function GlobalLoginModal() {
             if (err?.errors?.[0]?.code === 'session_exists' ||
                 err?.message?.includes('already signed in') ||
                 JSON.stringify(err).includes('already signed in')) {
-                router.push('/dashboard')
+                router.push(redirectUrl)
                 closeModal()
             }
             setIsLoading(false)

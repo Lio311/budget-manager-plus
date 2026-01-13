@@ -173,6 +173,11 @@ export default function LandingPage() {
                     </motion.div>
                     <div className="hidden md:flex items-center gap-6">
                         <AuthModalTrigger><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></AuthModalTrigger>
+                        <AuthModalTrigger redirectUrl="/onboarding">
+                            <Button className="bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded-full px-6 transition-all">
+                                התנסות במערכת בחינם
+                            </Button>
+                        </AuthModalTrigger>
                         <AuthModalTrigger><Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">התחל עכשיו</Button></AuthModalTrigger>
                     </div>
                     {/* Replaced Menu with Login button for mobile */}
@@ -408,10 +413,10 @@ function FAQContent() {
     )
 }
 
-function AuthModalTrigger({ children }: { children: React.ReactNode }) {
+function AuthModalTrigger({ children, redirectUrl }: { children: React.ReactNode, redirectUrl?: string }) {
     const { openModal } = useAuthModal()
     return (
-        <span onClick={openModal} className="cursor-pointer inline-block">
+        <span onClick={() => openModal(redirectUrl)} className="cursor-pointer inline-block">
             {children}
         </span>
     )

@@ -4,7 +4,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react'
 
 interface AuthModalContextType {
     isOpen: boolean
-    openModal: () => void
+    redirectUrl: string
+    openModal: (url?: string) => void
     closeModal: () => void
 }
 
@@ -12,12 +13,17 @@ const AuthModalContext = createContext<AuthModalContextType | undefined>(undefin
 
 export function AuthModalProvider({ children }: { children: ReactNode }) {
     const [isOpen, setIsOpen] = useState(false)
+    const [redirectUrl, setRedirectUrl] = useState('/dashboard')
 
-    const openModal = () => setIsOpen(true)
+    const openModal = (url?: string) => {
+        if (url) setRedirectUrl(url)
+        else setRedirectUrl('/dashboard') // Reset to default if not provided
+        setIsOpen(true)
+    }
     const closeModal = () => setIsOpen(false)
 
     return (
-        <AuthModalContext.Provider value={{ isOpen, openModal, closeModal }}>
+        <AuthModalContext.Provider value={{ isOpen, redirectUrl, openModal, closeModal }}>
             {children}
         </AuthModalContext.Provider>
     )
