@@ -383,7 +383,7 @@ async function generateSubscriptionIncomes(client: any, userId: string) {
         const endDate = startOfDay(new Date(client.subscriptionEnd))
         const amount = client.subscriptionPrice
         const currency = '₪' // Default currency
-        const budgetType = (client.scope === 'BUSINESS') ? 'BUSINESS' : 'PERSONAL'
+        const budgetType = 'BUSINESS' // Clients are always business scope as per user request
 
         console.log(`Generating incomes for client ${client.name} (${client.id}) Scope: ${maskScope(client.scope)} BudgetType: ${budgetType}`)
 
