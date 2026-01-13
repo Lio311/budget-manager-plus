@@ -894,7 +894,7 @@ export function ClientsTab() {
                                     <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פרטי התקשרות</th>
                                     <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">חבילה / סטטוס</th>
                                     <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden sm:table-cell">הכנסות</th>
-                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פעולות</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 text-center">פעולות</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
@@ -949,7 +949,7 @@ export function ClientsTab() {
                                             <div className="text-xs text-gray-500">{client._count?.incomes || 0} עסקאות</div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <div className="flex items-center gap-1 justify-end">
+                                            <div className="flex items-center gap-1 justify-center">
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
