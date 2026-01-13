@@ -33,6 +33,7 @@ interface ClientSubscriptionHistoryDialogProps {
     isOpen: boolean
     onClose: () => void
     client: any
+    onUpdate?: () => void
 }
 
 const SUBSCRIPTION_TYPES_HE: Record<string, string> = {
@@ -42,7 +43,7 @@ const SUBSCRIPTION_TYPES_HE: Record<string, string> = {
     'PROJECT': 'פרויקט'
 }
 
-export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: ClientSubscriptionHistoryDialogProps) {
+export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client, onUpdate }: ClientSubscriptionHistoryDialogProps) {
     const [incomes, setIncomes] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [updatingId, setUpdatingId] = useState<string | null>(null)
@@ -81,6 +82,7 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                 setIncomes(prev => prev.map(inc =>
                     inc.id === incomeId ? { ...inc, status: newStatus } : inc
                 ))
+                onUpdate?.()
             } else {
                 toast.error('שגיאה בעדכון סטטוס')
             }
@@ -100,6 +102,7 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
             if (result.success) {
                 toast.success('תשלום נמחק בהצלחה')
                 setIncomes(prev => prev.filter(inc => inc.id !== id))
+                onUpdate?.()
             } else {
                 toast.error('שגיאה במחיקת תשלום')
             }
@@ -123,6 +126,7 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                         : inc
                 ))
                 setEditingIncome(null)
+                onUpdate?.()
             } else {
                 toast.error('שגיאה בעדכון תשלום')
             }
@@ -331,8 +335,8 @@ function IncomeRow({ income, onStatusChange, onEdit, onDelete, updatingId, isPas
                     disabled={updatingId === income.id}
                 >
                     <SelectTrigger className={`w-[130px] h-9 ${income.status === 'PAID' ? 'text-green-600 border-green-200 bg-green-50' :
-                            income.status === 'PENDING' ? 'text-yellow-600 border-yellow-200 bg-yellow-50' :
-                                income.status === 'OVERDUE' ? 'text-red-600 border-red-200 bg-red-50' : ''
+                        income.status === 'PENDING' ? 'text-yellow-600 border-yellow-200 bg-yellow-50' :
+                            income.status === 'OVERDUE' ? 'text-red-600 border-red-200 bg-red-50' : ''
                         }`}>
                         <SelectValue />
                     </SelectTrigger>

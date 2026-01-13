@@ -1109,6 +1109,7 @@ export function ClientsTab() {
                 isOpen={!!subscriptionDialogClient}
                 onClose={() => setSubscriptionDialogClient(null)}
                 client={subscriptionDialogClient}
+                onUpdate={() => mutate()}
             />
         </div >
     )
