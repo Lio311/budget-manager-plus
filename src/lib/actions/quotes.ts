@@ -3,6 +3,7 @@
 import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+import { createInvoice, getNextInvoiceNumber, InvoiceFormData } from './invoices'
 
 export interface QuoteFormData {
     clientId: string
@@ -318,5 +319,66 @@ export async function signQuote(token: string, signatureBase64: string) {
     } catch (error) {
         console.error('signQuote error:', error)
         return { success: false, error: 'Failed to sign quote' }
+    }
+}
+
+export async function convertQuoteToInvoice(quoteId: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        // 1. Fetch Quote
+        const quote = await db.quote.findUnique({
+            where: { id: quoteId },
+            include: {
+                client: true,
+            }
+        })
+
+        if (!quote || quote.userId !== userId) {
+            throw new Error('Quote not found')
+        }
+
+        // 2. Get Next Invoice Number
+        const nextNumberRes = await getNextInvoiceNumber()
+        const invoiceNumber = nextNumberRes.success && nextNumberRes.data ? nextNumberRes.data : '1001'
+
+        // 3. Map Data
+        const lineItems = (quote.items as any[])?.map((item: any) => ({
+            description: item.description || item.name || 'פריט',
+            quantity: Number(item.quantity) || 1,
+            price: Number(item.price) || 0,
+            total: (Number(item.quantity) || 1) * (Number(item.price) || 0)
+        })) || []
+
+        const invoiceData: InvoiceFormData = {
+            clientId: quote.clientId,
+            invoiceNumber: invoiceNumber,
+            issueDate: new Date(),
+            dueDate: new Date(new Date().setDate(new Date().getDate() + 14)),
+            subtotal: quote.subtotal,
+            vatRate: quote.vatRate,
+            vatAmount: quote.vatAmount,
+            total: quote.total,
+            notes: `נוצר מהצעת מחיר #${quote.quoteNumber}`,
+            createIncomeFromInvoice: false,
+            lineItems: lineItems
+        }
+
+        // 4. Create Invoice
+        const result = await createInvoice(invoiceData, quote.scope)
+
+        if (!result.success) {
+            throw new Error(result.error)
+        }
+
+        revalidatePath('/dashboard')
+        return { success: true, invoiceId: result.data?.id }
+
+    } catch (error) {
+        console.error('convertQuoteToInvoice error:', error)
+        return { success: false, error: 'Failed to convert quote to invoice' }
     }
 }

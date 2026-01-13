@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Plus, Search, FileText, CheckCircle, Clock, XCircle, AlertCircle, Download, Trash2, Pencil, ChevronDown, Link as LinkIcon, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
-import { getQuotes, updateQuoteStatus, generateQuoteLink, type QuoteFormData } from '@/lib/actions/quotes'
+import { getQuotes, updateQuoteStatus, generateQuoteLink, convertQuoteToInvoice, type QuoteFormData } from '@/lib/actions/quotes'
 import { getClients } from '@/lib/actions/clients'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
@@ -218,6 +218,26 @@ export function QuotesTab() {
         }
     }
 
+    const handleConvertToInvoice = async (quoteId: string) => {
+        if (!confirm('האם אתה בטוח שברצונך להמיר את הצעת המחיר לחשבונית? פעולה זו תיצור טיוטת חשבונית חדשה.')) return
+
+        try {
+            toast.info('ממיר לחשבונית...')
+            const result = await convertQuoteToInvoice(quoteId)
+            if (result.success) {
+                toast.success('החשבונית נוצרה בהצלחה!')
+                // Optional: Redirect or just refresh
+                mutate()
+                // Maybe redirect to the invoice?
+                // window.location.href = `/dashboard/invoices?id=${result.invoiceId}`
+            } else {
+                toast.error(result.error || 'שגיאה ביצירת החשבונית')
+            }
+        } catch (error) {
+            toast.error('שגיאה ביצירת החשבונית')
+        }
+    }
+
     if (isLoading) {
         return (
             <div className="space-y-6">
@@ -417,9 +437,21 @@ export function QuotesTab() {
                                     <span className="hidden md:inline">קישור להצעה</span>
                                 </Button>
                                 {quote.isSigned && (
-                                    <Button variant="outline" size="icon" onClick={() => handleViewQuote(quote.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100">
-                                        <Eye className="h-4 w-4" />
-                                    </Button>
+                                    <>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleConvertToInvoice(quote.id)}
+                                            className="gap-2 text-green-600 border-green-200 bg-green-50 hover:bg-green-100"
+                                            title="הפוך לחשבונית"
+                                        >
+                                            <FileText className="h-4 w-4" />
+                                            <span className="hidden md:inline">הפוך לחשבונית</span>
+                                        </Button>
+                                        <Button variant="outline" size="icon" onClick={() => handleViewQuote(quote.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100">
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                    </>
                                 )}
                             </div>
                         </div>

@@ -265,6 +265,8 @@ model Expense {
   // Business Fields
   supplierId        String?
   supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  clientId          String?
+  client            Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
   
   expenseType       ExpenseType? @default(OPEX)
   amountBeforeVat   Float?
@@ -508,6 +510,7 @@ model Client {
   
   // Relations
   incomes   Income[]
+  expenses  Expense[]
   invoices  Invoice[]
   quotes    Quote[]
   workEvents WorkEvent[]

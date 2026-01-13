@@ -174,6 +174,15 @@ export function ExpensesTab() {
         fetcherCategoryBudgets
     )
 
+    // Fetch Clients for Dropdown
+    const { data: clientsList = [] } = useSWR(
+        ['clients-list'],
+        async () => {
+            const { getClientsList } = await import('@/lib/actions/clients')
+            return await getClientsList()
+        }
+    )
+
     // --- State ---
 
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -506,6 +515,7 @@ export function ExpensesTab() {
                     <ExpenseForm
                         categories={categories}
                         suppliers={suppliersData}
+                        clients={clientsList}
                         onCategoriesChange={mutateCategories}
                     />
                 </div>
@@ -524,6 +534,7 @@ export function ExpensesTab() {
                             <ExpenseForm
                                 categories={categories}
                                 suppliers={suppliersData}
+                                clients={clientsList}
                                 onCategoriesChange={mutateCategories}
                                 isMobile={true}
                                 onSuccess={() => setIsMobileOpen(false)}

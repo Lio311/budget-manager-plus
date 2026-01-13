@@ -800,6 +800,24 @@ export function ClientsTab() {
                                 </div>
                             )}
 
+                            {/* Financial Stats */}
+                            <div className="flex flex-col gap-1 mt-2 pt-2 border-t border-gray-100 dark:border-slate-700">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-500">הכנסות:</span>
+                                    <span className="font-semibold text-green-600">₪{client.totalRevenue?.toLocaleString() || 0}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-500">הוצאות:</span>
+                                    <span className="font-semibold text-red-600">₪{client.totalExpenses?.toLocaleString() || 0}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm font-bold bg-gray-50 dark:bg-slate-700/50 p-1 rounded mt-1">
+                                    <span className="text-gray-700 dark:text-gray-300">רווח נקי:</span>
+                                    <span className={`${(client.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                        ₪{client.netProfit?.toLocaleString() || 0}
+                                    </span>
+                                </div>
+                            </div>
+
                             <div className="border-t pt-3 mt-3 dark:border-slate-700">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600 dark:text-gray-400">סה"כ הכנסות:</span>

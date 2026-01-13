@@ -72,7 +72,7 @@ export async function getClients(scope: string = 'BUSINESS') {
         const clientIds = clients.map((c: any) => c.id)
 
         // Bulk aggregates for better performance
-        const [incomeGroups, paidInvoiceGroups, allInvoiceGroups] = await Promise.all([
+        const [incomeGroups, paidInvoiceGroups, allInvoiceGroups, expenseGroups] = await Promise.all([
             db.income.groupBy({
                 by: ['clientId'],
                 where: { clientId: { in: clientIds } },
@@ -87,6 +87,11 @@ export async function getClients(scope: string = 'BUSINESS') {
                 by: ['clientId'],
                 where: { clientId: { in: clientIds } },
                 _count: { id: true }
+            }),
+            db.expense.groupBy({
+                by: ['clientId'],
+                where: { clientId: { in: clientIds } },
+                _sum: { amount: true }
             })
         ])
 
@@ -94,29 +99,59 @@ export async function getClients(scope: string = 'BUSINESS') {
         const incomeMap = new Map(incomeGroups.map((g: any) => [g.clientId, g._sum.amount || 0]))
         const paidInvoiceMap = new Map(paidInvoiceGroups.map((g: any) => [g.clientId, g._sum.total || 0]))
         const allInvoiceMap = new Map(allInvoiceGroups.map((g: any) => [g.clientId, g._count.id || 0]))
+        const expenseMap = new Map(expenseGroups.map((g: any) => [g.clientId, g._sum.amount || 0]))
 
         const clientsWithStats = clients.map((client: any) => {
             const incomeTotal = incomeMap.get(client.id) || 0
             const paidInvoiceTotal = paidInvoiceMap.get(client.id) || 0
-            const allInvoicesCount = allInvoiceMap.get(client.id) || 0
-
-            const totalRevenue = incomeTotal + paidInvoiceTotal
-            const totalTransactions = client._count.incomes + allInvoicesCount
+            const expenseTotal = expenseMap.get(client.id) || 0
 
             return {
                 ...client,
-                totalRevenue,
+                totalRevenue: incomeTotal + paidInvoiceTotal,
+                totalExpenses: expenseTotal,
+                netProfit: (incomeTotal + paidInvoiceTotal) - expenseTotal,
                 _count: {
                     ...client._count,
-                    incomes: totalTransactions
+                    invoices: allInvoiceMap.get(client.id) || 0
                 }
             }
         })
+        const allInvoicesCount = allInvoiceMap.get(client.id) || 0
 
-        return { success: true, data: clientsWithStats }
+        const totalRevenue = incomeTotal + paidInvoiceTotal
+        const totalTransactions = client._count.incomes + allInvoicesCount
+
+        return {
+            ...client,
+            totalRevenue,
+            _count: {
+                ...client._count,
+                incomes: totalTransactions
+            }
+        }
+    })
+
+    return { success: true, data: clientsWithStats }
+} catch (error) {
+    console.error('getClients error:', error)
+    return { success: false, error: 'Failed to fetch clients' }
+}
+}
+
+export async function getClientsList() {
+    try {
+        const { userId } = await auth()
+        if (!userId) return []
+
+        const db = await authenticatedPrisma(userId)
+        return await db.client.findMany({
+            where: { userId, isActive: true },
+            select: { id: true, name: true },
+            orderBy: { name: 'asc' }
+        })
     } catch (error) {
-        console.error('getClients error:', error)
-        return { success: false, error: 'Failed to fetch clients' }
+        return []
     }
 }
 
@@ -348,6 +383,12 @@ export async function getClientStats(clientId: string, year: number) {
             _count: true
         })
 
+        const totalExpenses = await db.expense.aggregate({
+            where: { clientId },
+            _sum: { amount: true },
+            _count: true
+        })
+
         const openInvoices = await db.invoice.count({
             where: {
                 clientId,
@@ -360,7 +401,10 @@ export async function getClientStats(clientId: string, year: number) {
             data: {
                 monthlyRevenue,
                 totalRevenue: totalRevenue._sum.amount || 0,
+                totalExpenses: totalExpenses._sum.amount || 0,
+                netProfit: (totalRevenue._sum.amount || 0) - (totalExpenses._sum.amount || 0),
                 totalTransactions: totalRevenue._count,
+                totalExpenseTransactions: totalExpenses._count,
                 openInvoices
             }
         }

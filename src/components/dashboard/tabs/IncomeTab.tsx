@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { formatCurrency } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
-import { getIncomes, updateIncome, deleteIncome } from '@/lib/actions/income'
+import { getIncomes, updateIncome, deleteIncome, toggleIncomeStatus } from '@/lib/actions/income'
 import { getCategories } from '@/lib/actions/category'
 import { getClients } from '@/lib/actions/clients'
 import { getBusinessProfile, updateBusinessProfile } from '@/lib/actions/business-settings'
@@ -602,12 +602,12 @@ export function IncomeTab() {
                                                         const res = await toggleIncomeStatus(income.id, newStatus)
                                                         if (res.success) {
                                                             mutateIncomes()
-                                                            toast.success(newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה')
+                                                            toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
                                                         }
                                                     }}
                                                     className={`text-[10px] px-2 py-0.5 rounded-full border mb-1 transition-all ${income.status === 'PENDING'
-                                                            ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
-                                                            : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                                                        ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
+                                                        : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
                                                         }`}
                                                 >
                                                     {income.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}

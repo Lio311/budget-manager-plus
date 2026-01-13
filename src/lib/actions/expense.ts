@@ -60,6 +60,7 @@ export interface ExpenseInput {
     isRecurring?: boolean
     recurringEndDate?: string
     supplierId?: string
+    clientId?: string
     amountBeforeVat?: number
     vatRate?: number
     vatAmount?: number
@@ -99,6 +100,7 @@ export async function addExpense(
                 recurringEndDate: validatedData.recurringEndDate ? new Date(validatedData.recurringEndDate) : null,
                 // Business Fields
                 supplierId: validatedData.supplierId || null,
+                clientId: validatedData.clientId || null,
                 amountBeforeVat: validatedData.amountBeforeVat,
                 vatRate: validatedData.vatRate,
                 vatAmount: validatedData.vatAmount,
@@ -324,6 +326,7 @@ function formatExpenseDataForUpdate(validatedData: any) {
         ...(validatedData.date && { date: new Date(validatedData.date) }),
         // Business Fields
         supplierId: validatedData.supplierId,
+        clientId: validatedData.clientId,
         amountBeforeVat: validatedData.amountBeforeVat,
         vatRate: validatedData.vatRate,
         vatAmount: validatedData.vatAmount,

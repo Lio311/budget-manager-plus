@@ -103,7 +103,7 @@ export async function addIncome(
                 payer: data.payer,
                 workTime: data.workTime,
                 acceptedBy: data.acceptedBy,
-                status: data.status || 'PAID'
+                status: (data as any).status || 'PAID'
             } as any
         })
 

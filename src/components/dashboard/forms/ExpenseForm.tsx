@@ -48,15 +48,21 @@ interface Supplier {
     name: string
 }
 
+interface Client {
+    id: string
+    name: string
+}
+
 interface ExpenseFormProps {
     categories: Category[]
     suppliers: Supplier[]
+    clients?: Client[]
     onCategoriesChange?: () => void
     isMobile?: boolean
     onSuccess?: () => void
 }
 
-export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobile, onSuccess }: ExpenseFormProps) {
+export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesChange, isMobile, onSuccess }: ExpenseFormProps) {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const startOfMonth = new Date(year, month - 1, 1)
     const endOfMonth = new Date(year, month, 0)
@@ -80,6 +86,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
         isRecurring: false,
         recurringEndDate: undefined as string | undefined,
         supplierId: '',
+        clientId: '',
         amountBeforeVat: '',
         vatRate: '0.18',
         vatAmount: '',
@@ -272,6 +279,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 isRecurring: newExpense.isRecurring,
                 recurringEndDate: newExpense.recurringEndDate,
                 supplierId: isBusiness ? newExpense.supplierId || undefined : undefined,
+                clientId: isBusiness ? newExpense.clientId || undefined : undefined,
                 amountBeforeVat: isBusiness ? parseFloat(net) : undefined,
                 vatRate: isBusiness ? parseFloat(newExpense.vatRate) : undefined,
                 vatAmount: isBusiness ? parseFloat(vat) : undefined,
@@ -291,6 +299,7 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                 isRecurring: false,
                 recurringEndDate: undefined,
                 supplierId: '',
+                clientId: '',
                 amountBeforeVat: '',
                 vatRate: '0.18',
                 vatAmount: '',
@@ -542,6 +551,28 @@ export function ExpenseForm({ categories, suppliers, onCategoriesChange, isMobil
                                         <SelectItem value="NO_SUPPLIER">ללא ספק ספציפי</SelectItem>
                                         {suppliers.map(s => (
                                             <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+
+                        {/* Client Selector (Visible for everyone or just Business? Usually Business) */}
+                        {isBusiness && (
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך ללקוח (אופציונלי)</label>
+                                <Select
+                                    value={newExpense.clientId}
+                                    onValueChange={(value) => setNewExpense({ ...newExpense, clientId: value })}
+                                    onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
+                                >
+                                    <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-red-500/20">
+                                        <SelectValue placeholder="ללא לקוח מקושר" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="NO_CLIENT">ללא לקוח מקושר</SelectItem>
+                                        {clients?.map(c => (
+                                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
