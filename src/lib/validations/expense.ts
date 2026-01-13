@@ -13,6 +13,7 @@ export const expenseSchema = z.object({
     recurringEndDate: z.string().optional().nullable(),
     // Business Fields
     supplierId: z.string().optional().nullable(),
+    clientId: z.string().optional().nullable(),
     amountBeforeVat: z.number().optional(),
     vatRate: z.number().optional(),
     vatAmount: z.number().optional(),
