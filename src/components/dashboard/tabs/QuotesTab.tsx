@@ -10,6 +10,7 @@ import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 import useSWR from 'swr'
 import { toast } from 'sonner'
+import { useConfirm } from '@/hooks/useConfirm'
 import { useBudget } from '@/contexts/BudgetContext'
 import { format } from 'date-fns'
 import { formatCurrency, cn } from '@/lib/utils'
@@ -45,10 +46,12 @@ interface Quote {
     vatAmount: number
     items: any[]
     isSigned: boolean
+    invoiceId?: string | null
 }
 
 export function QuotesTab() {
     const { budgetType } = useBudget()
+    const confirm = useConfirm()
     const [searchTerm, setSearchTerm] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
 
@@ -73,6 +76,7 @@ export function QuotesTab() {
             totalAmount: q.total,
             vatAmount: q.vatAmount,
             isSigned: q.isSigned,
+            invoiceId: q.invoiceId,
             items: []
         }))
     }
@@ -219,7 +223,10 @@ export function QuotesTab() {
     }
 
     const handleConvertToInvoice = async (quoteId: string) => {
-        if (!confirm('האם אתה בטוח שברצונך להמיר את הצעת המחיר לחשבונית? פעולה זו תיצור טיוטת חשבונית חדשה.')) return
+        if (!await confirm(
+            'האם אתה בטוח שברצונך להמיר את הצעת המחיר לחשבונית? פעולה זו תיצור טיוטת חשבונית חדשה.',
+            'המרת הצעה לחשבונית'
+        )) return
 
         try {
             toast.info('ממיר לחשבונית...')

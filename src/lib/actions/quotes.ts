@@ -370,12 +370,18 @@ export async function convertQuoteToInvoice(quoteId: string) {
         // 4. Create Invoice
         const result = await createInvoice(invoiceData, quote.scope)
 
-        if (!result.success) {
-            throw new Error(result.error)
+        if (!result.success || !result.data) {
+            throw new Error(result.error || 'Failed to create invoice')
         }
 
+        // 5. Link Invoice to Quote
+        await db.quote.update({
+            where: { id: quoteId },
+            data: { invoiceId: result.data.id }
+        })
+
         revalidatePath('/dashboard')
-        return { success: true, invoiceId: result.data?.id }
+        return { success: true, invoiceId: result.data.id }
 
     } catch (error) {
         console.error('convertQuoteToInvoice error:', error)

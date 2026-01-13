@@ -600,6 +600,7 @@ model Invoice {
   incomes       Income[]
   lineItems     InvoiceLineItem[]
   creditNotes   CreditNote[] // NEW
+  quote         Quote?
   
   @@index([userId, scope])
   @@index([clientId])
@@ -667,6 +668,10 @@ model Quote {
   signature     String?     // Base64 encoded signature
   signedAt      DateTime?
   isSigned      Boolean     @default(false)
+
+  // Link to Invoice (Converted)
+  invoiceId     String?     @unique
+  invoice       Invoice?    @relation(fields: [invoiceId], references: [id])
 
   @@index([userId, scope])
   @@index([clientId])
