@@ -20,6 +20,7 @@ export async function getClientPackages() {
 
         const db = await authenticatedPrisma(userId)
         const packages = await db.clientPackage.findMany({
+            where: { userId },
             orderBy: { name: 'asc' }
         })
 
@@ -45,7 +46,10 @@ export async function createClientPackage(data: z.infer<typeof PackageSchema>) {
         // Use upsert or checking existence is not strictly needed with unique constraint, 
         // but we want to avoid throwing internal errors.
         const existing = await db.clientPackage.findFirst({
-            where: { name: data.name }
+            where: {
+                userId,
+                name: data.name
+            }
         })
 
         if (existing) {

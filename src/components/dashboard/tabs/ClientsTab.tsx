@@ -408,19 +408,30 @@ export function ClientsTab() {
                                     <Button onClick={() => setIsSettingsOpen(false)} className="w-full mt-2">
                                         שמור וסגור
                                     </Button>
+
+                                    <div className="relative my-2">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <span className="w-full border-t" />
+                                        </div>
+                                        <div className="relative flex justify-center text-xs uppercase">
+                                            <span className="bg-background px-2 text-muted-foreground">או</span>
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        onClick={() => {
+                                            setIsSettingsOpen(false)
+                                            setShowPackagesManager(true)
+                                        }}
+                                        variant="outline"
+                                        className="w-full"
+                                    >
+                                        ניהול חבילות וקטגוריות
+                                    </Button>
                                 </div>
                             </div>
                         </PopoverContent>
                     </Popover>
-
-                    <Button
-                        onClick={() => setShowPackagesManager(true)}
-                        variant="outline"
-                        className="mr-2"
-                    >
-                        <Settings className="h-4 w-4 ml-2" />
-                        ניהול חבילות
-                    </Button>
 
                     <Button
                         onClick={() => {

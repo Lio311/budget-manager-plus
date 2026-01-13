@@ -129,8 +129,37 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                         <div key={pkg.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
                             {editingId === pkg.id ? (
                                 <div className="flex-1 grid gap-4 p-2 bg-white dark:bg-slate-900 rounded-md border border-blue-200">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex gap-4 items-start">
                                         <div>
+                                            <Label>צבע</Label>
+                                            <div className="flex flex-wrap gap-1.5 mt-2 w-[160px]">
+                                                <div className="relative">
+                                                    <input
+                                                        type="color"
+                                                        value={formData.color}
+                                                        onChange={e => setFormData({ ...formData, color: e.target.value })}
+                                                        className="h-9 w-9 p-0 border-0 rounded-full overflow-hidden cursor-pointer"
+                                                        title="בחר צבע מותאם אישית"
+                                                    />
+                                                </div>
+                                                {PRESET_COLORS.map(color => (
+                                                    <button
+                                                        key={color.name}
+                                                        type="button"
+                                                        onClick={() => setFormData({ ...formData, color: color.hex })}
+                                                        className={cn(
+                                                            "w-9 h-9 rounded-full transition-all border-2",
+                                                            formData.color === color.hex
+                                                                ? "border-gray-900 scale-110 shadow-sm"
+                                                                : "border-transparent hover:scale-110"
+                                                        )}
+                                                        style={{ backgroundColor: color.hex }}
+                                                        title={color.name}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
                                             <Label>שם החבילה</Label>
                                             <Input
                                                 value={formData.name}
@@ -138,35 +167,6 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                                                 placeholder="שם החבילה"
                                                 autoFocus
                                             />
-                                        </div>
-                                        <div>
-                                            <Label>צבע</Label>
-                                            <div className="flex flex-wrap gap-1.5 mt-2">
-                                                {PRESET_COLORS.map(color => (
-                                                    <button
-                                                        key={color.name}
-                                                        type="button"
-                                                        onClick={() => setFormData({ ...formData, color: color.hex })}
-                                                        className={cn(
-                                                            "h-6 w-6 rounded-full border-2 transition-all",
-                                                            formData.color === color.hex ? "border-gray-900 scale-110" : "border-transparent hover:scale-110"
-                                                        )}
-                                                        style={{ backgroundColor: color.hex }}
-                                                    />
-                                                ))}
-                                                <div className="relative h-6 w-6 rounded-full overflow-hidden border border-gray-200 hover:scale-110 transition-transform">
-                                                    <div
-                                                        className="w-full h-full"
-                                                        style={{ backgroundColor: formData.color }}
-                                                    />
-                                                    <input
-                                                        type="color"
-                                                        value={formData.color}
-                                                        onChange={e => setFormData({ ...formData, color: e.target.value })}
-                                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                                    />
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                     <div className="flex justify-end gap-2">
@@ -285,6 +285,6 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                 )}
 
             </div>
-        </DialogContent>
+        </DialogContent >
     )
 }
