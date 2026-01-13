@@ -282,7 +282,7 @@ export function PhoneInputWithCountry({ value = '', onChange, className, placeho
     }
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value.replace(/\D/g, '') // Remove non-digits
+        const val = e.target.value.replace(/[^\d\s\-()]/g, '') // Allow digits, spaces, dashes, parens
         setLocalNumber(val)
         onChange(`+${countryCode}${val}`)
     }
