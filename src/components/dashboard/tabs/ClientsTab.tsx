@@ -114,7 +114,7 @@ export function ClientsTab() {
     })) : clientsData
 
     // Sorting State
-    const [sortMethod, setSortMethod] = useState<'CREATED_AT' | 'REVENUE' | 'EXPIRY' | 'VALUE' | 'NAME' | 'STATUS' | 'ACTIVITY'>('NAME') // Default to NAME for better UX
+    const [sortMethod, setSortMethod] = useState<'CREATED_AT' | 'REVENUE' | 'EXPIRY' | 'VALUE' | 'NAME' | 'STATUS' | 'ACTIVITY' | 'PACKAGE'>('NAME') // Default to NAME for better UX
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // Default asc for names
 
     // Optimistic create for instant UI feedback
@@ -187,6 +187,10 @@ export function ClientsTab() {
                     return sortDirection === 'asc'
                         ? (a.name || '').localeCompare(b.name || '')
                         : (b.name || '').localeCompare(a.name || '')
+                case 'PACKAGE':
+                    return sortDirection === 'asc'
+                        ? (a.packageName || '').localeCompare(b.packageName || '')
+                        : (b.packageName || '').localeCompare(a.packageName || '')
                 case 'CREATED_AT':
                 default:
                     const createdA = a.createdAt ? new Date(a.createdAt).getTime() : 0
@@ -386,15 +390,16 @@ export function ClientsTab() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="NAME">שם לקוח</SelectItem>
-                                    <SelectItem value="CREATED_AT">תאריך הקמה</SelectItem>
+                                    <SelectItem value="CREATED_AT">תאריך הצטרפות</SelectItem>
                                     <SelectItem value="REVENUE">הכנסות</SelectItem>
-                                    <SelectItem value="ACTIVITY">סטטוס פעילות</SelectItem>
+                                    <SelectItem value="ACTIVITY">מצב מנוי</SelectItem>
                                     <SelectItem value="STATUS">סטטוס תשלום</SelectItem>
+                                    <SelectItem value="PACKAGE">סוג חבילה</SelectItem>
                                     {/* Only show these if at least one client has subscription data */}
                                     {clients.some((c: any) => c.subscriptionEnd || c.subscriptionPrice) && (
                                         <>
                                             <SelectItem value="EXPIRY">תוקף מנוי</SelectItem>
-                                            <SelectItem value="VALUE">משתלם ביותר</SelectItem>
+                                            <SelectItem value="VALUE">רווחיות</SelectItem>
                                         </>
                                     )}
                                 </SelectContent>
