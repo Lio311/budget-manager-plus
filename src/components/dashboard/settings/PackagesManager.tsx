@@ -129,44 +129,66 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                         <div key={pkg.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
                             {editingId === pkg.id ? (
                                 <div className="flex-1 grid gap-4 p-2 bg-white dark:bg-slate-900 rounded-md border border-blue-200">
-                                    <div className="flex gap-4 items-start">
-                                        <div>
-                                            <Label>צבע</Label>
-                                            <div className="flex flex-wrap gap-1.5 mt-2 w-[160px]">
-                                                <div className="relative">
+                                    <div className="space-y-4">
+                                        <div className="flex gap-3 items-end">
+                                            {/* Color Indicator */}
+                                            <div
+                                                className="w-10 h-10 rounded-lg shadow-sm border flex items-center justify-center shrink-0 transition-colors"
+                                                style={{ backgroundColor: formData.color }}
+                                            >
+                                                {/* Hidden input for custom color triggering if needed, or just visual */}
+                                                <div className="relative w-full h-full opacity-0 cursor-pointer">
                                                     <input
                                                         type="color"
                                                         value={formData.color}
                                                         onChange={e => setFormData({ ...formData, color: e.target.value })}
-                                                        className="h-9 w-9 p-0 border-0 rounded-full overflow-hidden cursor-pointer"
+                                                        className="absolute inset-0 w-full h-full cursor-pointer"
                                                         title="בחר צבע מותאם אישית"
                                                     />
                                                 </div>
-                                                {PRESET_COLORS.map(color => (
-                                                    <button
-                                                        key={color.name}
-                                                        type="button"
-                                                        onClick={() => setFormData({ ...formData, color: color.hex })}
-                                                        className={cn(
-                                                            "w-9 h-9 rounded-full transition-all border-2",
-                                                            formData.color === color.hex
-                                                                ? "border-gray-900 scale-110 shadow-sm"
-                                                                : "border-transparent hover:scale-110"
-                                                        )}
-                                                        style={{ backgroundColor: color.hex }}
-                                                        title={color.name}
-                                                    />
-                                                ))}
+                                            </div>
+
+                                            <div className="flex-1">
+                                                <Label className="text-xs mb-1.5 block">שם החבילה</Label>
+                                                <Input
+                                                    value={formData.name}
+                                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                                    placeholder="שם החבילה"
+                                                    autoFocus
+                                                    className="border-2 focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors"
+                                                    style={{ borderColor: formData.color }} // Colored border
+                                                />
                                             </div>
                                         </div>
-                                        <div className="flex-1">
-                                            <Label>שם החבילה</Label>
-                                            <Input
-                                                value={formData.name}
-                                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                                placeholder="שם החבילה"
-                                                autoFocus
-                                            />
+
+                                        {/* Color Palette */}
+                                        <div className="flex flex-wrap gap-2">
+                                            {PRESET_COLORS.map(color => (
+                                                <button
+                                                    key={color.name}
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, color: color.hex })}
+                                                    className={cn(
+                                                        "w-8 h-8 rounded-full transition-all border-2",
+                                                        formData.color === color.hex
+                                                            ? "border-gray-900 scale-110 shadow-sm"
+                                                            : "border-transparent hover:scale-110"
+                                                    )}
+                                                    style={{ backgroundColor: color.hex }}
+                                                    title={color.name}
+                                                />
+                                            ))}
+                                            {/* Custom Color Button (Visible in palette too?) */}
+                                            <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-gray-200 hover:scale-110 transition-transform cursor-pointer group">
+                                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
+                                                <input
+                                                    type="color"
+                                                    value={formData.color}
+                                                    onChange={e => setFormData({ ...formData, color: e.target.value })}
+                                                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                                    title="צבע מותאם אישית"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="flex justify-end gap-2">
@@ -211,19 +233,36 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                             <h4 className="font-medium text-green-900 dark:text-green-100">יצירת חבילה חדשה</h4>
                             <Button size="icon" variant="ghost" onClick={resetForm}><X className="h-4 w-4" /></Button>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <Label>שם החבילה</Label>
-                                <Input
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="לדוגמה: מנוי זהב"
-                                />
+                        <div className="space-y-4">
+                            <div className="flex gap-3 items-end">
+                                {/* Color Indicator / Add Button styled */}
+                                <div
+                                    className="w-10 h-10 rounded-lg shadow-sm border flex items-center justify-center shrink-0 transition-colors bg-white dark:bg-slate-900"
+                                    style={{ borderColor: formData.color, backgroundColor: formData.color ? formData.color + '15' : undefined }}
+                                >
+                                    {isCreating && (
+                                        <div className="text-gray-900 dark:text-gray-100" style={{ color: formData.color }}>
+                                            <Plus className="w-6 h-6" />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex-1">
+                                    <Label className="text-xs mb-1.5 block">שם החבילה</Label>
+                                    <Input
+                                        value={formData.name}
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder="לדוגמה: מנוי זהב"
+                                        className="border-2 focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors"
+                                        style={{ borderColor: formData.color }}
+                                    />
+                                </div>
                             </div>
-                            <div>
-                                <Label>צבע תגית</Label>
-                                <div className="mt-2 text-sm text-gray-500 mb-2">בחר צבע או הזן קוד צבע מותאם אישית</div>
-                                <div className="flex flex-wrap gap-2 mb-3">
+
+                            {/* Colors */}
+                            <div className="space-y-2">
+                                <Label className="text-xs text-muted-foreground">בחר צבע תגית</Label>
+                                <div className="flex flex-wrap gap-2">
                                     {PRESET_COLORS.map(color => (
                                         <button
                                             key={color.name}
@@ -237,14 +276,9 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                                             title={color.name}
                                         />
                                     ))}
-                                    {/* Custom Color Picker wrapper */}
+                                    {/* Custom Color */}
                                     <div className="relative h-8 w-8 rounded-full overflow-hidden border-2 border-gray-200 hover:scale-110 transition-transform cursor-pointer group">
-                                        <div className="absolute inset-0 flex items-center justify-center bg-white">
-                                            <div
-                                                className="w-full h-full"
-                                                style={{ backgroundColor: formData.color }}
-                                            />
-                                        </div>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
                                         <input
                                             type="color"
                                             value={formData.color}
@@ -252,12 +286,6 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                                             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                                             title="צבע מותאם אישית"
                                         />
-                                        {/* Show checkmark if custom color is selected (not in presets) */}
-                                        {!PRESET_COLORS.some(c => c.hex === formData.color) && (
-                                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                                <div className="w-2 h-2 bg-white rounded-full shadow-sm" />
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
