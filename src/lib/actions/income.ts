@@ -102,8 +102,9 @@ export async function addIncome(
                 paymentTerms: data.paymentTerms,
                 payer: data.payer,
                 workTime: data.workTime,
-                acceptedBy: data.acceptedBy
-            }
+                acceptedBy: data.acceptedBy,
+                status: data.status || 'PAID'
+            } as any
         })
 
         if (data.isRecurring && data.recurringEndDate) {
@@ -133,6 +134,25 @@ export async function addIncome(
     } catch (error) {
         console.error('Error adding income:', error)
         return { success: false, error: 'Failed to add income' }
+    }
+}
+
+export async function toggleIncomeStatus(id: string, newStatus: 'PAID' | 'PENDING' | 'OVERDUE' | 'CANCELLED') {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+        await db.income.update({
+            where: { id },
+            data: { status: newStatus }
+        })
+
+        revalidatePath('/dashboard')
+        return { success: true }
+    } catch (error) {
+        console.error('Error toggling income status:', error)
+        return { success: false, error: 'Failed to update status' }
     }
 }
 

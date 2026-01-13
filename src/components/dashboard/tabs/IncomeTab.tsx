@@ -589,10 +589,30 @@ export function IncomeTab() {
                                                     <span>מע"מ: {formatCurrency(income.vatAmount, getCurrencySymbol(income.currency))}</span>
                                                 </div>
                                             )}
-                                            <div className="text-left sm:text-right">
+                                            <div className="flex text-left sm:text-right flex-col items-end">
                                                 <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-green-600' : 'text-green-600'}`}>
                                                     {formatCurrency(isBusiness && income.vatAmount ? (income.amount - income.vatAmount) : income.amount, getCurrencySymbol(income.currency || 'ILS'))}
                                                 </div>
+
+                                                {/* Status Badge */}
+                                                <button
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation()
+                                                        const newStatus = income.status === 'PENDING' ? 'PAID' : 'PENDING'
+                                                        const res = await toggleIncomeStatus(income.id, newStatus)
+                                                        if (res.success) {
+                                                            mutateIncomes()
+                                                            toast.success(newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה')
+                                                        }
+                                                    }}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-full border mb-1 transition-all ${income.status === 'PENDING'
+                                                            ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
+                                                            : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                                                        }`}
+                                                >
+                                                    {income.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
+                                                </button>
+
                                                 {income.invoice && (
                                                     <div className="text-[10px] text-gray-400 font-medium hidden sm:block">#{income.invoice.invoiceNumber}</div>
                                                 )}

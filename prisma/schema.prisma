@@ -199,6 +199,14 @@ model UserPaymentMethod {
 }
 
 
+
+enum IncomeStatus {
+  PAID
+  PENDING
+  OVERDUE
+  CANCELLED
+}
+
 model Income {
   id                String   @id @default(cuid())
   budgetId          String
@@ -206,6 +214,7 @@ model Income {
   source            String
   category          String   @default("כללי")
   amount            Float
+  status            IncomeStatus @default(PAID)
   date              DateTime?
   isRecurring         Boolean  @default(false)
   recurringSourceId   String?

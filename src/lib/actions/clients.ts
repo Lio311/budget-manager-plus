@@ -246,6 +246,18 @@ export async function updateClient(id: string, data: ClientFormData) {
 
         revalidatePath('/dashboard')
 
+        // Smart Update: Delete future PENDING incomes for this client to allow regeneration with new settings
+        // We only touch PENDING incomes in the future. Past or PAID/OVERDUE are kept as history.
+        const today = startOfDay(new Date())
+
+        await db.income.deleteMany({
+            where: {
+                clientId: id,
+                date: { gt: today },
+                status: 'PENDING'
+            }
+        })
+
         // Generate Incomes
         await generateSubscriptionIncomes(client, userId)
 
@@ -391,7 +403,10 @@ export async function generateSubscriptionIncomes(client: any, userId: string) {
         while (currentDate <= endDate) {
             // Check if income exists for this date
             if (!existingDates.has(currentDate.getTime())) {
-                console.log(`Creating income for date: ${currentDate.toISOString()}`)
+                const status = currentDate > new Date() ? 'PENDING' : 'PAID'
+
+                console.log(`Creating income for date: ${currentDate.toISOString()} Status: ${status}`)
+
                 // Create Income
                 await addIncome(
                     currentDate.getMonth() + 1,
@@ -406,7 +421,8 @@ export async function generateSubscriptionIncomes(client: any, userId: string) {
                         clientId: client.id,
                         paymentMethod: 'CREDIT_CARD', // Default assumption or add to form?
                         subscriptionType: client.subscriptionType, // Logic tracking
-                        paymentDate: new Date().toISOString() // Marked as paid now? Or on the date? Use transaction date.
+                        paymentDate: status === 'PAID' ? currentDate.toISOString() : undefined, // Only set paid date if paid
+                        status: status
                     } as any,
                     budgetType
                 )
