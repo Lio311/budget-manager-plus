@@ -60,7 +60,8 @@ export async function getClients(scope: string = 'BUSINESS') {
                 _count: {
                     select: {
                         incomes: true,
-                        invoices: true
+                        invoices: true,
+                        expenses: true
                     }
                 }
             },

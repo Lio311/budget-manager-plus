@@ -953,7 +953,7 @@ export function ClientsTab() {
                                         </td>
                                         <td className="px-4 py-3 hidden lg:table-cell">
                                             <div className="font-medium text-red-600">₪{client.totalExpenses?.toLocaleString() || 0}</div>
-                                            <div className="text-xs text-gray-500">{(client.expenses?.length || 0)} הוצאות</div>
+                                            <div className="text-xs text-gray-500">{client._count?.expenses || 0} הוצאות</div>
                                         </td>
                                         <td className="px-4 py-3 hidden lg:table-cell">
                                             <div className={cn("font-medium", (client.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600')}>
