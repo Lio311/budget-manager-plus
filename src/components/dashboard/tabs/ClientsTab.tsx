@@ -22,6 +22,7 @@ import { PhoneInputWithCountry } from '@/components/ui/PhoneInputWithCountry'
 import { Input } from '@/components/ui/input'
 import { ClientSubscriptionHistoryDialog } from '@/components/dashboard/dialogs/ClientSubscriptionHistoryDialog'
 import { Switch } from '@/components/ui/switch'
+import { cn } from '@/lib/utils'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
