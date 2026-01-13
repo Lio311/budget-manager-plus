@@ -383,7 +383,7 @@ export async function generateSubscriptionExpenses(supplier: any, userId: string
                         paymentMethod: 'BANK_TRANSFER', // Default
                         // Use paymentDate to indicate Paid status
                         paymentDate: isPaid ? currentDate.toISOString() : undefined,
-                        expenseType: 'FIXED'
+                        expenseType: 'OPEX'
                     } as any,
                     budgetType as any
                 )
