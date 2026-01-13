@@ -12,6 +12,7 @@ export default async function SubscribePage({
     const params = await searchParams
     const plan = typeof params.plan === 'string' ? params.plan : 'PERSONAL'
     const isTrialRequested = params.trial === 'true'
+    const error = typeof params.error === 'string' ? decodeURIComponent(params.error) : undefined
 
     // If trial is requested, attempt to activate it and redirect
     if (isTrialRequested) {
@@ -21,12 +22,21 @@ export default async function SubscribePage({
             try {
                 const status = await getSubscriptionStatus(user.id, 'PERSONAL')
                 if (status.status === 'none' && !status.hasAccess) {
-                    await startTrial(user.id, user.emailAddresses[0].emailAddress, 'PERSONAL')
-                    console.log('[SubscribePage] Trial activated, redirecting to dashboard')
-                    redirect('/dashboard')
+                    const result = await startTrial(user.id, user.emailAddresses[0].emailAddress, 'PERSONAL')
+
+                    if (result.success) {
+                        console.log('[SubscribePage] Trial activated, redirecting to dashboard')
+                        redirect('/dashboard')
+                    } else {
+                        // If failed, reload page with error (to show in Paywall) but without trial param to avoid loop
+                        redirect(`/subscribe?error=${encodeURIComponent(result.reason || 'Trial activation failed')}`)
+                    }
                 } else if (status.hasAccess) {
                     console.log('[SubscribePage] User already has access, redirecting to dashboard')
                     redirect('/dashboard')
+                } else {
+                    // Status exists but no access (e.g. expired)
+                    redirect(`/subscribe?error=${encodeURIComponent('תקופת הניסיון שלך פגה')}`)
                 }
             } catch (error) {
                 console.error('[SubscribePage] Error in fail-safe trial activation:', error)
@@ -37,7 +47,7 @@ export default async function SubscribePage({
     return (
         <div className="min-h-screen bg-slate-50">
             <ForceLightMode />
-            <Paywall initialPlan={plan} />
+            <Paywall initialPlan={plan} errorMessage={error} />
         </div>
     )
 }

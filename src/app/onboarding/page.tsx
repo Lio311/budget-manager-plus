@@ -23,16 +23,23 @@ export default async function OnboardingPage({
         console.log('[Onboarding] Current status:', personalStatus.status, 'Has access:', personalStatus.hasAccess)
 
         // Only start trial if requested AND user has no previous status AND doesn't already have access
-        if (isTrialRequested && personalStatus.status === 'none' && !personalStatus.hasAccess) {
-            console.log('[Onboarding] Activating new trial (PERSONAL) for user:', user.id)
-            const result = await startTrial(user.id, user.emailAddresses[0].emailAddress, 'PERSONAL')
-            if (result.success) {
-                console.log('[Onboarding] Trial activation successful')
-            } else {
-                console.error('[Onboarding] Trial activation failed:', result.reason)
+        // Only start trial if requested AND user has no previous status AND doesn't already have access
+        if (isTrialRequested) {
+            if (personalStatus.status === 'none' && !personalStatus.hasAccess) {
+                console.log('[Onboarding] Activating new trial (PERSONAL) for user:', user.id)
+                const result = await startTrial(user.id, user.emailAddresses[0].emailAddress, 'PERSONAL')
+
+                if (result.success) {
+                    console.log('[Onboarding] Trial activation successful')
+                } else {
+                    console.error('[Onboarding] Trial activation failed:', result.reason)
+                    redirect(`/subscribe?error=${encodeURIComponent(result.reason || 'Trial activation failed')}`)
+                }
+            } else if (!personalStatus.hasAccess) {
+                // User has a status (e.g. EXPIRED) but no access, and requested a trial
+                console.log('[Onboarding] Cannot start trial, status:', personalStatus.status)
+                redirect(`/subscribe?error=${encodeURIComponent('תקופת הניסיון שלך כבר נוצלה בעבר')}`)
             }
-        } else {
-            console.log('[Onboarding] Skipping trial activation. Requested:', isTrialRequested, 'Status:', personalStatus.status)
         }
     } catch (error) {
         console.error('[Onboarding] Error during onboarding:', error)

@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 
 // ... imports
 
-export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) {
+export function Paywall({ initialPlan = 'PERSONAL', errorMessage }: { initialPlan?: string, errorMessage?: string }) {
     const { userId } = useAuth()
     const { user } = useUser()
     const router = useRouter()
@@ -57,6 +57,12 @@ export function Paywall({ initialPlan = 'PERSONAL' }: { initialPlan?: string }) 
         }
         checkStatus()
     }, [userId])
+
+    useEffect(() => {
+        if (errorMessage) {
+            toast.error(errorMessage, { duration: 5000 })
+        }
+    }, [errorMessage])
 
     const handleApplyCoupon = async () => {
         if (!couponCode || !user?.emailAddresses[0]?.emailAddress) return
