@@ -200,7 +200,7 @@ export async function startTrial(userId: string, email: string, planType: string
 
     // 2. Activate all requested plans
     const startDate = new Date()
-    const endDate = addDays(startDate, 60) // 2 months trial period
+    const endDate = addDays(startDate, 10) // 10 days trial period
 
     for (const plan of plansToActivate) {
         // Create tracker
