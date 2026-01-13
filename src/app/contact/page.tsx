@@ -217,9 +217,9 @@ export default function ContactPage() {
                                     <h4 className="font-bold text-green-900 mb-2">💡 טיפ</h4>
                                     <p className="text-sm text-gray-600 leading-relaxed">
                                         לפני שפונים אלינו, מומלץ לבדוק את{' '}
-                                        <a href="/#faq" className="text-green-600 hover:text-green-700 font-medium underline">
+                                        <span className="text-green-600 font-medium underline">
                                             שאלות נפוצות
-                                        </a>
+                                        </span>
                                         {' '}- אולי התשובה כבר מחכה לך שם!
                                     </p>
                                 </div>
