@@ -1,3 +1,5 @@
+'use server'
+
 import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
