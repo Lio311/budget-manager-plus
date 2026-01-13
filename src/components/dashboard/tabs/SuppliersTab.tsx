@@ -239,8 +239,6 @@ export function SuppliersTab() {
         }
     }
 
-
-
     return (
         <div className="space-y-6">
             {/* Packages Manager Dialog */}
@@ -525,10 +523,11 @@ export function SuppliersTab() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
-                        
+
                         <div className="flex gap-2">
                             <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                                 {editingSupplier ? 'עדכן' : 'הוסף'}
