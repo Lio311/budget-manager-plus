@@ -159,6 +159,9 @@ export async function createSupplier(data: SupplierFormData, scope: string = 'BU
                 subscriptionEnd: validData.subscriptionEnd,
                 subscriptionStatus: validData.subscriptionStatus || null,
                 subscriptionColor: validData.subscriptionColor || null
+            },
+            include: {
+                package: true
             }
         })
 
@@ -213,6 +216,9 @@ export async function updateSupplier(id: string, data: SupplierFormData) {
                 subscriptionEnd: validData.subscriptionEnd,
                 subscriptionStatus: validData.subscriptionStatus || null,
                 subscriptionColor: validData.subscriptionColor || null
+            },
+            include: {
+                package: true
             }
         })
 
