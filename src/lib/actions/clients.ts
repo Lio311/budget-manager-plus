@@ -281,7 +281,7 @@ export async function updateClient(id: string, data: ClientFormData) {
         })
 
         // Generate Incomes
-        await generateSubscriptionIncomes(client, userId)
+        await generateSubscriptionIncomes(client, userId, today)
 
         return { success: true, data: client }
     } catch (error: any) {
@@ -401,7 +401,7 @@ export async function getClientStats(clientId: string, year: number) {
     }
 }
 
-export async function generateSubscriptionIncomes(client: any, userId: string) {
+export async function generateSubscriptionIncomes(client: any, userId: string, minDate?: Date) {
     // Only proceed if status is PAID and we have necessary fields
     if (client.subscriptionStatus !== 'PAID' || !client.subscriptionPrice || !client.subscriptionStart || !client.subscriptionEnd || !client.subscriptionType) {
         return
@@ -429,11 +429,16 @@ export async function generateSubscriptionIncomes(client: any, userId: string) {
         const budgetType = 'BUSINESS' // Clients are always business scope as per user request
 
         console.log(`Generating incomes for client ${client.name} (${client.id}) Scope: ${maskScope(client.scope)} BudgetType: ${budgetType}`)
+        if (minDate) console.log(`With minDate: ${minDate.toISOString()}`)
 
         // Loop through dates
         while (currentDate <= endDate) {
+            // Check minDate constraint
+            if (minDate && currentDate < minDate) {
+                // Skip generation but continue advancing loop to keep cycle
+            }
             // Check if income exists for this date
-            if (!existingDates.has(currentDate.getTime())) {
+            else if (!existingDates.has(currentDate.getTime())) {
                 const status = currentDate > new Date() ? 'PENDING' : 'PAID'
 
                 console.log(`Creating income for date: ${currentDate.toISOString()} Status: ${status}`)
