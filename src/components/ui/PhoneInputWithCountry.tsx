@@ -250,41 +250,48 @@ const COUNTRY_CODES = [
 ]
 
 export function PhoneInputWithCountry({ value = '', onChange, className, placeholder }: PhoneInputWithCountryProps) {
-    const [countryCode, setCountryCode] = useState('972')
-    const [localNumber, setLocalNumber] = useState('')
+    const lastEmittedValue = React.useRef(value)
 
-    // Parse initial value
+    // Sync only if value changes externally (not from our own typing)
     useEffect(() => {
+        if (value === lastEmittedValue.current) return
+
         if (!value) {
             setLocalNumber('')
+            setCountryCode('972') // Default back to IL
             return
         }
 
         // Try to match existing country code
-        // We sort by length desc to match longer codes first (though most are 1-3 digits)
         const sortedCodes = [...COUNTRY_CODES].sort((a, b) => b.code.length - a.code.length)
+        // Check for +Prefix or just Prefix
         const found = sortedCodes.find(c => value.startsWith('+' + c.code)) || sortedCodes.find(c => value.startsWith(c.code))
 
         if (found) {
             setCountryCode(found.code)
-            // Remove code from value
             const prefix = value.startsWith('+') ? '+' + found.code : found.code
-            setLocalNumber(value.substring(prefix.length))
+            // IMPORTANT: trim() prevents accumulating spaces
+            setLocalNumber(value.substring(prefix.length).trim())
         } else {
-            // Cannot detect, just set as local number (or default)
             setLocalNumber(value)
         }
     }, [value])
 
     const handleCountryChange = (code: string) => {
         setCountryCode(code)
-        onChange(`+${code} ${localNumber}`)
+        const newValue = `+${code} ${localNumber}`
+        lastEmittedValue.current = newValue
+        onChange(newValue)
     }
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value.replace(/[^\d\s\-()]/g, '') // Allow digits, spaces, dashes, parens
+        const val = e.target.value.replace(/[^\d\s\-()]/g, '')
         setLocalNumber(val)
-        onChange(`+${countryCode} ${val}`)
+
+        // Clean format: +Code Local
+        const newValue = `+${countryCode} ${val}`
+        lastEmittedValue.current = newValue
+        onChange(newValue)
     }
 
     return (
