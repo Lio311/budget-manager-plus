@@ -16,13 +16,21 @@ export default async function OnboardingPage({
     }
 
     try {
+        console.log('[Onboarding] Processing user:', user.id, 'Requested trial:', isTrialRequested)
+
         // Check if user already has a subscription or used trial
         const personalStatus = await getSubscriptionStatus(user.id, 'PERSONAL')
+        console.log('[Onboarding] Current status:', personalStatus.status, 'Has access:', personalStatus.hasAccess)
 
-        // Only start trial if requested and user has no previous status
-        if (isTrialRequested && personalStatus.status === 'none') {
-            console.log('[Onboarding] Starting new trial (PERSONAL) for user:', user.id)
-            await startTrial(user.id, user.emailAddresses[0].emailAddress, 'PERSONAL')
+        // Only start trial if requested AND user has no previous status AND doesn't already have access
+        if (isTrialRequested && personalStatus.status === 'none' && !personalStatus.hasAccess) {
+            console.log('[Onboarding] Activating new trial (PERSONAL) for user:', user.id)
+            const result = await startTrial(user.id, user.emailAddresses[0].emailAddress, 'PERSONAL')
+            if (result.success) {
+                console.log('[Onboarding] Trial activation successful')
+            } else {
+                console.error('[Onboarding] Trial activation failed:', result.reason)
+            }
         } else {
             console.log('[Onboarding] Skipping trial activation. Requested:', isTrialRequested, 'Status:', personalStatus.status)
         }
@@ -30,5 +38,6 @@ export default async function OnboardingPage({
         console.error('[Onboarding] Error during onboarding:', error)
     }
 
+    console.log('[Onboarding] Onboarding complete, redirecting to dashboard')
     redirect('/dashboard')
 }

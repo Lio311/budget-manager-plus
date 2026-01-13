@@ -120,7 +120,7 @@ export default function LandingPage() {
                             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                                 <div className="flex flex-col items-center gap-3">
                                     <div className="flex gap-4">
-                                        <Link href="/get-started">
+                                        <AuthModalTrigger redirectUrl="/onboarding?trial=true">
                                             <motion.button
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}
@@ -128,7 +128,7 @@ export default function LandingPage() {
                                             >
                                                 התחל בחינם
                                             </motion.button>
-                                        </Link>
+                                        </AuthModalTrigger>
                                         <AuthModalTrigger>
                                             <motion.button
                                                 whileHover={{ scale: 1.05 }}
@@ -238,7 +238,7 @@ export default function LandingPage() {
                             </ul>
 
                             <SignedOut>
-                                <Link href="/get-started">
+                                <AuthModalTrigger redirectUrl="/onboarding?trial=true">
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
@@ -246,7 +246,7 @@ export default function LandingPage() {
                                     >
                                         התחל בחינם
                                     </motion.button>
-                                </Link>
+                                </AuthModalTrigger>
                             </SignedOut>
                         </motion.div>
                     </div>
@@ -283,11 +283,11 @@ export default function LandingPage() {
                             </ul>
 
                             <motion.div whileHover={{ scale: 1.02 }}>
-                                <Link href="/get-started">
+                                <AuthModalTrigger redirectUrl="/onboarding?trial=true">
                                     <button className="px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg">
                                         התנסות חינם בתוכנית העסקית
                                     </button>
-                                </Link>
+                                </AuthModalTrigger>
                             </motion.div>
                         </motion.div>
 
@@ -423,7 +423,7 @@ export default function LandingPage() {
                             הצטרפו לאלפי משתמשים שכבר לקחו שליטה על העתיד הכלכלי שלהם
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Link href="/get-started">
+                            <AuthModalTrigger redirectUrl="/onboarding?trial=true">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
@@ -431,7 +431,7 @@ export default function LandingPage() {
                                 >
                                     הרשמה חינם
                                 </motion.button>
-                            </Link>
+                            </AuthModalTrigger>
                             <AuthModalTrigger>
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}

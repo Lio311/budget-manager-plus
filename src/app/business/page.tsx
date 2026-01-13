@@ -7,6 +7,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Menu, X, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ContactDialog } from '@/components/home/ContactDialog'
+import { useAuthModal } from '@/contexts/AuthModalContext'
+import { useAuth } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
 
 export default function BusinessLandingPage() {
     const [currentSection, setCurrentSection] = useState(0)
@@ -195,16 +198,16 @@ export default function BusinessLandingPage() {
 
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center gap-6">
-                        <Link href="/sign-in">
+                        <AuthModalTrigger>
                             <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">
                                 כניסה
                             </Button>
-                        </Link>
-                        <Link href="/sign-up">
+                        </AuthModalTrigger>
+                        <AuthModalTrigger>
                             <Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">
                                 התחל עכשיו
                             </Button>
-                        </Link>
+                        </AuthModalTrigger>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -226,16 +229,16 @@ export default function BusinessLandingPage() {
                         exit={{ opacity: 0, x: '100%' }}
                         className="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-40 md:hidden flex flex-col items-center justify-center gap-8"
                     >
-                        <Link href="/sign-in" onClick={() => setIsMenuOpen(false)}>
+                        <AuthModalTrigger onClick={() => setIsMenuOpen(false)}>
                             <Button variant="ghost" size="lg" className="text-white text-2xl rounded-2xl">
                                 כניסה
                             </Button>
-                        </Link>
-                        <Link href="/sign-up" onClick={() => setIsMenuOpen(false)}>
+                        </AuthModalTrigger>
+                        <AuthModalTrigger onClick={() => setIsMenuOpen(false)}>
                             <Button size="lg" className="bg-white text-gray-900 text-2xl px-12 rounded-2xl shadow-2xl">
                                 התחל עכשיו
                             </Button>
-                        </Link>
+                        </AuthModalTrigger>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -394,12 +397,12 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                                 transition={{ delay: 0.9 }}
                                 className="flex gap-4"
                             >
-                                <Link href="/sign-up">
+                                <AuthModalTrigger>
                                     <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-10 py-7 text-xl shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">
                                         התחל עכשיו
                                         <ArrowLeft className="mr-3" size={24} />
                                     </Button>
-                                </Link>
+                                </AuthModalTrigger>
                             </motion.div>
                         )}
                     </motion.div>
@@ -430,5 +433,25 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                 </div>
             </div>
         </div>
+    )
+}
+function AuthModalTrigger({ children, redirectUrl, onClick }: { children: React.ReactNode, redirectUrl?: string, onClick?: () => void }) {
+    const { openModal } = useAuthModal()
+    const { isSignedIn } = useAuth()
+    const router = useRouter()
+
+    const handleClick = () => {
+        if (onClick) onClick();
+        if (isSignedIn) {
+            router.push(redirectUrl || '/dashboard')
+        } else {
+            openModal(redirectUrl)
+        }
+    }
+
+    return (
+        <span onClick={handleClick} className="cursor-pointer inline-block pointer-events-auto relative z-[60]">
+            {children}
+        </span>
     )
 }
