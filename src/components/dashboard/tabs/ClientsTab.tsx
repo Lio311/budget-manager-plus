@@ -18,6 +18,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Label } from "@/components/ui/label"
 import { format, differenceInDays, startOfDay } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
+import { PhoneInputWithCountry } from '@/components/ui/PhoneInputWithCountry'
+import { Input } from '@/components/ui/input'
+import { ClientSubscriptionHistoryDialog } from '@/components/dashboard/dialogs/ClientSubscriptionHistoryDialog'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -56,6 +59,7 @@ export function ClientsTab() {
 
     const [warningDays, setWarningDays] = useState(14)
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+    const [subscriptionDialogClient, setSubscriptionDialogClient] = useState<any>(null)
 
     // Load settings from localStorage
     useEffect(() => {
@@ -745,6 +749,13 @@ export function ClientsTab() {
                                     >
                                         <Trash2 className="h-4 w-4 text-red-600" />
                                     </button>
+                                    <button
+                                        onClick={() => setSubscriptionDialogClient(client)}
+                                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                        title="היסטוריית תשלומים"
+                                    >
+                                        <List className="h-4 w-4 text-purple-600" />
+                                    </button>
                                 </div>
                             </div>
 
@@ -922,6 +933,12 @@ export function ClientsTab() {
                     </div>
                 )
             }
+            {/* Subscription History Dialog */}
+            <ClientSubscriptionHistoryDialog
+                isOpen={!!subscriptionDialogClient}
+                onClose={() => setSubscriptionDialogClient(null)}
+                client={subscriptionDialogClient}
+            />
         </div>
     )
 }

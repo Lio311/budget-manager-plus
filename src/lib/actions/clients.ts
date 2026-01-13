@@ -523,3 +523,52 @@ export async function syncClientIncomes(clientId: string) {
 function maskScope(scope: string) {
     return scope
 }
+
+export async function getClientSubscriptionIncomes(clientId: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        const incomes = await db.income.findMany({
+            where: {
+                clientId,
+                source: { startsWith: 'מנוי -' } // Filter for subscription generated incomes
+            },
+            orderBy: { date: 'desc' },
+            select: {
+                id: true,
+                date: true,
+                amount: true,
+                status: true,
+                currency: true
+            }
+        })
+
+        return { success: true, data: incomes }
+    } catch (error) {
+        console.error('getClientSubscriptionIncomes error:', error)
+        return { success: false, error: 'Failed to fetch subscription incomes' }
+    }
+}
+
+export async function updateIncomeStatus(incomeId: string, status: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        await db.income.update({
+            where: { id: incomeId },
+            data: { status: status as any }
+        })
+
+        revalidatePath('/dashboard')
+        return { success: true }
+    } catch (error) {
+        console.error('updateIncomeStatus error:', error)
+        return { success: false, error: 'Failed to update status' }
+    }
+}
