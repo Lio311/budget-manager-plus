@@ -860,7 +860,7 @@ export function ClientsTab() {
                             {client.phone && (
                                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
                                     <Phone className="h-4 w-4" />
-                                    <span>{client.phone}</span>
+                                    <span dir="ltr" className="text-left">{client.phone}</span>
                                 </div>
                             )}
 
@@ -931,7 +931,7 @@ export function ClientsTab() {
                                                 {client.phone && (
                                                     <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                                                         <Phone className="h-3 w-3 shrink-0" />
-                                                        <span dir="ltr" className="text-right">{client.phone}</span>
+                                                        <span dir="ltr" className="text-left">{client.phone}</span>
                                                     </div>
                                                 )}
                                                 {client.email && (
