@@ -894,6 +894,8 @@ export function ClientsTab() {
                                     <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פרטי התקשרות</th>
                                     <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">חבילה / סטטוס</th>
                                     <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden sm:table-cell">הכנסות</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden lg:table-cell">הוצאות</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden lg:table-cell">רווח נקי</th>
                                     <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 text-center">פעולות</th>
                                 </tr>
                             </thead>
@@ -947,6 +949,15 @@ export function ClientsTab() {
                                         <td className="px-4 py-3 hidden sm:table-cell">
                                             <div className="font-medium text-green-600">₪{client.totalRevenue?.toLocaleString() || 0}</div>
                                             <div className="text-xs text-gray-500">{client._count?.incomes || 0} עסקאות</div>
+                                        </td>
+                                        <td className="px-4 py-3 hidden lg:table-cell">
+                                            <div className="font-medium text-red-600">₪{client.totalExpenses?.toLocaleString() || 0}</div>
+                                            <div className="text-xs text-gray-500">{(client.expenses?.length || 0)} הוצאות</div>
+                                        </td>
+                                        <td className="px-4 py-3 hidden lg:table-cell">
+                                            <div className={cn("font-medium", (client.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600')}>
+                                                ₪{client.netProfit?.toLocaleString() || 0}
+                                            </div>
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-1 justify-center">
