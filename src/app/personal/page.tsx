@@ -6,11 +6,13 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Menu, X, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ContactDialog } from '@/components/home/ContactDialog'
 
 export default function PersonalLandingPage() {
     const [currentSection, setCurrentSection] = useState(0)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isScrolling, setIsScrolling] = useState(false)
+    const [isContactDialogOpen, setIsContactDialogOpen] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
 
     const sections = [
@@ -284,11 +286,14 @@ export default function PersonalLandingPage() {
                             <Link href="/terms" className="hover:text-white transition">תנאי שימוש</Link>
                             <Link href="/security" className="hover:text-white transition">אבטחת מידע</Link>
                             <Link href="/accessibility" className="hover:text-white transition">הצהרת נגישות</Link>
-                            <Link href="/contact" className="hover:text-white transition">צור קשר</Link>
+                            <button onClick={() => setIsContactDialogOpen(true)} className="hover:text-white transition">צור קשר</button>
                         </div>
                     </div>
                 </motion.div>
             )}
+
+            {/* Contact Dialog */}
+            <ContactDialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen} />
         </div>
     )
 }

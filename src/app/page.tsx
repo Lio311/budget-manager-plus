@@ -8,11 +8,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, ArrowLeft, Check, Menu, X, ChevronDown, LayoutDashboard, PieChart, Calendar, BarChart3, CreditCard, Receipt, Smartphone, Lock, Shield } from 'lucide-react'
 import SecurityBadge from '@/components/SecurityBadge'
 import { Button } from '@/components/ui/button'
+import { ContactDialog } from '@/components/home/ContactDialog'
 
 export default function LandingPage() {
     const [currentSection, setCurrentSection] = useState(0)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isScrolling, setIsScrolling] = useState(false)
+    const [isContactDialogOpen, setIsContactDialogOpen] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
 
     const sections = [
@@ -232,11 +234,14 @@ export default function LandingPage() {
                             <Link href="/terms" className="hover:text-white transition">תנאי שימוש</Link>
                             <Link href="/security" className="hover:text-white transition">אבטחת מידע</Link>
                             <Link href="/accessibility" className="hover:text-white transition">הצהרת נגישות</Link>
-                            <Link href="/contact" className="hover:text-white transition">צור קשר</Link>
+                            <button onClick={() => setIsContactDialogOpen(true)} className="hover:text-white transition">צור קשר</button>
                         </div>
                     </div>
                 </motion.div>
             )}
+
+            {/* Contact Dialog */}
+            <ContactDialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen} />
 
             <style dangerouslySetInnerHTML={{
                 __html: `
