@@ -358,7 +358,7 @@ export async function getClientStats(clientId: string, year: number) {
     }
 }
 
-async function generateSubscriptionIncomes(client: any, userId: string) {
+export async function generateSubscriptionIncomes(client: any, userId: string) {
     // Only proceed if status is PAID and we have necessary fields
     if (client.subscriptionStatus !== 'PAID' || !client.subscriptionPrice || !client.subscriptionStart || !client.subscriptionEnd || !client.subscriptionType) {
         return
@@ -445,6 +445,26 @@ async function generateSubscriptionIncomes(client: any, userId: string) {
 
     } catch (error) {
         console.error('Error generating subscription incomes:', error)
+    }
+}
+
+
+export async function syncClientIncomes(clientId: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+        const client = await db.client.findUnique({ where: { id: clientId } })
+
+        if (!client) return { success: false, error: 'Client not found' }
+
+        await generateSubscriptionIncomes(client, userId)
+        revalidatePath('/dashboard')
+        return { success: true }
+    } catch (error) {
+        console.error('syncClientIncomes error:', error)
+        return { success: false, error: 'Failed' }
     }
 }
 

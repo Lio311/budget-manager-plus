@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { getClients, createClient, updateClient, deleteClient, type ClientFormData } from '@/lib/actions/clients'
+import { getClients, createClient, updateClient, deleteClient, syncClientIncomes, type ClientFormData } from '@/lib/actions/clients'
 import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import useSWR from 'swr'
 import { toast } from 'sonner'
@@ -723,12 +723,25 @@ export function ClientsTab() {
                                     <button
                                         onClick={() => handleEdit(client)}
                                         className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                        title="ערוך"
                                     >
                                         <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                                     </button>
                                     <button
+                                        onClick={async () => {
+                                            const res = await syncClientIncomes(client.id)
+                                            if (res.success) toast.success('הכנסות סונכרנו בהצלחה')
+                                            else toast.error('שגיאה בסנכרון')
+                                        }}
+                                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                        title="סנכרן הכנסות ממנוי"
+                                    >
+                                        <RefreshCw className="h-4 w-4 text-blue-600" />
+                                    </button>
+                                    <button
                                         onClick={() => handleDelete(client.id)}
                                         className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                        title="מחק"
                                     >
                                         <Trash2 className="h-4 w-4 text-red-600" />
                                     </button>
@@ -849,8 +862,8 @@ export function ClientsTab() {
                                             )}
                                             {client.subscriptionStatus && (
                                                 <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${client.subscriptionStatus === 'PAID' ? 'border-green-500 text-green-600 bg-green-50' :
-                                                        client.subscriptionStatus === 'UNPAID' ? 'border-red-500 text-red-600 bg-red-50' :
-                                                            'border-orange-500 text-orange-600 bg-orange-50'
+                                                    client.subscriptionStatus === 'UNPAID' ? 'border-red-500 text-red-600 bg-red-50' :
+                                                        'border-orange-500 text-orange-600 bg-orange-50'
                                                     }`}>
                                                     {client.subscriptionStatus === 'PAID' ? 'שולם' : client.subscriptionStatus === 'UNPAID' ? 'לא שולם' : 'אחר'}
                                                 </Badge>
