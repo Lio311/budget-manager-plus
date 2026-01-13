@@ -117,26 +117,13 @@ export async function getClients(scope: string = 'BUSINESS') {
                 }
             }
         })
-        const allInvoicesCount = allInvoiceMap.get(client.id) || 0
 
-        const totalRevenue = incomeTotal + paidInvoiceTotal
-        const totalTransactions = client._count.incomes + allInvoicesCount
 
-        return {
-            ...client,
-            totalRevenue,
-            _count: {
-                ...client._count,
-                incomes: totalTransactions
-            }
-        }
-    })
-
-    return { success: true, data: clientsWithStats }
-} catch (error) {
-    console.error('getClients error:', error)
-    return { success: false, error: 'Failed to fetch clients' }
-}
+        return { success: true, data: clientsWithStats }
+    } catch (error) {
+        console.error('getClients error:', error)
+        return { success: false, error: 'Failed to fetch clients' }
+    }
 }
 
 export async function getClientsList() {
