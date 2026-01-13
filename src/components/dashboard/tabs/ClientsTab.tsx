@@ -817,77 +817,83 @@ export function ClientsTab() {
                 </div>
             ) : (
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-slate-800 dark:border-slate-700 overflow-hidden">
-                    <table className="w-full text-right text-sm">
-                        <thead className="bg-gray-50 dark:bg-slate-700/50">
-                            <tr>
-                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">שם לקוח</th>
-                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פרטי התקשרות</th>
-                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">חבילה / סטטוס</th>
-                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">הכנסות</th>
-                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פעולות</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
-                            {filteredClients.map((client: any) => (
-                                <tr key={client.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-2">
-                                            <Building2 className="h-4 w-4 text-green-600" />
-                                            <span className="font-medium">{client.name}</span>
-                                        </div>
-                                        {client.taxId && <div className="text-xs text-gray-400 mr-6">{client.taxId}</div>}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex flex-col gap-1">
-                                            {client.phone && (
-                                                <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                                                    <Phone className="h-3 w-3" />
-                                                    {client.phone}
-                                                </div>
-                                            )}
-                                            {client.email && (
-                                                <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                                                    <Mail className="h-3 w-3" />
-                                                    {client.email}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {client.packageName && (
-                                                <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 text-[10px] px-1.5 py-0 h-5">
-                                                    {client.packageName}
-                                                </Badge>
-                                            )}
-                                            {client.subscriptionStatus && (
-                                                <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${client.subscriptionStatus === 'PAID' ? 'border-green-500 text-green-600 bg-green-50' :
-                                                    client.subscriptionStatus === 'UNPAID' ? 'border-red-500 text-red-600 bg-red-50' :
-                                                        'border-orange-500 text-orange-600 bg-orange-50'
-                                                    }`}>
-                                                    {client.subscriptionStatus === 'PAID' ? 'שולם' : client.subscriptionStatus === 'UNPAID' ? 'לא שולם' : 'אחר'}
-                                                </Badge>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <div className="font-medium text-green-600">₪{client.totalRevenue?.toLocaleString() || 0}</div>
-                                        <div className="text-xs text-gray-500">{client._count?.incomes || 0} עסקאות</div>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-1">
-                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(client)}>
-                                                <Edit2 className="h-4 w-4 text-gray-500" />
-                                            </Button>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-red-600" onClick={() => handleDelete(client.id)}>
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-right text-sm whitespace-nowrap">
+                            <thead className="bg-gray-50 dark:bg-slate-700/50">
+                                <tr>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">שם לקוח</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פרטי התקשרות</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">חבילה / סטטוס</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden sm:table-cell">הכנסות</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פעולות</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                                {filteredClients.map((client: any) => (
+                                    <tr key={client.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-2">
+                                                <Building2 className="h-4 w-4 text-green-600 shrink-0" />
+                                                <span className="font-medium">{client.name}</span>
+                                            </div>
+                                            {client.taxId && <div className="text-xs text-gray-400 mr-6">{client.taxId}</div>}
+                                            {/* Mobile only revenue */}
+                                            <div className="sm:hidden mt-1 mr-6 text-xs text-green-600 font-medium">
+                                                ₪{client.totalRevenue?.toLocaleString() || 0}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-col gap-1">
+                                                {client.phone && (
+                                                    <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                                        <Phone className="h-3 w-3 shrink-0" />
+                                                        <span dir="ltr" className="text-right">{client.phone}</span>
+                                                    </div>
+                                                )}
+                                                {client.email && (
+                                                    <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                                        <Mail className="h-3 w-3 shrink-0" />
+                                                        <span className="truncate max-w-[120px]">{client.email}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {client.packageName && (
+                                                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 text-[10px] px-1.5 py-0 h-5 whitespace-nowrap">
+                                                        {client.packageName}
+                                                    </Badge>
+                                                )}
+                                                {client.subscriptionStatus && (
+                                                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 whitespace-nowrap ${client.subscriptionStatus === 'PAID' ? 'border-green-500 text-green-600 bg-green-50' :
+                                                        client.subscriptionStatus === 'UNPAID' ? 'border-red-500 text-red-600 bg-red-50' :
+                                                            'border-orange-500 text-orange-600 bg-orange-50'
+                                                        }`}>
+                                                        {client.subscriptionStatus === 'PAID' ? 'שולם' : client.subscriptionStatus === 'UNPAID' ? 'לא שולם' : 'אחר'}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 hidden sm:table-cell">
+                                            <div className="font-medium text-green-600">₪{client.totalRevenue?.toLocaleString() || 0}</div>
+                                            <div className="text-xs text-gray-500">{client._count?.incomes || 0} עסקאות</div>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-1">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(client)}>
+                                                    <Edit2 className="h-4 w-4 text-gray-500" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-red-600" onClick={() => handleDelete(client.id)}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 
