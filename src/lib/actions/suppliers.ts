@@ -58,7 +58,9 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
                 package: true, // Include Package
                 _count: {
                     select: {
-                        expenses: true
+                        expenses: {
+                            where: { paymentDate: { not: null } }
+                        }
                     }
                 }
             },
@@ -72,7 +74,10 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
         // Bulk aggregates for better performance
         const expenseGroups = await db.expense.groupBy({
             by: ['supplierId'],
-            where: { supplierId: { in: supplierIds } },
+            where: {
+                supplierId: { in: supplierIds },
+                paymentDate: { not: null }
+            },
             _sum: { amount: true }
         })
 
