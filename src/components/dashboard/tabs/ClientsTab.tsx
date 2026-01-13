@@ -355,7 +355,7 @@ export function ClientsTab() {
                     />
                 </div>
 
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
                     {/* Sort Dropdown & Toggle */}
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
@@ -416,7 +416,7 @@ export function ClientsTab() {
                         </div>
                     </div>
 
-                    <Badge variant="secondary" className="text-sm font-normal">
+                    <Badge variant="secondary" className="text-sm font-normal w-full sm:w-auto text-center justify-center">
                         סה"כ לקוחות: {clients.length}
                     </Badge>
                 </div>
