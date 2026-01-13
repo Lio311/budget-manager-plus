@@ -572,3 +572,45 @@ export async function updateIncomeStatus(incomeId: string, status: string) {
         return { success: false, error: 'Failed to update status' }
     }
 }
+
+export async function deleteSubscriptionIncome(incomeId: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        await db.income.delete({
+            where: { id: incomeId }
+        })
+
+        revalidatePath('/dashboard')
+        return { success: true }
+    } catch (error) {
+        console.error('deleteSubscriptionIncome error:', error)
+        return { success: false, error: 'Failed to delete income' }
+    }
+}
+
+export async function updateSubscriptionIncome(incomeId: string, data: { date: Date, amount: number }) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        await db.income.update({
+            where: { id: incomeId },
+            data: {
+                date: data.date,
+                amount: data.amount
+            }
+        })
+
+        revalidatePath('/dashboard')
+        return { success: true }
+    } catch (error) {
+        console.error('updateSubscriptionIncome error:', error)
+        return { success: false, error: 'Failed to update income' }
+    }
+}

@@ -20,10 +20,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { format } from 'date-fns'
-import { Check, X, Loader2 } from "lucide-react"
+import { Check, X, Loader2, Edit2, Trash2 } from "lucide-react"
 import { toast } from 'sonner'
-import { getClientSubscriptionIncomes, updateIncomeStatus } from '@/lib/actions/clients' // We will implement these
+import { getClientSubscriptionIncomes, updateIncomeStatus, deleteSubscriptionIncome, updateSubscriptionIncome } from '@/lib/actions/clients'
 import { formatCurrency } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { DatePicker } from '@/components/ui/date-picker'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface ClientSubscriptionHistoryDialogProps {
     isOpen: boolean
@@ -31,10 +35,19 @@ interface ClientSubscriptionHistoryDialogProps {
     client: any
 }
 
+const SUBSCRIPTION_TYPES_HE: Record<string, string> = {
+    'WEEKLY': 'שבועי',
+    'MONTHLY': 'חודשי',
+    'YEARLY': 'שנתי',
+    'PROJECT': 'פרויקט'
+}
+
 export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: ClientSubscriptionHistoryDialogProps) {
     const [incomes, setIncomes] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [updatingId, setUpdatingId] = useState<string | null>(null)
+    const [editingIncome, setEditingIncome] = useState<any>(null)
+    const confirm = useConfirm()
 
     useEffect(() => {
         if (isOpen && client) {
@@ -78,6 +91,46 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
         }
     }
 
+    const handleDelete = async (id: string) => {
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק תשלום זה?', 'מחיקת תשלום')
+        if (!confirmed) return
+
+        try {
+            const result = await deleteSubscriptionIncome(id)
+            if (result.success) {
+                toast.success('תשלום נמחק בהצלחה')
+                setIncomes(prev => prev.filter(inc => inc.id !== id))
+            } else {
+                toast.error('שגיאה במחיקת תשלום')
+            }
+        } catch (error) {
+            toast.error('שגיאה במחיקת תשלום')
+        }
+    }
+
+    const handleSaveEdit = async (income: any) => {
+        try {
+            const result = await updateSubscriptionIncome(income.id, {
+                date: new Date(income.date),
+                amount: income.amount
+            })
+
+            if (result.success) {
+                toast.success('תשלום עודכן בהצלחה')
+                setIncomes(prev => prev.map(inc =>
+                    inc.id === income.id
+                        ? { ...inc, date: income.date, amount: income.amount }
+                        : inc
+                ))
+                setEditingIncome(null)
+            } else {
+                toast.error('שגיאה בעדכון תשלום')
+            }
+        } catch (error) {
+            toast.error('שגיאה בעדכון תשלום')
+        }
+    }
+
     if (!client) return null
 
     return (
@@ -86,7 +139,7 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                 <DialogHeader>
                     <DialogTitle>היסטוריית תשלומי מנוי - {client.name}</DialogTitle>
                     <DialogDescription>
-                        ניהול תשלומי מנוי ({client.subscriptionType} - {formatCurrency(client.subscriptionPrice)})
+                        ניהול תשלומי מנוי ({SUBSCRIPTION_TYPES_HE[client.subscriptionType] || client.subscriptionType} - {formatCurrency(client.subscriptionPrice)})
                     </DialogDescription>
                 </DialogHeader>
 
@@ -134,11 +187,31 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             <SelectItem value="PAID">שולם</SelectItem>
-                                                            <SelectItem value="PENDING">שוחד</SelectItem>
+                                                            <SelectItem value="PENDING">ממתין</SelectItem>
                                                             <SelectItem value="OVERDUE">באיחור</SelectItem>
                                                             <SelectItem value="CANCELLED">בוטל</SelectItem>
                                                         </SelectContent>
                                                     </Select>
+                                                    <div className="flex gap-1 mr-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                            onClick={() => setEditingIncome(income)}
+                                                            title="ערוך תשלום"
+                                                        >
+                                                            <Edit2 className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                            onClick={() => handleDelete(income.id)}
+                                                            title="מחק תשלום"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
@@ -148,8 +221,45 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                         </Table>
                     </div>
                 )}
-            </DialogContent>
-        </Dialog>
+
+                {/* Edit Dialog */}
+                {editingIncome && (
+                    <Dialog open={!!editingIncome} onOpenChange={(open) => !open && setEditingIncome(null)}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>עריכת תשלום</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                    <Label>תאריך</Label>
+                                    <DatePicker
+                                        date={new Date(editingIncome.date)}
+                                        onSelect={(date) => date && setEditingIncome({ ...editingIncome, date: date.toISOString() })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>סכום</Label>
+                                    <Input
+                                        type="number"
+                                        value={editingIncome.amount}
+                                        onChange={(e) => setEditingIncome({ ...editingIncome, amount: parseFloat(e.target.value) })}
+                                    />
+                                </div>
+                                <div className="flex justify-end gap-2 mt-4">
+                                    <Button variant="outline" onClick={() => setEditingIncome(null)}>ביטול</Button>
+                                    <Button onClick={() => handleSaveEdit(editingIncome)}>שמור שינויים</Button>
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                )}
+            </TableBody>
+        </Table>
+                    </div >
+                )
+}
+            </DialogContent >
+        </Dialog >
     )
 }
 
