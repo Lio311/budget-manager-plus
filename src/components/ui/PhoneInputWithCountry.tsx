@@ -278,13 +278,13 @@ export function PhoneInputWithCountry({ value = '', onChange, className, placeho
 
     const handleCountryChange = (code: string) => {
         setCountryCode(code)
-        onChange(`+${code}${localNumber}`)
+        onChange(`+${code} ${localNumber}`)
     }
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value.replace(/[^\d\s\-()]/g, '') // Allow digits, spaces, dashes, parens
         setLocalNumber(val)
-        onChange(`+${countryCode}${val}`)
+        onChange(`+${countryCode} ${val}`)
     }
 
     return (
