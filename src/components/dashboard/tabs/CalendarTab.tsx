@@ -370,20 +370,36 @@ export function CalendarTab() {
                             <DialogTitle>תשלומים ליום {selectedDay}</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-3 mt-4 max-h-[60vh] overflow-y-auto">
-                            {getPaymentsForDay(selectedDay).map((payment) => (
-                                <div key={payment.id} className={`p-3 rounded-lg border-r-4 ${payment.isPaid ? 'opacity-60 bg-gray-50' : 'bg-white shadow-sm'
-                                    } border-gray-200`}>
-                                    <div className="flex justify-between items-center">
-                                        <div>
-                                            <p className="font-bold">{payment.name}</p>
-                                            <p className="text-xs text-muted-foreground">{formatCurrency(payment.amount, payment.currency)}</p>
+                            {getPaymentsForDay(selectedDay).map((payment) => {
+                                const categoryLabels: Record<Payment['type'], { label: string, color: string }> = {
+                                    'income': { label: 'הכנסה', color: 'bg-green-100 text-green-800 border-green-200' },
+                                    'expense': { label: 'הוצאה', color: 'bg-red-100 text-red-800 border-red-200' },
+                                    'saving': { label: 'חיסכון', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+                                    'bill': { label: 'חשבון קבוע', color: 'bg-orange-100 text-orange-800 border-orange-200' },
+                                    'debt': { label: 'הלוואה', color: 'bg-purple-100 text-purple-800 border-purple-200' }
+                                }
+                                const category = categoryLabels[payment.type]
+
+                                return (
+                                    <div key={payment.id} className={`p-3 rounded-lg border-r-4 ${payment.isPaid ? 'opacity-60 bg-gray-50' : 'bg-white shadow-sm'
+                                        } border-gray-200`}>
+                                        <div className="flex justify-between items-start gap-2">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <p className="font-bold">{payment.name}</p>
+                                                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${category.color}`}>
+                                                        {category.label}
+                                                    </span>
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">{formatCurrency(payment.amount, payment.currency)}</p>
+                                            </div>
+                                            {(!payment.isPaid && (payment.type === 'bill' || payment.type === 'debt')) && (
+                                                <Button size="sm" onClick={() => togglePaid(payment)}>סמן כשולם</Button>
+                                            )}
                                         </div>
-                                        {(!payment.isPaid && (payment.type === 'bill' || payment.type === 'debt')) && (
-                                            <Button size="sm" onClick={() => togglePaid(payment)}>סמן כשולם</Button>
-                                        )}
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                             {getPaymentsForDay(selectedDay).length === 0 && <p className="text-center text-muted-foreground">אין תשלומים ליום זה</p>}
                         </div>
                     </DialogContent>
