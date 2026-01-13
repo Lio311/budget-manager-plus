@@ -10,7 +10,7 @@ import { addDays, addMonths, addYears, isSameDay, startOfDay } from 'date-fns'
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
     email: z.string().email('כתובת אימייל לא תקינה').max(100).optional().or(z.literal('')),
-    phone: z.string().regex(/^[\d-]*$/, 'מספר טלפון לא תקין').max(20).optional().or(z.literal('')),
+    phone: z.string().max(30).optional().or(z.literal('')),
     taxId: z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional().or(z.literal('')),
     address: z.string().max(200, 'הכתובת ארוכה מדי').optional().or(z.literal('')),
     notes: z.string().max(500, 'הערות ארוכות מדי').optional().or(z.literal('')),
