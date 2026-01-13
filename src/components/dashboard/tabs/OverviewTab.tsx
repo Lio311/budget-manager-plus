@@ -706,75 +706,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     )}
                 </Card >
 
-                {isBusiness && (
-                    <Card className="glass-panel shadow-sm min-h-[400px]">
-                        <CardHeader>
-                            <CardTitle>חלוקת הוצאות (לפי אחראי)</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                {['RON', 'LEON', 'LIOR'].map(person => {
-                                    const totalForPerson = current.expenses.reduce((sum: number, item: any) => {
-                                        const responsibles = item.responsibles || ['RON']
-                                        const originalAmount = (item.isDeductible && item.amountBeforeVatILS !== undefined) ? item.amountBeforeVatILS : (item.amountILS || 0)
 
-                                        // Weighted Logic
-                                        if (responsibles.length === 1) {
-                                            if (responsibles.includes(person)) return sum + originalAmount
-                                            return sum
-                                        }
-
-                                        if (responsibles.length === 2 && responsibles.includes('RON') && responsibles.includes('LEON')) {
-                                            if (person === 'RON') return sum + (originalAmount * 0.70)
-                                            if (person === 'LEON') return sum + (originalAmount * 0.30)
-                                            return sum
-                                        }
-
-                                        if (responsibles.length === 3) {
-                                            if (person === 'RON') return sum + (originalAmount * 0.40)
-                                            if (person === 'LIOR') return sum + (originalAmount * 0.40)
-                                            if (person === 'LEON') return sum + (originalAmount * 0.20)
-                                            return sum
-                                        }
-
-                                        // Fallback Equal Split
-                                        if (responsibles.includes(person)) return sum + (originalAmount / responsibles.length)
-                                        return sum
-                                    }, 0)
-
-                                    const percent = totalExpenses > 0 ? (totalForPerson / totalExpenses) * 100 : 0
-
-                                    return (
-                                        <div key={person} className="flex items-center gap-4">
-                                            <div className={`
-                                                w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0
-                                                ${person === 'RON' ? 'bg-indigo-100 text-indigo-600' : ''}
-                                                ${person === 'LEON' ? 'bg-orange-100 text-orange-600' : ''}
-                                                ${person === 'LIOR' ? 'bg-emerald-100 text-emerald-600' : ''}
-                                            `}>
-                                                {person === 'RON' ? 'RO' : (person === 'LEON' ? 'LE' : 'LI')}
-                                            </div>
-                                            <div className="flex-1 space-y-1">
-                                                <div className="flex justify-between text-sm font-medium">
-                                                    <span>{person === 'RON' ? 'רון' : (person === 'LEON' ? 'לאון' : 'ליאור')}</span>
-                                                    <span>{formatCurrency(totalForPerson)}</span>
-                                                </div>
-                                                <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                                    <div
-                                                        className={`h-full rounded-full ${person === 'RON' ? 'bg-indigo-500' :
-                                                            person === 'LEON' ? 'bg-orange-500' : 'bg-emerald-500'
-                                                            }`}
-                                                        style={{ width: `${percent}%` }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
 
             </div >
 
