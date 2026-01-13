@@ -146,13 +146,13 @@ export default function ContactPage() {
                                             </>
                                         ) : isSuccess ? (
                                             <>
-                                                <CheckCircle2 className="ml-2 h-5 w-5" />
+                                                <CheckCircle2 className="mr-2 h-5 w-5" />
                                                 נשלח בהצלחה!
                                             </>
                                         ) : (
                                             <>
-                                                <Send className="ml-2 h-5 w-5" />
                                                 שלח הודעה
+                                                <Send className="ml-2 h-5 w-5" />
                                             </>
                                         )}
                                     </Button>
@@ -183,7 +183,7 @@ export default function ContactPage() {
                                                         info@kesefly.co.il
                                                     </a>
                                                     <p className="text-sm text-gray-500 mt-2">
-                                                        נשיב תוך 24 שעות בימי עסקים
+                                                        מענה עד 3 ימי עסקים
                                                     </p>
                                                 </div>
                                             </div>
@@ -198,11 +198,11 @@ export default function ContactPage() {
                                             <ul className="space-y-2 text-sm text-gray-600">
                                                 <li className="flex justify-between">
                                                     <span className="font-medium">ראשון - חמישי:</span>
-                                                    <span>09:00 - 18:00</span>
+                                                    <span>18:00 - 09:00</span>
                                                 </li>
                                                 <li className="flex justify-between">
                                                     <span className="font-medium">שישי:</span>
-                                                    <span>09:00 - 13:00</span>
+                                                    <span>13:00 - 09:00</span>
                                                 </li>
                                                 <li className="flex justify-between text-gray-400">
                                                     <span className="font-medium">שבת:</span>
@@ -214,11 +214,11 @@ export default function ContactPage() {
                                 </div>
 
                                 {/* FAQ Hint */}
-                                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-2xl border border-purple-100">
-                                    <h4 className="font-bold text-purple-900 mb-2">💡 טיפ</h4>
+                                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-100">
+                                    <h4 className="font-bold text-green-900 mb-2">💡 טיפ</h4>
                                     <p className="text-sm text-gray-600 leading-relaxed">
                                         לפני שפונים אלינו, מומלץ לבדוק את{' '}
-                                        <a href="/#faq" className="text-purple-600 hover:text-purple-700 font-medium underline">
+                                        <a href="/#faq" className="text-green-600 hover:text-green-700 font-medium underline">
                                             שאלות נפוצות
                                         </a>
                                         {' '}- אולי התשובה כבר מחכה לך שם!
