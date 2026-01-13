@@ -250,6 +250,8 @@ const COUNTRY_CODES = [
 ]
 
 export function PhoneInputWithCountry({ value = '', onChange, className, placeholder }: PhoneInputWithCountryProps) {
+    const [countryCode, setCountryCode] = useState('972')
+    const [localNumber, setLocalNumber] = useState('')
     const lastEmittedValue = React.useRef(value)
 
     // Sync only if value changes externally (not from our own typing)
