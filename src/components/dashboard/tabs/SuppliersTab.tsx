@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown } from 'lucide-react'
+import { format, differenceInDays, startOfDay } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { getSuppliers, createSupplier, updateSupplier, deleteSupplier, type SupplierFormData } from '@/lib/actions/suppliers'
 import { getSupplierPackages } from '@/lib/actions/supplier-packages'
@@ -561,21 +562,53 @@ export function SuppliersTab() {
                                     <Building2 className="h-5 w-5 text-blue-600" />
                                     <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{supplier.name}</h3>
                                 </div>
-                                {/* Package Badge */}
-                                {(supplier.package || supplier.packageName) && (
-                                    <Badge
-                                        variant="secondary"
-                                        className="w-fit text-xs font-normal"
-                                        style={{
-                                            backgroundColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '20',
-                                            color: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6'),
-                                            borderColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '40',
-                                            borderWidth: '1px'
-                                        }}
-                                    >
-                                        {supplier.package?.name || supplier.packageName}
-                                    </Badge>
-                                )}
+                                {/* Smart Status Badges */}
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {supplier.isActive === false && (
+                                        <Badge variant="secondary" className="bg-gray-200 text-gray-600 border-gray-300">
+                                            לא פעיל
+                                        </Badge>
+                                    )}
+                                    {(supplier.package || supplier.packageName) && (
+                                        <Badge
+                                            variant="secondary"
+                                            className="w-fit text-xs font-normal"
+                                            style={{
+                                                backgroundColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '20',
+                                                color: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6'),
+                                                borderColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '40',
+                                                borderWidth: '1px'
+                                            }}
+                                        >
+                                            {supplier.package?.name || supplier.packageName}
+                                        </Badge>
+                                    )}
+
+                                    {supplier.subscriptionStatus === 'PAID' && (
+                                        <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50">שולם</Badge>
+                                    )}
+                                    {supplier.subscriptionStatus === 'UNPAID' && (
+                                        <Badge variant="destructive">לא שולם</Badge>
+                                    )}
+                                    {supplier.subscriptionStatus === 'PARTIAL' && (
+                                        <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50">שולם חלקית</Badge>
+                                    )}
+                                    {supplier.subscriptionStatus === 'INSTALLMENTS' && (
+                                        <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50">בתשלומים</Badge>
+                                    )}
+
+                                    {/* Expiration Warning */}
+                                    {supplier.subscriptionEnd && (() => {
+                                        const end = startOfDay(new Date(supplier.subscriptionEnd))
+                                        const today = startOfDay(new Date())
+                                        const daysLeft = differenceInDays(end, today)
+
+                                        if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
+                                        if (daysLeft <= 14) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
+                                        if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
+                                        return null
+                                    })()}
+                                </div>
                             </div>
                             <div className="flex gap-1">
                                 <button
