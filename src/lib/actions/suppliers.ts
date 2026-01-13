@@ -443,11 +443,14 @@ export async function getSupplierSubscriptionExpenses(supplierId: string) {
         // For now relying on description logic as in clients.
         // Ideally we'd filter by exact description match but "startsWith" is safer for small variations.
 
-        // First get the supplier name to match
-        const supplier = await db.supplier.findUnique({ where: { id: supplierId }, select: { name: true } })
+        // First get the supplier details to match and potentially generate
+        const supplier = await db.supplier.findUnique({
+            where: { id: supplierId },
+            include: { package: true } // Include package if needed, but mainly we need own fields which are default included if no select
+        })
         if (!supplier) throw new Error('Supplier not found')
 
-        const expenses = await db.expense.findMany({
+        let expenses = await db.expense.findMany({
             where: {
                 supplierId,
                 description: { startsWith: 'מנוי -' }
@@ -462,6 +465,30 @@ export async function getSupplierSubscriptionExpenses(supplierId: string) {
                 description: true
             }
         })
+
+        // If no expenses found but supplier has subscription details, generate them
+        const s = supplier as any
+        if (expenses.length === 0 && s.subscriptionPrice && s.subscriptionType && s.subscriptionStart) {
+            console.log('Generating missing subscription expenses for supplier:', s.name)
+            await generateSubscriptionExpenses(s, userId, startOfDay(new Date(s.subscriptionStart)))
+
+            // Re-fetch
+            expenses = await db.expense.findMany({
+                where: {
+                    supplierId,
+                    description: { startsWith: 'מנוי -' }
+                },
+                orderBy: { date: 'desc' },
+                select: {
+                    id: true,
+                    date: true,
+                    amount: true,
+                    currency: true,
+                    paymentDate: true,
+                    description: true
+                }
+            })
+        }
 
         // Map to format compatible with dialog (add 'status' field derived from paymentDate)
         const mappedExpenses = expenses.map(e => ({
