@@ -576,3 +576,31 @@ export async function deleteAllMonthlyExpenses(month: number, year: number, type
         return { success: false, error: 'Failed to delete expenses' }
     }
 }
+
+export async function toggleExpenseStatus(id: string, newStatus: 'PAID' | 'PENDING') {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+
+        const data: any = {}
+        if (newStatus === 'PAID') {
+            data.paymentDate = new Date()
+        } else {
+            data.paymentDate = null
+        }
+
+        await db.expense.update({
+            where: { id },
+            data
+        })
+
+        revalidatePath('/dashboard')
+        revalidatePath('/')
+        return { success: true }
+    } catch (error) {
+        console.error('Error toggling expense status:', error)
+        return { success: false, error: 'Failed to update status' }
+    }
+}

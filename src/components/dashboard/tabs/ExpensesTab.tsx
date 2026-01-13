@@ -27,7 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { formatCurrency, cn, formatNumberWithCommas } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
-import { deleteExpense, getExpenses, updateExpense, importExpenses } from '@/lib/actions/expense'
+import { deleteExpense, getExpenses, updateExpense, importExpenses, toggleExpenseStatus } from '@/lib/actions/expense'
 import { getSuppliers } from '@/lib/actions/suppliers'
 import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { getCategories } from '@/lib/actions/category'
@@ -61,6 +61,7 @@ interface Expense {
     paymentMethod?: string | null
     isDeductible?: boolean | null
     isRecurring?: boolean | null
+    paymentDate?: Date | null
 }
 
 interface ExpenseData {
@@ -675,12 +676,31 @@ export function ExpensesTab() {
                                                         <span>מע"מ: <span className="inline-block">{formatNumberWithCommas(exp.vatAmount.toFixed(2))} {getCurrencySymbol(exp.currency || 'ILS')}</span></span>
                                                     </div>
                                                 ) : null}
-                                                <div className="text-left sm:text-right">
+                                                <div className="flex text-left sm:text-right flex-col items-end">
                                                     <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
                                                         <span className="inline-block">
                                                             {formatNumberWithCommas((isBusiness && exp.isDeductible && exp.vatAmount ? (exp.amount - exp.vatAmount) : exp.amount).toFixed(2))} {getCurrencySymbol(exp.currency || 'ILS')}
                                                         </span>
                                                     </div>
+
+                                                    {/* Status Badge */}
+                                                    <button
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation()
+                                                            const newStatus = exp.paymentDate ? 'PENDING' : 'PAID'
+                                                            const res = await toggleExpenseStatus(exp.id, newStatus)
+                                                            if (res.success) {
+                                                                mutateExpenses()
+                                                                toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
+                                                            }
+                                                        }}
+                                                        className={`text-[10px] px-2 py-0.5 rounded-full border mb-1 transition-all ${!exp.paymentDate
+                                                            ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
+                                                            : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                                                            }`}
+                                                    >
+                                                        {!exp.paymentDate ? 'בהמתנה לתשלום' : 'שולם'}
+                                                    </button>
                                                 </div>
                                                 <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                                     <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
