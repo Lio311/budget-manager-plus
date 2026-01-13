@@ -33,7 +33,7 @@ export function GlobalLoginModal() {
         try {
             await signIn.authenticateWithRedirect({
                 strategy: 'oauth_google',
-                redirectUrl: '/sso-callback',
+                redirectUrl: '/',
                 redirectUrlComplete: redirectUrl
             })
         } catch (err: any) {

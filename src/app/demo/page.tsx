@@ -9,7 +9,7 @@ export default function DemoPage() {
                 <DashboardShell
                     userPlan="PERSONAL"
                     hasPersonalAccess={true}
-                    hasBusinessAccess={false}
+                    hasBusinessAccess={true}
                 />
             </BudgetProvider>
         </DemoProvider>

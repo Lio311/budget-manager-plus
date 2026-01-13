@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { SignInButton, SignUpButton, SignedIn, SignedOut } from '@clerk/nextjs'
+import { SignInButton, SignUpButton, SignedIn, SignedOut, useAuth } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
 import { ArrowLeft, Check, Shield, Users, PieChart, Star, Menu, X, LayoutDashboard, CreditCard, Receipt, ShieldCheck, Smartphone, TrendingUp, Wallet, Bell, BarChart3, Calendar } from 'lucide-react'
 import Image from 'next/image'
 import SecurityBadge from '@/components/SecurityBadge'
@@ -34,6 +35,15 @@ const itemVariants = {
 }
 
 export default function LandingPage() {
+    const { isSignedIn } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (isSignedIn) {
+            router.push('/dashboard')
+        }
+    }, [isSignedIn, router])
+
     useEffect(() => {
         // Force light mode scrollbar behavior
         const originalColorScheme = document.documentElement.style.colorScheme;

@@ -211,7 +211,7 @@ export function ExpensesTab() {
     const searchParams = useSearchParams()
 
     useEffect(() => {
-        const shouldAutoOpen = searchParams.get('autoOpen') === 'true' || searchParams.has('amount')
+        const shouldAutoOpen = searchParams.get('autoOpen') === 'true' || searchParams.has('amount') || searchParams.has('date')
         if (shouldAutoOpen && !isMobileOpen) {
             setIsMobileOpen(true)
         }
