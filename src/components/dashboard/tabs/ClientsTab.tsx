@@ -459,15 +459,16 @@ export function ClientsTab() {
                                     }}
                                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                                 />
-                                <div className="mt-4 flex items-center gap-2">
+                                <div className="mt-4 flex items-center justify-between gap-4 border p-2 rounded-md bg-gray-50 dark:bg-slate-800/50">
+                                    <Label htmlFor="active-mode" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {formData.isActive ? 'לקוח פעיל' : 'לקוח לא פעיל'}
+                                    </Label>
                                     <Switch
                                         id="active-mode"
                                         checked={formData.isActive ?? true}
                                         onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                                        dir="ltr"
                                     />
-                                    <Label htmlFor="active-mode" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        {formData.isActive ? 'לקוח פעיל' : 'לקוח לא פעיל'}
-                                    </Label>
                                 </div>
                             </div>
 
