@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge'
 import { PhoneInputWithCountry } from '@/components/ui/PhoneInputWithCountry'
 import { Input } from '@/components/ui/input'
 import { ClientSubscriptionHistoryDialog } from '@/components/dashboard/dialogs/ClientSubscriptionHistoryDialog'
+import { Switch } from '@/components/ui/switch'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -52,7 +53,8 @@ export function ClientsTab() {
         subscriptionStart: undefined,
         subscriptionEnd: undefined,
         subscriptionStatus: '',
-        eventLocation: ''
+        eventLocation: '',
+        isActive: true
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [isAddingPackage, setIsAddingPackage] = useState(false)
@@ -163,6 +165,11 @@ export function ClientsTab() {
                     diff = getMonthlyValue(a) - getMonthlyValue(b)
                     break
                 case 'STATUS':
+                    // Active clients first
+                    if ((a.isActive ?? true) !== (b.isActive ?? true)) {
+                        return (a.isActive ?? true) ? -1 : 1
+                    }
+                    // Then by payment status
                     const statusPriority: Record<string, number> = { 'UNPAID': 3, 'PARTIAL': 2, 'INSTALLMENTS': 1, 'PAID': 0 }
                     const cleanStatusA = a.subscriptionStatus || 'PAID'
                     const cleanStatusB = b.subscriptionStatus || 'PAID'
@@ -218,7 +225,7 @@ export function ClientsTab() {
                     setEditingClient(null)
                     setShowForm(false)
                     setEditingClient(null)
-                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '' })
+                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', isActive: true })
                     mutate()
                 } else {
                     toast.error(result.error || 'שגיאה')
@@ -251,7 +258,9 @@ export function ClientsTab() {
             subscriptionStart: client.subscriptionStart,
             subscriptionEnd: client.subscriptionEnd,
             subscriptionStatus: client.subscriptionStatus || '',
-            eventLocation: client.eventLocation || ''
+            subscriptionStatus: client.subscriptionStatus || '',
+            eventLocation: client.eventLocation || '',
+            isActive: client.isActive ?? true
         })
         setShowForm(true)
     }
@@ -337,7 +346,7 @@ export function ClientsTab() {
                             setEditingClient(null)
                             setErrors({})
                             setIsAddingPackage(false)
-                            setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '' })
+                            setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', isActive: true })
                         }}
                         className="bg-green-600 hover:bg-green-700"
                     >
@@ -451,6 +460,16 @@ export function ClientsTab() {
                                     }}
                                     className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                                 />
+                                <div className="mt-4 flex items-center gap-2">
+                                    <Switch
+                                        id="active-mode"
+                                        checked={formData.isActive ?? true}
+                                        onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                                    />
+                                    <Label htmlFor="active-mode" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {formData.isActive ? 'לקוח פעיל' : 'לקוח לא פעיל'}
+                                    </Label>
+                                </div>
                             </div>
 
                             <div>
@@ -761,6 +780,11 @@ export function ClientsTab() {
 
                             {/* Smart Status Badges */}
                             <div className="flex flex-wrap gap-2 mb-3">
+                                {client.isActive === false && (
+                                    <Badge variant="secondary" className="bg-gray-200 text-gray-600 border-gray-300">
+                                        לא פעיל
+                                    </Badge>
+                                )}
                                 {client.packageName && (
                                     <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
                                         {client.packageName}
