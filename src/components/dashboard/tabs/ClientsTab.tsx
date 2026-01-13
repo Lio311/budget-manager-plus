@@ -667,6 +667,11 @@ export function ClientsTab() {
                                                 <Select
                                                     value={formData.packageId || 'NONE'}
                                                     onValueChange={(value) => {
+                                                        if (value === 'NEW_PACKAGE') {
+                                                            setShowPackagesManager(true)
+                                                            return
+                                                        }
+
                                                         if (value === 'NONE') {
                                                             setFormData({ ...formData, packageId: '', packageName: '', subscriptionColor: '#3B82F6' })
                                                         } else {
@@ -698,6 +703,13 @@ export function ClientsTab() {
                                                                 </div>
                                                             </SelectItem>
                                                         ))}
+                                                        <div className="h-px bg-gray-100 my-1 mx-1" />
+                                                        <SelectItem value="NEW_PACKAGE" className="text-green-600 bg-green-50/50 hover:bg-green-50 focus:bg-green-50 cursor-pointer font-medium">
+                                                            <div className="flex items-center gap-2">
+                                                                <Plus className="w-4 h-4" />
+                                                                + הוסף חדש
+                                                            </div>
+                                                        </SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>

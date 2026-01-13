@@ -222,7 +222,7 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                                         <Button size="icon" variant="ghost" onClick={() => startEdit(pkg)}>
                                             <Edit2 className="h-4 w-4 text-blue-500" />
                                         </Button>
-                                        <Button size="icon" variant="ghost" onClick={() => handleDelete(pkg.id)}>
+                                        <Button size="icon" variant="ghost" onClick={() => handleDelete(pkg.id, pkg.name)}>
                                             <Trash2 className="h-4 w-4 text-red-500" />
                                         </Button>
                                     </div>
