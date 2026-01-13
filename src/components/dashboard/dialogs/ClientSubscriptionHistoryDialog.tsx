@@ -234,7 +234,7 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                                     <Label>תאריך</Label>
                                     <DatePicker
                                         date={new Date(editingIncome.date)}
-                                        onSelect={(date) => date && setEditingIncome({ ...editingIncome, date: date.toISOString() })}
+                                        setDate={(date) => date && setEditingIncome({ ...editingIncome, date: date.toISOString() })}
                                     />
                                 </div>
                                 <div className="space-y-2">
