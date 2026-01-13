@@ -44,7 +44,7 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
         if (res.success && res.data) {
             setPackages(res.data)
         } else {
-            toast.error('Failed to load packages')
+            toast.error('שגיאה בטעינת החבילות')
         }
         setLoading(false)
     }
@@ -61,7 +61,7 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
 
     const handleSave = async () => {
         if (!formData.name) {
-            toast.error('Name is required')
+            toast.error('חובה להזין שם חבילה')
             return
         }
 
@@ -75,20 +75,20 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
         if (isCreating) {
             const res = await createClientPackage(payload)
             if (res.success) {
-                toast.success('Package created')
+                toast.success('החבילה נוצרה בהצלחה')
                 fetchPackages()
                 resetForm()
             } else {
-                toast.error(res.error || 'Failed to create')
+                toast.error(res.error || 'שגיאה ביצירת החבילה')
             }
         } else if (editingId) {
             const res = await updateClientPackage(editingId, payload)
             if (res.success) {
-                toast.success('Package updated')
+                toast.success('החבילה עודכנה בהצלחה')
                 fetchPackages()
                 resetForm()
             } else {
-                toast.error(res.error || 'Failed to update')
+                toast.error(res.error || 'שגיאה בעדכון החבילה')
             }
         }
     }
@@ -104,16 +104,26 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
         })
     }
 
-    const handleDelete = async (id: string) => {
-        if (confirm('Are you sure? Clients using this package will be unlinked.')) {
-            const res = await deleteClientPackage(id)
-            if (res.success) {
-                toast.success('Package deleted')
-                fetchPackages()
-            } else {
-                toast.error(res.error || 'Failed to delete')
-            }
-        }
+    const handleDelete = async (id: string, name: string) => {
+        toast('האם אתה בטוח שברצונך למחוק את החבילה?', {
+            description: 'לקוחות המשוייכים לחבילה זו ינותקו ממנה.',
+            action: {
+                label: 'מחק',
+                onClick: async () => {
+                    const res = await deleteClientPackage(id)
+                    if (res.success) {
+                        toast.success('החבילה נמחקה בהצלחה')
+                        fetchPackages()
+                    } else {
+                        toast.error(res.error || 'שגיאה במחיקת החבילה')
+                    }
+                }
+            },
+            cancel: {
+                label: 'ביטול',
+                onClick: () => { }
+            },
+        })
     }
 
     return (
@@ -193,7 +203,9 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                                     </div>
                                     <div className="flex justify-end gap-2">
                                         <Button size="sm" variant="ghost" onClick={resetForm}>ביטול</Button>
-                                        <Button size="sm" onClick={handleSave}>שמור שינויים</Button>
+                                        <Button size="sm" onClick={handleSave}>
+                                            {isCreating ? 'צור חבילה' : 'שמור שינויים'}
+                                        </Button>
                                     </div>
                                 </div>
                             ) : (
@@ -293,7 +305,6 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
                         <div className="flex justify-end gap-2 pt-2">
                             <Button variant="outline" onClick={resetForm}>ביטול</Button>
                             <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white">
-                                <Plus className="h-4 w-4 mr-2" />
                                 צור חבילה
                             </Button>
                         </div>
