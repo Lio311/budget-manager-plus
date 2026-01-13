@@ -370,49 +370,7 @@ export function CalendarTab() {
                 </CardContent>
             </Card>
 
-            {/* Financial Details Dialog */}
-            {viewMode === 'financial' && selectedDay && (
-                <Dialog open={!!selectedDay} onOpenChange={(open) => !open && setSelectedDay(null)}>
-                    <DialogContent dir="rtl" className="max-h-[80vh] overflow-y-auto">
-                        <DialogHeader className="text-right">
-                            <DialogTitle>תשלומים ליום {selectedDay}</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-3 mt-4 max-h-[60vh] overflow-y-auto">
-                            {getPaymentsForDay(selectedDay).map((payment) => {
-                                const categoryLabels: Record<Payment['type'], { label: string, color: string }> = {
-                                    'income': { label: 'הכנסה', color: 'bg-green-100 text-green-800 border-green-200' },
-                                    'expense': { label: 'הוצאה', color: 'bg-red-100 text-red-800 border-red-200' },
-                                    'saving': { label: 'חיסכון', color: 'bg-blue-100 text-blue-800 border-blue-200' },
-                                    'bill': { label: 'חשבון קבוע', color: 'bg-orange-100 text-orange-800 border-orange-200' },
-                                    'debt': { label: 'הלוואה', color: 'bg-purple-100 text-purple-800 border-purple-200' }
-                                }
-                                const category = categoryLabels[payment.type]
 
-                                return (
-                                    <div key={payment.id} className={`p-3 rounded-lg border-r-4 ${payment.isPaid ? 'opacity-60 bg-gray-50' : 'bg-white shadow-sm'
-                                        } border-gray-200`}>
-                                        <div className="flex justify-between items-start gap-2">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <p className="font-bold">{payment.name}</p>
-                                                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${category.color}`}>
-                                                        {category.label}
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs text-muted-foreground">{formatCurrency(payment.amount, payment.currency)}</p>
-                                            </div>
-                                            {(!payment.isPaid && (payment.type === 'bill' || payment.type === 'debt')) && (
-                                                <Button size="sm" onClick={() => togglePaid(payment)}>סמן כשולם</Button>
-                                            )}
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                            {getPaymentsForDay(selectedDay).length === 0 && <p className="text-center text-muted-foreground">אין תשלומים ליום זה</p>}
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            )}
 
             {/* Work Event Dialog */}
             {viewMode === 'work' && selectedDay && (
@@ -560,8 +518,14 @@ export function CalendarTab() {
                 onOpenChange={setIsQuickAddOpen}
                 selectedDay={selectedDay}
                 isBusiness={isBusiness}
+                payments={selectedDay ? getPaymentsForDay(selectedDay) : []}
+                onTogglePaid={togglePaid}
                 onSelectAction={(action) => {
-                    // Navigate to the appropriate tab
+                    // Calculate the date for the selected day
+                    const selectedDate = new Date(year, month - 1, selectedDay || 1)
+                    const dateStr = format(selectedDate, 'yyyy-MM-dd')
+
+                    // Navigate to the appropriate tab with date parameter
                     const tabMap = {
                         'expense': 'expenses',
                         'income': 'income',
@@ -569,7 +533,8 @@ export function CalendarTab() {
                         'debt': 'debts',
                         'bill': 'bills'
                     }
-                    router.push(`?tab=${tabMap[action]}`)
+                    router.push(`?tab=${tabMap[action]}&date=${dateStr}`)
+                    setIsQuickAddOpen(false)
                 }}
             />
         </div>

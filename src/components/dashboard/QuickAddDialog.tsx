@@ -2,16 +2,30 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { TrendingDown, TrendingUp, PiggyBank, CreditCard, Receipt } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { formatCurrency } from '@/lib/utils'
+
+interface Payment {
+    id: string
+    name: string
+    amount: number
+    currency: string
+    day: number
+    type: 'bill' | 'debt' | 'income' | 'expense' | 'saving'
+    isPaid: boolean
+}
 
 interface QuickAddDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     selectedDay: number | null
     isBusiness: boolean
+    payments?: Payment[]
+    onTogglePaid?: (payment: Payment) => void
     onSelectAction: (action: 'expense' | 'income' | 'saving' | 'debt' | 'bill') => void
 }
 
-export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, onSelectAction }: QuickAddDialogProps) {
+export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, payments = [], onTogglePaid, onSelectAction }: QuickAddDialogProps) {
     const actions = [
         {
             type: 'expense' as const,
@@ -41,7 +55,7 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, on
             hoverColor: 'hover:from-blue-600 hover:to-blue-700',
             bgColor: 'bg-blue-50',
             textColor: 'text-blue-600',
-            show: true
+            show: !isBusiness // Only show for personal
         },
         {
             type: 'debt' as const,
@@ -51,7 +65,7 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, on
             hoverColor: 'hover:from-purple-600 hover:to-purple-700',
             bgColor: 'bg-purple-50',
             textColor: 'text-purple-600',
-            show: true
+            show: !isBusiness // Only show for personal
         },
         {
             type: 'bill' as const,
@@ -65,16 +79,56 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, on
         }
     ].filter(action => action.show)
 
+    const categoryLabels: Record<Payment['type'], { label: string, color: string }> = {
+        'income': { label: 'הכנסה', color: 'bg-green-100 text-green-800 border-green-200' },
+        'expense': { label: 'הוצאה', color: 'bg-red-100 text-red-800 border-red-200' },
+        'saving': { label: 'חיסכון', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+        'bill': { label: 'חשבון קבוע', color: 'bg-orange-100 text-orange-800 border-orange-200' },
+        'debt': { label: 'הלוואה', color: 'bg-purple-100 text-purple-800 border-purple-200' }
+    }
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-md" dir="rtl">
+            <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                     <DialogTitle className="text-right text-xl">
-                        הוסף פריט ליום {selectedDay}
+                        {payments.length > 0 ? `יום ${selectedDay}` : `הוסף פריט ליום ${selectedDay}`}
                     </DialogTitle>
                 </DialogHeader>
 
-                <div className="grid grid-cols-2 gap-3 mt-4">
+                {/* Existing Payments */}
+                {payments.length > 0 && (
+                    <div className="space-y-3 mb-6">
+                        <h3 className="font-bold text-sm text-gray-700">תשלומים קיימים:</h3>
+                        {payments.map((payment) => {
+                            const category = categoryLabels[payment.type]
+                            return (
+                                <div key={payment.id} className={`p-3 rounded-lg border-r-4 ${payment.isPaid ? 'opacity-60 bg-gray-50' : 'bg-white shadow-sm'} border-gray-200`}>
+                                    <div className="flex justify-between items-start gap-2">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <p className="font-bold text-sm">{payment.name}</p>
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full border ${category.color}`}>
+                                                    {category.label}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">{formatCurrency(payment.amount, payment.currency)}</p>
+                                        </div>
+                                        {(!payment.isPaid && (payment.type === 'bill' || payment.type === 'debt') && onTogglePaid) && (
+                                            <Button size="sm" onClick={() => onTogglePaid(payment)}>סמן כשולם</Button>
+                                        )}
+                                    </div>
+                                </div>
+                            )
+                        })}
+                        <div className="border-t pt-4 mt-4">
+                            <h3 className="font-bold text-sm text-gray-700 mb-3">הוסף פריט חדש:</h3>
+                        </div>
+                    </div>
+                )}
+
+                {/* Quick Add Actions */}
+                <div className="grid grid-cols-2 gap-3">
                     {actions.map((action) => {
                         const Icon = action.icon
                         return (
@@ -82,7 +136,6 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, on
                                 key={action.type}
                                 onClick={() => {
                                     onSelectAction(action.type)
-                                    onOpenChange(false)
                                 }}
                                 className={`group relative p-6 rounded-xl border-2 border-transparent transition-all duration-200 ${action.bgColor} hover:border-current ${action.textColor} hover:shadow-lg`}
                             >
@@ -97,9 +150,11 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, on
                     })}
                 </div>
 
-                <p className="text-xs text-gray-500 text-center mt-4">
-                    בחר את סוג הפריט שברצונך להוסיף
-                </p>
+                {payments.length === 0 && (
+                    <p className="text-xs text-gray-500 text-center mt-4">
+                        בחר את סוג הפריט שברצונך להוסיף
+                    </p>
+                )}
             </DialogContent>
         </Dialog>
     )
