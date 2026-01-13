@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { PRESET_COLORS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface Package {
     id: string
@@ -104,26 +105,23 @@ export function PackagesManager({ onOpenChange }: PackagesManagerProps) {
         })
     }
 
+    const confirm = useConfirm()
+
     const handleDelete = async (id: string, name: string) => {
-        toast('האם אתה בטוח שברצונך למחוק את החבילה?', {
-            description: 'לקוחות המשוייכים לחבילה זו ינותקו ממנה.',
-            action: {
-                label: 'מחק',
-                onClick: async () => {
-                    const res = await deleteClientPackage(id)
-                    if (res.success) {
-                        toast.success('החבילה נמחקה בהצלחה')
-                        fetchPackages()
-                    } else {
-                        toast.error(res.error || 'שגיאה במחיקת החבילה')
-                    }
-                }
-            },
-            cancel: {
-                label: 'ביטול',
-                onClick: () => { }
-            },
-        })
+        const confirmed = await confirm(
+            'לקוחות המשוייכים לחבילה זו ינותקו ממנה.',
+            'האם אתה בטוח שברצונך למחוק את החבילה?'
+        )
+
+        if (confirmed) {
+            const res = await deleteClientPackage(id)
+            if (res.success) {
+                toast.success('החבילה נמחקה בהצלחה')
+                fetchPackages()
+            } else {
+                toast.error(res.error || 'שגיאה במחיקת החבילה')
+            }
+        }
     }
 
     return (
