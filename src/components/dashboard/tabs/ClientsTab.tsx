@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, type ClientFormData } from '@/lib/actions/clients'
 import { useOptimisticDelete, useOptimisticMutation } from '@/hooks/useOptimisticMutation'
@@ -34,6 +34,7 @@ export function ClientsTab() {
     const [searchTerm, setSearchTerm] = useState('')
     const [showForm, setShowForm] = useState(false)
     const [editingClient, setEditingClient] = useState<any>(null)
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
     const [showAdvanced, setShowAdvanced] = useState(false)
     const [formData, setFormData] = useState<ClientFormData>({
         name: '',
@@ -105,7 +106,7 @@ export function ClientsTab() {
     })) : clientsData
 
     // Sorting State
-    const [sortMethod, setSortMethod] = useState<'CREATED_AT' | 'REVENUE' | 'EXPIRY' | 'VALUE' | 'NAME'>('NAME') // Default to NAME for better UX
+    const [sortMethod, setSortMethod] = useState<'CREATED_AT' | 'REVENUE' | 'EXPIRY' | 'VALUE' | 'NAME' | 'STATUS'>('NAME') // Default to NAME for better UX
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // Default asc for names
 
     // Optimistic create for instant UI feedback
@@ -156,6 +157,12 @@ export function ClientsTab() {
                     break
                 case 'VALUE':
                     diff = getMonthlyValue(a) - getMonthlyValue(b)
+                    break
+                case 'STATUS':
+                    const statusPriority: Record<string, number> = { 'UNPAID': 3, 'PARTIAL': 2, 'INSTALLMENTS': 1, 'PAID': 0 }
+                    const cleanStatusA = a.subscriptionStatus || 'PAID'
+                    const cleanStatusB = b.subscriptionStatus || 'PAID'
+                    diff = (statusPriority[cleanStatusA] || 0) - (statusPriority[cleanStatusB] || 0)
                     break
                 case 'NAME':
                     return sortDirection === 'asc'
@@ -349,37 +356,64 @@ export function ClientsTab() {
                 </div>
 
                 <div className="flex justify-between items-center">
-                    {/* Sort Dropdown */}
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500 font-medium">מיון לפי:</span>
-                        <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
-                            <SelectTrigger className="w-[140px] h-9 gap-2">
-                                <SelectValue placeholder="מיון לפי" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="NAME">שם לקוח</SelectItem>
-                                <SelectItem value="CREATED_AT">תאריך הקמה</SelectItem>
-                                <SelectItem value="REVENUE">הכנסות</SelectItem>
-                                {/* Only show these if at least one client has subscription data */}
-                                {clients.some((c: any) => c.subscriptionEnd || c.subscriptionPrice) && (
-                                    <>
-                                        <SelectItem value="EXPIRY">תוקף מנוי</SelectItem>
-                                        <SelectItem value="VALUE">משתלם ביותר</SelectItem>
-                                    </>
-                                )}
-                            </SelectContent>
-                        </Select>
+                    {/* Sort Dropdown & Toggle */}
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500 font-medium">מיון לפי:</span>
+                            <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                                <SelectTrigger className="w-[140px] h-9 gap-2">
+                                    <SelectValue placeholder="מיון לפי" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="NAME">שם לקוח</SelectItem>
+                                    <SelectItem value="CREATED_AT">תאריך הקמה</SelectItem>
+                                    <SelectItem value="REVENUE">הכנסות</SelectItem>
+                                    <SelectItem value="STATUS">סטטוס תשלום</SelectItem>
+                                    {/* Only show these if at least one client has subscription data */}
+                                    {clients.some((c: any) => c.subscriptionEnd || c.subscriptionPrice) && (
+                                        <>
+                                            <SelectItem value="EXPIRY">תוקף מנוי</SelectItem>
+                                            <SelectItem value="VALUE">משתלם ביותר</SelectItem>
+                                        </>
+                                    )}
+                                </SelectContent>
+                            </Select>
 
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                            className="h-9 px-3 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800"
-                            title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
-                        >
-                            {/* Dynamic Icon based on Asc/Desc */}
-                            <ArrowUpDown className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                        </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                className="h-9 px-3 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800"
+                                title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
+                            >
+                                {/* Dynamic Icon based on Asc/Desc */}
+                                <ArrowUpDown className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                            </Button>
+                        </div>
+
+                        {/* View Toggle */}
+                        <div className="flex items-center bg-gray-100 dark:bg-slate-800 rounded-lg p-1 border border-gray-200 dark:border-slate-700">
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={`p-1.5 rounded-md transition-all ${viewMode === 'grid'
+                                    ? 'bg-white dark:bg-slate-700 shadow-sm text-green-600 dark:text-green-400'
+                                    : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                    }`}
+                                title="תצוגת כרטיסים"
+                            >
+                                <LayoutGrid className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`p-1.5 rounded-md transition-all ${viewMode === 'list'
+                                    ? 'bg-white dark:bg-slate-700 shadow-sm text-green-600 dark:text-green-400'
+                                    : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                    }`}
+                                title="תצוגת רשימה"
+                            >
+                                <List className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
 
                     <Badge variant="secondary" className="text-sm font-normal">
@@ -673,100 +707,176 @@ export function ClientsTab() {
             )}
 
             {/* Clients List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredClients.map((client: any) => (
-                    <div
-                        key={client.id}
-                        className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700"
-                    >
-                        <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-2">
-                                <Building2 className="h-5 w-5 text-green-600" />
-                                <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{client.name}</h3>
+            {viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredClients.map((client: any) => (
+                        <div
+                            key={client.id}
+                            className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700"
+                        >
+                            <div className="flex justify-between items-start mb-3">
+                                <div className="flex items-center gap-2">
+                                    <Building2 className="h-5 w-5 text-green-600" />
+                                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{client.name}</h3>
+                                </div>
+                                <div className="flex gap-1">
+                                    <button
+                                        onClick={() => handleEdit(client)}
+                                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                    >
+                                        <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(client.id)}
+                                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                    >
+                                        <Trash2 className="h-4 w-4 text-red-600" />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex gap-1">
-                                <button
-                                    onClick={() => handleEdit(client)}
-                                    className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
-                                >
-                                    <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(client.id)}
-                                    className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
-                                >
-                                    <Trash2 className="h-4 w-4 text-red-600" />
-                                </button>
+
+                            {/* Smart Status Badges */}
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {client.packageName && (
+                                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                                        {client.packageName}
+                                    </Badge>
+                                )}
+
+                                {client.subscriptionStatus === 'PAID' && (
+                                    <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50">שולם</Badge>
+                                )}
+                                {client.subscriptionStatus === 'UNPAID' && (
+                                    <Badge variant="destructive">לא שולם</Badge>
+                                )}
+                                {client.subscriptionStatus === 'PARTIAL' && (
+                                    <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50">שולם חלקית</Badge>
+                                )}
+                                {client.subscriptionStatus === 'INSTALLMENTS' && (
+                                    <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50">בתשלומים</Badge>
+                                )}
+
+                                {/* Expiration Warning */}
+                                {client.subscriptionEnd && (() => {
+                                    const end = startOfDay(new Date(client.subscriptionEnd))
+                                    const today = startOfDay(new Date())
+                                    const daysLeft = differenceInDays(end, today)
+
+                                    if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
+                                    if (daysLeft <= warningDays) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
+                                    if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
+                                    return null
+                                })()}
+                            </div>
+
+                            {client.taxId && (
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ח.פ: {client.taxId}</p>
+                            )}
+
+                            {client.email && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                    <Mail className="h-4 w-4" />
+                                    <span>{client.email}</span>
+                                </div>
+                            )}
+
+                            {client.phone && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                    <Phone className="h-4 w-4" />
+                                    <span>{client.phone}</span>
+                                </div>
+                            )}
+
+                            <div className="border-t pt-3 mt-3 dark:border-slate-700">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">סה"כ הכנסות:</span>
+                                    <span className="font-semibold text-green-600">
+                                        ₪{client.totalRevenue?.toLocaleString() || 0}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-sm mt-1">
+                                    <span className="text-gray-600 dark:text-gray-400">עסקאות:</span>
+                                    <span className="font-semibold dark:text-gray-200">{client._count?.incomes || 0}</span>
+                                </div>
                             </div>
                         </div>
-
-                        {/* Smart Status Badges */}
-                        <div className="flex flex-wrap gap-2 mb-3">
-                            {client.packageName && (
-                                <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
-                                    {client.packageName}
-                                </Badge>
-                            )}
-
-                            {client.subscriptionStatus === 'PAID' && (
-                                <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50">שולם</Badge>
-                            )}
-                            {client.subscriptionStatus === 'UNPAID' && (
-                                <Badge variant="destructive">לא שולם</Badge>
-                            )}
-                            {client.subscriptionStatus === 'PARTIAL' && (
-                                <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50">שולם חלקית</Badge>
-                            )}
-                            {client.subscriptionStatus === 'INSTALLMENTS' && (
-                                <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50">בתשלומים</Badge>
-                            )}
-
-                            {/* Expiration Warning */}
-                            {client.subscriptionEnd && (() => {
-                                const end = startOfDay(new Date(client.subscriptionEnd))
-                                const today = startOfDay(new Date())
-                                const daysLeft = differenceInDays(end, today)
-
-                                if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
-                                if (daysLeft <= warningDays) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
-                                if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
-                                return null
-                            })()}
-                        </div>
-
-                        {client.taxId && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ח.פ: {client.taxId}</p>
-                        )}
-
-                        {client.email && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
-                                <Mail className="h-4 w-4" />
-                                <span>{client.email}</span>
-                            </div>
-                        )}
-
-                        {client.phone && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <Phone className="h-4 w-4" />
-                                <span>{client.phone}</span>
-                            </div>
-                        )}
-
-                        <div className="border-t pt-3 mt-3 dark:border-slate-700">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600 dark:text-gray-400">סה"כ הכנסות:</span>
-                                <span className="font-semibold text-green-600">
-                                    ₪{client.totalRevenue?.toLocaleString() || 0}
-                                </span>
-                            </div>
-                            <div className="flex justify-between text-sm mt-1">
-                                <span className="text-gray-600 dark:text-gray-400">עסקאות:</span>
-                                <span className="font-semibold dark:text-gray-200">{client._count?.incomes || 0}</span>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-slate-800 dark:border-slate-700 overflow-hidden">
+                    <table className="w-full text-right text-sm">
+                        <thead className="bg-gray-50 dark:bg-slate-700/50">
+                            <tr>
+                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">שם לקוח</th>
+                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פרטי התקשרות</th>
+                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">חבילה / סטטוס</th>
+                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">הכנסות</th>
+                                <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                            {filteredClients.map((client: any) => (
+                                <tr key={client.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                                    <td className="px-4 py-3">
+                                        <div className="flex items-center gap-2">
+                                            <Building2 className="h-4 w-4 text-green-600" />
+                                            <span className="font-medium">{client.name}</span>
+                                        </div>
+                                        {client.taxId && <div className="text-xs text-gray-400 mr-6">{client.taxId}</div>}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <div className="flex flex-col gap-1">
+                                            {client.phone && (
+                                                <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                                    <Phone className="h-3 w-3" />
+                                                    {client.phone}
+                                                </div>
+                                            )}
+                                            {client.email && (
+                                                <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                                    <Mail className="h-3 w-3" />
+                                                    {client.email}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {client.packageName && (
+                                                <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 text-[10px] px-1.5 py-0 h-5">
+                                                    {client.packageName}
+                                                </Badge>
+                                            )}
+                                            {client.subscriptionStatus && (
+                                                <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${client.subscriptionStatus === 'PAID' ? 'border-green-500 text-green-600 bg-green-50' :
+                                                        client.subscriptionStatus === 'UNPAID' ? 'border-red-500 text-red-600 bg-red-50' :
+                                                            'border-orange-500 text-orange-600 bg-orange-50'
+                                                    }`}>
+                                                    {client.subscriptionStatus === 'PAID' ? 'שולם' : client.subscriptionStatus === 'UNPAID' ? 'לא שולם' : 'אחר'}
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <div className="font-medium text-green-600">₪{client.totalRevenue?.toLocaleString() || 0}</div>
+                                        <div className="text-xs text-gray-500">{client._count?.incomes || 0} עסקאות</div>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <div className="flex items-center gap-1">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(client)}>
+                                                <Edit2 className="h-4 w-4 text-gray-500" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:text-red-600" onClick={() => handleDelete(client.id)}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {
                 filteredClients.length === 0 && (

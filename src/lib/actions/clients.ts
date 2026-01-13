@@ -1,9 +1,9 @@
-'use server'
-
 import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { addIncome } from './income'
+import { addDays, addMonths, addYears, isSameDay, startOfDay } from 'date-fns'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -187,6 +187,10 @@ export async function createClient(data: ClientFormData, scope: string = 'BUSINE
         })
 
         revalidatePath('/dashboard')
+
+        // Generate Incomes
+        await generateSubscriptionIncomes(client, userId)
+
         return { success: true, data: client }
     } catch (error: any) {
         console.error('createClient error:', error)
@@ -239,6 +243,10 @@ export async function updateClient(id: string, data: ClientFormData) {
         })
 
         revalidatePath('/dashboard')
+
+        // Generate Incomes
+        await generateSubscriptionIncomes(client, userId)
+
         return { success: true, data: client }
     } catch (error: any) {
         console.error('updateClient error:', error)
@@ -345,5 +353,88 @@ export async function getClientStats(clientId: string, year: number) {
     } catch (error) {
         console.error('getClientStats error:', error)
         return { success: false, error: 'Failed to fetch client stats' }
+    }
+}
+
+async function generateSubscriptionIncomes(client: any, userId: string) {
+    // Only proceed if status is PAID and we have necessary fields
+    if (client.subscriptionStatus !== 'PAID' || !client.subscriptionPrice || !client.subscriptionStart || !client.subscriptionEnd || !client.subscriptionType) {
+        return
+    }
+
+    try {
+        const db = await authenticatedPrisma(userId)
+
+        // Fetch existing incomes to avoid duplicates
+        // We match by ClientId and Amount. Date will be checked in loop.
+        const existingIncomes = await db.income.findMany({
+            where: {
+                clientId: client.id,
+                amount: client.subscriptionPrice
+            },
+            select: { date: true }
+        })
+
+        const existingDates = new Set(existingIncomes.map((inc: any) => startOfDay(inc.date).getTime()))
+
+        let currentDate = startOfDay(new Date(client.subscriptionStart))
+        const endDate = startOfDay(new Date(client.subscriptionEnd))
+        const amount = client.subscriptionPrice
+        const currency = '₪' // Default currency
+
+        // Loop through dates
+        while (currentDate <= endDate) {
+            // Check if income exists for this date
+            if (!existingDates.has(currentDate.getTime())) {
+                // Create Income
+                await addIncome(
+                    currentDate.getMonth() + 1,
+                    currentDate.getFullYear(),
+                    {
+                        source: `מנוי - ${client.name}`,
+                        category: 'הכנסות', // Default category
+                        amount: amount,
+                        currency: currency,
+                        date: currentDate.toISOString(),
+                        isRecurring: false, // We generate individual records
+                        clientId: client.id,
+                        paymentMethod: 'CREDIT_CARD', // Default assumption or add to form?
+                        subscriptionType: client.subscriptionType, // Logic tracking
+                        paymentDate: new Date().toISOString() // Marked as paid now? Or on the date? Use transaction date.
+                    } as any
+                )
+            }
+
+            // Advance Date
+            switch (client.subscriptionType) {
+                case 'WEEKLY':
+                    currentDate = addDays(currentDate, 7)
+                    break
+                case 'MONTHLY':
+                    currentDate = addMonths(currentDate, 1)
+                    break
+                case 'YEARLY':
+                    currentDate = addYears(currentDate, 1)
+                    break
+                case 'PROJECT':
+                    // Project is one-time, but if start != end maybe we want to split? 
+                    // Usually project is one-time. If "Subscription" is "PROJECT", maybe just one at start?
+                    // Or if they set start and end, maybe they mean spread?
+                    // For now, let's assume PROJECT is one-time at start.
+                    if (currentDate.getTime() === startOfDay(new Date(client.subscriptionStart)).getTime()) {
+                        // It's the first execution, so we let it happen.
+                        // But for loop, we must break or advance past end
+                        currentDate = addDays(endDate, 1) // Force break
+                    } else {
+                        currentDate = addDays(endDate, 1) // Force break
+                    }
+                    break
+                default:
+                    currentDate = addDays(endDate, 1) // Force break
+            }
+        }
+
+    } catch (error) {
+        console.error('Error generating subscription incomes:', error)
     }
 }
