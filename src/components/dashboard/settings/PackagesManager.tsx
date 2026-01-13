@@ -16,8 +16,8 @@ interface Package {
     id: string
     name: string
     color: string
-    defaultPrice?: number
-    defaultType?: string
+    defaultPrice?: number | null
+    defaultType?: string | null
 }
 
 interface PackagesManagerProps {
