@@ -71,6 +71,7 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
     const [priorityFilter, setPriorityFilter] = useState<string>('ALL')
     const [editingTask, setEditingTask] = useState<Task | null>(null)
     const [showCompleted, setShowCompleted] = useState(false)
+    const [sortBy, setSortBy] = useState<'priority' | 'createdAt'>('priority')
 
     const handleDeleteTask = async (taskId: string) => {
         if (!confirm('האם אתה בטוח שברצונך למחוק משימה זו?')) return
@@ -149,10 +150,16 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
             return getDate(b) - getDate(a)
         }
 
-        // 3. If both are Active, Sort by Priority (Higher first)
-        const weightA = getPriorityWeight(a.priority)
-        const weightB = getPriorityWeight(b.priority)
-        return weightB - weightA
+        // 3. If both are Active, Sort by Priority or Creation Date
+        if (sortBy === 'createdAt') {
+            // Sort by creation date (newest first)
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        } else {
+            // Sort by Priority (Higher first)
+            const weightA = getPriorityWeight(a.priority)
+            const weightB = getPriorityWeight(b.priority)
+            return weightB - weightA
+        }
     })
 
     const activeTasks = filteredTasks.filter(t => t.status !== 'DONE')
@@ -333,6 +340,17 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
                             <SelectItem value="Lior">ליאור</SelectItem>
                             <SelectItem value="Ron">רון</SelectItem>
                             <SelectItem value="Leon">לאון</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <Select value={sortBy} onValueChange={(val) => setSortBy(val as 'priority' | 'createdAt')}>
+                        <SelectTrigger className="w-[140px] h-9 gap-2">
+                            <Clock size={16} className="text-gray-500" />
+                            <SelectValue placeholder="מיון" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="priority">לפי דחיפות</SelectItem>
+                            <SelectItem value="createdAt">לפי תאריך הוספה</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
