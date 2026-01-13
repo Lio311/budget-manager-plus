@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
+import { useSearchParams } from 'next/navigation'
 import { Loader2, Plus, PiggyBank, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -68,6 +69,18 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
             setNewSaving(prev => ({ ...prev, category: categories[0].name }))
         }
     }, [categories, newSaving.category])
+
+    // Read date from URL if provided
+    const searchParams = useSearchParams()
+    useEffect(() => {
+        const paramDate = searchParams?.get('date')
+        if (paramDate) {
+            setNewSaving(prev => ({
+                ...prev,
+                date: new Date(paramDate)
+            }))
+        }
+    }, [searchParams])
 
     // Optimistic add for instant UI feedback
     const { execute: optimisticAddSaving } = useOptimisticMutation<any, any>(

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
+import { useSearchParams } from 'next/navigation'
 import { Loader2, Plus, Wallet, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -59,6 +60,18 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
         numberOfInstallments: '',
         paymentMethod: ''
     })
+
+    // Read date from URL if provided
+    const searchParams = useSearchParams()
+    useEffect(() => {
+        const paramDate = searchParams?.get('date')
+        if (paramDate) {
+            setNewDebt(prev => ({
+                ...prev,
+                date: format(new Date(paramDate), 'yyyy-MM-dd')
+            }))
+        }
+    }, [searchParams])
 
     const handleAdd = async () => {
         // Validate required fields

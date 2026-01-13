@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
+import { useSearchParams } from 'next/navigation'
 import {
     Loader2, Plus, TrendingDown, Settings, ChevronDown
 } from 'lucide-react'
@@ -92,6 +93,18 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         const total = n + vat
         return { total: total.toFixed(2), vat: vat.toFixed(2) }
     }
+
+    // Read date from URL if provided
+    const searchParams = useSearchParams()
+    useEffect(() => {
+        const paramDate = searchParams?.get('date')
+        if (paramDate) {
+            setNewIncome(prev => ({
+                ...prev,
+                date: format(new Date(paramDate), 'yyyy-MM-dd')
+            }))
+        }
+    }, [searchParams])
 
     useEffect(() => {
         if (isBusiness && newIncome.amount && newIncome.vatRate) {

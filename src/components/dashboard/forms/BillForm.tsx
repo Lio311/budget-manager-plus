@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Loader2, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
@@ -52,6 +53,20 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
         frequency: 'MONTHLY',
         recurringEndDate: undefined
     })
+
+    // Read date from URL if provided (set dueDay from date)
+    const searchParams = useSearchParams()
+    useEffect(() => {
+        const paramDate = searchParams?.get('date')
+        if (paramDate) {
+            const date = new Date(paramDate)
+            const day = date.getDate()
+            setFormData(prev => ({
+                ...prev,
+                dueDay: day.toString()
+            }))
+        }
+    }, [searchParams])
 
     async function handleSubmit() {
         const newErrors: Record<string, boolean> = {}
