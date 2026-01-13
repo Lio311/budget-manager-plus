@@ -591,7 +591,7 @@ export function IncomeTab() {
                                             )}
                                             <div className="flex text-left sm:text-right flex-col items-end">
                                                 <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-green-600' : 'text-green-600'}`}>
-                                                    {formatCurrency(isBusiness && income.vatAmount ? (income.amount - income.vatAmount) : income.amount, getCurrencySymbol(income.currency || 'ILS'))}
+                                                    {formatCurrency(income.amount, getCurrencySymbol(income.currency || 'ILS'))}
                                                 </div>
 
                                                 {/* Status Badge */}
