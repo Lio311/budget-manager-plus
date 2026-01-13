@@ -541,7 +541,7 @@ function BusinessFeature({ text }: { text: string }) {
 function AuthModalTrigger({ children }: { children: React.ReactNode }) {
     const { openModal } = useAuthModal()
     return (
-        <span onClick={openModal} className="cursor-pointer inline-block">
+        <span onClick={() => openModal()} className="cursor-pointer inline-block">
             {children}
         </span>
     )
