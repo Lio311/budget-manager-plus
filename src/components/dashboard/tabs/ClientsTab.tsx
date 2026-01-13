@@ -707,7 +707,7 @@ export function ClientsTab() {
                                                         <SelectItem value="NEW_PACKAGE" className="text-green-600 bg-green-50/50 hover:bg-green-50 focus:bg-green-50 cursor-pointer font-medium">
                                                             <div className="flex items-center gap-2">
                                                                 <Plus className="w-4 h-4" />
-                                                                + הוסף חדש
+                                                                הוסף חדש
                                                             </div>
                                                         </SelectItem>
                                                     </SelectContent>
