@@ -112,7 +112,7 @@ export function ClientsTab() {
     })) : clientsData
 
     // Sorting State
-    const [sortMethod, setSortMethod] = useState<'CREATED_AT' | 'REVENUE' | 'EXPIRY' | 'VALUE' | 'NAME' | 'STATUS'>('NAME') // Default to NAME for better UX
+    const [sortMethod, setSortMethod] = useState<'CREATED_AT' | 'REVENUE' | 'EXPIRY' | 'VALUE' | 'NAME' | 'STATUS' | 'ACTIVITY'>('NAME') // Default to NAME for better UX
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // Default asc for names
 
     // Optimistic create for instant UI feedback
@@ -163,6 +163,12 @@ export function ClientsTab() {
                     break
                 case 'VALUE':
                     diff = getMonthlyValue(a) - getMonthlyValue(b)
+                    break
+                case 'ACTIVITY':
+                    // Active clients first
+                    if ((a.isActive ?? true) !== (b.isActive ?? true)) {
+                        return (a.isActive ?? true) ? -1 : 1
+                    }
                     break
                 case 'STATUS':
                     // Active clients first
@@ -380,6 +386,7 @@ export function ClientsTab() {
                                     <SelectItem value="NAME">שם לקוח</SelectItem>
                                     <SelectItem value="CREATED_AT">תאריך הקמה</SelectItem>
                                     <SelectItem value="REVENUE">הכנסות</SelectItem>
+                                    <SelectItem value="ACTIVITY">סטטוס פעילות</SelectItem>
                                     <SelectItem value="STATUS">סטטוס תשלום</SelectItem>
                                     {/* Only show these if at least one client has subscription data */}
                                     {clients.some((c: any) => c.subscriptionEnd || c.subscriptionPrice) && (
@@ -753,11 +760,11 @@ export function ClientsTab() {
                                 </div>
                                 <div className="flex gap-1">
                                     <button
-                                        onClick={() => handleEdit(client)}
+                                        onClick={() => setSubscriptionDialogClient(client)}
                                         className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
-                                        title="ערוך"
+                                        title="היסטוריית תשלומים"
                                     >
-                                        <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                                        <List className="h-4 w-4 text-purple-600" />
                                     </button>
                                     <button
                                         onClick={async () => {
@@ -771,18 +778,18 @@ export function ClientsTab() {
                                         <RefreshCw className="h-4 w-4 text-blue-600" />
                                     </button>
                                     <button
+                                        onClick={() => handleEdit(client)}
+                                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                        title="ערוך"
+                                    >
+                                        <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                                    </button>
+                                    <button
                                         onClick={() => handleDelete(client.id)}
                                         className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                         title="מחק"
                                     >
                                         <Trash2 className="h-4 w-4 text-red-600" />
-                                    </button>
-                                    <button
-                                        onClick={() => setSubscriptionDialogClient(client)}
-                                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
-                                        title="היסטוריית תשלומים"
-                                    >
-                                        <List className="h-4 w-4 text-purple-600" />
                                     </button>
                                 </div>
                             </div>
