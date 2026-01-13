@@ -466,7 +466,7 @@ export async function getSupplierSubscriptionExpenses(supplierId: string) {
         // Map to format compatible with dialog (add 'status' field derived from paymentDate)
         const mappedExpenses = expenses.map(e => ({
             ...e,
-            status: e.paymentDate ? 'PAID' : (new Date(e.date) < new Date() ? 'OVERDUE' : 'PENDING')
+            status: e.paymentDate ? 'PAID' : (new Date(e.date || new Date()) < new Date() ? 'OVERDUE' : 'PENDING')
         }))
 
         return { success: true, data: mappedExpenses }
