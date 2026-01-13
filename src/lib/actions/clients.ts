@@ -383,11 +383,15 @@ async function generateSubscriptionIncomes(client: any, userId: string) {
         const endDate = startOfDay(new Date(client.subscriptionEnd))
         const amount = client.subscriptionPrice
         const currency = '₪' // Default currency
+        const budgetType = (client.scope === 'BUSINESS') ? 'BUSINESS' : 'PERSONAL'
+
+        console.log(`Generating incomes for client ${client.name} (${client.id}) Scope: ${maskScope(client.scope)} BudgetType: ${budgetType}`)
 
         // Loop through dates
         while (currentDate <= endDate) {
             // Check if income exists for this date
             if (!existingDates.has(currentDate.getTime())) {
+                console.log(`Creating income for date: ${currentDate.toISOString()}`)
                 // Create Income
                 await addIncome(
                     currentDate.getMonth() + 1,
@@ -403,8 +407,11 @@ async function generateSubscriptionIncomes(client: any, userId: string) {
                         paymentMethod: 'CREDIT_CARD', // Default assumption or add to form?
                         subscriptionType: client.subscriptionType, // Logic tracking
                         paymentDate: new Date().toISOString() // Marked as paid now? Or on the date? Use transaction date.
-                    } as any
+                    } as any,
+                    budgetType
                 )
+            } else {
+                console.log(`Skipping date ${currentDate.toISOString()} - exists`)
             }
 
             // Advance Date
@@ -439,4 +446,8 @@ async function generateSubscriptionIncomes(client: any, userId: string) {
     } catch (error) {
         console.error('Error generating subscription incomes:', error)
     }
+}
+
+function maskScope(scope: string) {
+    return scope
 }
