@@ -236,7 +236,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                         <ModeToggle />
                         {isDemo ? (
                             <Button
-                                onClick={openModal}
+                                onClick={() => openModal()}
                                 variant="outline"
                                 size="sm"
                                 className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600 h-8"
