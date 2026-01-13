@@ -64,7 +64,9 @@ export async function getClients(scope: string = 'BUSINESS') {
                 package: true,
                 _count: {
                     select: {
-                        incomes: true,
+                        incomes: {
+                            where: { status: 'PAID' }
+                        },
                         invoices: true,
                         expenses: true
                     }
