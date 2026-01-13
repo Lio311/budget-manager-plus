@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, ArrowUpDown, LayoutGrid, List } from 'lucide-react'
 import { format, differenceInDays, startOfDay } from 'date-fns'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { getSuppliers, createSupplier, updateSupplier, deleteSupplier, type SupplierFormData } from '@/lib/actions/suppliers'
 import { getSupplierPackages } from '@/lib/actions/supplier-packages'
@@ -39,6 +40,9 @@ export function SuppliersTab() {
     const [packages, setPackages] = useState<any[]>([])
     const [showPackagesManager, setShowPackagesManager] = useState(false)
     const [showAdvanced, setShowAdvanced] = useState(false)
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+    const [sortMethod, setSortMethod] = useState<'CREATED_AT' | 'EXPENSES' | 'NAME' | 'STATUS' | 'PACKAGE'>('NAME')
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
     const [formData, setFormData] = useState<SupplierFormData>({
         name: '',
@@ -111,11 +115,50 @@ export function SuppliersTab() {
         _count: { expenses: 3 } // Fake count
     })) : suppliersData
 
-    const filteredSuppliers = suppliers.filter((supplier: any) =>
+    const sortSuppliers = (suppliersList: any[]) => {
+        return [...suppliersList].sort((a, b) => {
+            let diff = 0
+            switch (sortMethod) {
+                case 'EXPENSES':
+                    diff = (a.totalExpenses || 0) - (b.totalExpenses || 0)
+                    break
+                case 'STATUS':
+                    // Active first
+                    if ((a.isActive ?? true) !== (b.isActive ?? true)) {
+                        return (a.isActive ?? true) ? -1 : 1
+                    }
+                    // Then by subscription status
+                    const statusPriority: Record<string, number> = { 'UNPAID': 3, 'PARTIAL': 2, 'INSTALLMENTS': 1, 'PAID': 0 }
+                    const cleanStatusA = a.subscriptionStatus || 'PAID'
+                    const cleanStatusB = b.subscriptionStatus || 'PAID'
+                    diff = (statusPriority[cleanStatusA] || 0) - (statusPriority[cleanStatusB] || 0)
+                    break
+                case 'NAME':
+                    return sortDirection === 'asc'
+                        ? (a.name || '').localeCompare(b.name || '')
+                        : (b.name || '').localeCompare(a.name || '')
+                case 'PACKAGE':
+                    const pkgA = a.package?.name || a.subscriptionType || ''
+                    const pkgB = b.package?.name || b.subscriptionType || ''
+                    return sortDirection === 'asc'
+                        ? pkgA.localeCompare(pkgB)
+                        : pkgB.localeCompare(pkgA)
+                case 'CREATED_AT':
+                default:
+                    const createdA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+                    const createdB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+                    diff = createdA - createdB
+                    break
+            }
+            return sortDirection === 'asc' ? diff : -diff
+        })
+    }
+
+    const filteredSuppliers = sortSuppliers(suppliers.filter((supplier: any) =>
         (supplier.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         (supplier.email?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
         (supplier.phone || '').includes(searchTerm)
-    )
+    ))
 
     // Optimistic create for instant UI feedback
     const { execute: optimisticCreateSupplier } = useOptimisticMutation<any[], SupplierFormData>(
@@ -271,16 +314,77 @@ export function SuppliersTab() {
                 </Button>
             </div>
 
-            {/* Search */}
-            <div className="relative">
-                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                    type="text"
-                    placeholder="חיפוש ספק..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400"
-                />
+            {/* Search and Sort Section */}
+            <div className="space-y-4">
+                <div className="relative">
+                    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <input
+                        type="text"
+                        placeholder="חיפוש ספק..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400"
+                    />
+                </div>
+
+                <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+                    {/* Sort Dropdown & Toggle */}
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500 font-medium">מיון לפי:</span>
+                            <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                                <SelectTrigger className="w-[140px] h-9 gap-2">
+                                    <SelectValue placeholder="מיון לפי" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="NAME">שם ספק</SelectItem>
+                                    <SelectItem value="CREATED_AT">תאריך הצטרפות</SelectItem>
+                                    <SelectItem value="EXPENSES">הוצאות</SelectItem>
+                                    <SelectItem value="STATUS">סטטוס תשלום</SelectItem>
+                                    <SelectItem value="PACKAGE">חבילה</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                className="h-9 px-3 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800"
+                                title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
+                            >
+                                <ArrowUpDown className={`w-4 h-4 text-gray-600 dark:text-gray-400 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                            </Button>
+                        </div>
+
+                        {/* View Toggle */}
+                        <div className="flex items-center bg-gray-100 dark:bg-slate-800 rounded-lg p-1 border border-gray-200 dark:border-slate-700">
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={`p-1.5 rounded-md transition-all ${viewMode === 'grid'
+                                    ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400'
+                                    : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                    }`}
+                                title="תצוגת כרטיסים"
+                            >
+                                <LayoutGrid className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`p-1.5 rounded-md transition-all ${viewMode === 'list'
+                                    ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400'
+                                    : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+                                    }`}
+                                title="תצוגת רשימה"
+                            >
+                                <List className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+
+                    <Badge variant="secondary" className="text-sm font-normal w-full sm:w-auto text-center justify-center">
+                        סה"כ ספקים: {suppliers.length}
+                    </Badge>
+                </div>
             </div>
 
             {/* Form */}
@@ -550,115 +654,213 @@ export function SuppliersTab() {
             )}
 
             {/* Suppliers List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredSuppliers.map((supplier: any) => (
-                    <div
-                        key={supplier.id}
-                        className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700"
-                    >
-                        <div className="flex justify-between items-start mb-3">
-                            <div className="flex flex-col gap-1">
-                                <div className="flex items-center gap-2">
-                                    <Building2 className="h-5 w-5 text-blue-600" />
-                                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{supplier.name}</h3>
+            {viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredSuppliers.map((supplier: any) => (
+                        <div
+                            key={supplier.id}
+                            className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700"
+                        >
+                            <div className="flex justify-between items-start mb-3">
+                                <div className="flex flex-col gap-1">
+                                    <div className="flex items-center gap-2">
+                                        <Building2 className="h-5 w-5 text-blue-600" />
+                                        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{supplier.name}</h3>
+                                    </div>
+                                    {/* Smart Status Badges */}
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {supplier.isActive === false && (
+                                            <Badge variant="secondary" className="bg-gray-200 text-gray-600 border-gray-300">
+                                                לא פעיל
+                                            </Badge>
+                                        )}
+                                        {(supplier.package || supplier.packageName) && (
+                                            <Badge
+                                                variant="secondary"
+                                                className="w-fit text-xs font-normal"
+                                                style={{
+                                                    backgroundColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '20',
+                                                    color: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6'),
+                                                    borderColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '40',
+                                                    borderWidth: '1px'
+                                                }}
+                                            >
+                                                {supplier.package?.name || supplier.packageName}
+                                            </Badge>
+                                        )}
+
+                                        {supplier.subscriptionStatus === 'PAID' && (
+                                            <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50">שולם</Badge>
+                                        )}
+                                        {supplier.subscriptionStatus === 'UNPAID' && (
+                                            <Badge variant="destructive">לא שולם</Badge>
+                                        )}
+                                        {supplier.subscriptionStatus === 'PARTIAL' && (
+                                            <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50">שולם חלקית</Badge>
+                                        )}
+                                        {supplier.subscriptionStatus === 'INSTALLMENTS' && (
+                                            <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50">בתשלומים</Badge>
+                                        )}
+
+                                        {/* Expiration Warning */}
+                                        {supplier.subscriptionEnd && (() => {
+                                            const end = startOfDay(new Date(supplier.subscriptionEnd))
+                                            const today = startOfDay(new Date())
+                                            const daysLeft = differenceInDays(end, today)
+
+                                            if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
+                                            if (daysLeft <= 14) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
+                                            if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
+                                            return null
+                                        })()}
+                                    </div>
                                 </div>
-                                {/* Smart Status Badges */}
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {supplier.isActive === false && (
-                                        <Badge variant="secondary" className="bg-gray-200 text-gray-600 border-gray-300">
-                                            לא פעיל
-                                        </Badge>
-                                    )}
-                                    {(supplier.package || supplier.packageName) && (
-                                        <Badge
-                                            variant="secondary"
-                                            className="w-fit text-xs font-normal"
-                                            style={{
-                                                backgroundColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '20',
-                                                color: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6'),
-                                                borderColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '40',
-                                                borderWidth: '1px'
-                                            }}
-                                        >
-                                            {supplier.package?.name || supplier.packageName}
-                                        </Badge>
-                                    )}
-
-                                    {supplier.subscriptionStatus === 'PAID' && (
-                                        <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50">שולם</Badge>
-                                    )}
-                                    {supplier.subscriptionStatus === 'UNPAID' && (
-                                        <Badge variant="destructive">לא שולם</Badge>
-                                    )}
-                                    {supplier.subscriptionStatus === 'PARTIAL' && (
-                                        <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50">שולם חלקית</Badge>
-                                    )}
-                                    {supplier.subscriptionStatus === 'INSTALLMENTS' && (
-                                        <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50">בתשלומים</Badge>
-                                    )}
-
-                                    {/* Expiration Warning */}
-                                    {supplier.subscriptionEnd && (() => {
-                                        const end = startOfDay(new Date(supplier.subscriptionEnd))
-                                        const today = startOfDay(new Date())
-                                        const daysLeft = differenceInDays(end, today)
-
-                                        if (daysLeft < 0) return <Badge variant="destructive">מנוי הסתיים</Badge>
-                                        if (daysLeft <= 14) return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50">מסתיים בקרוב ({daysLeft} ימים)</Badge>
-                                        if (daysLeft <= 30) return <Badge variant="outline" className="border-yellow-500 text-yellow-600 bg-yellow-50">מסתיים בעוד חודש</Badge>
-                                        return null
-                                    })()}
+                                <div className="flex gap-1">
+                                    <button
+                                        onClick={() => handleEdit(supplier)}
+                                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                    >
+                                        <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(supplier.id)}
+                                        className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                    >
+                                        <Trash2 className="h-4 w-4 text-red-600" />
+                                    </button>
                                 </div>
                             </div>
-                            <div className="flex gap-1">
-                                <button
-                                    onClick={() => handleEdit(supplier)}
-                                    className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
-                                >
-                                    <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(supplier.id)}
-                                    className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
-                                >
-                                    <Trash2 className="h-4 w-4 text-red-600" />
-                                </button>
+
+                            {supplier.taxId && (
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ח.פ: {supplier.taxId}</p>
+                            )}
+
+                            {supplier.email && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                    <Mail className="h-4 w-4" />
+                                    <span>{supplier.email}</span>
+                                </div>
+                            )}
+
+                            {supplier.phone && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                    <Phone className="h-4 w-4" />
+                                    <span>{supplier.phone}</span>
+                                </div>
+                            )}
+
+                            <div className="border-t pt-3 mt-3 dark:border-slate-700">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">סה"כ עלויות:</span>
+                                    <span className="font-semibold text-blue-600">
+                                        ₪{supplier.totalExpenses?.toLocaleString() || 0}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between text-sm mt-1">
+                                    <span className="text-gray-600 dark:text-gray-400">עסקאות:</span>
+                                    <span className="font-semibold dark:text-gray-200">{supplier._count?.expenses || 0}</span>
+                                </div>
                             </div>
                         </div>
-
-                        {supplier.taxId && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ח.פ: {supplier.taxId}</p>
-                        )}
-
-                        {supplier.email && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
-                                <Mail className="h-4 w-4" />
-                                <span>{supplier.email}</span>
-                            </div>
-                        )}
-
-                        {supplier.phone && (
-                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                <Phone className="h-4 w-4" />
-                                <span>{supplier.phone}</span>
-                            </div>
-                        )}
-
-                        <div className="border-t pt-3 mt-3 dark:border-slate-700">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600 dark:text-gray-400">סה"כ עלויות:</span>
-                                <span className="font-semibold text-blue-600">
-                                    ₪{supplier.totalExpenses?.toLocaleString() || 0}
-                                </span>
-                            </div>
-                            <div className="flex justify-between text-sm mt-1">
-                                <span className="text-gray-600 dark:text-gray-400">עסקאות:</span>
-                                <span className="font-semibold dark:text-gray-200">{supplier._count?.expenses || 0}</span>
-                            </div>
-                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-slate-800 dark:border-slate-700 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-right text-sm whitespace-nowrap">
+                            <thead className="bg-gray-50 dark:bg-slate-700/50">
+                                <tr>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">שם ספק</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">פרטי התקשרות</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400">חבילה / סטטוס</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden sm:table-cell">עלויות</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 hidden lg:table-cell">עסקאות</th>
+                                    <th className="px-4 py-3 font-medium text-gray-500 dark:text-gray-400 text-center">פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                                {filteredSuppliers.map((supplier: any) => (
+                                    <tr key={supplier.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-2">
+                                                <Building2 className="h-4 w-4 text-blue-600 shrink-0" />
+                                                <span className="font-medium">{supplier.name}</span>
+                                            </div>
+                                            {supplier.taxId && <div className="text-xs text-gray-400 mr-6">{supplier.taxId}</div>}
+                                            {/* Mobile only revenue */}
+                                            <div className="sm:hidden mt-1 mr-6 text-xs text-blue-600 font-medium">
+                                                ₪{supplier.totalExpenses?.toLocaleString() || 0}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-col gap-1">
+                                                {supplier.phone && (
+                                                    <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                                        <Phone className="h-3 w-3 shrink-0" />
+                                                        <span dir="ltr" className="text-left">{supplier.phone}</span>
+                                                    </div>
+                                                )}
+                                                {supplier.email && (
+                                                    <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                                        <Mail className="h-3 w-3 shrink-0" />
+                                                        <span className="truncate max-w-[120px]">{supplier.email}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {supplier.isActive === false && (
+                                                    <Badge variant="secondary" className="bg-gray-200 text-gray-600 border-gray-300 text-[10px] px-1.5 py-0 h-5">
+                                                        לא פעיל
+                                                    </Badge>
+                                                )}
+                                                {(supplier.package || supplier.packageName) && (
+                                                    <Badge
+                                                        variant="secondary"
+                                                        style={{
+                                                            backgroundColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '20',
+                                                            color: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6'),
+                                                            borderColor: (supplier.package?.color || supplier.subscriptionColor || '#3B82F6') + '40'
+                                                        }}
+                                                        className="text-[10px] px-1.5 py-0 h-5 whitespace-nowrap hover:opacity-90 transition-opacity border border-solid"
+                                                    >
+                                                        {supplier.package?.name || supplier.packageName}
+                                                    </Badge>
+                                                )}
+                                                {supplier.subscriptionStatus && (
+                                                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 whitespace-nowrap ${supplier.subscriptionStatus === 'PAID' ? 'border-green-500 text-green-600 bg-green-50' :
+                                                        supplier.subscriptionStatus === 'UNPAID' ? 'border-red-500 text-red-600 bg-red-50' :
+                                                            'border-orange-500 text-orange-600 bg-orange-50'
+                                                        }`}>
+                                                        {supplier.subscriptionStatus === 'PAID' ? 'שולם' : supplier.subscriptionStatus === 'UNPAID' ? 'לא שולם' : 'אחר'}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 hidden sm:table-cell">
+                                            <div className="font-medium text-blue-600">₪{supplier.totalExpenses?.toLocaleString() || 0}</div>
+                                        </td>
+                                        <td className="px-4 py-3 hidden lg:table-cell">
+                                            <div className="text-sm dark:text-gray-200">{supplier._count?.expenses || 0}</div>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-1 justify-center">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-gray-900" onClick={() => handleEdit(supplier)}>
+                                                    <Edit2 className="h-4 w-4" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(supplier.id)}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                ))}
-            </div>
+                </div>
+            )}
 
             {
                 filteredSuppliers.length === 0 && (
