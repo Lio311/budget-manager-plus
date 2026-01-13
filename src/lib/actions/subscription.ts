@@ -5,6 +5,7 @@ import { currentUser } from '@clerk/nextjs/server'
 import { addYears, addDays } from 'date-fns'
 import { revalidatePath } from 'next/cache'
 import { trackReferralUsage } from './referral'
+import { syncUser } from '@/lib/actions/user'
 
 export async function createSubscription(paypalOrderId: string, amount: number, planType: string = 'PERSONAL', couponCode?: string) {
     try {
@@ -46,14 +47,7 @@ export async function createSubscription(paypalOrderId: string, amount: number, 
 
         // Ensure user exists in database (sync from Clerk)
         console.log('Syncing user to database...')
-        await prisma.user.upsert({
-            where: { id: userId },
-            update: {},
-            create: {
-                id: userId,
-                email: user.emailAddresses[0]?.emailAddress || ''
-            }
-        })
+        await syncUser(userId, user.emailAddresses[0]?.emailAddress || '')
         console.log('User synced successfully')
 
         // Calculate end date for 1 year from now
@@ -168,14 +162,7 @@ export async function startTrial(userId: string, email: string, planType: string
     console.log('[startTrial] Starting trial for user:', userId, email, planType)
 
     // Sync user to DB to handle webhook race condition
-    await prisma.user.upsert({
-        where: { id: userId },
-        update: {},
-        create: {
-            id: userId,
-            email: email
-        }
-    })
+    await syncUser(userId, email)
 
     // Determine which plans to activate
     const plansToActivate = planType === 'COMBINED' ? ['PERSONAL', 'BUSINESS'] : [planType]

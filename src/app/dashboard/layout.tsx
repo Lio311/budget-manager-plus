@@ -4,6 +4,7 @@ import { SWRConfig } from 'swr'
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { getSubscriptionStatus } from '@/lib/actions/subscription'
+import { syncUser } from '@/lib/actions/user'
 import { prisma } from '@/lib/db'
 
 export default async function DashboardLayout({
@@ -22,14 +23,7 @@ export default async function DashboardLayout({
 
     // Ensure user exists in database
     try {
-        await prisma.user.upsert({
-            where: { id: user.id },
-            update: {},
-            create: {
-                id: user.id,
-                email: user.emailAddresses[0]?.emailAddress || ''
-            }
-        })
+        await syncUser(user.id, user.emailAddresses[0]?.emailAddress || '')
         console.log('[DashboardLayout] User synced to DB')
     } catch (error) {
         console.error('[DashboardLayout] Error syncing user:', error)

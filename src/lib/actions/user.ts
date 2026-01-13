@@ -181,3 +181,53 @@ export async function getOnboardingStatus() {
         return true // Error -> treat as seen
     }
 }
+
+export async function syncUser(userId: string, email: string) {
+    console.log('[syncUser] Syncing user:', userId, email)
+    try {
+        // Try to create/update normally
+        const user = await prisma.user.upsert({
+            where: { id: userId },
+            update: { email }, // Ensure email is up to date
+            create: {
+                id: userId,
+                email
+            }
+        })
+        console.log('[syncUser] User synced successfully:', user.id)
+        return user
+    } catch (error: any) {
+        // Handle "Unique constraint failed on email" (P2002)
+        if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+            console.warn('[syncUser] Email collision detected. User ID changed? Attempting to recover/merge.')
+
+            // Find the existing user with this email
+            const existingUser = await prisma.user.findUnique({
+                where: { email }
+            })
+
+            if (existingUser) {
+                console.log('[syncUser] Found existing user with old ID:', existingUser.id)
+                // We have a mismatch: existingUser.id !== userId
+
+                try {
+                    // Update the existing user's ID to the new userId
+                    // This works because the new userId is unused (upsert create failed)
+                    // Note: This relies on database ON UPDATE CASCADE for foreign keys if they exist
+                    const updatedUser = await prisma.user.update({
+                        where: { email }, // Use email to identify the record
+                        data: { id: userId }
+                    })
+                    console.log('[syncUser] Recovered user account. Updated ID from', existingUser.id, 'to', userId)
+                    return updatedUser
+                } catch (updateError) {
+                    console.error('[syncUser] Failed to update user ID during recovery:', updateError)
+                    throw updateError
+                }
+            }
+        }
+
+        console.error('[syncUser] Critical error syncing user:', error)
+        throw error
+    }
+}
