@@ -39,12 +39,6 @@ export default function LandingPage() {
     const router = useRouter()
 
     useEffect(() => {
-        if (isSignedIn) {
-            router.push('/dashboard')
-        }
-    }, [isSignedIn, router])
-
-    useEffect(() => {
         // Force light mode scrollbar behavior
         const originalColorScheme = document.documentElement.style.colorScheme;
         document.documentElement.style.colorScheme = 'light';
@@ -551,7 +545,7 @@ function BusinessFeature({ text }: { text: string }) {
 function AuthModalTrigger({ children }: { children: React.ReactNode }) {
     const { openModal } = useAuthModal()
     return (
-        <span onClick={() => openModal()} className="cursor-pointer inline-block">
+        <span onClick={() => openModal()} className="cursor-pointer inline-block pointer-events-auto relative z-[60]">
             {children}
         </span>
     )

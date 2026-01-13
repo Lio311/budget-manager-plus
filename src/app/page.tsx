@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useAuthModal } from '@/contexts/AuthModalContext'
-import { useAuth } from '@clerk/nextjs'
+import { useAuth, SignedIn, SignedOut } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, ArrowLeft, Check, Menu, X, ChevronDown, LayoutDashboard, PieChart, Calendar, BarChart3, CreditCard, Receipt, Smartphone, Lock, Shield } from 'lucide-react'
@@ -15,12 +15,6 @@ import { ContactDialog } from '@/components/home/ContactDialog'
 export default function LandingPage() {
     const { isSignedIn } = useAuth()
     const router = useRouter()
-
-    useEffect(() => {
-        if (isSignedIn) {
-            router.push('/dashboard')
-        }
-    }, [isSignedIn, router])
 
     const [currentSection, setCurrentSection] = useState(0)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -187,22 +181,51 @@ export default function LandingPage() {
 
                     {/* Centered Dynamic "Try for Free" Button */}
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-full flex justify-center pointer-events-none">
-                        <AuthModalTrigger redirectUrl="/onboarding?trial=true">
-                            <Button className="pointer-events-auto bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded-full px-4 py-2 text-xs md:text-lg md:px-8 md:py-6 transition-all shadow-[0_0_10px_rgba(255,255,255,0.3)] md:shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] animate-pulse whitespace-nowrap">
-                                התנסות במערכת בחינם
-                            </Button>
-                        </AuthModalTrigger>
+                        <SignedOut>
+                            <AuthModalTrigger redirectUrl="/onboarding?trial=true">
+                                <Button className="pointer-events-auto bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded-full px-4 py-2 text-xs md:text-lg md:px-8 md:py-6 transition-all shadow-[0_0_10px_rgba(255,255,255,0.3)] md:shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] animate-pulse whitespace-nowrap">
+                                    התנסות במערכת בחינם
+                                </Button>
+                            </AuthModalTrigger>
+                        </SignedOut>
+                        <SignedIn>
+                            <Link href="/dashboard" className="pointer-events-auto">
+                                <Button className="bg-emerald-600 border border-emerald-500 text-white hover:bg-emerald-700 rounded-full px-4 py-2 text-xs md:text-lg md:px-8 md:py-6 transition-all shadow-lg animate-pulse whitespace-nowrap flex items-center gap-2">
+                                    <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5" />
+                                    כניסה לדשבורד
+                                </Button>
+                            </Link>
+                        </SignedIn>
                     </div>
 
                     <div className="hidden md:flex items-center gap-6">
-                        <AuthModalTrigger><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></AuthModalTrigger>
-                        <AuthModalTrigger><Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">התחל עכשיו</Button></AuthModalTrigger>
+                        <SignedOut>
+                            <AuthModalTrigger><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></AuthModalTrigger>
+                            <AuthModalTrigger><Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">התחל עכשיו</Button></AuthModalTrigger>
+                        </SignedOut>
+                        <SignedIn>
+                            <Link href="/dashboard">
+                                <Button className="bg-white/10 text-white hover:bg-white/20 rounded-full px-6 border border-white/20 flex items-center gap-2">
+                                    <LayoutDashboard className="w-4 h-4" />
+                                    דשבורד
+                                </Button>
+                            </Link>
+                        </SignedIn>
                     </div>
                     {/* Replaced Menu with Login button for mobile */}
                     <div className="md:hidden">
-                        <AuthModalTrigger>
-                            <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full">כניסה</Button>
-                        </AuthModalTrigger>
+                        <SignedOut>
+                            <AuthModalTrigger>
+                                <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full">כניסה</Button>
+                            </AuthModalTrigger>
+                        </SignedOut>
+                        <SignedIn>
+                            <Link href="/dashboard">
+                                <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full">
+                                    <LayoutDashboard className="w-5 h-5" />
+                                </Button>
+                            </Link>
+                        </SignedIn>
                     </div>
                 </div>
             </nav>
@@ -437,7 +460,7 @@ function FAQContent() {
 function AuthModalTrigger({ children, redirectUrl }: { children: React.ReactNode, redirectUrl?: string }) {
     const { openModal } = useAuthModal()
     return (
-        <span onClick={() => openModal(redirectUrl)} className="cursor-pointer inline-block">
+        <span onClick={() => openModal(redirectUrl)} className="cursor-pointer inline-block pointer-events-auto relative z-[60]">
             {children}
         </span>
     )
