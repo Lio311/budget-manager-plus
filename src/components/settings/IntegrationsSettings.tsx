@@ -107,7 +107,7 @@ export function IntegrationsSettings() {
 
                 <div className="grid grid-cols-1 gap-4">
                     <a
-                        href="https://www.icloud.com/shortcuts/3aa1f450bb2b40ed8f1b44b4dd595f2c"
+                        href="https://www.icloud.com/shortcuts/1823850ebc544b6ebf961a02ef6d3b8b"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block group"
@@ -129,7 +129,7 @@ export function IntegrationsSettings() {
                     </a>
 
                     <a
-                        href="https://www.icloud.com/shortcuts/f0243411e3e94f1ebfaaa940ce486387"
+                        href="https://www.icloud.com/shortcuts/7abc0f6af9074339a181f49fd044bfc0"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block group"
@@ -151,7 +151,7 @@ export function IntegrationsSettings() {
                     </a>
 
                     <a
-                        href="https://www.icloud.com/shortcuts/ce0592b919a6403ea223182f7ae7aee9"
+                        href="https://www.icloud.com/shortcuts/4cbbc7e41fc14921867ec02b4e3de1a1"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block group"
