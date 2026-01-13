@@ -253,11 +253,7 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client }: Cli
                         </DialogContent>
                     </Dialog>
                 )}
-            </TableBody>
-        </Table>
-                    </div >
-                )
-}
+
             </DialogContent >
         </Dialog >
     )
