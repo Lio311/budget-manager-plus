@@ -181,51 +181,22 @@ export default function LandingPage() {
 
                     {/* Centered Dynamic "Try for Free" Button */}
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-full flex justify-center pointer-events-none">
-                        <SignedOut>
-                            <AuthModalTrigger redirectUrl="/onboarding?trial=true">
-                                <Button className="pointer-events-auto bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded-full px-4 py-2 text-xs md:text-lg md:px-8 md:py-6 transition-all shadow-[0_0_10px_rgba(255,255,255,0.3)] md:shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] animate-pulse whitespace-nowrap">
-                                    התנסות במערכת בחינם
-                                </Button>
-                            </AuthModalTrigger>
-                        </SignedOut>
-                        <SignedIn>
-                            <Link href="/dashboard" className="pointer-events-auto">
-                                <Button className="bg-emerald-600 border border-emerald-500 text-white hover:bg-emerald-700 rounded-full px-4 py-2 text-xs md:text-lg md:px-8 md:py-6 transition-all shadow-lg animate-pulse whitespace-nowrap flex items-center gap-2">
-                                    <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5" />
-                                    כניסה לדשבורד
-                                </Button>
-                            </Link>
-                        </SignedIn>
+                        <AuthModalTrigger redirectUrl="/onboarding?trial=true">
+                            <Button className="pointer-events-auto bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded-full px-4 py-2 text-xs md:text-lg md:px-8 md:py-6 transition-all shadow-[0_0_10px_rgba(255,255,255,0.3)] md:shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] animate-pulse whitespace-nowrap">
+                                התנסות במערכת בחינם
+                            </Button>
+                        </AuthModalTrigger>
                     </div>
 
                     <div className="hidden md:flex items-center gap-6">
-                        <SignedOut>
-                            <AuthModalTrigger><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></AuthModalTrigger>
-                            <AuthModalTrigger><Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">התחל עכשיו</Button></AuthModalTrigger>
-                        </SignedOut>
-                        <SignedIn>
-                            <Link href="/dashboard">
-                                <Button className="bg-white/10 text-white hover:bg-white/20 rounded-full px-6 border border-white/20 flex items-center gap-2">
-                                    <LayoutDashboard className="w-4 h-4" />
-                                    דשבורד
-                                </Button>
-                            </Link>
-                        </SignedIn>
+                        <AuthModalTrigger><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></AuthModalTrigger>
+                        <AuthModalTrigger><Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">התחל עכשיו</Button></AuthModalTrigger>
                     </div>
                     {/* Replaced Menu with Login button for mobile */}
                     <div className="md:hidden">
-                        <SignedOut>
-                            <AuthModalTrigger>
-                                <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full">כניסה</Button>
-                            </AuthModalTrigger>
-                        </SignedOut>
-                        <SignedIn>
-                            <Link href="/dashboard">
-                                <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full">
-                                    <LayoutDashboard className="w-5 h-5" />
-                                </Button>
-                            </Link>
-                        </SignedIn>
+                        <AuthModalTrigger>
+                            <Button variant="ghost" className="text-white hover:bg-white/10 rounded-full">כניסה</Button>
+                        </AuthModalTrigger>
                     </div>
                 </div>
             </nav>
@@ -459,8 +430,19 @@ function FAQContent() {
 
 function AuthModalTrigger({ children, redirectUrl }: { children: React.ReactNode, redirectUrl?: string }) {
     const { openModal } = useAuthModal()
+    const { isSignedIn } = useAuth()
+    const router = useRouter()
+
+    const handleClick = () => {
+        if (isSignedIn) {
+            router.push(redirectUrl || '/dashboard')
+        } else {
+            openModal(redirectUrl)
+        }
+    }
+
     return (
-        <span onClick={() => openModal(redirectUrl)} className="cursor-pointer inline-block pointer-events-auto relative z-[60]">
+        <span onClick={handleClick} className="cursor-pointer inline-block pointer-events-auto relative z-[60]">
             {children}
         </span>
     )

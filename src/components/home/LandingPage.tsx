@@ -118,43 +118,28 @@ export default function LandingPage() {
                     >
                         <div className="flex flex-col items-center gap-4 w-fit mx-auto">
                             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                                <SignedOut>
-                                    <div className="flex flex-col items-center gap-3">
-                                        <div className="flex gap-4">
-                                            <Link href="/get-started">
-                                                <motion.button
-                                                    whileHover={{ scale: 1.05 }}
-                                                    whileTap={{ scale: 0.95 }}
-                                                    className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
-                                                >
-                                                    התחל בחינם
-                                                </motion.button>
-                                            </Link>
-                                            <AuthModalTrigger>
-                                                <motion.button
-                                                    whileHover={{ scale: 1.05 }}
-                                                    whileTap={{ scale: 0.95 }}
-                                                    className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-full font-bold text-lg transition-all shadow-md"
-                                                >
-                                                    כניסה למערכת
-                                                </motion.button>
-                                            </AuthModalTrigger>
-                                        </div>
+                                <div className="flex flex-col items-center gap-3">
+                                    <div className="flex gap-4">
+                                        <Link href="/get-started">
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-lg transition-all shadow-xl shadow-emerald-500/20"
+                                            >
+                                                התחל בחינם
+                                            </motion.button>
+                                        </Link>
+                                        <AuthModalTrigger>
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                className="px-10 py-4 border-2 border-slate-200 text-slate-700 bg-white hover:bg-slate-50 rounded-full font-bold text-lg transition-all shadow-md"
+                                            >
+                                                כניסה למערכת
+                                            </motion.button>
+                                        </AuthModalTrigger>
                                     </div>
-                                </SignedOut>
-
-                                <SignedIn>
-                                    <Link href="/dashboard" className="flex">
-                                        <motion.button
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            className="px-10 py-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-xl transition-all inline-flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
-                                        >
-                                            כניסה לדשבורד
-                                            <LayoutDashboard className="w-6 h-6" />
-                                        </motion.button>
-                                    </Link>
-                                </SignedIn>
+                                </div>
                             </div>
 
                             {/* Mobile Interface Toggle */}
@@ -298,20 +283,11 @@ export default function LandingPage() {
                             </ul>
 
                             <motion.div whileHover={{ scale: 1.02 }}>
-                                <SignedOut>
-                                    <Link href="/get-started">
-                                        <button className="px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg">
-                                            התנסות חינם בתוכנית העסקית
-                                        </button>
-                                    </Link>
-                                </SignedOut>
-                                <SignedIn>
-                                    <Link href="/subscribe/plans">
-                                        <button className="px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg">
-                                            שדרג לתוכנית עסקית
-                                        </button>
-                                    </Link>
-                                </SignedIn>
+                                <Link href="/get-started">
+                                    <button className="px-6 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg">
+                                        התנסות חינם בתוכנית העסקית
+                                    </button>
+                                </Link>
                             </motion.div>
                         </motion.div>
 
@@ -441,49 +417,32 @@ export default function LandingPage() {
                     transition={{ duration: 0.8 }}
                     className="text-center mt-2"
                 >
-                    <SignedOut>
-                        <div className="space-y-6">
-                            <h2 className="text-4xl font-bold mb-2">מוכנים להתחיל?</h2>
-                            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                                הצטרפו לאלפי משתמשים שכבר לקחו שליטה על העתיד הכלכלי שלהם
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <Link href="/get-started">
-                                    <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full font-bold text-lg hover:shadow-lg hover:shadow-emerald-500/20 transition-all shadow-md"
-                                    >
-                                        הרשמה חינם
-                                    </motion.button>
-                                </Link>
-                                <AuthModalTrigger>
-                                    <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="px-8 py-3 bg-white text-gray-700 hover:text-emerald-600 rounded-full font-bold text-lg border border-gray-200 hover:border-emerald-200 hover:shadow-md transition-all shadow-sm"
-                                    >
-                                        כניסה למערכת
-                                    </motion.button>
-                                </AuthModalTrigger>
-                            </div>
-                        </div>
-                    </SignedOut>
-
-                    <SignedIn>
-                        <div className="flex justify-center">
-                            <Link href="/dashboard">
+                    <div className="space-y-6">
+                        <h2 className="text-4xl font-bold mb-2">מוכנים להתחיל?</h2>
+                        <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                            הצטרפו לאלפי משתמשים שכבר לקחו שליטה על העתיד הכלכלי שלהם
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Link href="/get-started">
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="px-10 py-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-full font-bold text-xl transition-all inline-flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20"
+                                    className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full font-bold text-lg hover:shadow-lg hover:shadow-emerald-500/20 transition-all shadow-md"
                                 >
-                                    כניסה לדשבורד
-                                    <LayoutDashboard className="w-6 h-6" />
+                                    הרשמה חינם
                                 </motion.button>
                             </Link>
+                            <AuthModalTrigger>
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="px-8 py-3 bg-white text-gray-700 hover:text-emerald-600 rounded-full font-bold text-lg border border-gray-200 hover:border-emerald-200 hover:shadow-md transition-all shadow-sm"
+                                >
+                                    כניסה למערכת
+                                </motion.button>
+                            </AuthModalTrigger>
                         </div>
-                    </SignedIn>
+                    </div>
                 </motion.div>
 
                 {/* Footer Section - Terms & Privacy */}
@@ -542,10 +501,21 @@ function BusinessFeature({ text }: { text: string }) {
     )
 }
 
-function AuthModalTrigger({ children }: { children: React.ReactNode }) {
+function AuthModalTrigger({ children, redirectUrl }: { children: React.ReactNode, redirectUrl?: string }) {
     const { openModal } = useAuthModal()
+    const { isSignedIn } = useAuth()
+    const router = useRouter()
+
+    const handleClick = () => {
+        if (isSignedIn) {
+            router.push(redirectUrl || '/dashboard')
+        } else {
+            openModal(redirectUrl)
+        }
+    }
+
     return (
-        <span onClick={() => openModal()} className="cursor-pointer inline-block pointer-events-auto relative z-[60]">
+        <span onClick={handleClick} className="cursor-pointer inline-block pointer-events-auto relative z-[60]">
             {children}
         </span>
     )
