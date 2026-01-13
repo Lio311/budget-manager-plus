@@ -211,6 +211,18 @@ export default function ContactPage() {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* FAQ Hint */}
+                                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-100">
+                                    <h4 className="font-bold text-green-900 mb-2">💡 טיפ</h4>
+                                    <p className="text-sm text-gray-600 leading-relaxed">
+                                        לפני שפונים אלינו, מומלץ לבדוק את{' '}
+                                        <a href="/#faq" className="text-green-600 hover:text-green-700 font-medium underline">
+                                            שאלות נפוצות
+                                        </a>
+                                        {' '}- אולי התשובה כבר מחכה לך שם!
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

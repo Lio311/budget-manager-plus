@@ -197,6 +197,18 @@ export function ContactDialog({ open, onOpenChange }: ContactDialogProps) {
                                         </li>
                                     </ul>
                                 </div>
+
+                                {/* FAQ Hint */}
+                                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
+                                    <h4 className="font-bold text-green-900 mb-2 text-sm">💡 טיפ</h4>
+                                    <p className="text-xs text-gray-600 leading-relaxed">
+                                        לפני שפונים אלינו, מומלץ לבדוק את{' '}
+                                        <a href="/#faq" className="text-green-600 hover:text-green-700 font-medium underline">
+                                            שאלות נפוצות
+                                        </a>
+                                        {' '}- אולי התשובה כבר מחכה לך שם!
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
