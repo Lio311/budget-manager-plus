@@ -3,19 +3,14 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useAuthModal } from '@/contexts/AuthModalContext'
-import { useAuth, SignedIn, SignedOut } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, ArrowLeft, Check, Menu, X, ChevronDown, LayoutDashboard, PieChart, Calendar, BarChart3, CreditCard, Receipt, Smartphone, Lock, Shield } from 'lucide-react'
 import SecurityBadge from '@/components/SecurityBadge'
 import { Button } from '@/components/ui/button'
+import { AuthModalTrigger } from '@/components/auth/AuthModalTrigger'
 import { ContactDialog } from '@/components/home/ContactDialog'
 
 export default function LandingPage() {
-    const { isSignedIn } = useAuth()
-    const router = useRouter()
-
     const [currentSection, setCurrentSection] = useState(0)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isScrolling, setIsScrolling] = useState(false)
@@ -425,25 +420,5 @@ function FAQContent() {
                 </motion.div>
             ))}
         </div>
-    )
-}
-
-function AuthModalTrigger({ children, redirectUrl }: { children: React.ReactNode, redirectUrl?: string }) {
-    const { openModal } = useAuthModal()
-    const { isSignedIn } = useAuth()
-    const router = useRouter()
-
-    const handleClick = () => {
-        if (isSignedIn) {
-            router.push(redirectUrl || '/dashboard')
-        } else {
-            openModal(redirectUrl)
-        }
-    }
-
-    return (
-        <span onClick={handleClick} className="cursor-pointer inline-block pointer-events-auto relative z-[60]">
-            {children}
-        </span>
     )
 }

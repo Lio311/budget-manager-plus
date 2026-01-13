@@ -7,9 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Menu, X, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ContactDialog } from '@/components/home/ContactDialog'
-import { useAuthModal } from '@/contexts/AuthModalContext'
-import { useAuth } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
+import { AuthModalTrigger } from '@/components/auth/AuthModalTrigger'
 
 export default function BusinessLandingPage() {
     const [currentSection, setCurrentSection] = useState(0)
@@ -433,25 +431,5 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                 </div>
             </div>
         </div>
-    )
-}
-function AuthModalTrigger({ children, redirectUrl, onClick }: { children: React.ReactNode, redirectUrl?: string, onClick?: () => void }) {
-    const { openModal } = useAuthModal()
-    const { isSignedIn } = useAuth()
-    const router = useRouter()
-
-    const handleClick = () => {
-        if (onClick) onClick();
-        if (isSignedIn) {
-            router.push(redirectUrl || '/dashboard')
-        } else {
-            openModal(redirectUrl)
-        }
-    }
-
-    return (
-        <span onClick={handleClick} className="cursor-pointer inline-block pointer-events-auto relative z-[60]">
-            {children}
-        </span>
     )
 }
