@@ -104,6 +104,7 @@ export function QuotesTab() {
         totalAmount: q.amount,
         vatAmount: q.amount * 0.17,
         isSigned: q.status === 'ACCEPTED',
+        invoiceId: null, // Demo quotes don't have invoices
         items: []
     })) : quotesData
 
