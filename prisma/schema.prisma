@@ -500,6 +500,7 @@ model Client {
   subscriptionPrice  Float?
   subscriptionStatus String?   // PAID, UNPAID, PARTIAL, INSTALLMENTS
   packageName        String?
+  subscriptionColor  String?   // User validation color for the tag
   eventLocation      String?  // Physical location of service (optional)
   
   // Metadata

@@ -23,6 +23,7 @@ const ClientSchema = z.object({
     subscriptionPrice: z.union([z.number(), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
     subscriptionStatus: z.string().optional().or(z.literal('')),
     packageName: z.string().max(100, 'שם החבילה ארוך מדי').optional().or(z.literal('')),
+    subscriptionColor: z.string().optional().or(z.literal('')),
     eventLocation: z.string().max(200, 'המיקום ארוך מדי').optional().or(z.literal(''))
 })
 
@@ -41,6 +42,7 @@ export interface ClientFormData {
     subscriptionPrice?: number | string
     subscriptionStatus?: string
     packageName?: string
+    subscriptionColor?: string
     eventLocation?: string
 }
 
@@ -207,7 +209,8 @@ export async function createClient(data: ClientFormData, scope: string = 'BUSINE
                 subscriptionEnd: validData.subscriptionEnd ? new Date(validData.subscriptionEnd) : null,
                 subscriptionPrice: validData.subscriptionPrice || null,
                 subscriptionStatus: validData.subscriptionStatus || null,
-                packageName: validData.packageName || null
+                packageName: validData.packageName || null,
+                subscriptionColor: validData.subscriptionColor || null
             }
         })
 
@@ -263,7 +266,8 @@ export async function updateClient(id: string, data: ClientFormData) {
                 subscriptionEnd: validData.subscriptionEnd ? new Date(validData.subscriptionEnd) : null,
                 subscriptionPrice: validData.subscriptionPrice || null,
                 subscriptionStatus: validData.subscriptionStatus || null,
-                packageName: validData.packageName || null
+                packageName: validData.packageName || null,
+                subscriptionColor: validData.subscriptionColor || null
             }
         })
 
