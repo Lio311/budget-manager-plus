@@ -250,33 +250,34 @@ const COUNTRY_CODES = [
 ]
 
 export function PhoneInputWithCountry({ value = '', onChange, className, placeholder }: PhoneInputWithCountryProps) {
-    const [countryCode, setCountryCode] = useState('972')
-    const [localNumber, setLocalNumber] = useState('')
+    // Helper to parse phone number
+    const parseValue = (val: string) => {
+        if (!val) return { code: '972', local: '' }
+
+        const sortedCodes = [...COUNTRY_CODES].sort((a, b) => b.code.length - a.code.length)
+        const found = sortedCodes.find(c => val.startsWith('+' + c.code)) || sortedCodes.find(c => val.startsWith(c.code))
+
+        if (found) {
+            const prefix = val.startsWith('+') ? '+' + found.code : found.code
+            return { code: found.code, local: val.substring(prefix.length).trim() }
+        }
+        return { code: '972', local: val }
+    }
+
+    const [countryCode, setCountryCode] = useState(() => parseValue(value).code)
+    const [localNumber, setLocalNumber] = useState(() => parseValue(value).local)
+
+    // We still need this ref to prevent loops, but invalidating it on mount isn't enough
     const lastEmittedValue = React.useRef(value)
 
     // Sync only if value changes externally (not from our own typing)
     useEffect(() => {
+        // If the incoming value matches what we just emitted, do nothing
         if (value === lastEmittedValue.current) return
 
-        if (!value) {
-            setLocalNumber('')
-            setCountryCode('972') // Default back to IL
-            return
-        }
-
-        // Try to match existing country code
-        const sortedCodes = [...COUNTRY_CODES].sort((a, b) => b.code.length - a.code.length)
-        // Check for +Prefix or just Prefix
-        const found = sortedCodes.find(c => value.startsWith('+' + c.code)) || sortedCodes.find(c => value.startsWith(c.code))
-
-        if (found) {
-            setCountryCode(found.code)
-            const prefix = value.startsWith('+') ? '+' + found.code : found.code
-            // IMPORTANT: trim() prevents accumulating spaces
-            setLocalNumber(value.substring(prefix.length).trim())
-        } else {
-            setLocalNumber(value)
-        }
+        const { code, local } = parseValue(value)
+        setCountryCode(code)
+        setLocalNumber(local)
     }, [value])
 
     const handleCountryChange = (code: string) => {
