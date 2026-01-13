@@ -165,19 +165,24 @@ export default function LandingPage() {
         <div ref={containerRef} className="h-screen w-full overflow-hidden relative selection:bg-emerald-500/30" dir="rtl">
             {/* Navigation */}
             <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-                <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+                <div className="container mx-auto px-6 h-20 flex items-center justify-between relative">
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
                         <Link href="/">
                             <Image src="/images/branding/K-LOGO2.png" alt="Kesefly" width={140} height={40} className="h-14 w-auto brightness-0 invert" />
                         </Link>
                     </motion.div>
-                    <div className="hidden md:flex items-center gap-6">
-                        <AuthModalTrigger><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></AuthModalTrigger>
+
+                    {/* Centered Dynamic "Try for Free" Button */}
+                    <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                         <AuthModalTrigger redirectUrl="/onboarding">
-                            <Button className="bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded-full px-6 transition-all">
+                            <Button className="bg-transparent border border-white text-white hover:bg-white hover:text-gray-900 rounded-full px-8 py-6 text-lg transition-all shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.6)] animate-pulse">
                                 התנסות במערכת בחינם
                             </Button>
                         </AuthModalTrigger>
+                    </div>
+
+                    <div className="hidden md:flex items-center gap-6">
+                        <AuthModalTrigger><Button variant="ghost" className="text-white hover:bg-white/10 rounded-full px-6">כניסה</Button></AuthModalTrigger>
                         <AuthModalTrigger><Button className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-0">התחל עכשיו</Button></AuthModalTrigger>
                     </div>
                     {/* Replaced Menu with Login button for mobile */}
