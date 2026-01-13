@@ -231,7 +231,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             <div className="flex items-center gap-2">
                                 {/* Badge removed per user request */}
                                 <Button
-                                    onClick={openModal}
+                                    onClick={() => openModal()}
                                     className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-md transition-all px-6"
                                 >
                                     התחברות למערכת
