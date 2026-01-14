@@ -13,6 +13,7 @@ import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
+import parse from 'html-react-parser'
 
 export default function PublicQuotePage() {
     const params = useParams()
@@ -313,8 +314,11 @@ export default function PublicQuotePage() {
 
                     {/* Notes */}
                     {quote.notes && (
-                        <div className="mb-12 p-4 bg-gray-50 rounded text-sm text-gray-600">
-                            <strong>הערות:</strong> {quote.notes}
+                        <div className="mb-12 p-4 bg-gray-50 rounded text-sm text-gray-600 rich-text-content">
+                            <strong className="block mb-2">הערות:</strong>
+                            <div className="prose prose-sm max-w-none dark:prose-invert">
+                                {parse(quote.notes)}
+                            </div>
                         </div>
                     )}
 
