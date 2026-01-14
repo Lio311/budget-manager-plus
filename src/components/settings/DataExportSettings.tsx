@@ -14,35 +14,35 @@ const EXPORT_OPTIONS = [
         label: 'לקוחות',
         description: 'ייצוא רשימת כל הלקוחות, כולל פרטי קשר וסטטוס',
         icon: Users,
-        headers: ['ID', 'Name', 'Email', 'Phone', 'Tax ID', 'City', 'Address', 'Total Revenue']
+        headers: ['שם הלקוח', 'אימייל', 'טלפון', 'עיר', 'כתובת', 'ח.פ/ת.ז', 'הערות', 'סטטוס', 'תאריך הצטרפות', 'בנק', 'סניף', 'חשבון']
     },
     {
         id: 'incomes',
         label: 'הכנסות',
         description: 'ייצוא כל ההכנסות והעסקאות שבוצעו',
         icon: Receipt,
-        headers: ['ID', 'Date', 'Amount', 'Currency', 'Source', 'Category', 'Client Name', 'Invoice Number', 'Payment Method', 'Status']
+        headers: ['תאריך', 'לקוח', 'תיאור/מקור', 'קטגוריה', 'סכום', 'מטבע', 'אמצעי תשלום', 'מספר חשבונית', 'סטטוס']
     },
     {
         id: 'expenses',
         label: 'הוצאות',
         description: 'ייצוא כל ההוצאות העסקיות והתפעוליות',
         icon: CreditCard,
-        headers: ['ID', 'Date', 'Amount', 'Currency', 'Description', 'Category', 'Supplier Name', 'Payment Method', 'Is Deductible']
+        headers: ['תאריך', 'ספק', 'לקוח משויך', 'תיאור', 'קטגוריה', 'סכום', 'מטבע', 'אופן תשלום', 'סוג הוצאה']
     },
     {
         id: 'suppliers',
         label: 'ספקים',
         description: 'ייצוא רשימת הספקים ופרטי ההתקשרות',
         icon: Factory,
-        headers: ['ID', 'Name', 'Email', 'Phone', 'Tax ID', 'Category']
+        headers: ['שם הספק', 'אימייל', 'טלפון', 'כתובת', 'ח.פ/ת.ז', 'הערות', 'סטטוס']
     },
     {
         id: 'invoices',
         label: 'חשבוניות',
         description: 'ייצוא היסטוריית החשבוניות שהופקו',
         icon: FileText,
-        headers: ['ID', 'Invoice Number', 'Issue Date', 'Client Name', 'Subtotal', 'VAT Amount', 'Total', 'Status']
+        headers: ['מספר חשבונית', 'לקוח', 'תאריך הנפקה', 'תאריך תשלום', 'סכום לפני מע"מ', 'מע"מ', 'סה"כ לתשלום', 'סטטוס', 'מטבע', 'אמצעי תשלום', 'הערות']
     }
 ] as const
 
