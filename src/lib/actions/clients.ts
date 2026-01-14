@@ -23,10 +23,11 @@ const ClientSchema = z.object({
     bankAccount: z.string().max(50).optional().or(z.literal('')),
 
     // SaaS Fields
+    // SaaS Fields
     subscriptionType: z.string().optional().or(z.literal('')),
-    subscriptionStart: z.union([z.date(), z.string().transform((val) => val === '' ? undefined : new Date(val))]).optional(),
-    subscriptionEnd: z.union([z.date(), z.string().transform((val) => val === '' ? undefined : new Date(val))]).optional(),
-    subscriptionPrice: z.union([z.number(), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
+    subscriptionStart: z.preprocess((arg) => (arg === '' || arg === null ? undefined : arg), z.coerce.date().optional()),
+    subscriptionEnd: z.preprocess((arg) => (arg === '' || arg === null ? undefined : arg), z.coerce.date().optional()),
+    subscriptionPrice: z.preprocess((arg) => (arg === '' || arg === null ? undefined : parseFloat(arg as string)), z.number().optional()),
     subscriptionStatus: z.string().optional().or(z.literal('')),
     packageName: z.string().max(100, 'שם החבילה ארוך מדי').optional().or(z.literal('')),
     subscriptionColor: z.string().optional().or(z.literal('')),
