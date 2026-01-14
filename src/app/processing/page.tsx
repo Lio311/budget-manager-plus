@@ -1,16 +1,31 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { Progress } from '@/components/ui/progress'
+import { startTrialForCurrentUser } from '@/lib/actions/subscription'
 
 function ProcessingContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const nextUrl = searchParams.get('next') || '/dashboard'
     const [progress, setProgress] = useState(0)
+
+    useEffect(() => {
+        // Background trial activation
+        const checkAndStartTrial = async () => {
+            const hasTrialParam = nextUrl.includes('trial=true') || searchParams.get('trial') === 'true'
+
+            if (hasTrialParam) {
+                console.log('Starting trial in background...')
+                try {
+                    await startTrialForCurrentUser('PERSONAL')
+                    console.log('Background trial activation completed')
+                } catch (error) {
+                    console.error('Background trial activation failed:', error)
+                }
+            }
+        }
+
+        checkAndStartTrial()
+    }, [nextUrl, searchParams])
 
     useEffect(() => {
         const duration = 10000 // 10 seconds

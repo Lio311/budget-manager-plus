@@ -230,6 +230,16 @@ export async function startTrial(userId: string, email: string, planType: string
     return { success: true }
 }
 
+export async function startTrialForCurrentUser(planType: string = 'PERSONAL') {
+    const user = await currentUser()
+
+    if (!user) {
+        return { success: false, reason: 'User not authenticated' }
+    }
+
+    return await startTrial(user.id, user.emailAddresses[0].emailAddress, planType)
+}
+
 export async function getSubscriptionStatus(userId: string, planType: string = 'PERSONAL') {
     const validPlanType = planType === 'BUSINESS' ? 'BUSINESS' : 'PERSONAL'
 
