@@ -296,12 +296,16 @@ export function ClientsTab() {
     }
 
     const handleEdit = (client: any) => {
+        // Stop propagation if event is passed (though usually called from button click wrapper)
+        // Ensure phone is formatted to international if it's local, so PhoneInput detects country (IL)
+        const formattedPhone = client.phone ? formatIsraeliPhoneNumber(client.phone) : ''
+
         setEditingClient(client)
         setErrors({})
         setFormData({
             name: client.name,
             email: client.email || '',
-            phone: client.phone || '',
+            phone: formattedPhone || '',
             taxId: client.taxId || '',
             address: client.address || '',
             city: client.city || '',
@@ -977,7 +981,10 @@ export function ClientsTab() {
                                     </div>
                                     <div className="flex gap-1">
                                         <button
-                                            onClick={() => setSubscriptionDialogClient(client)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                setSubscriptionDialogClient(client)
+                                            }}
                                             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                             title="היסטוריית תשלומים"
                                         >
@@ -985,7 +992,10 @@ export function ClientsTab() {
                                         </button>
 
                                         <button
-                                            onClick={() => setRenewSubscriptionClient(client)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                setRenewSubscriptionClient(client)
+                                            }}
                                             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                             title="חדש מנוי"
                                         >
@@ -993,14 +1003,20 @@ export function ClientsTab() {
                                         </button>
 
                                         <button
-                                            onClick={() => handleEdit(client)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleEdit(client)
+                                            }}
                                             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                             title="ערוך"
                                         >
                                             <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(client.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleDelete(client.id)
+                                            }}
                                             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                             title="מחק"
                                         >

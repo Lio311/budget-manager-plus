@@ -246,13 +246,17 @@ export function SuppliersTab() {
     }
 
     const handleEdit = (supplier: any) => {
+        // Stop propagation if event is passed
+        // Ensure phone is formatted to international if it's local
+        const formattedPhone = supplier.phone ? formatIsraeliPhoneNumber(supplier.phone) : ''
+
         setEditingSupplier(supplier)
         setErrors({})
         setFormData({
-            name: supplier.name,
+            name: supplier.name || '',
             email: supplier.email || '',
-            phone: supplier.phone || '',
-            taxId: supplier.taxId || '',
+            phone: formattedPhone || '',
+            //taxId: supplier.taxId || '',
             address: supplier.address || '',
             notes: supplier.notes || '',
             isActive: supplier.isActive,
@@ -740,20 +744,29 @@ export function SuppliersTab() {
                                     </div>
                                     <div className="flex gap-1">
                                         <button
-                                            onClick={() => setSubscriptionDialogSupplier(supplier)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                setSubscriptionDialogSupplier(supplier)
+                                            }}
                                             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                             title="היסטוריית תשלומים"
                                         >
                                             <List className="h-4 w-4 text-blue-600" />
                                         </button>
                                         <button
-                                            onClick={() => handleEdit(supplier)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleEdit(supplier)
+                                            }}
                                             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                         >
                                             <Edit2 className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(supplier.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleDelete(supplier.id)
+                                            }}
                                             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                         >
                                             <Trash2 className="h-4 w-4 text-red-600" />
