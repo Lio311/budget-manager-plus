@@ -31,10 +31,16 @@ export function GlobalLoginModal() {
 
         setIsLoading(true)
         try {
+            const targetUrl = redirectUrl || '/dashboard'
+            // Ensure we go through processing page, but avoid double wrapping if already set
+            const finalRedirectUrl = targetUrl.startsWith('/processing')
+                ? targetUrl
+                : `/processing?next=${encodeURIComponent(targetUrl)}`
+
             await signIn.authenticateWithRedirect({
                 strategy: 'oauth_google',
                 redirectUrl: '/sso-callback',
-                redirectUrlComplete: redirectUrl || '/dashboard' // Explicitly fallback but prefer context URL
+                redirectUrlComplete: finalRedirectUrl
             })
             closeModal()
         } catch (err: any) {
