@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from 'sonner'
 import { renewSubscription } from '@/lib/actions/clients'
+import { getClientPackages } from '@/lib/actions/packages'
 import { format } from 'date-fns'
 import { Loader2 } from 'lucide-react'
 
@@ -24,14 +25,30 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
     const [endDate, setEndDate] = useState<Date | undefined>(undefined)
     const [subscriptionType, setSubscriptionType] = useState<string>('MONTHLY')
     const [packageName, setPackageName] = useState('')
+    const [packageId, setPackageId] = useState<string>('')
+    const [subscriptionStatus, setSubscriptionStatus] = useState<string>('PAID')
     const [subscriptionPrice, setSubscriptionPrice] = useState('')
+    const [packages, setPackages] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState(false)
+
+    // Fetch packages
+    useEffect(() => {
+        if (isOpen) {
+            getClientPackages().then(result => {
+                if (result.success) {
+                    setPackages(result.data || [])
+                }
+            })
+        }
+    }, [isOpen])
 
     // Initialize state when dialog opens or client changes
     useEffect(() => {
         if (isOpen && client) {
             setSubscriptionType(client.subscriptionType || 'MONTHLY')
-            setPackageName(client.packageName || client.package?.name || '')
+            setPackageName(client.packageName || '')
+            setPackageId(client.packageId || '')
+            setSubscriptionStatus(client.subscriptionStatus || 'PAID')
             setSubscriptionPrice(client.subscriptionPrice?.toString() || '')
         }
     }, [isOpen, client])
@@ -54,7 +71,9 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                 endDate,
                 {
                     subscriptionType,
-                    packageName,
+                    packageName: packageId ? undefined : packageName, // Only send name if no package ID is selected (custom)
+                    packageId: packageId === 'custom' ? undefined : packageId,
+                    subscriptionStatus,
                     subscriptionPrice: parseFloat(subscriptionPrice)
                 }
             )
@@ -102,22 +121,75 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label>שם חבילה (אופציונלי)</Label>
-                            <Input
-                                value={packageName}
-                                onChange={(e) => setPackageName(e.target.value)}
-                                placeholder="לדוגמה: ליווי עסקי"
-                            />
+                            <Label>חבילה</Label>
+                            <Select
+                                value={packageId || (packageName ? 'custom' : '')}
+                                onValueChange={(val) => {
+                                    if (val === 'custom') {
+                                        setPackageId('custom')
+                                        setPackageName(client.packageName || '')
+                                    } else {
+                                        setPackageId(val)
+                                        const pkg = packages.find(p => p.id === val)
+                                        if (pkg) {
+                                            setSubscriptionPrice(pkg.defaultPrice?.toString() || '')
+                                        }
+                                    }
+                                }}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="בחר חבילה" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {packages.map(pkg => (
+                                        <SelectItem key={pkg.id} value={pkg.id}>
+                                            <div className="flex items-center gap-2">
+                                                <div
+                                                    className="w-2 h-2 rounded-full"
+                                                    style={{ backgroundColor: pkg.color }}
+                                                />
+                                                {pkg.name}
+                                            </div>
+                                        </SelectItem>
+                                    ))}
+                                    <SelectItem value="custom">אחר (מותאם אישית)</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            {packageId === 'custom' && (
+                                <Input
+                                    className="mt-2"
+                                    value={packageName}
+                                    onChange={(e) => setPackageName(e.target.value)}
+                                    placeholder="שם חבילה מותאם"
+                                />
+                            )}
                         </div>
+
                         <div className="space-y-2">
-                            <Label>מחיר לחיוב</Label>
-                            <Input
-                                type="number"
-                                value={subscriptionPrice}
-                                onChange={(e) => setSubscriptionPrice(e.target.value)}
-                                placeholder="0.00"
-                            />
+                            <Label>סטטוס תשלום</Label>
+                            <Select value={subscriptionStatus} onValueChange={setSubscriptionStatus}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="סטטוס" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="PAID">שולם</SelectItem>
+                                    <SelectItem value="UNPAID">לא שולם</SelectItem>
+                                    <SelectItem value="PARTIAL">שולם חלקית</SelectItem>
+                                    <SelectItem value="INSTALLMENTS">בתשלומים</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>מחיר לחיוב</Label>
+                        <Input
+                            type="number"
+                            value={subscriptionPrice}
+                            onChange={(e) => setSubscriptionPrice(e.target.value)}
+                            placeholder="0.00"
+                        />
                     </div>
 
                     <div className="space-y-2">

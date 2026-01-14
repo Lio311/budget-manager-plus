@@ -636,6 +636,8 @@ export async function renewSubscription(
         subscriptionType: string
         packageName?: string
         subscriptionPrice: number
+        packageId?: string
+        subscriptionStatus?: string
     }
 ) {
     try {
@@ -658,7 +660,9 @@ export async function renewSubscription(
                 subscriptionEnd: end,
                 subscriptionType: data.subscriptionType,
                 packageName: data.packageName,
-                subscriptionPrice: data.subscriptionPrice
+                subscriptionPrice: data.subscriptionPrice,
+                packageId: data.packageId,
+                subscriptionStatus: data.subscriptionStatus
             }
         })
 
