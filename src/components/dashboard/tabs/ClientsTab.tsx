@@ -119,6 +119,7 @@ export function ClientsTab() {
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [isAddingPackage, setIsAddingPackage] = useState(false)
     const [openCity, setOpenCity] = useState(false)
+    const [openBank, setOpenBank] = useState(false)
     const [showPackagesManager, setShowPackagesManager] = useState(false)
     const [packages, setPackages] = useState<any[]>([])
 
@@ -711,10 +712,10 @@ export function ClientsTab() {
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[250px] p-0 h-[300px]" align="start">
-                                        <Command>
-                                            <CommandInput placeholder="חפש עיר..." />
+                                        <Command className="[&_[cmdk-input-wrapper]]:flex-row-reverse [&_[cmdk-input-wrapper]_svg]:ml-2 [&_[cmdk-input-wrapper]_svg]:mr-4">
+                                            <CommandInput placeholder="חפש עיר..." className="text-right" />
                                             <CommandList>
-                                                <CommandEmpty>לא נמצאה עיר.</CommandEmpty>
+                                                <CommandEmpty className="py-6 text-center text-sm">לא נמצאה עיר.</CommandEmpty>
                                                 <CommandGroup>
                                                     {ISRAELI_CITIES.map((city) => (
                                                         <CommandItem
@@ -724,6 +725,7 @@ export function ClientsTab() {
                                                                 setFormData({ ...formData, city: currentValue })
                                                                 setOpenCity(false)
                                                             }}
+                                                            className="text-right flex flex-row-reverse justify-between"
                                                         >
                                                             <Check
                                                                 className={cn(
@@ -754,19 +756,48 @@ export function ClientsTab() {
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     בנק
                                 </label>
-                                <Select
-                                    value={formData.bankName || ''}
-                                    onValueChange={(val) => setFormData({ ...formData, bankName: val })}
-                                >
-                                    <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700">
-                                        <SelectValue placeholder="בחר" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {ISRAELI_BANKS.map(bank => (
-                                            <SelectItem key={bank.code} value={bank.name}>{bank.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <Popover open={openBank} onOpenChange={setOpenBank}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            aria-expanded={openBank}
+                                            className="w-full justify-between bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 h-[42px] font-normal"
+                                        >
+                                            {formData.bankName || "בחר בנק..."}
+                                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[250px] p-0 h-[300px]" align="start">
+                                        <Command className="[&_[cmdk-input-wrapper]]:flex-row-reverse [&_[cmdk-input-wrapper]_svg]:ml-2 [&_[cmdk-input-wrapper]_svg]:mr-4">
+                                            <CommandInput placeholder="חפש בנק..." className="text-right" />
+                                            <CommandList>
+                                                <CommandEmpty className="py-6 text-center text-sm">לא נמצא בנק.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {ISRAELI_BANKS.map((bank) => (
+                                                        <CommandItem
+                                                            key={bank.code}
+                                                            value={bank.name}
+                                                            onSelect={(currentValue) => {
+                                                                setFormData({ ...formData, bankName: currentValue })
+                                                                setOpenBank(false)
+                                                            }}
+                                                            className="text-right flex flex-row-reverse justify-between"
+                                                        >
+                                                            <Check
+                                                                className={cn(
+                                                                    "mr-2 h-4 w-4",
+                                                                    formData.bankName === bank.name ? "opacity-100" : "opacity-0"
+                                                                )}
+                                                            />
+                                                            {bank.name}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
