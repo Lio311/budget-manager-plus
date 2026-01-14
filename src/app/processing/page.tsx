@@ -79,7 +79,7 @@ function ProcessingContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="w-full max-w-md p-8 text-center space-y-10 relative z-10"
+                className="w-full max-w-2xl p-8 text-center space-y-10 relative z-10"
             >
                 {/* Logo with pulse effect */}
                 <div className="relative w-32 h-32 mx-auto mb-8">
@@ -111,7 +111,7 @@ function ProcessingContent() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="text-lg text-gray-600"
+                        className="text-lg text-gray-600 whitespace-nowrap"
                     >
                         אנחנו מגדירים את הסביבה האישית שלך, זה ממש תכף קורה
                     </motion.p>
