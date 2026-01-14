@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Progress } from '@/components/ui/progress'
 
-export default function ProcessingPage() {
+function ProcessingContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const nextUrl = searchParams.get('next') || '/dashboard'
@@ -76,5 +76,15 @@ export default function ProcessingPage() {
                 </div>
             </motion.div>
         </div>
+    )
+}
+
+export default function ProcessingPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white">
+            <div className="animate-pulse bg-gray-200 h-32 w-32 rounded-full"></div>
+        </div>}>
+            <ProcessingContent />
+        </Suspense>
     )
 }
