@@ -63,7 +63,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
     // Fetch client-specific open incomes (regardless of month)
     const { data: clientIncomesData } = useSWR(
         formData.clientId ? ['client-incomes', formData.clientId] : null,
-        () => formData.clientId ? getClientUninvoicedIncomes(formData.clientId) : Promise.resolve({ data: [] })
+        () => getClientUninvoicedIncomes(formData.clientId!)
     )
 
     // Determine which incomes to show
