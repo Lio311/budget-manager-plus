@@ -1,5 +1,10 @@
 'use client'
 
+import { useEffect, useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
+import { motion } from 'framer-motion'
+import { Progress } from '@/components/ui/progress'
 import { startTrialForCurrentUser } from '@/lib/actions/subscription'
 
 function ProcessingContent() {
