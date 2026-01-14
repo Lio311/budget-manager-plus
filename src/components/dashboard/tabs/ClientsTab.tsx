@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw, Check } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw, Check, Upload, FileSpreadsheet } from 'lucide-react'
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command"
+import { read, utils } from 'xlsx'
+import { importClients } from '@/lib/actions/import-clients'
 import { ISRAELI_CITIES, ISRAELI_BANKS } from '@/lib/constants/israel-data'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, syncClientIncomes, type ClientFormData } from '@/lib/actions/clients'
@@ -369,6 +371,33 @@ export function ClientsTab() {
         }
     }
 
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        try {
+            const data = await file.arrayBuffer()
+            const workbook = read(data)
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+            const jsonData = utils.sheet_to_json(worksheet)
+
+            const result = await importClients(jsonData, budgetType)
+
+            if (result.success) {
+                toast.success(`יובאו בהצלחה ${result.count} לקוחות (${result.skipped} דלגו)`)
+                mutate()
+            } else {
+                toast.error(result.error || 'שגיאה ביבוא')
+            }
+        } catch (error) {
+            console.error('Import Error:', error)
+            toast.error('שגיאה בקריאת הקובץ')
+        } finally {
+            // Reset input
+            e.target.value = ''
+        }
+    }
+
     if (isLoading) {
         return (
             <div className="space-y-6">
@@ -449,6 +478,24 @@ export function ClientsTab() {
                             </div>
                         </PopoverContent>
                     </Popover>
+
+                    <div className="relative">
+                        <input
+                            type="file"
+                            id="import-clients"
+                            accept=".csv, .xlsx, .xls"
+                            className="hidden"
+                            onChange={handleFileUpload}
+                        />
+                        <Button
+                            variant="outline"
+                            className="gap-2 border-gray-300 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800"
+                            onClick={() => document.getElementById('import-clients')?.click()}
+                        >
+                            ייבוא לקוחות
+                            <FileSpreadsheet className="h-4 w-4" />
+                        </Button>
+                    </div>
 
                     <Button
                         onClick={() => {
