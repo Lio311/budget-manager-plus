@@ -209,7 +209,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                     </label>
                     <ClientSelector
                         clients={clients}
-                        selectedClientId={formData.clientId}
+                        selectedClientId={formData.clientId || ''}
                         guestClientName={guestClientName}
                         isGuestMode={isGuestClient}
                         onClientIdChange={(id) => setFormData(prev => ({ ...prev, clientId: id }))}
