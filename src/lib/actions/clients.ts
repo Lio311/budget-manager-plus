@@ -414,8 +414,8 @@ export async function getClientStats(clientId: string, year: number) {
 }
 
 export async function generateSubscriptionIncomes(client: any, userId: string, minDate?: Date) {
-    // Only proceed if status is PAID and we have necessary fields
-    if (client.subscriptionStatus !== 'PAID' || !client.subscriptionPrice || !client.subscriptionStart || !client.subscriptionEnd || !client.subscriptionType) {
+    // Only proceed if we have necessary fields. We allow any status (PAID, INSTALLMENTS, etc) to generate incomes.
+    if (!client.subscriptionStatus || !client.subscriptionPrice || !client.subscriptionStart || !client.subscriptionEnd || !client.subscriptionType) {
         return
     }
 
