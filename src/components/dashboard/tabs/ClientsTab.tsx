@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw, Check } from 'lucide-react'
+import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command"
+import { ISRAELI_CITIES, ISRAELI_BANKS } from '@/lib/constants/israel-data'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, syncClientIncomes, type ClientFormData } from '@/lib/actions/clients'
 import { getClientPackages } from '@/lib/actions/packages'
@@ -35,6 +37,10 @@ const ClientSchema = z.object({
     taxId: z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional().or(z.literal('')),
     address: z.string().max(200, 'הכתובת ארוכה מדי').optional().or(z.literal('')),
     notes: z.string().max(500, 'הערות ארוכות מדי').optional().or(z.literal('')),
+    city: z.string().max(100).optional().or(z.literal('')),
+    bankName: z.string().max(100).optional().or(z.literal('')),
+    bankBranch: z.string().max(20).optional().or(z.literal('')),
+    bankAccount: z.string().max(50).optional().or(z.literal('')),
 })
 
 const formatPhoneNumber = (phone: string | undefined | null) => {
@@ -102,10 +108,15 @@ export function ClientsTab() {
         eventLocation: '',
         subscriptionColor: '#3B82F6',
         packageId: '',
-        isActive: true
+        isActive: true,
+        city: '',
+        bankName: '',
+        bankBranch: '',
+        bankAccount: ''
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [isAddingPackage, setIsAddingPackage] = useState(false)
+    const [openCity, setOpenCity] = useState(false)
     const [showPackagesManager, setShowPackagesManager] = useState(false)
     const [packages, setPackages] = useState<any[]>([])
 
@@ -301,7 +312,7 @@ export function ClientsTab() {
                     setEditingClient(null)
                     setShowForm(false)
                     setEditingClient(null)
-                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', isActive: true })
+                    setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', isActive: true, city: '', bankName: '', bankBranch: '', bankAccount: '' })
                     mutate()
                 } else {
                     toast.error(result.error || 'שגיאה')
@@ -310,7 +321,7 @@ export function ClientsTab() {
                 await optimisticCreateClient(formData)
                 setShowForm(false)
                 setShowForm(false)
-                setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6' })
+                setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', city: '', bankName: '', bankBranch: '', bankAccount: '' })
             }
         } catch (error) {
             // Error handled by hook or update logic
@@ -326,6 +337,10 @@ export function ClientsTab() {
             phone: client.phone || '',
             taxId: client.taxId || '',
             address: client.address || '',
+            city: client.city || '',
+            bankName: client.bankName || '',
+            bankBranch: client.bankBranch || '',
+            bankAccount: client.bankAccount || '',
 
             notes: client.notes || '',
             packageName: client.packageName || '',
@@ -443,7 +458,7 @@ export function ClientsTab() {
                             setEditingClient(null)
                             setErrors({})
                             setIsAddingPackage(false)
-                            setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', packageId: '', isActive: true })
+                            setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', packageId: '', isActive: true, city: '', bankName: '', bankBranch: '', bankAccount: '' })
                         }}
                         className="bg-green-600 hover:bg-green-700"
                     >
@@ -620,16 +635,116 @@ export function ClientsTab() {
                                 </div>
                             </div>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                כתובת
-                            </label>
-                            <input
-                                type="text"
-                                value={formData.address}
-                                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    כתובת
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.address}
+                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    עיר
+                                </label>
+                                <Popover open={openCity} onOpenChange={setOpenCity}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            aria-expanded={openCity}
+                                            className="w-full justify-between bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 h-[42px] font-normal"
+                                        >
+                                            {formData.city || "בחר עיר..."}
+                                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[250px] p-0 h-[300px]" align="start">
+                                        <Command>
+                                            <CommandInput placeholder="חפש עיר..." />
+                                            <CommandList>
+                                                <CommandEmpty>לא נמצאה עיר.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {ISRAELI_CITIES.map((city) => (
+                                                        <CommandItem
+                                                            key={city}
+                                                            value={city}
+                                                            onSelect={(currentValue) => {
+                                                                setFormData({ ...formData, city: currentValue })
+                                                                setOpenCity(false)
+                                                            }}
+                                                        >
+                                                            <Check
+                                                                className={cn(
+                                                                    "mr-2 h-4 w-4",
+                                                                    formData.city === city ? "opacity-100" : "opacity-0"
+                                                                )}
+                                                            />
+                                                            {city}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
+                        </div>
+
+                        {/* Bank Details */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg bg-gray-50/50 dark:bg-slate-800/50">
+                            <div className="md:col-span-3 mb-[-5px]">
+                                <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                                    <Building2 className="w-4 h-4" />
+                                    פרטי חשבון בנק (אופציונלי)
+                                </h4>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    בנק
+                                </label>
+                                <Select
+                                    value={formData.bankName || ''}
+                                    onValueChange={(val) => setFormData({ ...formData, bankName: val })}
+                                >
+                                    <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700">
+                                        <SelectValue placeholder="בחר" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {ISRAELI_BANKS.map(bank => (
+                                            <SelectItem key={bank.code} value={bank.name}>{bank.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    מספר סניף
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.bankBranch}
+                                    onChange={(e) => setFormData({ ...formData, bankBranch: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                                    placeholder="מספר סניף"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    מספר חשבון
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.bankAccount}
+                                    onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                                    placeholder="מספר חשבון"
+                                />
+                            </div>
                         </div>
 
                         <div>

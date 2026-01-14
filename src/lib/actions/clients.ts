@@ -16,6 +16,12 @@ const ClientSchema = z.object({
     notes: z.string().max(500, 'הערות ארוכות מדי').optional().or(z.literal('')),
     isActive: z.boolean().optional(),
 
+    // New Fields
+    city: z.string().max(100).optional().or(z.literal('')),
+    bankName: z.string().max(100).optional().or(z.literal('')),
+    bankBranch: z.string().max(20).optional().or(z.literal('')),
+    bankAccount: z.string().max(50).optional().or(z.literal('')),
+
     // SaaS Fields
     subscriptionType: z.string().optional().or(z.literal('')),
     subscriptionStart: z.union([z.date(), z.string().transform((val) => val === '' ? undefined : new Date(val))]).optional(),
@@ -36,6 +42,11 @@ export interface ClientFormData {
     address?: string
     notes?: string
     isActive?: boolean
+
+    city?: string
+    bankName?: string
+    bankBranch?: string
+    bankAccount?: string
 
     subscriptionType?: string
     subscriptionStart?: Date | string
@@ -211,6 +222,12 @@ export async function createClient(data: ClientFormData, scope: string = 'BUSINE
                 notes: validData.notes || null,
                 isActive: validData.isActive ?? true,
 
+                // New Fields
+                city: validData.city || null,
+                bankName: validData.bankName || null,
+                bankBranch: validData.bankBranch || null,
+                bankAccount: validData.bankAccount || null,
+
                 // SaaS Fields
                 subscriptionType: validData.subscriptionType || null,
                 subscriptionStart: validData.subscriptionStart ? new Date(validData.subscriptionStart) : null,
@@ -268,6 +285,12 @@ export async function updateClient(id: string, data: ClientFormData) {
                 address: validData.address || null,
                 notes: validData.notes || null,
                 isActive: validData.isActive,
+
+                // New Fields
+                city: validData.city || null,
+                bankName: validData.bankName || null,
+                bankBranch: validData.bankBranch || null,
+                bankAccount: validData.bankAccount || null,
 
                 // SaaS Fields
                 subscriptionType: validData.subscriptionType || null,

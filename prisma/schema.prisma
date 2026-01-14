@@ -495,6 +495,12 @@ model Client {
   address   String?
   notes     String?  @db.Text
   
+  // New Fields
+  city        String?
+  bankName    String?
+  bankBranch  String?
+  bankAccount String?
+  
   // SaaS / Subscription Fields
   subscriptionType   String?   // WEEKLY, MONTHLY, YEARLY
   subscriptionStart  DateTime?
