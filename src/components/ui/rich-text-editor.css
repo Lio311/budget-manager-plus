@@ -44,6 +44,32 @@
     text-align: right;
     direction: rtl;
     min-height: 120px;
+    line-height: 1.6;
+    /* Improve readability */
+}
+
+/* Fix RTL List Items overlap */
+.rich-text-editor-wrapper .ql-editor li {
+    padding-right: 1.5em;
+    /* Space for bullet/number */
+    padding-left: 0;
+}
+
+.rich-text-editor-wrapper .ql-editor ol li:not(.ql-direction-rtl),
+.rich-text-editor-wrapper .ql-editor ul li:not(.ql-direction-rtl) {
+    padding-left: 1.5em;
+    padding-right: 0;
+    text-align: left;
+    direction: ltr;
+}
+
+/* Force RTL for our specific usage if wrapper is RTL */
+.rich-text-editor-wrapper[dir="rtl"] .ql-editor ol li,
+.rich-text-editor-wrapper[dir="rtl"] .ql-editor ul li {
+    direction: rtl;
+    text-align: right;
+    padding-right: 1.5em;
+    padding-left: 0;
 }
 
 /* Fix placeholder color */

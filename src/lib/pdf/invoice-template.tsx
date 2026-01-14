@@ -232,60 +232,66 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
         const textOnly = htmlContent.replace(/<[^>]+>/g, '').trim()
         if (!textOnly && !htmlContent.includes('<img')) return null
 
-        // Simple parser since react-pdf doesn't support full HTML
-        // We will split by block tags (<p>, <br>, <div>) and then by styles
-        const lines = htmlContent
-            .replace(/<p>/g, '\n')
-            .replace(/<\/p>/g, '')
-            .replace(/<br\s*\/?>/g, '\n')
+        // Improved Parser:
+        // 1. Handle blocks (p, div, li, br)
+        // 2. Handle lists (ol, ul) - convert to simple bullet/number text
+        let cleanHtml = htmlContent
+            // Replace block ends with newlines
+            .replace(/<\/p>/gi, '\n')
+            .replace(/<\/div>/gi, '\n')
+            .replace(/<br\s*\/?>/gi, '\n')
+            // Handle lists
+            .replace(/<ol[^>]*>/gi, '') // Start ordered list
+            .replace(/<\/ol>/gi, '')   // End ordered list
+            .replace(/<ul[^>]*>/gi, '') // Start unordered list
+            .replace(/<\/ul>/gi, '')   // End unordered list
+            .replace(/<li[^>]*>/gi, '• ') // List item start (bullet) - tricky for ordered but fine for simple
+            .replace(/<\/li>/gi, '\n')    // List item end
+            // Clean other tags attributes but keep the tag name
+            .replace(/<p[^>]*>/gi, '') // Just strip the P start tag (we use </p> for newline)
             .replace(/&nbsp;/g, ' ')
-            .split('\n')
-            .filter(line => line.trim() !== '')
+
+        // Remove multiple newlines
+        // cleanHtml = cleanHtml.replace(/\n\s*\n/g, '\n')
+
+        const lines = cleanHtml.split('\n').filter(line => line.trim() !== '')
 
         return (
             <View style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
                 {lines.map((line, i) => {
-                    // Check for bold content
-                    const isBold = line.includes('<strong>') || line.includes('<b>')
-                    const isUnderline = line.includes('<u>')
+                    // Check for lists
+                    let displayText = line
+                    let isBullet = line.trim().startsWith('•')
 
-                    // Simple cleaning for now. 
-                    // A robust solution would use html-react-parser traversing, 
-                    // but for basic Quill usage (bold, color), we can approximate or strip tags 
-                    // but keep the styling if applied to the whole line.
-                    // React-PDF Text doesn't support nested Views, but supports nested Text.
-
-                    // Let's try to parse segments: 
-                    // "This is <b>bold</b> text" -> ["This is ", {bold: true, text: "bold"}, " text"]
-
-                    // Regex to split by tags
-                    const segments = line.split(/(<[^>]+>)/g).filter(s => s !== '')
+                    // Regex to split by tags that might still be there (b, strong, u, span)
+                    // We need to match <tag ...> and </tag>
+                    const segments = line.split(/(<\/?(?:b|strong|u|span)[^>]*>)/gi).filter(s => s !== '')
 
                     const chunks: any[] = []
                     let currentStyle = { bold: false, underline: false, color: '#374151' }
 
                     segments.forEach(segment => {
-                        if (segment.match(/^<[^>]+>$/)) {
+                        const lowerSeg = segment.toLowerCase()
+
+                        if (lowerSeg.startsWith('<')) {
                             // It's a tag
-                            if (segment.includes('strong') || segment.includes('<b>')) currentStyle.bold = true
-                            if (segment.includes('/strong') || segment.includes('/b')) currentStyle.bold = false
-                            if (segment.includes('u>')) currentStyle.underline = true
-                            if (segment.includes('/u>')) currentStyle.underline = false
+                            if (lowerSeg.includes('strong') || lowerSeg.includes('<b>')) currentStyle.bold = !lowerSeg.startsWith('</')
+                            if (lowerSeg.includes('u>')) currentStyle.underline = !lowerSeg.startsWith('</')
 
                             // Color parsing from style attr: <span style="color: rgb(230, 0, 0);">
-                            if (segment.includes('color:')) {
-                                const match = segment.match(/color:\s*([^;"'>]+)/)
+                            if (lowerSeg.startsWith('<span') && lowerSeg.includes('color:')) {
+                                const match = segment.match(/color:\s*([^;"'>]+)/i)
                                 if (match) currentStyle.color = match[1]
                             }
-                            if (segment.includes('/span')) currentStyle.color = '#374151'
+                            if (lowerSeg.startsWith('</span')) currentStyle.color = '#374151' // Reset color
                         } else {
                             // It's text
-                            chunks.push({ text: segment, style: { ...currentStyle } })
+                            if (segment) chunks.push({ text: segment, style: { ...currentStyle } })
                         }
                     })
 
                     return (
-                        <View key={i} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+                        <View key={i} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'flex-start', marginBottom: 2 }}>
                             {chunks.map((chunk, j) => (
                                 <Text
                                     key={j}
