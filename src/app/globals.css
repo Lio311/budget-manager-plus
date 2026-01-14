@@ -746,6 +746,11 @@ div[class*="cl-branding"] {
 }
 
 /* Footer */
+.cl-footer,
+.cl-userButtonPopoverFooter {
+  direction: ltr !important;
+}
+
 .dark .cl-footer,
 .dark .cl-userButtonPopoverFooter {
   background: #1e293b !important;
