@@ -25,7 +25,7 @@ export function FinancialOverview({ data }: { data: any }) {
                     </div>
                     <div>
                         <p className="text-gray-500 text-sm font-medium">הכנסות</p>
-                        <span className="text-2xl font-bold text-emerald-600 whitespace-nowrap">{formatNumberWithCommas(revenue.toFixed(2))} ₪</span>
+                        <span className="text-2xl font-bold text-emerald-600 whitespace-nowrap">{formatNumberWithCommas(revenue)} ₪</span>
                     </div>
                 </motion.div>
 
@@ -41,7 +41,7 @@ export function FinancialOverview({ data }: { data: any }) {
                     </div>
                     <div>
                         <p className="text-gray-500 text-sm font-medium">הוצאות</p>
-                        <span className="text-2xl font-bold text-rose-600 whitespace-nowrap">{formatNumberWithCommas(expenses.toFixed(2))} ₪</span>
+                        <span className="text-2xl font-bold text-rose-600 whitespace-nowrap">{formatNumberWithCommas(expenses)} ₪</span>
                     </div>
                 </motion.div>
 
@@ -58,7 +58,7 @@ export function FinancialOverview({ data }: { data: any }) {
                     <div>
                         <p className="text-gray-500 text-sm font-medium">רווח לפני מס</p>
                         <span className="text-2xl font-bold text-blue-600 whitespace-nowrap" dir="rtl">
-                            {profit < 0 ? `${formatNumberWithCommas(Math.abs(profit).toFixed(2))}-` : formatNumberWithCommas(profit.toFixed(2))} ₪
+                            {profit < 0 ? `${formatNumberWithCommas(Math.abs(profit))}-` : formatNumberWithCommas(profit)} ₪
                         </span>
                         {profit >= 0 && revenue > 0 && (
                             <p className="text-blue-600/70 text-xs mt-1">מתוך סה"כ הכנסות: <span dir="ltr" className="inline-block">{((profit / revenue) * 100 || 0).toFixed(1)}%</span></p>
