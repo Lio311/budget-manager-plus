@@ -105,7 +105,6 @@ export const metadata: Metadata = {
             { url: '/images/branding/K-LOGO.png', sizes: '512x512', type: 'image/png' }
         ],
         apple: '/images/branding/apple-touch-icon.png',
-        shortcut: '/favicon.svg',
     },
     appleWebApp: {
         capable: true,
