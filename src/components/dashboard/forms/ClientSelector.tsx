@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Check, ChevronsUpDown, User, UserPlus } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Check, ChevronsUpDown, User, UserPlus, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,11 +12,6 @@ import {
     CommandItem,
     CommandList,
 } from '@/components/ui/command'
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/components/ui/popover'
 import { Input } from '@/components/ui/input'
 
 interface Client {
@@ -46,16 +41,28 @@ export function ClientSelector({
     error
 }: ClientSelectorProps) {
     const [open, setOpen] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
 
     const selectedClient = clients.find(c => c.id === selectedClientId)
 
+    // Handle click outside to close the dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
     return (
-        <div className="space-y-3">
+        <div className="space-y-3" ref={containerRef}>
             {/* Mode Toggle */}
             <div className="flex gap-4 text-sm">
                 <button
                     type="button"
-                    onClick={() => !isGuestMode && onGuestModeToggle()}
+                    onClick={() => isGuestMode && onGuestModeToggle()}
                     className={cn(
                         "flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors",
                         !isGuestMode
@@ -68,7 +75,7 @@ export function ClientSelector({
                 </button>
                 <button
                     type="button"
-                    onClick={() => isGuestMode && onGuestModeToggle()}
+                    onClick={() => !isGuestMode && onGuestModeToggle()}
                     className={cn(
                         "flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors",
                         isGuestMode
@@ -83,25 +90,21 @@ export function ClientSelector({
 
             {/* Client Selection */}
             {!isGuestMode ? (
-                <div dir="rtl">
-                    <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={open}
-                                className={cn(
-                                    "w-full justify-between text-right bg-white dark:bg-slate-800",
-                                    error && "!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20"
-                                )}
-                            >
-                                {selectedClient ? selectedClient.name : "בחר לקוח..."}
-                                <ChevronsUpDown className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-full p-0" align="start">
-                            <Command dir="rtl">
-                                <CommandInput placeholder="חפש לקוח..." className="text-right" />
+                <div dir="rtl" className="relative">
+                    <Command
+                        className="rounded-lg border shadow-sm overflow-visible bg-white dark:bg-slate-800 [&_[cmdk-input-wrapper]]:flex-row-reverse [&_[cmdk-input-wrapper]_svg]:ml-2 [&_[cmdk-input-wrapper]_svg]:mr-0"
+                    >
+                        <CommandInput
+                            placeholder={selectedClient ? selectedClient.name : "חפש לקוח..."}
+                            value={selectedClient ? selectedClient.name : ""}
+                            onFocus={() => setOpen(true)}
+                            className={cn(
+                                "text-right",
+                                error && "border-red-500 ring-1 ring-red-500/20 rounded-md"
+                            )}
+                        />
+                        {open && (
+                            <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 rounded-lg border bg-popover shadow-md outline-none animate-in fade-in-0 zoom-in-95">
                                 <CommandList>
                                     <CommandEmpty>לא נמצאו לקוחות</CommandEmpty>
                                     <CommandGroup>
@@ -113,7 +116,7 @@ export function ClientSelector({
                                                     onClientIdChange(client.id)
                                                     setOpen(false)
                                                 }}
-                                                className="text-right cursor-pointer"
+                                                className="text-right cursor-pointer flex flex-row-reverse justify-between"
                                             >
                                                 <Check
                                                     className={cn(
@@ -126,9 +129,9 @@ export function ClientSelector({
                                         ))}
                                     </CommandGroup>
                                 </CommandList>
-                            </Command>
-                        </PopoverContent>
-                    </Popover>
+                            </div>
+                        )}
+                    </Command>
                     {error && <p className="text-red-500 text-xs text-right mt-1">שדה חובה</p>}
                 </div>
             ) : (
