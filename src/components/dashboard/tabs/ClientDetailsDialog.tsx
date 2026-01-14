@@ -7,6 +7,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { getBankName } from '@/lib/constants/israel-data'
+import { formatIsraeliPhoneNumber } from '@/lib/utils'
 import { Badge } from "@/components/ui/badge"
 import { Building2, Mail, Phone, MapPin, Calendar, CreditCard, FileText, Banknote } from "lucide-react"
 
@@ -75,7 +76,7 @@ export function ClientDetailsDialog({ client, isOpen, onClose }: ClientDetailsDi
                                 {client.phone && (
                                     <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
                                         <Phone className="h-4 w-4 shrink-0" />
-                                        <span dir="ltr">{client.phone}</span>
+                                        <span dir="ltr">{formatIsraeliPhoneNumber(client.phone)}</span>
                                     </div>
                                 )}
                                 {(client.address || client.city) && (
