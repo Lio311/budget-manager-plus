@@ -6,6 +6,7 @@ import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, Command
 import { read, utils } from 'xlsx'
 import { importClients } from '@/lib/actions/import-clients'
 import { ISRAELI_CITIES, ISRAELI_BANKS } from '@/lib/constants/israel-data'
+import { ClientDetailsDialog } from './ClientDetailsDialog'
 import { Button } from '@/components/ui/button'
 import { getClients, createClient, updateClient, deleteClient, syncClientIncomes, type ClientFormData } from '@/lib/actions/clients'
 import { getClientPackages } from '@/lib/actions/packages'
@@ -601,6 +602,12 @@ export function ClientsTab() {
                 </div>
             </div>
 
+            <ClientDetailsDialog
+                client={selectedClientDetails}
+                isOpen={!!selectedClientDetails}
+                onClose={() => setSelectedClientDetails(null)}
+            />
+
             {/* Form Dialog */}
             <Dialog open={showForm} onOpenChange={(open) => {
                 if (!open) {
@@ -1051,7 +1058,8 @@ export function ClientsTab() {
                         {filteredClients.map((client: any) => (
                             <div
                                 key={client.id}
-                                className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700"
+                                onClick={() => setSelectedClientDetails(client)}
+                                className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700 cursor-pointer group"
                             >
                                 <div className="flex justify-between items-start mb-3">
                                     <div className="flex items-center gap-2">
