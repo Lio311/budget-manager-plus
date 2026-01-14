@@ -679,7 +679,7 @@ export function ExpensesTab() {
                                                 <div className="flex text-left sm:text-right flex-col items-end">
                                                     <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
                                                         <span className="inline-block">
-                                                            {formatNumberWithCommas((isBusiness && exp.isDeductible && exp.vatAmount ? (exp.amount - exp.vatAmount) : exp.amount).toFixed(2))} {getCurrencySymbol(exp.currency || 'ILS')}
+                                                            {formatNumberWithCommas(isBusiness && exp.isDeductible && exp.vatAmount ? (exp.amount - exp.vatAmount) : exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
                                                         </span>
                                                     </div>
 
