@@ -103,7 +103,7 @@ function ProcessingContent() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="text-3xl font-bold text-gray-900 tracking-tight"
+                        className="text-3xl font-bold text-gray-900 tracking-tight whitespace-nowrap"
                     >
                         מכינים את החשבון המדהים שלך...
                     </motion.h1>
