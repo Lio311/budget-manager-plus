@@ -627,8 +627,9 @@ model Invoice {
   id            String        @id @default(cuid())
   userId        String
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clientId      String
-  client        Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId      String?       // Made nullable for guest clients
+  client        Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  guestClientName String?     // For one-time clients not in the database
   
   // Invoice details
   invoiceNumber String

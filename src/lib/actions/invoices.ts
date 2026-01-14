@@ -15,7 +15,9 @@ export interface InvoiceLineItemData {
 }
 
 export interface InvoiceFormData {
-    clientId: string
+    clientId?: string
+    guestClientName?: string
+    isGuestClient?: boolean
     incomeId?: string // Optional: Link to specific income
     invoiceNumber: string
     issueDate: Date
@@ -31,7 +33,9 @@ export interface InvoiceFormData {
 }
 
 const InvoiceSchema = z.object({
-    clientId: z.string().min(1, 'חובה לבחור לקוח'),
+    clientId: z.string().optional(),
+    guestClientName: z.string().optional(),
+    isGuestClient: z.boolean().optional(),
     incomeId: z.string().optional(),
     invoiceNumber: z.string().min(1, 'חובה להזין מספר חשבונית'),
     issueDate: z.date(),
@@ -47,6 +51,9 @@ const InvoiceSchema = z.object({
         price: z.number().min(0, 'מחיר חייב להיות חיובי'),
         total: z.number()
     })).min(1, 'חובה להוסיף לפחות שורה אחת')
+}).refine((data) => data.isGuestClient ? !!data.guestClientName : !!data.clientId, {
+    message: 'חובה לבחור לקוח או להזין שם לקוח אורח',
+    path: ['clientId']
 })
 
 export async function getInvoices(scope: string = 'BUSINESS') {
@@ -132,7 +139,8 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
         const invoice = await db.invoice.create({
             data: {
                 userId,
-                clientId: validData.clientId,
+                clientId: validData.isGuestClient ? null : validData.clientId,
+                guestClientName: validData.isGuestClient ? validData.guestClientName : null,
                 scope,
                 invoiceNumber: validData.invoiceNumber,
                 issueDate: validData.issueDate,
@@ -196,7 +204,7 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
                     date: invoiceDate,
 
                     // Business fields
-                    clientId: validData.clientId,
+                    clientId: validData.isGuestClient ? null : validData.clientId,
                     invoiceId: invoice.id,
                     amountBeforeVat: validData.subtotal,
                     vatRate: vatRate,

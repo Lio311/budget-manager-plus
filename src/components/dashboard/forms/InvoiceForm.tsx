@@ -11,9 +11,10 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { toast } from 'sonner'
 import { Trash2 } from 'lucide-react'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
-import { getIncomes, getClientUninvoicedIncomes } from '@/lib/actions/income' // Need to fetch client incomes
+import { getIncomes, getClientUninvoicedIncomes } from '@/lib/actions/income'
 import useSWR from 'swr'
 import { formatCurrency } from '@/lib/utils'
+import { ClientSelector } from './ClientSelector'
 
 interface InvoiceFormProps {
     clients: any[]
@@ -47,6 +48,8 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
     })
 
     const [errors, setErrors] = useState<Record<string, boolean>>({})
+    const [isGuestClient, setIsGuestClient] = useState(false)
+    const [guestClientName, setGuestClientName] = useState('')
 
     const [loadingNumber, setLoadingNumber] = useState(false)
     const { year, month } = useBudget()
@@ -142,8 +145,12 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
             newErrors.lineItems = true
         }
 
-        if (!formData.clientId) {
+        if (!isGuestClient && !formData.clientId) {
             newErrors.clientId = true
+        }
+
+        if (isGuestClient && !guestClientName.trim()) {
+            newErrors.guestClientName = true
         }
 
         if (Object.keys(newErrors).length > 0) {
@@ -160,7 +167,10 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                 ...formData,
                 incomeId: selectedIncomeId,
                 createIncomeFromInvoice: formData.createIncomeFromInvoice,
-                lineItems
+                lineItems,
+                isGuestClient,
+                guestClientName: isGuestClient ? guestClientName : undefined,
+                clientId: isGuestClient ? undefined : formData.clientId
             })
             onSuccess()
         } catch (error) {
@@ -197,22 +207,19 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         לקוח *
                     </label>
-                    <div dir="rtl">
-                        <Select
-                            value={formData.clientId}
-                            onValueChange={(value) => setFormData((prev) => ({ ...prev, clientId: value }))}
-                        >
-                            <SelectTrigger className={`w-full bg-white dark:bg-slate-800 text-right ${errors.clientId ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-300 dark:border-slate-700'}`}>
-                                <SelectValue placeholder="בחר לקוח" />
-                            </SelectTrigger>
-                            <SelectContent dir="rtl">
-                                {clients.map((client: any) => (
-                                    <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        {errors.clientId && <p className="text-red-500 text-xs text-right mt-1">שדה חובה</p>}
-                    </div>
+                    <ClientSelector
+                        clients={clients}
+                        selectedClientId={formData.clientId}
+                        guestClientName={guestClientName}
+                        isGuestMode={isGuestClient}
+                        onClientIdChange={(id) => setFormData(prev => ({ ...prev, clientId: id }))}
+                        onGuestModeToggle={() => {
+                            setIsGuestClient(!isGuestClient)
+                            setErrors(prev => ({ ...prev, clientId: false, guestClientName: false }))
+                        }}
+                        onGuestNameChange={setGuestClientName}
+                        error={errors.clientId || errors.guestClientName}
+                    />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
