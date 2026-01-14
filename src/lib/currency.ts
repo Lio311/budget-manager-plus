@@ -12,7 +12,7 @@ interface ExchangeRates {
 
 // Map of supported currency codes to their display symbols
 export const SUPPORTED_CURRENCIES = {
-    'ILS': '₪',
+    'ILS': 'ש״ח',
     'USD': '$',
     'EUR': '€'
 } as const;
