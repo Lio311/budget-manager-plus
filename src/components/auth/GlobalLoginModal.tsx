@@ -37,6 +37,17 @@ export function GlobalLoginModal() {
                 redirectUrlComplete: redirectUrl || '/dashboard' // Explicitly fallback but prefer context URL
             })
             closeModal()
+        } catch (err: any) {
+            console.error('Login error:', err)
+            // Handle specific "already signed in" error from Clerk
+            if (err?.errors?.[0]?.code === 'session_exists' ||
+                err?.message?.includes('already signed in') ||
+                JSON.stringify(err).includes('already signed in')) {
+                router.push(redirectUrl)
+                closeModal()
+            }
+        } finally {
+            setIsLoading(false)
         }
         setIsLoading(false)
     }
