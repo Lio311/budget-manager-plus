@@ -32,6 +32,7 @@ import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { RenewSubscriptionDialog } from '@/components/dashboard/dialogs/RenewSubscriptionDialog'
+import { ComboboxInput } from '@/components/ui/combobox-input'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -93,6 +94,7 @@ export function ClientsTab() {
     const [searchTerm, setSearchTerm] = useState('')
     const [showForm, setShowForm] = useState(false)
     const [editingClient, setEditingClient] = useState<any>(null)
+    const [selectedClientDetails, setSelectedClientDetails] = useState<any>(null)
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
     const [showAdvanced, setShowAdvanced] = useState(false)
     const [formData, setFormData] = useState<ClientFormData>({
@@ -119,8 +121,6 @@ export function ClientsTab() {
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [isAddingPackage, setIsAddingPackage] = useState(false)
-    const [openCity, setOpenCity] = useState(false)
-    const [openBank, setOpenBank] = useState(false)
     const [showPackagesManager, setShowPackagesManager] = useState(false)
     const [packages, setPackages] = useState<any[]>([])
 
@@ -495,7 +495,7 @@ export function ClientsTab() {
                             onClick={() => document.getElementById('import-clients')?.click()}
                         >
                             ייבוא לקוחות
-                            <FileSpreadsheet className="h-4 w-4" />
+                            <Upload className="h-4 w-4" />
                         </Button>
                     </div>
 
@@ -706,48 +706,12 @@ export function ClientsTab() {
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     עיר
                                 </label>
-                                <Popover open={openCity} onOpenChange={setOpenCity}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            aria-expanded={openCity}
-                                            className="w-full justify-between bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 h-[42px] font-normal"
-                                        >
-                                            {formData.city || "בחר עיר..."}
-                                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[250px] p-0 h-[300px]" align="start">
-                                        <Command className="[&_[cmdk-input-wrapper]]:flex-row-reverse [&_[cmdk-input-wrapper]_svg]:ml-2 [&_[cmdk-input-wrapper]_svg]:mr-4">
-                                            <CommandInput placeholder="חפש עיר..." className="text-right" />
-                                            <CommandList>
-                                                <CommandEmpty className="py-6 text-center text-sm">לא נמצאה עיר.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {ISRAELI_CITIES.map((city) => (
-                                                        <CommandItem
-                                                            key={city}
-                                                            value={city}
-                                                            onSelect={(currentValue) => {
-                                                                setFormData({ ...formData, city: currentValue })
-                                                                setOpenCity(false)
-                                                            }}
-                                                            className="text-right flex flex-row-reverse justify-between"
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "mr-2 h-4 w-4",
-                                                                    formData.city === city ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            {city}
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
+                                <ComboboxInput
+                                    value={formData.city}
+                                    onChange={(val) => setFormData({ ...formData, city: val })}
+                                    options={ISRAELI_CITIES}
+                                    placeholder="בחר עיר..."
+                                />
                             </div>
                         </div>
 
@@ -763,48 +727,12 @@ export function ClientsTab() {
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     בנק
                                 </label>
-                                <Popover open={openBank} onOpenChange={setOpenBank}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            aria-expanded={openBank}
-                                            className="w-full justify-between bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 h-[42px] font-normal"
-                                        >
-                                            {formData.bankName || "בחר בנק..."}
-                                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[250px] p-0 h-[300px]" align="start">
-                                        <Command className="[&_[cmdk-input-wrapper]]:flex-row-reverse [&_[cmdk-input-wrapper]_svg]:ml-2 [&_[cmdk-input-wrapper]_svg]:mr-4">
-                                            <CommandInput placeholder="חפש בנק..." className="text-right" />
-                                            <CommandList>
-                                                <CommandEmpty className="py-6 text-center text-sm">לא נמצא בנק.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {ISRAELI_BANKS.map((bank) => (
-                                                        <CommandItem
-                                                            key={bank.code}
-                                                            value={bank.name}
-                                                            onSelect={(currentValue) => {
-                                                                setFormData({ ...formData, bankName: currentValue })
-                                                                setOpenBank(false)
-                                                            }}
-                                                            className="text-right flex flex-row-reverse justify-between"
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "mr-2 h-4 w-4",
-                                                                    formData.bankName === bank.name ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            {bank.name}
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
+                                <ComboboxInput
+                                    value={formData.bankName}
+                                    onChange={(val) => setFormData({ ...formData, bankName: val })}
+                                    options={ISRAELI_BANKS.map(b => b.name)}
+                                    placeholder="בחר בנק..."
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
