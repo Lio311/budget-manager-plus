@@ -133,13 +133,13 @@ export function ContactDialog({ open, onOpenChange }: ContactDialogProps) {
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <Loader2 className="ml-2 h-5 w-5 animate-spin" />
                                         שולח...
+                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                     </>
                                 ) : isSuccess ? (
                                     <>
-                                        <CheckCircle2 className="mr-2 h-5 w-5" />
                                         נשלח בהצלחה!
+                                        <CheckCircle2 className="mr-2 h-5 w-5" />
                                     </>
                                 ) : (
                                     <>
