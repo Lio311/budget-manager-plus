@@ -104,22 +104,21 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4" dir="rtl">
-                    <div className="space-y-2">
-                        <Label>סוג מנוי</Label>
-                        <Select value={subscriptionType} onValueChange={setSubscriptionType}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="בחר סוג מנוי" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="WEEKLY">שבועי</SelectItem>
-                                <SelectItem value="MONTHLY">חודשי</SelectItem>
-                                <SelectItem value="YEARLY">שנתי</SelectItem>
-                                <SelectItem value="PROJECT">פרויקט חד פעמי</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
                     <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label>סוג מנוי</Label>
+                            <Select value={subscriptionType} onValueChange={setSubscriptionType}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="בחר סוג" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="WEEKLY">שבועי</SelectItem>
+                                    <SelectItem value="MONTHLY">חודשי</SelectItem>
+                                    <SelectItem value="YEARLY">שנתי</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
                         <div className="space-y-2">
                             <Label>חבילה</Label>
                             <Select
@@ -151,6 +150,18 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                                 </SelectContent>
                             </Select>
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label>מחיר לחיוב</Label>
+                            <Input
+                                type="number"
+                                value={subscriptionPrice}
+                                onChange={(e) => setSubscriptionPrice(e.target.value)}
+                                placeholder="0.00"
+                            />
+                        </div>
 
                         <div className="space-y-2">
                             <Label>סטטוס תשלום</Label>
@@ -166,16 +177,6 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                                 </SelectContent>
                             </Select>
                         </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>מחיר לחיוב</Label>
-                        <Input
-                            type="number"
-                            value={subscriptionPrice}
-                            onChange={(e) => setSubscriptionPrice(e.target.value)}
-                            placeholder="0.00"
-                        />
                     </div>
 
                     <div className="space-y-2">
