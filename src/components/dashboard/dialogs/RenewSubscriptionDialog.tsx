@@ -123,17 +123,13 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                         <div className="space-y-2">
                             <Label>חבילה</Label>
                             <Select
-                                value={packageId || (packageName ? 'custom' : '')}
+                                value={packageId}
                                 onValueChange={(val) => {
-                                    if (val === 'custom') {
-                                        setPackageId('custom')
-                                        setPackageName(client.packageName || '')
-                                    } else {
-                                        setPackageId(val)
-                                        const pkg = packages.find(p => p.id === val)
-                                        if (pkg) {
-                                            setSubscriptionPrice(pkg.defaultPrice?.toString() || '')
-                                        }
+                                    setPackageId(val)
+                                    const pkg = packages.find(p => p.id === val)
+                                    if (pkg) {
+                                        setSubscriptionPrice(pkg.defaultPrice?.toString() || '')
+                                        setPackageName(pkg.name)
                                     }
                                 }}
                             >
@@ -152,18 +148,8 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                                             </div>
                                         </SelectItem>
                                     ))}
-                                    <SelectItem value="custom">אחר (מותאם אישית)</SelectItem>
                                 </SelectContent>
                             </Select>
-
-                            {packageId === 'custom' && (
-                                <Input
-                                    className="mt-2"
-                                    value={packageName}
-                                    onChange={(e) => setPackageName(e.target.value)}
-                                    placeholder="שם חבילה מותאם"
-                                />
-                            )}
                         </div>
 
                         <div className="space-y-2">
