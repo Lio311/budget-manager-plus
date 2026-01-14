@@ -41,6 +41,8 @@ export async function submitContactForm(formData: FormData) {
             </div>
         `
 
+        console.log('🔄 Attempting to send email to info@kesefly.co.il...')
+
         // Send email to business
         const result = await sendEmail(
             'info@kesefly.co.il',
@@ -48,8 +50,10 @@ export async function submitContactForm(formData: FormData) {
             emailHtml
         )
 
+        console.log('📬 Email send result:', result)
+
         if (!result.success) {
-            console.error('Failed to send contact email:', result.error)
+            console.error('❌ Failed to send contact email:', result.error)
             // Still log for backup
         }
 
