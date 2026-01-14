@@ -743,6 +743,7 @@ div[class*="cl-branding"] {
 .cl-profilePage .cl-footer {
   gap: 1rem !important;
   padding-top: 2rem !important;
+  direction: ltr !important;
 }
 
 /* Footer */
