@@ -56,9 +56,16 @@ export function ClientSelector({
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
 
+    const [inputValue, setInputValue] = useState(selectedClient ? selectedClient.name : "")
+
+    // Allow typing
+    useEffect(() => {
+        setInputValue(selectedClient ? selectedClient.name : "")
+    }, [selectedClient])
+
     return (
         <div className="space-y-3" ref={containerRef}>
-            {/* Mode Toggle */}
+            {/* ... preserved buttons ... */}
             <div className="flex gap-4 text-sm">
                 <button
                     type="button"
@@ -95,8 +102,9 @@ export function ClientSelector({
                         className="rounded-lg border shadow-sm overflow-visible bg-white dark:bg-slate-800 [&_[cmdk-input-wrapper]]:flex-row-reverse [&_[cmdk-input-wrapper]_svg]:ml-2 [&_[cmdk-input-wrapper]_svg]:mr-0"
                     >
                         <CommandInput
-                            placeholder={selectedClient ? selectedClient.name : "חפש לקוח..."}
-                            value={selectedClient ? selectedClient.name : ""}
+                            placeholder="חפש לקוח..."
+                            value={inputValue}
+                            onValueChange={setInputValue}
                             onFocus={() => setOpen(true)}
                             className={cn(
                                 "text-right",
@@ -114,6 +122,7 @@ export function ClientSelector({
                                                 value={client.name}
                                                 onSelect={() => {
                                                     onClientIdChange(client.id)
+                                                    setInputValue(client.name) // Sync immediately
                                                     setOpen(false)
                                                 }}
                                                 className="text-right cursor-pointer flex flex-row-reverse justify-between"

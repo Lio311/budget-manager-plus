@@ -487,11 +487,11 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
             <div className="flex gap-2 pt-2">
                 <Button
                     type="submit"
-                    className={`w-full md:w-auto transition-all ${(!formData.clientId || !formData.invoiceNumber || lineItems.length === 0 || ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice))
+                    className={`w-full md:w-auto transition-all ${(((!isGuestClient && !formData.clientId) || (isGuestClient && !guestClientName)) || !formData.invoiceNumber || lineItems.length === 0 || ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice))
                         ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
                         : 'bg-purple-600 hover:bg-purple-700'
                         }`}
-                    disabled={!formData.clientId || !formData.invoiceNumber || lineItems.length === 0 || ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice)}
+                    disabled={((!isGuestClient && !formData.clientId) || (isGuestClient && !guestClientName)) || !formData.invoiceNumber || lineItems.length === 0 || ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice)}
                 >
                     צור חשבונית
                 </Button>
