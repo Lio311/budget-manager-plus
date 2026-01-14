@@ -83,7 +83,10 @@ export async function getClients(scope: string = 'BUSINESS') {
         const [incomeGroups, paidInvoiceGroups, allInvoiceGroups, expenseGroups] = await Promise.all([
             db.income.groupBy({
                 by: ['clientId'],
-                where: { clientId: { in: clientIds } },
+                where: {
+                    clientId: { in: clientIds },
+                    status: 'PAID'
+                },
                 _sum: { amount: true }
             }),
             db.invoice.groupBy({
@@ -359,6 +362,7 @@ export async function getClientStats(clientId: string, year: number) {
                 const result = await db.income.aggregate({
                     where: {
                         clientId,
+                        status: 'PAID',
                         date: {
                             gte: new Date(year, month - 1, 1),
                             lt: new Date(year, month, 1)
@@ -377,7 +381,7 @@ export async function getClientStats(clientId: string, year: number) {
 
         // Get total stats
         const totalRevenue = await db.income.aggregate({
-            where: { clientId },
+            where: { clientId, status: 'PAID' },
             _sum: { amount: true },
             _count: true
         })
