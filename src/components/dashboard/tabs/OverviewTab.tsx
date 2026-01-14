@@ -296,7 +296,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         initialSavings: isBusiness ? (overviewData?.user as any)?.businessInitialSavings : overviewData?.user?.initialSavings
     }
 
-    return (
     const newClientsCount = (overviewData as any)?.businessStats?.newClientsCount || 0
     const salesBeforeVat = current.incomes.reduce((sum: number, item: any) => sum + (item.amountBeforeVatILS || 0), 0)
 
@@ -304,15 +303,15 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     // If business metric (no target): 0 -> 0%, >0 -> 100% (as "Active")
     // If personal metric (has target/total): Calculate %
     const calculateWidth = (value: number, total: number | null, isBusinessMetric: boolean) => {
-            if (!showProgress) return '0%'
+        if (!showProgress) return '0%'
 
-            if (isBusinessMetric) {
-                return value > 0 ? '100%' : '0%'
-            }
-
-            // Personal logic
-            return `${Math.min((value / (total || 1)) * 100, 100)}%`
+        if (isBusinessMetric) {
+            return value > 0 ? '100%' : '0%'
         }
+
+        // Personal logic
+        return `${Math.min((value / (total || 1)) * 100, 100)}%`
+    }
 
     return (
         <div className="space-y-6 pb-20 animate-in fade-in-50 duration-500 font-sans px-2 md:px-0" dir="rtl">
