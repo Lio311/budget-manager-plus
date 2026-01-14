@@ -748,8 +748,20 @@ div[class*="cl-branding"] {
 
 /* Footer */
 .cl-footer,
-.cl-userButtonPopoverFooter {
+.cl-userButtonPopoverFooter,
+.cl-userProfile-footer,
+.cl-rootBox .cl-footer,
+div[class*="cl-footer"],
+div[class*="cl-userProfile-footer"] {
   direction: ltr !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.cl-rootBox .cl-footer>div,
+.cl-userProfile-footer>div {
+  display: flex !important;
+  gap: 0.5rem !important;
 }
 
 .dark .cl-footer,
