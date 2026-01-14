@@ -7,32 +7,36 @@ import { z } from 'zod'
 import { addIncome } from './income'
 import { addDays, addMonths, addYears, isSameDay, startOfDay } from 'date-fns'
 
+const emptyToUndefined = (val: unknown) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    return val;
+};
+
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
-    email: z.string().email('כתובת אימייל לא תקינה').max(100).optional().or(z.literal('')),
-    phone: z.string().max(30).optional().or(z.literal('')),
-    taxId: z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional().or(z.literal('')),
-    address: z.string().max(200, 'הכתובת ארוכה מדי').optional().or(z.literal('')),
-    notes: z.string().max(500, 'הערות ארוכות מדי').optional().or(z.literal('')),
+    email: z.preprocess(emptyToUndefined, z.string().email('כתובת אימייל לא תקינה').max(100).optional()),
+    phone: z.preprocess(emptyToUndefined, z.string().max(30).optional()),
+    taxId: z.preprocess(emptyToUndefined, z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional()),
+    address: z.preprocess(emptyToUndefined, z.string().max(200, 'הכתובת ארוכה מדי').optional()),
+    notes: z.preprocess(emptyToUndefined, z.string().max(500, 'הערות ארוכות מדי').optional()),
     isActive: z.boolean().optional(),
 
     // New Fields
-    city: z.string().max(100).optional().or(z.literal('')),
-    bankName: z.string().max(100).optional().or(z.literal('')),
-    bankBranch: z.string().max(20).optional().or(z.literal('')),
-    bankAccount: z.string().max(50).optional().or(z.literal('')),
+    city: z.preprocess(emptyToUndefined, z.string().max(100).optional()),
+    bankName: z.preprocess(emptyToUndefined, z.string().max(100).optional()),
+    bankBranch: z.preprocess(emptyToUndefined, z.string().max(20).optional()),
+    bankAccount: z.preprocess(emptyToUndefined, z.string().max(50).optional()),
 
     // SaaS Fields
-    // SaaS Fields
-    subscriptionType: z.string().optional().or(z.literal('')),
-    subscriptionStart: z.preprocess((arg) => (arg === '' || arg === null ? undefined : arg), z.coerce.date().optional()),
-    subscriptionEnd: z.preprocess((arg) => (arg === '' || arg === null ? undefined : arg), z.coerce.date().optional()),
-    subscriptionPrice: z.preprocess((arg) => (arg === '' || arg === null ? undefined : parseFloat(arg as string)), z.number().optional()),
-    subscriptionStatus: z.string().optional().or(z.literal('')),
-    packageName: z.string().max(100, 'שם החבילה ארוך מדי').optional().or(z.literal('')),
-    subscriptionColor: z.string().optional().or(z.literal('')),
-    packageId: z.string().optional().or(z.literal('')),
-    eventLocation: z.string().max(200, 'המיקום ארוך מדי').optional().or(z.literal(''))
+    subscriptionType: z.preprocess(emptyToUndefined, z.string().optional()),
+    subscriptionStart: z.preprocess(emptyToUndefined, z.coerce.date().optional()),
+    subscriptionEnd: z.preprocess(emptyToUndefined, z.coerce.date().optional()),
+    subscriptionPrice: z.preprocess(emptyToUndefined, z.coerce.number().optional()),
+    subscriptionStatus: z.preprocess(emptyToUndefined, z.string().optional()),
+    packageName: z.preprocess(emptyToUndefined, z.string().max(100, 'שם החבילה ארוך מדי').optional()),
+    subscriptionColor: z.preprocess(emptyToUndefined, z.string().optional()),
+    packageId: z.preprocess(emptyToUndefined, z.string().optional()),
+    eventLocation: z.preprocess(emptyToUndefined, z.string().max(200, 'המיקום ארוך מדי').optional())
 })
 
 export interface ClientFormData {
