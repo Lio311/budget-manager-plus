@@ -626,7 +626,7 @@ div[class*="cl-branding"] {
 /* Ensure the modal content allows the footer to sit nicely */
 /* Ensure the modal content allows the footer to sit nicely */
 .cl-modalContent {
-  overflow: visible !important;
+  /* overflow: visible !important; */
 }
 
 /* Mobile Fixes for Clerk User Profile */
