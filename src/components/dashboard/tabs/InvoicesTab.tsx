@@ -65,7 +65,7 @@ export function InvoicesTab() {
         return result.data.map((inv: any) => ({
             id: inv.id,
             invoiceNumber: inv.invoiceNumber,
-            clientName: inv.client?.name || 'לקוח לא ידוע',
+            clientName: inv.guestClientName || inv.client?.name || 'לקוח לא ידוע',
             clientId: inv.clientId,
             date: inv.issueDate,
             dueDate: inv.dueDate,
