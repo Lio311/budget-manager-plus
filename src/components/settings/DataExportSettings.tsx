@@ -59,83 +59,98 @@ export function DataExportSettings() {
         const csvRows = [headers.join(',')]
 
         for (const row of data) {
-            const values = headers.map(header => {
-                let val = ''
+            let values: string[] = []
 
-                // Mapping logic based on type (simplified for robust export)
-                switch (type) {
-                    case 'clients':
-                        if (header === 'ID') val = row.id
-                        if (header === 'Name') val = row.name
-                        if (header === 'Email') val = row.email
-                        if (header === 'Phone') val = row.phone
-                        if (header === 'Tax ID') val = row.taxId
-                        if (header === 'City') val = row.city
-                        if (header === 'Address') val = row.address
-                        if (header === 'Total Revenue') val = row.totalRevenue
-                        break;
-                    case 'incomes':
-                        if (header === 'ID') val = row.id
-                        if (header === 'Date') val = row.date ? format(new Date(row.date), 'yyyy-MM-dd') : ''
-                        if (header === 'Amount') val = row.amount
-                        if (header === 'Currency') val = row.currency
-                        if (header === 'Source') val = row.source
-                        if (header === 'Category') val = row.category
-                        if (header === 'Client Name') val = row.client?.name || row.payer || ''
-                        if (header === 'Invoice Number') val = row.invoice?.invoiceNumber || ''
-                        if (header === 'Payment Method') val = row.paymentMethod
-                        if (header === 'Status') val = row.status
-                        break;
-                    case 'expenses':
-                        if (header === 'ID') val = row.id
-                        if (header === 'Date') val = row.date ? format(new Date(row.date), 'yyyy-MM-dd') : ''
-                        if (header === 'Amount') val = row.amount
-                        if (header === 'Currency') val = row.currency
-                        if (header === 'Description') val = row.description
-                        if (header === 'Category') val = row.category
-                        if (header === 'Supplier Name') val = row.supplier?.name || ''
-                        if (header === 'Payment Method') val = row.paymentMethod
-                        if (header === 'Is Deductible') val = row.isDeductible ? 'Yes' : 'No'
-                        break;
-                    case 'suppliers':
-                        if (header === 'ID') val = row.id
-                        if (header === 'Name') val = row.name
-                        if (header === 'Email') val = row.email
-                        if (header === 'Phone') val = row.phone
-                        if (header === 'Tax ID') val = row.taxId
-                        if (header === 'Category') val = row.category
-                        break;
-                    case 'invoices':
-                        if (header === 'ID') val = row.id
-                        if (header === 'Invoice Number') val = row.invoiceNumber
-                        if (header === 'Issue Date') val = row.issueDate ? format(new Date(row.issueDate), 'yyyy-MM-dd') : ''
-                        if (header === 'Client Name') val = row.client?.name || row.guestClientName || ''
-                        if (header === 'Subtotal') val = row.subtotal
-                        if (header === 'VAT Amount') val = row.vatAmount
-                        if (header === 'Total') val = (row.subtotal || 0) + (row.vatAmount || 0)
-                        if (header === 'Status') val = row.status // Check if status exists on invoice, assuming yes or derived
-                        break;
-                    default:
-                        val = row[header]
-                }
+            switch (type) {
+                case 'clients':
+                    values = [
+                        row.name,
+                        row.email,
+                        row.phone,
+                        row.city,
+                        row.address,
+                        row.taxId,
+                        row.notes,
+                        row.isActive ? 'פעיל' : 'לא פעיל',
+                        row.createdAt ? new Date(row.createdAt).toLocaleDateString('he-IL') : '',
+                        row.bankName,
+                        row.bankBranch,
+                        row.bankAccount
+                    ]
+                    break
+                case 'incomes':
+                    values = [
+                        row.date ? new Date(row.date).toLocaleDateString('he-IL') : '',
+                        row.client?.name || '',
+                        row.source,
+                        row.category,
+                        row.amount?.toString(),
+                        row.currency,
+                        row.paymentMethod,
+                        row.invoice?.invoiceNumber || '',
+                        row.status
+                    ]
+                    break
+                case 'expenses':
+                    values = [
+                        row.date ? new Date(row.date).toLocaleDateString('he-IL') : '',
+                        row.supplier?.name || '',
+                        row.client?.name || '',
+                        row.description,
+                        row.category,
+                        row.amount?.toString(),
+                        row.currency,
+                        row.paymentMethod,
+                        row.expenseType
+                    ]
+                    break
+                case 'suppliers':
+                    values = [
+                        row.name,
+                        row.email,
+                        row.phone,
+                        row.address,
+                        row.taxId,
+                        row.notes,
+                        row.isActive ? 'פעיל' : 'לא פעיל'
+                    ]
+                    break
+                case 'invoices':
+                    values = [
+                        row.invoiceNumber,
+                        row.client?.name || row.guestClientName || '',
+                        row.issueDate ? new Date(row.issueDate).toLocaleDateString('he-IL') : '',
+                        row.dueDate ? new Date(row.dueDate).toLocaleDateString('he-IL') : '',
+                        row.subtotal?.toString(),
+                        row.vatAmount?.toString(),
+                        row.total?.toString(),
+                        row.status,
+                        row.currency,
+                        row.paymentMethod,
+                        row.notes
+                    ]
+                    break
+            }
 
-                const escaped = ('' + (val || '')).replace(/"/g, '\\"')
-                return `"${escaped}"`
+            const escapedValues = values.map(val => {
+                const str = '' + (val || '')
+                return `"${str.replace(/"/g, '""')}"`
             })
-            csvRows.push(values.join(','))
+            csvRows.push(escapedValues.join(','))
         }
 
         return csvRows.join('\n')
     }
 
-    const handleExport = async (type: string) => {
+    const handleExport = async (type: ExportType) => {
         setLoading(prev => ({ ...prev, [type]: true }))
         try {
-            const result = await getExportData(type as ExportType)
+            const result = await getExportData(type)
 
             if (result.success && result.data) {
                 const csv = convertToCSV(result.data, type)
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                // Add BOM for Excel Hebrew support
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
                 const url = URL.createObjectURL(blob)
                 const link = document.createElement('a')
                 link.href = url
@@ -143,13 +158,13 @@ export function DataExportSettings() {
                 document.body.appendChild(link)
                 link.click()
                 document.body.removeChild(link)
-                toast.success(`קובץ ${type} יוצא בהצלחה`)
+                toast.success('הקובץ יוצא בהצלחה')
             } else {
                 toast.error('שגיאה בייצוא הנתונים')
             }
         } catch (error) {
             console.error(error)
-            toast.error('שגיאה בייצוא הנתונים')
+            toast.error('אירעה שגיאה בייצוא')
         } finally {
             setLoading(prev => ({ ...prev, [type]: false }))
         }
@@ -162,7 +177,7 @@ export function DataExportSettings() {
                     <FileSpreadsheet className="h-5 w-5 text-green-600" />
                     ייצוא נתונים
                 </CardTitle>
-                <CardDescription className="text-right">
+                <CardDescription className="text-right" dir="rtl">
                     הורדת נתונים כקובץ CSV לשימוש ב-Excel או תוכנות אחרות
                 </CardDescription>
             </CardHeader>
@@ -201,7 +216,7 @@ export function DataExportSettings() {
                                     ) : (
                                         <>
                                             <Download className="mr-2 h-4 w-4" />
-                                            הורד CSV
+                                            CSV הורד
                                         </>
                                     )}
                                 </Button>

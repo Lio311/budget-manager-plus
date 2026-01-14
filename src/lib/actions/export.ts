@@ -24,25 +24,30 @@ export async function getExportData(type: ExportType) {
                 data = await db.supplier.findMany({
                     orderBy: { name: 'asc' }
                 })
-                break;
+                break
+            case 'invoices':
+                data = await db.invoice.findMany({
+                    include: { client: true },
+                    orderBy: { issueDate: 'desc' }
+                })
+                break
             case 'incomes':
                 data = await db.income.findMany({
                     include: { client: true, invoice: true },
                     orderBy: { date: 'desc' }
                 })
-                break;
+                break
             case 'expenses':
                 data = await db.expense.findMany({
-                    include: { supplier: true },
+                    include: { supplier: true, client: true },
                     orderBy: { date: 'desc' }
                 })
-                break;
-            case 'invoices':
-                data = await db.invoice.findMany({
-                    include: { client: true, lineItems: true },
-                    orderBy: { issueDate: 'desc' }
+                break
+            case 'suppliers':
+                data = await db.supplier.findMany({
+                    orderBy: { name: 'asc' }
                 })
-                break;
+                break
             default:
                 return { success: false, error: 'Invalid export type' }
         }
