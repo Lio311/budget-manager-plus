@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency, getDaysInMonth, getMonthName } from '@/lib/utils'
+import { getCurrencySymbol } from '@/lib/currency'
 import { getBills, toggleBillPaid } from '@/lib/actions/bill'
 import { getDebts, toggleDebtPaid } from '@/lib/actions/debts'
 import { getIncomes } from '@/lib/actions/income'
@@ -487,7 +488,7 @@ export function CalendarTab() {
                                         <SelectItem value="none">ללא</SelectItem>
                                         {incomes.map((income: any) => (
                                             <SelectItem key={income.id} value={income.id}>
-                                                {income.source} - {formatCurrency(income.amount, income.currency)}
+                                                {income.source} - {formatCurrency(income.amount, getCurrencySymbol(income.currency))}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
