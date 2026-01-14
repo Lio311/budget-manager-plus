@@ -27,6 +27,7 @@ import { FinancialAdvisorButton } from '@/components/dashboard/FinancialAdvisorB
 import { FeedbackButton } from '@/components/dashboard/FeedbackButton'
 import { ReferralDashboard } from '@/components/dashboard/referral/ReferralDashboard'
 import { BusinessSettings } from '@/components/settings/BusinessSettings'
+import { DataExportSettings } from '@/components/settings/DataExportSettings'
 import { IntegrationsSettings } from '@/components/settings/IntegrationsSettings'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { CustomTooltip } from '../charts/CustomTooltip'
@@ -738,9 +739,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <DialogTitle className="text-right">הגדרות עסק</DialogTitle>
                             </DialogHeader>
                             <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
-                                <TabsList className="grid w-full grid-cols-2">
+                                <TabsList className="grid w-full grid-cols-3">
                                     <TabsTrigger value="details">פרטי העסק</TabsTrigger>
                                     <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
+                                    <TabsTrigger value="export">ייצוא נתונים</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="details" className="mt-4">
                                     <BusinessSettings onSuccess={() => setIsSettingsOpen(false)} />
@@ -786,6 +788,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                             </Button>
                                         </CardContent>
                                     </Card>
+                                </TabsContent>
+                                <TabsContent value="export" className="mt-4">
+                                    <DataExportSettings />
                                 </TabsContent>
                             </Tabs>
                         </DialogContent>

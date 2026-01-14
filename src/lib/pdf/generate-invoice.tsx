@@ -31,12 +31,52 @@ interface GenerateInvoicePDFParams {
     userId: string
 }
 
+export function mapInvoiceToPDFData(invoice: any, businessProfile: any, businessBudget: any) {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') || 'https://www.kesefly.co.il'
+    const logoPath = `${baseUrl}/images/branding/K-LOGO.png`
+
+    const vatRate = invoice.vatRate * 100
+    const subtotal = invoice.subtotal
+    const vatAmount = invoice.vatAmount
+    const total = invoice.total
+
+    return {
+        title: 'חשבונית',
+        invoiceNumber: invoice.invoiceNumber,
+        issueDate: invoice.issueDate.toISOString(),
+        dueDate: invoice.dueDate?.toISOString() || invoice.issueDate.toISOString(),
+        status: getStatusLabel(invoice.status),
+        paymentMethod: getPaymentMethodLabel(invoice.paymentMethod),
+
+        businessName: businessProfile?.companyName || 'החברה שלי',
+        businessId: businessProfile?.companyId || undefined,
+        businessAddress: businessProfile?.address || undefined,
+        businessPhone: businessProfile?.phone || undefined,
+        businessEmail: businessProfile?.email || undefined,
+        businessLogo: businessProfile?.logoUrl || undefined,
+        businessSignature: businessProfile?.signatureUrl || undefined,
+
+        clientName: invoice.guestClientName || invoice.client?.name || 'N/A',
+        clientId: invoice.client?.taxId || undefined,
+
+        subtotal,
+        vatRate,
+        vatAmount,
+        total,
+        currency: invoice.currency || businessBudget?.currency || 'ILS',
+
+        notes: invoice.notes || undefined,
+        poweredByLogoPath: logoPath
+    }
+}
+
+export async function generatePDFBuffer(data: any): Promise<Buffer> {
+    registerFont()
+    return await renderToBuffer(<InvoiceTemplate data={data} />)
+}
+
 export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoicePDFParams): Promise<{ buffer: Buffer, filename: string }> {
     try {
-        // Ensure font is registered
-        registerFont()
-
-        // ... (data fetching remains same)
         const invoice = await prisma.invoice.findFirst({
             where: {
                 id: invoiceId,
@@ -48,9 +88,7 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
                     include: {
                         businessProfile: true,
                         budgets: {
-                            where: {
-                                type: 'BUSINESS'
-                            },
+                            where: { type: 'BUSINESS' },
                             take: 1
                         }
                     }
@@ -65,58 +103,12 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
         const businessProfile = invoice.user.businessProfile
         const businessBudget = invoice.user.budgets[0]
 
-        // Construct logo URL using Vercel URL or fallback
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') || 'https://www.kesefly.co.il'
-        const logoPath = `${baseUrl}/images/branding/K-LOGO.png`
+        const invoiceData = mapInvoiceToPDFData(invoice, businessProfile, businessBudget)
 
-        // Use invoice's own financial data
-        const vatRate = invoice.vatRate * 100 // Convert to percentage
-        const subtotal = invoice.subtotal
-        const vatAmount = invoice.vatAmount
-        const total = invoice.total
-
-        // Prepare invoice data
-        const invoiceData: any = {
-            title: 'חשבונית',
-            invoiceNumber: invoice.invoiceNumber,
-            issueDate: invoice.issueDate.toISOString(),
-            dueDate: invoice.dueDate?.toISOString() || invoice.issueDate.toISOString(),
-            status: getStatusLabel(invoice.status),
-            paymentMethod: getPaymentMethodLabel(invoice.paymentMethod),
-
-            // Business info
-            businessName: businessProfile?.companyName || 'החברה שלי',
-            businessId: businessProfile?.companyId || undefined,
-            businessAddress: businessProfile?.address || undefined,
-            businessPhone: businessProfile?.phone || undefined,
-            businessEmail: businessProfile?.email || undefined,
-            businessLogo: businessProfile?.logoUrl || undefined,
-            businessSignature: businessProfile?.signatureUrl || undefined,
-
-            // Client info
-            clientName: invoice.guestClientName || invoice.client?.name || 'N/A',
-            clientId: invoice.client?.taxId || undefined,
-
-            // Financial
-            subtotal,
-            vatRate,
-            vatAmount,
-            total,
-            currency: invoice.currency || businessBudget?.currency || 'ILS',
-
-            // Notes
-            notes: invoice.notes || undefined,
-
-            // System
-            poweredByLogoPath: logoPath
-        }
-
-        // Generate filename
         const sanitizedBusinessName = (businessProfile?.companyName || 'Business').replace(/[^a-zA-Z0-9\u0590-\u05FF\s-]/g, '').trim()
         const filename = `${invoice.invoiceNumber} Invoice from ${sanitizedBusinessName}.pdf`
 
-        // Generate PDF
-        const buffer = await renderToBuffer(<InvoiceTemplate data={invoiceData} />)
+        const buffer = await generatePDFBuffer(invoiceData)
 
         return { buffer, filename }
     } catch (error) {
