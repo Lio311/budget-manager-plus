@@ -21,7 +21,7 @@ export const FormattedNumberInput = forwardRef<HTMLInputElement, FormattedNumber
             if (value === '' || value === null || value === undefined) {
                 setDisplayValue('')
             } else {
-                setDisplayValue(formatNumberWithCommas(value))
+                setDisplayValue(formatNumberWithCommas(Number(value)))
             }
         }, [value])
 
