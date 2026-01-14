@@ -18,6 +18,7 @@ export async function getWorkEvents(month: number, year: number) {
 
         const events = await db.workEvent.findMany({
             where: {
+                userId: userId, // Explicit filter for security
                 start: {
                     gte: startDate,
                     lte: endDate
