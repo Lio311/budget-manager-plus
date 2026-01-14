@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from 'sonner'
 import { renewSubscription } from '@/lib/actions/clients'
 import { format } from 'date-fns'
@@ -20,17 +22,42 @@ interface RenewSubscriptionDialogProps {
 export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: RenewSubscriptionDialogProps) {
     const [startDate, setStartDate] = useState<Date | undefined>(undefined)
     const [endDate, setEndDate] = useState<Date | undefined>(undefined)
+    const [subscriptionType, setSubscriptionType] = useState<string>('MONTHLY')
+    const [packageName, setPackageName] = useState('')
+    const [subscriptionPrice, setSubscriptionPrice] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+
+    // Initialize state when dialog opens or client changes
+    useEffect(() => {
+        if (isOpen && client) {
+            setSubscriptionType(client.subscriptionType || 'MONTHLY')
+            setPackageName(client.packageName || client.package?.name || '')
+            setSubscriptionPrice(client.subscriptionPrice?.toString() || '')
+        }
+    }, [isOpen, client])
 
     const handleSubmit = async () => {
         if (!startDate) {
             toast.error('נא לבחור תאריך התחלה')
             return
         }
+        if (!subscriptionPrice) {
+            toast.error('נא להזין מחיר מנוי')
+            return
+        }
 
         setIsLoading(true)
         try {
-            const result = await renewSubscription(client.id, startDate, endDate)
+            const result = await renewSubscription(
+                client.id,
+                startDate,
+                endDate,
+                {
+                    subscriptionType,
+                    packageName,
+                    subscriptionPrice: parseFloat(subscriptionPrice)
+                }
+            )
             if (result.success) {
                 toast.success('מנוי חודש בהצלחה')
                 onSuccess?.()
@@ -58,6 +85,41 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4" dir="rtl">
+                    <div className="space-y-2">
+                        <Label>סוג מנוי</Label>
+                        <Select value={subscriptionType} onValueChange={setSubscriptionType}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="בחר סוג מנוי" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="WEEKLY">שבועי</SelectItem>
+                                <SelectItem value="MONTHLY">חודשי</SelectItem>
+                                <SelectItem value="YEARLY">שנתי</SelectItem>
+                                <SelectItem value="PROJECT">פרויקט חד פעמי</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label>שם חבילה (אופציונלי)</Label>
+                            <Input
+                                value={packageName}
+                                onChange={(e) => setPackageName(e.target.value)}
+                                placeholder="לדוגמה: ליווי עסקי"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>מחיר לחיוב</Label>
+                            <Input
+                                type="number"
+                                value={subscriptionPrice}
+                                onChange={(e) => setSubscriptionPrice(e.target.value)}
+                                placeholder="0.00"
+                            />
+                        </div>
+                    </div>
+
                     <div className="space-y-2">
                         <Label>תאריך התחלה חדש</Label>
                         <DatePicker

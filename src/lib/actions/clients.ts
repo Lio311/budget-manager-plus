@@ -628,7 +628,16 @@ export async function updateSubscriptionIncome(incomeId: string, data: { date: D
     }
 }
 
-export async function renewSubscription(clientId: string, start: Date, end: Date | undefined) {
+export async function renewSubscription(
+    clientId: string,
+    start: Date,
+    end: Date | undefined,
+    data: {
+        subscriptionType: string
+        packageName?: string
+        subscriptionPrice: number
+    }
+) {
     try {
         const { userId } = await auth()
         if (!userId) throw new Error('Unauthorized')
@@ -647,16 +656,13 @@ export async function renewSubscription(clientId: string, start: Date, end: Date
             data: {
                 subscriptionStart: start,
                 subscriptionEnd: end,
-                // We keep the status as is, or maybe ensure it is PAID/ACTIVE? 
-                // The user requirement says "adds to them", implying we just extend functionality.
-                // Assuming status should remain valid for generating incomes.
+                subscriptionType: data.subscriptionType,
+                packageName: data.packageName,
+                subscriptionPrice: data.subscriptionPrice
             }
         })
 
         // Generate Incomes for the new period
-        // We pass the new start date as minDate to avoid regenerating past incomes if they overlap or if logic is tricky,
-        // but generateSubscriptionIncomes already checks for existing incomes by date/amount combo.
-        // However, explicitly passing start as minDate is safer to ensure we focus on the new period.
         await generateSubscriptionIncomes(updatedClient, userId, start)
 
         revalidatePath('/dashboard')
