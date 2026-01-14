@@ -1,6 +1,7 @@
 'use server'
 
 import { z } from 'zod'
+import { sendEmail } from '@/lib/email/send'
 
 const contactFormSchema = z.object({
     name: z.string().min(2, 'שם חייב להכיל לפחות 2 תווים'),
@@ -21,18 +22,44 @@ export async function submitContactForm(formData: FormData) {
         // Validate
         const validated = contactFormSchema.parse(data)
 
-        // TODO: In production, integrate with email service (e.g., Resend, SendGrid)
-        // For now, log to console
+        // Create email HTML
+        const emailHtml = `
+            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #10b981; margin-bottom: 20px;">פנייה חדשה מאתר KeseFly</h2>
+                <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="margin: 10px 0;"><strong>שם:</strong> ${validated.name}</p>
+                    <p style="margin: 10px 0;"><strong>אימייל:</strong> <a href="mailto:${validated.email}">${validated.email}</a></p>
+                    <p style="margin: 10px 0;"><strong>נושא:</strong> ${validated.subject}</p>
+                </div>
+                <div style="background-color: #ffffff; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <h3 style="color: #374151; margin-top: 0;">הודעה:</h3>
+                    <p style="white-space: pre-wrap; line-height: 1.6;">${validated.message}</p>
+                </div>
+                <p style="color: #6b7280; font-size: 12px; margin-top: 20px; text-align: center;">
+                    נשלח ב-${new Date().toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem' })}
+                </p>
+            </div>
+        `
+
+        // Send email to business
+        const result = await sendEmail(
+            'info@kesefly.co.il',
+            `פנייה חדשה: ${validated.subject}`,
+            emailHtml
+        )
+
+        if (!result.success) {
+            console.error('Failed to send contact email:', result.error)
+            // Still log for backup
+        }
+
+        // Log for backup
         console.log('📧 Contact Form Submission:', {
             from: validated.email,
             name: validated.name,
             subject: validated.subject,
-            message: validated.message,
             timestamp: new Date().toISOString(),
         })
-
-        // Simulate email sending delay
-        await new Promise(resolve => setTimeout(resolve, 500))
 
         return {
             success: true,
