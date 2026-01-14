@@ -10,6 +10,7 @@ import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { useBudget } from '@/contexts/BudgetContext'
 import { toast } from 'sonner'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
+import { RichTextEditor } from '@/components/ui/RichTextEditor'
 
 interface QuoteFormProps {
     clients: any[]
@@ -298,11 +299,10 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     הערות
                 </label>
-                <textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                <RichTextEditor
+                    value={formData.notes || ''}
+                    onChange={(value) => setFormData({ ...formData, notes: value })}
+                    placeholder="הוסף הערות להצעת המחיר..."
                 />
             </div>
 

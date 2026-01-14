@@ -287,6 +287,8 @@ button.cl-modalCloseButton,
   border-radius: 1.5rem !important;
   /* rounded-3xl */
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  /* --- TIKUN 1: הוספת רקע לבן למניעת שקיפות --- */
+  background-color: #ffffff !important;
 }
 
 /* Fix Text Overlap in Error Messages (Disconnected Account) */
@@ -621,6 +623,15 @@ div[class*="cl-branding"] {
   box-shadow: none !important;
   margin-top: 0 !important;
   padding-top: 10px !important;
+
+  /* --- TIKUN 2: יישור הלוגו לשמאל --- */
+  direction: ltr !important;
+  display: flex !important;
+  justify-content: flex-start !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  padding-left: 20px !important;
+  width: 100% !important;
 }
 
 /* Ensure the modal content allows the footer to sit nicely */
@@ -758,7 +769,7 @@ div[class*="cl-footer"],
 div[class*="cl-userProfile-footer"] {
   direction: ltr !important;
   display: flex !important;
-  justify-content: center !important;
+  justify-content: flex-start !important; /* עודכן: היה center */
   flex-direction: row !important;
   /* Force standard row order */
 }

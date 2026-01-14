@@ -224,46 +224,81 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
     // New Logic: Render words individually in row-reverse to ensure visual RTL order
     // CRITICAL FIX: English/Number sequences must be GROUPED together to preserve LTR order within the block.
     // Hebrew words must be SEPARATED to flow RTL via flexbox.
-    const renderNotes = (text: string | undefined) => {
-        if (!text) return null
+    // Parse HTML for PDF
+    const renderNotes = (htmlContent: string | undefined) => {
+        if (!htmlContent) return null
 
-        // Split by newlines first to preserve paragraphs
-        const lines = text.split('\n')
+        // Strip HTML tags for simple text check
+        const textOnly = htmlContent.replace(/<[^>]+>/g, '').trim()
+        if (!textOnly && !htmlContent.includes('<img')) return null
+
+        // Simple parser since react-pdf doesn't support full HTML
+        // We will split by block tags (<p>, <br>, <div>) and then by styles
+        const lines = htmlContent
+            .replace(/<p>/g, '\n')
+            .replace(/<\/p>/g, '')
+            .replace(/<br\s*\/?>/g, '\n')
+            .replace(/&nbsp;/g, ' ')
+            .split('\n')
+            .filter(line => line.trim() !== '')
 
         return (
             <View style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
                 {lines.map((line, i) => {
-                    const words = line.split(' ')
-                    const chunks: string[] = []
-                    let currentLtrBuffer: string[] = []
+                    // Check for bold content
+                    const isBold = line.includes('<strong>') || line.includes('<b>')
+                    const isUnderline = line.includes('<u>')
 
-                    words.forEach(word => {
-                        // Check if word contains Hebrew characters
-                        const isHebrew = /[\u0590-\u05FF]/.test(word)
+                    // Simple cleaning for now. 
+                    // A robust solution would use html-react-parser traversing, 
+                    // but for basic Quill usage (bold, color), we can approximate or strip tags 
+                    // but keep the styling if applied to the whole line.
+                    // React-PDF Text doesn't support nested Views, but supports nested Text.
 
-                        if (isHebrew) {
-                            // Flush buffer if exists
-                            if (currentLtrBuffer.length > 0) {
-                                chunks.push(currentLtrBuffer.join(' '))
-                                currentLtrBuffer = []
+                    // Let's try to parse segments: 
+                    // "This is <b>bold</b> text" -> ["This is ", {bold: true, text: "bold"}, " text"]
+
+                    // Regex to split by tags
+                    const segments = line.split(/(<[^>]+>)/g).filter(s => s !== '')
+
+                    const chunks: any[] = []
+                    let currentStyle = { bold: false, underline: false, color: '#374151' }
+
+                    segments.forEach(segment => {
+                        if (segment.match(/^<[^>]+>$/)) {
+                            // It's a tag
+                            if (segment.includes('strong') || segment.includes('<b>')) currentStyle.bold = true
+                            if (segment.includes('/strong') || segment.includes('/b')) currentStyle.bold = false
+                            if (segment.includes('u>')) currentStyle.underline = true
+                            if (segment.includes('/u>')) currentStyle.underline = false
+
+                            // Color parsing from style attr: <span style="color: rgb(230, 0, 0);">
+                            if (segment.includes('color:')) {
+                                const match = segment.match(/color:\s*([^;"'>]+)/)
+                                if (match) currentStyle.color = match[1]
                             }
-                            // Push Hebrew word individually
-                            chunks.push(word)
+                            if (segment.includes('/span')) currentStyle.color = '#374151'
                         } else {
-                            // Add regular symbols/numbers/english to buffer
-                            currentLtrBuffer.push(word)
+                            // It's text
+                            chunks.push({ text: segment, style: { ...currentStyle } })
                         }
                     })
-                    // Final flush
-                    if (currentLtrBuffer.length > 0) {
-                        chunks.push(currentLtrBuffer.join(' '))
-                    }
 
                     return (
                         <View key={i} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
                             {chunks.map((chunk, j) => (
-                                <Text key={j} style={{ fontSize: 9, color: '#374151', marginLeft: 3 }}>
-                                    {chunk}
+                                <Text
+                                    key={j}
+                                    style={{
+                                        fontSize: 9,
+                                        color: chunk.style.color,
+                                        fontWeight: chunk.style.bold ? 'bold' : 'normal',
+                                        textDecoration: chunk.style.underline ? 'underline' : 'none',
+                                        marginLeft: 3,
+                                        fontFamily: 'Alef'
+                                    }}
+                                >
+                                    {chunk.text}
                                 </Text>
                             ))}
                         </View>
