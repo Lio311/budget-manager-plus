@@ -259,7 +259,7 @@ export function CalendarTab() {
                 {/* Summary (Only for Financial) */}
                 {viewMode === 'financial' && (
                     <div className="text-sm text-muted-foreground">
-                        סה"כ תשלומים: <span className="font-bold text-blue-600">{formatCurrency(totalPayments, currency)}</span>
+                        סה"כ תשלומים: <span className="font-bold text-blue-600">{formatCurrency(totalPayments, getCurrencySymbol(currency))}</span>
                     </div>
                 )}
 
