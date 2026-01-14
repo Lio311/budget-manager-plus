@@ -612,146 +612,198 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     <CardHeader>
                         <CardTitle>מצב תקציב חודשי</CardTitle>
                     </CardHeader>
+                    <CardContent className="space-y-6 pt-4">
 
-                    {/* Expenses (Red) - Clickable */}
-                    <div
-                        className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
-                        onClick={() => router.push('?tab=expenses')}
-                    >
-                        <div className="flex justify-between text-sm">
-                            <span className="font-medium text-gray-700 dark:text-gray-300">הוצאות שוטפות</span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalExpenses)}</span>
-                        </div>
-                        <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                            <div className={`h-full bg-red-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalExpenses / (totalIncome || 1)) * 100, 100)}%` : '0%' }} />
-                        </div>
-                    </div>
-
-                    {/* Bills / New Clients (Orange) */}
-                    <div
-                        className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
-                        onClick={() => isBusiness ? router.push('?tab=clients') : router.push('?tab=bills')}
-                    >
-                        <div className="flex justify-between text-sm">
-                            <span className="font-medium text-gray-700 dark:text-gray-300">
-                                {isBusiness ? 'לקוחות חדשים' : 'חשבונות ששולמו'}
-                            </span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">
-                                {isBusiness ? newClientsCount : formatCurrency(paidBills)}
-                            </span>
-                        </div>
-                        <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                            <div
-                                className={`h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
-                                style={{
-                                    width: calculateWidth(
-                                        isBusiness ? newClientsCount : paidBills,
-                                        isBusiness ? null : totalBills,
-                                        isBusiness
-                                    )
-                                }}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Debts / Sales Before VAT (Purple/Green) */}
-                    <div
-                        className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
-                        onClick={() => !isBusiness ? router.push('?tab=debts') : router.push('?tab=income')}
-                    >
-                        <div className="flex justify-between text-sm">
-                            <span className="font-medium text-gray-700 dark:text-gray-300">
-                                {isBusiness ? 'מכירות לפני מע"מ' : 'הלוואות ששולמו'}
-                            </span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">
-                                {isBusiness
-                                    ? formatCurrency(salesBeforeVat)
-                                    : formatCurrency(paidDebts)
-                                }
-                            </span>
-                        </div>
-                        <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                            <div
-                                className={`h-full ${isBusiness ? 'bg-green-500' : 'bg-purple-500'} rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
-                                style={{
-                                    width: calculateWidth(
-                                        isBusiness ? salesBeforeVat : paidDebts,
-                                        isBusiness ? null : totalDebts,
-                                        isBusiness
-                                    )
-                                }}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Savings (Blue) - Hidden for Business */}
-                    {!isBusiness && (
+                        {/* Expenses (Red) - Clickable */}
                         <div
                             className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
-                            onClick={() => router.push('?tab=savings')}
+                            onClick={() => router.push('?tab=expenses')}
                         >
                             <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700 dark:text-gray-300">חיסכון והפקדות</span>
-                                <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalSavingsObserved)}</span>
+                                <span className="font-medium text-gray-700 dark:text-gray-300">הוצאות שוטפות</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalExpenses)}</span>
                             </div>
                             <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalSavingsObserved / (totalIncome * 0.2 || 1)) * 100, 100)}%` : '0%' }} />
+                                <div className={`h-full bg-red-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalExpenses / (totalIncome || 1)) * 100, 100)}%` : '0%' }} />
+                            </div>
+                        </div>
+
+                        {/* Bills / New Clients (Orange) */}
+                        <div
+                            className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                            onClick={() => isBusiness ? router.push('?tab=clients') : router.push('?tab=bills')}
+                        >
+                            <div className="flex justify-between text-sm">
+                                <span className="font-medium text-gray-700 dark:text-gray-300">
+                                    {isBusiness ? 'לקוחות חדשים' : 'חשבונות ששולמו'}
+                                </span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                    {isBusiness ? newClientsCount : formatCurrency(paidBills)}
+                                </span>
+                            </div>
+                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                <div
+                                    className={`h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
+                                    style={{
+                                        width: calculateWidth(
+                                            isBusiness ? newClientsCount : paidBills,
+                                            isBusiness ? null : totalBills,
+                                            isBusiness
+                                        )
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Debts / Sales Before VAT (Purple/Green) */}
+                        <div
+                            className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                            onClick={() => !isBusiness ? router.push('?tab=debts') : router.push('?tab=income')}
+                        >
+                            <div className="flex justify-between text-sm">
+                                <span className="font-medium text-gray-700 dark:text-gray-300">
+                                    {isBusiness ? 'מכירות לפני מע"מ' : 'הלוואות ששולמו'}
+                                </span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                    {isBusiness
+                                        ? formatCurrency(salesBeforeVat)
+                                        : formatCurrency(paidDebts)
+                                    }
+                                </span>
+                            </div>
+                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                <div
+                                    className={`h-full ${isBusiness ? 'bg-green-500' : 'bg-purple-500'} rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
+                                    style={{
+                                        width: calculateWidth(
+                                            isBusiness ? salesBeforeVat : paidDebts,
+                                            isBusiness ? null : totalDebts,
+                                            isBusiness
+                                        )
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Savings (Blue) - Hidden for Business */}
+                        {!isBusiness && (
+                            <div
+                                className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                                onClick={() => router.push('?tab=savings')}
+                            >
+                                <div className="flex justify-between text-sm">
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">חיסכון והפקדות</span>
+                                    <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalSavingsObserved)}</span>
+                                </div>
+                                <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalSavingsObserved / (totalIncome * 0.2 || 1)) * 100, 100)}%` : '0%' }} />
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+
+                    {isBusiness && (
+                        <div className="px-6 pb-6 pt-2">
+                            <div className="grid grid-cols-2 gap-3">
+                                {/* VAT Refund (Green) */}
+                                <div className="bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/20">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">החזר מע"מ צפוי</div>
+                                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                                        {formatCurrency(totalVatPaid)}
+                                    </div>
+                                </div>
+
+                                {/* VAT Pay (Red) */}
+                                <div className="bg-red-50 dark:bg-red-900/10 p-3 rounded-xl border border-red-100 dark:border-red-900/20">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">מע"מ לתשלום</div>
+                                    <div className="text-lg font-bold text-red-600 dark:text-red-400">
+                                        {formatCurrency(totalVatCollected)}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}
-                </CardContent>
-
-                {isBusiness && (
-                    <div className="px-6 pb-6 pt-2">
-                        <div className="grid grid-cols-2 gap-3">
-                            {/* VAT Refund (Green) */}
-                            <div className="bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/20">
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">החזר מע"מ צפוי</div>
-                                <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                                    {formatCurrency(totalVatPaid)}
-                                </div>
-                            </div>
-
-                            {/* VAT Pay (Red) */}
-                            <div className="bg-red-50 dark:bg-red-900/10 p-3 rounded-xl border border-red-100 dark:border-red-900/20">
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">מע"מ לתשלום</div>
-                                <div className="text-lg font-bold text-red-600 dark:text-red-400">
-                                    {formatCurrency(totalVatCollected)}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </Card >
+                </Card >
 
 
 
-        </div >
+            </div >
 
-        {/* Settings Dialog */ }
-        < Dialog open = { isSettingsOpen } onOpenChange = { setIsSettingsOpen } >
-        {
-            isBusiness?(
-                    <DialogContent dir = "rtl" className = "w-[95vw] sm:w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl" >
-                        <DialogHeader className="text-right">
-                            <DialogTitle className="text-right">הגדרות עסק</DialogTitle>
-                        </DialogHeader>
-                        <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="details">פרטי העסק</TabsTrigger>
-                                <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="details" className="mt-4">
-                                <BusinessSettings onSuccess={() => setIsSettingsOpen(false)} />
-                            </TabsContent>
-                            <TabsContent value="financials" className="mt-4 space-y-4">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="text-base text-right">הגדרות יתרה</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
+            {/* Settings Dialog */}
+            < Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} >
+                {
+                    isBusiness ? (
+                        <DialogContent dir="rtl" className="w-[95vw] sm:w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl" >
+                            <DialogHeader className="text-right">
+                                <DialogTitle className="text-right">הגדרות עסק</DialogTitle>
+                            </DialogHeader>
+                            <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="details">פרטי העסק</TabsTrigger>
+                                    <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="details" className="mt-4">
+                                    <BusinessSettings onSuccess={() => setIsSettingsOpen(false)} />
+                                </TabsContent>
+                                <TabsContent value="financials" className="mt-4 space-y-4">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle className="text-base text-right">הגדרות יתרה</CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-right block">יתרה התחלתית (עו"ש)</Label>
+                                                <FormattedNumberInput
+                                                    value={initialBalance}
+                                                    onChange={(e) => {
+                                                        const val = parseFloat(e.target.value)
+                                                        if (val < 0) return
+                                                        setInitialBalance(e.target.value)
+                                                    }}
+                                                    min="0"
+                                                    dir="ltr"
+                                                    className="text-right"
+                                                />
+                                                <p className="text-xs text-muted-foreground text-right">היתרה בבנק לפני תחילת השימוש במערכת</p>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-right block">יתרה התחלתית</Label>
+                                                <FormattedNumberInput
+                                                    value={initialSavings}
+                                                    onChange={(e) => {
+                                                        const val = parseFloat(e.target.value)
+                                                        if (val < 0) return
+                                                        setInitialSavings(e.target.value)
+                                                    }}
+                                                    min="0"
+                                                    dir="ltr"
+                                                    className="text-right"
+                                                />
+                                                <p className="text-xs text-muted-foreground text-right">יתרת החסכונות/השקעות קודמת</p>
+                                            </div>
+                                            <Button onClick={handleSaveSettings} className="w-full bg-emerald-500 hover:bg-emerald-600 mt-4">
+                                                שמור הגדרות כספיות
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+                            </Tabs>
+                        </DialogContent>
+                    ) : (
+                        <DialogContent dir="rtl" className="sm:max-w-[425px]">
+                            <DialogHeader className="text-right sm:text-right">
+                                <DialogTitle className="text-right">הגדרות</DialogTitle>
+                            </DialogHeader>
+                            <Tabs defaultValue="display" className="w-full">
+                                <TabsList className="grid w-full grid-cols-1">
+                                    <TabsTrigger value="display">תצוגה</TabsTrigger>
+                                </TabsList>
+
+                                <TabsContent value="display">
+                                    {/* Settings Form Content */}
+                                    <div className="space-y-4 py-4 text-right">
                                         <div className="space-y-2">
-                                            <Label className="text-right block">יתרה התחלתית (עו"ש)</Label>
+                                            <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
                                             <FormattedNumberInput
                                                 value={initialBalance}
                                                 onChange={(e) => {
@@ -763,10 +815,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                 dir="ltr"
                                                 className="text-right"
                                             />
-                                            <p className="text-xs text-muted-foreground text-right">היתרה בבנק לפני תחילת השימוש במערכת</p>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-right block">יתרה התחלתית</Label>
+                                            <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
                                             <FormattedNumberInput
                                                 value={initialSavings}
                                                 onChange={(e) => {
@@ -778,66 +829,16 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                                 dir="ltr"
                                                 className="text-right"
                                             />
-                                            <p className="text-xs text-muted-foreground text-right">יתרת החסכונות/השקעות קודמת</p>
                                         </div>
-                                        <Button onClick={handleSaveSettings} className="w-full bg-emerald-500 hover:bg-emerald-600 mt-4">
-                                            שמור הגדרות כספיות
-                                        </Button>
-                                    </CardContent>
-                                </Card>
-                            </TabsContent>
-                        </Tabs>
-                    </DialogContent>
-                ) : (
-        <DialogContent dir="rtl" className="sm:max-w-[425px]">
-            <DialogHeader className="text-right sm:text-right">
-                <DialogTitle className="text-right">הגדרות</DialogTitle>
-            </DialogHeader>
-            <Tabs defaultValue="display" className="w-full">
-                <TabsList className="grid w-full grid-cols-1">
-                    <TabsTrigger value="display">תצוגה</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="display">
-                    {/* Settings Form Content */}
-                    <div className="space-y-4 py-4 text-right">
-                        <div className="space-y-2">
-                            <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
-                            <FormattedNumberInput
-                                value={initialBalance}
-                                onChange={(e) => {
-                                    const val = parseFloat(e.target.value)
-                                    if (val < 0) return
-                                    setInitialBalance(e.target.value)
-                                }}
-                                min="0"
-                                dir="ltr"
-                                className="text-right"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
-                            <FormattedNumberInput
-                                value={initialSavings}
-                                onChange={(e) => {
-                                    const val = parseFloat(e.target.value)
-                                    if (val < 0) return
-                                    setInitialSavings(e.target.value)
-                                }}
-                                min="0"
-                                dir="ltr"
-                                className="text-right"
-                            />
-                        </div>
-                        <div className="pt-4">
-                            <Button onClick={handleSaveSettings} className="w-full bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
-                        </div>
-                    </div>
-                </TabsContent>
-            </Tabs>
-        </DialogContent>
-    )
-}
+                                        <div className="pt-4">
+                                            <Button onClick={handleSaveSettings} className="w-full bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
+                        </DialogContent>
+                    )
+                }
             </Dialog >
 
             <Dialog open={isIntegrationsOpen} onOpenChange={setIsIntegrationsOpen}>
