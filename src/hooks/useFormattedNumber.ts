@@ -28,7 +28,11 @@ export function useFormattedNumber(initialValue: number = 0) {
         }
 
         // Update display with commas
-        setDisplayValue(formatNumberWithCommas(cleaned))
+        const parts = cleaned.split('.')
+        parts[0] = formatNumberWithCommas(parts[0] === '' ? 0 : Number(parts[0]))
+        if (cleaned.startsWith('.')) parts[0] = '0'
+        const formatted = parts.join('.')
+        setDisplayValue(formatted)
 
         // Update numeric value
         const parsed = parseNumberFromFormatted(cleaned)
