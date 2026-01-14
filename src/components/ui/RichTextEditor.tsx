@@ -21,17 +21,13 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         toolbar: [
             ['bold', 'underline', 'italic'],
             [{ 'color': [] }, { 'background': [] }],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            [{ 'align': [] }],
             ['clean']
         ],
     }
 
     const formats = [
         'bold', 'underline', 'italic',
-        'color', 'background',
-        'list', 'bullet',
-        'align'
+        'color', 'background'
     ]
 
     return (
