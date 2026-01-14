@@ -287,10 +287,6 @@ button.cl-modalCloseButton,
   border-radius: 1.5rem !important;
   /* rounded-3xl */
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-
-  /* --- תיקון קריטי 1: הוספת רקע לבן כדי שהחלונית לא תהיה שקופה --- */
-  background-color: #ffffff !important;
-  background: #ffffff !important;
 }
 
 /* Fix Text Overlap in Error Messages (Disconnected Account) */
@@ -454,7 +450,6 @@ button.cl-modalCloseButton,
 /* Ensure branding footer blends perfectly */
 .cl-modalContent>.cl-footer,
 .cl-modalContent>div:last-child {
-  /* --- שינוי חשוב: הופך את רקע ה"בלוק" של הפוטר לשקוף כדי שיקבל את הלבן של הכרטיס הראשי --- */
   background: transparent !important;
   border-top: none !important;
   margin-top: 0 !important;
@@ -620,30 +615,12 @@ button.cl-modalCloseButton,
 .cl-branding,
 div[class*="cl-footer"],
 div[class*="cl-branding"] {
-  /* --- תיקון קריטי 2: רקע לבן ויישור לשמאל --- */
-  background-color: #ffffff !important;
-  /* היה transparent */
-  background: #ffffff !important;
-
+  background-color: transparent !important;
+  background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   margin-top: 0 !important;
   padding-top: 10px !important;
-
-  /* Layout */
-  direction: ltr !important;
-  /* כיוון LTR ליישור נכון של הלוגו */
-  display: flex !important;
-  justify-content: flex-start !important;
-  /* הצמדה לשמאל */
-  margin-right: auto !important;
-  margin-left: 0 !important;
-  padding-left: 20px !important;
-  width: 100% !important;
-
-  /* פינות עגולות למטה */
-  border-bottom-left-radius: 1.5rem !important;
-  border-bottom-right-radius: 1.5rem !important;
 }
 
 /* Ensure the modal content allows the footer to sit nicely */
@@ -781,8 +758,7 @@ div[class*="cl-footer"],
 div[class*="cl-userProfile-footer"] {
   direction: ltr !important;
   display: flex !important;
-  justify-content: flex-start !important;
-  /* חובה שיהיה START */
+  justify-content: center !important;
   flex-direction: row !important;
   /* Force standard row order */
 }
