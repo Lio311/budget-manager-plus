@@ -206,7 +206,7 @@ export default function PublicInvoicePage() {
                             {/* Client Info */}
                             <div>
                                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">לכבוד</h3>
-                                <div className="text-gray-900 font-medium text-lg">{client?.name}</div>
+                                <div className="text-gray-900 font-medium text-lg">{invoice.guestClientName || client?.name}</div>
                                 {client?.taxId && <div className="text-gray-600">ח.פ / ת.ז: {client.taxId}</div>}
                                 {client?.address && <div className="text-gray-600">{client.address}</div>}
                                 {client?.email && <div className="text-gray-600">{client.email}</div>}
