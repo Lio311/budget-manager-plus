@@ -730,7 +730,7 @@ export function ClientsTab() {
                                 <ComboboxInput
                                     value={formData.bankName}
                                     onChange={(val) => setFormData({ ...formData, bankName: val })}
-                                    options={ISRAELI_BANKS.map(b => b.name)}
+                                    options={ISRAELI_BANKS.map(b => `${b.name} - ${b.code}`)}
                                     placeholder="בחר בנק..."
                                 />
                             </div>

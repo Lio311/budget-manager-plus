@@ -26,3 +26,17 @@ export const ISRAELI_BANKS = [
     { code: "68", name: "בנק אוצר השלטון המקומי" },
     { code: "99", name: "בנק ישראל" }
 ];
+
+export const getBankName = (codeOrName: string | undefined | null) => {
+    if (!codeOrName) return '';
+    // Try to find by code
+    const bankByCode = ISRAELI_BANKS.find(b => b.code === codeOrName);
+    if (bankByCode) return `${bankByCode.name} - ${bankByCode.code}`;
+
+    // Try to find by name (if already formatted or just name)
+    const bankByName = ISRAELI_BANKS.find(b => b.name === codeOrName);
+    if (bankByName) return `${bankByName.name} - ${bankByName.code}`;
+
+    // Return original if no match (maybe it's already "Name - Code" or unknown)
+    return codeOrName;
+};

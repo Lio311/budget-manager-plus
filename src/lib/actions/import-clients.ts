@@ -4,6 +4,7 @@ import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { ClientFormData, createClient } from './clients'
+import { ISRAELI_CITIES, ISRAELI_BANKS, getBankName } from '@/lib/constants/israel-data'
 
 export async function importClients(clients: any[], budgetType: 'BUSINESS' | 'PERSONAL' = 'BUSINESS') {
     try {
@@ -64,7 +65,7 @@ export async function importClients(clients: any[], budgetType: 'BUSINESS' | 'PE
                 city: row['עיר']?.toString().trim() || undefined,
 
                 // Bank Details
-                bankName: row['בנק']?.toString().trim() || undefined,
+                bankName: getBankName(row['בנק']?.toString().trim()) || undefined,
                 bankBranch: row['סניף']?.toString().trim() || undefined,
                 bankAccount: row['מספר חשבון']?.toString().trim() || undefined,
 
