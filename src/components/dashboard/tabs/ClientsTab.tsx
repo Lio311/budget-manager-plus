@@ -33,6 +33,7 @@ import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { RenewSubscriptionDialog } from '@/components/dashboard/dialogs/RenewSubscriptionDialog'
 import { ComboboxInput } from '@/components/ui/combobox-input'
+import { FloatingActionButton } from '@/components/ui/floating-action-button'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -427,6 +428,24 @@ export function ClientsTab() {
                     <h2 className="text-2xl font-bold text-gray-900">לקוחות</h2>
                     <p className="text-sm text-gray-500 mt-1">ניהול תיקי לקוחות</p>
                 </div>
+
+                {/* Mobile FAB */}
+                <div className="lg:hidden">
+                    <FloatingActionButton
+                        onClick={() => {
+                            setShowForm(true)
+                            setEditingClient(null)
+                            setErrors({})
+                            setEditingClient(null)
+                            setErrors({})
+                            setIsAddingPackage(false)
+                            setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', packageId: '', isActive: true, city: '', bankName: '', bankBranch: '', bankAccount: '' })
+                        }}
+                        label="לקוח חדש"
+                        colorClass="bg-green-600"
+                    />
+                </div>
+
                 <div className="flex gap-2">
                     <Popover open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                         <PopoverTrigger asChild>

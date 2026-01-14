@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge'
 import { SupplierPackagesManager } from '../settings/SupplierPackagesManager'
 import { SupplierSubscriptionHistoryDialog } from '../dialogs/SupplierSubscriptionHistoryDialog'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { FloatingActionButton } from '@/components/ui/floating-action-button'
 
 const SupplierSchema = z.object({
     name: z.string().min(2, 'שם הספק חייב להכיל לפחות 2 תווים').max(100, 'שם הספק ארוך מדי'),
@@ -298,6 +299,25 @@ export function SuppliersTab() {
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">ספקים</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">ניהול ספקים ותשלומים</p>
                 </div>
+
+                {/* Mobile FAB */}
+                <div className="lg:hidden">
+                    <FloatingActionButton
+                        onClick={() => {
+                            setShowForm(true)
+                            setEditingSupplier(null)
+                            setErrors({})
+                            setFormData({
+                                name: '', email: '', phone: '', taxId: '', address: '', notes: '',
+                                packageId: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: null, subscriptionEnd: null, subscriptionStatus: 'ACTIVE', subscriptionColor: '#3B82F6'
+                            })
+                            setShowAdvanced(false)
+                        }}
+                        label="ספק חדש"
+                        colorClass="bg-blue-600"
+                    />
+                </div>
+
                 <Button
                     onClick={() => {
                         setShowForm(true)
