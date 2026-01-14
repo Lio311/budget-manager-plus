@@ -23,7 +23,7 @@ export function ClientDetailsDialog({ client, isOpen, onClose }: ClientDetailsDi
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <div className="flex flex-row-reverse items-center gap-3">
+                    <div className="flex items-center gap-3">
                         <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
                             <Building2 className="h-6 w-6 text-green-600 dark:text-green-400" />
                         </div>

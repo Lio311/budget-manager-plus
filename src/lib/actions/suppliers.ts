@@ -5,23 +5,28 @@ import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
+const emptyToUndefined = (val: unknown) => {
+    if (val === '' || val === null || val === undefined) return undefined;
+    return val;
+};
+
 const SupplierSchema = z.object({
     name: z.string().min(2, 'שם הספק חייב להכיל לפחות 2 תווים').max(100, 'שם הספק ארוך מדי'),
-    email: z.string().email('כתובת אימייל לא תקינה').max(100).optional().or(z.literal('')),
-    phone: z.string().regex(/^[\d-]*$/, 'מספר טלפון לא תקין').max(20).optional().or(z.literal('')),
-    taxId: z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional().or(z.literal('')),
-    address: z.string().max(200, 'הכתובת ארוכה מדי').optional().or(z.literal('')),
-    notes: z.string().max(500, 'הערות ארוכות מדי').optional().or(z.literal('')),
+    email: z.preprocess(emptyToUndefined, z.string().email('כתובת אימייל לא תקינה').max(100).optional()),
+    phone: z.preprocess(emptyToUndefined, z.string().regex(/^[\d-]*$/, 'מספר טלפון לא תקין').max(20).optional()),
+    taxId: z.preprocess(emptyToUndefined, z.string().regex(/^\d*$/, 'ח.פ/ע.מ חייב להכיל ספרות בלבד').max(20).optional()),
+    address: z.preprocess(emptyToUndefined, z.string().max(200, 'הכתובת ארוכה מדי').optional()),
+    notes: z.preprocess(emptyToUndefined, z.string().max(500, 'הערות ארוכות מדי').optional()),
     isActive: z.boolean().optional(),
 
     // Package & Subscription Fields
-    packageId: z.string().optional().or(z.literal('')),
-    subscriptionType: z.string().optional().or(z.literal('')),
-    subscriptionPrice: z.any().optional(), // Allow string/number, transform later
-    subscriptionStart: z.date().optional().nullable(),
-    subscriptionEnd: z.date().optional().nullable(),
-    subscriptionStatus: z.string().optional().or(z.literal('')),
-    subscriptionColor: z.string().optional().or(z.literal(''))
+    packageId: z.preprocess(emptyToUndefined, z.string().optional()),
+    subscriptionType: z.preprocess(emptyToUndefined, z.string().optional()),
+    subscriptionPrice: z.preprocess(emptyToUndefined, z.coerce.number().optional()),
+    subscriptionStart: z.preprocess(emptyToUndefined, z.coerce.date().optional()),
+    subscriptionEnd: z.preprocess(emptyToUndefined, z.coerce.date().optional()),
+    subscriptionStatus: z.preprocess(emptyToUndefined, z.string().optional()),
+    subscriptionColor: z.preprocess(emptyToUndefined, z.string().optional())
 })
 
 export interface SupplierFormData {
