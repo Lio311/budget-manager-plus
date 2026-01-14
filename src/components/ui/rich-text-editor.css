@@ -64,10 +64,19 @@
 }
 
 /* Force RTL for our specific usage if wrapper is RTL */
+/* Force RTL for our specific usage if wrapper is RTL */
 .rich-text-editor-wrapper[dir="rtl"] .ql-editor ol li,
 .rich-text-editor-wrapper[dir="rtl"] .ql-editor ul li {
     direction: rtl;
     text-align: right;
+    padding-right: 2em !important;
+    padding-left: 0;
+    list-style-position: outside !important;
+}
+
+/* Ensure Lists have margin for bullets */
+.rich-text-editor-wrapper[dir="rtl"] .ql-editor ol,
+.rich-text-editor-wrapper[dir="rtl"] .ql-editor ul {
     padding-right: 1.5em;
     padding-left: 0;
 }
