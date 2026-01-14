@@ -50,7 +50,11 @@ export const FormattedNumberInput = forwardRef<HTMLInputElement, FormattedNumber
             }
 
             // Update display with commas
-            const formatted = formatNumberWithCommas(cleaned)
+            const parts = cleaned.split('.')
+            parts[0] = formatNumberWithCommas(parts[0] === '' ? 0 : Number(parts[0]))
+            // Handle edge case where input is just "." or starts with "." -> "0."
+            if (cleaned.startsWith('.')) parts[0] = '0'
+            const formatted = parts.join('.')
             setDisplayValue(formatted)
 
             // Pass the numeric value back
