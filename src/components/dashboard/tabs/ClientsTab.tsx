@@ -29,7 +29,7 @@ import { PhoneInputWithCountry } from '@/components/ui/PhoneInputWithCountry'
 import { Input } from '@/components/ui/input'
 import { ClientSubscriptionHistoryDialog } from '@/components/dashboard/dialogs/ClientSubscriptionHistoryDialog'
 import { Switch } from '@/components/ui/switch'
-import { cn } from '@/lib/utils'
+import { cn, formatIsraeliPhoneNumber } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { RenewSubscriptionDialog } from '@/components/dashboard/dialogs/RenewSubscriptionDialog'
 import { ComboboxInput } from '@/components/ui/combobox-input'
@@ -48,45 +48,7 @@ const ClientSchema = z.object({
     bankAccount: z.string().max(50).optional().or(z.literal('')),
 })
 
-const formatPhoneNumber = (phone: string | undefined | null) => {
-    if (!phone) return ''
 
-    let prefix = ''
-    let number = phone
-
-    // Check for prefix
-    if (phone.startsWith('+')) {
-        // Try to split by space first
-        const parts = phone.split(' ')
-        if (parts.length > 1) {
-            prefix = parts[0]
-            number = parts.slice(1).join('')
-        } else {
-            // Try to split by known length or just naive
-            // Assume +972 for now if no space, or regex separate
-            const match = phone.match(/^(\+\d{1,3})(.*)$/)
-            if (match) {
-                prefix = match[1]
-                number = match[2]
-            }
-        }
-    }
-
-    // Clean padding/formatting from the number part
-    const cleanNum = number.replace(/[^\d]/g, '')
-
-    let formattedNum = number
-    // Israeli Mobile: 05X-XXXXXXX (10 digits)
-    if (cleanNum.length === 10 && cleanNum.startsWith('05')) {
-        formattedNum = cleanNum.replace(/(\d{3})(\d+)/, '$1-$2')
-    }
-    // Israeli Landline: 0X-XXXXXXX (9 digits)
-    else if (cleanNum.length === 9 && cleanNum.startsWith('0')) {
-        formattedNum = cleanNum.replace(/(\d{2})(\d+)/, '$1-$2')
-    }
-
-    return prefix ? `${prefix} ${formattedNum}` : formattedNum
-}
 
 
 export function ClientsTab() {
@@ -1107,7 +1069,7 @@ export function ClientsTab() {
                                 {client.phone && (
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
                                         <Phone className="h-4 w-4" />
-                                        <span dir="ltr" className="text-left">{formatPhoneNumber(client.phone)}</span>
+                                        <span dir="ltr" className="text-left">{formatIsraeliPhoneNumber(client.phone)}</span>
                                     </div>
                                 )}
 
@@ -1178,7 +1140,7 @@ export function ClientsTab() {
                                                     {client.phone && (
                                                         <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                                                             <Phone className="h-3 w-3 shrink-0" />
-                                                            <span dir="ltr" className="text-left">{formatPhoneNumber(client.phone)}</span>
+                                                            <span dir="ltr" className="text-left">{formatIsraeliPhoneNumber(client.phone)}</span>
                                                         </div>
                                                     )}
                                                     {client.email && (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, ArrowUpDown, LayoutGrid, List } from 'lucide-react'
 import { format, differenceInDays, startOfDay } from 'date-fns'
-import { cn } from '@/lib/utils'
+import { cn, formatIsraeliPhoneNumber } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { getSuppliers, createSupplier, updateSupplier, deleteSupplier, type SupplierFormData } from '@/lib/actions/suppliers'
 import { getSupplierPackages } from '@/lib/actions/supplier-packages'
@@ -775,7 +775,7 @@ export function SuppliersTab() {
                                 {supplier.phone && (
                                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
                                         <Phone className="h-4 w-4" />
-                                        <span>{supplier.phone}</span>
+                                        <span dir="ltr" className="text-left">{formatIsraeliPhoneNumber(supplier.phone)}</span>
                                     </div>
                                 )}
 
@@ -827,7 +827,7 @@ export function SuppliersTab() {
                                                     {supplier.phone && (
                                                         <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                                                             <Phone className="h-3 w-3 shrink-0" />
-                                                            <span dir="ltr" className="text-left">{supplier.phone}</span>
+                                                            <span dir="ltr" className="text-left">{formatIsraeliPhoneNumber(supplier.phone)}</span>
                                                         </div>
                                                     )}
                                                     {supplier.email && (
