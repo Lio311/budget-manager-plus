@@ -70,10 +70,10 @@ export async function GET(req: NextRequest) {
         }
 
         // Generate ZIP
-        const content = await zip.generateAsync({ type: 'nodebuffer' })
+        const content = await zip.generateAsync({ type: 'uint8array' })
 
         // Return Response
-        return new NextResponse(content, {
+        return new NextResponse(content as any, {
             status: 200,
             headers: {
                 'Content-Type': 'application/zip',
