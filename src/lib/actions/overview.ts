@@ -21,7 +21,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
         const prevMonth = month === 1 ? 12 : month - 1
         const prevYear = month === 1 ? year - 1 : year
 
-        // Fetch user for initial balance/savings
+        // Fetch user for initial balance/savings and subscription start date
         const user = await db.user.findUnique({
             where: { id: userId },
             select: {
@@ -34,17 +34,31 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 trialEndsAt: true,
                 hasUsedTrial: true,
                 subscriptions: {
-                    where: { status: 'active' },
+                    where: { status: 'active', planType: type === 'BUSINESS' ? 'BUSINESS' : 'PERSONAL' },
                     select: {
                         endDate: true,
-                        planType: true
-                    }
+                        planType: true,
+                        startDate: true
+                    },
+                    orderBy: { startDate: 'asc' },
+                    take: 1
                 }
             }
         })
 
         if (!user) {
             return { success: false, error: 'User not found' }
+        }
+
+        // Extract subscription start date for filtering
+        const subscription = user.subscriptions[0]
+        let subscriptionStartMonth: number | null = null
+        let subscriptionStartYear: number | null = null
+
+        if (subscription?.startDate) {
+            const startDate = new Date(subscription.startDate)
+            subscriptionStartMonth = startDate.getMonth() + 1 // JavaScript months are 0-indexed
+            subscriptionStartYear = startDate.getFullYear()
         }
 
         // Get current and previous budgets with optimized field selection
@@ -163,16 +177,36 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
         })
 
         // Get net worth history (up to current month for accurate "Current" state)
+        // Filter by subscription start date if available
+        const budgetWhereClause: any = {
+            userId,
+            type,
+            OR: [
+                { year: { lt: year } },
+                { year: year, month: { lte: month } }
+            ]
+        }
+
+        // Add subscription start date filter if available
+        if (subscriptionStartYear !== null && subscriptionStartMonth !== null) {
+            budgetWhereClause.OR = [
+                { year: { gt: subscriptionStartYear } },
+                { year: subscriptionStartYear, month: { gte: subscriptionStartMonth } }
+            ]
+            // Also ensure we don't go beyond current month
+            budgetWhereClause.AND = [
+                {
+                    OR: [
+                        { year: { lt: year } },
+                        { year: year, month: { lte: month } }
+                    ]
+                }
+            ]
+        }
+
         // @ts-ignore
         const allBudgets = await db.budget.findMany({
-            where: {
-                userId,
-                type,
-                OR: [
-                    { year: { lt: year } },
-                    { year: year, month: { lte: month } }
-                ]
-            },
+            where: budgetWhereClause,
             select: {
                 month: true,
                 year: true,
