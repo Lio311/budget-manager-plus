@@ -297,425 +297,150 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     }
 
     return (
+    const newClientsCount = (overviewData as any)?.businessStats?.newClientsCount || 0
+    const salesBeforeVat = current.incomes.reduce((sum: number, item: any) => sum + (item.amountBeforeVatILS || 0), 0)
+
+    // Helper to calculate bar width correctly
+    // If business metric (no target): 0 -> 0%, >0 -> 100% (as "Active")
+    // If personal metric (has target/total): Calculate %
+    const calculateWidth = (value: number, total: number | null, isBusinessMetric: boolean) => {
+            if (!showProgress) return '0%'
+
+            if (isBusinessMetric) {
+                return value > 0 ? '100%' : '0%'
+            }
+
+            // Personal logic
+            return `${Math.min((value / (total || 1)) * 100, 100)}%`
+        }
+
+    return (
         <div className="space-y-6 pb-20 animate-in fade-in-50 duration-500 font-sans px-2 md:px-0" dir="rtl">
+            {/* Header ... */}
 
-            {/* Header & Action Buttons Row */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            {/* ... (Skipping to CardContent) ... */}
 
-                {/* Title - First in DOM -> Right in RTL */}
-                <div className="flex items-center gap-2">
-                    <PieChartIcon className="w-6 h-6 text-[#323338] dark:text-gray-100" />
-                    <h1 className="text-2xl font-bold text-[#323338] dark:text-gray-100">סקירה כללית</h1>
-                </div>
-
-                {/* Buttons Group - Second in DOM -> Left in RTL */}
-                <div className="flex gap-2 items-center w-full md:w-auto justify-end md:justify-end">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                            if (isDemo) { interceptAction(); return; }
-                            if (isBusiness) setActiveSettingsTab('details')
-                            setIsSettingsOpen(true)
-                        }}
-                        className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                        title="הגדרות"
-                    >
-                        <Settings className="w-4 h-4" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
-                    </Button>
-
-                    {!isBusiness && (
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                                if (isDemo) { interceptAction(); return; }
-                                setIsIntegrationsOpen(true)
-                            }}
-                            className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground md:hidden"
-                            title="אוטומציות (iPhone Shortcuts)"
-                        >
-                            <svg className="w-4 h-4 fill-current text-[#323338] dark:text-gray-100" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 49 126.7 83.6 126.1 27.2-.5 38-19.1 82.9-19.1s54.9 19.1 83.6 18.9c35.5-.3 67.2-76.5 87.8-109.2-25.2-13.8-49.9-46.7-47.6-102.7zM245.8 48.9c30.1-39.1 24.8-82.5 24.4-86.4-29.2 2.8-55.5 17.5-74 40.6-16.7 20.9-24.6 57-19.8 86.1 32 3.8 54.4-23.9 69.4-40.3z" />
-                            </svg>
-                            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-stone-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
-                        </Button>
-                    )}
-
-                    <FinancialAdvisorButton financialData={aiFinancialData} />
-                    <FeedbackButton />
-
-
-                    {!isBusiness && (
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                                if (isDemo) { interceptAction(); return; }
-                                setIsReferralOpen(true)
-                            }}
-                            className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                            title="חבר מביא חבר"
-                        >
-                            <Share2
-                                className={`w-4 h-4 transition-colors duration-300 ${(overviewData?.user as any)?.referralProgramActive
-                                    ? 'text-green-600'
-                                    : 'text-[#323338] dark:text-gray-100'
-                                    }`}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-r from-green-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
-                        </Button>
-                    )}
-                </div>
-
-            </div>
-
-            {/* Top Row: Key Metrics - ORDER for RTL (Visual Right to Left) */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-
-                {/* 1. Income (Rightmost) */}
-                <Card className="glass-panel border-r-4 border-r-green-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('income')}>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'מכירות' : 'סך הכנסות'}</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-green-500" />
-                    </CardHeader>
-                    <CardContent className="p-3 md:p-6">
-                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
-                            {loading ? '...' : <AnimatedNumber value={totalIncome} currency="₪" />}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1 text-right">
-                            {renderTrend(incomeChange, 'חודש שעבר', false)}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                {/* 2. Expenses */}
-                <Card className="glass-panel border-r-4 border-r-red-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('expenses')}>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'הוצאות תפעול' : 'סך הוצאות'}</CardTitle>
-                        <TrendingDown className="h-4 w-4 text-red-500" />
-                    </CardHeader>
-                    <CardContent className="p-3 md:p-6">
-                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
-                            {loading ? '...' : <AnimatedNumber value={totalExpenses} currency="₪" />}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1 text-right">
-                            {renderTrend(expensesChange, 'חודש שעבר', true)}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                {/* 3. Month Savings (Calculated) */}
-                <Card className="glass-panel border-r-4 border-r-blue-500 shadow-sm transition-all">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'רווח נקי' : 'יתרה חודשית'}</CardTitle>
-                        <PiggyBank className="h-4 w-4 text-blue-500" />
-                    </CardHeader>
-                    <CardContent className="p-3 md:p-6">
-                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
-                            {loading ? '...' : <AnimatedNumber value={monthlySavingsCalculated} currency="₪" />}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1 text-right">
-                            {renderTrend(savingsChange, 'חודש שעבר', false)}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                {/* 4. Equity / Bills (Leftmost) */}
-                <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => {
-                    if (isBusiness) {
-                        setActiveSettingsTab('financials')
-                        setIsSettingsOpen(true)
-                    }
-                    else onNavigateToTab?.('bills')
-                }}>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'שווי העסק' : 'יתרת חשבונות'}</CardTitle>
-                        <Wallet className="h-4 w-4 text-orange-500" />
-                    </CardHeader>
-                    <CardContent className="p-3 md:p-6">
-                        <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
-                            {/* If Business -> Net Worth. If Personal -> Bills to Pay (Unpaid) */}
-                            {loading ? '...' : <AnimatedNumber value={isBusiness ? currentNetWorth : currentBillsDisplay} currency="₪" />}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1 text-right">
-                            {renderTrend(fourthMetricChange, 'חודש שעבר', isBusiness ? false : true)}
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Charts Grid */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-
-                {/* 2. Distribution Pie Chart (Visually Right in RTL) */}
-                <Card className="glass-panel shadow-sm min-h-[400px]">
-                    <CardHeader>
-                        <CardTitle>התפלגות תקציב</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {incomeVsExpenses.length > 0 ? (
-                            <div className="h-[300px] w-full relative" style={{ fontFamily: 'var(--font-sans), system-ui, sans-serif' }}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={incomeVsExpenses}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={80} // Large inner radius
-                                            outerRadius={110} // Large outer radius
-                                            paddingAngle={4}
-                                            dataKey="value"
-                                            stroke="none"
-                                            style={{ filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.15))' }}
-                                            animationBegin={0}
-                                            animationDuration={800}
-                                            animationEasing="ease-out"
-                                        >
-                                            {incomeVsExpenses.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip
-                                            content={({ active, payload }) => {
-                                                if (active && payload && payload.length) {
-                                                    const data = payload[0];
-                                                    return (
-                                                        <div className="glass-panel px-3 py-2 border border-white/50 shadow-xl rounded-xl backdrop-blur-xl text-right">
-                                                            <p className="font-bold text-[#323338] dark:text-gray-100 text-sm mb-0.5">{data.name}</p>
-                                                            <p className="font-mono text-gray-600 dark:text-white font-medium text-xs">
-                                                                ₪{Number(data.value).toLocaleString()}
-                                                            </p>
-                                                        </div>
-                                                    );
-                                                }
-                                                return null;
-                                            }}
-                                        />
-                                        <Legend
-                                            verticalAlign="bottom"
-                                            height={36}
-                                            iconType="circle"
-                                            iconSize={8} // Small dots
-                                            className="scrollbar-hide"
-                                            formatter={(value) => <span className="text-black dark:text-gray-100 mx-1 text-xs font-medium whitespace-nowrap">{value}</span>}
-                                            wrapperStyle={{
-                                                paddingTop: '10px',
-                                                display: 'flex',
-                                                width: '100%',
-                                                justifyContent: 'center',
-                                                flexWrap: 'nowrap',
-                                                gap: '5px',
-                                                overflowX: 'auto'
-                                            }}
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-
-                        ) : (
-                            <EmptyChartState title="התפלגות תקציב" />
-                        )}
-                    </CardContent>
-                </Card>
-
-                {/* 1. Expenses By Category Chart (Visually Left in RTL) */}
-                <Card className="glass-panel shadow-sm min-h-[400px]">
-                    <CardHeader>
-                        <CardTitle>הוצאות לפי קטגוריה</CardTitle>
-                    </CardHeader>
-                    <CardContent className="px-2 pb-6">
-                        {expensesByCategoryData.length > 0 ? (
-                            <div className="h-[300px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={expensesByCategoryData} barSize={32} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
-                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} padding={{ left: 50, right: 10 }} />
-                                        <YAxis axisLine={false} tickLine={false} width={45} tickFormatter={(val) => `₪${val}`} tick={{ fill: '#ffffff', fontSize: 11 }} domain={[0, 'auto']} />
-                                        <Tooltip
-                                            cursor={{ fill: 'transparent' }}
-                                            content={({ active, payload, label }) => {
-                                                if (active && payload && payload.length) {
-                                                    return (
-                                                        <div className="glass-panel px-3 py-2 border border-white/50 dark:border-slate-700/50 shadow-xl rounded-xl backdrop-blur-xl text-right dark:bg-slate-800/90">
-                                                            <p className="font-bold text-[#323338] dark:text-gray-100 text-sm mb-0.5">{label}</p>
-                                                            <p className="font-mono text-gray-600 dark:text-white font-medium text-xs">
-                                                                ₪{Number(payload[0].value).toLocaleString()}
-                                                            </p>
-                                                        </div>
-                                                    )
-                                                }
-                                                return null
-                                            }}
-                                        />
-                                        <Bar dataKey="value" radius={[4, 4, 0, 0]} animationDuration={800} animationBegin={0}>
-                                            {expensesByCategoryData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-
-                                </ResponsiveContainer>
-                            </div>
-                        ) : (
-                            <EmptyChartState title="הוצאות לפי קטגוריה" />
-                        )}
-                    </CardContent>
-                </Card >
-
-                {/* 4. Net Worth (Green Area Chart) (Visually Right in RTL) */}
-                <Card
-                    className="glass-panel shadow-sm min-h-[350px] cursor-pointer hover:shadow-md transition-all"
-                    onClick={() => {
-                        setActiveSettingsTab('financials')
-                        setIsSettingsOpen(true)
-                    }}
+            <CardContent className="space-y-6 pt-4">
+                {/* Expenses (Red) - Clickable */}
+                <div
+                    className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                    onClick={() => router.push('?tab=expenses')}
                 >
-                    <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                        <CardTitle>{isBusiness ? 'שווי העסק' : 'הון עצמי'}</CardTitle>
-                        {isBusiness && <Settings className="h-4 w-4 text-muted-foreground opacity-70" />}
-                    </CardHeader>
-                    <CardContent className="h-[300px] -ml-4">
-                        {netWorthHistory && netWorthHistory.length > 0 && (parseFloat(initialBalance) > 0 || parseFloat(initialSavings) > 0) ? (
-                            <NetWorthChart data={netWorthHistory} loading={loading} />
-                        ) : (
-                            <div className="pl-4 h-full">
-                                <EmptyChartState
-                                    title={isBusiness ? 'הגדרת שווי העסק' : 'הגדרת הון עצמי'}
-                                    subtitle="לחץ כאן כדי להגדיר יתרה התחלתית ולהציג נתונים"
-                                />
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                    <div className="flex justify-between text-sm">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">הוצאות שוטפות</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalExpenses)}</span>
+                    </div>
+                    <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                        <div className={`h-full bg-red-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalExpenses / (totalIncome || 1)) * 100, 100)}%` : '0%' }} />
+                    </div>
+                </div>
 
-                {/* 3. Budget Status (Progress Bars) (Visually Left in RTL) */}
-                <Card className="glass-panel shadow-sm col-span-1 md:col-span-1 min-h-[350px]">
-                    <CardHeader>
-                        <CardTitle>מצב תקציב חודשי</CardTitle>
-                    </CardHeader>
-                    {/* ... content truncated for brevity, assume unchanged ... */}
-                    <CardContent className="space-y-6 pt-4">
-                        {/* Expenses (Red) - Clickable */}
+                {/* Bills / New Clients (Orange) */}
+                <div
+                    className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                    onClick={() => isBusiness ? router.push('?tab=clients') : router.push('?tab=bills')}
+                >
+                    <div className="flex justify-between text-sm">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                            {isBusiness ? 'לקוחות חדשים' : 'חשבונות ששולמו'}
+                        </span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                            {isBusiness ? newClientsCount : formatCurrency(paidBills)}
+                        </span>
+                    </div>
+                    <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                         <div
-                            className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
-                            onClick={() => router.push('?tab=expenses')}
-                        >
-                            <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700 dark:text-gray-300">הוצאות שוטפות</span>
-                                <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalExpenses)}</span>
-                            </div>
-                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div className={`h-full bg-red-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalExpenses / (totalIncome || 1)) * 100, 100)}%` : '0%' }} />
-                            </div>
-                        </div>
+                            className={`h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
+                            style={{
+                                width: calculateWidth(
+                                    isBusiness ? newClientsCount : paidBills,
+                                    isBusiness ? null : totalBills,
+                                    isBusiness
+                                )
+                            }}
+                        />
+                    </div>
+                </div>
 
-                        {/* Bills / New Clients (Orange) */}
+                {/* Debts / Sales Before VAT (Purple/Green) */}
+                <div
+                    className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                    onClick={() => !isBusiness ? router.push('?tab=debts') : router.push('?tab=income')}
+                >
+                    <div className="flex justify-between text-sm">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                            {isBusiness ? 'מכירות לפני מע"מ' : 'הלוואות ששולמו'}
+                        </span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                            {isBusiness
+                                ? formatCurrency(salesBeforeVat)
+                                : formatCurrency(paidDebts)
+                            }
+                        </span>
+                    </div>
+                    <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                         <div
-                            className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
-                            onClick={() => isBusiness ? router.push('?tab=clients') : router.push('?tab=bills')}
-                        >
-                            <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700 dark:text-gray-300">
-                                    {isBusiness ? 'לקוחות חדשים' : 'חשבונות ששולמו'}
-                                </span>
-                                <span className="font-medium text-gray-900 dark:text-gray-100">
-                                    {isBusiness ? (overviewData as any)?.businessStats?.newClientsCount || 0 : formatCurrency(paidBills)}
-                                </span>
-                            </div>
-                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div
-                                    className={`h-full bg-orange-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
-                                    style={{
-                                        width: showProgress
-                                            ? isBusiness
-                                                ? '100%' // Full width for new clients
-                                                : `${Math.min((paidBills / (totalBills || 1)) * 100, 100)}%`
-                                            : '0%'
-                                    }}
-                                />
+                            className={`h-full ${isBusiness ? 'bg-green-500' : 'bg-purple-500'} rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
+                            style={{
+                                width: calculateWidth(
+                                    isBusiness ? salesBeforeVat : paidDebts,
+                                    isBusiness ? null : totalDebts,
+                                    isBusiness
+                                )
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {/* Savings (Blue) - Hidden for Business */}
+                {!isBusiness && (
+                    <div
+                        className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
+                        onClick={() => router.push('?tab=savings')}
+                    >
+                        <div className="flex justify-between text-sm">
+                            <span className="font-medium text-gray-700 dark:text-gray-300">חיסכון והפקדות</span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalSavingsObserved)}</span>
+                        </div>
+                        <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                            <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalSavingsObserved / (totalIncome * 0.2 || 1)) * 100, 100)}%` : '0%' }} />
+                        </div>
+                    </div>
+                )}
+            </CardContent>
+
+            {isBusiness && (
+                <div className="px-6 pb-6 pt-2">
+                    <div className="grid grid-cols-2 gap-3">
+                        {/* VAT Refund (Green) */}
+                        <div className="bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/20">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">החזר מע"מ צפוי</div>
+                            <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                                {formatCurrency(totalVatPaid)}
                             </div>
                         </div>
 
-                        {/* Debts / Sales Before VAT (Purple/Green) */}
-                        <div
-                            className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
-                            onClick={() => !isBusiness ? router.push('?tab=debts') : router.push('?tab=income')}
-                        >
-                            <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700 dark:text-gray-300">
-                                    {isBusiness ? 'מכירות לפני מע"מ' : 'הלוואות ששולמו'}
-                                </span>
-                                <span className="font-medium text-gray-900 dark:text-gray-100">
-                                    {isBusiness
-                                        ? formatCurrency(current.incomes.reduce((sum: number, item: any) => sum + (item.amountBeforeVatILS || 0), 0))
-                                        : formatCurrency(paidDebts)
-                                    }
-                                </span>
-                            </div>
-                            <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div
-                                    className={`h-full ${isBusiness ? 'bg-green-500' : 'bg-purple-500'} rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`}
-                                    style={{
-                                        width: showProgress
-                                            ? isBusiness
-                                                ? '100%' // Full width for sales metric
-                                                : `${Math.min((paidDebts / (totalDebts || 1)) * 100, 100)}%`
-                                            : '0%'
-                                    }}
-                                />
+                        {/* VAT Pay (Red) */}
+                        <div className="bg-red-50 dark:bg-red-900/10 p-3 rounded-xl border border-red-100 dark:border-red-900/20">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">מע"מ לתשלום</div>
+                            <div className="text-lg font-bold text-red-600 dark:text-red-400">
+                                {formatCurrency(totalVatCollected)}
                             </div>
                         </div>
-
-                        {/* Savings (Blue) - Hidden for Business */}
-                        {!isBusiness && (
-                            <div
-                                className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors"
-                                onClick={() => router.push('?tab=savings')}
-                            >
-                                <div className="flex justify-between text-sm">
-                                    <span className="font-medium text-gray-700 dark:text-gray-300">חיסכון והפקדות</span>
-                                    <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(totalSavingsObserved)}</span>
-                                </div>
-                                <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div className={`h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out ${showProgress ? '' : 'w-0'}`} style={{ width: showProgress ? `${Math.min((totalSavingsObserved / (totalIncome * 0.2 || 1)) * 100, 100)}%` : '0%' }} />
-                                </div>
-                            </div>
-                        )}
-                    </CardContent>
-
-                    {isBusiness && (
-                        <div className="px-6 pb-6 pt-2">
-                            <div className="grid grid-cols-2 gap-3">
-                                {/* VAT Refund (Green) */}
-                                <div className="bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/20">
-                                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">החזר מע"מ צפוי</div>
-                                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                                        {formatCurrency(totalVatPaid)}
-                                    </div>
-                                </div>
-
-                                {/* VAT Pay (Red) */}
-                                <div className="bg-red-50 dark:bg-red-900/10 p-3 rounded-xl border border-red-100 dark:border-red-900/20">
-                                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">מע"מ לתשלום</div>
-                                    <div className="text-lg font-bold text-red-600 dark:text-red-400">
-                                        {formatCurrency(totalVatCollected)}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </Card >
+                    </div>
+                </div>
+            )}
+        </Card >
 
 
 
             </div >
 
-            {/* Settings Dialog */}
-            < Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} >
-                {isBusiness ? (
-                    <DialogContent dir="rtl" className="w-[95vw] sm:w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl">
+        {/* Settings Dialog */ }
+        < Dialog open = { isSettingsOpen } onOpenChange = { setIsSettingsOpen } >
+        {
+            isBusiness?(
+                    <DialogContent dir = "rtl" className = "w-[95vw] sm:w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-xl" >
                         <DialogHeader className="text-right">
                             <DialogTitle className="text-right">הגדרות עסק</DialogTitle>
                         </DialogHeader>
@@ -772,54 +497,55 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         </Tabs>
                     </DialogContent>
                 ) : (
-                    <DialogContent dir="rtl" className="sm:max-w-[425px]">
-                        <DialogHeader className="text-right sm:text-right">
-                            <DialogTitle className="text-right">הגדרות</DialogTitle>
-                        </DialogHeader>
-                        <Tabs defaultValue="display" className="w-full">
-                            <TabsList className="grid w-full grid-cols-1">
-                                <TabsTrigger value="display">תצוגה</TabsTrigger>
-                            </TabsList>
+        <DialogContent dir="rtl" className="sm:max-w-[425px]">
+            <DialogHeader className="text-right sm:text-right">
+                <DialogTitle className="text-right">הגדרות</DialogTitle>
+            </DialogHeader>
+            <Tabs defaultValue="display" className="w-full">
+                <TabsList className="grid w-full grid-cols-1">
+                    <TabsTrigger value="display">תצוגה</TabsTrigger>
+                </TabsList>
 
-                            <TabsContent value="display">
-                                {/* Settings Form Content */}
-                                <div className="space-y-4 py-4 text-right">
-                                    <div className="space-y-2">
-                                        <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
-                                        <FormattedNumberInput
-                                            value={initialBalance}
-                                            onChange={(e) => {
-                                                const val = parseFloat(e.target.value)
-                                                if (val < 0) return
-                                                setInitialBalance(e.target.value)
-                                            }}
-                                            min="0"
-                                            dir="ltr"
-                                            className="text-right"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
-                                        <FormattedNumberInput
-                                            value={initialSavings}
-                                            onChange={(e) => {
-                                                const val = parseFloat(e.target.value)
-                                                if (val < 0) return
-                                                setInitialSavings(e.target.value)
-                                            }}
-                                            min="0"
-                                            dir="ltr"
-                                            className="text-right"
-                                        />
-                                    </div>
-                                    <div className="pt-4">
-                                        <Button onClick={handleSaveSettings} className="w-full bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
-                                    </div>
-                                </div>
-                            </TabsContent>
-                        </Tabs>
-                    </DialogContent>
-                )}
+                <TabsContent value="display">
+                    {/* Settings Form Content */}
+                    <div className="space-y-4 py-4 text-right">
+                        <div className="space-y-2">
+                            <Label className="text-right block">יתרה התחלתית בעו"ש</Label>
+                            <FormattedNumberInput
+                                value={initialBalance}
+                                onChange={(e) => {
+                                    const val = parseFloat(e.target.value)
+                                    if (val < 0) return
+                                    setInitialBalance(e.target.value)
+                                }}
+                                min="0"
+                                dir="ltr"
+                                className="text-right"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-right block">יתרה התחלתית בחסכונות</Label>
+                            <FormattedNumberInput
+                                value={initialSavings}
+                                onChange={(e) => {
+                                    const val = parseFloat(e.target.value)
+                                    if (val < 0) return
+                                    setInitialSavings(e.target.value)
+                                }}
+                                min="0"
+                                dir="ltr"
+                                className="text-right"
+                            />
+                        </div>
+                        <div className="pt-4">
+                            <Button onClick={handleSaveSettings} className="w-full bg-emerald-500 hover:bg-emerald-600">שמור הגדרות</Button>
+                        </div>
+                    </div>
+                </TabsContent>
+            </Tabs>
+        </DialogContent>
+    )
+}
             </Dialog >
 
             <Dialog open={isIntegrationsOpen} onOpenChange={setIsIntegrationsOpen}>
