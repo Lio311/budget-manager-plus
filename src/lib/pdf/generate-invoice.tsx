@@ -94,8 +94,8 @@ export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoiceP
             businessSignature: businessProfile?.signatureUrl || undefined,
 
             // Client info
-            clientName: invoice.client.name,
-            clientId: invoice.client.taxId || undefined,
+            clientName: invoice.guestClientName || invoice.client?.name || 'N/A',
+            clientId: invoice.client?.taxId || undefined,
 
             // Financial
             subtotal,

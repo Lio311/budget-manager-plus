@@ -128,7 +128,7 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
                 type: 'INVOICE',
                 number: inv.invoiceNumber,
                 description: `חשבונית ${inv.invoiceNumber}`,
-                entityName: inv.client.name,
+                entityName: inv.guestClientName || inv.client?.name,
                 amount: totalILS,
                 amountNet: netILS,
                 vat: vatILS
@@ -153,7 +153,7 @@ export async function getProfitLossData(year: number): Promise<{ success: boolea
                 type: 'CREDIT_NOTE',
                 number: cn.creditNoteNumber,
                 description: `זיכוי ${cn.creditNoteNumber} (חשבונית ${cn.invoice.invoiceNumber})`,
-                entityName: cn.invoice.client.name,
+                entityName: cn.invoice.guestClientName || cn.invoice.client?.name,
                 amount: -totalILS,
                 amountNet: -netILS,
                 vat: -vatILS

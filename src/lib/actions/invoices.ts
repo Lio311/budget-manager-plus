@@ -140,7 +140,7 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
             data: {
                 userId,
                 clientId: validData.isGuestClient ? null : validData.clientId,
-                guestClientName: validData.isGuestClient ? validData.guestClientName : null,
+                guestClientName: validData.isGuestClient ? (validData.guestClientName || null) : null,
                 scope,
                 invoiceNumber: validData.invoiceNumber,
                 issueDate: validData.issueDate,
