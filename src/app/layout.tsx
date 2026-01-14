@@ -99,9 +99,13 @@ export const metadata: Metadata = {
         },
     },
     icons: {
-        icon: '/images/branding/K-LOGO.png',
+        icon: [
+            { url: '/favicon.svg', type: 'image/svg+xml' },
+            { url: '/images/branding/K-LOGO.png', sizes: '192x192', type: 'image/png' },
+            { url: '/images/branding/K-LOGO.png', sizes: '512x512', type: 'image/png' }
+        ],
         apple: '/images/branding/apple-touch-icon.png',
-        shortcut: '/images/branding/K-LOGO.png',
+        shortcut: '/favicon.svg',
     },
     appleWebApp: {
         capable: true,
