@@ -35,7 +35,11 @@ export function ContactDialog({ open, onOpenChange }: ContactDialogProps) {
         if (result.success) {
             setIsSuccess(true)
             toast.success(result.message)
-            e.currentTarget.reset()
+            // Reset form safely
+            const form = e.currentTarget
+            if (form) {
+                setTimeout(() => form.reset(), 0)
+            }
             setTimeout(() => {
                 setIsSuccess(false)
                 onOpenChange(false)
