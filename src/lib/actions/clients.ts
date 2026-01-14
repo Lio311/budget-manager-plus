@@ -604,6 +604,7 @@ export async function deleteSubscriptionIncome(incomeId: string) {
     }
 }
 
+
 export async function updateSubscriptionIncome(incomeId: string, data: { date: Date, amount: number }) {
     try {
         const { userId } = await auth()
@@ -624,5 +625,44 @@ export async function updateSubscriptionIncome(incomeId: string, data: { date: D
     } catch (error) {
         console.error('updateSubscriptionIncome error:', error)
         return { success: false, error: 'Failed to update income' }
+    }
+}
+
+export async function renewSubscription(clientId: string, start: Date, end: Date | undefined) {
+    try {
+        const { userId } = await auth()
+        if (!userId) throw new Error('Unauthorized')
+
+        const db = await authenticatedPrisma(userId)
+
+        // Verify ownership
+        const client = await db.client.findUnique({ where: { id: clientId } })
+        if (!client || client.userId !== userId) {
+            throw new Error('Client not found')
+        }
+
+        // Update Client
+        const updatedClient = await db.client.update({
+            where: { id: clientId },
+            data: {
+                subscriptionStart: start,
+                subscriptionEnd: end,
+                // We keep the status as is, or maybe ensure it is PAID/ACTIVE? 
+                // The user requirement says "adds to them", implying we just extend functionality.
+                // Assuming status should remain valid for generating incomes.
+            }
+        })
+
+        // Generate Incomes for the new period
+        // We pass the new start date as minDate to avoid regenerating past incomes if they overlap or if logic is tricky,
+        // but generateSubscriptionIncomes already checks for existing incomes by date/amount combo.
+        // However, explicitly passing start as minDate is safer to ensure we focus on the new period.
+        await generateSubscriptionIncomes(updatedClient, userId, start)
+
+        revalidatePath('/dashboard')
+        return { success: true }
+    } catch (error) {
+        console.error('renewSubscription error:', error)
+        return { success: false, error: 'Failed to renew subscription' }
     }
 }

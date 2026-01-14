@@ -26,6 +26,7 @@ import { ClientSubscriptionHistoryDialog } from '@/components/dashboard/dialogs/
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { RenewSubscriptionDialog } from '@/components/dashboard/dialogs/RenewSubscriptionDialog'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -124,6 +125,7 @@ export function ClientsTab() {
     const [warningDays, setWarningDays] = useState(14)
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [subscriptionDialogClient, setSubscriptionDialogClient] = useState<any>(null)
+    const [renewSubscriptionClient, setRenewSubscriptionClient] = useState<any>(null)
 
     // Load settings from localStorage
     useEffect(() => {
@@ -873,6 +875,14 @@ export function ClientsTab() {
                                         </button>
 
                                         <button
+                                            onClick={() => setRenewSubscriptionClient(client)}
+                                            className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                                            title="חדש מנוי"
+                                        >
+                                            <RefreshCw className="h-4 w-4 text-blue-600" />
+                                        </button>
+
+                                        <button
                                             onClick={() => handleEdit(client)}
                                             className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                                             title="ערוך"
@@ -1080,6 +1090,16 @@ export function ClientsTab() {
                                                         <List className="h-4 w-4" />
                                                     </Button>
 
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 hover:text-blue-600 hover:bg-blue-50"
+                                                        onClick={() => setRenewSubscriptionClient(client)}
+                                                        title="חדש מנוי"
+                                                    >
+                                                        <RefreshCw className="h-4 w-4" />
+                                                    </Button>
+
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-gray-900" onClick={() => handleEdit(client)}>
                                                         <Edit2 className="h-4 w-4" />
                                                     </Button>
@@ -1110,6 +1130,13 @@ export function ClientsTab() {
                 onClose={() => setSubscriptionDialogClient(null)}
                 client={subscriptionDialogClient}
                 onUpdate={() => mutate()}
+            />
+
+            <RenewSubscriptionDialog
+                isOpen={!!renewSubscriptionClient}
+                onClose={() => setRenewSubscriptionClient(null)}
+                client={renewSubscriptionClient}
+                onSuccess={() => mutate()}
             />
         </div >
     )
