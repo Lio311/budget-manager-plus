@@ -54,11 +54,23 @@ export async function submitContactForm(formData: FormData) {
 
         if (!result.success) {
             console.error('❌ Failed to send contact email:', result.error)
-            // Still log for backup
+
+            // Log for backup even on failure
+            console.log('📧 Contact Form Submission (Email Failed):', {
+                from: validated.email,
+                name: validated.name,
+                subject: validated.subject,
+                timestamp: new Date().toISOString(),
+            })
+
+            return {
+                success: false,
+                message: 'אירעה שגיאה בשליחת המייל. אנא נסה שוב או שלח ישירות ל-info@kesefly.co.il',
+            }
         }
 
-        // Log for backup
-        console.log('📧 Contact Form Submission:', {
+        // Log for backup on success
+        console.log('📧 Contact Form Submission (Success):', {
             from: validated.email,
             name: validated.name,
             subject: validated.subject,
