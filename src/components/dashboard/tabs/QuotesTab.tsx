@@ -471,6 +471,7 @@ export function QuotesTab() {
                                     </Button>
                                 </div>
                                 {quote.isSigned && (
+                                    <>
                                         <Button variant="outline" size="icon" onClick={() => handleViewQuote(quote.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100">
                                             <Eye className="h-4 w-4" />
                                         </Button>
@@ -494,23 +495,23 @@ export function QuotesTab() {
                                         </Button>
                                     </>
                                 )}
+                            </div>
                         </div>
-                        </div>
-            ))
+                    ))
                 )}
-        </div>
+            </div>
 
             {
-        totalPages > 1 && (
-            <div className="p-4 border-t border-gray-100 dark:border-slate-700 flex justify-center direction-ltr">
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
-            </div>
-        )
-    }
+                totalPages > 1 && (
+                    <div className="p-4 border-t border-gray-100 dark:border-slate-700 flex justify-center direction-ltr">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+                    </div>
+                )
+            }
         </div >
     )
 }
