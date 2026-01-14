@@ -41,11 +41,11 @@ export async function submitContactForm(formData: FormData) {
             </div>
         `
 
-        console.log('🔄 Attempting to send email to info@kesefly.co.il...')
+        console.log('🔄 Attempting to send email to kesefly@gmail.com...')
 
-        // Send email to business
+        // Send email to business (actual destination: kesefly@gmail.com)
         const result = await sendEmail(
-            'info@kesefly.co.il',
+            'kesefly@gmail.com',
             `פנייה חדשה: ${validated.subject}`,
             emailHtml
         )
