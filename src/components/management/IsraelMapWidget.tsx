@@ -108,7 +108,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                 מחוץ למפה / חו"ל
                             </h4>
                             <div className="flex flex-col gap-1.5 max-h-[150px] overflow-y-auto custom-scrollbar">
-                                {sortedAbroadCalls.map((loc) => (
+                                {sortedAbroadCalls.map((loc: any) => (
                                     <div key={loc.city} className="flex items-center justify-between gap-2 text-[10px]">
                                         <span className="text-gray-700 truncate font-medium" title={loc.city}>
                                             {loc.city}
@@ -143,7 +143,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                             stroke="none"
                         />
 
-                        {israelLocations.map((loc, i) => {
+                        {israelLocations.map((loc: any, i: number) => {
                             // Find original index for consistent coloring
                             const originalIndex = allSortedForList.indexOf(loc)
                             const color = COLORS[originalIndex % COLORS.length]
@@ -239,7 +239,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                     </div>
 
                     <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar flex flex-col gap-2 pr-2 pb-0">
-                        {paginatedLocations.map((loc, i) => {
+                        {paginatedLocations.map((loc: any, i: number) => {
                             const originalIndex = allSortedForList.indexOf(loc)
                             const color = COLORS[originalIndex % COLORS.length]
                             const isAbroad = !loc.cityData
