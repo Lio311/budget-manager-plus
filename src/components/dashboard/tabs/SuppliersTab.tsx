@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, ArrowUpDown, LayoutGrid, List } from 'lucide-react'
 import { format, differenceInDays, startOfDay } from 'date-fns'
-import { cn, formatIsraeliPhoneNumber } from '@/lib/utils'
+import { cn, formatIsraeliPhoneNumber, formatCurrency } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { getSuppliers, createSupplier, updateSupplier, deleteSupplier, type SupplierFormData } from '@/lib/actions/suppliers'
 import { getSupplierPackages } from '@/lib/actions/supplier-packages'
@@ -796,7 +796,7 @@ export function SuppliersTab() {
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-600 dark:text-gray-400">סה"כ עלויות:</span>
                                         <span className="font-semibold text-blue-600">
-                                            ₪{supplier.totalExpenses?.toLocaleString() || 0}
+                                            {formatCurrency(supplier.totalExpenses || 0)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm mt-1">
@@ -830,9 +830,9 @@ export function SuppliersTab() {
                                                     <span className="font-medium">{supplier.name}</span>
                                                 </div>
                                                 {supplier.taxId && <div className="text-xs text-gray-400 mr-6">{supplier.taxId}</div>}
-                                                {/* Mobile only revenue */}
+                                                {/* Mobile only expenses */}
                                                 <div className="sm:hidden mt-1 mr-6 text-xs text-blue-600 font-medium">
-                                                    ₪{supplier.totalExpenses?.toLocaleString() || 0}
+                                                    {formatCurrency(supplier.totalExpenses || 0)}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3">
@@ -882,7 +882,8 @@ export function SuppliersTab() {
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 hidden sm:table-cell">
-                                                <div className="font-medium text-blue-600">₪{supplier.totalExpenses?.toLocaleString() || 0}</div>
+                                                <div className="font-medium text-blue-600">{formatCurrency(supplier.totalExpenses || 0)}</div>
+                                                <div className="text-xs text-gray-500">{supplier._count?.expenses || 0} עסקאות</div>
                                             </td>
                                             <td className="px-4 py-3 hidden lg:table-cell">
                                                 <div className="text-sm dark:text-gray-200">{supplier._count?.expenses || 0}</div>
