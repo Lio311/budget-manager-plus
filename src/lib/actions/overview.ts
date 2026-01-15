@@ -67,7 +67,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 where: { userId, month, year, type },
                 select: {
                     id: true,
-                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true, status: true } },
+                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, status: true } },
                     expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
@@ -82,7 +82,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 where: { userId, month: prevMonth, year: prevYear, type },
                 select: {
                     id: true,
-                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true, status: true } },
+                    incomes: { select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, status: true } },
                     expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
@@ -132,7 +132,9 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                         ...item,
                         amountILS,
                         vatAmountILS,
-                        amountBeforeVatILS: amountILS - vatAmountILS
+                        amountBeforeVatILS: item.amountBeforeVat !== null && item.amountBeforeVat !== undefined
+                            ? (item.amountBeforeVat * ratio)
+                            : (amountILS - vatAmountILS)
                     }
                 }) || []),
                 Promise.all(budget.expenses?.map(async (item: any) => {

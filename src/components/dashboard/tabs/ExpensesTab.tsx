@@ -62,6 +62,7 @@ interface Expense {
     isDeductible?: boolean | null
     isRecurring?: boolean | null
     paymentDate?: Date | null
+    paidBy?: string | null
 }
 
 interface ExpenseData {
