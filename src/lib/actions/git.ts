@@ -1,10 +1,7 @@
 'use server'
 
-import { exec } from 'child_process'
-import { promisify } from 'util'
+import { spawn } from 'child_process'
 import path from 'path'
-
-const execAsync = promisify(exec)
 
 export interface Commit {
     hash: string
@@ -19,11 +16,41 @@ export interface GitStats {
     totalFiles: number
 }
 
+function runGitCommand(args: string[], cwd: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const child = spawn('git', args, { cwd, shell: false })
+        let stdout = ''
+        let stderr = ''
+
+        child.stdout.on('data', data => stdout += data.toString())
+        child.stderr.on('data', data => stderr += data.toString())
+
+        child.on('close', code => {
+            if (code === 0) {
+                resolve(stdout)
+            } else {
+                reject(new Error(`Git command failed with code ${code}\nStderr: ${stderr}`))
+            }
+        })
+
+        child.on('error', err => reject(err))
+    })
+}
+
 export async function getGitStats(): Promise<{ success: boolean; data?: GitStats; error?: string }> {
     try {
-        // 1. Get Commits (limited to last 2000 to be safe, though users usually want full history)
-        // Using a custom separator |~| to avoid conflicts with pipe in commit messages
-        const { stdout: logOutput } = await execAsync('git log --pretty=format:"%h|~|%ad|~|%s|~|%an" --date=iso -n 2000')
+        const cwd = process.cwd()
+        console.log('[GitStats] CWD:', cwd)
+
+        // 1. Get Commits
+        // Pass arguments as array to avoid shell quoting issues on Windows
+        // Format: hash |~| date |~| message |~| author
+        const logOutput = await runGitCommand([
+            'log',
+            '--pretty=format:%h|~|%ad|~|%s|~|%an',
+            '--date=iso',
+            '-n', '2000'
+        ], cwd)
 
         const commits = logOutput
             .split('\n')
@@ -37,21 +64,21 @@ export async function getGitStats(): Promise<{ success: boolean; data?: GitStats
             .filter((c): c is Commit => c !== null)
 
         // 2. Get Files
-        const { stdout: filesOutput } = await execAsync('git ls-files')
+        const filesOutput = await runGitCommand(['ls-files'], cwd)
         const files = filesOutput.split('\n').filter(f => f.trim())
 
         const statsMap: { [key: string]: number } = {}
         files.forEach(file => {
             const ext = path.extname(file).toLowerCase() || 'no-ext'
-            // Clean up slightly (remove leading dot)
+            // Clean up
             const cleanExt = ext.startsWith('.') ? ext.substring(1) : ext
             statsMap[cleanExt] = (statsMap[cleanExt] || 0) + 1
         })
 
-        // Transform to array for Recharts
+        // Transform to array
         const fileStats = Object.entries(statsMap)
             .map(([name, value]) => ({ name, value }))
-            .sort((a, b) => b.value - a.value) // Sort by count desc
+            .sort((a, b) => b.value - a.value)
 
         return {
             success: true,
@@ -62,9 +89,20 @@ export async function getGitStats(): Promise<{ success: boolean; data?: GitStats
             }
         }
 
-    } catch (error) {
-        console.error('Git stats error:', error)
-        // In case git is not installed or not a repo
-        return { success: false, error: 'Failed to fetch git stats. Make sure git is installed.' }
+    } catch (error: any) {
+        console.error('[GitStats] Error details:', {
+            message: error.message,
+            stack: error.stack,
+            cmd: error.cmd,
+            code: error.code,
+            stderr: error.stderr
+        })
+
+        // Specific error message for common issues
+        if (error.stderr?.includes('not a git repository')) {
+            return { success: false, error: 'Not a git repository (or .git folder missing).' }
+        }
+
+        return { success: false, error: `Failed to fetch git stats: ${error.message}` }
     }
 }

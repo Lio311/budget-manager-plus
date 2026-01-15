@@ -242,7 +242,7 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
                                                             <div className="text-sm text-gray-600 pr-2">
                                                                 {notif.message}
                                                             </div>
-                                                            <div className="text-[10px] text-gray-400 mt-1 pr-2">
+                                                            <div className="text-[10px] text-gray-400 mt-1 pr-2" suppressHydrationWarning>
                                                                 {formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true, locale: he })}
                                                             </div>
                                                         </div>
