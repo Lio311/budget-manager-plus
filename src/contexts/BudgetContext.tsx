@@ -104,7 +104,9 @@ export function BudgetProvider({ children, initialPlan }: { children: React.Reac
 
             // Force reload after a brief delay
             setTimeout(() => {
-                window.location.reload()
+                const url = new URL(window.location.href)
+                url.searchParams.set('tab', 'overview')
+                window.location.href = url.toString()
             }, 400)
         }
     }

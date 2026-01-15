@@ -99,9 +99,34 @@ export default function ProfitLossTab() {
     const [searchTerm, setSearchTerm] = useState('')
 
     const currentYear = new Date().getFullYear()
-    const years = [2024, 2025, 2026]
+
+
+    const [registrationDate, setRegistrationDate] = useState<Date | null>(null)
+    const [years, setYears] = useState<number[]>([new Date().getFullYear()])
 
     const { isDemo, data: demoData, interceptAction } = useDemo()
+
+    useEffect(() => {
+        import('@/lib/actions/user').then(({ getUserRegistrationDate }) => {
+            getUserRegistrationDate().then(date => {
+                if (date) {
+                    const regDate = new Date(date)
+                    setRegistrationDate(regDate)
+
+                    // Generate years from registration to current + 1
+                    const startYear = regDate.getFullYear()
+                    const endYear = new Date().getFullYear() + 1
+                    const yearList = []
+                    for (let y = startYear; y <= endYear; y++) {
+                        yearList.push(y)
+                    }
+                    setYears(yearList)
+                    // Ensure selected year is valid
+                    if (selectedYear < startYear) setSelectedYear(endYear - 1)
+                }
+            })
+        })
+    }, [])
 
     useEffect(() => {
         if (selectedPeriod && isDetailOpen) {
@@ -176,9 +201,19 @@ export default function ProfitLossTab() {
         const periods: { label: string, status: 'OPEN' | 'CLOSED' | 'FUTURE', from: Date, to: Date }[] = []
         const now = new Date()
 
+        // Registration date check (default to beginning of time if not loaded)
+        // We only care about start date filtering
+        const startDateLimit = registrationDate || new Date(0)
+        // Reset time to start of day
+        startDateLimit.setHours(0, 0, 0, 0)
+
         if (viewType === 'ANNUAL') {
             const start = new Date(selectedYear, 0, 1)
             const end = new Date(selectedYear, 11, 31)
+
+            // Filter: If period ends before registration, skip it
+            if (end < startDateLimit) return []
+
             let status: 'OPEN' | 'CLOSED' | 'FUTURE' = 'CLOSED'
             if (selectedYear === currentYear) status = 'OPEN'
             if (selectedYear > currentYear) status = 'FUTURE'
@@ -197,6 +232,10 @@ export default function ProfitLossTab() {
             monthPairs.forEach(pair => {
                 const start = new Date(selectedYear, pair.start, 1)
                 const end = new Date(selectedYear, pair.end + 1, 0)
+
+                // Filter: Skip if period ends before registration
+                if (end < startDateLimit) return
+
                 let status: 'OPEN' | 'CLOSED' | 'FUTURE' = 'FUTURE'
 
                 if (end < now) status = 'CLOSED'
@@ -213,6 +252,10 @@ export default function ProfitLossTab() {
             months.forEach((name, index) => {
                 const start = new Date(selectedYear, index, 1)
                 const end = new Date(selectedYear, index + 1, 0)
+
+                // Filter: Skip if period ends before registration
+                if (end < startDateLimit) return
+
                 let status: 'OPEN' | 'CLOSED' | 'FUTURE' = 'FUTURE'
 
                 if (end < now) status = 'CLOSED'
@@ -327,7 +370,7 @@ export default function ProfitLossTab() {
                 <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-y-auto p-4 md:p-6" dir="rtl">
                     <DialogHeader className="flex flex-col gap-4">
                         <DialogTitle className="text-2xl font-bold text-center">
-                            דוח רווח והפסד - {selectedPeriod?.label} {selectedYear}
+                            דוח רווח והפסד - {selectedPeriod?.label.includes(selectedYear.toString()) ? selectedPeriod?.label : `${selectedPeriod?.label} ${selectedYear}`}
                         </DialogTitle>
 
                         {/* Centered Action Buttons */}

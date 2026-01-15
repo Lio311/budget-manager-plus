@@ -231,3 +231,20 @@ export async function syncUser(userId: string, email: string) {
         throw error
     }
 }
+
+export async function getUserRegistrationDate() {
+    try {
+        const { userId } = await auth()
+        if (!userId) return null
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { createdAt: true }
+        })
+
+        return user?.createdAt || null
+    } catch (error) {
+        console.error('Error fetching registration date:', error)
+        return null
+    }
+}
