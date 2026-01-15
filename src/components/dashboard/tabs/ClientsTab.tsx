@@ -1094,11 +1094,11 @@ export function ClientsTab() {
                                 <div className="flex flex-col gap-1 mt-2 pt-2 border-t border-gray-100 dark:border-slate-700">
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-gray-500">הכנסות:</span>
-                                        <span className="font-semibold text-green-600">₪{client.totalRevenue?.toLocaleString() || 0}</span>
+                                        <span className="font-semibold text-green-600">{formatCurrency(client.totalRevenue || 0)}</span>
                                     </div>
                                     <div className="flex justify-between items-center text-sm">
                                         <span className="text-gray-500">הוצאות:</span>
-                                        <span className="font-semibold text-red-600">₪{client.totalExpenses?.toLocaleString() || 0}</span>
+                                        <span className="font-semibold text-red-600">{formatCurrency(client.totalExpenses || 0)}</span>
                                     </div>
                                     <div className="flex justify-between items-center text-sm font-bold bg-gray-50 dark:bg-slate-700/50 p-1 rounded mt-1">
                                         <span className="text-gray-700 dark:text-gray-300">רווח נקי:</span>
@@ -1112,7 +1112,7 @@ export function ClientsTab() {
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-600 dark:text-gray-400">סה"כ הכנסות:</span>
                                         <span className="font-semibold text-green-600">
-                                            ₪{client.totalRevenue?.toLocaleString() || 0}
+                                            {formatCurrency(client.totalRevenue || 0)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between text-sm mt-1">
@@ -1149,7 +1149,7 @@ export function ClientsTab() {
                                                 {client.taxId && <div className="text-xs text-gray-400 mr-6">{client.taxId}</div>}
                                                 {/* Mobile only revenue */}
                                                 <div className="sm:hidden mt-1 mr-6 text-xs text-green-600 font-medium">
-                                                    ₪{client.totalRevenue?.toLocaleString() || 0}
+                                                    {formatCurrency(client.totalRevenue || 0)}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3">
@@ -1193,11 +1193,11 @@ export function ClientsTab() {
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 hidden sm:table-cell">
-                                                <div className="font-medium text-green-600">₪{client.totalRevenue?.toLocaleString() || 0}</div>
+                                                <div className="font-medium text-green-600">{formatCurrency(client.totalRevenue || 0)}</div>
                                                 <div className="text-xs text-gray-500">{client._count?.incomes || 0} עסקאות</div>
                                             </td>
                                             <td className="px-4 py-3 hidden lg:table-cell">
-                                                <div className="font-medium text-red-600">₪{client.totalExpenses?.toLocaleString() || 0}</div>
+                                                <div className="font-medium text-red-600">{formatCurrency(client.totalExpenses || 0)}</div>
                                                 <div className="text-xs text-gray-500">{client._count?.expenses || 0} הוצאות</div>
                                             </td>
                                             <td className="px-4 py-3 hidden lg:table-cell">
