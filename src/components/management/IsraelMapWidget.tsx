@@ -41,24 +41,49 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
     const [hoveredCity, setHoveredCity] = useState<string | null>(null)
     const ITEMS_PER_PAGE = 6
 
-    // Sort locations
-    const sortedLocations = [...locations].sort((a, b) => {
-        if (sortMethod === 'COUNT') {
-            return b._count.id - a._count.id
+    // Pre-process locations to separate Israel vs Abroad
+    const { israelLocations, abroadLocations } = locations.reduce((acc, loc) => {
+        // 1. Try exact match
+        let cityData = ISRAEL_CITIES[loc.city]
+
+        // 2. Fuzzy / Reverse lookup
+        if (!cityData) {
+            const key = Object.keys(ISRAEL_CITIES).find(k =>
+                k.toLowerCase() === loc.city.toLowerCase() ||
+                ISRAEL_CITIES[k].hebrewName === loc.city
+            )
+            if (key) cityData = ISRAEL_CITIES[key]
         }
-        // Alpha (Hebrew if possible, then English)
-        // Try to find the city in our big list
-        const cityDataA = ISRAEL_CITIES[a.city] || Object.values(ISRAEL_CITIES).find(c => c.hebrewName === a.city)
-        const cityDataB = ISRAEL_CITIES[b.city] || Object.values(ISRAEL_CITIES).find(c => c.hebrewName === b.city)
 
-        const nameA = cityDataA?.hebrewName || a.city
-        const nameB = cityDataB?.hebrewName || b.city
+        if (cityData) {
+            acc.israelLocations.push({ ...loc, cityData })
+        } else {
+            acc.abroadLocations.push(loc)
+        }
+        return acc
+    }, { israelLocations: [], abroadLocations: [] } as { israelLocations: any[], abroadLocations: any[] })
 
-        return nameA.localeCompare(nameB, 'he')
-    })
+    // Sort function for the list
+    const getSorted = (locs: any[]) => {
+        return [...locs].sort((a, b) => {
+            if (sortMethod === 'COUNT') {
+                return b._count.id - a._count.id
+            }
+            const nameA = a.cityData?.hebrewName || a.city
+            const nameB = b.cityData?.hebrewName || b.city
+            return nameA.localeCompare(nameB, 'he')
+        })
+    }
 
-    const totalPages = Math.ceil(sortedLocations.length / ITEMS_PER_PAGE)
-    const paginatedLocations = sortedLocations.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE)
+    const sortedIsraelCalls = getSorted(israelLocations)
+    const sortedAbroadCalls = getSorted(abroadLocations)
+
+    // Combine for pagination in the list view (or should we separate?)
+    // Let's iterate all for the list, but maintain the separation logic for the map
+    const allSortedForList = [...sortedIsraelCalls, ...sortedAbroadCalls]
+
+    const totalPages = Math.ceil(allSortedForList.length / ITEMS_PER_PAGE)
+    const paginatedLocations = allSortedForList.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE)
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 0 && newPage < totalPages) {
@@ -75,6 +100,28 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
             <div className="relative w-full h-full flex flex-row-reverse gap-4">
                 {/* Visual Map Section (Right Side) */}
                 <div className="flex-1 h-full relative flex items-center justify-center">
+
+                    {/* Abroad/Unknown Locations Box - Floating Top/Left */}
+                    {abroadLocations.length > 0 && (
+                        <div className="absolute top-0 left-0 bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-sm border border-orange-200 z-10 max-w-[150px]">
+                            <h4 className="text-xs font-bold text-orange-600 mb-2 border-b border-orange-100 pb-1">
+                                מחוץ למפה / חו"ל
+                            </h4>
+                            <div className="flex flex-col gap-1.5 max-h-[150px] overflow-y-auto custom-scrollbar">
+                                {sortedAbroadCalls.map((loc) => (
+                                    <div key={loc.city} className="flex items-center justify-between gap-2 text-[10px]">
+                                        <span className="text-gray-700 truncate font-medium" title={loc.city}>
+                                            {loc.city}
+                                        </span>
+                                        <span className="bg-orange-100 text-orange-700 px-1.5 rounded-full">
+                                            {loc._count.id}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <svg viewBox="0 0 100 230" className="h-[98%] drop-shadow-xl overflow-visible">
                         {/* Land Mass */}
                         <path
@@ -96,35 +143,13 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                             stroke="none"
                         />
 
-                        {sortedLocations.map((loc, originalIndex) => {
-                            let coords = { x: 50, y: 100 } // fallback
-                            let cityName = loc.city
-
-                            // 1. Try exact match in our big list
-                            let cityData = ISRAEL_CITIES[loc.city]
-
-                            // 2. If not found, try to find by hebrew name reverse lookup or case insensitive
-                            if (!cityData) {
-                                // Fuzzy / Reverse lookup
-                                const key = Object.keys(ISRAEL_CITIES).find(k =>
-                                    k.toLowerCase() === loc.city.toLowerCase() ||
-                                    ISRAEL_CITIES[k].hebrewName === loc.city
-                                )
-                                if (key) {
-                                    cityData = ISRAEL_CITIES[key]
-                                }
-                            }
-
-                            if (cityData) {
-                                coords = project(cityData.lat, cityData.lng)
-                                cityName = cityData.hebrewName // Always show Hebrew name if available
-                            } else {
-                                // "Unknown" Pile - side of map
-                                coords = { x: 15, y: 150 + (originalIndex * 5) }
-                            }
-
-                            // Use same color index as in legend
+                        {israelLocations.map((loc, i) => {
+                            // Find original index for consistent coloring
+                            const originalIndex = allSortedForList.indexOf(loc)
                             const color = COLORS[originalIndex % COLORS.length]
+
+                            const coords = project(loc.cityData.lat, loc.cityData.lng)
+                            const cityName = loc.cityData.hebrewName
                             const isHovered = hoveredCity === loc.city
 
                             return (
@@ -132,7 +157,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     key={loc.city}
                                     initial={{ scale: 0, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
-                                    transition={{ delay: originalIndex * 0.1 }}
+                                    transition={{ delay: i * 0.1 }}
                                 >
                                     {/* Small Pin / Dot */}
                                     <circle
@@ -144,7 +169,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                         strokeWidth={isHovered ? "1.5" : "0.5"}
                                         className={`drop-shadow-md transition-all duration-200 ${isHovered ? 'opacity-100' : 'opacity-80'}`}
                                     />
-                                    {/* Pulse effect - only when NOT hovered */}
+                                    {/* Pulse effect */}
                                     {!isHovered && (
                                         <circle
                                             cx={coords.x}
@@ -195,10 +220,10 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                     )}
                 </div>
 
-                {/* Legend List Section (Left Side) */}
+                {/* Legend List Section */}
                 <div className="w-1/3 min-w-[200px] flex flex-col gap-2 py-4 h-full">
+                    {/* ... Sort and Controls ... */}
                     <div className="flex flex-col gap-2 mb-2 sticky top-0 z-10 w-full">
-                        {/* Sort Control */}
                         <div className="flex items-center gap-2 justify-start w-full">
                             <span className="text-xs text-gray-500 font-medium whitespace-nowrap">מיון לפי:</span>
                             <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
@@ -215,12 +240,10 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
 
                     <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar flex flex-col gap-2 pr-2 pb-0">
                         {paginatedLocations.map((loc, i) => {
-                            const originalIndex = sortedLocations.indexOf(loc)
+                            const originalIndex = allSortedForList.indexOf(loc)
                             const color = COLORS[originalIndex % COLORS.length]
-
-                            // Lookup name
-                            const cityData = ISRAEL_CITIES[loc.city] || Object.values(ISRAEL_CITIES).find(c => c.hebrewName === loc.city)
-                            const cityName = cityData?.hebrewName || loc.city
+                            const isAbroad = !loc.cityData
+                            const cityName = loc.cityData?.hebrewName || loc.city
 
                             return (
                                 <motion.div
@@ -228,7 +251,7 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                     initial={{ x: -20, opacity: 0 }}
                                     animate={{ x: 0, opacity: 1 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className="flex items-center gap-2 p-2 rounded-lg bg-white/60 hover:bg-white border border-transparent hover:border-blue-100 transition-all shadow-sm cursor-pointer"
+                                    className={`flex items-center gap-2 p-2 rounded-lg bg-white/60 hover:bg-white border hover:border-blue-100 transition-all shadow-sm cursor-pointer ${hoveredCity === loc.city ? 'ring-2 ring-blue-100' : 'border-transparent'}`}
                                     onMouseEnter={() => setHoveredCity(loc.city)}
                                     onMouseLeave={() => setHoveredCity(null)}
                                 >
@@ -236,10 +259,13 @@ export function IsraelMapWidget({ locations }: { locations: any[] }) {
                                         className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
                                         style={{ backgroundColor: color }}
                                     />
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-bold text-gray-800 line-clamp-1" title={cityName}>
-                                            {cityName}
-                                        </span>
+                                    <div className="flex flex-col flex-1 overflow-hidden">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs font-bold text-gray-800 truncate" title={cityName}>
+                                                {cityName}
+                                            </span>
+                                            {isAbroad && <span className="text-[9px] bg-gray-100 text-gray-500 px-1 rounded">חו"ל</span>}
+                                        </div>
                                         <span className="text-[10px] text-gray-500">
                                             {loc._count.id} מבקרים
                                         </span>
