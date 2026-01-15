@@ -258,7 +258,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                     <UserButton.Action
                                         label="החלף משתמש"
                                         labelIcon={<Users className="w-4 h-4" />}
-                                        onClick={() => signOut(() => router.push('/sign-in'))}
+                                        onClick={() => signOut(() => router.push('/sign-in?force_google=true'))}
                                     />
                                 </UserButton.MenuItems>
 
