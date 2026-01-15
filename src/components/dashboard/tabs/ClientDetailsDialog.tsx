@@ -9,7 +9,7 @@ import {
 import { getBankName } from '@/lib/constants/israel-data'
 import { formatIsraeliPhoneNumber } from '@/lib/utils'
 import { Badge } from "@/components/ui/badge"
-import { Building2, Mail, Phone, MapPin, Calendar, CreditCard, FileText, Banknote } from "lucide-react"
+import { Building2, Mail, Phone, MapPin, Calendar, CreditCard, FileText, Banknote, Receipt } from "lucide-react"
 
 interface ClientDetailsDialogProps {
     client: any
@@ -60,6 +60,25 @@ export function ClientDetailsDialog({ client, isOpen, onClose }: ClientDetailsDi
                         {client.subscriptionStatus === 'UNPAID' && <Badge variant="destructive">לא שולם</Badge>}
                         {client.subscriptionStatus === 'PARTIAL' && <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50">שולם חלקית</Badge>}
                         {client.subscriptionStatus === 'INSTALLMENTS' && <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50">בתשלומים</Badge>}
+                    </div>
+
+                    {/* Document Stats Cards */}
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/20 flex flex-col items-center justify-center gap-1">
+                            <FileText className="h-5 w-5 text-yellow-600" />
+                            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">{client.quotesCount || 0}</span>
+                            <span className="text-xs text-gray-500">הצעות מחיר</span>
+                        </div>
+                        <div className="bg-purple-50 dark:bg-purple-900/10 p-3 rounded-lg border border-purple-100 dark:border-purple-900/20 flex flex-col items-center justify-center gap-1">
+                            <Receipt className="h-5 w-5 text-purple-600" />
+                            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">{client.invoicesCount || 0}</span>
+                            <span className="text-xs text-gray-500">חשבוניות</span>
+                        </div>
+                        <div className="bg-orange-50 dark:bg-orange-900/10 p-3 rounded-lg border border-orange-100 dark:border-orange-900/20 flex flex-col items-center justify-center gap-1">
+                            <CreditCard className="h-5 w-5 text-orange-600" />
+                            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">{client.creditNotesCount || 0}</span>
+                            <span className="text-xs text-gray-500">זיכויים</span>
+                        </div>
                     </div>
 
                     {/* Contact Info */}

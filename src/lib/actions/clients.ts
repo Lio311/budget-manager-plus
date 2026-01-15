@@ -78,12 +78,18 @@ export async function getClients(scope: string = 'BUSINESS') {
             },
             include: {
                 package: true,
+                quotes: { select: { id: true } }, // Fetch quotes IDs to count them
+                invoices: {
+                    select: {
+                        id: true,
+                        creditNotes: { select: { id: true } } // Fetch credit notes via invoices
+                    }
+                },
                 _count: {
                     select: {
                         incomes: {
                             where: { status: 'PAID' }
                         },
-                        invoices: true,
                         expenses: true
                     }
                 }
@@ -92,6 +98,9 @@ export async function getClients(scope: string = 'BUSINESS') {
                 createdAt: 'desc'
             }
         })
+
+
+
 
         const clientIds = clients.map((c: any) => c.id)
 
@@ -133,6 +142,15 @@ export async function getClients(scope: string = 'BUSINESS') {
             const paidInvoiceTotal = paidInvoiceMap.get(client.id) || 0
             const expenseTotal = expenseMap.get(client.id) || 0
 
+            // Calculate document counts from the included data
+            const quotesCount = client.quotes.length
+            // NOTE: We trust the array length from 'include' for invoicesCount, or we could use the _count if we didn't include.
+            // But since we include invoices for creditNotes, we can use the array.
+            // However, the original code used a bulk group by for specific invoice status? No, it used it for 'allInvoiceMap'.
+
+            const invoicesCount = client.invoices.length
+            const creditNotesCount = client.invoices.reduce((acc: number, inv: any) => acc + inv.creditNotes.length, 0)
+
             return {
                 ...client,
                 totalRevenue: incomeTotal + paidInvoiceTotal,
@@ -141,7 +159,10 @@ export async function getClients(scope: string = 'BUSINESS') {
                 _count: {
                     ...client._count,
                     invoices: allInvoiceMap.get(client.id) || 0
-                }
+                },
+                quotesCount,
+                invoicesCount,
+                creditNotesCount
             }
         })
 

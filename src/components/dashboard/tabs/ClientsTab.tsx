@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw, Check, Upload, FileSpreadsheet } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw, Check, Upload, FileSpreadsheet, FileText, Receipt, CreditCard } from 'lucide-react'
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command"
 import { read, utils } from 'xlsx'
 import { importClients } from '@/lib/actions/import-clients'
@@ -1120,7 +1120,25 @@ export function ClientsTab() {
                                         <span className="font-semibold dark:text-gray-200">{client._count?.incomes || 0}</span>
                                     </div>
                                 </div>
+
+                                {/* Document Counts */}
+                                <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
+                                    <div className="flex items-center gap-1" title="הצעת מחיר">
+                                        <FileText className="h-3.5 w-3.5 text-yellow-600" />
+                                        <span className="text-xs text-gray-600 dark:text-gray-400">{client.quotesCount || 0}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1" title="חשבונית">
+                                        <Receipt className="h-3.5 w-3.5 text-purple-600" />
+                                        <span className="text-xs text-gray-600 dark:text-gray-400">{client.invoicesCount || 0}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1" title="זיכוי">
+                                        <CreditCard className="h-3.5 w-3.5 text-orange-600" />
+                                        <span className="text-xs text-gray-600 dark:text-gray-400">{client.creditNotesCount || 0}</span>
+                                    </div>
+
+                                </div>
                             </div>
+
                         ))}
                     </div>
                 ) : (
