@@ -13,6 +13,22 @@ import { he } from 'date-fns/locale'
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658']
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-white p-3 border border-gray-100 shadow-xl rounded-lg text-right" dir="rtl">
+                <p className="font-bold text-gray-700 mb-1">
+                    {format(parseISO(label), 'd בMMMM yyyy', { locale: he })}
+                </p>
+                <p className="text-sm font-medium" style={{ color: payload[0].fill || payload[0].stroke }}>
+                    {`${payload[0].name}: ${payload[0].value}`}
+                </p>
+            </div>
+        )
+    }
+    return null
+}
+
 export function GitAnalytics() {
     const [stats, setStats] = useState<GitStats | null>(null)
     const [loading, setLoading] = useState(true)
@@ -174,10 +190,7 @@ export function GitAnalytics() {
                                     fontSize={12}
                                 />
                                 <YAxis stroke="#9CA3AF" fontSize={12} />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                    labelFormatter={(label) => format(parseISO(label), 'd בMMMM yyyy', { locale: he })}
-                                />
+                                <Tooltip content={<CustomTooltip />} />
                                 <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} name="קומיטים" />
                             </BarChart>
                         </ResponsiveContainer>
@@ -209,10 +222,7 @@ export function GitAnalytics() {
                                     fontSize={12}
                                 />
                                 <YAxis stroke="#9CA3AF" fontSize={12} />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                    labelFormatter={(label) => format(parseISO(label), 'd בMMMM yyyy', { locale: he })}
-                                />
+                                <Tooltip content={<CustomTooltip />} />
                                 <Area type="monotone" dataKey="count" stroke="#10B981" fillOpacity={1} fill="url(#colorCount)" name="קומיטים" />
                             </AreaChart>
                         </ResponsiveContainer>
