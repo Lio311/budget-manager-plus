@@ -111,22 +111,26 @@ export function DocumentsTab() {
 
     const { data: clientsData = [] } = useSWR(
         isDemo ? null : ['clients', budgetType],
-        clientsFetcher
+        clientsFetcher,
+        { revalidateOnFocus: false, shouldRetryOnError: false }
     )
 
     const { data: quotesData = [], mutate: mutateQuotes } = useSWR(
         isDemo ? null : ['quotes', budgetType],
-        quotesFetcher
+        quotesFetcher,
+        { revalidateOnFocus: false, shouldRetryOnError: false }
     )
 
     const { data: invoicesData = [], mutate: mutateInvoices } = useSWR(
         isDemo ? null : ['invoices', budgetType],
-        invoicesFetcher
+        invoicesFetcher,
+        { revalidateOnFocus: false, shouldRetryOnError: false }
     )
 
     const { data: creditNotesData = [], mutate: mutateCreditNotes } = useSWR(
         isDemo ? null : ['credit-notes', budgetType],
-        creditNotesFetcher
+        creditNotesFetcher,
+        { revalidateOnFocus: false, shouldRetryOnError: false }
     )
 
     const clients = isDemo ? demoData.clients : clientsData
