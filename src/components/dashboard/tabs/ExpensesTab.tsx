@@ -679,22 +679,20 @@ export function ExpensesTab() {
                                             <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
                                                 {/* Amount Display Logic */}
                                                 {isBusiness && exp.isDeductible ? (
-                                                    // Deductible: Red Total + Gray Breakdown
-                                                    <div className="flex flex-col items-end">
-                                                        <div className="text-base sm:text-lg font-bold text-red-600">
+                                                    // Deductible: Red Total + Gray Breakdown horizontal layout
+                                                    <div className="flex flex-row items-center gap-3 sm:gap-4">
+                                                        <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
+                                                            <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))} {getCurrencySymbol(exp.currency || 'ILS')}</span>
+                                                            <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(exp.vatAmount || 0)} {getCurrencySymbol(exp.currency || 'ILS')}</span>
+                                                        </div>
+                                                        <div className="text-base sm:text-lg font-bold text-red-600 whitespace-nowrap">
                                                             {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
                                                         </div>
-                                                        {exp.vatAmount && exp.vatAmount > 0 && (
-                                                            <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium">
-                                                                <span>לפני מע"מ: {formatNumberWithCommas((exp.amount - exp.vatAmount))} {getCurrencySymbol(exp.currency || 'ILS')}</span>
-                                                                <span>מע"מ: {formatNumberWithCommas(exp.vatAmount)} {getCurrencySymbol(exp.currency || 'ILS')}</span>
-                                                            </div>
-                                                        )}
                                                     </div>
                                                 ) : (
                                                     // Non-Deductible or Personal: Only Total Amount
                                                     <div className="flex flex-col items-end">
-                                                        <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
+                                                        <div className={`text-base sm:text-lg font-bold whitespace-nowrap ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
                                                             {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
                                                         </div>
                                                     </div>
