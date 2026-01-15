@@ -1,16 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Receipt, CreditCard } from 'lucide-react'
+import { FileText, Receipt, CreditCard, Eye, Link as LinkIcon, Pencil, Trash2, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { QuoteForm } from '@/components/dashboard/forms/QuoteForm'
 import { InvoiceForm } from '@/components/dashboard/forms/InvoiceForm'
 import { CreditNoteForm } from '@/components/dashboard/forms/CreditNoteForm'
 import useSWR from 'swr'
 import { getClients } from '@/lib/actions/clients'
-import { getQuotes } from '@/lib/actions/quotes'
-import { getInvoices } from '@/lib/actions/invoices'
-import { getCreditNotes } from '@/lib/actions/credit-notes'
+import { getQuotes, generateQuoteLink, updateQuoteStatus, convertQuoteToInvoice, deleteQuote } from '@/lib/actions/quotes'
+import { getInvoices, generateInvoiceLink, updateInvoiceStatus, deleteInvoice } from '@/lib/actions/invoices'
+import { getCreditNotes, generateCreditNoteLink, deleteCreditNote } from '@/lib/actions/credit-notes'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useDemo } from '@/contexts/DemoContext'
 import { format } from 'date-fns'
@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/select'
 import { Pagination } from '@/components/ui/Pagination'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
+import { useConfirm } from '@/hooks/useConfirm'
+import { toast } from 'sonner'
 
 type DocumentType = 'quote' | 'invoice' | 'credit' | null
 
@@ -171,6 +173,136 @@ export function DocumentsTab() {
         mutateCreditNotes()
     }
 
+    const confirm = useConfirm()
+
+    // View document
+    const handleViewDocument = async (type: 'quote' | 'invoice' | 'credit', id: string) => {
+        try {
+            toast.info('פותח מסמך...')
+            let result
+            if (type === 'quote') {
+                result = await generateQuoteLink(id)
+            } else if (type === 'invoice') {
+                result = await generateInvoiceLink(id)
+            } else {
+                result = await generateCreditNoteLink(id)
+            }
+
+            if (result.success && result.token) {
+                window.location.href = `${window.location.origin}/${type}/${result.token}`
+            } else {
+                toast.error('שגיאה בפתיחת המסמך')
+            }
+        } catch (error) {
+            toast.error('שגיאה בפתיחת המסמך')
+        }
+    }
+
+    // Copy link
+    const handleCopyLink = async (type: 'quote' | 'invoice' | 'credit', id: string) => {
+        try {
+            let result
+            if (type === 'quote') {
+                result = await generateQuoteLink(id)
+            } else if (type === 'invoice') {
+                result = await generateInvoiceLink(id)
+            } else {
+                result = await generateCreditNoteLink(id)
+            }
+
+            if (result.success && result.token) {
+                const url = `${window.location.origin}/${type}/${result.token}`
+
+                // Try native share first (mobile)
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: type === 'quote' ? 'הצעת מחיר' : type === 'invoice' ? 'חשבונית' : 'זיכוי',
+                            text: `הינה ${type === 'quote' ? 'הצעת המחיר' : type === 'invoice' ? 'החשבונית' : 'הזיכוי'} שלך`,
+                            url: url
+                        })
+                        return
+                    } catch (err) {
+                        if ((err as Error).name !== 'AbortError') {
+                            console.error('Share failed:', err)
+                        }
+                    }
+                }
+
+                // Fallback to clipboard
+                await navigator.clipboard.writeText(url)
+                toast.success('הקישור הועתק ללוח')
+            } else {
+                toast.error('שגיאה ביצירת הקישור')
+            }
+        } catch (error) {
+            toast.error('שגיאה ביצירת הקישור')
+        }
+    }
+
+    // Status change
+    const handleStatusChange = async (type: 'quote' | 'invoice', id: string, newStatus: any) => {
+        try {
+            if (type === 'quote') {
+                await updateQuoteStatus(id, newStatus)
+            } else {
+                await updateInvoiceStatus(id, newStatus)
+            }
+            toast.success('סטטוס עודכן בהצלחה')
+            mutateQuotes()
+            mutateInvoices()
+        } catch (error) {
+            toast.error('שגיאה בעדכון הסטטוס')
+        }
+    }
+
+    // Convert quote to invoice
+    const handleConvertToInvoice = async (quoteId: string) => {
+        if (!await confirm(
+            'האם אתה בטוח שברצונך להמיר את הצעת המחיר לחשבונית? פעולה זו תיצור טיוטת חשבונית חדשה.',
+            'המרת הצעה לחשבונית'
+        )) return
+
+        try {
+            toast.info('ממיר לחשבונית...')
+            const result = await convertQuoteToInvoice(quoteId)
+            if (result.success) {
+                toast.success('החשבונית נוצרה בהצלחה!')
+                mutateQuotes()
+                mutateInvoices()
+            } else {
+                toast.error(result.error || 'שגיאה ביצירת החשבונית')
+            }
+        } catch (error) {
+            toast.error('שגיאה ביצירת החשבונית')
+        }
+    }
+
+    // Delete document
+    const handleDelete = async (type: 'quote' | 'invoice' | 'credit', id: string) => {
+        const docName = type === 'quote' ? 'הצעת המחיר' : type === 'invoice' ? 'החשבונית' : 'הזיכוי'
+        if (!await confirm(
+            `האם אתה בטוח שברצונך למחוק את ${docName}?`,
+            'מחיקת מסמך'
+        )) return
+
+        try {
+            if (type === 'quote') {
+                await deleteQuote(id)
+            } else if (type === 'invoice') {
+                await deleteInvoice(id)
+            } else {
+                await deleteCreditNote(id)
+            }
+            toast.success('המסמך נמחק בהצלחה')
+            mutateQuotes()
+            mutateInvoices()
+            mutateCreditNotes()
+        } catch (error) {
+            toast.error('שגיאה במחיקת המסמך')
+        }
+    }
+
     const getDocumentTypeConfig = (type: 'quote' | 'invoice' | 'credit') => {
         return documentTypes.find(dt => dt.value === type)!
     }
@@ -313,45 +445,158 @@ export function DocumentsTab() {
                                 : 'אין מסמכים עדיין. צור מסמך חדש כדי להתחיל.'}
                         </div>
                     ) : (
-                        paginatedDocuments.map((doc) => {
+                        paginatedDocuments.map((doc: any) => {
                             const config = getDocumentTypeConfig(doc.type)
                             const Icon = config.icon
+                            const hasStatus = doc.type === 'quote' || doc.type === 'invoice'
+                            const canConvert = doc.type === 'quote' && doc.isSigned && !doc.invoiceId
 
                             return (
                                 <div
                                     key={`${doc.type}-${doc.id}`}
-                                    className="flex items-center justify-between p-4 border border-gray-100 dark:border-slate-700 rounded-lg hover:shadow-md transition-all"
+                                    className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-all"
                                 >
-                                    <div className="flex items-center gap-4 flex-1">
-                                        <div className={cn(
-                                            "w-10 h-10 rounded-full flex items-center justify-center",
-                                            config.color
-                                        )}>
-                                            <Icon className="w-5 h-5 text-white" />
+                                    {/* Top Row: Icon, Client, Type, Status */}
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center gap-3 flex-1">
+                                            <div className={cn(
+                                                "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+                                                config.color
+                                            )}>
+                                                <Icon className="w-5 h-5 text-white" />
+                                            </div>
+
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className="font-bold text-gray-900 dark:text-gray-100">
+                                                        {doc.clientName}
+                                                    </span>
+                                                    <span className={cn(
+                                                        "text-xs px-2 py-0.5 rounded-full font-medium",
+                                                        config.textColor,
+                                                        "bg-gray-100 dark:bg-slate-700"
+                                                    )}>
+                                                        {config.label}
+                                                    </span>
+                                                </div>
+                                                <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                                    #{doc.displayNumber} • {format(new Date(doc.displayDate), 'dd/MM/yyyy')}
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-bold text-gray-900 dark:text-gray-100">
-                                                    {doc.clientName}
-                                                </span>
-                                                <span className={cn(
-                                                    "text-xs px-2 py-0.5 rounded-full font-medium",
-                                                    config.textColor,
-                                                    "bg-gray-100 dark:bg-slate-700"
-                                                )}>
-                                                    {config.label}
-                                                </span>
+                                        {/* Status Selector (for quotes and invoices) */}
+                                        {hasStatus && (
+                                            <div className="mr-2">
+                                                <Select
+                                                    value={doc.status}
+                                                    onValueChange={(value) => handleStatusChange(doc.type, doc.id, value)}
+                                                >
+                                                    <SelectTrigger className={cn(
+                                                        "h-8 w-[120px] text-xs px-2 border shadow-sm",
+                                                        doc.status === 'DRAFT' ? 'bg-gray-50 text-gray-700 border-gray-200' :
+                                                            doc.status === 'SENT' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                                doc.status === 'ACCEPTED' || doc.status === 'PAID' ? 'bg-green-50 text-green-700 border-green-200' :
+                                                                    doc.status === 'EXPIRED' || doc.status === 'OVERDUE' ? 'bg-orange-50 text-orange-700 border-orange-200' :
+                                                                        'bg-gray-50 text-gray-700 border-gray-200'
+                                                    )}>
+                                                        <span className="w-full text-center font-medium">
+                                                            <SelectValue />
+                                                        </span>
+                                                    </SelectTrigger>
+                                                    <SelectContent dir="rtl" className="text-right">
+                                                        <SelectItem value="DRAFT" className="pr-8">טיוטה</SelectItem>
+                                                        <SelectItem value="SENT" className="pr-8">נשלח</SelectItem>
+                                                        {doc.type === 'quote' ? (
+                                                            <>
+                                                                <SelectItem value="ACCEPTED" className="pr-8">נחתם</SelectItem>
+                                                                <SelectItem value="EXPIRED" className="pr-8">פג תוקף</SelectItem>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <SelectItem value="PAID" className="pr-8">שולם</SelectItem>
+                                                                <SelectItem value="OVERDUE" className="pr-8">באיחור</SelectItem>
+                                                            </>
+                                                        )}
+                                                        <SelectItem value="CANCELLED" className="pr-8">בוטל</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
-                                            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                #{doc.displayNumber} • {format(new Date(doc.displayDate), 'dd/MM/yyyy')}
-                                            </div>
-                                        </div>
+                                        )}
                                     </div>
 
-                                    <div className="text-left">
+                                    {/* Bottom Row: Amount + Action Buttons */}
+                                    <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-slate-700">
                                         <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">
                                             {formatCurrency(doc.displayAmount)}
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            {/* View Button */}
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => handleViewDocument(doc.type, doc.id)}
+                                                className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100"
+                                                title="צפייה"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+
+                                            {/* Copy Link Button */}
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => handleCopyLink(doc.type, doc.id)}
+                                                className={cn(
+                                                    "border-200 bg-50 hover:bg-100",
+                                                    config.textColor.replace('text-', 'text-'),
+                                                    config.textColor.replace('text-', 'border-'),
+                                                    config.textColor.replace('text-', 'bg-').replace('600', '50')
+                                                )}
+                                                title="העתק קישור"
+                                            >
+                                                <LinkIcon className="h-4 w-4" />
+                                            </Button>
+
+                                            {/* Convert to Invoice (for signed quotes only) */}
+                                            {canConvert && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleConvertToInvoice(doc.id)}
+                                                    className="gap-2 text-green-600 border-green-200 bg-green-50 hover:bg-green-100"
+                                                    title="הפוך לחשבונית"
+                                                >
+                                                    <FileText className="h-4 w-4" />
+                                                    <span className="hidden md:inline">הפוך לחשבונית</span>
+                                                </Button>
+                                            )}
+
+                                            {/* Edit Button */}
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => {
+                                                    // TODO: Implement edit functionality
+                                                    toast.info('עריכה תתווסף בקרוב')
+                                                }}
+                                                className="text-gray-600 border-gray-200 bg-gray-50 hover:bg-gray-100"
+                                                title="עריכה"
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+
+                                            {/* Delete Button */}
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() => handleDelete(doc.type, doc.id)}
+                                                className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100"
+                                                title="מחיקה"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
