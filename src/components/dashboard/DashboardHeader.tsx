@@ -25,7 +25,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
     const pathname = usePathname()
     const { isDemo } = useDemo()
     const { openModal } = useAuthModal()
-    const { openUserProfile } = useClerk()
+    const { openUserProfile, signOut } = useClerk()
 
     useEffect(() => {
         if (searchParams.get('openProfile') === 'true') {
@@ -254,6 +254,11 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                                         label="מנוי"
                                         labelIcon={<CreditCard className="w-4 h-4" />}
                                         onClick={() => setIsSubscriptionOpen(true)}
+                                    />
+                                    <UserButton.Action
+                                        label="החלף משתמש"
+                                        labelIcon={<Users className="w-4 h-4" />}
+                                        onClick={() => signOut(() => router.push('/sign-in'))}
                                     />
                                 </UserButton.MenuItems>
 
