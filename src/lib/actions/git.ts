@@ -17,16 +17,22 @@ const GITHUB_REPO = 'Lio311/budget-manager-plus'
 
 export async function getGitStats(): Promise<{ success: boolean; data?: GitStats; error?: string }> {
     try {
-        // 1. Fetch Commits from GitHub API
-        const commitsResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/commits?per_page=100`, {
-            next: { revalidate: 300 } // Cache for 5 minutes
-        })
+        // 1. Fetch Commits from GitHub API (Fetch last 300 commits for better analytics)
+        const pages = [1, 2, 3]
+        const responses = await Promise.all(
+            pages.map(page =>
+                fetch(`https://api.github.com/repos/${GITHUB_REPO}/commits?per_page=100&page=${page}`, {
+                    next: { revalidate: 300 }
+                })
+            )
+        )
 
-        if (!commitsResponse.ok) {
-            throw new Error(`GitHub API Error: ${commitsResponse.statusText}`)
-        }
-
-        const commitsData = await commitsResponse.json()
+        const commitsData = (await Promise.all(
+            responses.map(async res => {
+                if (!res.ok) return []
+                return await res.json()
+            })
+        )).flat()
 
         const commits: Commit[] = commitsData.map((c: any) => ({
             hash: c.sha,

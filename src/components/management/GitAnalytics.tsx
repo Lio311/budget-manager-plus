@@ -112,24 +112,14 @@ export function GitAnalytics() {
     return (
         <div className="space-y-8 animate-in fade-in-50 duration-500">
             {/* Header Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="p-6 flex items-center gap-4 border-l-4 border-blue-500 hover:shadow-lg transition-all">
                     <div className="p-3 bg-blue-100 rounded-full text-blue-600">
                         <GitCommit size={24} />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500">סה"כ קומיטים (בטווח)</p>
+                        <p className="text-sm text-gray-500">סה"כ קומיטים</p>
                         <h3 className="text-2xl font-bold">{totalCommitsInRange}</h3>
-                    </div>
-                </Card>
-
-                <Card className="p-6 flex items-center gap-4 border-l-4 border-emerald-500 hover:shadow-lg transition-all">
-                    <div className="p-3 bg-emerald-100 rounded-full text-emerald-600">
-                        <FileCode size={24} />
-                    </div>
-                    <div>
-                        <p className="text-sm text-gray-500">נתונים נטענו</p>
-                        <h3 className="text-2xl font-bold">API</h3>
                     </div>
                 </Card>
 
@@ -244,7 +234,18 @@ export function GitAnalytics() {
                                     data={fileStatsData}
                                     cx="50%"
                                     cy="50%"
-                                    label
+                                    label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+                                        if (percent < 0.05) return null; // Hide labels for < 5%
+                                        const RADIAN = Math.PI / 180;
+                                        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                                        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                                        const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                                        return (
+                                            <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+                                                {`${(percent * 100).toFixed(0)}%`}
+                                            </text>
+                                        );
+                                    }}
                                     innerRadius={60}
                                     outerRadius={90}
                                     fill="#8884d8"
@@ -255,7 +256,7 @@ export function GitAnalytics() {
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip />
+                                <Tooltip formatter={(value: number) => (value / 1024).toFixed(1) + ' KB'} />
                                 <Legend />
                             </PieChart>
                         </ResponsiveContainer>
