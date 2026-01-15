@@ -17,34 +17,39 @@ const GITHUB_REPO = 'Lio311/budget-manager-plus'
 
 export async function getGitStats(): Promise<{ success: boolean; data?: GitStats; error?: string }> {
     try {
-        // 1. Fetch Commits from GitHub API (Fetch last 300 commits for better analytics)
-        const pages = [1, 2, 3]
-        const responses = await Promise.all(
-            pages.map(page =>
-                fetch(`https://api.github.com/repos/${GITHUB_REPO}/commits?per_page=100&page=${page}`, {
-                    next: { revalidate: 300 }
-                })
-            )
-        )
+        // 1. Fetch Commits from GitHub API (Fetch ALL commits for accurate stats)
+        // Note: For very large repos this might need optimization, but for ~2000 commits it's fine.
+        let allCommits: any[] = []
+        let page = 1
+        const PER_PAGE = 100
 
-        const commitsData = (await Promise.all(
-            responses.map(async res => {
-                if (!res.ok) return []
-                return await res.json()
+        while (true) {
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/commits?per_page=${PER_PAGE}&page=${page}`, {
+                next: { revalidate: 300 }
             })
-        )).flat()
 
-        const commits: Commit[] = commitsData.map((c: any) => ({
+            if (!res.ok) break
+            const data = await res.json()
+
+            if (!data || data.length === 0) break
+
+            allCommits = allCommits.concat(data)
+
+            // Safety break to prevent infinite loops if something goes wrong, though 50 pages = 5000 commits
+            if (data.length < PER_PAGE || page >= 50) break
+            page++
+        }
+
+        const commits: Commit[] = allCommits.map((c: any) => ({
             hash: c.sha,
             date: c.commit.author.date,
             message: c.commit.message,
             author: c.commit.author.name
         }))
 
-        // 2. Fetch Languages (as a proxy for file stats, since ls-files isn't available via simple API without crawling trees)
-        // We will map languages to "file types" for the chart
+        // 2. Fetch Languages
         const languagesResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/languages`, {
-            next: { revalidate: 3600 } // Cache for 1 hour
+            next: { revalidate: 3600 }
         })
 
         if (!languagesResponse.ok) {
@@ -64,7 +69,7 @@ export async function getGitStats(): Promise<{ success: boolean; data?: GitStats
             data: {
                 commits,
                 fileStats,
-                totalFiles: commits.length // API doesn't give total files easily, using commits length as a placeholder or we could omit
+                totalFiles: commits.length
             }
         }
 
