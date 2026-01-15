@@ -38,7 +38,10 @@ const documentTypes = [
         icon: FileText,
         color: 'bg-yellow-500 hover:bg-yellow-600',
         borderColor: 'border-yellow-500',
-        textColor: 'text-yellow-600'
+        textColor: 'text-yellow-600',
+        hoverBorderColor: 'hover:border-yellow-500',
+        hoverIconBg: 'group-hover:bg-yellow-50',
+        hoverTextColor: 'group-hover:text-yellow-600'
     },
     {
         value: 'invoice' as const,
@@ -46,7 +49,10 @@ const documentTypes = [
         icon: Receipt,
         color: 'bg-purple-500 hover:bg-purple-600',
         borderColor: 'border-purple-500',
-        textColor: 'text-purple-600'
+        textColor: 'text-purple-600',
+        hoverBorderColor: 'hover:border-purple-500',
+        hoverIconBg: 'group-hover:bg-purple-50',
+        hoverTextColor: 'group-hover:text-purple-600'
     },
     {
         value: 'credit' as const,
@@ -54,7 +60,10 @@ const documentTypes = [
         icon: CreditCard,
         color: 'bg-orange-500 hover:bg-orange-600',
         borderColor: 'border-orange-500',
-        textColor: 'text-orange-600'
+        textColor: 'text-orange-600',
+        hoverBorderColor: 'hover:border-orange-500',
+        hoverIconBg: 'group-hover:bg-orange-50',
+        hoverTextColor: 'group-hover:text-orange-600'
     },
 ]
 
@@ -375,16 +384,16 @@ export function DocumentsTab() {
                                 "flex flex-col items-center gap-3 group",
                                 isSelected
                                     ? `${docType.borderColor} bg-white dark:bg-slate-800 shadow-lg scale-105`
-                                    : "border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:scale-102"
+                                    : `border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:scale-102 ${docType.hoverBorderColor}`
                             )}
                         >
                             <div className={cn(
                                 "w-16 h-16 rounded-full flex items-center justify-center transition-colors",
-                                isSelected ? docType.color : "bg-gray-100 dark:bg-slate-700 group-hover:bg-gray-200"
+                                isSelected ? docType.color : `bg-gray-100 dark:bg-slate-700 ${docType.hoverIconBg}`
                             )}>
                                 <Icon className={cn(
-                                    "w-8 h-8",
-                                    isSelected ? "text-white" : "text-gray-600 dark:text-gray-300"
+                                    "w-8 h-8 transition-colors",
+                                    isSelected ? "text-white" : `text-gray-600 dark:text-gray-300 ${docType.hoverTextColor}`
                                 )} />
                             </div>
                             <div className="text-center">
