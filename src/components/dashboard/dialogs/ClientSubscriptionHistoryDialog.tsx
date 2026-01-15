@@ -143,7 +143,7 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client, onUpd
                 <DialogHeader>
                     <DialogTitle>היסטוריית תשלומי מנוי - {client.name}</DialogTitle>
                     <DialogDescription>
-                        ניהול תשלומי מנוי ({SUBSCRIPTION_TYPES_HE[client.subscriptionType] || client.subscriptionType} - {formatCurrency(client.subscriptionPrice)})
+                        ניהול תשלומי מנוי ({SUBSCRIPTION_TYPES_HE[client.subscriptionType] || client.subscriptionType} - {formatCurrency(client.subscriptionPrice || 0)})
                     </DialogDescription>
                 </DialogHeader>
 
