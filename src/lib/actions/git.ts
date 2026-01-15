@@ -18,7 +18,8 @@ export interface GitStats {
 
 function runGitCommand(args: string[], cwd: string): Promise<string> {
     return new Promise((resolve, reject) => {
-        const child = spawn('git', args, { cwd, shell: false })
+        // Use shell: true to help resolve git on Windows if it's in PATH but not easily found by direct spawn
+        const child = spawn('git', args, { cwd, shell: true })
         let stdout = ''
         let stderr = ''
 
@@ -44,10 +45,11 @@ export async function getGitStats(): Promise<{ success: boolean; data?: GitStats
 
         // 1. Get Commits
         // Pass arguments as array to avoid shell quoting issues on Windows
-        // Format: hash |~| date |~| message |~| author
+        // Format: hash __SEP__ date __SEP__ message __SEP__ author
+        // We wrap the format string in quotes because shell:true is enabled
         const logOutput = await runGitCommand([
             'log',
-            '--pretty=format:%h|~|%ad|~|%s|~|%an',
+            '"--pretty=format:%h__SEP__%ad__SEP__%s__SEP__%an"',
             '--date=iso',
             '-n', '2000'
         ], cwd)
@@ -56,7 +58,7 @@ export async function getGitStats(): Promise<{ success: boolean; data?: GitStats
             .split('\n')
             .filter(line => line.trim())
             .map(line => {
-                const parts = line.split('|~|')
+                const parts = line.split('__SEP__')
                 if (parts.length < 4) return null
                 const [hash, date, message, author] = parts
                 return { hash, date, message, author }
