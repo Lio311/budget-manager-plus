@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number, currency: string = '₪'): string {
-  return `${amount.toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ${currency}`
+  return `${currency} ${amount.toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
 }
 
 export function formatNumberWithCommas(num: number): string {

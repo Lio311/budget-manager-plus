@@ -109,11 +109,10 @@ export async function addExpense(
                 deductibleRate: validatedData.deductibleRate,
                 expenseType: validatedData.expenseType,
                 invoiceDate: validatedData.invoiceDate ? new Date(validatedData.invoiceDate) : null,
-                // Auto-mark as paid if no clientId (direct expense from costs page)
-                // If clientId exists (from clients page), keep as pending unless explicitly set
+                // Mark as paid by default unless explicitly set otherwise
                 paymentDate: validatedData.paymentDate
                     ? new Date(validatedData.paymentDate)
-                    : (!validatedData.clientId ? new Date() : null),
+                    : new Date(),
                 paymentMethod: validatedData.paymentMethod,
 
                 paymentTerms: validatedData.paymentTerms,
