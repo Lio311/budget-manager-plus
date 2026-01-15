@@ -34,15 +34,26 @@ export interface ProfitLossReport {
     transactions: TransactionItem[]
 }
 
-export async function getProfitLossData(year: number): Promise<{ success: boolean, data?: ProfitLossReport, error?: string }> {
+export async function getProfitLossData(year: number, dateRange?: { from: Date, to: Date }): Promise<{ success: boolean, data?: ProfitLossReport, error?: string }> {
     try {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
 
         const db = await authenticatedPrisma(userId)
 
-        const startDate = new Date(year, 0, 1) // Jan 1st
-        const endDate = new Date(year, 11, 31, 23, 59, 59) // Dec 31st
+        let startDate: Date
+        let endDate: Date
+
+        if (dateRange) {
+            startDate = dateRange.from
+            endDate = dateRange.to
+            // Ensure full day coverage
+            startDate.setHours(0, 0, 0, 0)
+            endDate.setHours(23, 59, 59, 999)
+        } else {
+            startDate = new Date(year, 0, 1) // Jan 1st
+            endDate = new Date(year, 11, 31, 23, 59, 59) // Dec 31st
+        }
 
         // 1. Fetch Invoices (Revenue)
         // User requested: "Signed Finally" -> "Receipt" or "Tax Invoice/Receipt".

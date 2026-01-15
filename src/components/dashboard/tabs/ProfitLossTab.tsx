@@ -90,24 +90,26 @@ const getCategoryColor = (catName: string) => {
 }
 
 export default function ProfitLossTab() {
-    const [selectedYear, setSelectedYear] = useState<number | null>(null)
+    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear())
+    const [viewType, setViewType] = useState<'ANNUAL' | 'BI_MONTHLY' | 'MONTHLY'>('ANNUAL')
+    const [selectedPeriod, setSelectedPeriod] = useState<{ label: string, from: Date, to: Date } | null>(null)
     const [reportData, setReportData] = useState<ProfitLossReport | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [isDetailOpen, setIsDetailOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
 
     const currentYear = new Date().getFullYear()
-    const availableYears = [2025, 2026]
+    const years = [2024, 2025, 2026]
 
     const { isDemo, data: demoData, interceptAction } = useDemo()
 
     useEffect(() => {
-        if (selectedYear) {
-            fetchReport(selectedYear)
+        if (selectedPeriod && isDetailOpen) {
+            fetchReport(selectedPeriod)
         }
-    }, [selectedYear])
+    }, [selectedPeriod, isDetailOpen])
 
-    const fetchReport = async (year: number) => {
+    const fetchReport = async (period: { from: Date, to: Date }) => {
         setIsLoading(true)
         if (isDemo) {
             // Simulate network delay
@@ -119,7 +121,8 @@ export default function ProfitLossTab() {
         }
 
         try {
-            const result = await getProfitLossData(year)
+            // Use the updated action that accepts dateRange
+            const result = await getProfitLossData(selectedYear, { from: period.from, to: period.to })
             if (result.success && result.data) {
                 setReportData(result.data)
             } else {
@@ -163,9 +166,63 @@ export default function ProfitLossTab() {
         }
     }
 
-    const handleYearSelect = (year: number) => {
-        setSelectedYear(year)
+    const handlePeriodSelect = (period: { label: string, from: Date, to: Date }) => {
+        setSelectedPeriod(period)
         setIsDetailOpen(true)
+    }
+
+    // Helper to generate periods based on view type
+    const getPeriods = () => {
+        const periods: { label: string, status: 'OPEN' | 'CLOSED' | 'FUTURE', from: Date, to: Date }[] = []
+        const now = new Date()
+
+        if (viewType === 'ANNUAL') {
+            const start = new Date(selectedYear, 0, 1)
+            const end = new Date(selectedYear, 11, 31)
+            let status: 'OPEN' | 'CLOSED' | 'FUTURE' = 'CLOSED'
+            if (selectedYear === currentYear) status = 'OPEN'
+            if (selectedYear > currentYear) status = 'FUTURE'
+
+            periods.push({ label: `דוח שנתי ${selectedYear}`, status, from: start, to: end })
+        } else if (viewType === 'BI_MONTHLY') {
+            const monthPairs = [
+                { names: 'ינואר - פברואר', start: 0, end: 1 },
+                { names: 'מרץ - אפריל', start: 2, end: 3 },
+                { names: 'מאי - יוני', start: 4, end: 5 },
+                { names: 'יולי - אוגוסט', start: 6, end: 7 },
+                { names: 'ספטמבר - אוקטובר', start: 8, end: 9 },
+                { names: 'נובמבר - דצמבר', start: 10, end: 11 },
+            ]
+
+            monthPairs.forEach(pair => {
+                const start = new Date(selectedYear, pair.start, 1)
+                const end = new Date(selectedYear, pair.end + 1, 0)
+                let status: 'OPEN' | 'CLOSED' | 'FUTURE' = 'FUTURE'
+
+                if (end < now) status = 'CLOSED'
+                else if (start <= now && end >= now) status = 'OPEN'
+
+                periods.push({ label: pair.names, status, from: start, to: end })
+            })
+        } else if (viewType === 'MONTHLY') {
+            const months = [
+                'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
+                'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
+            ]
+
+            months.forEach((name, index) => {
+                const start = new Date(selectedYear, index, 1)
+                const end = new Date(selectedYear, index + 1, 0)
+                let status: 'OPEN' | 'CLOSED' | 'FUTURE' = 'FUTURE'
+
+                if (end < now) status = 'CLOSED'
+                else if (start <= now && end >= now) status = 'OPEN'
+
+                periods.push({ label: name, status, from: start, to: end })
+            })
+        }
+
+        return periods
     }
 
     const isYearCompleted = (year: number) => year < currentYear
@@ -185,56 +242,97 @@ export default function ProfitLossTab() {
                 <p className="text-gray-500">צפייה והורדת דוחות שנתיים עבור העסק</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {availableYears.map(year => (
-                    <Card key={year} className="p-6 hover:shadow-lg transition-shadow cursor-pointer relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-2 h-full bg-emerald-500" />
+            {/* Controls */}
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between glass-panel p-4 rounded-xl">
+                <div className="flex bg-gray-100 p-1 rounded-lg">
+                    <button
+                        onClick={() => setViewType('ANNUAL')}
+                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'ANNUAL' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-900'}`}
+                    >
+                        שנתי
+                    </button>
+                    <button
+                        onClick={() => setViewType('BI_MONTHLY')}
+                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'BI_MONTHLY' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-900'}`}
+                    >
+                        דו-חודשי
+                    </button>
+                    <button
+                        onClick={() => setViewType('MONTHLY')}
+                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'MONTHLY' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-900'}`}
+                    >
+                        חודשי
+                    </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-500">שנה:</span>
+                    <select
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                        className="h-9 px-3 py-1 rounded-md border border-gray-200 bg-white text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                    >
+                        {years.map(y => (
+                            <option key={y} value={y}>{y}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {getPeriods().map((period, idx) => (
+                    <Card key={idx} className="p-6 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden group border-t-4 border-t-transparent hover:border-t-emerald-500">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <h3 className="text-2xl font-bold">{year}</h3>
-                                <p className="text-sm text-gray-500">
-                                    {isYearCompleted(year) ? 'דוח סגור וזמין' : 'שנה נוכחית'}
-                                </p>
+                                <h3 className="text-xl font-bold text-gray-800">{period.label}</h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className={`inline-block w-2 h-2 rounded-full 
+                                        ${period.status === 'CLOSED' ? 'bg-gray-400' :
+                                            period.status === 'OPEN' ? 'bg-emerald-500 animate-pulse' : 'bg-blue-300'}`}
+                                    />
+                                    <p className="text-xs font-medium text-gray-500">
+                                        {period.status === 'CLOSED' ? 'סגור' :
+                                            period.status === 'OPEN' ? 'פתוח' : 'עתידי'}
+                                    </p>
+                                </div>
                             </div>
-                            <FileText className="text-emerald-500 opacity-20 group-hover:opacity-100 transition-opacity" size={48} />
+                            <FileText className={`transition-all duration-300 
+                                ${period.status === 'OPEN' ? 'text-emerald-500' : 'text-gray-300'} 
+                                group-hover:scale-110`}
+                                size={32}
+                            />
                         </div>
 
                         <div className="mt-4 pt-4 border-t border-gray-100">
-                            {isYearCompleted(year) ? (
+                            {period.status !== 'FUTURE' ? (
                                 <Button
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-                                    onClick={() => handleYearSelect(year)}
+                                    variant="outline"
+                                    className="w-full group-hover:bg-emerald-50 group-hover:text-emerald-700 group-hover:border-emerald-200"
+                                    onClick={() => handlePeriodSelect(period)}
                                 >
-                                    צפה בדוח שנתי
+                                    צפה בדוח
                                 </Button>
                             ) : (
-                                <div className="text-center py-2 text-sm text-gray-400 bg-gray-50 rounded-md">
-                                    הדו"ח יהיה זמין בסוף השנה
+                                <div className="text-center py-2 text-sm text-gray-400 bg-gray-50 rounded-md select-none">
+                                    טרם הגיע מועד הדוח
                                 </div>
                             )}
                         </div>
-
-                        {/* Footer with Logo */}
-                        {isYearCompleted(year) && (
-                            <div className="mt-6 pt-4 border-t flex justify-between items-center opacity-60 text-xs">
-                                <span>הופק ע"י Kesefly בתאריך {new Date().toLocaleDateString('he-IL')}</span>
-                            </div>
-                        )}
                     </Card>
                 ))}
             </div>
 
             {/* Report Dialog */}
-            <Dialog open={!!selectedYear && isDetailOpen && isYearCompleted(selectedYear!)} onOpenChange={(open) => !open && setIsDetailOpen(false)}>
-                <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-y-auto p-4 md:p-6">
+            <Dialog open={isDetailOpen} onOpenChange={(open) => !open && setIsDetailOpen(false)}>
+                <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-y-auto p-4 md:p-6" dir="rtl">
                     <DialogHeader className="flex flex-col gap-4">
                         <DialogTitle className="text-2xl font-bold text-center">
-                            דוח רווח והפסד - {selectedYear}
+                            דוח רווח והפסד - {selectedPeriod?.label} {selectedYear}
                         </DialogTitle>
 
                         {/* Centered Action Buttons */}
                         <div className="flex flex-col md:flex-row justify-center gap-4 w-full">
-                            <Button variant="outline" onClick={() => fetchReport(selectedYear!)} disabled={isLoading} className="gap-2 min-w-[200px]">
+                            <Button variant="outline" onClick={() => selectedPeriod && fetchReport(selectedPeriod)} disabled={isLoading} className="gap-2 min-w-[200px]">
                                 רענן נתונים
                                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                             </Button>
