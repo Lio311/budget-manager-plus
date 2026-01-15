@@ -78,6 +78,37 @@ export function GitAnalytics() {
         return top
     })()
 
+    // 4. Commit Types (Feature vs Fix vs Chore vs Other)
+    const commitTypeData = (() => {
+        const types = {
+            'Feature': 0,
+            'Fix': 0,
+            'Chore': 0,
+            'Refactor': 0,
+            'Other': 0
+        }
+
+        stats.commits.forEach(c => {
+            const msg = c.message.toLowerCase()
+            if (msg.startsWith('feat') || msg.includes('add') || msg.includes('new') || msg.includes('create')) {
+                types['Feature']++
+            } else if (msg.startsWith('fix') || msg.includes('bug') || msg.includes('resolve') || msg.includes('repair')) {
+                types['Fix']++
+            } else if (msg.startsWith('chore') || msg.includes('update') || msg.includes('misc')) {
+                types['Chore']++
+            } else if (msg.startsWith('refactor') || msg.includes('clean') || msg.includes('improve')) {
+                types['Refactor']++
+            } else {
+                types['Other']++
+            }
+        })
+
+        return Object.entries(types)
+            .filter(([_, value]) => value > 0)
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value)
+    })()
+
     return (
         <div className="space-y-8 animate-in fade-in-50 duration-500">
             {/* Header Stats */}
@@ -199,7 +230,7 @@ export function GitAnalytics() {
                 </Card>
 
                 {/* File Types Pie Chart */}
-                <Card className="p-6 shadow-sm lg:col-span-2">
+                <Card className="p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="font-bold text-gray-800 flex items-center gap-2">
                             <FileCode className="text-emerald-500" size={20} />
@@ -214,14 +245,47 @@ export function GitAnalytics() {
                                     cx="50%"
                                     cy="50%"
                                     label
-                                    innerRadius={80}
-                                    outerRadius={120}
+                                    innerRadius={60}
+                                    outerRadius={90}
                                     fill="#8884d8"
                                     paddingAngle={5}
                                     dataKey="value"
                                 >
                                     {fileStatsData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </Card>
+
+                {/* Commit Types Distribution */}
+                <Card className="p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-bold text-gray-800 flex items-center gap-2">
+                            <GitCommit className="text-orange-500" size={20} />
+                            סוגי קומיטים (Features/Fixes)
+                        </h3>
+                    </div>
+                    <div className="h-[300px] w-full flex items-center justify-center" dir="ltr">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={commitTypeData}
+                                    cx="50%"
+                                    cy="50%"
+                                    label
+                                    innerRadius={60}
+                                    outerRadius={90}
+                                    fill="#82ca9d"
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                >
+                                    {commitTypeData.map((entry, index) => (
+                                        <Cell key={`cell-type-${index}`} fill={COLORS[(index + 3) % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip />
