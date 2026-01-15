@@ -54,7 +54,7 @@ function ProcessingContent() {
     }, [router, nextUrl])
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-emerald-50 overflow-hidden relative" dir="rtl">
+        <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-emerald-50 overflow-hidden relative px-4" dir="rtl">
             {/* Background decorative elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <motion.div
@@ -79,10 +79,10 @@ function ProcessingContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="w-full max-w-2xl p-8 text-center space-y-10 relative z-10"
+                className="w-full max-w-2xl text-center space-y-10 relative z-10"
             >
                 {/* Logo with pulse effect */}
-                <div className="relative w-32 h-32 mx-auto mb-8">
+                <div className="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-8">
                     <motion.div
                         animate={{ scale: [1, 1.05, 1] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -103,7 +103,7 @@ function ProcessingContent() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="text-3xl font-bold text-gray-900 tracking-tight whitespace-nowrap"
+                        className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight"
                     >
                         מכינים את החשבון המדהים שלך...
                     </motion.h1>
@@ -111,7 +111,7 @@ function ProcessingContent() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="text-lg text-gray-600 whitespace-nowrap"
+                        className="text-base md:text-lg text-gray-600"
                     >
                         אנחנו מגדירים את הסביבה האישית שלך, זה ממש תכף קורה
                     </motion.p>

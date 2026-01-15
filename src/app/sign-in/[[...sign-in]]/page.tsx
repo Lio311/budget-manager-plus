@@ -29,7 +29,7 @@ export default function SignInPage() {
 
     if (isRedirecting) {
         return (
-            <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 gap-4" dir="rtl">
+            <div className="flex flex-col justify-center items-center min-h-[100dvh] w-full bg-gray-50 gap-4 px-4 text-center" dir="rtl">
                 <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
                 <p className="text-gray-500 font-medium">מעביר לגוגל...</p>
             </div>
