@@ -175,18 +175,8 @@ export function IncomeTab() {
 
     // --- State ---
 
-    const [editingId, setEditingId] = useState<string | null>(null)
-    const [editData, setEditData] = useState({
-        source: '',
-        category: '',
-        amount: '',
-        currency: 'ILS',
-        date: '',
-        clientId: '',
-        vatAmount: '',
-        paymentMethod: '',
-        payer: ''
-    })
+    const [editingIncome, setEditingIncome] = useState<Income | null>(null)
+    const [isEditMobileOpen, setIsEditMobileOpen] = useState(false)
 
     const [submitting, setSubmitting] = useState(false)
 
@@ -279,59 +269,12 @@ export function IncomeTab() {
     }
 
     function handleEdit(income: any) {
-        setEditingId(income.id)
-        setEditData({
-            source: income.source,
-            category: income.category,
-            amount: income.amount.toString(),
-            currency: income.currency || 'ILS',
-            date: income.date ? format(new Date(income.date), 'yyyy-MM-dd') : '',
-            clientId: income.clientId || '',
-            vatAmount: income.vatAmount?.toString() || '',
-            paymentMethod: income.paymentMethod || '',
-            payer: income.payer || ''
-        })
+        setEditingIncome(income)
+        setIsEditMobileOpen(true)
     }
 
-    async function handleUpdate() {
-        if (!editingId) return
+    // Removed handleUpdate and executeUpdate as they are now handled by IncomeForm
 
-        const income = incomes.find(i => i.id === editingId)
-        if (income && income.isRecurring) {
-            setPendingAction({ type: 'edit', id: editingId })
-            setRecurrenceDialogOpen(true)
-            return
-        }
-
-        await executeUpdate('SINGLE')
-    }
-
-    async function executeUpdate(mode: 'SINGLE' | 'FUTURE') {
-        if (!editingId) return
-
-        setSubmitting(true)
-        const result = await updateIncome(editingId, {
-            source: editData.source,
-            category: editData.category,
-            amount: parseFloat(editData.amount),
-            currency: editData.currency,
-            date: editData.date || undefined,
-            clientId: isBusiness ? editData.clientId || undefined : undefined,
-            vatAmount: isBusiness ? parseFloat(editData.vatAmount) || undefined : undefined,
-            paymentMethod: editData.paymentMethod || undefined,
-            payer: editData.payer || undefined
-        }, mode)
-
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'ההכנסה עודכנה בהצלחה' })
-            setEditingId(null)
-            await mutateIncomes()
-            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן הכנסה', variant: 'destructive' })
-        }
-        setSubmitting(false)
-    }
 
     const handleRecurrenceConfirm = async (mode: 'SINGLE' | 'FUTURE') => {
         setRecurrenceDialogOpen(false)
@@ -347,7 +290,14 @@ export function IncomeTab() {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הכנסה', variant: 'destructive' })
             }
         } else if (pendingAction.type === 'edit') {
-            await executeUpdate(mode)
+            // Re-open edit dialog if confirmed
+            if (pendingAction.id) {
+                const income = incomes.find(i => i.id === pendingAction.id)
+                if (income) {
+                    setEditingIncome(income as any)
+                    setIsEditMobileOpen(true)
+                }
+            }
         }
         setPendingAction(null)
     }
@@ -458,6 +408,23 @@ export function IncomeTab() {
                     </Dialog>
                 </div>
 
+                {/* Edit Dialog */}
+                <Dialog open={isEditMobileOpen} onOpenChange={setIsEditMobileOpen}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                        <DialogTitle className="text-right">עריכת הכנסה</DialogTitle>
+                        {editingIncome && (
+                            <IncomeForm
+                                categories={categories}
+                                clients={clientsData}
+                                onCategoriesChange={mutateCategories}
+                                isMobile={true}
+                                onSuccess={() => setIsEditMobileOpen(false)}
+                                initialData={editingIncome}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+
                 {/* List View */}
                 <div className="lg:col-span-7 space-y-3">
                     <div className="flex items-center justify-between px-1 flex-wrap gap-2">
@@ -501,137 +468,114 @@ export function IncomeTab() {
                     ) : (
                         paginatedIncomes.map((income: any) => (
                             <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
-                                {editingId === income.id ? (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            <Input placeholder="תיאור" value={editData.source} onChange={e => setEditData({ ...editData, source: e.target.value })} />
-                                            <Input placeholder="התקבל מ..." value={editData.payer} onChange={e => setEditData({ ...editData, payer: e.target.value })} />
-                                        </div>
-                                        <div className="w-full">
-                                            <PaymentMethodSelector
-                                                value={editData.paymentMethod}
-                                                onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
-                                                color={isBusiness ? 'blue' : 'green'}
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                            <FormattedNumberInput value={editData.amount} onChange={e => setEditData({ ...editData, amount: e.target.value })} placeholder="סכום" />
-                                            <select className="p-2 border rounded-lg bg-white dark:bg-slate-800 dark:border-slate-700 text-sm dark:text-slate-100" value={editData.category} onChange={e => setEditData({ ...editData, category: e.target.value })}>
-                                                {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                                            </select>
-                                            <DatePicker date={editData.date ? new Date(editData.date) : undefined} setDate={(d) => setEditData({ ...editData, date: d ? format(d, 'yyyy-MM-dd') : '' })} />
-                                        </div>
-                                        <div className="flex justify-end gap-2">
-                                            <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                            <Button size="sm" onClick={handleUpdate} className={`${isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'} text-white`}>שמור שינויים</Button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
-                                        <div className="flex items-start gap-3 w-full sm:w-auto">
-                                            <div className="shrink-0">
-                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
-                                                    {getCategoryIcon(income.category)}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col min-w-0 gap-0.5 flex-1">
-                                                <div className="flex items-center gap-2 min-w-0">
-                                                    <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
-                                                    {income.isRecurring && (
-                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-green-50 text-green-600 border border-green-100">
-                                                            <span className="w-1 h-1 rounded-full bg-current" />
-                                                            קבועה
-                                                        </div>
-                                                    )}
-                                                    {income.client && (
-                                                        <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100 font-bold hidden sm:inline-block shrink-0">
-                                                            {income.client.name}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#676879] dark:text-gray-400 mt-0.5">
-                                                    <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                                                    <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                    <span className="">{income.category}</span>
-                                                    {income.payer && (
-                                                        <>
-                                                            <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                            <span className="">מאת: {income.payer}</span>
-                                                        </>
-                                                    )}
-                                                    {income.paymentMethod && (
-                                                        <>
-                                                            <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                            <span className="">
-                                                                {(() => {
-                                                                    const pm = income.paymentMethod
-                                                                    const map: Record<string, string> = {
-                                                                        'CHECK': "צ'ק",
-                                                                        'CREDIT_CARD': 'כרטיס אשראי',
-                                                                        'BANK_TRANSFER': 'העברה בנקאית',
-                                                                        'CASH': 'מזומן',
-                                                                        'BIT': 'ביט/פייבוקס',
-                                                                        'OTHER': 'אחר'
-                                                                    }
-                                                                    return map[pm] || pm
-                                                                })()}
-                                                            </span>
-                                                        </>
-                                                    )}
-                                                </div>
+
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
+                                    <div className="flex items-start gap-3 w-full sm:w-auto">
+                                        <div className="shrink-0">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
+                                                {getCategoryIcon(income.category)}
                                             </div>
                                         </div>
-
-                                        <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
-                                            {isBusiness && income.vatAmount && income.vatAmount > 0 ? (
-                                                <div className="flex flex-row items-center gap-3 sm:gap-4">
-                                                    <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
-                                                        <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((income.amount - (income.vatAmount || 0)))} {getCurrencySymbol(income.currency || 'ILS')}</span>
-                                                        <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(income.vatAmount || 0)} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                        <div className="flex flex-col min-w-0 gap-0.5 flex-1">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
+                                                {income.isRecurring && (
+                                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-green-50 text-green-600 border border-green-100">
+                                                        <span className="w-1 h-1 rounded-full bg-current" />
+                                                        קבועה
                                                     </div>
-                                                    <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
-                                                        {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="flex flex-col items-end">
-                                                    <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
-                                                        {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            <div className="flex text-left sm:text-right flex-col items-end gap-1">
-                                                {/* Status Badge */}
-                                                <button
-                                                    onClick={async (e) => {
-                                                        e.stopPropagation()
-                                                        const newStatus = income.status === 'PENDING' ? 'PAID' : 'PENDING'
-                                                        const res = await toggleIncomeStatus(income.id, newStatus)
-                                                        if (res.success) {
-                                                            mutateIncomes()
-                                                            toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
-                                                        }
-                                                    }}
-                                                    className={`text-[10px] px-2 py-0.5 rounded-full border mb-0 transition-all ${income.status === 'PENDING'
-                                                        ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
-                                                        : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
-                                                        }`}
-                                                >
-                                                    {income.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
-                                                </button>
-
-                                                {income.invoice && (
-                                                    <div className="text-[10px] text-gray-400 font-medium hidden sm:block">#{income.invoice.invoiceNumber}</div>
+                                                )}
+                                                {income.client && (
+                                                    <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100 font-bold hidden sm:inline-block shrink-0">
+                                                        {income.client.name}
+                                                    </span>
                                                 )}
                                             </div>
-                                            <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
-                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:bg-red-50 rounded-full"><Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
+                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#676879] dark:text-gray-400 mt-0.5">
+                                                <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                <span className="">{income.category}</span>
+                                                {income.payer && (
+                                                    <>
+                                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                        <span className="">מאת: {income.payer}</span>
+                                                    </>
+                                                )}
+                                                {income.paymentMethod && (
+                                                    <>
+                                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                        <span className="">
+                                                            {(() => {
+                                                                const pm = income.paymentMethod
+                                                                const map: Record<string, string> = {
+                                                                    'CHECK': "צ'ק",
+                                                                    'CREDIT_CARD': 'כרטיס אשראי',
+                                                                    'BANK_TRANSFER': 'העברה בנקאית',
+                                                                    'CASH': 'מזומן',
+                                                                    'BIT': 'ביט/פייבוקס',
+                                                                    'OTHER': 'אחר'
+                                                                }
+                                                                return map[pm] || pm
+                                                            })()}
+                                                        </span>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
-                                )}
+
+                                    <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
+                                        {isBusiness && income.vatAmount && income.vatAmount > 0 ? (
+                                            <div className="flex flex-row items-center gap-3 sm:gap-4">
+                                                <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
+                                                    <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((income.amount - (income.vatAmount || 0)))} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                                    <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(income.vatAmount || 0)} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                                </div>
+                                                <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
+                                                    {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-end">
+                                                <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
+                                                    {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="flex text-left sm:text-right flex-col items-end gap-1">
+                                            {/* Status Badge */}
+                                            <button
+                                                onClick={async (e) => {
+                                                    e.stopPropagation()
+                                                    const newStatus = income.status === 'PENDING' ? 'PAID' : 'PENDING'
+                                                    const res = await toggleIncomeStatus(income.id, newStatus)
+                                                    if (res.success) {
+                                                        mutateIncomes()
+                                                        toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
+                                                    }
+                                                }}
+                                                className={`text-[10px] px-2 py-0.5 rounded-full border mb-0 transition-all ${income.status === 'PENDING'
+                                                    ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
+                                                    : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                                                    }`}
+                                            >
+                                                {income.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
+                                            </button>
+
+                                            {income.invoice && (
+                                                <div className="text-[10px] text-gray-400 font-medium hidden sm:block">#{income.invoice.invoiceNumber}</div>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                            <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
+                                            <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(income)}>
+                                                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         ))
                     )}

@@ -21,9 +21,10 @@ import { RecurringEndDatePicker } from '@/components/ui/recurring-end-date-picke
 interface BillFormProps {
     onSuccess?: () => void
     isMobile?: boolean
+    initialData?: any
 }
 
-export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
+export function BillForm({ onSuccess, isMobile = false, initialData }: BillFormProps) {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const startOfMonth = new Date(year, month - 1, 1)
     const endOfMonth = new Date(year, month, 0)
@@ -43,7 +44,16 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
         isRecurring: boolean
         frequency: 'MONTHLY' | 'BI_MONTHLY'
         recurringEndDate?: string
-    }>({
+    }>(initialData ? {
+        name: initialData.name || '',
+        amount: initialData.amount?.toString() || '',
+        currency: initialData.currency || 'ILS',
+        dueDay: initialData.dueDay?.toString() || initialData.dueDate ? new Date(initialData.dueDate).getDate().toString() : '',
+        paymentMethod: initialData.paymentMethod || '',
+        isRecurring: initialData.isRecurring || false,
+        frequency: initialData.frequency || 'MONTHLY',
+        recurringEndDate: initialData.recurringEndDate || undefined
+    } : {
         name: '',
         amount: '',
         currency: 'ILS',
@@ -53,6 +63,14 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
         frequency: 'MONTHLY',
         recurringEndDate: undefined
     })
+
+    useEffect(() => {
+        if (initialData) {
+            if (initialData.isRecurring || initialData.paymentMethod) {
+                setIsAdvancedOpen(true)
+            }
+        }
+    }, [initialData])
 
     // Read date from URL if provided (set dueDay from date)
     const searchParams = useSearchParams()
@@ -105,7 +123,8 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
 
         setSubmitting(true)
         try {
-            const result = await addBill(month, year, {
+            let result;
+            const billData = {
                 name: formData.name,
                 amount: parseFloat(formData.amount),
                 currency: formData.currency,
@@ -114,23 +133,34 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 isRecurring: formData.isRecurring,
                 recurringEndDate: formData.recurringEndDate,
                 frequency: formData.frequency
-            }, budgetType)
+            }
+
+            if (initialData?.id) {
+                // Update mode
+                result = await import('@/lib/actions/bill').then(mod => mod.updateBill(initialData.id, billData))
+            } else {
+                // Create mode
+                result = await addBill(month, year, billData, budgetType)
+            }
 
             if (result.success) {
                 toast({
                     title: 'הצלחה',
-                    description: 'החשבון נוסף בהצלחה'
+                    description: initialData ? 'החשבון עודכן בהצלחה' : 'החשבון נוסף בהצלחה'
                 })
-                setFormData({
-                    name: '',
-                    amount: '',
-                    currency: 'ILS',
-                    dueDay: '',
-                    paymentMethod: '',
-                    isRecurring: false,
-                    frequency: 'MONTHLY',
-                    recurringEndDate: undefined
-                })
+
+                if (!initialData) {
+                    setFormData({
+                        name: '',
+                        amount: '',
+                        currency: 'ILS',
+                        dueDay: '',
+                        paymentMethod: '',
+                        isRecurring: false,
+                        frequency: 'MONTHLY',
+                        recurringEndDate: undefined
+                    })
+                }
 
                 // Trigger revalidation for bills and overview
                 globalMutate(['bills', month, year, budgetType])
@@ -141,7 +171,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
             } else {
                 toast({
                     title: 'שגיאה',
-                    description: result.error || 'לא ניתן להוסיף חשבון',
+                    description: result.error || (initialData ? 'לא ניתן לעדכן חשבון' : 'לא ניתן להוסיף חשבון'),
                     variant: 'destructive'
                 })
             }
@@ -296,7 +326,7 @@ export function BillForm({ onSuccess, isMobile = false }: BillFormProps) {
                 onClick={handleSubmit}
                 disabled={submitting || !formData.name || !formData.amount || !formData.dueDay}
             >
-                {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : "הוסף"}
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : (initialData ? 'שמור שינויים' : 'הוסף')}
             </Button>
         </div >
     )

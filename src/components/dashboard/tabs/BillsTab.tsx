@@ -71,8 +71,8 @@ export function BillsTab() {
     const totalPaidILS = isDemo ? demoData.bills.filter(b => b.isPaid).reduce((sum, b) => sum + b.amount, 0) : (data?.totalPaidILS || 0)
     const totalUnpaidILS = isDemo ? demoData.bills.filter(b => !b.isPaid).reduce((sum, b) => sum + b.amount, 0) : (data?.totalUnpaidILS || 0)
 
-    const [editingId, setEditingId] = useState<string | null>(null)
-    const [editData, setEditData] = useState({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
+    const [editingBill, setEditingBill] = useState<Bill | null>(null)
+    const [isEditMobileOpen, setIsEditMobileOpen] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
     // Pagination State
@@ -164,72 +164,16 @@ export function BillsTab() {
     }
 
     function handleEdit(bill: Bill) {
-        setEditingId(bill.id)
-        setEditData({
-            name: bill.name,
-            amount: bill.amount.toString(),
-            currency: bill.currency || 'ILS',
-            dueDay: new Date(bill.dueDate).getDate().toString(),
-            paymentMethod: bill.paymentMethod || ''
-        })
+        setEditingBill(bill)
+        setIsEditMobileOpen(true)
     }
 
     function handleCancelEdit() {
-        setEditingId(null)
-        setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
+        setEditingBill(null)
+        setIsEditMobileOpen(false)
     }
 
-    async function handleUpdate() {
-        if (!editingId || !editData.name || !editData.amount || !editData.dueDay) {
-            toast({
-                title: 'שגיאה',
-                description: 'נא למלא את כל השדות',
-                variant: 'destructive',
-                duration: 1000
-            })
-            return
-        }
-
-        const dueDay = parseInt(editData.dueDay)
-        if (dueDay < 1 || dueDay > 31) {
-            toast({
-                title: 'שגיאה',
-                description: 'יום תשלום חייב להיות בין 1 ל-31',
-                variant: 'destructive',
-                duration: 1000
-            })
-            return
-        }
-
-        setSubmitting(true)
-        const result = await updateBill(editingId, {
-            name: editData.name,
-            amount: parseFloat(editData.amount),
-            currency: editData.currency,
-            dueDay,
-            paymentMethod: editData.paymentMethod || undefined
-        })
-
-        if (result.success) {
-            toast({
-                title: 'הצלחה',
-                description: 'החשבון עודכן בהצלחה',
-                duration: 1000
-            })
-            setEditingId(null)
-            setEditData({ name: '', amount: '', currency: 'ILS', dueDay: '', paymentMethod: '' })
-            await mutate()
-            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } else {
-            toast({
-                title: 'שגיאה',
-                description: result.error || 'לא ניתן לעדכן חשבון',
-                variant: 'destructive',
-                duration: 1000
-            })
-        }
-        setSubmitting(false)
-    }
+    // Removed handleUpdate as it's now handled by the form
 
     // Optimistic delete for instant UI feedback
     const { deleteItem: optimisticDeleteBill } = useOptimisticDelete<BillData>(
@@ -314,6 +258,19 @@ export function BillsTab() {
                     </Dialog>
                 </div>
 
+                {/* Edit Dialog */}
+                <Dialog open={isEditMobileOpen} onOpenChange={setIsEditMobileOpen}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                        <DialogTitle className="text-right">עריכת חשבון</DialogTitle>
+                        {editingBill && (
+                            <BillForm
+                                onSuccess={() => setIsEditMobileOpen(false)}
+                                initialData={editingBill}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+
 
                 <div className="glass-panel p-5 block">
                     <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
@@ -371,121 +328,76 @@ export function BillsTab() {
                                         key={bill.id}
                                         className="group relative flex flex-col md:flex-row items-center justify-between p-3 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 gap-3"
                                     >
-                                        {editingId === bill.id ? (
-                                            <div className="flex flex-col gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
-                                                <div className="flex items-center gap-2">
-                                                    <Input
-                                                        value={editData.name}
-                                                        onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                                                        className="h-9 flex-1"
-                                                        autoFocus
-                                                    />
-                                                    <select
-                                                        className="p-2 border rounded-md h-9 bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-sm w-20 text-slate-900 dark:text-slate-100"
-                                                        value={editData.currency}
-                                                        onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
-                                                    >
-                                                        {Object.keys(SUPPORTED_CURRENCIES).map(c => <option key={c} value={c}>{c}</option>)}
-                                                    </select>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <FormattedNumberInput
-                                                        value={editData.amount}
-                                                        onChange={(e) => setEditData({ ...editData, amount: e.target.value })}
-                                                        placeholder="סכום"
-                                                    />
-                                                    <Input
-                                                        type="number"
-                                                        value={editData.dueDay}
-                                                        onChange={(e) => setEditData({ ...editData, dueDay: e.target.value })}
-                                                        className="w-16 h-9"
-                                                    />
-                                                    <div className="flex-1">
-                                                        <PaymentMethodSelector
-                                                            value={editData.paymentMethod}
-                                                            onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
-                                                            color="orange"
-                                                        />
+                                        <div className="w-full">
+                                            <div className="flex flex-wrap items-center justify-between w-full gap-y-2">
+                                                {/* Right side (RTL): Checkbox + Name + Date */}
+                                                <div className="flex items-center gap-3 flex-1 min-w-[200px]">
+                                                    <div className="flex flex-col items-center gap-1 shrink-0">
+                                                        <button
+                                                            onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
+                                                            className={`
+                                                            w-14 h-7 rounded-full text-[10px] font-medium transition-all duration-200 flex items-center justify-center
+                                                            ${bill.isPaid
+                                                                    ? 'bg-[#00c875] text-white hover:bg-[#00b065] shadow-sm'
+                                                                    : 'bg-[#ffcb00] text-[#323338] hover:bg-[#eabb00]'
+                                                                }
+                                                        `}
+                                                        >
+                                                            {bill.isPaid ? 'שולם' : 'ממתין'}
+                                                        </button>
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0 flex-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`font-bold text-sm sm:text-base transition-colors truncate ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338] dark:text-gray-100'}`}>
+                                                                {bill.name}
+                                                            </span>
+                                                            {bill.isRecurring && (
+                                                                <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${budgetType === 'BUSINESS' ? 'bg-orange-100 text-orange-700' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
+                                                                    <span className="w-1 h-1 rounded-full bg-current" />
+                                                                    קבוע
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-xs text-[#676879]">
+                                                            <span className="shrink-0">
+                                                                תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
+                                                            </span>
+                                                            {bill.paymentMethod && (
+                                                                <>
+                                                                    <span className="hidden sm:inline">•</span>
+                                                                    <span className="truncate">{bill.paymentMethod}</span>
+                                                                </>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex justify-end gap-2 mt-2">
-                                                    <Button size="sm" variant="outline" onClick={handleCancelEdit}>ביטול</Button>
-                                                    <Button size="sm" onClick={handleUpdate} className="bg-orange-500 hover:bg-orange-600 text-white">שמור שינויים</Button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="w-full">
-                                                <div className="flex flex-wrap items-center justify-between w-full gap-y-2">
-                                                    {/* Right side (RTL): Checkbox + Name + Date */}
-                                                    <div className="flex items-center gap-3 flex-1 min-w-[200px]">
-                                                        <div className="flex flex-col items-center gap-1 shrink-0">
-                                                            <button
-                                                                onClick={() => handleTogglePaid(bill.id, bill.isPaid)}
-                                                                className={`
-                                                                    w-14 h-7 rounded-full text-[10px] font-medium transition-all duration-200 flex items-center justify-center
-                                                                    ${bill.isPaid
-                                                                        ? 'bg-[#00c875] text-white hover:bg-[#00b065] shadow-sm'
-                                                                        : 'bg-[#ffcb00] text-[#323338] hover:bg-[#eabb00]'
-                                                                    }
-                                                                `}
-                                                            >
-                                                                {bill.isPaid ? 'שולם' : 'ממתין'}
-                                                            </button>
-                                                        </div>
-                                                        <div className="flex flex-col min-w-0 flex-1">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={`font-bold text-sm sm:text-base transition-colors truncate ${bill.isPaid ? 'text-gray-400 line-through' : 'text-[#323338] dark:text-gray-100'}`}>
-                                                                    {bill.name}
-                                                                </span>
-                                                                {bill.isRecurring && (
-                                                                    <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${budgetType === 'BUSINESS' ? 'bg-orange-100 text-orange-700' : 'bg-orange-50 text-orange-600 border border-orange-100'}`}>
-                                                                        <span className="w-1 h-1 rounded-full bg-current" />
-                                                                        קבוע
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-xs text-[#676879]">
-                                                                <span className="shrink-0">
-                                                                    תאריך תשלום: {new Date(bill.dueDate).getDate()} בחודש
-                                                                </span>
-                                                                {bill.paymentMethod && (
-                                                                    <>
-                                                                        <span className="hidden sm:inline">•</span>
-                                                                        <span className="truncate">{bill.paymentMethod}</span>
-                                                                    </>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Left side (RTL): Amount + Actions */}
-                                                    <div className="flex items-center gap-2 sm:gap-4 justify-between sm:justify-end w-full sm:w-auto mt-1 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-gray-50 dark:border-slate-700/50">
-                                                        <span className={`text-base sm:text-lg font-bold ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
-                                                            {formatCurrency(bill.amount, getCurrencySymbol(bill.currency || 'ILS'))}
-                                                        </span>
-                                                        <div className="flex gap-1">
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => handleEdit(bill)}
-                                                                className="h-8 w-8 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full"
-                                                            >
-                                                                <Pencil className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => handleDelete(bill.id)}
-                                                                className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
-                                                            >
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
+                                                {/* Left side (RTL): Amount + Actions */}
+                                                <div className="flex items-center gap-2 sm:gap-4 justify-between sm:justify-end w-full sm:w-auto mt-1 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-gray-50 dark:border-slate-700/50">
+                                                    <span className={`text-base sm:text-lg font-bold ${bill.isPaid ? 'text-[#00c875]' : 'text-[#fdab3d]'}`}>
+                                                        {formatCurrency(bill.amount, getCurrencySymbol(bill.currency || 'ILS'))}
+                                                    </span>
+                                                    <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => handleEdit(bill)}
+                                                            className="h-8 w-8 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => handleDelete(bill.id)}
+                                                            className="h-8 w-8 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
                                                 </div>
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
                                 ))}
                                 <Pagination
@@ -498,6 +410,6 @@ export function BillsTab() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

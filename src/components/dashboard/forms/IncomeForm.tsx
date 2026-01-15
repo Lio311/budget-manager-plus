@@ -30,7 +30,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { addIncome } from '@/lib/actions/income'
+import { addIncome, updateIncome } from '@/lib/actions/income'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { CategoryManagementDialog } from './CategoryManagementDialog'
 
@@ -51,9 +51,10 @@ interface IncomeFormProps {
     onCategoriesChange?: () => void
     isMobile?: boolean
     onSuccess?: () => void
+    initialData?: any
 }
 
-export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, onSuccess }: IncomeFormProps) {
+export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, onSuccess, initialData }: IncomeFormProps) {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const startOfMonth = new Date(year, month - 1, 1)
     const endOfMonth = new Date(year, month, 0)
@@ -67,7 +68,24 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes')
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
 
-    const [newIncome, setNewIncome] = useState({
+    const [newIncome, setNewIncome] = useState(initialData ? {
+        source: initialData.source || '',
+        category: initialData.category || '',
+        amount: initialData.amount?.toString() || '',
+        currency: initialData.currency || 'ILS',
+        date: initialData.date ? format(new Date(initialData.date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+        isRecurring: initialData.isRecurring || false,
+        recurringEndDate: initialData.recurringEndDate || undefined,
+        clientId: initialData.clientId || '',
+        amountBeforeVat: initialData.amountBeforeVat?.toString() || '',
+        vatRate: initialData.vatRate?.toString() || '0.18',
+        vatAmount: initialData.vatAmount?.toString() || '',
+        paymentMethod: initialData.paymentMethod || '',
+        payer: initialData.payer || '',
+        workTime: initialData.workTime?.toString() || '',
+        acceptedBy: initialData.acceptedBy || '',
+        id: initialData.id // Store ID for update
+    } : {
         source: '',
         category: '',
         amount: '',
@@ -84,6 +102,15 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         workTime: '',
         acceptedBy: ''
     })
+
+    useEffect(() => {
+        if (initialData) {
+            // Open advanced if relevant
+            if (initialData.isRecurring || initialData.clientId || initialData.payer || initialData.workTime) {
+                setIsAdvancedOpen(true)
+            }
+        }
+    }, [initialData])
 
     // Handle VAT Calculations
     const calculateFromNet = (net: string, rate: string) => {
@@ -172,54 +199,75 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
             end.setHours(0, 0, 0, 0)
             if (end < start) {
                 toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההכנסה', variant: 'destructive' })
+                setSubmitting(false)
                 return
             }
         }
 
+        const incomeData = {
+            source: newIncome.source,
+            category: newIncome.category,
+            amount: parseFloat(newIncome.amount),
+            currency: newIncome.currency,
+            date: newIncome.date,
+            isRecurring: newIncome.isRecurring,
+            recurringEndDate: newIncome.isRecurring ? newIncome.recurringEndDate : undefined,
+            clientId: isBusiness ? (newIncome.clientId || undefined) : undefined,
+            amountBeforeVat: isBusiness ? (parseFloat(newIncome.amountBeforeVat) || undefined) : undefined,
+            vatRate: isBusiness ? (parseFloat(newIncome.vatRate) || undefined) : undefined,
+            vatAmount: isBusiness ? (parseFloat(newIncome.vatAmount) || undefined) : undefined,
+            paymentMethod: newIncome.paymentMethod || undefined,
+            payer: newIncome.payer || undefined,
+            workTime: timeUnit === 'minutes' && newIncome.workTime
+                ? (parseFloat(newIncome.workTime) / 60).toFixed(2)
+                : (newIncome.workTime || undefined),
+            acceptedBy: newIncome.acceptedBy || undefined
+        }
+
         try {
-            await optimisticAddIncome({
-                source: newIncome.source,
-                category: newIncome.category,
-                amount: parseFloat(newIncome.amount),
-                currency: newIncome.currency,
-                date: newIncome.date || undefined,
-                isRecurring: newIncome.isRecurring,
-                recurringEndDate: newIncome.isRecurring ? newIncome.recurringEndDate : undefined,
-                clientId: isBusiness ? newIncome.clientId || undefined : undefined,
-                amountBeforeVat: isBusiness ? parseFloat(newIncome.amountBeforeVat) : undefined,
-                vatRate: isBusiness ? parseFloat(newIncome.vatRate) : undefined,
-                vatAmount: isBusiness ? parseFloat(newIncome.vatAmount) : undefined,
-                paymentMethod: newIncome.paymentMethod || undefined,
-                payer: newIncome.payer || undefined,
-                workTime: timeUnit === 'minutes' && newIncome.workTime
-                    ? (parseFloat(newIncome.workTime) / 60).toFixed(2)
-                    : (newIncome.workTime || undefined),
-                acceptedBy: newIncome.acceptedBy || undefined
-            })
+            let result;
+            if (initialData?.id) {
+                // Update mode
+                result = await updateIncome(initialData.id, incomeData, 'SINGLE')
+            } else {
+                // Create mode
+                result = await addIncome(month, year, incomeData, budgetType) // Reverted to original addIncome signature
+            }
 
-            // Reset form
-            setNewIncome({
-                source: '',
-                category: categories.length > 0 ? categories[0].name : '',
-                amount: '',
-                currency: budgetCurrency,
-                date: format(new Date(), 'yyyy-MM-dd'),
-                isRecurring: false,
-                recurringEndDate: undefined,
-                clientId: '',
-                amountBeforeVat: '',
-                vatRate: '0.18',
-                vatAmount: '',
-                paymentMethod: '',
-                payer: '',
-                workTime: '',
-                acceptedBy: ''
-            })
+            if (result.success) {
+                toast({ title: initialData ? 'הכנסה עודכנה בהצלחה' : 'הכנסה נוספה בהצלחה' })
 
-            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            if (onSuccess) onSuccess()
+                // Clear form only on create
+                if (!initialData) {
+                    setNewIncome({
+                        source: '',
+                        category: categories.length > 0 ? categories[0].name : '',
+                        amount: '',
+                        currency: budgetCurrency,
+                        date: format(new Date(), 'yyyy-MM-dd'),
+                        isRecurring: false,
+                        recurringEndDate: undefined,
+                        clientId: '',
+                        amountBeforeVat: '',
+                        vatRate: '0.18',
+                        vatAmount: '',
+                        paymentMethod: '',
+                        payer: '',
+                        workTime: '',
+                        acceptedBy: ''
+                    })
+                }
+
+                if (onSuccess) onSuccess()
+                globalMutate(key => Array.isArray(key) && (key[0] === 'incomes' || key[0] === 'overview'))
+            } else {
+                toast({ title: 'שגיאה', description: result.error, variant: 'destructive' })
+            }
         } catch (error) {
-            // Error managed by hook
+            console.error(error)
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשמירת ההכנסה', variant: 'destructive' })
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -528,15 +576,11 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 )}
 
                 <Button
-                    onClick={handleAdd}
-                    className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md
-                        ${(!newIncome.source || !newIncome.amount || !newIncome.category) && !isDemo
-                            ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
-                            : (isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-[#00c875] hover:bg-[#00b268]')
-                        }`}
-                    disabled={!isDemo && (submitting || !newIncome.source || !newIncome.amount || !newIncome.category)}
+                    type="submit"
+                    className={`w-full ${isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'} text-white transition-all duration-200 shadow-md hover:shadow-lg`}
+                    disabled={submitting}
                 >
-                    {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הכנסה' : 'הוסף')}
+                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : (isMobile ? (initialData ? 'שמור שינויים' : 'הוסף') : (initialData ? 'עדכן הכנסה' : 'הוסף הכנסה'))}
                 </Button>
             </div>
         </div>

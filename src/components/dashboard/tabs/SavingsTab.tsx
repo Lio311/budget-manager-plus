@@ -177,19 +177,11 @@ export function SavingsTab() {
     )
 
     // Edit form state
-    const [editingId, setEditingId] = useState<string | null>(null)
-    const [editData, setEditData] = useState({
-        category: '',
-        description: '',
-        monthlyDeposit: '',
-        currency: 'ILS',
-        goal: '',
-        date: new Date(),
-        paymentMethod: ''
-    })
+    // Edit form state
+    const [editingSaving, setEditingSaving] = useState<Saving | null>(null)
 
     const [recurrenceDialogOpen, setRecurrenceDialogOpen] = useState(false)
-    const [pendingAction, setPendingAction] = useState<{ type: 'delete' | 'edit', id: string } | null>(null)
+    const [pendingAction, setPendingAction] = useState<{ type: 'delete', id: string } | null>(null)
 
     // Optimistic delete for instant UI feedback
     const { deleteItem: optimisticDeleteSaving } = useOptimisticDelete<SavingsData>(
@@ -220,58 +212,8 @@ export function SavingsTab() {
         }
     }
 
-    const startEdit = (saving: Saving) => {
-        setEditingId(saving.id)
-        // Handle both targetDate (DB field) 
-        const dateToUse = saving.targetDate ? new Date(saving.targetDate) : new Date()
-        setEditData({
-            category: saving.category || '',
-            description: saving.name || '',
-            monthlyDeposit: saving.monthlyDeposit ? saving.monthlyDeposit.toString() : '',
-            currency: saving.currency || 'ILS', // Default fallback
-            goal: saving.notes || '',
-            date: dateToUse,
-            paymentMethod: saving.paymentMethod || ''
-        })
-    }
-
-    const cancelEdit = () => {
-        setEditingId(null)
-        setEditData({ category: '', description: '', monthlyDeposit: '', currency: 'ILS', goal: '', date: new Date(), paymentMethod: '' })
-    }
-
-    async function handleUpdate(id: string) {
-        const saving = savings.find(s => s.id === id)
-        if (saving && saving.isRecurring) {
-            setPendingAction({ type: 'edit', id: id })
-            setRecurrenceDialogOpen(true)
-            return
-        }
-
-        await executeUpdate(id, 'SINGLE')
-    }
-
-    async function executeUpdate(id: string, mode: 'SINGLE' | 'FUTURE') {
-        setSubmitting(true)
-        const result = await updateSaving(id, {
-            category: editData.category,
-            description: editData.description,
-            monthlyDeposit: parseFloat(editData.monthlyDeposit),
-            currency: editData.currency,
-            goal: editData.goal || undefined,
-            date: editData.date,
-            paymentMethod: editData.paymentMethod || undefined
-        }, mode)
-
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'החיסכון עודכן בהצלחה' })
-            setEditingId(null)
-            await mutateSavings()
-            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן חיסכון', variant: 'destructive' })
-        }
-        setSubmitting(false)
+    function handleEdit(saving: Saving) {
+        setEditingSaving(saving)
     }
 
     const handleRecurrenceConfirm = async (mode: 'SINGLE' | 'FUTURE') => {
@@ -287,8 +229,6 @@ export function SavingsTab() {
             } else {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק חיסכון', variant: 'destructive' })
             }
-        } else if (pendingAction.type === 'edit') {
-            await executeUpdate(pendingAction.id, mode)
         }
         setPendingAction(null)
     }
@@ -402,152 +342,76 @@ export function SavingsTab() {
                                     key={saving.id}
                                     className="group relative flex flex-col sm:flex-row items-center justify-between p-3 sm:p-3 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
                                 >
-                                    {editingId === saving.id ? (
-                                        <div className="flex flex-col gap-3 w-full animate-in fade-in zoom-in-95 duration-200">
-                                            <div className="flex flex-wrap gap-2 w-full">
-                                                <select
-                                                    className="p-2 border rounded-lg h-9 bg-white dark:bg-slate-800 dark:border-slate-700 text-sm min-w-[100px] flex-1 dark:text-slate-100"
-                                                    value={editData.category}
-                                                    onChange={(e) => setEditData({ ...editData, category: e.target.value })}
-                                                    disabled={submitting}
-                                                >
-                                                    {categories.map(cat => (
-                                                        <option key={cat.id} value={cat.name}>{cat.name}</option>
-                                                    ))}
-                                                </select>
-                                                <Input
-                                                    className="h-9 min-w-[120px] flex-[2]"
-                                                    value={editData.description}
-                                                    onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                            </div>
-                                            <div className="flex flex-wrap gap-2 w-full">
-                                                <select
-                                                    className="p-2 border rounded-lg h-9 bg-white dark:bg-slate-800 dark:border-slate-700 text-sm min-w-[80px] flex-1 dark:text-slate-100"
-                                                    value={editData.currency}
-                                                    onChange={(e) => setEditData({ ...editData, currency: e.target.value })}
-                                                    disabled={submitting}
-                                                >
-                                                    {Object.keys(SUPPORTED_CURRENCIES).map(code => (
-                                                        <option key={code} value={code}>{code}</option>
-                                                    ))}
-                                                </select>
-                                                <Input
-                                                    type="number"
-                                                    className="h-9 min-w-[80px] flex-1"
-                                                    placeholder="סכום"
-                                                    value={editData.monthlyDeposit}
-                                                    onChange={(e) => setEditData({ ...editData, monthlyDeposit: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                                <Input
-                                                    type="number"
-                                                    className="h-9 min-w-[80px] flex-1"
-                                                    placeholder="יעד"
-                                                    value={editData.goal}
-                                                    onChange={(e) => setEditData({ ...editData, goal: e.target.value })}
-                                                    disabled={submitting}
-                                                />
-                                                <div className="min-w-[120px] flex-1">
-                                                    <DatePicker
-                                                        date={editData.date}
-                                                        setDate={(date) => setEditData({ ...editData, date: date || new Date() })}
-                                                    />
-                                                </div>
+                                    <div className="flex items-start gap-3 w-full sm:w-auto">
+                                        <div className="shrink-0">
+                                            <span className={`monday-pill ${getCategoryColor(saving.category)} opacity-90 text-xs sm:text-sm`}>
+                                                {saving.category}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex flex-col gap-1 min-w-0 flex-1">
+                                            {/* Name - full width, no truncate */}
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-bold text-sm sm:text-base text-[#323338] dark:text-gray-100">{saving.name}</span>
+                                                {saving.isRecurring && (
+                                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
+                                                        <span className="w-1 h-1 rounded-full bg-current" />
+                                                        קבוע
+                                                    </div>
+                                                )}
                                             </div>
 
-                                            <div className="w-full">
-                                                <PaymentMethodSelector
-                                                    value={editData.paymentMethod}
-                                                    onChange={(val) => setEditData({ ...editData, paymentMethod: val })}
-                                                    color="blue"
-                                                />
-                                            </div>
-
-                                            <div className="flex justify-end gap-2 mt-2">
-                                                <Button size="sm" variant="outline" onClick={cancelEdit}>
-                                                    ביטול
-                                                </Button>
-                                                <Button size="sm" onClick={() => handleUpdate(saving.id)} className="bg-blue-600 hover:bg-blue-700 text-white">
-                                                    שמור שינויים
-                                                </Button>
+                                            {/* Date and details in separate line */}
+                                            <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#676879]">
+                                                <span>
+                                                    {(() => {
+                                                        try {
+                                                            const dateToFormat = saving.targetDate
+                                                            return dateToFormat ? format(new Date(dateToFormat), 'dd/MM/yyyy') : 'תאריך חסר'
+                                                        } catch (e) {
+                                                            return 'תאריך לא תקין'
+                                                        }
+                                                    })()}
+                                                </span>
+                                                {saving.notes && (
+                                                    <>
+                                                        <span className="shrink-0">•</span>
+                                                        <span>יעד: {saving.notes}</span>
+                                                    </>
+                                                )}
+                                                {saving.paymentMethod && (
+                                                    <>
+                                                        <span className="shrink-0">•</span>
+                                                        <span>{saving.paymentMethod}</span>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
-                                    ) : (
-                                        <>
-                                            <div className="flex items-start gap-3 w-full sm:w-auto">
-                                                <div className="shrink-0">
-                                                    <span className={`monday-pill ${getCategoryColor(saving.category)} opacity-90 text-xs sm:text-sm`}>
-                                                        {saving.category}
-                                                    </span>
-                                                </div>
+                                    </div>
 
-                                                <div className="flex flex-col gap-1 min-w-0 flex-1">
-                                                    {/* Name - full width, no truncate */}
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-sm sm:text-base text-[#323338] dark:text-gray-100">{saving.name}</span>
-                                                        {saving.isRecurring && (
-                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
-                                                                <span className="w-1 h-1 rounded-full bg-current" />
-                                                                קבוע
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Date and details in separate line */}
-                                                    <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#676879]">
-                                                        <span>
-                                                            {(() => {
-                                                                try {
-                                                                    const dateToFormat = saving.targetDate
-                                                                    return dateToFormat ? format(new Date(dateToFormat), 'dd/MM/yyyy') : 'תאריך חסר'
-                                                                } catch (e) {
-                                                                    return 'תאריך לא תקין'
-                                                                }
-                                                            })()}
-                                                        </span>
-                                                        {saving.notes && (
-                                                            <>
-                                                                <span className="shrink-0">•</span>
-                                                                <span>יעד: {saving.notes}</span>
-                                                            </>
-                                                        )}
-                                                        {saving.paymentMethod && (
-                                                            <>
-                                                                <span className="shrink-0">•</span>
-                                                                <span>{saving.paymentMethod}</span>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0 pl-1">
-                                                <span className="text-base sm:text-lg font-bold text-[#00c875]">
-                                                    {formatCurrency(saving.monthlyDeposit || 0, getCurrencySymbol(saving.currency))}
-                                                </span>
-                                                <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => startEdit(saving)}
-                                                        className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"
-                                                    >
-                                                        <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleDelete(saving)}
-                                                        className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:bg-red-50 rounded-full"
-                                                    >
-                                                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
+                                    <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0 pl-1">
+                                        <span className="text-base sm:text-lg font-bold text-[#00c875]">
+                                            {formatCurrency(saving.monthlyDeposit || 0, getCurrencySymbol(saving.currency))}
+                                        </span>
+                                        <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleEdit(saving)}
+                                                className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"
+                                            >
+                                                <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleDelete(saving)}
+                                                className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:bg-red-50 rounded-full"
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
                                 )}
                                 <Pagination
@@ -560,6 +424,25 @@ export function SavingsTab() {
                     </div>
                 </div>
             </div >
+
+            {/* Edit DIALOG */}
+            <Dialog open={!!editingSaving} onOpenChange={(open) => !open && setEditingSaving(null)}>
+                <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] sm:max-w-[600px] rounded-xl" dir="rtl">
+                    <DialogTitle>עריכת חיסכון</DialogTitle>
+                    {editingSaving && (
+                        <SavingForm
+                            categories={categories}
+                            onCategoriesChange={mutateCategories}
+                            initialData={editingSaving}
+                            onSuccess={() => {
+                                setEditingSaving(null)
+                                mutateSavings()
+                                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
+                            }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
 
             <RecurrenceActionDialog
                 isOpen={recurrenceDialogOpen}

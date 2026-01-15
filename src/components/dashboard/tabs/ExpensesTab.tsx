@@ -187,21 +187,8 @@ export function ExpensesTab() {
 
     // --- State ---
 
-    const [editingId, setEditingId] = useState<string | null>(null)
-    const [editData, setEditData] = useState({
-        description: '',
-        amount: '',
-        category: '',
-        currency: 'ILS',
-        date: '',
-        supplierId: '',
-        vatAmount: '',
-        amountBeforeVat: '',
-        vatRate: '0.18',
-        isDeductible: true,
-        paymentMethod: ''
-    })
-
+    const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
+    const [isEditMobileOpen, setIsEditMobileOpen] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
     const [recurrenceDialogOpen, setRecurrenceDialogOpen] = useState(false)
@@ -252,68 +239,12 @@ export function ExpensesTab() {
         }
     }
 
-    function handleEdit(exp: any) {
-        if (isDemo) { interceptAction(); return; }
-        setEditingId(exp.id)
-        setEditData({
-            description: exp.description || '',
-            amount: exp.amount.toString(),
-            category: exp.category,
-            currency: exp.currency || 'ILS',
-            date: exp.date ? format(new Date(exp.date), 'yyyy-MM-dd') : '',
-            supplierId: exp.supplierId || '',
-            vatAmount: exp.vatAmount?.toString() || '',
-            amountBeforeVat: exp.amountBeforeVat?.toString() || exp.amount.toString(),
-            vatRate: exp.vatRate?.toString() || '0.18',
-            isDeductible: exp.isDeductible ?? true,
-            paymentMethod: exp.paymentMethod || ''
-        })
+    function handleEdit(expense: any) {
+        setEditingExpense(expense)
+        setIsEditMobileOpen(true)
     }
 
-    async function handleUpdate() {
-        if (!editingId) return
-
-        const expense = expenses.find(e => e.id === editingId)
-        if (expense && expense.isRecurring) {
-            setPendingAction({ type: 'edit', id: editingId })
-            setRecurrenceDialogOpen(true)
-            return
-        }
-
-        await executeUpdate('SINGLE')
-    }
-
-    async function executeUpdate(mode: 'SINGLE' | 'FUTURE') {
-        if (!editingId) return
-
-        setSubmitting(true)
-        const result = await updateExpense(editingId, {
-            description: editData.description,
-            amount: parseFloat(editData.amount),
-            category: editData.category,
-            currency: editData.currency as "ILS" | "USD" | "EUR" | "GBP",
-            date: editData.date,
-            supplierId: isBusiness ? editData.supplierId || undefined : undefined,
-            amountBeforeVat: isBusiness ? parseFloat(editData.amountBeforeVat) || undefined : undefined,
-            vatRate: isBusiness ? parseFloat(editData.vatRate) || undefined : undefined,
-            vatAmount: isBusiness ? parseFloat(editData.vatAmount) || undefined : undefined,
-            isDeductible: isBusiness ? editData.isDeductible : undefined,
-            paymentMethod: editData.paymentMethod || undefined
-        }, mode)
-
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'ההוצאה עודכנה בהצלחה' })
-            setEditingId(null)
-            await mutateExpenses()
-            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן הוצאה', variant: 'destructive' })
-        }
-        setSubmitting(false)
-    }
-
-
-
+    // Removed handleUpdate and executeUpdate as they are now handled by ExpenseForm
 
 
     // Pagination
@@ -494,7 +425,14 @@ export function ExpensesTab() {
                 toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הוצאה', variant: 'destructive' })
             }
         } else if (pendingAction.type === 'edit') {
-            await executeUpdate(mode)
+            // Re-open edit dialog if confirmed
+            if (pendingAction.id) {
+                const expense = expenses.find(e => e.id === pendingAction.id)
+                if (expense) {
+                    setEditingExpense(expense)
+                    setIsEditMobileOpen(true)
+                }
+            }
         }
         setPendingAction(null)
     }
@@ -545,6 +483,24 @@ export function ExpensesTab() {
                     </Dialog>
                 </div>
 
+                {/* Edit Dialog */}
+                <Dialog open={isEditMobileOpen} onOpenChange={setIsEditMobileOpen}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                        <DialogTitle className="text-right">עריכת הוצאה</DialogTitle>
+                        {editingExpense && (
+                            <ExpenseForm
+                                categories={categories}
+                                suppliers={suppliersData}
+                                clients={clientsList}
+                                onCategoriesChange={mutateCategories}
+                                isMobile={true}
+                                onSuccess={() => setIsEditMobileOpen(false)}
+                                initialData={editingExpense}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+
                 {/* List View */}
                 <div className="lg:col-span-7 space-y-3">
                     <div className="flex items-center justify-between px-1 flex-wrap gap-2">
@@ -591,142 +547,99 @@ export function ExpensesTab() {
 
                             return (
                                 <div key={exp.id} className="glass-panel p-2.5 sm:p-4 hover:shadow-md transition-all group relative">
-                                    {editingId === exp.id ? (
-                                        <div className="space-y-4">
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <Input value={editData.description} onChange={(e) => setEditData({ ...editData, description: e.target.value })} placeholder="תיאור" />
-                                                <FormattedNumberInput
-                                                    value={isBusiness ? editData.amountBeforeVat : editData.amount}
-                                                    onChange={(e) => {
-                                                        const val = e.target.value;
-                                                        if (isBusiness) {
-                                                            const rate = parseFloat(editData.vatRate) || 1.18;
-                                                            const n = parseFloat(val) || 0;
-                                                            const vat = n * 0.18; // Default to 18% if rate is missing/weird during edit
-                                                            const total = n + vat;
-                                                            setEditData({
-                                                                ...editData,
-                                                                amountBeforeVat: val,
-                                                                vatAmount: vat.toFixed(2),
-                                                                amount: total.toFixed(2)
-                                                            });
-                                                        } else {
-                                                            setEditData({ ...editData, amount: val });
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
+                                        <div className="flex items-start gap-3 w-full sm:w-auto">
+                                            <div className="shrink-0">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} shadow-sm`}>
+                                                    {getCategoryIcon(exp.category)}
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col min-w-0 gap-0.5 flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base">{exp.description}</span>
+                                                    {exp.isRecurring && (
+                                                        <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${isBusiness ? 'bg-red-100 text-red-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                                                            <span className="w-1 h-1 rounded-full bg-current" />
+                                                            קבועה
+                                                        </div>
+                                                    )}
+                                                    {isBusiness && exp.isDeductible && (
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
+                                                            <span className="w-1 h-1 rounded-full bg-current" />
+                                                            הוצאה מוכרת
+                                                        </div>
+                                                    )}
+                                                    {exp.paidBy && (
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-purple-50 text-purple-600 border border-purple-100">
+                                                            <span className="w-1 h-1 rounded-full bg-current" />
+                                                            {exp.paidBy}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] dark:text-gray-400 flex-wrap">
+                                                    <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                    <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                    <span className="truncate max-w-[80px] sm:max-w-none">{exp.category}</span>
+                                                    {exp.paymentMethod && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                            <span className="truncate max-w-[60px] sm:max-w-none">{PAYMENT_METHOD_LABELS[exp.paymentMethod] || exp.paymentMethod}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
+                                            {/* Amount Display Logic */}
+                                            {isBusiness && exp.isDeductible ? (
+                                                // Deductible: Red Total + Gray Breakdown horizontal layout
+                                                <div className="flex flex-row items-center gap-3 sm:gap-4">
+                                                    <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
+                                                        <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))} {getCurrencySymbol(exp.currency || 'ILS')}</span>
+                                                        <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(exp.vatAmount || 0)} {getCurrencySymbol(exp.currency || 'ILS')}</span>
+                                                    </div>
+                                                    <div className="text-base sm:text-lg font-bold text-red-600 whitespace-nowrap">
+                                                        {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                // Non-Deductible or Personal: Only Total Amount
+                                                <div className="flex flex-col items-end">
+                                                    <div className={`text-base sm:text-lg font-bold whitespace-nowrap ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
+                                                        {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Status Badge - Only for expenses with Client (in Business mode) */}
+                                            {(exp as any).clientId && (
+                                                <button
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation()
+                                                        const newStatus = exp.paymentDate ? 'PENDING' : 'PAID'
+                                                        const res = await toggleExpenseStatus(exp.id, newStatus)
+                                                        if (res.success) {
+                                                            mutateExpenses()
+                                                            toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
                                                         }
                                                     }}
-                                                    placeholder={isBusiness ? 'סכום לפני מע"מ' : 'סכום'}
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <select
-                                                    className="w-full p-2 border border-blue-100 bg-blue-50/50 dark:bg-slate-800 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all dark:text-slate-100"
-                                                    value={editData.category}
-                                                    onChange={(e) => setEditData({ ...editData, category: e.target.value })}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-full border mb-1 transition-all ${!exp.paymentDate
+                                                        ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
+                                                        : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                                                        }`}
                                                 >
-                                                    {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
-                                                </select>
-                                                <DatePicker date={editData.date ? new Date(editData.date) : undefined} setDate={(d) => setEditData({ ...editData, date: d ? format(d, 'yyyy-MM-dd') : '' })} />
-                                            </div>
-                                            <div className="flex justify-end gap-2">
-                                                <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>ביטול</Button>
-                                                <Button size="sm" onClick={() => handleUpdate()} className={`${isBusiness ? 'bg-red-600' : 'bg-[#e2445c] hover:bg-[#d43f55]'} text-white`}>שמור שינויים</Button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
-                                            <div className="flex items-start gap-3 w-full sm:w-auto">
-                                                <div className="shrink-0">
-                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} shadow-sm`}>
-                                                        {getCategoryIcon(exp.category)}
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col min-w-0 gap-0.5 flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base">{exp.description}</span>
-                                                        {exp.isRecurring && (
-                                                            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${isBusiness ? 'bg-red-100 text-red-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
-                                                                <span className="w-1 h-1 rounded-full bg-current" />
-                                                                קבועה
-                                                            </div>
-                                                        )}
-                                                        {isBusiness && exp.isDeductible && (
-                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
-                                                                <span className="w-1 h-1 rounded-full bg-current" />
-                                                                הוצאה מוכרת
-                                                            </div>
-                                                        )}
-                                                        {exp.paidBy && (
-                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-purple-50 text-purple-600 border border-purple-100">
-                                                                <span className="w-1 h-1 rounded-full bg-current" />
-                                                                {exp.paidBy}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] dark:text-gray-400 flex-wrap">
-                                                        <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                        <span className="truncate max-w-[80px] sm:max-w-none">{exp.category}</span>
-                                                        {exp.paymentMethod && (
-                                                            <>
-                                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                                <span className="truncate max-w-[60px] sm:max-w-none">{PAYMENT_METHOD_LABELS[exp.paymentMethod] || exp.paymentMethod}</span>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
-                                                {/* Amount Display Logic */}
-                                                {isBusiness && exp.isDeductible ? (
-                                                    // Deductible: Red Total + Gray Breakdown horizontal layout
-                                                    <div className="flex flex-row items-center gap-3 sm:gap-4">
-                                                        <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
-                                                            <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))} {getCurrencySymbol(exp.currency || 'ILS')}</span>
-                                                            <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(exp.vatAmount || 0)} {getCurrencySymbol(exp.currency || 'ILS')}</span>
-                                                        </div>
-                                                        <div className="text-base sm:text-lg font-bold text-red-600 whitespace-nowrap">
-                                                            {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    // Non-Deductible or Personal: Only Total Amount
-                                                    <div className="flex flex-col items-end">
-                                                        <div className={`text-base sm:text-lg font-bold whitespace-nowrap ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
-                                                            {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Status Badge - Only for expenses with Client (in Business mode) */}
-                                                {(exp as any).clientId && (
-                                                    <button
-                                                        onClick={async (e) => {
-                                                            e.stopPropagation()
-                                                            const newStatus = exp.paymentDate ? 'PENDING' : 'PAID'
-                                                            const res = await toggleExpenseStatus(exp.id, newStatus)
-                                                            if (res.success) {
-                                                                mutateExpenses()
-                                                                toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
-                                                            }
-                                                        }}
-                                                        className={`text-[10px] px-2 py-0.5 rounded-full border mb-1 transition-all ${!exp.paymentDate
-                                                            ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
-                                                            : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
-                                                            }`}
-                                                    >
-                                                        {!exp.paymentDate ? 'בהמתנה לתשלום' : 'שולם'}
-                                                    </button>
-                                                )}
-                                                <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
-                                                    <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(exp)}>
-                                                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                                    </Button>
-                                                </div>
+                                                    {!exp.paymentDate ? 'בהמתנה לתשלום' : 'שולם'}
+                                                </button>
+                                            )}
+                                            <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
+                                                <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(exp)}>
+                                                    <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                                </Button>
                                             </div>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             )
                         })

@@ -27,7 +27,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { useRef } from 'react'
-import { addExpense, importExpenses, deleteAllMonthlyExpenses } from '@/lib/actions/expense'
+import { addExpense, updateExpense, importExpenses, deleteAllMonthlyExpenses } from '@/lib/actions/expense'
 import { Trash2 } from 'lucide-react'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { BankImportModal } from '../BankImportModal'
@@ -60,9 +60,10 @@ interface ExpenseFormProps {
     onCategoriesChange?: () => void
     isMobile?: boolean
     onSuccess?: () => void
+    initialData?: any
 }
 
-export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesChange, isMobile, onSuccess }: ExpenseFormProps) {
+export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesChange, isMobile, onSuccess, initialData }: ExpenseFormProps) {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const startOfMonth = new Date(year, month - 1, 1)
     const endOfMonth = new Date(year, month, 0)
@@ -77,7 +78,25 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
 
-    const [newExpense, setNewExpense] = useState({
+    const [newExpense, setNewExpense] = useState(initialData ? {
+        description: initialData.description || '',
+        amount: initialData.amount?.toString() || '',
+        category: initialData.category || '',
+        currency: initialData.currency || 'ILS',
+        date: initialData.date ? format(new Date(initialData.date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+        isRecurring: initialData.isRecurring || false,
+        recurringEndDate: initialData.recurringEndDate || undefined,
+        supplierId: initialData.supplierId || '',
+        clientId: initialData.clientId || '',
+        amountBeforeVat: initialData.amountBeforeVat?.toString() || '',
+        vatRate: initialData.vatRate?.toString() || '0.18',
+        vatAmount: initialData.vatAmount?.toString() || '',
+        isDeductible: initialData.isDeductible ?? true,
+        deductibleRate: initialData.deductibleRate?.toString() || '1.0',
+        paymentMethod: initialData.paymentMethod || '',
+        paidBy: initialData.paidBy || '',
+        id: initialData.id // Store ID for update
+    } : {
         description: '',
         amount: '',
         category: '',
@@ -95,6 +114,15 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         paymentMethod: '',
         paidBy: ''
     })
+
+    useEffect(() => {
+        if (initialData) {
+            // Open advanced if advanced fields are populated
+            if (initialData.isRecurring || initialData.supplierId || initialData.clientId || initialData.isDeductible === false || (initialData.vatRate && initialData.vatRate !== 0.17)) {
+                setIsAdvancedOpen(true)
+            }
+        }
+    }, [initialData])
 
     // Handle VAT Calculations (Backwards from Gross)
     const calculateFromGross = (gross: string, rate: string) => {
@@ -263,58 +291,72 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
             }
         }
 
+        const expenseData = {
+            description: newExpense.description,
+            amount: parseFloat(newExpense.amount),
+            category: newExpense.category,
+            currency: newExpense.currency,
+            date: newExpense.date,
+            isRecurring: newExpense.isRecurring,
+            recurringEndDate: newExpense.recurringEndDate,
+            supplierId: newExpense.supplierId || undefined,
+            clientId: newExpense.clientId || undefined,
+            amountBeforeVat: parseFloat(newExpense.amountBeforeVat) || undefined,
+            vatRate: parseFloat(newExpense.vatRate) || undefined,
+            vatAmount: parseFloat(newExpense.vatAmount) || undefined,
+            isDeductible: newExpense.isDeductible,
+            deductibleRate: parseFloat(newExpense.deductibleRate) || 1.0,
+            paymentMethod: newExpense.paymentMethod || undefined,
+            paidBy: newExpense.paidBy || undefined
+        }
+
         try {
-            const totalAmount = newExpense.amount
+            let result;
+            if (initialData?.id) {
+                // Update mode
+                result = await updateExpense(initialData.id, expenseData, 'SINGLE')
+            } else {
+                // Create mode
+                result = await addExpense(expenseData)
+            }
 
-            // Calculate derived values for payload
-            const { net, vat } = isBusiness
-                ? calculateFromGross(totalAmount, newExpense.vatRate)
-                : { net: totalAmount, vat: '0' }
+            if (result.success) {
+                toast({ title: initialData ? 'הוצאה עודכנה בהצלחה' : 'הוצאה נוספה בהצלחה' })
 
-            await optimisticAddExpense({
-                description: newExpense.description || 'הוצאה ללא תיאור',
-                amount: parseFloat(totalAmount),
-                category: newExpense.category,
-                currency: newExpense.currency as "ILS" | "USD" | "EUR" | "GBP",
-                date: newExpense.date,
-                isRecurring: newExpense.isRecurring,
-                recurringEndDate: newExpense.recurringEndDate,
-                supplierId: isBusiness && newExpense.supplierId && newExpense.supplierId !== 'NO_SUPPLIER' ? newExpense.supplierId : undefined,
-                clientId: isBusiness && newExpense.clientId && newExpense.clientId !== 'NO_CLIENT' ? newExpense.clientId : undefined,
-                amountBeforeVat: isBusiness ? parseFloat(net) : undefined,
-                vatRate: isBusiness ? parseFloat(newExpense.vatRate) : undefined,
-                vatAmount: isBusiness ? parseFloat(vat) : undefined,
-                isDeductible: isBusiness ? newExpense.isDeductible : undefined,
-                deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
+                // Clear form only on create
+                if (!initialData) {
+                    setNewExpense({
+                        description: '',
+                        amount: '',
+                        category: '',
+                        currency: 'ILS',
+                        date: format(new Date(), 'yyyy-MM-dd'),
+                        isRecurring: false,
+                        recurringEndDate: undefined,
+                        supplierId: '',
+                        clientId: '',
+                        amountBeforeVat: '',
+                        vatRate: '0.18',
+                        vatAmount: '',
+                        isDeductible: true,
+                        deductibleRate: '1.0',
+                        paymentMethod: '',
+                        paidBy: ''
+                    })
+                }
 
-                paymentMethod: newExpense.paymentMethod || undefined,
-                paidBy: newExpense.paidBy || undefined,
-            })
+                if (onSuccess) onSuccess()
 
-            // Reset form
-            setNewExpense({
-                description: '',
-                amount: '',
-                category: categories.length > 0 ? categories[0].name : '',
-                currency: budgetCurrency,
-                date: format(new Date(), 'yyyy-MM-dd'),
-                isRecurring: false,
-                recurringEndDate: undefined,
-                supplierId: '',
-                clientId: '',
-                amountBeforeVat: '',
-                vatRate: '0.18',
-                vatAmount: '',
-                isDeductible: true,
-                deductibleRate: '1.0',
-                paymentMethod: '',
-                paidBy: '',
-            })
-
-            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            if (onSuccess) onSuccess()
+                // Refresh data
+                globalMutate(key => Array.isArray(key) && (key[0] === 'expenses' || key[0] === 'overview'))
+            } else {
+                toast({ title: 'שגיאה', description: result.error, variant: 'destructive' })
+            }
         } catch (error) {
-            // Error managed by hook
+            console.error(error)
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה בשמירת ההוצאה', variant: 'destructive' })
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -643,17 +685,12 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                 )}
 
 
-
                 <Button
-                    onClick={handleAdd}
-                    className={`w-full h-11 rounded-lg text-white font-bold shadow-sm transition-all hover:shadow-md 
-                        ${(!newExpense.description || !newExpense.amount || !newExpense.category) && !isDemo
-                            ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
-                            : (isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d43f55]')
-                        }`}
-                    disabled={!isDemo && (submitting || !newExpense.description || !newExpense.amount || !newExpense.category)}
+                    type="submit"
+                    className={`w-full ${isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d03d54]'} text-white transition-all duration-200 shadow-md hover:shadow-lg`}
+                    disabled={submitting}
                 >
-                    {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (isBusiness ? 'שמור הוצאה' : 'הוסף')}
+                    {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : (isMobile ? (initialData ? 'שמור שינויים' : 'הוסף') : (initialData ? 'עדכן הוצאה' : 'הוסף הוצאה'))}
                 </Button>
             </div>
         </div >

@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { formatCurrency } from '@/lib/utils'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
-import { addDebt } from '@/lib/actions/debts'
+import { addDebt, updateDebt } from '@/lib/actions/debts'
 import { DEBT_TYPES } from '@/lib/constants/debt-types'
 import { DatePicker } from '@/components/ui/date-picker'
 import {
@@ -29,9 +29,10 @@ import {
 interface DebtFormProps {
     isMobile?: boolean
     onSuccess?: () => void
+    initialData?: any
 }
 
-export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
+export function DebtForm({ isMobile, onSuccess, initialData }: DebtFormProps) {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const startOfMonth = new Date(year, month - 1, 1)
     const endOfMonth = new Date(year, month, 0)
@@ -41,39 +42,70 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
+
+    // Initialize state with initialData if provided
     const [newDebt, setNewDebt] = useState<{
         creditor: string
         debtType: string
         totalAmount: string
         currency: string
-        date: string // Changed from dueDay
+        date: string
         isRecurring: boolean
         numberOfInstallments: string
         paymentMethod: string
-    }>({
-        creditor: '',
-        debtType: DEBT_TYPES.OWED_BY_ME,
-        totalAmount: '',
-        currency: 'ILS',
-        date: '', // Changed from dueDay
-        isRecurring: false,
-        numberOfInstallments: '',
-        paymentMethod: ''
+        id?: string
+    }>(() => {
+        if (initialData) {
+            return {
+                creditor: initialData.creditor || '',
+                debtType: initialData.debtType || DEBT_TYPES.OWED_BY_ME,
+                totalAmount: initialData.totalAmount?.toString() || '',
+                currency: initialData.currency || 'ILS',
+                date: initialData.date ? format(new Date(initialData.date), 'yyyy-MM-dd') :
+                    (initialData.dueDay ? format(new Date(year, month - 1, initialData.dueDay), 'yyyy-MM-dd') : ''), // Fallback for dueDay legacy
+                isRecurring: initialData.isRecurring || false,
+                numberOfInstallments: initialData.numberOfInstallments?.toString() || '',
+                paymentMethod: initialData.paymentMethod || '',
+                id: initialData.id
+            }
+        }
+
+        return {
+            creditor: '',
+            debtType: DEBT_TYPES.OWED_BY_ME,
+            totalAmount: '',
+            currency: 'ILS',
+            date: '',
+            isRecurring: false,
+            numberOfInstallments: '',
+            paymentMethod: ''
+        }
     })
 
-    // Read date from URL if provided
+    // Read date from URL if provided (only for new items)
     const searchParams = useSearchParams()
     useEffect(() => {
-        const paramDate = searchParams?.get('date')
-        if (paramDate) {
-            setNewDebt(prev => ({
-                ...prev,
-                date: format(new Date(paramDate), 'yyyy-MM-dd')
-            }))
+        if (!initialData) {
+            const paramDate = searchParams?.get('date')
+            if (paramDate) {
+                setNewDebt(prev => ({
+                    ...prev,
+                    date: format(new Date(paramDate), 'yyyy-MM-dd')
+                }))
+            }
         }
-    }, [searchParams])
+    }, [searchParams, initialData])
 
-    const handleAdd = async () => {
+    // Open advanced settings if editing complex data
+    useEffect(() => {
+        if (initialData) {
+            if (initialData.isRecurring || initialData.paymentMethod) {
+                setIsAdvancedOpen(true)
+            }
+        }
+    }, [initialData])
+
+    const handleSubmit = async () => {
         // Validate required fields
         const newErrors: Record<string, boolean> = {}
         if (!newDebt.creditor || !newDebt.creditor.trim()) newErrors.creditor = true
@@ -103,45 +135,71 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
             const debtDate = new Date(newDebt.date) // Parse the date string
             const dueDay = debtDate.getDate() // Extract day from the date
 
-            const result = await addDebt(month, year, {
+            const debtData = {
                 creditor: newDebt.creditor.trim(),
                 debtType: newDebt.debtType,
                 totalAmount,
                 currency: newDebt.currency,
                 monthlyPayment,
-                dueDay, // Use the extracted day
+                dueDay,
                 isRecurring: newDebt.isRecurring,
                 totalDebtAmount: newDebt.isRecurring ? totalAmount : undefined,
                 numberOfInstallments: newDebt.isRecurring ? parseInt(newDebt.numberOfInstallments) : undefined,
-                paymentMethod: newDebt.paymentMethod || undefined
-            }, budgetType)
+                paymentMethod: newDebt.paymentMethod || undefined,
+                // If updating, include the date explicitly if needed by backend, though dueDay is primary
+                date: newDebt.date
+            }
+
+            let result;
+            if (initialData?.id) {
+                // Update mode
+                result = await updateDebt(initialData.id, debtData)
+            } else {
+                // Create mode
+                result = await addDebt(month, year, debtData, budgetType)
+            }
 
             if (result.success) {
-                setNewDebt({
-                    creditor: '',
-                    debtType: DEBT_TYPES.OWED_BY_ME,
-                    totalAmount: '',
-                    currency: 'ILS',
-                    date: '', // Reset date
-                    isRecurring: false,
-                    numberOfInstallments: '',
-                    paymentMethod: ''
-                })
+                if (!initialData) {
+                    setNewDebt({
+                        creditor: '',
+                        debtType: DEBT_TYPES.OWED_BY_ME,
+                        totalAmount: '',
+                        currency: 'ILS',
+                        date: '',
+                        isRecurring: false,
+                        numberOfInstallments: '',
+                        paymentMethod: ''
+                    })
+                }
 
-                globalMutate(['debts', month, year, budgetType])
+                if (initialData) {
+                    // Refresh the specific list since we are editing
+                    await globalMutate(['debts', month, year, budgetType])
+                } else {
+                    // Refresh the list for add
+                    await globalMutate(['debts', month, year, budgetType])
+                }
+
                 globalMutate(key => Array.isArray(key) && key[0] === 'overview')
 
                 toast({
                     title: 'הצלחה',
-                    description: newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'ההלוואה נוספה בהצלחה'
+                    description: initialData
+                        ? 'ההלוואה עודכנה בהצלחה'
+                        : (newDebt.isRecurring ? `נוצרו ${newDebt.numberOfInstallments} תשלומים בהצלחה` : 'ההלוואה נוספה בהצלחה')
                 })
 
                 if (onSuccess) onSuccess()
             } else {
-                toast({ title: 'שגיאה', description: result.error || 'לא ניתן להוסיף הלוואה', variant: 'destructive' })
+                toast({
+                    title: 'שגיאה',
+                    description: result.error || (initialData ? 'לא ניתן לעדכן הלוואה' : 'לא ניתן להוסיף הלוואה'),
+                    variant: 'destructive'
+                })
             }
         } catch (error) {
-            console.error('Add debt failed:', error)
+            console.error('Add/Update debt failed:', error)
             toast({ title: 'שגיאה', description: 'אירעה שגיאה בלתי צפויה', variant: 'destructive' })
         } finally {
             setSubmitting(false)
@@ -152,7 +210,7 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
         <div>
             <div className="flex items-center gap-2 mb-6">
                 <Wallet className="h-5 w-5 text-purple-600" />
-                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">הוספת הלוואה</h3>
+                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{initialData ? 'עריכת הלוואה' : 'הוספת הלוואה'}</h3>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -286,15 +344,15 @@ export function DebtForm({ isMobile, onSuccess }: DebtFormProps) {
                     </div>
                 )}
                 <Button
-                    onClick={handleAdd}
+                    onClick={handleSubmit}
                     className={`w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md
-                            ${(!newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date)
+                                ${(!newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date)
                             ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
                             : 'bg-purple-600 hover:bg-purple-700'
                         }`}
                     disabled={submitting || !newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date}
                 >
-                    {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : 'הוסף'}
+                    {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (initialData ? 'עדכן' : 'הוסף')}
                 </Button>
             </div>
         </div>

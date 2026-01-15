@@ -19,7 +19,7 @@ import { RecurringEndDatePicker } from '@/components/ui/recurring-end-date-picke
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES } from '@/lib/currency'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
-import { addSaving } from '@/lib/actions/savings'
+import { addSaving, updateSaving } from '@/lib/actions/savings'
 import { addCategory } from '@/lib/actions/category'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 
@@ -34,9 +34,10 @@ interface SavingFormProps {
     onCategoriesChange?: () => void
     isMobile?: boolean
     onSuccess?: () => void
+    initialData?: any
 }
 
-export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess }: SavingFormProps) {
+export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess, initialData }: SavingFormProps) {
     const { month, year, currency: budgetCurrency, budgetType } = useBudget()
     const startOfMonth = new Date(year, month - 1, 1)
     const endOfMonth = new Date(year, month, 0)
@@ -51,16 +52,31 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
     const [newCategoryName, setNewCategoryName] = useState('')
     const [newCategoryColor, setNewCategoryColor] = useState(PRESET_COLORS[0].class)
 
-    const [newSaving, setNewSaving] = useState({
-        category: '',
-        description: '', // Maps to name
-        monthlyDeposit: '',
-        currency: 'ILS',
-        goal: '',        // Maps to notes
-        date: new Date(),
-        isRecurring: false,
-        recurringEndDate: undefined as Date | undefined,
-        paymentMethod: ''
+    const [newSaving, setNewSaving] = useState(() => {
+        if (initialData) {
+            return {
+                category: initialData.category || '',
+                description: initialData.name || '',
+                monthlyDeposit: initialData.monthlyDeposit?.toString() || '',
+                currency: initialData.currency || 'ILS',
+                goal: initialData.notes || '',
+                date: initialData.targetDate ? new Date(initialData.targetDate) : new Date(),
+                isRecurring: initialData.isRecurring || false,
+                recurringEndDate: undefined, // TODO: Map extended props if available
+                paymentMethod: initialData.paymentMethod || ''
+            }
+        }
+        return {
+            category: '',
+            description: '',
+            monthlyDeposit: '',
+            currency: 'ILS',
+            goal: '',
+            date: new Date(),
+            isRecurring: false,
+            recurringEndDate: undefined as Date | undefined,
+            paymentMethod: ''
+        }
     })
 
     // Set default category
@@ -113,7 +129,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
         }
     )
 
-    async function handleAdd() {
+    async function handleSubmit() {
         const newErrors: Record<string, boolean> = {}
         if (!newSaving.category) newErrors.category = true
         if (!newSaving.description) newErrors.description = true
@@ -137,37 +153,63 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
             }
         }
 
+        const savingData = {
+            category: newSaving.category,
+            description: newSaving.description,
+            monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
+            currency: newSaving.currency,
+            goal: newSaving.goal || undefined,
+            date: newSaving.date,
+            isRecurring: newSaving.isRecurring,
+            recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
+            recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined,
+            paymentMethod: newSaving.paymentMethod || undefined
+        }
+
         try {
-            await optimisticAddSaving({
-                category: newSaving.category,
-                description: newSaving.description,
-                monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
-                currency: newSaving.currency,
-                goal: newSaving.goal || undefined,
-                date: newSaving.date,
-                isRecurring: newSaving.isRecurring,
-                recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
-                recurringEndDate: newSaving.isRecurring ? newSaving.recurringEndDate : undefined,
-                paymentMethod: newSaving.paymentMethod || undefined
-            })
+            let result;
+            if (initialData?.id) {
+                // Update
+                result = await updateSaving(initialData.id, savingData, 'SINGLE')
+            } else {
+                // Add
+                // We use manual call instead of optimistic hook for uniformity in this refactor, 
+                // or we could conditional call optimistic. 
+                // Since this form is now used for both, let's keep it simple.
+                // But wait, the previous code used optimisticAddSaving. 
+                // To preserve that behavior for ADD, we can separate paths.
 
-            // Reset form
-            setNewSaving({
-                category: categories.length > 0 ? categories[0].name : '',
-                description: '',
-                monthlyDeposit: '',
-                currency: budgetCurrency,
-                goal: '',
-                date: new Date(),
-                isRecurring: false,
-                recurringEndDate: undefined,
-                paymentMethod: ''
-            })
+                if (!initialData) {
+                    await optimisticAddSaving(savingData)
+                    // Reset form
+                    setNewSaving({
+                        category: categories.length > 0 ? categories[0].name : '',
+                        description: '',
+                        monthlyDeposit: '',
+                        currency: budgetCurrency,
+                        goal: '',
+                        date: new Date(),
+                        isRecurring: false,
+                        recurringEndDate: undefined,
+                        paymentMethod: ''
+                    })
+                    globalMutate(key => Array.isArray(key) && key[0] === 'overview')
+                    if (onSuccess) onSuccess()
+                    return
+                }
+            }
 
-            globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            if (onSuccess) onSuccess()
+            // Handle Update Result (since Add returned early)
+            if (result && result.success) {
+                toast({ title: 'הצלחה', description: 'החיסכון עודכן בהצלחה' })
+                globalMutate(['savings', month, year, budgetType])
+                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
+                if (onSuccess) onSuccess()
+            } else {
+                toast({ title: 'שגיאה', description: result?.error || 'שגיאה בעדכון החיסכון', variant: 'destructive' })
+            }
         } catch (error) {
-            // Error managed by hook
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה', variant: 'destructive' })
         }
     }
 
@@ -216,7 +258,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
         <div>
             <div className="mb-6 flex items-center gap-2">
                 <PiggyBank className="h-5 w-5 text-blue-600" />
-                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">הוספת חיסכון</h3>
+                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{initialData ? 'עריכת חיסכון' : 'הוספת חיסכון'}</h3>
             </div>
 
             <div className="flex flex-wrap gap-4 items-end">
@@ -388,7 +430,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 )}
 
                 <Button
-                    onClick={handleAdd}
+                    onClick={handleSubmit}
                     className={`w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md mt-2
                         ${(!newSaving.category || !newSaving.description || !newSaving.monthlyDeposit)
                             ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
@@ -399,7 +441,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                     {submitting ? (
                         <Loader2 className="h-4 w-4 animate-rainbow-spin" />
                     ) : (
-                        'הוסף'
+                        initialData ? 'עדכן' : 'הוסף'
                     )}
                 </Button>
             </div>
