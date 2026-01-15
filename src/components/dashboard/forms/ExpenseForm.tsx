@@ -92,7 +92,8 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         vatAmount: '',
         isDeductible: true,
         deductibleRate: '1.0',
-        paymentMethod: ''
+        paymentMethod: '',
+        paidBy: ''
     })
 
     // Handle VAT Calculations (Backwards from Gross)
@@ -287,6 +288,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                 deductibleRate: isBusiness ? parseFloat(newExpense.deductibleRate) : undefined,
 
                 paymentMethod: newExpense.paymentMethod || undefined,
+                paidBy: newExpense.paidBy || undefined,
             })
 
             // Reset form
@@ -306,6 +308,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                 isDeductible: true,
                 deductibleRate: '1.0',
                 paymentMethod: '',
+                paidBy: '',
             })
 
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
@@ -589,6 +592,20 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                                 color={isBusiness ? 'red' : 'red'}
                             />
                         </div>
+
+                        {/* Paid By Field */}
+                        {isBusiness && (
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שולם על ידי (אופציונלי)</label>
+                                <Input
+                                    type="text"
+                                    value={newExpense.paidBy}
+                                    onChange={(e) => setNewExpense({ ...newExpense, paidBy: e.target.value })}
+                                    placeholder="שם המשלם"
+                                    className="h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-red-500/20"
+                                />
+                            </div>
+                        )}
 
                         <div className={`flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full ${!isBusiness ? 'bg-white dark:bg-slate-800' : ''}`}>
                             <div className="flex items-center gap-2">

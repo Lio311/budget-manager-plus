@@ -26,6 +26,7 @@ export const expenseSchema = z.object({
     paymentMethod: z.any().optional(),
     paymentTerms: z.number().optional(),
     responsibles: z.array(z.string()).optional(),
+    paidBy: z.string().optional().nullable(),
 
 })
 

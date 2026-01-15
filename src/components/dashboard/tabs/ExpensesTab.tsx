@@ -654,6 +654,12 @@ export function ExpensesTab() {
                                                                 הוצאה מוכרת
                                                             </div>
                                                         )}
+                                                        {exp.paidBy && (
+                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-purple-50 text-purple-600 border border-purple-100">
+                                                                <span className="w-1 h-1 rounded-full bg-current" />
+                                                                {exp.paidBy}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] dark:text-gray-400 flex-wrap">
                                                         <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>

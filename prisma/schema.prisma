@@ -282,6 +282,7 @@ model Expense {
   paymentDate       DateTime? // Cash flow date
   paymentMethod     String?    // Changed from Enum to String for flexibility
   paymentTerms      Int?     @default(0)
+  paidBy            String?   // Who paid this expense
   
 
   createdAt         DateTime @default(now())

@@ -67,6 +67,7 @@ export interface ExpenseInput {
     isDeductible?: boolean
     deductibleRate?: number
     paymentMethod?: string
+    paidBy?: string
 }
 
 export async function addExpense(
@@ -116,6 +117,7 @@ export async function addExpense(
                 paymentMethod: validatedData.paymentMethod,
 
                 paymentTerms: validatedData.paymentTerms,
+                paidBy: validatedData.paidBy || null,
 
             }
         })
@@ -340,7 +342,8 @@ function formatExpenseDataForUpdate(validatedData: any) {
         invoiceDate: validatedData.invoiceDate ? new Date(validatedData.invoiceDate) : undefined,
         paymentDate: validatedData.paymentDate ? new Date(validatedData.paymentDate) : undefined,
         paymentMethod: validatedData.paymentMethod,
-        paymentTerms: validatedData.paymentTerms
+        paymentTerms: validatedData.paymentTerms,
+        paidBy: validatedData.paidBy
     } as any // Cast to any to allow property deletion upstream
 }
 
