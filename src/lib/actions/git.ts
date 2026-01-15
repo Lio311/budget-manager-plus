@@ -16,10 +16,13 @@ export interface GitStats {
     totalFiles: number
 }
 
+// Hardcoded path based on environment discovery
+const GIT_PATH = String.raw`C:\Users\Lior\anaconda3\Library\bin\git.exe`
+
 function runGitCommand(args: string[], cwd: string): Promise<string> {
     return new Promise((resolve, reject) => {
         // Use shell: true to help resolve git on Windows if it's in PATH but not easily found by direct spawn
-        const child = spawn('git', args, { cwd, shell: true })
+        const child = spawn(GIT_PATH, args, { cwd, shell: true })
         let stdout = ''
         let stderr = ''
 
