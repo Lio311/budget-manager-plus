@@ -425,14 +425,13 @@ export function DocumentsTab() {
                     {selectedType === 'quote' && (
                         <QuoteForm
                             clients={clients}
-                            editingQuote={editingQuote}
+                            initialData={editingQuote}
                             onSuccess={handleFormSuccess}
                         />
                     )}
                     {selectedType === 'invoice' && (
                         <InvoiceForm
                             clients={clients}
-                            editingInvoice={editingInvoice}
                             onSuccess={handleFormSuccess}
                         />
                     )}
