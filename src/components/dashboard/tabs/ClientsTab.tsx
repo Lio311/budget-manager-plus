@@ -20,6 +20,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { useDemo } from '@/contexts/DemoContext'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { DatePicker } from '@/components/ui/date-picker'
+import { formatCurrency } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
