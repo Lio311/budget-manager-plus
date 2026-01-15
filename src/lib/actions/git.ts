@@ -16,8 +16,8 @@ export interface GitStats {
     totalFiles: number
 }
 
-// Hardcoded path based on environment discovery
-const GIT_PATH = String.raw`C:\Users\Lior\anaconda3\Library\bin\git.exe`
+// Hardcoded path using forward slashes to avoid shell escaping issues
+const GIT_PATH = 'C:/Users/Lior/anaconda3/Library/bin/git.exe'
 
 function runGitCommand(args: string[], cwd: string): Promise<string> {
     return new Promise((resolve, reject) => {
