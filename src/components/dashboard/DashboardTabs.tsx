@@ -18,9 +18,7 @@ import { CalendarTab } from './tabs/CalendarTab'
 import { SavingsTab } from './tabs/SavingsTab'
 import { ClientsTab } from './tabs/ClientsTab'
 import { SuppliersTab } from './tabs/SuppliersTab'
-import { InvoicesTab } from './tabs/InvoicesTab'
-import { QuotesTab } from './tabs/QuotesTab'
-import { CreditNotesTab } from './tabs/CreditNotesTab'
+import { DocumentsTab } from './tabs/DocumentsTab'
 import { BudgetLimitsTab } from './tabs/BudgetLimitsTab'
 import ProfitLossTab from './tabs/ProfitLossTab'
 import { useBudget } from '@/contexts/BudgetContext'
@@ -169,9 +167,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         { value: 'suppliers', label: 'ספקים', icon: Building2, activeClass: 'data-[state=active]:bg-blue-600' },
         { value: 'income', label: 'מכירות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'expenses', label: 'עלויות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
-        { value: 'quotes', label: 'הצעות מחיר', icon: FileText, activeClass: 'data-[state=active]:bg-yellow-500 data-[state=active]:text-black' },
-        { value: 'invoices', label: 'חשבוניות', icon: FileText, activeClass: 'data-[state=active]:bg-purple-600' },
-        { value: 'credit-notes', label: 'זיכויים', icon: FileText, activeClass: 'data-[state=active]:bg-orange-600' },
+        { value: 'documents', label: 'הפקת מסמכים', icon: FileText, activeClass: 'data-[state=active]:bg-blue-500' },
         { value: 'profit_loss', label: 'דוח רווח והפסד', icon: Calculator, activeClass: 'data-[state=active]:bg-emerald-600' },
         { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeClass: 'data-[state=active]:bg-black' },
     ]
@@ -333,14 +329,8 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     <TabsContent value="profit_loss" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <ProfitLossTab />
                     </TabsContent>
-                    <TabsContent value="invoices" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <InvoicesTab />
-                    </TabsContent>
-                    <TabsContent value="quotes" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <QuotesTab />
-                    </TabsContent>
-                    <TabsContent value="credit-notes" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <CreditNotesTab />
+                    <TabsContent value="documents" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <DocumentsTab />
                     </TabsContent>
                 </div>
             </div>
