@@ -8,6 +8,10 @@ export interface CityData {
 }
 
 export const ISRAEL_CITIES: Record<string, CityData> = {
+    "Ashquelon": { lat: 31.669, lng: 34.574, hebrewName: "אשקלון" },
+    "Herzliya Pituah": { lat: 32.179, lng: 34.805, hebrewName: "הרצליה פיתוח" },
+    "Shefa-'Amr": { lat: 32.805, lng: 35.170, hebrewName: "שפרעם" },
+    "Tsofit": { lat: 32.1983, lng: 34.9137, hebrewName: "צופית" },
     "Oranim": {
         "lat": 32.711323,
         "lng": 35.109876,

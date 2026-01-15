@@ -188,7 +188,7 @@ export function GitAnalytics() {
                 <Card className="p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="font-bold text-gray-800 flex items-center gap-2">
-                            <Calendar className="text-purple-500" size={20} />
+                            <Calendar className="text-emerald-500" size={20} />
                             מגמת פעילות
                         </h3>
                     </div>
@@ -197,8 +197,8 @@ export function GitAnalytics() {
                             <AreaChart data={commitsData}>
                                 <defs>
                                     <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
@@ -213,7 +213,7 @@ export function GitAnalytics() {
                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                                     labelFormatter={(label) => format(parseISO(label), 'd בMMMM yyyy', { locale: he })}
                                 />
-                                <Area type="monotone" dataKey="count" stroke="#8884d8" fillOpacity={1} fill="url(#colorCount)" name="קומיטים" />
+                                <Area type="monotone" dataKey="count" stroke="#10B981" fillOpacity={1} fill="url(#colorCount)" name="קומיטים" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
