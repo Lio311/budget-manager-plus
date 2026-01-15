@@ -3,7 +3,7 @@
 import { UserButton, useClerk } from '@clerk/nextjs'
 import { useBudget } from '@/contexts/BudgetContext'
 import { getMonthName } from '@/lib/utils'
-import { ChevronLeft, ChevronRight, Menu, CreditCard, Mail } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Menu, CreditCard, Mail, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { ModeToggle } from '@/components/mode-toggle'
