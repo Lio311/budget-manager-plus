@@ -1,8 +1,5 @@
 'use server'
 
-import { spawn } from 'child_process'
-import path from 'path'
-
 export interface Commit {
     hash: string
     date: string
@@ -16,73 +13,44 @@ export interface GitStats {
     totalFiles: number
 }
 
-// Hardcoded path using forward slashes to avoid shell escaping issues
-const GIT_PATH = 'C:/Users/Lior/anaconda3/Library/bin/git.exe'
-
-function runGitCommand(args: string[], cwd: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-        // Use shell: true to help resolve git on Windows if it's in PATH but not easily found by direct spawn
-        const child = spawn(GIT_PATH, args, { cwd, shell: true })
-        let stdout = ''
-        let stderr = ''
-
-        child.stdout.on('data', data => stdout += data.toString())
-        child.stderr.on('data', data => stderr += data.toString())
-
-        child.on('close', code => {
-            if (code === 0) {
-                resolve(stdout)
-            } else {
-                reject(new Error(`Git command failed with code ${code}\nStderr: ${stderr}`))
-            }
-        })
-
-        child.on('error', err => reject(err))
-    })
-}
+const GITHUB_REPO = 'Lio311/budget-manager-plus'
 
 export async function getGitStats(): Promise<{ success: boolean; data?: GitStats; error?: string }> {
     try {
-        const cwd = process.cwd()
-        console.log('[GitStats] CWD:', cwd)
-
-        // 1. Get Commits
-        // Pass arguments as array to avoid shell quoting issues on Windows
-        // Format: hash __SEP__ date __SEP__ message __SEP__ author
-        // We wrap the format string in quotes because shell:true is enabled
-        const logOutput = await runGitCommand([
-            'log',
-            '"--pretty=format:%h__SEP__%ad__SEP__%s__SEP__%an"',
-            '--date=iso',
-            '-n', '2000'
-        ], cwd)
-
-        const commits = logOutput
-            .split('\n')
-            .filter(line => line.trim())
-            .map(line => {
-                const parts = line.split('__SEP__')
-                if (parts.length < 4) return null
-                const [hash, date, message, author] = parts
-                return { hash, date, message, author }
-            })
-            .filter((c): c is Commit => c !== null)
-
-        // 2. Get Files
-        const filesOutput = await runGitCommand(['ls-files'], cwd)
-        const files = filesOutput.split('\n').filter(f => f.trim())
-
-        const statsMap: { [key: string]: number } = {}
-        files.forEach(file => {
-            const ext = path.extname(file).toLowerCase() || 'no-ext'
-            // Clean up
-            const cleanExt = ext.startsWith('.') ? ext.substring(1) : ext
-            statsMap[cleanExt] = (statsMap[cleanExt] || 0) + 1
+        // 1. Fetch Commits from GitHub API
+        const commitsResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/commits?per_page=100`, {
+            next: { revalidate: 300 } // Cache for 5 minutes
         })
 
-        // Transform to array
-        const fileStats = Object.entries(statsMap)
-            .map(([name, value]) => ({ name, value }))
+        if (!commitsResponse.ok) {
+            throw new Error(`GitHub API Error: ${commitsResponse.statusText}`)
+        }
+
+        const commitsData = await commitsResponse.json()
+
+        const commits: Commit[] = commitsData.map((c: any) => ({
+            hash: c.sha,
+            date: c.commit.author.date,
+            message: c.commit.message,
+            author: c.commit.author.name
+        }))
+
+        // 2. Fetch Languages (as a proxy for file stats, since ls-files isn't available via simple API without crawling trees)
+        // We will map languages to "file types" for the chart
+        const languagesResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/languages`, {
+            next: { revalidate: 3600 } // Cache for 1 hour
+        })
+
+        if (!languagesResponse.ok) {
+            throw new Error(`GitHub Languages API Error: ${languagesResponse.statusText}`)
+        }
+
+        const languagesData = await languagesResponse.json()
+
+        // Transform languages byte count to specific "file count" approximation or just usage share
+        // For the visual, we will use the byte count as "value" which works for the Pie Chart share
+        const fileStats = Object.entries(languagesData)
+            .map(([name, value]) => ({ name, value: value as number }))
             .sort((a, b) => b.value - a.value)
 
         return {
@@ -90,24 +58,12 @@ export async function getGitStats(): Promise<{ success: boolean; data?: GitStats
             data: {
                 commits,
                 fileStats,
-                totalFiles: files.length
+                totalFiles: commits.length // API doesn't give total files easily, using commits length as a placeholder or we could omit
             }
         }
 
     } catch (error: any) {
-        console.error('[GitStats] Error details:', {
-            message: error.message,
-            stack: error.stack,
-            cmd: error.cmd,
-            code: error.code,
-            stderr: error.stderr
-        })
-
-        // Specific error message for common issues
-        if (error.stderr?.includes('not a git repository')) {
-            return { success: false, error: 'Not a git repository (or .git folder missing).' }
-        }
-
-        return { success: false, error: `Failed to fetch git stats: ${error.message}` }
+        console.error('[GitStats] API Error:', error)
+        return { success: false, error: `Failed to fetch GitHub stats: ${error.message}` }
     }
 }

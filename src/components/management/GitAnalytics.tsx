@@ -128,8 +128,8 @@ export function GitAnalytics() {
                         <FileCode size={24} />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500">קבצים בפרויקט</p>
-                        <h3 className="text-2xl font-bold">{stats.totalFiles}</h3>
+                        <p className="text-sm text-gray-500">נתונים נטענו</p>
+                        <h3 className="text-2xl font-bold">API</h3>
                     </div>
                 </Card>
 
@@ -234,7 +234,7 @@ export function GitAnalytics() {
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="font-bold text-gray-800 flex items-center gap-2">
                             <FileCode className="text-emerald-500" size={20} />
-                            התפלגות סוגי קבצים
+                            התפלגות שפות (לפי נפח קוד)
                         </h3>
                     </div>
                     <div className="h-[300px] w-full flex items-center justify-center" dir="ltr">
