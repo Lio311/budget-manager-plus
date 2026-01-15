@@ -317,7 +317,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                 result = await updateExpense(initialData.id, expenseData, 'SINGLE')
             } else {
                 // Create mode
-                result = await addExpense(expenseData)
+                result = await addExpense(month, year, expenseData, budgetType)
             }
 
             if (result.success) {
