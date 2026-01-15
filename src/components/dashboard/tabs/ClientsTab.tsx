@@ -1102,7 +1102,7 @@ export function ClientsTab() {
                                     <div className="flex justify-between items-center text-sm font-bold bg-gray-50 dark:bg-slate-700/50 p-1 rounded mt-1">
                                         <span className="text-gray-700 dark:text-gray-300">רווח נקי:</span>
                                         <span className={`${(client.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                            ₪{client.netProfit?.toLocaleString() || 0}
+                                            {formatCurrency(client.netProfit || 0)}
                                         </span>
                                     </div>
                                 </div>
@@ -1201,7 +1201,7 @@ export function ClientsTab() {
                                             </td>
                                             <td className="px-4 py-3 hidden lg:table-cell">
                                                 <div className={cn("font-medium", (client.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600')}>
-                                                    ₪{client.netProfit?.toLocaleString() || 0}
+                                                    {formatCurrency(client.netProfit || 0)}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3">
