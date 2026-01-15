@@ -18,7 +18,7 @@ import { IncomeForm } from '@/components/dashboard/forms/IncomeForm'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Pagination } from '@/components/ui/Pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, formatNumberWithCommas } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { getIncomes, updateIncome, deleteIncome, toggleIncomeStatus } from '@/lib/actions/income'
@@ -583,17 +583,25 @@ export function IncomeTab() {
                                         </div>
 
                                         <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
-                                            {isBusiness && income.vatAmount && income.vatAmount > 0 && (
-                                                <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
-                                                    <span>סה"כ: {formatCurrency(income.amount, getCurrencySymbol(income.currency))}</span>
-                                                    <span>מע"מ: {formatCurrency(income.vatAmount, getCurrencySymbol(income.currency))}</span>
+                                            {isBusiness && income.vatAmount && income.vatAmount > 0 ? (
+                                                <div className="flex flex-row items-center gap-3 sm:gap-4">
+                                                    <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
+                                                        <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((income.amount - (income.vatAmount || 0)))} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                                        <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(income.vatAmount || 0)} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                                    </div>
+                                                    <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
+                                                        {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-end">
+                                                    <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
+                                                        {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
+                                                    </div>
                                                 </div>
                                             )}
-                                            <div className="flex text-left sm:text-right flex-col items-end">
-                                                <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-green-600' : 'text-green-600'}`}>
-                                                    {formatCurrency(income.amount, getCurrencySymbol(income.currency || 'ILS'))}
-                                                </div>
 
+                                            <div className="flex text-left sm:text-right flex-col items-end gap-1">
                                                 {/* Status Badge */}
                                                 <button
                                                     onClick={async (e) => {
@@ -605,7 +613,7 @@ export function IncomeTab() {
                                                             toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
                                                         }
                                                     }}
-                                                    className={`text-[10px] px-2 py-0.5 rounded-full border mb-1 transition-all ${income.status === 'PENDING'
+                                                    className={`text-[10px] px-2 py-0.5 rounded-full border mb-0 transition-all ${income.status === 'PENDING'
                                                         ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
                                                         : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
                                                         }`}
