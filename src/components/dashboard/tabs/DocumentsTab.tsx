@@ -21,8 +21,9 @@ import {
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue
+    SelectValue,
 } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Pagination } from '@/components/ui/Pagination'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 import { useConfirm } from '@/hooks/useConfirm'
@@ -70,6 +71,8 @@ export function DocumentsTab() {
     const [editingQuote, setEditingQuote] = useState<any | null>(null)
     const [editingInvoice, setEditingInvoice] = useState<any | null>(null)
     const [editingCreditNote, setEditingCreditNote] = useState<any | null>(null)
+    const [showEditDialog, setShowEditDialog] = useState(false)
+    const [editDialogType, setEditDialogType] = useState<'quote' | 'invoice' | 'credit' | null>(null)
 
     // Fetch data
     const clientsFetcher = async () => {
@@ -195,17 +198,18 @@ export function DocumentsTab() {
             return
         }
 
-        // Set editing state and open form
+        // Set editing state and open dialog
         if (type === 'quote') {
             setEditingQuote(doc)
-            setSelectedType('quote')
+            setEditDialogType('quote')
         } else if (type === 'invoice') {
             setEditingInvoice(doc)
-            setSelectedType('invoice')
+            setEditDialogType('invoice')
         } else {
             setEditingCreditNote(doc)
-            setSelectedType('credit')
+            setEditDialogType('credit')
         }
+        setShowEditDialog(true)
     }
 
     // View document
@@ -655,6 +659,55 @@ export function DocumentsTab() {
                     </div>
                 )}
             </div>
+
+            {/* Edit Dialog */}
+            <Dialog open={showEditDialog} onOpenChange={(open) => {
+                if (!open) {
+                    setShowEditDialog(false)
+                    setEditingQuote(null)
+                    setEditingInvoice(null)
+                    setEditingCreditNote(null)
+                    setEditDialogType(null)
+                }
+            }}>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {editDialogType === 'quote' && 'עריכת הצעת מחיר'}
+                            {editDialogType === 'invoice' && 'עריכת חשבונית'}
+                            {editDialogType === 'credit' && 'עריכת זיכוי'}
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    {editDialogType === 'quote' && editingQuote && (
+                        <QuoteForm
+                            clients={clients}
+                            initialData={editingQuote}
+                            onSuccess={() => {
+                                handleFormSuccess()
+                                setShowEditDialog(false)
+                            }}
+                        />
+                    )}
+                    {editDialogType === 'invoice' && editingInvoice && (
+                        <InvoiceForm
+                            clients={clients}
+                            onSuccess={() => {
+                                handleFormSuccess()
+                                setShowEditDialog(false)
+                            }}
+                        />
+                    )}
+                    {editDialogType === 'credit' && editingCreditNote && (
+                        <CreditNoteForm
+                            onSuccess={() => {
+                                handleFormSuccess()
+                                setShowEditDialog(false)
+                            }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
