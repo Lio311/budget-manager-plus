@@ -66,6 +66,11 @@ export function DocumentsTab() {
     const [currentPage, setCurrentPage] = useState(1)
     const [searchTerm, setSearchTerm] = useState('')
 
+    // Editing states
+    const [editingQuote, setEditingQuote] = useState<any | null>(null)
+    const [editingInvoice, setEditingInvoice] = useState<any | null>(null)
+    const [editingCreditNote, setEditingCreditNote] = useState<any | null>(null)
+
     // Fetch data
     const clientsFetcher = async () => {
         const result = await getClients(budgetType)
@@ -168,12 +173,40 @@ export function DocumentsTab() {
 
     const handleFormSuccess = () => {
         setSelectedType(null)
+        setEditingQuote(null)
+        setEditingInvoice(null)
+        setEditingCreditNote(null)
         mutateQuotes()
         mutateInvoices()
         mutateCreditNotes()
     }
 
     const confirm = useConfirm()
+
+    // Edit document
+    const handleEdit = (type: 'quote' | 'invoice' | 'credit', doc: any) => {
+        // Check if document is signed/paid (cannot edit)
+        if (type === 'quote' && (doc.isSigned || doc.status === 'ACCEPTED')) {
+            toast.error('לא ניתן לערוך הצעת מחיר חתומה')
+            return
+        }
+        if (type === 'invoice' && doc.status === 'PAID') {
+            toast.error('לא ניתן לערוך חשבונית ששולמה')
+            return
+        }
+
+        // Set editing state and open form
+        if (type === 'quote') {
+            setEditingQuote(doc)
+            setSelectedType('quote')
+        } else if (type === 'invoice') {
+            setEditingInvoice(doc)
+            setSelectedType('invoice')
+        } else {
+            setEditingCreditNote(doc)
+            setSelectedType('credit')
+        }
+    }
 
     // View document
     const handleViewDocument = async (type: 'quote' | 'invoice' | 'credit', id: string) => {
@@ -371,14 +404,19 @@ export function DocumentsTab() {
                 <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                            {selectedType === 'quote' && 'יצירת הצעת מחיר חדשה'}
-                            {selectedType === 'invoice' && 'יצירת חשבונית חדשה'}
-                            {selectedType === 'credit' && 'יצירת זיכוי חדש'}
+                            {selectedType === 'quote' && (editingQuote ? 'עריכת הצעת מחיר' : 'יצירת הצעת מחיר חדשה')}
+                            {selectedType === 'invoice' && (editingInvoice ? 'עריכת חשבונית' : 'יצירת חשבונית חדשה')}
+                            {selectedType === 'credit' && (editingCreditNote ? 'עריכת זיכוי' : 'יצירת זיכוי חדש')}
                         </h3>
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setSelectedType(null)}
+                            onClick={() => {
+                                setSelectedType(null)
+                                setEditingQuote(null)
+                                setEditingInvoice(null)
+                                setEditingCreditNote(null)
+                            }}
                         >
                             ביטול
                         </Button>
@@ -387,12 +425,14 @@ export function DocumentsTab() {
                     {selectedType === 'quote' && (
                         <QuoteForm
                             clients={clients}
+                            editingQuote={editingQuote}
                             onSuccess={handleFormSuccess}
                         />
                     )}
                     {selectedType === 'invoice' && (
                         <InvoiceForm
                             clients={clients}
+                            editingInvoice={editingInvoice}
                             onSuccess={handleFormSuccess}
                         />
                     )}
@@ -573,19 +613,19 @@ export function DocumentsTab() {
                                                 </Button>
                                             )}
 
-                                            {/* Edit Button */}
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                onClick={() => {
-                                                    // TODO: Implement edit functionality
-                                                    toast.info('עריכה תתווסף בקרוב')
-                                                }}
-                                                className="text-gray-600 border-gray-200 bg-gray-50 hover:bg-gray-100"
-                                                title="עריכה"
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
+                                            {/* Edit Button - hide for signed/paid documents */}
+                                            {!((doc.type === 'quote' && (doc.isSigned || doc.status === 'ACCEPTED')) ||
+                                                (doc.type === 'invoice' && doc.status === 'PAID')) && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        onClick={() => handleEdit(doc.type, doc)}
+                                                        className="text-gray-600 border-gray-200 bg-gray-50 hover:bg-gray-100"
+                                                        title="עריכה"
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                )}
 
                                             {/* Delete Button */}
                                             <Button
