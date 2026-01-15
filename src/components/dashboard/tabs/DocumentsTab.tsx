@@ -277,7 +277,7 @@ export function DocumentsTab() {
 
                     <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
                         {/* Filter */}
-                        <Select value={filterType} onValueChange={setFilterType}>
+                        <Select value={filterType} onValueChange={(v) => setFilterType(v as typeof filterType)}>
                             <SelectTrigger className="w-full md:w-[180px]">
                                 <SelectValue placeholder="סנן לפי סוג" />
                             </SelectTrigger>
