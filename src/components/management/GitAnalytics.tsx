@@ -176,7 +176,7 @@ export function GitAnalytics() {
                                 <YAxis stroke="#9CA3AF" fontSize={12} />
                                 <Tooltip
                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                    labelFormatter={(label) => format(parseISO(label), 'dd MMMM yyyy', { locale: he })}
+                                    labelFormatter={(label) => format(parseISO(label), 'd בMMMM yyyy', { locale: he })}
                                 />
                                 <Bar dataKey="count" fill="#3B82F6" radius={[4, 4, 0, 0]} name="קומיטים" />
                             </BarChart>
@@ -211,7 +211,7 @@ export function GitAnalytics() {
                                 <YAxis stroke="#9CA3AF" fontSize={12} />
                                 <Tooltip
                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                    labelFormatter={(label) => format(parseISO(label), 'dd MMMM yyyy', { locale: he })}
+                                    labelFormatter={(label) => format(parseISO(label), 'd בMMMM yyyy', { locale: he })}
                                 />
                                 <Area type="monotone" dataKey="count" stroke="#8884d8" fillOpacity={1} fill="url(#colorCount)" name="קומיטים" />
                             </AreaChart>
