@@ -299,6 +299,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     const newClientsCount = (overviewData as any)?.businessStats?.newClientsCount || 0
     const salesBeforeVat = current.incomes.reduce((sum: number, item: any) => sum + (item.amountBeforeVatILS || 0), 0)
+    const totalWorkHours = current.incomes.reduce((sum: number, item: any) => sum + (parseFloat(item.workTime) || 0), 0)
+    const hourlyWage = totalWorkHours > 0 ? salesBeforeVat / totalWorkHours : 0
 
     // Helper to calculate bar width correctly
     // If business metric (no target): 0 -> 0%, >0 -> 100% (as "Active")
@@ -685,6 +687,29 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 />
                             </div>
                         </div>
+
+                        {/* Hourly Wage Bar (Blue) - Business Only, if hours exist */}
+                        {isBusiness && totalWorkHours > 0 && (
+                            <div className="space-y-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/50 p-1 rounded-md transition-colors">
+                                <div className="flex justify-between text-sm">
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                                        שכר שעתי (ממוצע)
+                                    </span>
+                                    <span className="font-medium text-blue-600 dark:text-blue-400">
+                                        {formatCurrency(hourlyWage).replace('₪', '')} <span className="text-sm">₪ / שעה</span>
+                                    </span>
+                                </div>
+                                <div className="h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out"
+                                        style={{ width: showProgress ? '100%' : '0%' }}
+                                    />
+                                </div>
+                                <p className="text-[10px] text-gray-400 text-right">
+                                    מחושב ע"פ {totalWorkHours} שעות עבודה שדווחו החודש
+                                </p>
+                            </div>
+                        )}
 
                         {/* Savings (Blue) - Hidden for Business */}
                         {!isBusiness && (
