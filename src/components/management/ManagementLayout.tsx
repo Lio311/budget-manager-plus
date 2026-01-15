@@ -20,7 +20,8 @@ import {
     Calendar as CalendarIcon,
     MapPin,
     CreditCard,
-    Megaphone // Added marketing icon
+    Megaphone, // Added marketing icon
+    GitBranch
 } from 'lucide-react'
 import Image from 'next/image'
 import {
@@ -106,6 +107,7 @@ export function ManagementLayout({ children }: { children: React.ReactNode }) {
         { icon: Users, label: 'צוות', href: '/management/team', color: 'text-purple-500', activeBg: 'bg-purple-50' },
         { icon: FileText, label: 'חוזה', href: '/management/agreement', color: 'text-gray-500', activeBg: 'bg-gray-50' },
         { icon: MapPin, label: 'מפה', href: '/management/map', color: 'text-cyan-500', activeBg: 'bg-cyan-50' },
+        { icon: GitBranch, label: 'Git', href: '/management/git', color: 'text-gray-800', activeBg: 'bg-gray-100' },
     ]
 
     return (
