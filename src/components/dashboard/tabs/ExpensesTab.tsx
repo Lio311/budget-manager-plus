@@ -677,20 +677,31 @@ export function ExpensesTab() {
                                             </div>
 
                                             <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
-                                                {isBusiness && exp.vatAmount && exp.vatAmount > 0 ? (
-                                                    <div className="hidden md:flex flex-col items-end text-[10px] text-gray-400 font-bold uppercase">
-                                                        <span>סה"כ: <span className="inline-block">{formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}</span></span>
-                                                        <span>מע"מ: <span className="inline-block">{formatNumberWithCommas(exp.vatAmount)} {getCurrencySymbol(exp.currency || 'ILS')}</span></span>
+                                                {/* Amount Display Logic */}
+                                                {isBusiness && exp.isDeductible ? (
+                                                    // Deductible: Red Total + Gray Breakdown
+                                                    <div className="flex flex-col items-end">
+                                                        <div className="text-base sm:text-lg font-bold text-red-600">
+                                                            {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
+                                                        </div>
+                                                        {exp.vatAmount && exp.vatAmount > 0 && (
+                                                            <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium">
+                                                                <span>לפני מע"מ: {formatNumberWithCommas((exp.amount - exp.vatAmount))} {getCurrencySymbol(exp.currency || 'ILS')}</span>
+                                                                <span>מע"מ: {formatNumberWithCommas(exp.vatAmount)} {getCurrencySymbol(exp.currency || 'ILS')}</span>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                ) : null}
-                                                <div className="flex text-left sm:text-right flex-col items-end">
-                                                    <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
-                                                        <span className="inline-block">
-                                                            {formatNumberWithCommas(isBusiness && exp.isDeductible && exp.vatAmount ? (exp.amount - exp.vatAmount) : exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
-                                                        </span>
+                                                ) : (
+                                                    // Non-Deductible or Personal: Only Total Amount
+                                                    <div className="flex flex-col items-end">
+                                                        <div className={`text-base sm:text-lg font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
+                                                            {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
+                                                        </div>
                                                     </div>
+                                                )}
 
-                                                    {/* Status Badge */}
+                                                {/* Status Badge - Only for expenses with Client (in Business mode) */}
+                                                {(exp as any).clientId && (
                                                     <button
                                                         onClick={async (e) => {
                                                             e.stopPropagation()
@@ -708,7 +719,7 @@ export function ExpensesTab() {
                                                     >
                                                         {!exp.paymentDate ? 'בהמתנה לתשלום' : 'שולם'}
                                                     </button>
-                                                </div>
+                                                )}
                                                 <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                                                     <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
                                                     <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(exp)}>
