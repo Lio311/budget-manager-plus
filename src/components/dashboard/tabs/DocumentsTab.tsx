@@ -60,7 +60,7 @@ export function DocumentsTab() {
     const { isDemo, data: demoData, interceptAction } = useDemo()
 
     const [selectedType, setSelectedType] = useState<DocumentType>(null)
-    const [filterType, setFilterType] = useState<'all' | DocumentType>('all')
+    const [filterType, setFilterType] = useState<'all' | 'quote' | 'invoice' | 'credit'>('all')
     const [currentPage, setCurrentPage] = useState(1)
     const [searchTerm, setSearchTerm] = useState('')
 
