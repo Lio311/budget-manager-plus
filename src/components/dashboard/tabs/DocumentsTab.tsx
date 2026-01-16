@@ -45,7 +45,7 @@ const documentTypes = [
     },
     {
         value: 'invoice' as const,
-        label: 'חשבונית',
+        label: 'חשבונית (מס, קבלה, עסקה)',
         icon: Receipt,
         color: 'bg-purple-500 hover:bg-purple-600',
         borderColor: 'border-purple-500',
