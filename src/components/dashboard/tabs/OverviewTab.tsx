@@ -328,21 +328,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             <OverviewTutorial
                 isOpen={isTutorialOpen}
                 onClose={() => setIsTutorialOpen(false)}
-                onStepChange={(stepId) => {
-                    // Auto-open panels based on tutorial step
-                    if (stepId === 'overview-settings-btn') {
-                        setIsSettingsOpen(true)
-                        setIsAiAdvisorOpen(false)
-                    } else if (stepId === 'overview-ai-btn') {
-                        setIsAiAdvisorOpen(true)
-                        setIsSettingsOpen(false)
-                    } else {
-                        // Optional: Close panels when moving away? 
-                        // Let's close them to keep focus on the highlighted element.
-                        setIsSettingsOpen(false)
-                        setIsAiAdvisorOpen(false)
-                    }
-                }}
             />
 
             {/* Header & Action Buttons Row */}
@@ -356,19 +341,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                 {/* Buttons Group - Second in DOM -> Left in RTL */}
                 <div className="flex gap-2 items-center w-full md:w-auto justify-end md:justify-end">
-                    {/* Info / Tutorial Button - Right of Settings in RTL (Before in DOM) */}
-                    {isBusiness && (
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setIsTutorialOpen(true)}
-                            className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                            title="הדרכה"
-                        >
-                            <Info className="w-4 h-4 text-[#323338] dark:text-gray-100" />
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
-                        </Button>
-                    )}
+
 
                     <Button
                         id="overview-settings-btn"
@@ -411,7 +384,20 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             onOpenChange={setIsAiAdvisorOpen}
                         />
                     </div>
+
                     <FeedbackButton />
+
+                    {isBusiness && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                            onClick={() => setIsTutorialOpen(true)}
+                            title="הדרכה"
+                        >
+                            <Info className="h-5 w-5" />
+                        </Button>
+                    )}
 
 
                     {!isBusiness && (
