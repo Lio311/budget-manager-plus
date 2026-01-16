@@ -36,10 +36,13 @@ export async function getSavingsGoals(
         if (!userId) return { success: false, error: 'Unauthorized' }
 
         const db = await authenticatedPrisma(userId)
+
+        // Note: We still need budget for category goals, but we fetch ALL savings
+        // across all time for cumulative calculation
         const budget = await getCurrentBudget(month, year, '₪', type)
 
-        // Fetch ALL savings for this user (not just current month)
-        // We need all savings to calculate cumulative deposits
+        // Fetch ALL savings for this user (not filtered by month/year)
+        // This allows cumulative tracking across all time
         const savings = await db.saving.findMany({
             where: {
                 budget: {
