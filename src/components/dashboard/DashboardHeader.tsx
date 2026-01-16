@@ -12,6 +12,7 @@ import Image from 'next/image'
 import { SubscriptionStatus } from './UserProfile/SubscriptionStatus'
 import { LinkedEmails } from './UserProfile/LinkedEmails'
 import { useState, useEffect } from 'react'
+import { useTheme } from 'next-themes'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useDemo } from '@/contexts/DemoContext'
 import Link from 'next/link'
@@ -35,6 +36,17 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
             }, 500)
         }
     }, [searchParams])
+
+    const { resolvedTheme } = useTheme()
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    const logoSrc = mounted && resolvedTheme === 'dark'
+        ? '/images/branding/K-LOGO2.png'
+        : '/images/branding/K-LOGO.png'
 
     const handleToggle = (type: 'PERSONAL' | 'BUSINESS') => {
         if (type === 'BUSINESS' && !hasBusinessAccess) {
@@ -153,7 +165,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             router.push(`${pathname}?${params.toString()}`)
                         }}>
                         <Image
-                            src="/images/branding/K-LOGO.png"
+                            src={logoSrc}
                             alt="Logo"
                             width={100}
                             height={100}
@@ -193,7 +205,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         router.push(`${pathname}?${params.toString()}`)
                     }}>
                     <Image
-                        src="/images/branding/K-LOGO.png"
+                        src={logoSrc}
                         alt="Logo"
                         width={120}
                         height={120}
