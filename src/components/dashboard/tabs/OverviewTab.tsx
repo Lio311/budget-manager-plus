@@ -402,7 +402,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 <Card className="glass-panel border-r-4 border-r-green-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('income')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'מכירות' : 'סך הכנסות'}</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-green-500" style={{ transform: 'scaleX(-1)' }} />
+                        <TrendingUp className="h-4 w-4 text-green-500" />
                     </CardHeader>
                     <CardContent className="p-3 md:p-6">
                         <div className="text-xl md:text-2xl font-bold text-[#323338] dark:text-gray-100">
