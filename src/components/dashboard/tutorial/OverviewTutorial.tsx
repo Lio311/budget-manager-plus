@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 interface TutorialProps {
     isOpen: boolean
     onClose: () => void
+    onStepChange?: (stepId: string, index: number) => void
 }
 
 type Placement = 'top' | 'bottom' | 'left' | 'right'
@@ -30,7 +31,7 @@ interface TooltipState {
     arrowStyle: React.CSSProperties
 }
 
-export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
+export function OverviewTutorial({ isOpen, onClose, onStepChange }: TutorialProps) {
     const [tooltips, setTooltips] = useState<TooltipState[]>([])
     const [mounted, setMounted] = useState(false)
     const [currentStep, setCurrentStep] = useState(0)
@@ -61,6 +62,9 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
     useEffect(() => {
         if (isOpen && tooltips.length > 0 && tooltips[currentStep]) {
             const current = tooltips[currentStep]
+            // Notify parent of step change
+            onStepChange?.(current.config.id, currentStep)
+
             const el = document.getElementById(current.config.id)
 
             if (el) {

@@ -10,6 +10,8 @@ import Image from 'next/image'
 
 interface FinancialAdvisorButtonProps {
     financialData: any
+    isOpen?: boolean
+    onOpenChange?: (open: boolean) => void
 }
 
 const SparkleIcon = ({ className }: { className?: string }) => (
@@ -22,12 +24,15 @@ const SparkleIcon = ({ className }: { className?: string }) => (
     />
 )
 
-export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButtonProps) {
-    const [isOpen, setIsOpen] = useState(false)
+export function FinancialAdvisorButton({ financialData, isOpen: controlledOpen, onOpenChange: setControlledOpen }: FinancialAdvisorButtonProps) {
+    const [internalOpen, setInternalOpen] = useState(false)
     const [advice, setAdvice] = useState<string>('')
     const [loading, setLoading] = useState(false)
     const [isCached, setIsCached] = useState(false)
     const [expiresIn, setExpiresIn] = useState<string>('')
+
+    const isControlled = controlledOpen !== undefined
+    const isOpen = isControlled ? controlledOpen : internalOpen
 
     const handleGetAdvice = async () => {
         setLoading(true)
@@ -53,7 +58,12 @@ export function FinancialAdvisorButton({ financialData }: FinancialAdvisorButton
     }
 
     const handleOpenChange = (open: boolean) => {
-        setIsOpen(open)
+        if (isControlled) {
+            setControlledOpen?.(open)
+        } else {
+            setInternalOpen(open)
+        }
+
         if (open && !advice && !loading) {
             handleGetAdvice()
         }

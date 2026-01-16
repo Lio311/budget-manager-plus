@@ -71,6 +71,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const [isReferralOpen, setIsReferralOpen] = useState(false)
     const [isIntegrationsOpen, setIsIntegrationsOpen] = useState(false)
     const [isTutorialOpen, setIsTutorialOpen] = useState(false)
+    const [isAiAdvisorOpen, setIsAiAdvisorOpen] = useState(false)
 
     useEffect(() => {
         const timer = setTimeout(() => setShowProgress(true), 100)
@@ -324,7 +325,25 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     return (
         <div className="space-y-6 pb-20 animate-in fade-in-50 duration-500 font-sans px-2 md:px-0" dir="rtl">
-            <OverviewTutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
+            <OverviewTutorial
+                isOpen={isTutorialOpen}
+                onClose={() => setIsTutorialOpen(false)}
+                onStepChange={(stepId) => {
+                    // Auto-open panels based on tutorial step
+                    if (stepId === 'overview-settings-btn') {
+                        setIsSettingsOpen(true)
+                        setIsAiAdvisorOpen(false)
+                    } else if (stepId === 'overview-ai-btn') {
+                        setIsAiAdvisorOpen(true)
+                        setIsSettingsOpen(false)
+                    } else {
+                        // Optional: Close panels when moving away? 
+                        // Let's close them to keep focus on the highlighted element.
+                        setIsSettingsOpen(false)
+                        setIsAiAdvisorOpen(false)
+                    }
+                }}
+            />
 
             {/* Header & Action Buttons Row */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -386,7 +405,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     )}
 
                     <div id="overview-ai-btn">
-                        <FinancialAdvisorButton financialData={aiFinancialData} />
+                        <FinancialAdvisorButton
+                            financialData={aiFinancialData}
+                            isOpen={isAiAdvisorOpen}
+                            onOpenChange={setIsAiAdvisorOpen}
+                        />
                     </div>
                     <FeedbackButton />
 
