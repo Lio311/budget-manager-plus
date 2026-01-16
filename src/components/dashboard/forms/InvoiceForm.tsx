@@ -267,7 +267,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                         <SelectContent dir="rtl">
                             <SelectItem value="TAX_INVOICE">חשבונית מס</SelectItem>
                             <SelectItem value="RECEIPT">קבלה</SelectItem>
-                            <SelectItem value="INVOICE">חשבונית (רגילה)</SelectItem>
+                            <SelectItem value="INVOICE">חשבונית מס / קבלה</SelectItem>
                             <SelectItem value="DEAL_INVOICE">חשבונית עסקה</SelectItem>
 
                         </SelectContent>

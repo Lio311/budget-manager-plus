@@ -238,7 +238,7 @@ export function CalendarTab() {
 
     const totalPayments = (billsData?.totalILS || 0) +
         (debtsData?.stats?.monthlyPaymentOwedByMeILS || 0) +
-        (expensesData?.totalILS || 0) +
+        (isBusiness ? (expensesData?.totalNetILS || 0) : (expensesData?.totalILS || 0)) +
         (savingsData?.stats?.totalMonthlyDepositILS || 0)
     const paidPayments = payments.filter(p => p.isPaid).reduce((sum, p) => sum + p.amount, 0)
 
