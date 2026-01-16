@@ -36,6 +36,10 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { findMatchingCategory } from '@/lib/category-utils'
 import { useDemo } from '@/contexts/DemoContext'
 import { SimpleClientSelector } from './SimpleClientSelector'
+import { ProjectSelector } from './ProjectSelector'
+import { addProject } from '@/lib/actions/projects'
+import useSWR from 'swr'
+import { getProjects } from '@/lib/actions/projects'
 
 interface Category {
     id: string
@@ -52,6 +56,12 @@ interface Supplier {
 interface Client {
     id: string
     name: string
+}
+
+interface Project {
+    id: string
+    name: string
+    color: string
 }
 
 interface ExpenseFormProps {
@@ -74,6 +84,13 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
     const confirm = useConfirm()
     const isBusiness = budgetType === 'BUSINESS'
     const { isDemo, interceptAction } = useDemo()
+
+    // Fetch projects for personal budgets
+    const { data: projectsData, mutate: mutateProjects } = useSWR(
+        !isBusiness ? ['projects', budgetType] : null,
+        () => getProjects('PERSONAL')
+    )
+    const projects = projectsData?.data || []
 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
@@ -616,6 +633,28 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                                     selectedClientId={newExpense.clientId}
                                     onClientIdChange={(id) => setNewExpense({ ...newExpense, clientId: id })}
                                     placeholder="חפש לקוח..."
+                                />
+                            </div>
+                        )}
+
+                        {/* Project Selector (Personal only) */}
+                        {!isBusiness && (
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך לפרויקט (אופציונלי)</label>
+                                <ProjectSelector
+                                    projects={projects}
+                                    selectedProjectId={newExpense.projectId}
+                                    onProjectIdChange={(id) => setNewExpense({ ...newExpense, projectId: id })}
+                                    onAddProject={async (name, color) => {
+                                        const result = await addProject({ name, color }, 'PERSONAL')
+                                        if (result.success) {
+                                            mutateProjects()
+                                            toast({ title: 'פרויקט נוסף בהצלחה' })
+                                        } else {
+                                            toast({ title: 'שגיאה', description: result.error, variant: 'destructive' })
+                                        }
+                                    }}
+                                    placeholder="חפש פרויקט..."
                                 />
                             </div>
                         )}
