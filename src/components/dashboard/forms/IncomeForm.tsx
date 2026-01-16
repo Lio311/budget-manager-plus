@@ -34,6 +34,9 @@ import { addIncome, updateIncome } from '@/lib/actions/income'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { CategoryManagementDialog } from './CategoryManagementDialog'
 import { SimpleClientSelector } from './SimpleClientSelector'
+import { ProjectSelector } from './ProjectSelector'
+import { addProject, getProjects } from '@/lib/actions/projects'
+import useSWR from 'swr'
 
 interface Category {
     id: string
@@ -44,6 +47,12 @@ interface Category {
 interface Client {
     id: string
     name: string
+}
+
+interface Project {
+    id: string
+    name: string
+    color: string
 }
 
 interface IncomeFormProps {
@@ -63,6 +72,13 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     const { mutate: globalMutate } = useSWRConfig()
     const isBusiness = budgetType === 'BUSINESS'
     const { isDemo, interceptAction } = useDemo()
+
+    // Fetch projects for personal budgets
+    const { data: projectsData, mutate: mutateProjects } = useSWR(
+        !isBusiness ? ['projects', budgetType] : null,
+        () => getProjects('PERSONAL')
+    )
+    const projects = projectsData?.data || []
 
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
@@ -460,6 +476,28 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 </div>
                             )}
                         </div>
+
+                        {/* Project Selector (Personal only) */}
+                        {!isBusiness && (
+                            <div className="w-full">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך לפרויקט (אופציונלי)</label>
+                                <ProjectSelector
+                                    projects={projects}
+                                    selectedProjectId={newIncome.projectId}
+                                    onProjectIdChange={(id) => setNewIncome({ ...newIncome, projectId: id })}
+                                    onAddProject={async (name, color) => {
+                                        const result = await addProject({ name, color }, 'PERSONAL')
+                                        if (result.success) {
+                                            mutateProjects()
+                                            toast({ title: 'פרויקט נוסף בהצלחה' })
+                                        } else {
+                                            toast({ title: 'שגיאה', description: result.error, variant: 'destructive' })
+                                        }
+                                    }}
+                                    placeholder="חפש פרויקט..."
+                                />
+                            </div>
+                        )}
 
                         {isBusiness && (
                             <div className="w-full">
