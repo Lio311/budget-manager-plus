@@ -17,7 +17,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
-import { getProjectsWithStats, addProject, updateProject, deleteProject } from '@/lib/actions/projects'
+import { getProjectsWithStats, addProject, updateProject, deleteProject, getProjectDetails } from '@/lib/actions/projects'
+import { ProjectDetailsDialog } from '@/components/dashboard/dialogs/ProjectDetailsDialog'
 import { PRESET_COLORS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
@@ -48,6 +49,11 @@ export function ProjectsTab() {
     const [isAddOpen, setIsAddOpen] = useState(false)
     const [isEditOpen, setIsEditOpen] = useState(false)
     const [editingProject, setEditingProject] = useState<Project | null>(null)
+
+    // Details Dialog State
+    const [viewProject, setViewProject] = useState<any>(null)
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+    const [isLoadingDetails, setIsLoadingDetails] = useState(false)
 
     // Form states
     const [name, setName] = useState('')
@@ -130,6 +136,23 @@ export function ProjectsTab() {
         setEditingProject(null)
     }
 
+    const handleProjectClick = async (project: Project) => {
+        setIsLoadingDetails(true)
+        try {
+            const result = await getProjectDetails(project.id)
+            if (result.success) {
+                setViewProject(result.data)
+                setIsDetailsOpen(true)
+            } else {
+                toast({ title: 'שגיאה', description: 'לא ניתן לטעון פרטי פרויקט', variant: 'destructive' })
+            }
+        } catch (error) {
+            toast({ title: 'שגיאה', description: 'אירעה שגיאה בטעינת הפרטים', variant: 'destructive' })
+        } finally {
+            setIsLoadingDetails(false)
+        }
+    }
+
     if (error) return <div className="text-center p-10 text-red-500">שגיאה בטעינת פרויקטים</div>
 
     return (
@@ -173,12 +196,16 @@ export function ProjectsTab() {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {/* @ts-ignore */}
                     {projects.map((project: Project) => (
-                        <Card key={project.id} className="hover:shadow-md transition-shadow relative group">
+                        <Card
+                            key={project.id}
+                            className="hover:shadow-md transition-shadow relative group cursor-pointer"
+                            onClick={() => handleProjectClick(project)}
+                        >
                             <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => openEdit(project)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); openEdit(project) }}>
                                     <Pencil className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-500" onClick={() => handleDelete(project)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-500" onClick={(e) => { e.stopPropagation(); handleDelete(project) }}>
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
                             </div>
@@ -330,6 +357,12 @@ export function ProjectsTab() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <ProjectDetailsDialog
+                project={viewProject}
+                isOpen={isDetailsOpen}
+                onClose={() => setIsDetailsOpen(false)}
+            />
         </div>
     )
 }

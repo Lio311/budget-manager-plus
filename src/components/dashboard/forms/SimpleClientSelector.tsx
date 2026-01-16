@@ -66,7 +66,7 @@ export function SimpleClientSelector({
                     onValueChange={setInputValue}
                     onFocus={() => setOpen(true)}
                     className={cn(
-                        "text-right h-10",
+                        "text-right h-10 text-base md:text-sm",
                         error && "border-red-500 ring-1 ring-red-500/20 rounded-md"
                     )}
                 />

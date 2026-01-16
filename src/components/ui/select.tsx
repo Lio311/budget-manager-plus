@@ -19,7 +19,7 @@ const SelectTrigger = React.forwardRef<
     <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
-            "flex h-10 w-full items-center justify-between rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:!bg-slate-800 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 text-right transition-all duration-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400",
+            "flex h-10 w-full items-center justify-between rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:!bg-slate-800 px-3 py-2 text-base md:text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 text-right transition-all duration-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400",
             className
         )}
         {...props}
@@ -172,7 +172,7 @@ const SelectTriggerLTR = React.forwardRef<
     <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
-            "flex h-10 w-full items-center justify-between rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:!bg-slate-800 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 text-left transition-all duration-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400",
+            "flex h-10 w-full items-center justify-between rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:!bg-slate-800 px-3 py-2 text-base md:text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 text-left transition-all duration-300 hover:bg-gray-50 dark:hover:bg-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400",
             className
         )}
         {...props}

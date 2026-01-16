@@ -19,6 +19,7 @@ export interface InvoiceFormData {
     guestClientName?: string
     isGuestClient?: boolean
     incomeId?: string // Optional: Link to specific income
+    invoiceType: string // NEW
     invoiceNumber: string
     issueDate: Date
     dueDate?: Date
@@ -37,6 +38,7 @@ const InvoiceSchema = z.object({
     guestClientName: z.string().optional(),
     isGuestClient: z.boolean().optional(),
     incomeId: z.string().optional(),
+    invoiceType: z.string().default('INVOICE'),
     invoiceNumber: z.string().min(1, 'חובה להזין מספר חשבונית'),
     issueDate: z.date(),
     dueDate: z.date().optional().nullable(),
@@ -142,6 +144,7 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
                 clientId: validData.isGuestClient ? null : validData.clientId,
                 guestClientName: validData.isGuestClient ? (validData.guestClientName || null) : null,
                 scope,
+                invoiceType: validData.invoiceType,
                 invoiceNumber: validData.invoiceNumber,
                 issueDate: validData.issueDate,
                 dueDate: validData.dueDate || null,

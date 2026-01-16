@@ -45,6 +45,7 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
         paymentMethod: '',
         notes: '',
         createIncomeFromInvoice: false,
+        invoiceType: 'TAX_INVOICE', // Default to Tax Invoice
         lineItems: []
     })
 
@@ -171,7 +172,8 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
                 lineItems,
                 isGuestClient,
                 guestClientName: isGuestClient ? guestClientName : undefined,
-                clientId: isGuestClient ? undefined : formData.clientId
+                clientId: isGuestClient ? undefined : formData.clientId,
+                invoiceType: formData.invoiceType
             })
             onSuccess()
         } catch (error) {
@@ -184,6 +186,26 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
     return (
         <form onSubmit={handleSubmit} className="space-y-4 p-1">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        סוג מסמך
+                    </label>
+                    <Select
+                        value={formData.invoiceType}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, invoiceType: value }))}
+                    >
+                        <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                            <SelectValue placeholder="בחר סוג מסמך" />
+                        </SelectTrigger>
+                        <SelectContent dir="rtl">
+                            <SelectItem value="TAX_INVOICE">חשבונית מס</SelectItem>
+                            <SelectItem value="RECEIPT">קבלה</SelectItem>
+                            <SelectItem value="INVOICE">חשבונית (רגילה)</SelectItem>
+                            <SelectItem value="DEAL_INVOICE">חשבונית עסקה</SelectItem>
+                            <SelectItem value="REFUND_INVOICE">חשבונית זיכוי</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         מספר חשבונית *

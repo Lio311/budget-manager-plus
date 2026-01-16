@@ -195,7 +195,15 @@ export default function PublicInvoicePage() {
                         <div className="w-full md:w-1/2 space-y-8 text-center md:text-start">
                             {/* Invoice Details */}
                             <div>
-                                <h1 className="text-3xl md:text-4xl font-light text-green-600 mb-2">חשבונית מס</h1>
+                                <h1 className="text-3xl md:text-4xl font-light text-green-600 mb-2">
+                                    {{
+                                        'TAX_INVOICE': 'חשבונית מס',
+                                        'RECEIPT': 'קבלה',
+                                        'INVOICE': 'חשבונית',
+                                        'DEAL_INVOICE': 'חשבונית עסקה',
+                                        'REFUND_INVOICE': 'חשבונית זיכוי'
+                                    }[invoice.invoiceType as string] || 'חשבונית מס'}
+                                </h1>
                                 <div className="text-gray-600">
                                     <p><strong>מספר חשבונית:</strong> {invoice.invoiceNumber}</p>
                                     <p><strong>תאריך:</strong> {new Date(invoice.issueDate).toLocaleDateString('he-IL')}</p>

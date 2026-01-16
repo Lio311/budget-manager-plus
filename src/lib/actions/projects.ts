@@ -56,7 +56,7 @@ export async function getProjectsWithStats(type: 'PERSONAL' | 'BUSINESS' = 'PERS
 
             // Remove large arrays to save bandwidth
             const { incomes, expenses, ...projectData } = project
-            
+
             return {
                 ...projectData,
                 stats: {
@@ -212,5 +212,35 @@ export async function getProjectStats(
     } catch (error) {
         console.error('Error fetching project stats:', error)
         return { success: false, error: 'Failed to fetch project stats' }
+    }
+}
+
+export async function getProjectDetails(projectId: string) {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+
+        const project = await db.project.findUnique({
+            where: { id: projectId },
+            include: {
+                incomes: {
+                    orderBy: { date: 'desc' }
+                },
+                expenses: {
+                    orderBy: { date: 'desc' }
+                }
+            }
+        })
+
+        if (!project) {
+            return { success: false, error: 'Project not found' }
+        }
+
+        return { success: true, data: project }
+    } catch (error) {
+        console.error('Error fetching project details:', error)
+        return { success: false, error: 'Failed to fetch project details' }
     }
 }

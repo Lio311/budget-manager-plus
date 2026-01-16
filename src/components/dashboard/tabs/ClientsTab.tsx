@@ -477,10 +477,10 @@ export function ClientsTab() {
                         />
                         <Button
                             variant="outline"
-                            className="gap-2 border-gray-300 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800"
+                            className="gap-2 border-gray-300 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 px-3 sm:px-4"
                             onClick={() => document.getElementById('import-clients')?.click()}
                         >
-                            ייבוא לקוחות
+                            <span className="hidden sm:inline">ייבוא לקוחות</span>
                             <Upload className="h-4 w-4" />
                         </Button>
                     </div>
@@ -495,7 +495,7 @@ export function ClientsTab() {
                             setIsAddingPackage(false)
                             setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', packageId: '', isActive: true, city: '', bankName: '', bankBranch: '', bankAccount: '' })
                         }}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-green-600 hover:bg-green-700 hidden lg:flex"
                     >
                         <Plus className="h-4 w-4 ml-2" />
                         לקוח חדש
@@ -515,17 +515,17 @@ export function ClientsTab() {
                         placeholder="חיפוש לקוח..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400"
+                        className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400 text-base md:text-sm"
                     />
                 </div>
 
                 <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
                     {/* Sort Dropdown & Toggle */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-4">
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500 font-medium">מיון לפי:</span>
+                            <span className="text-sm text-gray-500 font-medium hidden xs:inline">מיון:</span>
                             <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
-                                <SelectTrigger className="w-[140px] h-9 gap-2">
+                                <SelectTrigger className="w-[110px] sm:w-[140px] h-9 gap-1 sm:gap-2 text-xs sm:text-sm">
                                     <SelectValue placeholder="מיון לפי" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -968,17 +968,17 @@ export function ClientsTab() {
             {/* Clients List */}
             {
                 viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                         {filteredClients.map((client: any) => (
                             <div
                                 key={client.id}
                                 onClick={() => setSelectedClientDetails(client)}
-                                className="bg-white p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700 cursor-pointer group"
+                                className="bg-white p-4 sm:p-5 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow dark:bg-slate-800 dark:border-slate-700 cursor-pointer group"
                             >
                                 <div className="flex justify-between items-start mb-3">
-                                    <div className="flex items-center gap-2">
-                                        <Building2 className="h-5 w-5 text-green-600" />
-                                        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{client.name}</h3>
+                                    <div className="flex items-center gap-2 flex-1 min-w-0 ml-2">
+                                        <Building2 className="h-5 w-5 text-green-600 shrink-0" />
+                                        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 break-words line-clamp-2 md:line-clamp-1">{client.name}</h3>
                                     </div>
                                     <div className="flex gap-1">
                                         <button

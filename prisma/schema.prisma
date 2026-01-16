@@ -684,6 +684,7 @@ model Invoice {
   issueDate     DateTime      @default(now())
   dueDate       DateTime?
   status        InvoiceStatus @default(DRAFT)
+  invoiceType   String        @default("INVOICE") // INVOICE, OPT_INVOICE (Tax Invoice), RECEIPT, DEAL_INVOICE
   
   // Amounts
   subtotal      Float
