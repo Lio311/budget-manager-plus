@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
 import { useSearchParams } from 'next/navigation'
 import {
-    Loader2, Plus, TrendingDown, Settings, ChevronDown
+    Loader2, Plus, TrendingDown, Settings, ChevronDown, TrendingUp
 } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -310,7 +310,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     return (
         <div>
             <div className="mb-4 flex items-center gap-2">
-                <TrendingDown className={`h-5 w-5 rotate-180 ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`} />
+                <TrendingUp className={`h-5 w-5 ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`} />
                 <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד מכירה / הכנסה' : 'הוספת הכנסה'}</h3>
                 <div className="mr-auto">
                     <CategoryManagementDialog

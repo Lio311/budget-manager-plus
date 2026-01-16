@@ -73,22 +73,28 @@ export function CalendarTab() {
     const isBusiness = budgetType === 'BUSINESS'
 
     // Fetchers
-    const fetchBills = async () => (await getBills(month, year, budgetType)).data?.bills || []
-    const fetchDebts = async () => (await getDebts(month, year, budgetType)).data?.debts || []
-    const fetchIncomes = async () => (await getIncomes(month, year, budgetType)).data?.incomes || []
-    const fetchExpenses = async () => (await getExpenses(month, year, budgetType)).data?.expenses || []
-    const fetchSavings = async () => (await getSavings(month, year, budgetType)).data?.savings || []
+    const fetchBills = async () => (await getBills(month, year, budgetType)).data
+    const fetchDebts = async () => (await getDebts(month, year, budgetType)).data
+    const fetchIncomes = async () => (await getIncomes(month, year, budgetType)).data
+    const fetchExpenses = async () => (await getExpenses(month, year, budgetType)).data
+    const fetchSavings = async () => (await getSavings(month, year, budgetType)).data
 
     // Work Mode Fetchers
     const fetchWorkEvents = async () => (await getWorkEvents(month, year)).data || []
     const fetchClients = async () => (await getClients(budgetType)).data || []
 
     // SWR Hooks
-    const { data: bills = [], mutate: mutateBills } = useSWR(['bills', month, year, budgetType], fetchBills)
-    const { data: debts = [], mutate: mutateDebts } = useSWR(['debts', month, year, budgetType], fetchDebts)
-    const { data: incomes = [] } = useSWR(['incomes', month, year, budgetType], fetchIncomes)
-    const { data: expenses = [] } = useSWR(['expenses', month, year, budgetType], fetchExpenses)
-    const { data: savings = [] } = useSWR(['savings', month, year, budgetType], fetchSavings)
+    const { data: billsData, mutate: mutateBills } = useSWR(['bills', month, year, budgetType], fetchBills)
+    const { data: debtsData, mutate: mutateDebts } = useSWR(['debts', month, year, budgetType], fetchDebts)
+    const { data: incomesData } = useSWR(['incomes', month, year, budgetType], fetchIncomes)
+    const { data: expensesData } = useSWR(['expenses', month, year, budgetType], fetchExpenses)
+    const { data: savingsData } = useSWR(['savings', month, year, budgetType], fetchSavings)
+
+    const bills = billsData?.bills || []
+    const debts = debtsData?.debts || []
+    const incomes = incomesData?.incomes || []
+    const expenses = expensesData?.expenses || []
+    const savings = savingsData?.savings || []
 
     const { data: workEvents = [], mutate: mutateWorkEvents } = useSWR(
         viewMode === 'work' ? ['workEvents', month, year] : null,
@@ -230,7 +236,10 @@ export function CalendarTab() {
         })
     }
 
-    const totalPayments = payments.filter(p => p.type !== 'income').reduce((sum, p) => sum + p.amount, 0)
+    const totalPayments = (billsData?.totalILS || 0) +
+        (debtsData?.stats?.monthlyPaymentOwedByMeILS || 0) +
+        (expensesData?.totalILS || 0) +
+        (savingsData?.stats?.totalMonthlyDepositILS || 0)
     const paidPayments = payments.filter(p => p.isPaid).reduce((sum, p) => sum + p.amount, 0)
 
     const calendarDays = []
@@ -295,12 +304,27 @@ export function CalendarTab() {
                             const hasItems = viewMode === 'financial' ? dayPayments.length > 0 : dayEvents.length > 0
 
                             // Financial View Logic
-                            const allPaid = dayPayments.length > 0 && dayPayments.every(p => p.isPaid)
-                            const financialBg = hasItems
-                                ? allPaid
-                                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                                    : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
-                                : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700'
+                            const hasIncome = dayPayments.some(p => p.type === 'income')
+                            const hasExpense = dayPayments.some(p => p.type !== 'income') // Bill, Debt, Expense, Saving
+
+                            let financialBg = 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700'
+                            let dotColor = 'bg-gray-300'
+
+                            if (hasItems) {
+                                if (hasIncome && hasExpense) {
+                                    // Mixed -> Yellow
+                                    financialBg = 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+                                    dotColor = 'bg-yellow-500'
+                                } else if (hasIncome) {
+                                    // Only Income -> Green
+                                    financialBg = 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                                    dotColor = 'bg-green-500'
+                                } else {
+                                    // Only Expense -> Red
+                                    financialBg = 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                                    dotColor = 'bg-red-500'
+                                }
+                            }
 
                             // Work View Logic
                             const workBg = hasItems
@@ -332,7 +356,7 @@ export function CalendarTab() {
                                     {viewMode === 'financial' && hasItems && (
                                         <div className="space-y-1">
                                             <div className="md:hidden flex justify-center">
-                                                <div className={`w-2 h-2 rounded-full ${allPaid ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                                                <div className={`w-2 h-2 rounded-full ${dotColor}`} />
                                             </div>
                                             <div className="hidden md:block">
                                                 <div className="text-xs text-center font-bold">
