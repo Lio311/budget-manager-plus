@@ -141,8 +141,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const netWorthHistory = overviewData?.netWorthHistory || []
 
     const totalIncome = current.incomes
-        .filter((item: any) => item.status !== 'PENDING' && item.status !== 'UNPAID')
-        .reduce((sum: number, item: any) => sum + (item.amountILS || 0), 0)
+        .reduce((sum: number, item: any) => sum + (isBusiness ? (item.amountBeforeVatILS || 0) : (item.amountILS || 0)), 0)
     // For expenses: If it's a business expense and deductible, we deduct Amount BEFORE VAT from profit (since VAT is reclaimed).
     // If it's not deductible (or personal), the full amount is the expense.
     const totalExpenses = current.expenses.reduce((sum: number, item: any) => {
