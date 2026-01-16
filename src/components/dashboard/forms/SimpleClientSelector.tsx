@@ -71,8 +71,8 @@ export function SimpleClientSelector({
                     )}
                 />
                 {open && (
-                    <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 rounded-lg border bg-popover shadow-md outline-none animate-in fade-in-0 zoom-in-95 max-h-[300px] overflow-auto">
-                        <CommandList>
+                    <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 rounded-lg border bg-popover shadow-md outline-none animate-in fade-in-0 zoom-in-95">
+                        <CommandList className="max-h-[300px]">
                             <CommandEmpty>לא נמצאו לקוחות</CommandEmpty>
                             <CommandGroup>
                                 <CommandItem
