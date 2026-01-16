@@ -485,152 +485,153 @@ export function IncomeTab() {
                         </div>
                     </div>
 
-                    {incomes.length === 0 ? (
-                        <div className="glass-panel text-center py-20 text-gray-400">
-                            לא נמצאו נתונים לחודש זה
-                        </div>
-                    ) : (
-                        paginatedIncomes.map((income: any) => (
-                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
-
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
-                                    <div className="flex items-start gap-3 w-full sm:w-auto">
-                                        <div className="shrink-0">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
-                                                {getCategoryIcon(income.category)}
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col min-w-0 gap-0.5 flex-1">
-                                            <div className="flex items-center gap-2 min-w-0">
-                                                <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
-                                                {income.isRecurring && (
-                                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-green-50 text-green-600 border border-green-100">
-                                                        <span className="w-1 h-1 rounded-full bg-current" />
-                                                        קבועה
-                                                    </div>
-                                                )}
-                                                {income.client && (
-                                                    <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100 font-bold hidden sm:inline-block shrink-0">
-                                                        {income.client.name}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#676879] dark:text-gray-400 mt-0.5">
-                                                <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                <span className="">{income.category}</span>
-                                                {income.payer && (
-                                                    <>
-                                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                        <span className="">מאת: {income.payer}</span>
-                                                    </>
-                                                )}
-                                                {income.paymentMethod && (
-                                                    <>
-                                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                        <span className="">
-                                                            {(() => {
-                                                                const pm = income.paymentMethod
-                                                                const map: Record<string, string> = {
-                                                                    'CHECK': "צ'ק",
-                                                                    'CREDIT_CARD': 'כרטיס אשראי',
-                                                                    'BANK_TRANSFER': 'העברה בנקאית',
-                                                                    'CASH': 'מזומן',
-                                                                    'BIT': 'ביט/פייבוקס',
-                                                                    'OTHER': 'אחר'
-                                                                }
-                                                                return map[pm] || pm
-                                                            })()}
-                                                        </span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
-                                        {isBusiness && income.vatAmount && income.vatAmount > 0 ? (
-                                            <div className="flex flex-row items-center gap-3 sm:gap-4">
-                                                <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
-                                                    <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((income.amountBeforeVat ?? (income.amount - (income.vatAmount || 0))))} {getCurrencySymbol(income.currency || 'ILS')}</span>
-                                                    <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(income.vatAmount || 0)} {getCurrencySymbol(income.currency || 'ILS')}</span>
-                                                </div>
-                                                <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
-                                                    {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col items-end">
-                                                <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
-                                                    {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        <div className="flex text-left sm:text-right flex-col items-end gap-1">
-                                            {/* Status Badge */}
-                                            <button
-                                                onClick={async (e) => {
-                                                    e.stopPropagation()
-                                                    const newStatus = income.status === 'PENDING' ? 'PAID' : 'PENDING'
-                                                    const res = await toggleIncomeStatus(income.id, newStatus)
-                                                    if (res.success) {
-                                                        mutateIncomes()
-                                                        toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
-                                                    }
-                                                }}
-                                                className={`text-[10px] px-2 py-0.5 rounded-full border mb-0 transition-all ${income.status === 'PENDING'
-                                                    ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
-                                                    : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
-                                                    }`}
-                                            >
-                                                {income.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
-                                            </button>
-
-                                            {income.invoice && (
-                                                <div className="text-[10px] text-gray-400 font-medium hidden sm:block">#{income.invoice.invoiceNumber}</div>
-                                            )}
-                                        </div>
-                                        <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                                            <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
-                                            <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(income)}>
-                                                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-
+                    <div id="income-list-container">
+                        {incomes.length === 0 ? (
+                            <div className="glass-panel text-center py-20 text-gray-400">
+                                לא נמצאו נתונים לחודש זה
                             </div>
-                        ))
-                    )}
+                        ) : (
+                            paginatedIncomes.map((income: any) => (
+                                <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
 
-                    {totalPages > 1 && (
-                        <div className="mt-4 flex justify-center direction-ltr">
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={setCurrentPage}
-                            />
-                        </div>
-                    )}
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
+                                        <div className="flex items-start gap-3 w-full sm:w-auto">
+                                            <div className="shrink-0">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
+                                                    {getCategoryIcon(income.category)}
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col min-w-0 gap-0.5 flex-1">
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                    <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
+                                                    {income.isRecurring && (
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-green-50 text-green-600 border border-green-100">
+                                                            <span className="w-1 h-1 rounded-full bg-current" />
+                                                            קבועה
+                                                        </div>
+                                                    )}
+                                                    {income.client && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100 font-bold hidden sm:inline-block shrink-0">
+                                                            {income.client.name}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#676879] dark:text-gray-400 mt-0.5">
+                                                    <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                    <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                    <span className="">{income.category}</span>
+                                                    {income.payer && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                            <span className="">מאת: {income.payer}</span>
+                                                        </>
+                                                    )}
+                                                    {income.paymentMethod && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                            <span className="">
+                                                                {(() => {
+                                                                    const pm = income.paymentMethod
+                                                                    const map: Record<string, string> = {
+                                                                        'CHECK': "צ'ק",
+                                                                        'CREDIT_CARD': 'כרטיס אשראי',
+                                                                        'BANK_TRANSFER': 'העברה בנקאית',
+                                                                        'CASH': 'מזומן',
+                                                                        'BIT': 'ביט/פייבוקס',
+                                                                        'OTHER': 'אחר'
+                                                                    }
+                                                                    return map[pm] || pm
+                                                                })()}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
+                                            {isBusiness && income.vatAmount && income.vatAmount > 0 ? (
+                                                <div className="flex flex-row items-center gap-3 sm:gap-4">
+                                                    <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
+                                                        <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((income.amountBeforeVat ?? (income.amount - (income.vatAmount || 0))))} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                                        <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(income.vatAmount || 0)} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                                    </div>
+                                                    <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
+                                                        {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-end">
+                                                    <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
+                                                        {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <div className="flex text-left sm:text-right flex-col items-end gap-1">
+                                                {/* Status Badge */}
+                                                <button
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation()
+                                                        const newStatus = income.status === 'PENDING' ? 'PAID' : 'PENDING'
+                                                        const res = await toggleIncomeStatus(income.id, newStatus)
+                                                        if (res.success) {
+                                                            mutateIncomes()
+                                                            toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
+                                                        }
+                                                    }}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-full border mb-0 transition-all ${income.status === 'PENDING'
+                                                        ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
+                                                        : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                                                        }`}
+                                                >
+                                                    {income.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
+                                                </button>
+
+                                                {income.invoice && (
+                                                    <div className="text-[10px] text-gray-400 font-medium hidden sm:block">#{income.invoice.invoiceNumber}</div>
+                                                )}
+                                            </div>
+                                            <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
+                                                <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(income)}>
+                                                    <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            ))
+                        )}
+
+                        {totalPages > 1 && (
+                            <div className="mt-4 flex justify-center direction-ltr">
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={setCurrentPage}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
+
+                <RecurrenceActionDialog
+                    isOpen={recurrenceDialogOpen}
+                    onClose={() => {
+                        setRecurrenceDialogOpen(false)
+                        setPendingAction(null)
+                    }}
+                    onConfirm={handleRecurrenceConfirm}
+                    action={pendingAction?.type || 'delete'}
+                    entityName="הכנסה"
+                />
+
+                <IncomeTutorial
+                    isOpen={showTutorial}
+                    onClose={() => setShowTutorial(false)}
+                />
             </div>
-
-            <RecurrenceActionDialog
-                isOpen={recurrenceDialogOpen}
-                onClose={() => {
-                    setRecurrenceDialogOpen(false)
-                    setPendingAction(null)
-                }}
-                onConfirm={handleRecurrenceConfirm}
-                action={pendingAction?.type || 'delete'}
-                entityName="הכנסה"
-            />
-
-            <IncomeTutorial
-                isOpen={showTutorial}
-                onClose={() => setShowTutorial(false)}
-            />
-        </div>
-    )
+            )
 }
