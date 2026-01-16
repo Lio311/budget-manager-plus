@@ -120,7 +120,7 @@ export function CalendarTab() {
             id: expense.id, name: expense.description, amount: expense.amount, currency: expense.currency || 'ILS', day: expense.date ? new Date(expense.date).getDate() : 1, type: 'expense' as const, isPaid: true
         })),
         ...(Array.isArray(savings) ? savings : []).map((saving: any) => ({
-            id: saving.id, name: saving.name || saving.description || 'חיסכון', amount: saving.monthlyDeposit || 0, currency: saving.currency || 'ILS', day: saving.date ? new Date(saving.date).getDate() : 1, type: 'saving' as const, isPaid: true
+            id: saving.id, name: saving.name || saving.description || 'חיסכון', amount: saving.monthlyDeposit || 0, currency: saving.currency || 'ILS', day: saving.targetDate ? new Date(saving.targetDate).getDate() : 1, type: 'saving' as const, isPaid: true
         }))
     ]
 
