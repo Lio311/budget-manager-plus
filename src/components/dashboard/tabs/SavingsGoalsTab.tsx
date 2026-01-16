@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useSWR from 'swr'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -18,6 +18,7 @@ export function SavingsGoalsTab() {
     const { toast } = useToast()
     const [editingCategory, setEditingCategory] = useState<string | null>(null)
     const [editValue, setEditValue] = useState('')
+    const [hasShownWarning, setHasShownWarning] = useState(false)
 
     // Fetch savings goals data
     const { data: goalsData, isLoading } = useSWR<SavingsGoalsData>(
@@ -37,6 +38,22 @@ export function SavingsGoalsTab() {
         totalTargetILS: 0,
         overallProgress: 0
     }
+
+    // Show warning toast if any category has no target
+    useEffect(() => {
+        if (!isLoading && goals.length > 0 && !hasShownWarning) {
+            const categoriesWithoutTarget = goals.filter(g => g.targetAmount === 0)
+            if (categoriesWithoutTarget.length > 0) {
+                toast({
+                    title: '⚠️ יעדים חסרים',
+                    description: `יש ${categoriesWithoutTarget.length} קטגוריות ללא יעד מוגדר. לחץ על כפתור העריכה להגדרת יעד.`,
+                    variant: 'default',
+                    duration: 6000
+                })
+                setHasShownWarning(true)
+            }
+        }
+    }, [goals, isLoading, hasShownWarning, toast])
 
     const handleEditClick = (category: string, currentTarget: number) => {
         setEditingCategory(category)
@@ -181,7 +198,7 @@ export function SavingsGoalsTab() {
                                             <div className="flex flex-col gap-1 min-w-0 flex-1">
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-bold text-base text-gray-900 dark:text-gray-100">
-                                                        {goal.savingsCount} חיסכונות
+                                                        {goal.savingsCount} הפקדות
                                                     </span>
                                                     {isComplete && (
                                                         <Award className="h-5 w-5 text-green-500 dark:text-green-400" />
