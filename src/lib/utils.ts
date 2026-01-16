@@ -5,12 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(amount: number, currency: string = '₪'): string {
-  return `${amount.toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ${currency}`
+export function formatCurrency(amount: number | null | undefined, currency: string = '₪'): string {
+  const safeAmount = amount || 0
+  return `${safeAmount.toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ${currency}`
 }
 
-export function formatNumberWithCommas(num: number): string {
-  return num.toLocaleString('he-IL')
+export function formatNumberWithCommas(num: number | null | undefined): string {
+  const safeNum = num || 0
+  return safeNum.toLocaleString('he-IL')
 }
 
 export function parseNumberFromFormatted(formatted: string): number {
