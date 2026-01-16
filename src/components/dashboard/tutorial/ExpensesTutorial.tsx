@@ -105,9 +105,9 @@ export function ExpensesTutorial({ isOpen, onClose }: TutorialProps) {
                 maxWidth: 300
             },
             {
-                id: 'expenses-import-btn',
-                title: 'ייבוא חשבוניות',
-                text: 'ייבוא מהיר של הוצאות מקובץ Excel/CSV או סריקת חשבונית באמצעות AI. חוסך זמן ומונע טעויות הקלדה.',
+                id: 'expenses-delete-all-btn',
+                title: 'מחיקת כל ההוצאות',
+                text: 'כפתור זה מאפשר למחוק את כל ההוצאות של החודש הנוכחי בלחיצה אחת. שימו לב - פעולה זו בלתי הפיכה!',
                 placement: 'bottom',
                 align: 'end',
                 maxWidth: 300
@@ -121,9 +121,9 @@ export function ExpensesTutorial({ isOpen, onClose }: TutorialProps) {
                 maxWidth: 300
             },
             {
-                id: 'expenses-delete-all-btn',
-                title: 'מחיקת כל ההוצאות',
-                text: 'כפתור זה מאפשר למחוק את כל ההוצאות של החודש הנוכחי בלחיצה אחת. שימו לב - פעולה זו בלתי הפיכה!',
+                id: 'expenses-import-btn',
+                title: 'ייבוא חשבוניות',
+                text: 'ייבוא מהיר של הוצאות מקובץ Excel/CSV או סריקת חשבונית באמצעות AI. חוסך זמן ומונע טעויות הקלדה.',
                 placement: 'bottom',
                 align: 'end',
                 maxWidth: 300
