@@ -491,7 +491,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
 
                 {/* 2. Distribution Pie Chart (Visually Right in RTL) */}
-                <Card className="glass-panel shadow-sm min-h-[400px]">
+                <Card id="overview-graph-budget" className="glass-panel shadow-sm min-h-[400px]">
                     <CardHeader>
                         <CardTitle>התפלגות תקציב</CardTitle>
                     </CardHeader>
@@ -562,7 +562,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card>
 
                 {/* 1. Expenses By Category Chart (Visually Left in RTL) */}
-                <Card className="glass-panel shadow-sm min-h-[400px]">
+                <Card id="overview-graph-expenses" className="glass-panel shadow-sm min-h-[400px]">
                     <CardHeader>
                         <CardTitle>הוצאות לפי קטגוריה</CardTitle>
                     </CardHeader>

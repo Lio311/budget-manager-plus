@@ -27,22 +27,30 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
     useEffect(() => {
         setMounted(true)
         if (isOpen) {
-            // Lock body scroll
-            document.body.style.overflow = 'hidden'
+            // We want to allow scrolling, so we DO NOT lock body overflow.
             calculatePositions()
             window.addEventListener('resize', calculatePositions)
-        } else {
-            document.body.style.overflow = ''
+            // Recalculate positions on scroll to keep highlights accurate if they were fixed, 
+            // but since we will use absolute positioning relative to the document, we just need initial calc + resize.
+            // Actually, getBoundingClientRect is relative to viewport. So if we use absolute positioning with top = rect.top + scrollY,
+            // we need to recalculate if the DOM shifts, but scrolling itself handled by the absolute positioning logic.
+            // Wait, if elements move due to layout changes, we need to know.
+            // But simple scrolling with 'absolute' overlay works if top is fixed to document coordinates.
+            window.addEventListener('scroll', calculatePositions)
         }
 
         return () => {
-            document.body.style.overflow = ''
             window.removeEventListener('resize', calculatePositions)
+            window.removeEventListener('scroll', calculatePositions)
         }
     }, [isOpen])
 
     const calculatePositions = () => {
         const newPositions: TooltipPosition[] = []
+
+        // Offset to allow scrolling calculations
+        const scrollX = window.scrollX
+        const scrollY = window.scrollY
 
         const cards = [
             {
@@ -64,6 +72,16 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                 id: 'overview-card-balance',
                 title: 'שווי העסק / יתרה',
                 text: 'כרטיסייה זו מציגה את היתרה הסופית המשוערת, בהתחשב בכל התנועות הכספיות.'
+            },
+            {
+                id: 'overview-graph-budget',
+                title: 'התפלגות תקציב',
+                text: 'גרף עוגה המציג חלוקה ויזואלית בין הכנסות להוצאות, ומאפשר להבין במהירות את היחס הפיננסי.'
+            },
+            {
+                id: 'overview-graph-expenses',
+                title: 'הוצאות לפי קטגוריה',
+                text: 'גרף עמודות המפרט את ההוצאות לפי סוגים (לדוגמה: שיווק, ציוד, משכורות), ומסייע בזיהוי מוקדי ההוצאה העיקריים.'
             }
         ]
 
@@ -73,8 +91,8 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                 const rect = el.getBoundingClientRect()
                 newPositions.push({
                     id: cardInfo.id,
-                    x: rect.left,
-                    y: rect.top,
+                    x: rect.left + scrollX,
+                    y: rect.top + scrollY,
                     width: rect.width,
                     height: rect.height,
                     title: cardInfo.title,
@@ -89,56 +107,58 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
     if (!mounted || !isOpen) return null
 
     return createPortal(
-        <div className="fixed inset-0 z-[9999] isolate">
-            {/* Backdrop */}
+        <div className="absolute inset-0 z-[9999] isolate w-full min-h-screen h-full pointer-events-none">
+            {/* Backdrop - Absolute to cover full document height */}
             <div
-                className="absolute inset-0 bg-black/70 backdrop-blur-[2px] transition-opacity duration-300 animate-in fade-in"
+                className="absolute inset-0 bg-black/70 backdrop-blur-[2px] transition-opacity duration-300 animate-in fade-in pointer-events-auto"
                 onClick={onClose}
+                // Ensure backdrop covers everything even if scrolled
+                style={{ height: 'max(100vh, 100%)' }}
             />
 
-            {/* Close Button */}
-            <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-4 left-4 z-50 text-white hover:bg-white/20 rounded-full w-12 h-12"
-                onClick={onClose}
-            >
-                <X className="w-6 h-6" />
-            </Button>
+            {/* Close Button - Fixed so it stays visible while scrolling */}
+            <div className="fixed top-4 left-4 z-50">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20 rounded-full w-12 h-12 pointer-events-auto"
+                    onClick={onClose}
+                >
+                    <X className="w-6 h-6" />
+                </Button>
+            </div>
 
             {/* Highlights and Tooltips - Correct z-index handling */}
-            <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 w-full h-full">
                 {positions.map((pos) => (
-                    <div key={pos.id}>
-                        {/* Highlight Cutout (Visual Hack using box-shadow or just overlaying a transparent div with border) */}
+                    <div key={pos.id} className="absolute" style={{ left: 0, top: 0 }}>
+                        {/* Highlight Cutout */}
                         <div
-                            className="absolute rounded-xl border-2 border-white/50 box-content shadow-[0_0_0_9999px_rgba(0,0,0,0.7)]"
+                            className="absolute rounded-xl border-2 border-white/50 box-content shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] pointer-events-none transition-all duration-200"
                             style={{
                                 left: pos.x,
                                 top: pos.y,
                                 width: pos.width,
                                 height: pos.height,
-                                // Need to counteract the backdrop in that specific area? 
-                                // Actually better to just render tooltips on top of the plain backdrop.
-                                // The backdrop above is full screen. We can just highlight by placing a glowing border.
                                 boxShadow: '0 0 30px rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.2)'
                             }}
                         />
 
                         {/* Tooltip */}
                         <div
-                            className="absolute z-50 pointer-events-auto"
+                            className="absolute z-50 pointer-events-auto transition-all duration-200"
                             style={{
                                 left: pos.x + (pos.width / 2) - 140, // Center roughly (width 280)
-                                top: pos.y + pos.height + 20, // Below
+                                // Added extra spacing (50px instead of 20px) to prevent crowding
+                                top: pos.y + pos.height + 50,
                             }}
                         >
-                            <div className="relative bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-4 rounded-lg shadow-2xl w-[280px] animate-in slide-in-from-top-2 duration-300 text-right" dir="rtl">
-                                {/* Arrow */}
-                                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-slate-800 rotate-45" />
+                            <div className="relative bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-4 rounded-lg shadow-2xl w-[280px] animate-in slide-in-from-top-2 duration-300 text-right border border-gray-100 dark:border-gray-700" dir="rtl">
+                                {/* Arrow - pointing up to the card */}
+                                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-slate-800 rotate-45 border-t border-l border-gray-100 dark:border-gray-700" />
 
                                 <div className="relative">
-                                    <div className="flex items-center gap-2 mb-2 text-purple-600 dark:text-purple-400 font-bold">
+                                    <div className="flex items-center gap-2 mb-2 text-[#323338] dark:text-gray-100 font-bold border-b pb-2 border-gray-100 dark:border-gray-700">
                                         <Info className="w-4 h-4" />
                                         <span>{pos.title}</span>
                                     </div>
@@ -152,7 +172,8 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                 ))}
             </div>
 
-            <div className="absolute bottom-10 left-0 right-0 text-center text-white/80 text-sm pointer-events-none">
+            {/* Footer instruction - Fixed at bottom of viewport */}
+            <div className="fixed bottom-10 left-0 right-0 text-center text-white/80 text-sm pointer-events-none z-50">
                 לחץ בכל מקום על המסך כדי לסגור
             </div>
         </div>,
