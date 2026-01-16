@@ -324,7 +324,7 @@ export function IncomeTab() {
             <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-green-600' : 'border-r-[#00c875]'} dark:bg-slate-800`}>
                 <div className="flex justify-between items-start">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {isBusiness ? 'סך מכירות/הכנסות חודשיות (נקי)' : 'סך הכנסות חודשיות'}
+                        {isBusiness ? 'סך מכירות/הכנסות חודשיות' : 'סך הכנסות חודשיות'}
                     </h3>
                     {isBusiness && (
                         <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
@@ -359,7 +359,7 @@ export function IncomeTab() {
                 </div>
 
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
-                    {loadingIncomes ? '...' : formatCurrency(isBusiness ? totalNetILS : totalIncomeILS, '₪')}
+                    {loadingIncomes ? '...' : formatCurrency(totalIncomeILS, '₪')}
                 </div>
 
                 {/* Tax Deduction Breakdown */}
