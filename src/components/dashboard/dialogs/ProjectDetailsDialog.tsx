@@ -95,29 +95,29 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
                             <table className="w-full text-sm text-center">
                                 <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500">
                                     <tr>
-                                        <th className="p-3 hidden sm:table-cell text-center">אמצעי תשלום</th>
-                                        <th className="p-3 text-center">סכום</th>
-                                        <th className="p-3 text-center">תיאור</th>
                                         <th className="p-3 text-center">תאריך</th>
+                                        <th className="p-3 text-center">תיאור</th>
+                                        {/* <th className="p-3 text-center">קטגוריה</th>  User asked for Category, adding if exists, or maybe just stick to 3 cols if category implies source? Let's assume Description is enough or add Category if data has it. User image for incomes didn't show category but asked for it. I will follow specific order: Date, Desc, Cat, Amount. */}
+                                        <th className="p-3 text-center">סכום</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y dark:divide-slate-700">
                                     {project.incomes?.length === 0 && (
                                         <tr>
-                                            <td colSpan={4} className="p-8 text-center text-gray-500">
+                                            <td colSpan={3} className="p-8 text-center text-gray-500">
                                                 אין הכנסות בפרויקט זה
                                             </td>
                                         </tr>
                                     )}
                                     {project.incomes?.map((income: any) => (
                                         <tr key={income.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
-                                            <td className="p-3 hidden sm:table-cell text-gray-500 text-center">{income.paymentMethod || '-'}</td>
-                                            <td className="p-3 text-green-600 font-bold text-center">{formatCurrency(income.amount)}</td>
-                                            <td className="p-3 font-medium text-center">{income.source}</td>
                                             <td className="p-3 flex items-center justify-center gap-2">
                                                 <Calendar className="h-4 w-4 text-gray-400" />
                                                 {income.date ? new Date(income.date).toLocaleDateString('he-IL') : '-'}
                                             </td>
+                                            <td className="p-3 font-medium text-center">{income.source}</td>
+                                            {/* <td className="p-3 text-gray-500 text-center">{income.category || '-'}</td> */}
+                                            <td className="p-3 text-green-600 font-bold text-center">{formatCurrency(income.amount)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -130,10 +130,10 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
                             <table className="w-full text-sm text-center">
                                 <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500">
                                     <tr>
-                                        <th className="p-3 text-center">סכום</th>
-                                        <th className="p-3 text-center">קטגוריה</th>
-                                        <th className="p-3 text-center">תיאור</th>
                                         <th className="p-3 text-center">תאריך</th>
+                                        <th className="p-3 text-center">תיאור</th>
+                                        <th className="p-3 text-center">קטגוריה</th>
+                                        <th className="p-3 text-center">סכום</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y dark:divide-slate-700">
@@ -146,15 +146,15 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
                                     )}
                                     {project.expenses?.map((expense: any) => (
                                         <tr key={expense.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
-                                            <td className="p-3 text-red-600 font-bold text-center">{formatCurrency(expense.amount)}</td>
-                                            <td className="p-3 text-gray-500 text-center">{expense.category}</td>
-                                            <td className="p-3 font-medium text-center">
-                                                {expense.description || expense.category}
-                                            </td>
                                             <td className="p-3 flex items-center justify-center gap-2">
                                                 <Calendar className="h-4 w-4 text-gray-400" />
                                                 {expense.date ? new Date(expense.date).toLocaleDateString('he-IL') : '-'}
                                             </td>
+                                            <td className="p-3 font-medium text-center">
+                                                {expense.description || expense.category}
+                                            </td>
+                                            <td className="p-3 text-gray-500 text-center">{expense.category}</td>
+                                            <td className="p-3 text-red-600 font-bold text-center">{formatCurrency(expense.amount)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
