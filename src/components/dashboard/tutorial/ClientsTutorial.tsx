@@ -89,14 +89,6 @@ export function ClientsTutorial({ isOpen, onClose }: TutorialProps) {
 
         const cards: CardConfig[] = [
             {
-                id: 'clients-add-btn',
-                title: 'הוספת לקוח חדש',
-                text: 'כפתור זה פותח טופס להוספת לקוח חדש למערכת. ניתן להזין פרטים אישיים, פרטי התקשרות, כתובת, ופרטי בנק. כמו כן, ניתן לשייך את הלקוח לחבילת שירות או מנוי קבוע.',
-                placement: 'bottom',
-                align: 'end',
-                maxWidth: 300
-            },
-            {
                 id: 'clients-settings-btn',
                 title: 'הגדרות תצוגה ומנויים',
                 text: 'כאן ניתן להגדיר את מספר הימים לקבלת התראה לפני סיום מנוי, וכן לנהל את רשימת החבילות והשירותים המוצעים ללקוחות.',
@@ -108,6 +100,14 @@ export function ClientsTutorial({ isOpen, onClose }: TutorialProps) {
                 id: 'clients-import-btn',
                 title: 'ייבוא לקוחות',
                 text: 'אם יש לך רשימת לקוחות קיימת בקובץ Excel או CSV, ניתן לייבא אותה בלחיצת כפתור אחת אל תוך המערכת.',
+                placement: 'bottom',
+                align: 'end',
+                maxWidth: 300
+            },
+            {
+                id: 'clients-add-btn',
+                title: 'הוספת לקוח חדש',
+                text: 'כפתור זה פותח טופס להוספת לקוח חדש למערכת. ניתן להזין פרטים אישיים, פרטי התקשרות, כתובת, ופרטי בנק. כמו כן, ניתן לשייך את הלקוח לחבילת שירות או מנוי קבוע.',
                 placement: 'bottom',
                 align: 'end',
                 maxWidth: 300
