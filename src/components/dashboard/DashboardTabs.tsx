@@ -156,7 +156,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         { value: 'budget_limits', label: 'תקציבים', icon: Shield, activeClass: 'data-[state=active]:bg-yellow-500 data-[state=active]:text-black' },
         { value: 'savings_goals', label: 'יעדי חיסכון', icon: Target, activeClass: 'data-[state=active]:bg-cyan-500' },
         { value: 'projects', label: 'פרויקטים', icon: FolderOpen, activeClass: 'data-[state=active]:bg-pink-500' },
-        { value: 'income', label: 'הכנסות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
+        { value: 'income', label: 'הכנסות', icon: TrendingUp, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
         { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard, activeClass: 'data-[state=active]:bg-orange-500' },
         { value: 'debts', label: 'הלוואות', icon: Wallet, activeClass: 'data-[state=active]:bg-purple-600' },
