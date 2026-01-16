@@ -296,6 +296,13 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors)
             toast({ title: 'שגיאה', description: 'נא למלא את שדות החובה המסומנים', variant: 'destructive' })
+
+            // Scroll to error
+            const firstError = Object.keys(newErrors)[0]
+            if (firstError === 'description') document.getElementById('description-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            else if (firstError === 'amount') document.getElementById('amount-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            else if (firstError === 'category') document.getElementById('category-trigger')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
             return
         }
         setErrors({})
@@ -472,6 +479,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                 <div className="w-full">
                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור ההוצאה *</label>
                     <Input
+                        id="description-input"
                         className={`h-10 ${errors.description ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}
                         placeholder={isBusiness ? "עבור מה התשלום? (למשל: ציוד משרדי)" : "תיאור ההוצאה"}
                         value={newExpense.description}
@@ -494,7 +502,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                             }}
                             onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
                         >
-                            <SelectTrigger className={`w-full h-10 border bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${errors.category ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-slate-700'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}>
+                            <SelectTrigger id="category-trigger" className={`w-full h-10 border bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 ${errors.category ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-slate-700'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}>
                                 <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                             <SelectContent className="max-h-[200px]">
@@ -544,6 +552,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                     <div className="col-span-2">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום (כולל מע"מ) *' : 'סכום כולל *'}</label>
                         <FormattedNumberInput
+                            id="amount-input"
                             className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}
                             placeholder="0.00"
                             value={newExpense.amount}

@@ -14,6 +14,7 @@ export const expenseSchema = z.object({
     // Business Fields
     supplierId: z.string().optional().nullable(),
     clientId: z.string().optional().nullable(),
+    projectId: z.string().optional().nullable(),
     amountBeforeVat: z.number().optional(),
     vatRate: z.number().optional(),
     vatAmount: z.number().optional(),
