@@ -20,6 +20,7 @@ interface ParsedExpense {
     billingAmount: number
     paymentMethod?: string
     branchName?: string
+    vatAmount?: number
 }
 
 export function BankImportModal({ onImport }: BankImportModalProps) {
@@ -88,7 +89,8 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
                         amount: result.data.amount,
                         billingAmount: result.data.amount,
                         paymentMethod: 'כרטיס אשראי',
-                        branchName: 'חשבוניות סרוקות' // As requested
+                        branchName: 'חשבוניות סרוקות', // As requested
+                        vatAmount: result.data.vatAmount
                     }
                     setPreviewData([scannedExpense])
                 } else {

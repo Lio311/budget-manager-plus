@@ -418,7 +418,32 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
             currency: 'ILS' as 'ILS' | 'USD' | 'EUR' | 'GBP',
             date: row.date,
             isRecurring: false,
-            paymentMethod: row.paymentMethod || 'כרטיס אשראי'
+            paymentMethod: row.paymentMethod || 'כרטיס אשראי',
+            // VAT Logic for Business
+            ...(isBusiness ? (() => {
+                // If VAT exists from scan, use it
+                if (row.vatAmount !== undefined && row.vatAmount > 0) {
+                    return {
+                        vatAmount: parseFloat(row.vatAmount),
+                        vatRate: 0.18, // Assume 18% or calculate: vat / net
+                        amountBeforeVat: parseFloat(row.billingAmount) - parseFloat(row.vatAmount),
+                        isDeductible: true,
+                        deductibleRate: 1.0
+                    }
+                }
+                // Fallback: Calculate 18% from Total
+                const gross = parseFloat(row.billingAmount) || 0
+                // Default 18% VAT (gross / 1.18 = net)
+                const net = gross / 1.18
+                const vat = gross - net
+                return {
+                    amountBeforeVat: parseFloat(net.toFixed(2)),
+                    vatAmount: parseFloat(vat.toFixed(2)),
+                    vatRate: 0.18,
+                    isDeductible: true,
+                    deductibleRate: 1.0
+                }
+            })() : {})
         }))
 
         const result = await importExpenses(expensesToImport, budgetType)

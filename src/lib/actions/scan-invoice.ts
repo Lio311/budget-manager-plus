@@ -16,6 +16,7 @@ interface ScanResult {
         amount: number
         businessName: string
         category?: string
+        vatAmount?: number
     }
     error?: string
 }
@@ -46,6 +47,7 @@ export async function scanInvoiceImage(formData: FormData): Promise<ScanResult> 
         2. "businessName": The name of the merchant/business. string.
         3. "date": The date of the invoice in YYYY-MM-DD format. If not found, null. string | null.
         4. "category": A suggested category for this expense (e.g., "Food", "Transport", "Shopping", "Bills"). string.
+        5. "vatAmount": The VAT/Tax amount if stated. If 0 or not found, null or 0. number.
 
         Return ONLY the JSON object. Do not include markdown code blocks.
         `
@@ -74,7 +76,8 @@ export async function scanInvoiceImage(formData: FormData): Promise<ScanResult> 
                     date: data.date || null,
                     amount: typeof data.amount === 'number' ? data.amount : parseFloat(data.amount) || 0,
                     businessName: data.businessName || 'עסק לא מזוהה',
-                    category: data.category
+                    category: data.category,
+                    vatAmount: typeof data.vatAmount === 'number' ? data.vatAmount : parseFloat(data.vatAmount) || 0
                 }
             }
         } catch (e) {
