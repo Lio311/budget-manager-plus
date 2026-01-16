@@ -78,7 +78,6 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
         const expenseGroups = await db.expense.groupBy({
             by: ['supplierId'],
             where: {
-                supplierId: { in: supplierIds },
                 supplierId: { in: supplierIds }
             },
             _sum: { amount: true }
