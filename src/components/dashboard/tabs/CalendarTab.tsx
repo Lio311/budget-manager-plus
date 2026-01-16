@@ -108,7 +108,7 @@ export function CalendarTab() {
     // Aggregate Payments
     const payments: Payment[] = [
         ...(Array.isArray(bills) ? bills : []).map((bill: any) => ({
-            id: bill.id, name: bill.name, amount: bill.amount, currency: bill.currency || 'ILS', day: bill.dueDay, type: 'bill' as const, isPaid: bill.isPaid
+            id: bill.id, name: bill.name, amount: bill.amount, currency: bill.currency || 'ILS', day: bill.dueDate ? new Date(bill.dueDate).getDate() : 1, type: 'bill' as const, isPaid: bill.isPaid
         })),
         ...(Array.isArray(debts) ? debts : []).map((debt: any) => ({
             id: debt.id, name: debt.creditor, amount: debt.monthlyPayment, currency: debt.currency || 'ILS', day: debt.dueDay, type: 'debt' as const, isPaid: debt.isPaid
