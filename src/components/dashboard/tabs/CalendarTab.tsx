@@ -5,7 +5,22 @@ import { useState, useRef } from 'react'
 import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Check, Loader2, Calendar as CalendarIcon, X, Plus, Clock, Briefcase, Pencil, Trash2 } from 'lucide-react'
+import {
+    Calendar as CalendarIcon,
+    DollarSign,
+    CreditCard,
+    TrendingUp,
+    Briefcase,
+    Plus,
+    X,
+    Edit2,
+    Trash2,
+    Info,
+    Check,
+    Loader2,
+    Clock,
+    Pencil
+} from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
@@ -25,6 +40,7 @@ import { getClients } from '@/lib/actions/clients'
 import { useToast } from '@/hooks/use-toast'
 import { QuickAddDialog } from '@/components/dashboard/QuickAddDialog'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { CalendarTutorial } from '@/components/dashboard/tutorial/CalendarTutorial'
 // import { CalendarSyncButton } from '@/components/dashboard/CalendarSyncButton'
 
 interface Payment {
@@ -67,6 +83,7 @@ export function CalendarTab() {
     })
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [isQuickAddOpen, setIsQuickAddOpen] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
     const router = useRouter()
     const searchParams = useSearchParams()
 
@@ -251,7 +268,7 @@ export function CalendarTab() {
             {/* Header / Toggle */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 {isBusiness ? (
-                    <div className="flex items-center space-x-2 rtl:space-x-reverse bg-white dark:bg-slate-800 p-2 rounded-lg border border-gray-200 dark:border-slate-700">
+                    <div id="calendar-mode-toggle" className="flex items-center space-x-2 rtl:space-x-reverse bg-white dark:bg-slate-800 p-2 rounded-lg border border-gray-200 dark:border-slate-700">
                         <Switch
                             id="calendar-mode"
                             dir="ltr"
@@ -267,7 +284,7 @@ export function CalendarTab() {
 
                 {/* Summary (Only for Financial) */}
                 {viewMode === 'financial' && (
-                    <div className="text-sm text-muted-foreground">
+                    <div id="calendar-summary" className="text-sm text-muted-foreground">
                         סה"כ תשלומים: <span className="font-bold text-blue-600">{formatCurrency(totalPayments, getCurrencySymbol(currency))}</span>
                     </div>
                 )}
@@ -278,15 +295,26 @@ export function CalendarTab() {
             {/* Calendar */}
             <Card>
                 <CardHeader>
-                    <div className="flex items-center gap-2">
-                        <CalendarIcon className="h-5 w-5 text-blue-600" />
-                        <CardTitle>
-                            {viewMode === 'work' ? 'יומן עבודה' : 'לוח שנה'} - {getMonthName(month)} {year}
-                        </CardTitle>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <CalendarIcon className="h-5 w-5 text-blue-600" />
+                            <CardTitle>
+                                {viewMode === 'work' ? 'יומן עבודה' : 'לוח שנה'} - {getMonthName(month)} {year}
+                            </CardTitle>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setShowTutorial(true)}
+                            className="h-8 w-8"
+                            title="הדרכה"
+                        >
+                            <Info className="h-4 w-4" />
+                        </Button>
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-7 gap-2 mb-2">
+                    <div id="calendar-grid" className="grid grid-cols-7 gap-2 mb-2">
                         {['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'].map((day) => (
                             <div key={day} className="text-center font-bold text-sm text-muted-foreground p-2">
                                 {day}
@@ -564,6 +592,11 @@ export function CalendarTab() {
                     router.push(`?tab=${tabMap[action]}&date=${dateStr}`)
                     setIsQuickAddOpen(false)
                 }}
+            />
+
+            <CalendarTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
             />
         </div>
     )
