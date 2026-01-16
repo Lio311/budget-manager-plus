@@ -392,6 +392,7 @@ export async function convertQuoteToInvoice(quoteId: string) {
             total: quote.total,
             notes: `נוצר מהצעת מחיר #${quote.quoteNumber}`,
             createIncomeFromInvoice: false,
+            invoiceType: 'TAX_INVOICE', // Default to Tax Invoice when converting from Quote
             lineItems: lineItems
         }
 
