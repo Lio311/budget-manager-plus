@@ -78,12 +78,12 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
             {
                 id: 'overview-graph-networth',
                 title: 'שווי העסק לאורך זמן',
-                text: 'גרף שטח המציג את התפתחות שווי העסק או ההון העצמי על פני החודשים האחרונים.'
+                text: 'גרף שטח המציג את התפתחות שווי העסק או ההון העצמי. ניתן ללחוץ על כפתור ההגדרות (גלגל השיניים) בפינה השמאלית של הכרטיסייה כדי להגדיר יתרה התחלתית ולדייק את החישוב.'
             },
             {
                 id: 'overview-graph-status',
                 title: 'מצב תקציב חודשי',
-                text: 'מדדי התקדמות המציגים את ניצול התקציב, סטטוס גבייה מלקוחות, ומכירות לפני מע"מ ביחס ליעדים.'
+                text: 'כרטיסייה זו מרכזת מדדים קריטיים: הוצאות מול הכנסות, סטטוס גבייה מלקוחות, ומכירות לפני מע"מ. כמו כן, מוצג כאן חישוב שכר שעתי (הכנסות חלקי שעות עבודה), ונתוני מע"מ (החזרי מע"מ ומע"מ לתשלום) כדי לתקף את תזרים המזומנים הצפוי.'
             }
         ]
 
@@ -160,7 +160,7 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                                 className="absolute z-50 pointer-events-auto transition-all duration-200"
                                 style={{
                                     left: pos.x + (pos.width / 2) - (tooltipWidth / 2),
-                                    top: pos.y + pos.height + 30 + staggerOffset,
+                                    top: pos.y + pos.height + 10 + staggerOffset,
                                 }}
                             >
                                 <div
