@@ -61,7 +61,6 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 currency: initialData.currency || 'ILS',
                 goal: initialData.notes || '',
                 targetAmount: initialData.targetAmount?.toString() || '',
-                currentAmount: initialData.currentAmount?.toString() || '',
                 date: initialData.targetDate ? new Date(initialData.targetDate) : new Date(),
                 isRecurring: initialData.isRecurring || false,
                 recurringEndDate: undefined, // TODO: Map extended props if available
@@ -75,7 +74,6 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
             currency: 'ILS',
             goal: '',
             targetAmount: '',
-            currentAmount: '',
             date: new Date(),
             isRecurring: false,
             recurringEndDate: undefined as Date | undefined,
@@ -164,7 +162,6 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
             currency: newSaving.currency,
             goal: newSaving.goal || undefined,
             targetAmount: newSaving.targetAmount ? parseFloat(newSaving.targetAmount) : undefined,
-            currentAmount: newSaving.currentAmount ? parseFloat(newSaving.currentAmount) : undefined,
             date: newSaving.date,
             isRecurring: newSaving.isRecurring,
             recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
@@ -195,7 +192,6 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                         currency: budgetCurrency,
                         goal: '',
                         targetAmount: '',
-                        currentAmount: '',
                         date: new Date(),
                         isRecurring: false,
                         recurringEndDate: undefined,
@@ -392,27 +388,16 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום יעד</label>
-                                <Input
-                                    type="number"
-                                    placeholder="0.00"
-                                    className="h-10"
-                                    value={newSaving.targetAmount}
-                                    onChange={(e) => setNewSaving({ ...newSaving, targetAmount: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום נוכחי</label>
-                                <Input
-                                    type="number"
-                                    placeholder="0.00"
-                                    className="h-10"
-                                    value={newSaving.currentAmount}
-                                    onChange={(e) => setNewSaving({ ...newSaving, currentAmount: e.target.value })}
-                                />
-                            </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום יעד</label>
+                            <Input
+                                type="number"
+                                placeholder="0.00"
+                                className="h-10"
+                                value={newSaving.targetAmount}
+                                onChange={(e) => setNewSaving({ ...newSaving, targetAmount: e.target.value })}
+                            />
+                            <p className="text-xs text-gray-500 dark:text-gray-400">הסכום הנוכחי יחושב אוטומטית על סמך ההפקדות שלך</p>
                         </div>
 
                         <div className="w-full">

@@ -53,7 +53,21 @@ export async function getSavingsGoals(
         // Calculate progress for each goal
         const goals: SavingGoal[] = savings.map(saving => {
             const targetAmount = saving.targetAmount || 0
-            const currentAmount = saving.currentAmount || 0
+
+            // Calculate currentAmount based on accumulated monthly deposits
+            // Count how many months have passed since the saving was created
+            const createdDate = new Date(saving.createdAt)
+            const now = new Date()
+            const monthsPassed = (now.getFullYear() - createdDate.getFullYear()) * 12 +
+                (now.getMonth() - createdDate.getMonth()) + 1 // +1 to include current month
+
+            // Calculate accumulated amount: monthlyDeposit * months passed
+            const monthlyDeposit = saving.monthlyDeposit || 0
+            const calculatedCurrentAmount = monthlyDeposit * Math.max(0, monthsPassed)
+
+            // Use the calculated amount, or the stored currentAmount if it exists (for manual overrides)
+            const currentAmount = saving.currentAmount || calculatedCurrentAmount
+
             const progress = targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0
             const remainingAmount = Math.max(0, targetAmount - currentAmount)
 
