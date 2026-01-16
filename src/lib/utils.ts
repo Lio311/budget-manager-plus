@@ -11,8 +11,8 @@ export function formatCurrency(amount: number | null | undefined, currency: stri
   const formattedNumber = absAmount.toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
 
   if (safeAmount < 0) {
-    // For RTL: Symbol then Minus then Number -> "₪-500"
-    return `${currency}-${formattedNumber}`
+    // For RTL: Number then Minus then Symbol -> "500- ₪" (Visually: 500- ₪)
+    return `${formattedNumber}- ${currency}`
   }
   return `${formattedNumber} ${currency}`
 }
