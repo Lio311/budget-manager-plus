@@ -315,13 +315,11 @@ export async function getSupplierStats(supplierId: string, year: number) {
         // Get total stats
         const totalExpenses = await db.expense.aggregate({
             where: {
-                supplierId,
-                where: {
-                    supplierId
-                },
-                _sum: { amount: true },
-                _count: true
-            })
+                supplierId
+            },
+            _sum: { amount: true },
+            _count: true
+        })
 
         return {
             success: true,
