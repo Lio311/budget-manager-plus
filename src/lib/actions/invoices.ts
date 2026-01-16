@@ -71,7 +71,8 @@ export async function getInvoices(scope: string = 'BUSINESS') {
                 scope
             },
             include: {
-                client: true
+                client: true,
+                lineItems: true
             },
             orderBy: {
                 issueDate: 'desc'
@@ -155,26 +156,22 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
 
                 notes: validData.notes || null,
                 paymentMethod: validData.paymentMethod || null,
-                status: 'DRAFT'
+                status: 'DRAFT',
+                // Create Line Items nested
+                lineItems: {
+                    create: validData.lineItems.map(item => ({
+                        description: item.description,
+                        quantity: item.quantity,
+                        price: item.price,
+                        total: item.total
+                    }))
+                }
             },
             include: {
                 client: true,
                 lineItems: true
             }
         })
-
-        // Create Line Items
-        if (validData.lineItems && validData.lineItems.length > 0) {
-            await db.invoiceLineItem.createMany({
-                data: validData.lineItems.map(item => ({
-                    invoiceId: invoice.id,
-                    description: item.description,
-                    quantity: item.quantity,
-                    price: item.price,
-                    total: item.total
-                }))
-            })
-        }
 
         // Logic 1: Link Existing Income if provided
         if (validData.incomeId && validData.incomeId !== 'none') {
