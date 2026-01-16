@@ -82,8 +82,20 @@ export async function getSavingsGoals(
             // Calculate accumulated amount for this saving
             const createdDate = new Date(saving.createdAt)
             const now = new Date()
-            const monthsPassed = (now.getFullYear() - createdDate.getFullYear()) * 12 +
-                (now.getMonth() - createdDate.getMonth()) + 1
+
+            // Calculate how many months have passed since creation
+            let monthsPassed = (now.getFullYear() - createdDate.getFullYear()) * 12 +
+                (now.getMonth() - createdDate.getMonth()) + 1 // +1 to include current month
+
+            // If this is a recurring saving with an end date, limit the months
+            if (saving.isRecurring && saving.recurringEndDate) {
+                const endDate = new Date(saving.recurringEndDate)
+                const maxMonths = (endDate.getFullYear() - createdDate.getFullYear()) * 12 +
+                    (endDate.getMonth() - createdDate.getMonth()) + 1
+
+                // Use the minimum between months passed and max months
+                monthsPassed = Math.min(monthsPassed, maxMonths)
+            }
 
             const monthlyDeposit = saving.monthlyDeposit || 0
             const accumulated = monthlyDeposit * Math.max(0, monthsPassed)
