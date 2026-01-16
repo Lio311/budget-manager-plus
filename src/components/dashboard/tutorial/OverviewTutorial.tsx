@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -10,26 +10,42 @@ interface TutorialProps {
     onClose: () => void
 }
 
-interface TooltipPosition {
+type Placement = 'top' | 'bottom' | 'left' | 'right'
+type Alignment = 'start' | 'center' | 'end'
+
+interface CardConfig {
     id: string
-    x: number
-    y: number
-    width: number
-    height: number
-    text: string
     title: string
+    text: string
+    placement?: Placement
+    align?: Alignment
+    maxWidth?: number
+}
+
+interface TooltipState {
+    config: CardConfig
+    rect: DOMRect // We store the original rect to recalculate positions dynamically if needed, or just pre-calculated coords
+    // Pre-calculated absolute positions for the tooltip box
+    style: React.CSSProperties
+    arrowStyle: React.CSSProperties
 }
 
 export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
-    const [positions, setPositions] = useState<TooltipPosition[]>([])
+    const [tooltips, setTooltips] = useState<TooltipState[]>([])
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
         setMounted(true)
+    }, [])
+
+    useEffect(() => {
         if (isOpen) {
             calculatePositions()
             window.addEventListener('resize', calculatePositions)
             window.addEventListener('scroll', calculatePositions)
+        } else {
+            window.removeEventListener('resize', calculatePositions)
+            window.removeEventListener('scroll', calculatePositions)
         }
 
         return () => {
@@ -39,84 +55,190 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
     }, [isOpen])
 
     const calculatePositions = () => {
-        const newPositions: TooltipPosition[] = []
+        const newTooltips: TooltipState[] = []
 
         const scrollX = window.scrollX
         const scrollY = window.scrollY
+        const viewportWidth = window.innerWidth
 
-        const cards = [
+        // Configuration for each card
+        const cards: CardConfig[] = [
+            // Row 1: Metrics
             {
-                id: 'overview-card-income',
+                id: 'overview-card-income', // Rightmost
                 title: 'מכירות / הכנסות',
-                text: 'כרטיסייה זו מציגה את סך המכירות וההכנסות של העסק לחודש הנוכחי.'
+                text: 'כרטיסייה זו מציגה את סך המכירות וההכנסות של העסק לחודש הנוכחי.',
+                placement: 'bottom',
+                align: 'start', // Align Right (in RTL start is Right)
+                maxWidth: 220
             },
             {
                 id: 'overview-card-expenses',
                 title: 'הוצאות תפעול',
-                text: 'כרטיסייה זו מציגה את סך ההוצאות השוטפות של העסק (לא כולל מע"מ אם העסק עוסק מורשה/חברה).'
+                text: 'כרטיסייה זו מציגה את סך ההוצאות השוטפות של העסק (לא כולל מע"מ).',
+                placement: 'bottom',
+                align: 'center',
+                maxWidth: 220
             },
             {
                 id: 'overview-card-profit',
                 title: 'רווח נקי',
-                text: 'כרטיסייה זו נועדה להציג את סה"כ הכנסות העסק פחות אחוז מס הכנסה המשולם פחות ההוצאות של העסק. אחוז מס ההכנסה מוגדר כברירת מחדל על 0, אך ניתן לשנות אותו על ידי לחיצה על כפתור ההגדרות.'
+                text: 'סה"כ הכנסות פחות הוצאות ופחות הפרשת מס הכנסה (ניתן להגדרה).',
+                placement: 'bottom',
+                align: 'center',
+                maxWidth: 220
             },
             {
-                id: 'overview-card-balance',
+                id: 'overview-card-balance', // Leftmost
                 title: 'שווי העסק / יתרה',
-                text: 'כרטיסייה זו מציגה את היתרה הסופית המשוערת, בהתחשב בכל התנועות הכספיות.'
+                text: 'היתרה הסופית המשוערת. כוללת את כל התנועות הכספיות.',
+                placement: 'bottom',
+                align: 'end', // Align Left
+                maxWidth: 220
             },
+
+            // Row 2: Middle Graphs
             {
-                id: 'overview-graph-budget',
+                id: 'overview-graph-budget', // Right
                 title: 'התפלגות תקציב',
-                text: 'גרף עוגה המציג חלוקה ויזואלית בין הכנסות להוצאות, ומאפשר להבין במהירות את היחס הפיננסי.'
+                text: 'חלוקה ויזואלית בין הכנסות להוצאות להבנת היחס הפיננסי.',
+                placement: 'top', // Show above to not crowd the bottom graphs? Or bottom?
+                // Let's try 'top' for these middle graphs if there is space, otherwise bottom.
+                // Actually user said "Not everything has to be this angle".
+                // Let's put these on the SIDE if desktop?
+                // Visual Right (Budget) -> Left side of screen. 
+                // Visual Left (Expenses) -> Right side of screen.
+                // Let's stick to Top/Bottom for safety but use Top for these to vary it.
+                align: 'center',
+                maxWidth: 250
             },
             {
-                id: 'overview-graph-expenses',
+                id: 'overview-graph-expenses', // Left
                 title: 'הוצאות לפי קטגוריה',
-                text: 'גרף עמודות המפרט את ההוצאות לפי סוגים (לדוגמה: שיווק, ציוד, משכורות), ומסייע בזיהוי מוקדי ההוצאה העיקריים.'
+                text: 'פירוט הוצאות לפי סוגים לזיהוי מוקדים עיקריים.',
+                placement: 'top',
+                align: 'center',
+                maxWidth: 250
             },
+
+            // Row 3: Bottom Graphs
             {
-                id: 'overview-graph-networth',
+                id: 'overview-graph-networth', // Right
                 title: 'שווי העסק לאורך זמן',
-                text: 'גרף שטח המציג את התפתחות שווי העסק או ההון העצמי. ניתן ללחוץ על כפתור ההגדרות (גלגל השיניים) בפינה השמאלית של הכרטיסייה כדי להגדיר יתרה התחלתית ולדייק את החישוב.'
+                text: 'התפתחות ההון העצמי. השתמש בגלגל השיניים להגדרת יתרה התחלתית.',
+                placement: 'top', // Show above so it doesn't fall off screen
+                align: 'start',
+                maxWidth: 260
             },
             {
-                id: 'overview-graph-status',
+                id: 'overview-graph-status', // Left
                 title: 'מצב תקציב חודשי',
-                text: 'כרטיסייה זו מרכזת מדדים קריטיים: הוצאות מול הכנסות, סטטוס גבייה מלקוחות, ומכירות לפני מע"מ. כמו כן, מוצג כאן חישוב שכר שעתי (הכנסות חלקי שעות עבודה), ונתוני מע"מ (החזרי מע"מ ומע"מ לתשלום) כדי לתקף את תזרים המזומנים הצפוי.'
+                text: 'מדדי ביצוע, שכר שעתי, ונתוני מע"מ (החזר/תשלום).',
+                placement: 'top', // Show above
+                align: 'end',
+                maxWidth: 260
             }
         ]
 
-        cards.forEach(cardInfo => {
-            const el = document.getElementById(cardInfo.id)
+        cards.forEach(config => {
+            const el = document.getElementById(config.id)
             if (el) {
                 const rect = el.getBoundingClientRect()
-                newPositions.push({
-                    id: cardInfo.id,
-                    x: rect.left + scrollX,
-                    y: rect.top + scrollY,
-                    width: rect.width,
-                    height: rect.height,
-                    title: cardInfo.title,
-                    text: cardInfo.text
+                // Absolute coords on document
+                const absLeft = rect.left + scrollX
+                const absTop = rect.top + scrollY
+                const absRight = rect.right + scrollX
+                const absBottom = rect.bottom + scrollY
+
+                let style: React.CSSProperties = {}
+                let arrowStyle: React.CSSProperties = {}
+
+                // Defaults
+                const placement = config.placement || 'bottom'
+                const align = config.align || 'center'
+                const width = config.maxWidth || 240
+                const gap = 0 // Tight connection requested
+
+                // Calculate Text Box Position
+                if (placement === 'bottom') {
+                    style.top = absBottom + gap
+                    style.marginTop = '10px' // Arrow size compensation
+
+                    if (align === 'center') style.left = absLeft + (rect.width / 2) - (width / 2)
+                    if (align === 'start') style.left = absRight - width // Align Right edge (RTL start)? No, RTL start is Right visually, so 'left' css property accounts for x axis.
+                    // Let's solve 'left' CSS property math: 
+                    // Align 'start' (Right in RTL) -> The box right edge should match element right edge.
+                    // box.left = element.right - box.width
+                    if (align === 'start') style.left = absRight - width + 10 // Shift slightly in
+                    // Align 'end' (Left in RTL) -> Box left edge matches element left edge
+                    if (align === 'end') style.left = absLeft - 10
+
+                    // Arrow (Points UP)
+                    arrowStyle = {
+                        top: '-6px', // Overlap border slightly
+                        left: '50%',
+                        transform: 'translateX(-50%) rotate(45deg)',
+                        borderTop: '1px solid #e2e8f0', // Color match border
+                        borderLeft: '1px solid #e2e8f0'
+                    }
+                    if (align === 'start') arrowStyle.left = `${width - 30}px`, arrowStyle.transform = 'translateX(0) rotate(45deg)'
+                    if (align === 'end') arrowStyle.left = '20px', arrowStyle.transform = 'translateX(0) rotate(45deg)'
+
+                } else if (placement === 'top') {
+                    style.top = absTop - gap
+                    style.transform = 'translateY(-100%)' // Shift up by its own height
+                    style.marginTop = '-10px' // Gap
+
+                    if (align === 'center') style.left = absLeft + (rect.width / 2) - (width / 2)
+                    if (align === 'start') style.left = absRight - width + 10
+                    if (align === 'end') style.left = absLeft - 10
+
+                    // Arrow (Points DOWN)
+                    arrowStyle = {
+                        bottom: '-6px',
+                        left: '50%',
+                        transform: 'translateX(-50%) rotate(225deg)', // Point down
+                        borderTop: '1px solid #e2e8f0',
+                        borderLeft: '1px solid #e2e8f0'
+                    }
+                    if (align === 'start') arrowStyle.left = `${width - 30}px`, arrowStyle.transform = 'translateX(0) rotate(225deg)'
+                    if (align === 'end') arrowStyle.left = '20px', arrowStyle.transform = 'translateX(0) rotate(225deg)'
+                }
+
+                newTooltips.push({
+                    config,
+                    rect, // Raw rect if needed
+                    style: {
+                        position: 'absolute',
+                        width: `${width}px`,
+                        ...style
+                    },
+                    arrowStyle: {
+                        position: 'absolute',
+                        width: '12px',
+                        height: '12px',
+                        background: 'inherit', // Match bg
+                        zIndex: 10,
+                        ...arrowStyle
+                    }
                 })
             }
         })
 
-        setPositions(newPositions)
+        setTooltips(newTooltips)
     }
 
     if (!mounted || !isOpen) return null
 
     return createPortal(
         <div className="absolute inset-0 z-[9999] isolate w-full min-h-screen h-full pointer-events-none">
-            {/* Backdrop - Fixed to cover viewport completely, ensuring dark overlay everywhere */}
+            {/* Backdrop */}
             <div
                 className="fixed inset-0 bg-black/70 backdrop-blur-[2px] transition-opacity duration-300 animate-in fade-in pointer-events-auto"
                 onClick={onClose}
             />
 
-            {/* Close Button - Fixed */}
+            {/* Close Button */}
             <div className="fixed top-4 left-4 z-50">
                 <Button
                     variant="ghost"
@@ -128,72 +250,44 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                 </Button>
             </div>
 
-            {/* Highlights and Tooltips */}
+            {/* Render Tooltips */}
             <div className="absolute inset-0 w-full h-full">
-                {positions.map((pos, index) => {
-                    // Staggering Logic for Top Row (indices 0-3 are likely the top cards)
-                    // We can simply alternate the vertical offset slightly for even/odd cards in the top row
-                    // to prevent them from looking like a single crowded block.
-                    // Or, we can check if it's one of the first 4 cards.
-                    const isTopRow = index < 4;
-                    const staggerOffset = isTopRow && (index % 2 !== 0) ? 70 : 0; // Push odd cards down further
+                {tooltips.map((t, i) => (
+                    <div key={t.config.id}>
+                        {/* Highlight Cutout */}
+                        <div
+                            className="absolute rounded-xl border-2 border-white/50 box-content shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] pointer-events-none transition-all duration-200"
+                            style={{
+                                left: t.rect.left + window.scrollX,
+                                top: t.rect.top + window.scrollY,
+                                width: t.rect.width,
+                                height: t.rect.height,
+                                boxShadow: '0 0 30px rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.2)'
+                            }}
+                        />
 
-                    // Reduced width from 280 to 240 to help with crowding
-                    const tooltipWidth = 240;
+                        {/* The Tooltip Box */}
+                        <div
+                            className="pointer-events-auto transition-all duration-200 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-gray-100 dark:border-gray-700 p-4 text-right"
+                            style={t.style}
+                            dir="rtl"
+                        >
+                            {/* Arrow */}
+                            <div className="bg-white dark:bg-slate-800" style={t.arrowStyle} />
 
-                    return (
-                        <div key={pos.id} className="absolute" style={{ left: 0, top: 0 }}>
-                            {/* Highlight Cutout */}
-                            <div
-                                className="absolute rounded-xl border-2 border-white/50 box-content shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] pointer-events-none transition-all duration-200"
-                                style={{
-                                    left: pos.x,
-                                    top: pos.y,
-                                    width: pos.width,
-                                    height: pos.height,
-                                    boxShadow: '0 0 30px rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.2)'
-                                }}
-                            />
-
-                            {/* Tooltip */}
-                            <div
-                                className="absolute z-50 pointer-events-auto transition-all duration-200"
-                                style={{
-                                    left: pos.x + (pos.width / 2) - (tooltipWidth / 2),
-                                    top: pos.y + pos.height + 10 + staggerOffset,
-                                }}
-                            >
-                                <div
-                                    className={`relative bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-4 rounded-lg shadow-2xl animate-in slide-in-from-top-2 duration-300 text-right border border-gray-100 dark:border-gray-700`}
-                                    style={{ width: tooltipWidth }}
-                                    dir="rtl"
-                                >
-                                    {/* Arrow - Adjusted height based on stagger */}
-                                    <div
-                                        className="absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-slate-800 rotate-45 border-t border-l border-gray-100 dark:border-gray-700"
-                                        style={{ top: -8 - (staggerOffset > 0 ? 0 : 0) }}
-                                    // Note: If we staggered the tooltip DOWN, the arrow should ideally extend UP, but simple arrow works if the gap isn't too huge.
-                                    // Actually if we move the tooltip down, the arrow needs to be at the top of the tooltip.
-                                    // But visually connecting across a large gap (70px) might look weird.
-                                    // A better approach for "spread" might be to just keep them close but ensure width is small enough.
-                                    // Let's rely on the width reduction (280 -> 240) which is significant (40px per card * 4 = 160px saved total).
-                                    // And the stagger will visually break the line.
-                                    />
-
-                                    <div className="relative">
-                                        <div className="flex items-center gap-2 mb-2 text-[#323338] dark:text-gray-100 font-bold border-b pb-2 border-gray-100 dark:border-gray-700">
-                                            <Info className="w-4 h-4" />
-                                            <span>{pos.title}</span>
-                                        </div>
-                                        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                            {pos.text}
-                                        </p>
-                                    </div>
+                            {/* Content */}
+                            <div className="relative z-20">
+                                <div className="flex items-center gap-2 mb-2 text-[#323338] dark:text-gray-100 font-bold border-b pb-2 border-slate-100 dark:border-slate-700">
+                                    <Info className="w-4 h-4" />
+                                    <span>{t.config.title}</span>
                                 </div>
+                                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                    {t.config.text}
+                                </p>
                             </div>
                         </div>
-                    )
-                })}
+                    </div>
+                ))}
             </div>
 
             {/* Footer instruction */}
