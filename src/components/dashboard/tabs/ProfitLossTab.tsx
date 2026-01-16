@@ -15,7 +15,7 @@ import {
     Check, Loader2, Pencil, Plus, Trash2, X,
     ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn,
     Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane, RefreshCw,
-    Umbrella, Dumbbell, Shield
+    Umbrella, Dumbbell, Shield, Info
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -42,6 +42,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { saveBkmvData } from '@/lib/actions/stored-reports'
 import { useDemo } from '@/contexts/DemoContext'
+import { ProfitLossTutorial } from '@/components/dashboard/tutorial/ProfitLossTutorial'
 
 // ...
 
@@ -97,6 +98,7 @@ export default function ProfitLossTab() {
     const [isLoading, setIsLoading] = useState(false)
     const [isDetailOpen, setIsDetailOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
+    const [showTutorial, setShowTutorial] = useState(false)
 
     const currentYear = new Date().getFullYear()
 
@@ -281,13 +283,24 @@ export default function ProfitLossTab() {
     return (
         <div className="space-y-6 md:space-y-8 p-2 md:p-6" dir="rtl">
             <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold">דוחות רווח והפסד</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-3xl font-bold">דוחות רווח והפסד</h1>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowTutorial(true)}
+                        className="h-8 w-8"
+                        title="הדרכה"
+                    >
+                        <Info className="h-4 w-4" />
+                    </Button>
+                </div>
                 <p className="text-gray-500">צפייה והורדת דוחות שנתיים עבור העסק</p>
             </div>
 
             {/* Controls */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between glass-panel p-4 rounded-xl">
-                <div className="flex bg-gray-100 p-1 rounded-lg">
+                <div id="pl-view-toggle" className="flex bg-gray-100 p-1 rounded-lg">
                     <button
                         onClick={() => setViewType('ANNUAL')}
                         className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'ANNUAL' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-900'}`}
@@ -308,7 +321,7 @@ export default function ProfitLossTab() {
                     </button>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div id="pl-year-selector" className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-500">שנה:</span>
                     <select
                         value={selectedYear}
@@ -322,7 +335,7 @@ export default function ProfitLossTab() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div id="pl-periods-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {getPeriods().map((period, idx) => (
                     <Card key={idx} className="p-6 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden group border-t-4 border-t-transparent hover:border-t-emerald-500">
                         <div className="flex justify-between items-start mb-4">
@@ -480,6 +493,11 @@ export default function ProfitLossTab() {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            <ProfitLossTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
+            />
         </div>
     )
 }
