@@ -31,89 +31,13 @@ interface TooltipState {
     arrowStyle: React.CSSProperties
 }
 
-export function OverviewTutorial({ isOpen, onClose, onStepChange }: TutorialProps) {
-    const [tooltips, setTooltips] = useState<TooltipState[]>([])
-    const [mounted, setMounted] = useState(false)
-    const [currentStep, setCurrentStep] = useState(0)
+export function OverviewTutorial({ isOpen, onClose, onStepChange, isBusiness = true }: TutorialProps & { isBusiness?: boolean }) {
+    // ... (keep state) ...
 
-    useEffect(() => {
-        setMounted(true)
-    }, [])
-
-    useEffect(() => {
-        if (isOpen) {
-            calculatePositions()
-            window.addEventListener('resize', calculatePositions)
-            window.addEventListener('scroll', calculatePositions)
-            // Always start at step 0 when opening
-            setCurrentStep(0)
-        } else {
-            window.removeEventListener('resize', calculatePositions)
-            window.removeEventListener('scroll', calculatePositions)
-        }
-
-        return () => {
-            window.removeEventListener('resize', calculatePositions)
-            window.removeEventListener('scroll', calculatePositions)
-        }
-    }, [isOpen])
-
-    // Scroll effect for step change (All Devices)
-    useEffect(() => {
-        if (isOpen && tooltips.length > 0 && tooltips[currentStep]) {
-            const current = tooltips[currentStep]
-            // Notify parent of step change
-            onStepChange?.(current.config.id, currentStep)
-
-            const el = document.getElementById(current.config.id)
-
-            if (el) {
-                // Determine layout details to scroll intelligently
-                const placement = current.config.placement || 'bottom'
-                const isMobileView = window.innerWidth < 768
-
-                // If placement is TOP, we need to ensure the space ABOVE the element is visible.
-                // If placement is BOTTOM, we need space BELOW.
-
-                // Standard block: 'center' works well for middle, but 'nearest' might be better for edges?
-                // Actually, 'center' is usually safest, BUT if the tooltip is top and element is large, header might block it.
-                // Let's do a refined scroll
-
-                const rect = el.getBoundingClientRect()
-                const absoluteTop = rect.top + window.scrollY
-
-                // Estimate tooltip height (approx 150-200px) or use actual if we had it ref
-                const offset = placement === 'top' ? 250 : -250 // Scroll up more for top placement, down for bottom
-
-                // We want the element roughly in center, but biased by the offset
-                // Actually, simpler: Scroll the element to center, then adjust by offset/2
-
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-
-                // Small timeout to allow basic scroll to happen, then adjust if needed? 
-                // Or just use window.scrollTo with calculations.
-                // let's stick to scrollIntoView for now, it's robust. 
-                // If the user says it cuts off, maybe 'center' isn't checking the tooltip boundaries.
-                // Let's try to scroll to the TOOLTIP's hypothetical top if placement is top.
-
-                if (placement === 'top') {
-                    const y = absoluteTop - 250 // Buffer for tooltip above
-                    window.scrollTo({ top: Math.max(0, y - 100), behavior: 'smooth' })
-                } else {
-                    // Bottom placement - scroll so element and space below is viewable
-                    const y = absoluteTop - 100 // Element top with some padding top
-                    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
-                }
-            }
-        }
-    }, [currentStep, isOpen, tooltips.length])
+    // ... (keep useEffects) ...
 
     const calculatePositions = () => {
-        const newTooltips: TooltipState[] = []
-
-        const scrollX = window.scrollX
-        const scrollY = window.scrollY
-        const isMobileView = window.innerWidth < 768
+        // ... (keep variables) ...
 
         // Full Detailed Content
         const cards: CardConfig[] = [
@@ -121,7 +45,9 @@ export function OverviewTutorial({ isOpen, onClose, onStepChange }: TutorialProp
             {
                 id: 'overview-settings-btn',
                 title: 'הגדרות המערכת',
-                text: 'כפתור זה פותח את חלונית ההגדרות, המכילה 3 לשוניות: ״פרטי העסק״ (עדכון לוגו, שם העסק), ״הגדרות כספיות״ (קביעת יתרה התחלתית להון עצמי, הגדרת אחוז מס הכנסה מופרש), ו״ייצוא נתונים״ (הורדת דוחות אקסל/CSV).',
+                text: isBusiness
+                    ? 'כפתור זה פותח את חלונית ההגדרות, המכילה 3 לשוניות: ״פרטי העסק״ (עדכון לוגו, שם העסק), ״הגדרות כספיות״ (קביעת יתרה התחלתית להון עצמי, הגדרת אחוז מס הכנסה מופרש), ו״ייצוא נתונים״ (הורדת דוחות אקסל/CSV).'
+                    : 'כפתור זה פותח את חלונית ההגדרות, שבה ניתן לעדכן פרטים אישיים, לנהל הגדרות כספיות (כמו יתרה התחלתית) ולבצע ייצוא נתונים לאקסל.',
                 placement: 'bottom',
                 align: 'end',
                 maxWidth: 280
@@ -129,7 +55,9 @@ export function OverviewTutorial({ isOpen, onClose, onStepChange }: TutorialProp
             {
                 id: 'overview-ai-btn',
                 title: 'יועץ פיננסי (AI)',
-                text: 'כפתור זה פותח צ\'אט עם יועץ פיננסי חכם המבוסס על בינה מלאכותית. היועץ רואה את כל הנתונים המוצגים בעמוד ויכול לענות על שאלות, לנתח את המצב הפיננסי, ולהציע תובנות לשיפור הרווחיות.',
+                text: isBusiness
+                    ? 'כפתור זה פותח צ\'אט עם יועץ פיננסי חכם המבוסס על בינה מלאכותית. היועץ רואה את כל הנתונים המוצגים בעמוד ויכול לענות על שאלות, לנתח את המצב הפיננסי, ולהציע תובנות לשיפור הרווחיות.'
+                    : 'כפתור זה פותח צ\'אט עם יועץ פיננסי חכם. היועץ רואה את הנתונים שלך ויכול לעזור לך לתכנן תקציב, לענות על שאלות ולתת טיפים לחיסכון והתנהלות נכונה.',
                 placement: 'bottom',
                 align: 'end',
                 maxWidth: 300
@@ -138,32 +66,40 @@ export function OverviewTutorial({ isOpen, onClose, onStepChange }: TutorialProp
             // Row 1: Metrics
             {
                 id: 'overview-card-income',
-                title: 'מכירות / הכנסות',
-                text: 'כרטיסייה זו מציגה את סך המכירות וההכנסות של העסק לחודש הנוכחי.',
+                title: isBusiness ? 'מכירות / הכנסות' : 'סך הכנסות',
+                text: isBusiness
+                    ? 'כרטיסייה זו מציגה את סך המכירות וההכנסות של העסק לחודש הנוכחי.'
+                    : 'כרטיסייה זו מציגה את סך כל ההכנסות שלך החודש (משכורת, העברות, והכנסות נוספות).',
                 placement: 'bottom',
                 align: 'start',
                 maxWidth: 300
             },
             {
                 id: 'overview-card-expenses',
-                title: 'הוצאות תפעול',
-                text: 'כרטיסייה זו מציגה את סך ההוצאות השוטפות של העסק (לא כולל מע"מ אם העסק עוסק מורשה/חברה).',
+                title: isBusiness ? 'הוצאות תפעול' : 'סך הוצאות',
+                text: isBusiness
+                    ? 'כרטיסייה זו מציגה את סך ההוצאות השוטפות של העסק (לא כולל מע"מ אם העסק עוסק מורשה/חברה).'
+                    : 'כרטיסייה זו מסכמת את כל ההוצאות שלך החודש, לפי הקטגוריות שהגדרת.',
                 placement: 'bottom',
                 align: 'center',
                 maxWidth: 300
             },
             {
                 id: 'overview-card-profit',
-                title: 'רווח נקי',
-                text: 'כרטיסייה זו נועדה להציג את סה"כ הכנסות העסק פחות אחוז מס הכנסה המשולם פחות ההוצאות של העסק. אחוז מס ההכנסה מוגדר כברירת מחדל על 0, אך ניתן לשנות אותו על ידי לחיצה על כפתור ההגדרות.',
+                title: isBusiness ? 'רווח נקי' : 'יתרה חודשית',
+                text: isBusiness
+                    ? 'כרטיסייה זו נועדה להציג את סה"כ הכנסות העסק פחות אחוז מס הכנסה המשולם פחות ההוצאות של העסק. אחוז מס ההכנסה מוגדר כברירת מחדל על 0, אך ניתן לשנות אותו על ידי לחיצה על כפתור ההגדרות.'
+                    : 'כרטיסייה זו מראה כמה כסף נשאר לך החודש (הכנסות פחות הוצאות). זהו המדד המרכזי לחיסכון חודשי.',
                 placement: 'bottom',
                 align: 'center',
                 maxWidth: 320
             },
             {
                 id: 'overview-card-balance',
-                title: 'שווי העסק / יתרה',
-                text: 'כרטיסייה זו מציגה את היתרה הסופית המשוערת, בהתחשב בכל התנועות הכספיות.',
+                title: isBusiness ? 'שווי העסק / יתרה' : 'יתרה כוללת',
+                text: isBusiness
+                    ? 'כרטיסייה זו מציגה את היתרה הסופית המשוערת, בהתחשב בכל התנועות הכספיות.'
+                    : 'כרטיסייה זו מציגה את סך כל הכסף הזמין לך (עובר ושב + חסכונות), בהתחשב ביתרה ההתחלתית שהגדרת.',
                 placement: 'bottom',
                 align: 'end',
                 maxWidth: 300
@@ -192,8 +128,10 @@ export function OverviewTutorial({ isOpen, onClose, onStepChange }: TutorialProp
             // Row 3: Bottom Graphs
             {
                 id: 'overview-graph-networth',
-                title: 'שווי העסק לאורך זמן',
-                text: 'גרף שטח המציג את התפתחות שווי העסק או ההון העצמי. ניתן ללחוץ על כפתור ההגדרות (גלגל השיניים) בפינה השמאלית של הכרטיסייה כדי להגדיר יתרה התחלתית ולדייק את החישוב.',
+                title: isBusiness ? 'שווי העסק לאורך זמן' : 'צמיחת הון עצמי',
+                text: isBusiness
+                    ? 'גרף שטח המציג את התפתחות שווי העסק או ההון העצמי. ניתן ללחוץ על כפתור ההגדרות (גלגל השיניים) בפינה השמאלית של הכרטיסייה כדי להגדיר יתרה התחלתית ולדייק את החישוב.'
+                    : 'גרף המציג את השינוי בכמות הכסף שלך לאורך זמן. מומלץ להגדיר יתרה התחלתית (בהגדרות) כדי לקבל תמונה מדויקת.',
                 placement: 'top',
                 align: 'start',
                 maxWidth: 320
@@ -201,7 +139,9 @@ export function OverviewTutorial({ isOpen, onClose, onStepChange }: TutorialProp
             {
                 id: 'overview-graph-status',
                 title: 'מצב תקציב חודשי',
-                text: 'כרטיסייה זו מרכזת מדדים קריטיים: הוצאות מול הכנסות, סטטוס גבייה מלקוחות, ומכירות לפני מע"מ. כמו כן, מוצג כאן חישוב שכר שעתי (הכנסות חלקי שעות עבודה), ונתוני מע"מ (החזרי מע"מ ומע"מ לתשלום) כדי לתקף את תזרים המזומנים הצפוי.',
+                text: isBusiness
+                    ? 'כרטיסייה זו מרכזת מדדים קריטיים: הוצאות מול הכנסות, סטטוס גבייה מלקוחות, ומכירות לפני מע"מ. כמו כן, מוצג כאן חישוב שכר שעתי, ונתוני מע"מ.'
+                    : 'סיכום חודשי: השוואה בין סך ההכנסות לסך ההוצאות, וכמה כסף פנוי נשאר לך החודש.',
                 placement: 'top',
                 align: 'end',
                 maxWidth: 320

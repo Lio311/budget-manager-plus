@@ -328,6 +328,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             <OverviewTutorial
                 isOpen={isTutorialOpen}
                 onClose={() => setIsTutorialOpen(false)}
+                isBusiness={isBusiness}
             />
 
             {/* Header & Action Buttons Row */}
@@ -387,17 +388,6 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                     <FeedbackButton />
 
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
-                        onClick={() => setIsTutorialOpen(true)}
-                        title="הדרכה"
-                    >
-                        <Info className="h-5 w-5" />
-                    </Button>
-
-
                     {!isBusiness && (
                         <Button
                             variant="outline"
@@ -418,6 +408,16 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <div className="absolute inset-0 bg-gradient-to-r from-green-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                         </Button>
                     )}
+
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                        onClick={() => setIsTutorialOpen(true)}
+                        title="הדרכה"
+                    >
+                        <Info className="h-5 w-5" />
+                    </Button>
                 </div>
 
             </div>
