@@ -18,7 +18,7 @@ import { PRESET_COLORS } from '@/lib/constants'
 interface Project {
     id: string
     name: string
-    color: string
+    color: string | null
 }
 
 interface ProjectSelectorProps {
@@ -138,7 +138,7 @@ export function ProjectSelector({
                                                 />
                                                 <div
                                                     className="w-3 h-3 rounded-full"
-                                                    style={{ backgroundColor: project.color }}
+                                                    style={{ backgroundColor: project.color || '#cccccc' }}
                                                 />
                                             </div>
                                             {project.name}

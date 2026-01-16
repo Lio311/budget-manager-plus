@@ -31,7 +31,7 @@ const Skeleton = ({ className }: { className?: string }) => (
 interface Project {
     id: string
     name: string
-    color: string
+    color: string | null
     stats: {
         totalIncome: number
         totalExpenses: number
@@ -120,7 +120,7 @@ export function ProjectsTab() {
     const openEdit = (project: Project) => {
         setEditingProject(project)
         setName(project.name)
-        setColor(project.color)
+        setColor(project.color || PRESET_COLORS[0].hex)
         setIsEditOpen(true)
     }
 
@@ -186,7 +186,7 @@ export function ProjectsTab() {
                                 <div className="flex items-center gap-3">
                                     <div
                                         className="w-4 h-10 rounded-full"
-                                        style={{ backgroundColor: project.color }}
+                                        style={{ backgroundColor: project.color || '#cccccc' }}
                                     />
                                     <div>
                                         <CardTitle className="text-xl">{project.name}</CardTitle>

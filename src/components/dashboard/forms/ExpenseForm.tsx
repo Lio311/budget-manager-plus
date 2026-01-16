@@ -61,7 +61,7 @@ interface Client {
 interface Project {
     id: string
     name: string
-    color: string
+    color: string | null
 }
 
 interface ExpenseFormProps {
