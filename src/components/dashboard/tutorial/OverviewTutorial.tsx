@@ -61,10 +61,45 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
     useEffect(() => {
         if (isOpen && tooltips.length > 0 && tooltips[currentStep]) {
             const current = tooltips[currentStep]
-            // Scroll element into view (center) with some margin
             const el = document.getElementById(current.config.id)
+
             if (el) {
+                // Determine layout details to scroll intelligently
+                const placement = current.config.placement || 'bottom'
+                const isMobileView = window.innerWidth < 768
+
+                // If placement is TOP, we need to ensure the space ABOVE the element is visible.
+                // If placement is BOTTOM, we need space BELOW.
+
+                // Standard block: 'center' works well for middle, but 'nearest' might be better for edges?
+                // Actually, 'center' is usually safest, BUT if the tooltip is top and element is large, header might block it.
+                // Let's do a refined scroll
+
+                const rect = el.getBoundingClientRect()
+                const absoluteTop = rect.top + window.scrollY
+
+                // Estimate tooltip height (approx 150-200px) or use actual if we had it ref
+                const offset = placement === 'top' ? 250 : -250 // Scroll up more for top placement, down for bottom
+
+                // We want the element roughly in center, but biased by the offset
+                // Actually, simpler: Scroll the element to center, then adjust by offset/2
+
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+                // Small timeout to allow basic scroll to happen, then adjust if needed? 
+                // Or just use window.scrollTo with calculations.
+                // let's stick to scrollIntoView for now, it's robust. 
+                // If the user says it cuts off, maybe 'center' isn't checking the tooltip boundaries.
+                // Let's try to scroll to the TOOLTIP's hypothetical top if placement is top.
+
+                if (placement === 'top') {
+                    const y = absoluteTop - 250 // Buffer for tooltip above
+                    window.scrollTo({ top: Math.max(0, y - 100), behavior: 'smooth' })
+                } else {
+                    // Bottom placement - scroll so element and space below is viewable
+                    const y = absoluteTop - 100 // Element top with some padding top
+                    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+                }
             }
         }
     }, [currentStep, isOpen, tooltips.length])
@@ -350,7 +385,7 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
 
                                     {/* Navigation Bar */}
                                     <div className="flex items-center justify-between mt-4 border-t border-slate-100 dark:border-slate-700 pt-3">
-                                        <span className="text-xs text-muted-foreground">
+                                        <span className="text-xs text-muted-foreground" dir="ltr">
                                             {currentStep + 1} / {tooltips.length}
                                         </span>
                                         <div className="flex gap-2">
