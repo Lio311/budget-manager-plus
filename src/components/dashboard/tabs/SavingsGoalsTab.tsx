@@ -98,7 +98,7 @@ export function SavingsGoalsTab() {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="border-l-4 border-l-gray-500 dark:border-l-gray-400">
+                <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <Target className="h-4 w-4" />
@@ -112,7 +112,7 @@ export function SavingsGoalsTab() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-green-500 dark:border-l-green-400">
+                <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <DollarSign className="h-4 w-4" />
@@ -126,7 +126,7 @@ export function SavingsGoalsTab() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-gray-500 dark:border-l-gray-400">
+                <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <TrendingUp className="h-4 w-4" />
@@ -140,7 +140,7 @@ export function SavingsGoalsTab() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-green-500 dark:border-l-green-400">
+                <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <Award className="h-4 w-4" />

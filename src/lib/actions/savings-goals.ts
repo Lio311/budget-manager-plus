@@ -38,10 +38,14 @@ export async function getSavingsGoals(
         const db = await authenticatedPrisma(userId)
         const budget = await getCurrentBudget(month, year, '₪', type)
 
-        // Fetch all savings for this budget
+        // Fetch ALL savings for this user (not just current month)
+        // We need all savings to calculate cumulative deposits
         const savings = await db.saving.findMany({
             where: {
-                budgetId: budget.id
+                budget: {
+                    userId,
+                    type
+                }
             },
             orderBy: { category: 'asc' }
         })
