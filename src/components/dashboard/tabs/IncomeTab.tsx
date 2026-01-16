@@ -367,11 +367,11 @@ export function IncomeTab() {
                     <div className="mt-2 text-xs border-t pt-2 border-gray-100 dark:border-gray-700">
                         <div className="flex justify-between text-gray-500 mb-1">
                             <span>הפרשה למס ({taxRate}%):</span>
-                            <span className="text-red-500">{formatCurrency(totalNetILS * (taxRate / 100), '₪')}-</span>
+                            <span className="text-red-500">{formatCurrency(totalIncomeILS * (taxRate / 100), '₪')}-</span>
                         </div>
                         <div className="flex justify-between font-bold text-gray-700 dark:text-gray-300">
                             <span>נשאר בכיס (נטו):</span>
-                            <span className="text-green-600">{formatCurrency(totalNetILS * (1 - taxRate / 100), '₪')}</span>
+                            <span className="text-green-600">{formatCurrency(totalIncomeILS * (1 - taxRate / 100), '₪')}</span>
                         </div>
                     </div>
                 )}
