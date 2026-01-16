@@ -355,6 +355,8 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
         if (data.notes !== undefined) updateData.notes = data.notes
         if (data.paymentMethod !== undefined) updateData.paymentMethod = data.paymentMethod
 
+        if (data.invoiceType) updateData.invoiceType = data.invoiceType
+
         if (data.subtotal !== undefined) {
             const vatRate = data.vatRate ?? existing.vatRate
             const vatAmount = data.subtotal * vatRate
@@ -366,11 +368,68 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
             updateData.total = total
         }
 
+        // Handle Line Items Update (Delete All + Recreate) if provided
+        const lineItemsUpdate = data.lineItems ? {
+            lineItems: {
+                deleteMany: {},
+                create: data.lineItems.map(item => ({
+                    description: item.description,
+                    quantity: item.quantity,
+                    price: item.price,
+                    total: item.total
+                }))
+            }
+        } : {}
+
+        // Handle Income Creation logic on update
+        if (data.createIncomeFromInvoice) {
+            // Check if income links to this invoice exist
+            const existingIncomes = await db.income.count({ where: { invoiceId: id } })
+            if (existingIncomes === 0) {
+                // Create income logic - similar to createInvoice but adapted
+                const invoiceDate = data.issueDate || existing.issueDate
+                const budget = await getCurrentBudget(
+                    invoiceDate.getMonth() + 1,
+                    invoiceDate.getFullYear(),
+                    '₪',
+                    'BUSINESS' // Assuming scope is available or defaulted
+                )
+
+                const mainDescription = data.lineItems?.[0]?.description || 'שירות'
+                const incomeSource = `חשבונית ${data.invoiceNumber || existing.invoiceNumber}: ${mainDescription}`
+                const totalAmount = (data.subtotal !== undefined ? data.subtotal * (1 + (data.vatRate || existing.vatRate)) : existing.total)
+
+                await db.income.create({
+                    data: {
+                        budgetId: budget.id,
+                        source: incomeSource,
+                        category: 'הכנסות מעסק',
+                        amount: totalAmount,
+                        currency: '₪',
+                        date: invoiceDate,
+                        clientId: data.isGuestClient ? null : (data.clientId || existing.clientId),
+                        invoiceId: id,
+                        amountBeforeVat: data.subtotal || existing.subtotal,
+                        vatRate: data.vatRate || existing.vatRate,
+                        vatAmount: (data.subtotal || existing.subtotal) * (data.vatRate || existing.vatRate),
+                        invoiceDate: invoiceDate,
+                        paymentMethod: data.paymentMethod || existing.paymentMethod,
+                        isRecurring: false
+                    }
+                })
+            }
+        }
+
         const invoice = await db.invoice.update({
             where: { id },
-            data: updateData,
+            data: {
+                ...updateData,
+                ...lineItemsUpdate
+            },
             include: {
-                client: true
+                client: true,
+                lineItems: true,
+                incomes: true
             }
         })
 
