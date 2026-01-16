@@ -7,7 +7,7 @@ import { getUserSubscriptionStatus, getOnboardingStatus } from '@/lib/actions/us
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BarChart3, Calendar, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator } from 'lucide-react'
+import { BarChart3, Calendar, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator, Target } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
@@ -16,6 +16,7 @@ import { BillsTab } from './tabs/BillsTab'
 import { DebtsTab } from './tabs/DebtsTab'
 import { CalendarTab } from './tabs/CalendarTab'
 import { SavingsTab } from './tabs/SavingsTab'
+import { SavingsGoalsTab } from './tabs/SavingsGoalsTab'
 import { ClientsTab } from './tabs/ClientsTab'
 import { SuppliersTab } from './tabs/SuppliersTab'
 import { DocumentsTab } from './tabs/DocumentsTab'
@@ -153,6 +154,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     const personalTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:bg-black' },
         { value: 'budget_limits', label: 'תקציבים', icon: Shield, activeClass: 'data-[state=active]:bg-yellow-500 data-[state=active]:text-black' },
+        { value: 'savings_goals', label: 'יעדי חיסכון', icon: Target, activeClass: 'data-[state=active]:bg-cyan-500' },
         { value: 'income', label: 'הכנסות', icon: TrendingDown, rotate: true, activeClass: 'data-[state=active]:bg-green-600' },
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
         { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard, activeClass: 'data-[state=active]:bg-orange-500' },
@@ -301,6 +303,9 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </TabsContent>
                     <TabsContent value="budget_limits" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <BudgetLimitsTab />
+                    </TabsContent>
+                    <TabsContent value="savings_goals" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <SavingsGoalsTab />
                     </TabsContent>
                     <TabsContent value="income" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <IncomeTab />
