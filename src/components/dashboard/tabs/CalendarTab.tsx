@@ -376,8 +376,11 @@ export function CalendarTab() {
                                             </div>
                                             <div className="hidden md:block space-y-1">
                                                 {dayEvents.slice(0, 3).map(e => (
-                                                    <div key={e.id} className="text-[10px] truncate bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 px-1 rounded">
-                                                        {e.title}
+                                                    <div key={e.id} className="text-[10px] truncate bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 px-1 rounded flex justify-between gap-1">
+                                                        <span className="truncate">{e.title}</span>
+                                                        <span className="opacity-75 text-[9px] whitespace-nowrap">
+                                                            {format(new Date(e.start), 'HH:mm')}-{e.end ? format(new Date(e.end), 'HH:mm') : ''}
+                                                        </span>
                                                     </div>
                                                 ))}
                                                 {dayEvents.length > 3 && (
