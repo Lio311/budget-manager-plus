@@ -48,6 +48,17 @@ interface Invoice {
     items: any[]
 }
 
+const getInvoiceLabel = (type: string) => {
+    const map: Record<string, string> = {
+        'TAX_INVOICE': 'חשבונית מס',
+        'RECEIPT': 'קבלה',
+        'INVOICE': 'חשבונית',
+        'DEAL_INVOICE': 'חשבונית עסקה',
+        'REFUND_INVOICE': 'חשבונית זיכוי'
+    }
+    return map[type] || 'חשבונית'
+}
+
 export function InvoicesTab() {
     const { budgetType } = useBudget()
     const [searchTerm, setSearchTerm] = useState('')
@@ -350,14 +361,12 @@ export function InvoicesTab() {
                                     <div>
                                         <div className="font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                                             {inv.clientName}
-                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
-                                                {({
-                                                    'TAX_INVOICE': 'חשבונית מס',
-                                                    'RECEIPT': 'קבלה',
-                                                    'INVOICE': 'חשבונית',
-                                                    'DEAL_INVOICE': 'חשבונית עסקה',
-                                                    'REFUND_INVOICE': 'חשבונית זיכוי'
-                                                } as Record<string, string>)[inv.invoiceType] || 'חשבונית'}
+                                            <span className={cn(
+                                                "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium",
+                                                inv.invoiceType === 'RECEIPT' ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" :
+                                                    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
+                                            )}>
+                                                {getInvoiceLabel(inv.invoiceType)}
                                             </span>
                                         </div>
                                         <div className="text-xs text-gray-500">
