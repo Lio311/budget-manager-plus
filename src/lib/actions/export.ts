@@ -17,34 +17,40 @@ export async function getExportData(type: ExportType) {
         switch (type) {
             case 'clients':
                 data = await db.client.findMany({
+                    where: { userId },
                     orderBy: { name: 'asc' }
                 })
                 break;
             case 'suppliers':
                 data = await db.supplier.findMany({
+                    where: { userId },
                     orderBy: { name: 'asc' }
                 })
                 break
             case 'invoices':
                 data = await db.invoice.findMany({
+                    where: { userId },
                     include: { client: true },
                     orderBy: { issueDate: 'desc' }
                 })
                 break
             case 'incomes':
                 data = await db.income.findMany({
+                    where: { budget: { userId } },
                     include: { client: true, invoice: true },
                     orderBy: { date: 'desc' }
                 })
                 break
             case 'expenses':
                 data = await db.expense.findMany({
+                    where: { budget: { userId } },
                     include: { supplier: true, client: true },
                     orderBy: { date: 'desc' }
                 })
                 break
             case 'suppliers':
                 data = await db.supplier.findMany({
+                    where: { userId },
                     orderBy: { name: 'asc' }
                 })
                 break
