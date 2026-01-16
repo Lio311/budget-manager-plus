@@ -65,7 +65,7 @@ export function SavingsGoalsTab() {
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <DollarSign className="h-4 w-4" />
-                            סך נחסך
+                            סך הפקדות חודשיות
                         </CardTitle>
                     </CardHeader>
                     <CardContent>

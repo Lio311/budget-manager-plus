@@ -75,19 +75,25 @@ export async function getSavingsGoals(
         // Calculate aggregate statistics in ILS
         let totalSavedILS = 0
         let totalTargetILS = 0
+        let totalMonthlyDepositILS = 0
 
         for (const goal of goals) {
             const savedILS = await convertToILS(goal.currentAmount, goal.currency)
             const targetILS = await convertToILS(goal.targetAmount, goal.currency)
+            const monthlyILS = await convertToILS(goal.monthlyDeposit || 0, goal.currency)
+
             totalSavedILS += savedILS
             totalTargetILS += targetILS
+            totalMonthlyDepositILS += monthlyILS
         }
 
+        // If no targets are set, use monthly deposits as the "saved" amount for display
+        const displaySaved = totalTargetILS > 0 ? totalSavedILS : totalMonthlyDepositILS
         const overallProgress = totalTargetILS > 0 ? (totalSavedILS / totalTargetILS) * 100 : 0
 
         const stats = {
             totalGoals: goals.length,
-            totalSavedILS,
+            totalSavedILS: displaySaved,
             totalTargetILS,
             overallProgress: Math.min(100, overallProgress)
         }
