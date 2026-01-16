@@ -324,24 +324,22 @@ export function IncomeTab() {
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0" dir="rtl">
             <div className="flex justify-between items-start mb-6">
                 <div>
-                    <div className="flex items-center gap-2">
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-[#00c875] to-[#00a86b] bg-clip-text text-transparent">
-                            {isBusiness ? 'הכנסות ומכירות' : 'הכנסות אישיות'}
-                        </h2>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
-                            onClick={() => setShowTutorial(true)}
-                            title="הדרכה"
-                        >
-                            <Info className="h-5 w-5" />
-                        </Button>
-                    </div>
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-[#00c875] to-[#00a86b] bg-clip-text text-transparent">
+                        {isBusiness ? 'הכנסות ומכירות' : 'הכנסות אישיות'}
+                    </h2>
                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                         {isBusiness ? 'מעקב אחר מכירות, עסקאות והכנסות שוטפות' : 'מעקב אחר משכורות, מענקים והכנסות נוספות'}
                     </p>
                 </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                    onClick={() => setShowTutorial(true)}
+                    title="הדרכה"
+                >
+                    <Info className="h-5 w-5" />
+                </Button>
             </div>
 
             <div className="text-right" id="income-stats-cards">

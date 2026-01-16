@@ -133,15 +133,15 @@ export function ExpensesTutorial({ isOpen, onClose }: ExpensesTutorialProps) {
                             {currentCard.text}
                         </p>
                         <div className="flex justify-between items-center">
-                            <div className="text-sm text-gray-400">
-                                {currentStep + 1} מתוך {cards.length}
+                            <div className="text-sm text-gray-400" dir="ltr">
+                                {currentStep + 1} / {cards.length}
                             </div>
                             <div className="flex gap-2">
                                 <Button variant="outline" size="sm" onClick={handlePrev} disabled={currentStep === 0}>
                                     הקודם
                                 </Button>
-                                <Button className="bg-red-600 hover:bg-red-700 text-white" size="sm" onClick={handleNext}>
-                                    {currentStep === cards.length - 1 ? 'סיים' : 'הבא'}
+                                <Button className="bg-[#323338] hover:bg-black text-white" size="sm" onClick={handleNext}>
+                                    {currentStep === cards.length - 1 ? 'סיום' : 'הבא'}
                                 </Button>
                             </div>
                         </div>
@@ -218,14 +218,8 @@ export function ExpensesTutorial({ isOpen, onClose }: ExpensesTutorialProps) {
                                     {currentCard.text}
                                 </p>
                                 <div className="flex items-center justify-between mt-4">
-                                    <div className="flex gap-1">
-                                        {cards.map((_, idx) => (
-                                            <div
-                                                key={idx}
-                                                className={`w-1.5 h-1.5 rounded-full transition-colors ${idx === currentStep ? 'bg-red-600' : 'bg-gray-200 dark:bg-slate-600'
-                                                    }`}
-                                            />
-                                        ))}
+                                    <div className="text-xs text-muted-foreground" dir="ltr">
+                                        {currentStep + 1} / {cards.length}
                                     </div>
                                     <div className="flex gap-2">
                                         <Button
@@ -240,7 +234,7 @@ export function ExpensesTutorial({ isOpen, onClose }: ExpensesTutorialProps) {
                                         <Button
                                             size="sm"
                                             onClick={handleNext}
-                                            className="h-8 px-4 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs"
+                                            className="h-8 px-4 bg-[#323338] hover:bg-black text-white rounded-full text-xs"
                                         >
                                             {currentStep === cards.length - 1 ? 'סיום' : (
                                                 <div className="flex items-center gap-1">
