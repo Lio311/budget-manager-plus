@@ -199,14 +199,22 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     )
 
     async function handleAdd() {
+        console.log('[IncomeForm] Submitting:', newIncome)
         const newErrors: Record<string, boolean> = {}
         if (!newIncome.source) newErrors.source = true
         if (!newIncome.amount) newErrors.amount = true
         if (!newIncome.category) newErrors.category = true
 
         if (Object.keys(newErrors).length > 0) {
+            console.warn('[IncomeForm] Validation failed:', newErrors)
             setErrors(newErrors)
             toast({ title: 'שגיאה', description: 'נא למלא את שדות החובה המסומנים', variant: 'destructive' })
+
+            const firstError = Object.keys(newErrors)[0]
+            if (firstError === 'source') document.getElementById('income-source-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            else if (firstError === 'amount') document.getElementById('income-amount-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            else if (firstError === 'category') document.getElementById('income-category-trigger')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
             return
         }
         setErrors({})
@@ -321,6 +329,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 <div className="w-full">
                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור / מקור *</label>
                     <Input
+                        id="income-source-input"
                         className={`h-10 focus:ring-green-500/20 ${errors.source ? 'border-red-500' : 'border-gray-200'}`}
                         placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"}
                         value={newIncome.source}
@@ -356,7 +365,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             }}
                             onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
                         >
-                            <SelectTrigger className={`w-full text-right h-11 md:h-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 focus:ring-green-500/20 focus:border-green-500 rounded-lg ${errors.category ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : ''}`}>
+                            <SelectTrigger id="income-category-trigger" className={`w-full text-right h-11 md:h-10 bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 focus:ring-green-500/20 focus:border-green-500 rounded-lg ${errors.category ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : ''}`}>
                                 <SelectValue placeholder="בחר קטגוריה" />
                             </SelectTrigger>
                             <SelectContent dir="rtl" className="text-right max-h-[200px]">
@@ -404,6 +413,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     <div className="col-span-2">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ *' : 'סכום כולל *'}</label>
                         <FormattedNumberInput
+                            id="income-amount-input"
                             className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-green-500/20' : 'focus:ring-green-500/20'}`}
                             placeholder="0.00"
                             value={newIncome.amount}
