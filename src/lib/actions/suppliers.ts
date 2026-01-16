@@ -64,7 +64,7 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
                 _count: {
                     select: {
                         expenses: {
-                            where: { paymentDate: { not: null } }
+                            expenses: true
                         }
                     }
                 }
@@ -81,7 +81,7 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
             by: ['supplierId'],
             where: {
                 supplierId: { in: supplierIds },
-                paymentDate: { not: null }
+                supplierId: { in: supplierIds }
             },
             _sum: { amount: true }
         })
@@ -296,7 +296,6 @@ export async function getSupplierStats(supplierId: string, year: number) {
                 const result = await db.expense.aggregate({
                     where: {
                         supplierId,
-                        paymentDate: { not: null },
                         date: {
                             gte: new Date(year, month - 1, 1),
                             lt: new Date(year, month, 1)
@@ -317,11 +316,12 @@ export async function getSupplierStats(supplierId: string, year: number) {
         const totalExpenses = await db.expense.aggregate({
             where: {
                 supplierId,
-                paymentDate: { not: null }
-            },
-            _sum: { amount: true },
-            _count: true
-        })
+                where: {
+                    supplierId
+                },
+                _sum: { amount: true },
+                _count: true
+            })
 
         return {
             success: true,
