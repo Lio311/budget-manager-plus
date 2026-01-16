@@ -468,7 +468,7 @@ export function ExpensesTab() {
             <div className="grid gap-4 lg:grid-cols-12">
                 {/* Add Form */}
                 {/* Add Form - Desktop Only */}
-                <div className="hidden lg:block lg:col-span-5 glass-panel p-5 h-fit lg:sticky lg:top-4">
+                <div className="hidden lg:block lg:col-span-5 glass-panel p-5 h-fit lg:sticky lg:top-4" id="expenses-add-section">
                     <ExpenseForm
                         categories={categories}
                         suppliers={suppliersData}
