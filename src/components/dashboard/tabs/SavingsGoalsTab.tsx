@@ -98,7 +98,7 @@ export function SavingsGoalsTab() {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="border-l-4 border-l-cyan-500 dark:border-l-cyan-400">
+                <Card className="border-l-4 border-l-gray-500 dark:border-l-gray-400">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <Target className="h-4 w-4" />
@@ -106,13 +106,13 @@ export function SavingsGoalsTab() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-2xl font-bold text-cyan-600 dark:text-cyan-400 ${isLoading ? 'animate-pulse' : ''}`}>
+                        <div className={`text-2xl font-bold text-gray-900 dark:text-gray-100 ${isLoading ? 'animate-pulse' : ''}`}>
                             {isLoading ? '...' : stats.totalCategories}
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-cyan-500 dark:border-l-cyan-400">
+                <Card className="border-l-4 border-l-green-500 dark:border-l-green-400">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <DollarSign className="h-4 w-4" />
@@ -120,13 +120,13 @@ export function SavingsGoalsTab() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-2xl font-bold text-cyan-600 dark:text-cyan-400 break-all ${isLoading ? 'animate-pulse' : ''}`}>
+                        <div className={`text-2xl font-bold text-green-600 dark:text-green-400 break-all ${isLoading ? 'animate-pulse' : ''}`}>
                             {isLoading ? '...' : formatCurrency(stats.totalSavedILS, '₪')}
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-cyan-500 dark:border-l-cyan-400">
+                <Card className="border-l-4 border-l-gray-500 dark:border-l-gray-400">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <TrendingUp className="h-4 w-4" />
@@ -134,13 +134,13 @@ export function SavingsGoalsTab() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-2xl font-bold text-cyan-600 dark:text-cyan-400 break-all ${isLoading ? 'animate-pulse' : ''}`}>
+                        <div className={`text-2xl font-bold text-gray-900 dark:text-gray-100 break-all ${isLoading ? 'animate-pulse' : ''}`}>
                             {isLoading ? '...' : formatCurrency(stats.totalTargetILS, '₪')}
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-cyan-500 dark:border-l-cyan-400">
+                <Card className="border-l-4 border-l-green-500 dark:border-l-green-400">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <Award className="h-4 w-4" />
@@ -148,13 +148,13 @@ export function SavingsGoalsTab() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className={`text-2xl font-bold text-cyan-600 dark:text-cyan-400 ${isLoading ? 'animate-pulse' : ''}`}>
+                        <div className={`text-2xl font-bold text-green-600 dark:text-green-400 ${isLoading ? 'animate-pulse' : ''}`}>
                             {isLoading ? '...' : `${Math.round(stats.overallProgress)}%`}
                         </div>
                         <Progress
                             value={stats.overallProgress}
                             className="h-2 mt-2 rotate-180 bg-gray-100 dark:bg-slate-700"
-                            indicatorClassName="bg-cyan-500 dark:bg-cyan-400"
+                            indicatorClassName="bg-green-500 dark:bg-green-400"
                         />
                     </CardContent>
                 </Card>
