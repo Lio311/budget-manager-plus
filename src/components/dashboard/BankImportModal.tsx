@@ -11,6 +11,7 @@ import { scanInvoiceImage } from '@/lib/actions/scan-invoice'
 
 interface BankImportModalProps {
     onImport: (data: any[]) => Promise<void>
+    triggerId?: string
 }
 
 interface ParsedExpense {
@@ -23,7 +24,7 @@ interface ParsedExpense {
     vatAmount?: number
 }
 
-export function BankImportModal({ onImport }: BankImportModalProps) {
+export function BankImportModal({ onImport, triggerId }: BankImportModalProps) {
     const [open, setOpen] = useState(false)
     const [dragging, setDragging] = useState(false)
     const [file, setFile] = useState<File | null>(null)
@@ -352,7 +353,7 @@ export function BankImportModal({ onImport }: BankImportModalProps) {
     return (
         <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) resetModal(); }}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2 border-dashed flex-row-reverse">
+                <Button id={triggerId} variant="outline" className="gap-2 border-dashed flex-row-reverse">
                     <Upload className="h-4 w-4" />
                     ייבוא חשבוניות
                 </Button>

@@ -105,6 +105,30 @@ export function ExpensesTutorial({ isOpen, onClose }: TutorialProps) {
                 maxWidth: 300
             },
             {
+                id: 'expenses-import-btn',
+                title: 'ייבוא חשבוניות',
+                text: 'ייבוא מהיר של הוצאות מקובץ Excel/CSV או סריקת חשבונית באמצעות AI. חוסך זמן ומונע טעויות הקלדה.',
+                placement: 'bottom',
+                align: 'end',
+                maxWidth: 300
+            },
+            {
+                id: 'expenses-settings-btn',
+                title: 'ניהול קטגוריות',
+                text: 'כאן ניתן להוסיף, לערוך או למחוק קטגוריות הוצאות. התאם את הקטגוריות לצרכים האישיים או העסקיים שלך.',
+                placement: 'bottom',
+                align: 'end',
+                maxWidth: 300
+            },
+            {
+                id: 'expenses-delete-all-btn',
+                title: 'מחיקת כל ההוצאות',
+                text: 'כפתור זה מאפשר למחוק את כל ההוצאות של החודש הנוכחי בלחיצה אחת. שימו לב - פעולה זו בלתי הפיכה!',
+                placement: 'bottom',
+                align: 'end',
+                maxWidth: 300
+            },
+            {
                 id: 'expenses-controls',
                 title: 'מיון ותצוגה',
                 text: 'ניתן למיין את רשימת ההוצאות לפי תאריך, סכום, תיאור, קטגוריה או אמצעי תשלום. השתמש בכפתור החץ להחלפת כיוון המיון (עולה/יורד).',

@@ -473,6 +473,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                 <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
                 <div className="mr-auto flex items-center gap-2">
                     <Button
+                        id="expenses-delete-all-btn"
                         variant="outline"
                         size="icon"
                         onClick={handleDeleteAll}
@@ -490,13 +491,13 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                             if (onCategoriesChange) onCategoriesChange()
                         }}
                         trigger={
-                            <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
+                            <Button id="expenses-settings-btn" variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50" title="ניהול קטגוריות">
                                 <Settings className="h-4 w-4" />
                             </Button>
                         }
                     />
 
-                    <BankImportModal onImport={handleImportExpenses} />
+                    <BankImportModal onImport={handleImportExpenses} triggerId="expenses-import-btn" />
                 </div>
             </div>
 
