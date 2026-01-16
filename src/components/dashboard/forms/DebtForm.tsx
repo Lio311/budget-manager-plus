@@ -345,12 +345,8 @@ export function DebtForm({ isMobile, onSuccess, initialData }: DebtFormProps) {
                 )}
                 <Button
                     onClick={handleSubmit}
-                    className={`w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md
-                                ${(!newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date)
-                            ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
-                            : 'bg-purple-600 hover:bg-purple-700'
-                        }`}
-                    disabled={submitting || !newDebt.creditor || !newDebt.totalAmount || parseFloat(newDebt.totalAmount) <= 0 || !newDebt.date}
+                    className="w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md bg-purple-600 hover:bg-purple-700"
+                    disabled={submitting}
                 >
                     {submitting ? <Loader2 className="h-4 w-4 animate-rainbow-spin" /> : (initialData ? 'עדכן' : 'הוסף')}
                 </Button>

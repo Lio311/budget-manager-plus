@@ -318,13 +318,9 @@ export function BillForm({ onSuccess, isMobile = false, initialData }: BillFormP
             )}
 
             <Button
-                className={`w-full h-10 shadow-sm mt-2 font-medium transition-all
-                ${(!formData.name || !formData.amount || !formData.dueDay)
-                        ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
-                        : 'bg-orange-500 hover:bg-orange-600'
-                    }`}
+                className="w-full h-10 shadow-sm mt-2 font-medium transition-all bg-orange-500 hover:bg-orange-600 text-white"
                 onClick={handleSubmit}
-                disabled={submitting || !formData.name || !formData.amount || !formData.dueDay}
+                disabled={submitting}
             >
                 {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : (initialData ? 'שמור שינויים' : 'הוסף')}
             </Button>

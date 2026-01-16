@@ -418,12 +418,8 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
 
                 <Button
                     onClick={handleSubmit}
-                    className={`w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md mt-2
-                        ${(!newSaving.category || !newSaving.description || !newSaving.monthlyDeposit)
-                            ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
-                            : 'bg-blue-600 hover:bg-blue-700'
-                        }`}
-                    disabled={submitting || !newSaving.category || !newSaving.description || !newSaving.monthlyDeposit}
+                    className={`w-full h-10 rounded-lg text-white font-medium shadow-sm transition-all hover:shadow-md mt-2 bg-blue-600 hover:bg-blue-700`}
+                    disabled={submitting}
                 >
                     {submitting ? (
                         <Loader2 className="h-4 w-4 animate-rainbow-spin" />
