@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, ArrowUpDown, LayoutGrid, List } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, ArrowUpDown, LayoutGrid, List, Info, Settings } from 'lucide-react'
 import { format, differenceInDays, startOfDay } from 'date-fns'
 import { cn, formatIsraeliPhoneNumber, formatCurrency } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -22,6 +22,8 @@ import { SupplierSubscriptionHistoryDialog } from '../dialogs/SupplierSubscripti
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 
+import { SuppliersTutorial } from '../tutorial/SuppliersTutorial'
+
 const SupplierSchema = z.object({
     name: z.string().min(2, 'שם הספק חייב להכיל לפחות 2 תווים').max(100, 'שם הספק ארוך מדי'),
     email: z.string().email('כתובת אימייל לא תקינה').max(100).optional().or(z.literal('')),
@@ -36,6 +38,7 @@ export function SuppliersTab() {
     const confirm = useConfirm()
     const [searchTerm, setSearchTerm] = useState('')
     const [showForm, setShowForm] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
     const [editingSupplier, setEditingSupplier] = useState<any>(null)
     const [subscriptionDialogSupplier, setSubscriptionDialogSupplier] = useState<any>(null)
 
@@ -292,6 +295,8 @@ export function SuppliersTab() {
 
     return (
         <div className="space-y-6">
+            <SuppliersTutorial isOpen={showTutorial} onClose={() => setShowTutorial(false)} />
+
             {/* Packages Manager Dialog */}
             <Dialog open={showPackagesManager} onOpenChange={setShowPackagesManager}>
                 <SupplierPackagesManager onOpenChange={setShowPackagesManager} />
@@ -322,27 +327,52 @@ export function SuppliersTab() {
                     />
                 </div>
 
-                <Button
-                    onClick={() => {
-                        setShowForm(true)
-                        setEditingSupplier(null)
-                        setErrors({})
-                        setFormData({
-                            name: '', email: '', phone: '', taxId: '', address: '', notes: '',
-                            packageId: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: null, subscriptionEnd: null, subscriptionStatus: 'ACTIVE', subscriptionColor: '#3B82F6'
-                        })
-                        setShowAdvanced(false)
-                    }}
-                    className="bg-blue-600 hover:bg-blue-700"
-                >
-                    <Plus className="h-4 w-4 ml-2" />
-                    ספק חדש
-                </Button>
+                <div className="flex gap-2">
+                    {/* Settings Button - Right in RTL */}
+                    <Button
+                        id="suppliers-settings-btn"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setShowPackagesManager(true)}
+                        className="bg-white hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700 border-gray-200 dark:border-slate-700 hidden md:flex"
+                        title="ניהול חבילות"
+                    >
+                        <Settings className="h-4 w-4" />
+                    </Button>
+
+                    <Button
+                        onClick={() => {
+                            setShowForm(true)
+                            setEditingSupplier(null)
+                            setErrors({})
+                            setFormData({
+                                name: '', email: '', phone: '', taxId: '', address: '', notes: '',
+                                packageId: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: null, subscriptionEnd: null, subscriptionStatus: 'ACTIVE', subscriptionColor: '#3B82F6'
+                            })
+                            setShowAdvanced(false)
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700"
+                        id="suppliers-add-btn"
+                    >
+                        <Plus className="h-4 w-4 ml-2" />
+                        ספק חדש
+                    </Button>
+
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                        onClick={() => setShowTutorial(true)}
+                        title="הדרכה"
+                    >
+                        <Info className="h-5 w-5" />
+                    </Button>
+                </div>
             </div>
 
             {/* Search and Sort Section */}
             <div className="space-y-4">
-                <div className="relative">
+                <div className="relative" id="suppliers-search-bar">
                     <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <input
                         type="text"
@@ -355,7 +385,7 @@ export function SuppliersTab() {
 
                 <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
                     {/* Sort Dropdown & Toggle */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4" id="suppliers-sort-controls">
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-500 font-medium">מיון לפי:</span>
                             <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
@@ -406,11 +436,11 @@ export function SuppliersTab() {
                             </button>
                         </div>
                     </div>
-
-                    <Badge variant="secondary" className="text-sm font-normal w-full sm:w-auto text-center justify-center">
-                        סה"כ ספקים: {suppliers.length}
-                    </Badge>
                 </div>
+
+                <Badge variant="secondary" className="text-sm font-normal w-full sm:w-auto text-center justify-center">
+                    סה"כ ספקים: {suppliers.length}
+                </Badge>
             </div>
 
             {/* Form Dialog */}
@@ -606,7 +636,7 @@ export function SuppliersTab() {
                                             <div className="w-full">
                                                 <DatePicker
                                                     date={formData.subscriptionStart ? new Date(formData.subscriptionStart) : undefined}
-                                                    setDate={(date) => setFormData({ ...formData, subscriptionStart: date })}
+                                                    setDate={(date) => setFormData({ ...formData, subscriptionStart: date || null })}
                                                     placeholder="בחר תאריך התחלה"
                                                 />
                                             </div>
@@ -618,7 +648,7 @@ export function SuppliersTab() {
                                             <div className="w-full">
                                                 <DatePicker
                                                     date={formData.subscriptionEnd ? new Date(formData.subscriptionEnd) : undefined}
-                                                    setDate={(date) => setFormData({ ...formData, subscriptionEnd: date })}
+                                                    setDate={(date) => setFormData({ ...formData, subscriptionEnd: date || null })}
                                                     placeholder="בחר תאריך סיום"
                                                 />
                                             </div>
@@ -682,7 +712,7 @@ export function SuppliersTab() {
             {/* Suppliers List */}
             {
                 viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="suppliers-list-container">
                         {filteredSuppliers.map((supplier: any) => (
                             <div
                                 key={supplier.id}
@@ -808,7 +838,7 @@ export function SuppliersTab() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-slate-800 dark:border-slate-700 overflow-hidden">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-slate-800 dark:border-slate-700 overflow-hidden" id="suppliers-list-container">
                         <div className="overflow-x-auto">
                             <table className="w-full text-right text-sm whitespace-nowrap">
                                 <thead className="bg-gray-50 dark:bg-slate-700/50">
@@ -924,7 +954,7 @@ export function SuppliersTab() {
                 supplier={subscriptionDialogSupplier}
                 onUpdate={() => mutate()}
             />
-        </div >
+        </div>
     )
 }
 
