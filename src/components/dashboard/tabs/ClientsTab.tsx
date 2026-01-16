@@ -986,7 +986,7 @@ export function ClientsTab() {
             {/* Clients List */}
             {
                 viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4" id="clients-list-container">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="clients-list-container">
                         {filteredClients.map((client: any) => (
                             <div
                                 key={client.id}
@@ -1160,7 +1160,7 @@ export function ClientsTab() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-slate-800 dark:border-slate-700 overflow-hidden">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-slate-800 dark:border-slate-700 overflow-hidden" id="clients-list-container">
                         <div className="overflow-x-auto">
                             <table className="w-full text-right text-sm whitespace-nowrap">
                                 <thead className="bg-gray-50 dark:bg-slate-700/50">
