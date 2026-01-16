@@ -606,7 +606,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card >
 
                 {/* 4. Net Worth (Green Area Chart) (Visually Right in RTL) */}
+                {/* 4. Net Worth (Green Area Chart) (Visually Right in RTL) */}
                 <Card
+                    id="overview-graph-networth"
                     className="glass-panel shadow-sm min-h-[350px] cursor-pointer hover:shadow-md transition-all"
                     onClick={() => {
                         setActiveSettingsTab('financials')
@@ -632,7 +634,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card>
 
                 {/* 3. Budget Status (Progress Bars) (Visually Left in RTL) */}
-                <Card className="glass-panel shadow-sm col-span-1 md:col-span-1 min-h-[350px]">
+                <Card id="overview-graph-status" className="glass-panel shadow-sm col-span-1 md:col-span-1 min-h-[350px]">
                     <CardHeader>
                         <CardTitle>מצב תקציב חודשי</CardTitle>
                     </CardHeader>
