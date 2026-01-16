@@ -147,7 +147,9 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                         ...item,
                         amountILS,
                         vatAmountILS: (item.vatAmount || 0) * ratio,
-                        amountBeforeVatILS: (item.amountBeforeVat || 0) * ratio
+                        amountBeforeVatILS: item.amountBeforeVat
+                            ? (item.amountBeforeVat * ratio)
+                            : (amountILS - ((item.vatAmount || 0) * ratio))
                     }
                 }) || []),
                 Promise.all(budget.bills?.map(async (item: any) => ({
