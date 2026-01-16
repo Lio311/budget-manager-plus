@@ -37,12 +37,12 @@ export async function getSavingsGoals(
 
         const db = await authenticatedPrisma(userId)
 
-        // Note: We still need budget for category goals, but we fetch ALL savings
-        // across all time for cumulative calculation
+        // Fetch user budget for the requested month to anchor the query
+        // But we need ALL records to calculate cumulative totals properly
         const budget = await getCurrentBudget(month, year, '₪', type)
 
-        // Fetch ALL savings for this user (not filtered by month/year)
-        // This allows cumulative tracking across all time
+        // 1. Fetch ALL savings (transactions) for this user/type
+        // We filter by budget.userId and budget.type via the relation to get all historical data
         const savings = await db.saving.findMany({
             where: {
                 budget: {
@@ -50,70 +50,96 @@ export async function getSavingsGoals(
                     type
                 }
             },
-            orderBy: { category: 'asc' }
+            include: {
+                budget: true
+            },
+            orderBy: { createdAt: 'asc' }
         })
 
-        // Fetch category goals
-        const categoryGoals = await db.savingCategoryGoal.findMany({
+        // 2. Fetch Latest Targets (Find all goals and map latest)
+        // We want to persist targets across months. If no target for THIS month, use the most recent one.
+        const allCategoryGoals = await db.savingCategoryGoal.findMany({
             where: {
-                budgetId: budget.id
+                budget: {
+                    userId,
+                    type
+                }
+            },
+            include: {
+                budget: true
             }
         })
 
-        // Create a map of category -> targetAmount
         const targetMap = new Map<string, number>()
-        categoryGoals.forEach(goal => {
-            targetMap.set(goal.category, goal.targetAmount)
+
+        // Sort goals by date descending (Newest budget first)
+        allCategoryGoals.sort((a, b) => {
+            const dateA = a.budget.year * 12 + a.budget.month
+            const dateB = b.budget.year * 12 + b.budget.month
+            return dateB - dateA
         })
 
-        // Group savings by category and calculate totals
+        // Fill map (first entry is newest, so it wins)
+        allCategoryGoals.forEach(goal => {
+            if (!targetMap.has(goal.category)) {
+                targetMap.set(goal.category, goal.targetAmount)
+            }
+        })
+
+        // 3. Group savings and Calculate Totals (Correct logic: Simply Sum Amounts)
         const categoryMap = new Map<string, {
-            savings: typeof savings
+            savingsCount: number
             totalMonthly: number
             totalCurrent: number
         }>()
 
+        const requestedDateStart = new Date(year, month - 1, 1) // Start of requested month
+        const requestedDateEnd = new Date(year, month, 0, 23, 59, 59, 999) // End of requested month
+
         savings.forEach(saving => {
             if (!categoryMap.has(saving.category)) {
                 categoryMap.set(saving.category, {
-                    savings: [],
+                    savingsCount: 0,
                     totalMonthly: 0,
                     totalCurrent: 0
                 })
             }
 
             const categoryData = categoryMap.get(saving.category)!
-            categoryData.savings.push(saving)
-            categoryData.totalMonthly += saving.monthlyDeposit || 0
+            categoryData.savingsCount++
 
-            // Calculate accumulated amount for this saving
-            const createdDate = new Date(saving.createdAt)
-            const now = new Date()
-
-            // Calculate how many months have passed since creation
-            let monthsPassed = (now.getFullYear() - createdDate.getFullYear()) * 12 +
-                (now.getMonth() - createdDate.getMonth()) + 1 // +1 to include current month
-
-            // If this is a recurring saving with an end date, limit the months
-            if (saving.isRecurring && saving.recurringEndDate) {
-                const endDate = new Date(saving.recurringEndDate)
-                const maxMonths = (endDate.getFullYear() - createdDate.getFullYear()) * 12 +
-                    (endDate.getMonth() - createdDate.getMonth()) + 1
-
-                // Use the minimum between months passed and max months
-                monthsPassed = Math.min(monthsPassed, maxMonths)
+            // Use targetDate if available, else createdAt.
+            // targetDate represents the effective date of the transaction.
+            let date = saving.targetDate
+            if (!date) {
+                // Fallback to budget month/year if no specific date
+                date = new Date(saving.budget.year, saving.budget.month - 1, 1)
             }
 
-            const monthlyDeposit = saving.monthlyDeposit || 0
-            const accumulated = monthlyDeposit * Math.max(0, monthsPassed)
-            categoryData.totalCurrent += accumulated
+            const amount = saving.monthlyDeposit || 0
+
+            // Current Total: Sum all savings up to end of requested month
+            // (So viewing past months shows historical status)
+            if (date <= requestedDateEnd) {
+                categoryData.totalCurrent += amount
+            }
+
+            // Monthly Total: Sum savings ONLY IN requested month
+            if (date >= requestedDateStart && date <= requestedDateEnd) {
+                categoryData.totalMonthly += amount
+            }
         })
 
-        // Build category goals array
+        // 4. Build Result
         const goals: CategoryGoal[] = []
 
-        for (const [category, data] of categoryMap.entries()) {
+        // Merge categories from Savings and from Targets (in case we have a target but no savings yet)
+        const allCategories = new Set([...categoryMap.keys(), ...targetMap.keys()])
+
+        for (const category of allCategories) {
+            const data = categoryMap.get(category) || { totalCurrent: 0, totalMonthly: 0, savingsCount: 0 }
             const targetAmount = targetMap.get(category) || 0
+
             const currentAmount = data.totalCurrent
             const progress = targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0
             const remainingAmount = Math.max(0, targetAmount - currentAmount)
@@ -122,10 +148,10 @@ export async function getSavingsGoals(
                 category,
                 currentAmount,
                 targetAmount,
-                currency: 'ILS', // We'll convert everything to ILS for now
+                currency: 'ILS',
                 progress: Math.min(100, progress),
                 remainingAmount,
-                savingsCount: data.savings.length,
+                savingsCount: data.savingsCount,
                 monthlyTotal: data.totalMonthly
             })
         }
