@@ -74,7 +74,7 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
                     </div>
                 </div>
 
-                <Tabs defaultValue="incomes" className="w-full">
+                <Tabs defaultValue="incomes" className="w-full" dir="rtl">
                     <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
                         <TabsTrigger
                             value="incomes"
