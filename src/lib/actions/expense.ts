@@ -61,6 +61,7 @@ export interface ExpenseInput {
     recurringEndDate?: string
     supplierId?: string
     clientId?: string
+    projectId?: string
     amountBeforeVat?: number
     vatRate?: number
     vatAmount?: number
@@ -332,6 +333,7 @@ function formatExpenseDataForUpdate(validatedData: any) {
         // Business Fields
         supplierId: validatedData.supplierId,
         clientId: validatedData.clientId,
+        projectId: validatedData.projectId,
         amountBeforeVat: validatedData.amountBeforeVat,
         vatRate: validatedData.vatRate,
         vatAmount: validatedData.vatAmount,
@@ -547,7 +549,8 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
                     vatAmount: exp.vatAmount,
                     isDeductible: exp.isDeductible,
                     deductibleRate: exp.deductibleRate,
-                    paymentMethod: exp.paymentMethod
+                    paymentMethod: exp.paymentMethod,
+                    projectId: exp.projectId,
                 }
             })
             addedCount++
