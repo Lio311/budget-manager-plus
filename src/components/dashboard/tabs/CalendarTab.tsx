@@ -230,7 +230,7 @@ export function CalendarTab() {
         })
     }
 
-    const totalPayments = payments.reduce((sum, p) => sum + p.amount, 0)
+    const totalPayments = payments.filter(p => p.type !== 'income').reduce((sum, p) => sum + p.amount, 0)
     const paidPayments = payments.filter(p => p.isPaid).reduce((sum, p) => sum + p.amount, 0)
 
     const calendarDays = []
