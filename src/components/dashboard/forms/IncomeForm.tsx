@@ -33,6 +33,7 @@ import {
 import { addIncome, updateIncome } from '@/lib/actions/income'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { CategoryManagementDialog } from './CategoryManagementDialog'
+import { SimpleClientSelector } from './SimpleClientSelector'
 
 interface Category {
     id: string
@@ -314,21 +315,12 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 {isBusiness && (
                     <div className="w-full">
                         <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">לקוח</label>
-                        <Select
-                            value={newIncome.clientId}
-                            onValueChange={(value) => setNewIncome({ ...newIncome, clientId: value })}
-                            onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
-                        >
-                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-green-500/20">
-                                <SelectValue placeholder="ללא לקוח ספציפי" />
-                            </SelectTrigger>
-                            <SelectContent dir="rtl" className="text-right">
-                                <SelectItem value="NO_CLIENT" className="pr-8">ללא לקוח ספציפי</SelectItem>
-                                {clients.map(client => (
-                                    <SelectItem key={client.id} value={client.id} className="pr-8">{client.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <SimpleClientSelector
+                            clients={clients}
+                            selectedClientId={newIncome.clientId}
+                            onClientIdChange={(id) => setNewIncome({ ...newIncome, clientId: id })}
+                            placeholder="חפש לקוח..."
+                        />
                     </div>
                 )}
 

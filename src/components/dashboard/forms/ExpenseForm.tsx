@@ -35,6 +35,7 @@ import { CategoryManagementDialog } from './CategoryManagementDialog'
 import { useConfirm } from '@/hooks/useConfirm'
 import { findMatchingCategory } from '@/lib/category-utils'
 import { useDemo } from '@/contexts/DemoContext'
+import { SimpleClientSelector } from './SimpleClientSelector'
 
 interface Category {
     id: string
@@ -606,21 +607,12 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                         {isBusiness && (
                             <div className="w-full">
                                 <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך ללקוח (אופציונלי)</label>
-                                <Select
-                                    value={newExpense.clientId}
-                                    onValueChange={(value) => setNewExpense({ ...newExpense, clientId: value })}
-                                    onOpenChange={(open) => { if (open && isDemo) interceptAction() }}
-                                >
-                                    <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-red-500/20">
-                                        <SelectValue placeholder="ללא לקוח מקושר" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="NO_CLIENT">ללא לקוח מקושר</SelectItem>
-                                        {clients?.map(c => (
-                                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <SimpleClientSelector
+                                    clients={clients}
+                                    selectedClientId={newExpense.clientId}
+                                    onClientIdChange={(id) => setNewExpense({ ...newExpense, clientId: id })}
+                                    placeholder="חפש לקוח..."
+                                />
                             </div>
                         )}
 
