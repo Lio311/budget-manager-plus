@@ -616,22 +616,23 @@ export function IncomeTab() {
                         )}
                     </div>
                 </div>
-
-                <RecurrenceActionDialog
-                    isOpen={recurrenceDialogOpen}
-                    onClose={() => {
-                        setRecurrenceDialogOpen(false)
-                        setPendingAction(null)
-                    }}
-                    onConfirm={handleRecurrenceConfirm}
-                    action={pendingAction?.type || 'delete'}
-                    entityName="הכנסה"
-                />
-
-                <IncomeTutorial
-                    isOpen={showTutorial}
-                    onClose={() => setShowTutorial(false)}
-                />
             </div>
-            )
-    }
+
+            <RecurrenceActionDialog
+                isOpen={recurrenceDialogOpen}
+                onClose={() => {
+                    setRecurrenceDialogOpen(false)
+                    setPendingAction(null)
+                }}
+                onConfirm={handleRecurrenceConfirm}
+                action={pendingAction?.type || 'delete'}
+                entityName="הכנסה"
+            />
+
+            <IncomeTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
+            />
+        </div>
+    )
+}
