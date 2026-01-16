@@ -45,7 +45,8 @@ const documentTypes = [
     },
     {
         value: 'invoice' as const,
-        label: 'חשבונית (מס, קבלה, עסקה)',
+        label: 'חשבונית',
+        cardLabel: 'חשבונית (מס, קבלה, עסקה)',
         icon: Receipt,
         color: 'bg-purple-500 hover:bg-purple-600',
         borderColor: 'border-purple-500',
@@ -401,7 +402,7 @@ export function DocumentsTab() {
                                     "font-bold text-lg",
                                     isSelected ? docType.textColor : "text-gray-900 dark:text-gray-100"
                                 )}>
-                                    {docType.label}
+                                    {(docType as any).cardLabel || docType.label}
                                 </div>
                                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                     {isSelected ? "לחץ לביטול" : "לחץ ליצירה"}
@@ -525,10 +526,19 @@ export function DocumentsTab() {
                                                     </span>
                                                     <span className={cn(
                                                         "text-xs px-2 py-0.5 rounded-full font-medium",
-                                                        config.textColor,
-                                                        "bg-gray-100 dark:bg-slate-700"
+                                                        doc.type === 'invoice' && doc.invoiceType === 'RECEIPT'
+                                                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                                                            : config.textColor + " bg-gray-100 dark:bg-slate-700"
                                                     )}>
-                                                        {config.label}
+                                                        {doc.type === 'invoice' && doc.invoiceType ? (
+                                                            ({
+                                                                'TAX_INVOICE': 'חשבונית מס',
+                                                                'RECEIPT': 'קבלה',
+                                                                'INVOICE': 'חשבונית',
+                                                                'DEAL_INVOICE': 'חשבונית עסקה',
+                                                                'REFUND_INVOICE': 'חשבונית זיכוי'
+                                                            } as Record<string, string>)[doc.invoiceType] || config.label
+                                                        ) : config.label}
                                                     </span>
                                                 </div>
                                                 <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
