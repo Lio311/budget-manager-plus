@@ -5,49 +5,59 @@ import { Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { getNextInvoiceNumber, createInvoice, type InvoiceFormData } from '@/lib/actions/invoices'
-import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
-import { useBudget } from '@/contexts/BudgetContext'
-import { toast } from 'sonner'
-import { Trash2 } from 'lucide-react'
-import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
-import { getIncomes, getClientUninvoicedIncomes } from '@/lib/actions/income'
-import useSWR from 'swr'
-import { formatCurrency } from '@/lib/utils'
-import { ClientSelector } from './ClientSelector'
-import { RichTextEditor } from '@/components/ui/RichTextEditor'
+import { getNextInvoiceNumber, createInvoice, updateInvoice, type InvoiceFormData } from '@/lib/actions/invoices'
 
 interface InvoiceFormProps {
     clients: any[]
+    initialData?: any
     onSuccess: () => void
 }
 
-interface LineItem {
-    id: string
-    description: string
-    quantity: number
-    price: number
-    total: number
-}
-
-
-export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
+export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProps) {
     const { budgetType } = useBudget()
-    const [formData, setFormData] = useState<InvoiceFormData>({
-        clientId: '',
-        invoiceNumber: '',
-        issueDate: new Date(),
-        dueDate: undefined,
-        subtotal: 0,
-        vatRate: 0.18,
-        vatAmount: 0,
-        total: 0,
-        paymentMethod: '',
-        notes: '',
-        createIncomeFromInvoice: false,
-        invoiceType: 'TAX_INVOICE', // Default to Tax Invoice
-        lineItems: []
-    })
+    // Helper to map initial data or use defaults
+    const getInitialState = (): InvoiceFormData => {
+        if (initialData) {
+            return {
+                clientId: initialData.clientId || '',
+                invoiceNumber: initialData.invoiceNumber || '',
+                issueDate: initialData.issueDate ? new Date(initialData.issueDate) : new Date(),
+                dueDate: initialData.dueDate ? new Date(initialData.dueDate) : undefined,
+                subtotal: initialData.subtotal || 0,
+                vatRate: initialData.vatRate ?? 0.18,
+                vatAmount: initialData.vatAmount || 0,
+                total: initialData.total || 0,
+                paymentMethod: initialData.paymentMethod || '',
+                notes: initialData.notes || '',
+                createIncomeFromInvoice: false,
+                invoiceType: initialData.invoiceType || 'TAX_INVOICE',
+                lineItems: initialData.lineItems?.map((item: any) => ({
+                    id: item.id, // Keep ID for updates if needed, though we often recreate
+                    description: item.description,
+                    quantity: item.quantity,
+                    price: item.price,
+                    total: item.total
+                })) || []
+            }
+        }
+        return {
+            clientId: '',
+            invoiceNumber: '',
+            issueDate: new Date(),
+            dueDate: undefined,
+            subtotal: 0,
+            vatRate: 0.18,
+            vatAmount: 0,
+            total: 0,
+            paymentMethod: '',
+            notes: '',
+            createIncomeFromInvoice: false,
+            invoiceType: 'TAX_INVOICE', // Default to Tax Invoice
+            lineItems: []
+        }
+    }
+
+    const [formData, setFormData] = useState<InvoiceFormData>(getInitialState())
 
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [isGuestClient, setIsGuestClient] = useState(false)
@@ -57,7 +67,15 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
     const { year, month } = useBudget()
 
     const [selectedIncomeId, setSelectedIncomeId] = useState<string>('none')
-    const [lineItems, setLineItems] = useState<LineItem[]>([])
+    const [lineItems, setLineItems] = useState<LineItem[]>(
+        initialData?.lineItems?.map((item: any) => ({
+            id: item.id || crypto.randomUUID(),
+            description: item.description,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.total
+        })) || []
+    )
 
     // Fetch incomes for selection logic
     const { data: incomesData } = useSWR(['incomes', month, year, budgetType], () => getIncomes(month, year, budgetType))
@@ -105,31 +123,36 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
         setFormData(prev => ({ ...prev, subtotal: newSubtotal, lineItems }))
     }, [lineItems])
 
-    // Fetch next invoice number on mount
+    // Fetch next invoice number on mount ONLY IF creating new
     useEffect(() => {
         const fetchNextNumber = async () => {
-            setLoadingNumber(true)
-            const result = await getNextInvoiceNumber()
-            if (result.success && result.data) {
-                setFormData(prev => ({ ...prev, invoiceNumber: result.data || '' }))
+            if (!initialData) {
+                setLoadingNumber(true)
+                const result = await getNextInvoiceNumber()
+                if (result.success && result.data) {
+                    setFormData(prev => ({ ...prev, invoiceNumber: result.data || '' }))
+                }
+                setLoadingNumber(false)
             }
-            setLoadingNumber(false)
         }
         fetchNextNumber()
-    }, [])
+    }, [initialData])
 
     const { execute: optimisticCreateInvoice } = useOptimisticMutation<any[], InvoiceFormData>(
         ['invoices', budgetType],
         (input) => createInvoice(input, budgetType),
         {
-            getOptimisticData: (current, input) => {
-                // In a real optimistic update we would add to the list, 
-                // but here we just want the server action to fire and SWR to revalidate.
-                // We can return current for now or mock the addition if we passed the full list.
-                return current
-            },
             successMessage: 'חשבונית נוצרה בהצלחה',
             errorMessage: 'שגיאה ביצירת החשבונית'
+        }
+    )
+
+    const { execute: optimisticUpdateInvoice } = useOptimisticMutation<any[], Partial<InvoiceFormData>>(
+        ['invoices', budgetType],
+        (input) => updateInvoice(initialData.id, input),
+        {
+            successMessage: 'חשבונית עודכנה בהצלחה',
+            errorMessage: 'שגיאה בעדכון החשבונית'
         }
     )
 
@@ -139,9 +162,16 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
 
         const newErrors: Record<string, boolean> = {}
 
-        if ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice) {
-            newErrors.income = true
+        // Skip income check if editing or creating manual
+        if (!initialData && (selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice) {
+            // Allow creating without income association if explicitly chosen or just manual?
+            // Current logic enforced it. Let's relax it if user just wants a manual invoice?
+            // But keeping strict for now unless editing.
+            if (!initialData) newErrors.income = true
         }
+
+        // Relaxing income requirement for Edit since it might already be linked or manually managed
+        // If editing, we don't force re-selecting income.
 
         if (lineItems.length === 0) {
             newErrors.lineItems = true
@@ -156,25 +186,42 @@ export function InvoiceForm({ clients, onSuccess }: InvoiceFormProps) {
         }
 
         if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors)
-            if (newErrors.income) toast.error('חובה לבחור מכירה/עסקה או לסמן יצירת הכנסה אוטומטית')
-            else if (newErrors.lineItems) toast.error('חובה להוסיף לפחות שורה אחת לפירוט החשבונית')
-            else toast.error('אנא מלא את שדות החובה המסומנים')
-            return
+            // Filter out income error if we are relaxing it
+            if (initialData && newErrors.income) delete newErrors.income;
+
+            if (Object.keys(newErrors).length > 0) {
+                setErrors(newErrors)
+                if (newErrors.income) toast.error('חובה לבחור מכירה/עסקה או לסמן יצירת הכנסה אוטומטית')
+                else if (newErrors.lineItems) toast.error('חובה להוסיף לפחות שורה אחת לפירוט החשבונית')
+                else toast.error('אנא מלא את שדות החובה המסומנים')
+                return
+            }
         }
         setErrors({})
 
         try {
-            await optimisticCreateInvoice({
-                ...formData,
-                incomeId: selectedIncomeId,
-                createIncomeFromInvoice: formData.createIncomeFromInvoice,
-                lineItems,
-                isGuestClient,
-                guestClientName: isGuestClient ? guestClientName : undefined,
-                clientId: isGuestClient ? undefined : formData.clientId,
-                invoiceType: formData.invoiceType
-            })
+            if (initialData) {
+                await optimisticUpdateInvoice({
+                    ...formData,
+                    lineItems,
+                    // client/guest logic usually not changeable in simple edit? or yes?
+                    // allowing full edit for now
+                    isGuestClient,
+                    guestClientName: isGuestClient ? guestClientName : undefined,
+                    clientId: isGuestClient ? undefined : formData.clientId,
+                })
+            } else {
+                await optimisticCreateInvoice({
+                    ...formData,
+                    incomeId: selectedIncomeId,
+                    createIncomeFromInvoice: formData.createIncomeFromInvoice,
+                    lineItems,
+                    isGuestClient,
+                    guestClientName: isGuestClient ? guestClientName : undefined,
+                    clientId: isGuestClient ? undefined : formData.clientId,
+                    invoiceType: formData.invoiceType
+                })
+            }
             onSuccess()
         } catch (error) {
             // Error managed by hook

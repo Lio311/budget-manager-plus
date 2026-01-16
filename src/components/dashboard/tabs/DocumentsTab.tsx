@@ -701,6 +701,7 @@ export function DocumentsTab() {
                     {editDialogType === 'invoice' && editingInvoice && (
                         <InvoiceForm
                             clients={clients}
+                            initialData={editingInvoice}
                             onSuccess={() => {
                                 handleFormSuccess()
                                 setShowEditDialog(false)
