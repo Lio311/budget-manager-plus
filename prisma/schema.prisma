@@ -124,6 +124,7 @@ model Budget {
   debts     Debt[]
   savings   Saving[]
   categoryBudgets CategoryBudget[]
+  savingCategoryGoals SavingCategoryGoal[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -362,6 +363,19 @@ model Saving {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   @@map("savings")
+}
+
+model SavingCategoryGoal {
+  id            String   @id @default(cuid())
+  budgetId      String
+  budget        Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  category      String
+  targetAmount  Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([budgetId, category])
+  @@map("saving_category_goals")
 }
 
 model Subscription {
