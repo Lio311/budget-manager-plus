@@ -352,6 +352,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                     )}
 
                     <Button
+                        id="overview-settings-btn"
                         variant="outline"
                         size="icon"
                         onClick={() => {
@@ -384,7 +385,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         </Button>
                     )}
 
-                    <FinancialAdvisorButton financialData={aiFinancialData} />
+                    <div id="overview-ai-btn">
+                        <FinancialAdvisorButton financialData={aiFinancialData} />
+                    </div>
                     <FeedbackButton />
 
 

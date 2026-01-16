@@ -181,6 +181,24 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                 placement: 'top',
                 align: 'end',
                 maxWidth: 320
+            },
+
+            // Row 4: Tools (Settings & AI)
+            {
+                id: 'overview-settings-btn',
+                title: 'הגדרות המערכת',
+                text: 'כפתור זה פותח את חלונית ההגדרות, המכילה 3 לשוניות: ״פרטי העסק״ (עדכון לוגו, שם העסק), ״הגדרות כספיות״ (קביעת יתרה התחלתית להון עצמי, הגדרת אחוז מס הכנסה מופרש), ו״ייצוא נתונים״ (הורדת דוחות אקסל/CSV).',
+                placement: 'bottom',
+                align: 'end',
+                maxWidth: 280
+            },
+            {
+                id: 'overview-ai-btn',
+                title: 'יועץ פיננסי (AI)',
+                text: 'כפתור זה פותח צ\'אט עם יועץ פיננסי חכם המבוסס על בינה מלאכותית. היועץ רואה את כל הנתונים המוצגים בעמוד ויכול לענות על שאלות, לנתח את המצב הפיננסי, ולהציע תובנות לשיפור הרווחיות.',
+                placement: 'bottom',
+                align: 'end',
+                maxWidth: 300
             }
         ]
 
