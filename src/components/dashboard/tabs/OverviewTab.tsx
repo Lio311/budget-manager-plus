@@ -344,7 +344,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             size="icon"
                             onClick={() => setIsTutorialOpen(true)}
                             className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                            title="עזרה / הסברים"
+                            title="הדרכה"
                         >
                             <Info className="w-4 h-4 text-[#323338] dark:text-gray-100" />
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />

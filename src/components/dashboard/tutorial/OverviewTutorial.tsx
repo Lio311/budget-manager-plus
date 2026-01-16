@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Info } from 'lucide-react'
+import { X, Info, ChevronRight, ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface TutorialProps {
     isOpen: boolean
@@ -24,8 +25,7 @@ interface CardConfig {
 
 interface TooltipState {
     config: CardConfig
-    rect: DOMRect // We store the original rect to recalculate positions dynamically if needed, or just pre-calculated coords
-    // Pre-calculated absolute positions for the tooltip box
+    rect: DOMRect
     style: React.CSSProperties
     arrowStyle: React.CSSProperties
 }
@@ -33,6 +33,7 @@ interface TooltipState {
 export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
     const [tooltips, setTooltips] = useState<TooltipState[]>([])
     const [mounted, setMounted] = useState(false)
+    const [currentStep, setCurrentStep] = useState(0)
 
     useEffect(() => {
         setMounted(true)
@@ -43,6 +44,8 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
             calculatePositions()
             window.addEventListener('resize', calculatePositions)
             window.addEventListener('scroll', calculatePositions)
+            // Always start at step 0 when opening
+            setCurrentStep(0)
         } else {
             window.removeEventListener('resize', calculatePositions)
             window.removeEventListener('scroll', calculatePositions)
@@ -54,89 +57,95 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
         }
     }, [isOpen])
 
+    // Scroll effect for step change (All Devices)
+    useEffect(() => {
+        if (isOpen && tooltips.length > 0 && tooltips[currentStep]) {
+            const current = tooltips[currentStep]
+            // Scroll element into view (center) with some margin
+            const el = document.getElementById(current.config.id)
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }
+        }
+    }, [currentStep, isOpen, tooltips.length])
+
     const calculatePositions = () => {
         const newTooltips: TooltipState[] = []
 
         const scrollX = window.scrollX
         const scrollY = window.scrollY
-        const viewportWidth = window.innerWidth
+        const isMobileView = window.innerWidth < 768
 
-        // Configuration for each card
+        // Full Detailed Content
         const cards: CardConfig[] = [
             // Row 1: Metrics
             {
-                id: 'overview-card-income', // Rightmost
+                id: 'overview-card-income',
                 title: 'מכירות / הכנסות',
                 text: 'כרטיסייה זו מציגה את סך המכירות וההכנסות של העסק לחודש הנוכחי.',
                 placement: 'bottom',
-                align: 'start', // Align Right (in RTL start is Right)
-                maxWidth: 220
+                align: 'start',
+                maxWidth: 300
             },
             {
                 id: 'overview-card-expenses',
                 title: 'הוצאות תפעול',
-                text: 'כרטיסייה זו מציגה את סך ההוצאות השוטפות של העסק (לא כולל מע"מ).',
+                text: 'כרטיסייה זו מציגה את סך ההוצאות השוטפות של העסק (לא כולל מע"מ אם העסק עוסק מורשה/חברה).',
                 placement: 'bottom',
                 align: 'center',
-                maxWidth: 220
+                maxWidth: 300
             },
             {
                 id: 'overview-card-profit',
                 title: 'רווח נקי',
-                text: 'סה"כ הכנסות פחות הוצאות ופחות הפרשת מס הכנסה (ניתן להגדרה).',
+                text: 'כרטיסייה זו נועדה להציג את סה"כ הכנסות העסק פחות אחוז מס הכנסה המשולם פחות ההוצאות של העסק. אחוז מס ההכנסה מוגדר כברירת מחדל על 0, אך ניתן לשנות אותו על ידי לחיצה על כפתור ההגדרות.',
                 placement: 'bottom',
                 align: 'center',
-                maxWidth: 220
+                maxWidth: 320
             },
             {
-                id: 'overview-card-balance', // Leftmost
+                id: 'overview-card-balance',
                 title: 'שווי העסק / יתרה',
-                text: 'היתרה הסופית המשוערת. כוללת את כל התנועות הכספיות.',
+                text: 'כרטיסייה זו מציגה את היתרה הסופית המשוערת, בהתחשב בכל התנועות הכספיות.',
                 placement: 'bottom',
-                align: 'end', // Align Left
-                maxWidth: 220
+                align: 'end',
+                maxWidth: 300
             },
 
             // Row 2: Middle Graphs
             {
-                id: 'overview-graph-budget', // Right
+                id: 'overview-graph-budget',
                 title: 'התפלגות תקציב',
-                text: 'חלוקה ויזואלית בין הכנסות להוצאות להבנת היחס הפיננסי.',
-                placement: 'top', // Show above to not crowd the bottom graphs? Or bottom?
-                // Let's try 'top' for these middle graphs if there is space, otherwise bottom.
-                // Actually user said "Not everything has to be this angle".
-                // Let's put these on the SIDE if desktop?
-                // Visual Right (Budget) -> Left side of screen. 
-                // Visual Left (Expenses) -> Right side of screen.
-                // Let's stick to Top/Bottom for safety but use Top for these to vary it.
-                align: 'center',
-                maxWidth: 250
-            },
-            {
-                id: 'overview-graph-expenses', // Left
-                title: 'הוצאות לפי קטגוריה',
-                text: 'פירוט הוצאות לפי סוגים לזיהוי מוקדים עיקריים.',
+                text: 'גרף עוגה המציג חלוקה ויזואלית בין הכנסות להוצאות, ומאפשר להבין במהירות את היחס הפיננסי.',
                 placement: 'top',
                 align: 'center',
-                maxWidth: 250
+                maxWidth: 300
+            },
+            {
+                id: 'overview-graph-expenses',
+                title: 'הוצאות לפי קטגוריה',
+                text: 'גרף עמודות המפרט את ההוצאות לפי סוגים (לדוגמה: שיווק, ציוד, משכורות), ומסייע בזיהוי מוקדי ההוצאה העיקריים.',
+                placement: 'top',
+                align: 'center',
+                maxWidth: 300
             },
 
             // Row 3: Bottom Graphs
             {
-                id: 'overview-graph-networth', // Right
+                id: 'overview-graph-networth',
                 title: 'שווי העסק לאורך זמן',
-                text: 'התפתחות ההון העצמי. השתמש בגלגל השיניים להגדרת יתרה התחלתית.',
-                placement: 'top', // Show above so it doesn't fall off screen
+                text: 'גרף שטח המציג את התפתחות שווי העסק או ההון העצמי. ניתן ללחוץ על כפתור ההגדרות (גלגל השיניים) בפינה השמאלית של הכרטיסייה כדי להגדיר יתרה התחלתית ולדייק את החישוב.',
+                placement: 'top',
                 align: 'start',
-                maxWidth: 260
+                maxWidth: 320
             },
             {
-                id: 'overview-graph-status', // Left
+                id: 'overview-graph-status',
                 title: 'מצב תקציב חודשי',
-                text: 'מדדי ביצוע, שכר שעתי, ונתוני מע"מ (החזר/תשלום).',
-                placement: 'top', // Show above
+                text: 'כרטיסייה זו מרכזת מדדים קריטיים: הוצאות מול הכנסות, סטטוס גבייה מלקוחות, ומכירות לפני מע"מ. כמו כן, מוצג כאן חישוב שכר שעתי (הכנסות חלקי שעות עבודה), ונתוני מע"מ (החזרי מע"מ ומע"מ לתשלום) כדי לתקף את תזרים המזומנים הצפוי.',
+                placement: 'top',
                 align: 'end',
-                maxWidth: 260
+                maxWidth: 320
             }
         ]
 
@@ -144,7 +153,6 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
             const el = document.getElementById(config.id)
             if (el) {
                 const rect = el.getBoundingClientRect()
-                // Absolute coords on document
                 const absLeft = rect.left + scrollX
                 const absTop = rect.top + scrollY
                 const absRight = rect.right + scrollX
@@ -153,32 +161,28 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                 let style: React.CSSProperties = {}
                 let arrowStyle: React.CSSProperties = {}
 
-                // Defaults
-                const placement = config.placement || 'bottom'
-                const align = config.align || 'center'
-                const width = config.maxWidth || 240
-                const gap = 0 // Tight connection requested
+                // Allow slightly wider text boxes on desktop now that we are step-by-step
+                const width = isMobileView ? 280 : (config.maxWidth || 300)
+                const placement = isMobileView ? (config.placement === 'top' ? 'top' : 'bottom') : (config.placement || 'bottom')
+                const align = isMobileView ? 'center' : (config.align || 'center')
+
+                const gap = 0
 
                 // Calculate Text Box Position
                 if (placement === 'bottom') {
                     style.top = absBottom + gap
-                    style.marginTop = '10px' // Arrow size compensation
+                    style.marginTop = '15px'
 
                     if (align === 'center') style.left = absLeft + (rect.width / 2) - (width / 2)
-                    if (align === 'start') style.left = absRight - width // Align Right edge (RTL start)? No, RTL start is Right visually, so 'left' css property accounts for x axis.
-                    // Let's solve 'left' CSS property math: 
-                    // Align 'start' (Right in RTL) -> The box right edge should match element right edge.
-                    // box.left = element.right - box.width
-                    if (align === 'start') style.left = absRight - width + 10 // Shift slightly in
-                    // Align 'end' (Left in RTL) -> Box left edge matches element left edge
+                    if (align === 'start') style.left = absRight - width + 10
                     if (align === 'end') style.left = absLeft - 10
 
                     // Arrow (Points UP)
                     arrowStyle = {
-                        top: '-6px', // Overlap border slightly
+                        top: '-6px',
                         left: '50%',
                         transform: 'translateX(-50%) rotate(45deg)',
-                        borderTop: '1px solid #e2e8f0', // Color match border
+                        borderTop: '1px solid #e2e8f0',
                         borderLeft: '1px solid #e2e8f0'
                     }
                     if (align === 'start') arrowStyle.left = `${width - 30}px`, arrowStyle.transform = 'translateX(0) rotate(45deg)'
@@ -186,8 +190,8 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
 
                 } else if (placement === 'top') {
                     style.top = absTop - gap
-                    style.transform = 'translateY(-100%)' // Shift up by its own height
-                    style.marginTop = '-10px' // Gap
+                    style.transform = 'translateY(-100%)'
+                    style.marginTop = '-15px'
 
                     if (align === 'center') style.left = absLeft + (rect.width / 2) - (width / 2)
                     if (align === 'start') style.left = absRight - width + 10
@@ -197,7 +201,7 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                     arrowStyle = {
                         bottom: '-6px',
                         left: '50%',
-                        transform: 'translateX(-50%) rotate(225deg)', // Point down
+                        transform: 'translateX(-50%) rotate(225deg)',
                         borderTop: '1px solid #e2e8f0',
                         borderLeft: '1px solid #e2e8f0'
                     }
@@ -205,9 +209,43 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                     if (align === 'end') arrowStyle.left = '20px', arrowStyle.transform = 'translateX(0) rotate(225deg)'
                 }
 
+                // Screen Edge Clamping (Crucial for preventing overflow)
+                // We apply this for both Mobile AND Desktop to ensure robustness
+                let leftVal = parseFloat(style.left?.toString() || '0')
+                const maxLeft = window.innerWidth - width - 20
+                const minLeft = 20
+
+                if (leftVal < minLeft) {
+                    const diff = minLeft - leftVal
+                    leftVal = minLeft
+                    // Adjust arrow to compensate
+                    // We need to parse current arrow left
+                    // Simple approach: if we shift box right, shift arrow left by same amount
+                    // ... This is complex to parse back.
+                    // Easier: Just recalculate arrow relative to the new box left.
+                    const centerOfElement = absLeft + (rect.width / 2)
+                    const newArrowLeft = centerOfElement - leftVal
+                    arrowStyle.left = `${Math.max(10, Math.min(newArrowLeft, width - 10))}px`
+                    arrowStyle.transform = placement === 'top'
+                        ? 'translateX(-50%) rotate(225deg)'
+                        : 'translateX(-50%) rotate(45deg)'
+
+                } else if (leftVal > maxLeft) {
+                    const diff = leftVal - maxLeft
+                    leftVal = maxLeft
+                    const centerOfElement = absLeft + (rect.width / 2)
+                    const newArrowLeft = centerOfElement - leftVal
+                    arrowStyle.left = `${Math.max(10, Math.min(newArrowLeft, width - 10))}px`
+                    arrowStyle.transform = placement === 'top'
+                        ? 'translateX(-50%) rotate(225deg)'
+                        : 'translateX(-50%) rotate(45deg)'
+                }
+
+                style.left = leftVal
+
                 newTooltips.push({
                     config,
-                    rect, // Raw rect if needed
+                    rect,
                     style: {
                         position: 'absolute',
                         width: `${width}px`,
@@ -217,7 +255,7 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
                         position: 'absolute',
                         width: '12px',
                         height: '12px',
-                        background: 'inherit', // Match bg
+                        background: 'inherit',
                         zIndex: 10,
                         ...arrowStyle
                     }
@@ -228,6 +266,27 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
         setTooltips(newTooltips)
     }
 
+    const handleNext = () => {
+        if (currentStep < tooltips.length - 1) {
+            setCurrentStep(prev => prev + 1)
+        } else {
+            onClose()
+        }
+    }
+
+    const handlePrev = () => {
+        if (currentStep > 0) {
+            setCurrentStep(prev => prev - 1)
+        }
+    }
+
+    const handleBackdropClick = (e: React.MouseEvent) => {
+        // If clicking strictly on backdrop (not bubbling from tooltip), step forward? 
+        // Or just close? User requested "Next" buttons, usually backdrop click closes.
+        // Let's keep close on backdrop.
+        onClose()
+    }
+
     if (!mounted || !isOpen) return null
 
     return createPortal(
@@ -235,7 +294,7 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
             {/* Backdrop */}
             <div
                 className="fixed inset-0 bg-black/70 backdrop-blur-[2px] transition-opacity duration-300 animate-in fade-in pointer-events-auto"
-                onClick={onClose}
+                onClick={handleBackdropClick}
             />
 
             {/* Close Button */}
@@ -252,47 +311,73 @@ export function OverviewTutorial({ isOpen, onClose }: TutorialProps) {
 
             {/* Render Tooltips */}
             <div className="absolute inset-0 w-full h-full">
-                {tooltips.map((t, i) => (
-                    <div key={t.config.id}>
-                        {/* Highlight Cutout */}
-                        <div
-                            className="absolute rounded-xl border-2 border-white/50 box-content shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] pointer-events-none transition-all duration-200"
-                            style={{
-                                left: t.rect.left + window.scrollX,
-                                top: t.rect.top + window.scrollY,
-                                width: t.rect.width,
-                                height: t.rect.height,
-                                boxShadow: '0 0 30px rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.2)'
-                            }}
-                        />
+                {tooltips.map((t, i) => {
+                    // Show only current step
+                    if (i !== currentStep) return null
 
-                        {/* The Tooltip Box */}
-                        <div
-                            className="pointer-events-auto transition-all duration-200 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-gray-100 dark:border-gray-700 p-4 text-right"
-                            style={t.style}
-                            dir="rtl"
-                        >
-                            {/* Arrow */}
-                            <div className="bg-white dark:bg-slate-800" style={t.arrowStyle} />
+                    return (
+                        <div key={t.config.id}>
+                            {/* Highlight Cutout */}
+                            <div
+                                className="absolute rounded-xl border-2 border-white/50 box-content shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] pointer-events-none transition-all duration-500 ease-in-out"
+                                style={{
+                                    left: t.rect.left + window.scrollX,
+                                    top: t.rect.top + window.scrollY,
+                                    width: t.rect.width,
+                                    height: t.rect.height,
+                                    boxShadow: '0 0 30px rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.2)'
+                                }}
+                            />
 
-                            {/* Content */}
-                            <div className="relative z-20">
-                                <div className="flex items-center gap-2 mb-2 text-[#323338] dark:text-gray-100 font-bold border-b pb-2 border-slate-100 dark:border-slate-700">
-                                    <Info className="w-4 h-4" />
-                                    <span>{t.config.title}</span>
+                            {/* The Tooltip Box */}
+                            <div
+                                className="pointer-events-auto transition-all duration-300 ease-in-out bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-gray-100 dark:border-gray-700 p-4 text-right animate-in fade-in slide-in-from-bottom-4"
+                                style={t.style}
+                                dir="rtl"
+                            >
+                                {/* Arrow */}
+                                <div className="bg-white dark:bg-slate-800" style={t.arrowStyle} />
+
+                                {/* Content */}
+                                <div className="relative z-20">
+                                    <div className="flex items-center gap-2 mb-2 text-[#323338] dark:text-gray-100 font-bold border-b pb-2 border-slate-100 dark:border-slate-700">
+                                        <Info className="w-4 h-4" />
+                                        <span>{t.config.title}</span>
+                                    </div>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        {t.config.text}
+                                    </p>
+
+                                    {/* Navigation Bar */}
+                                    <div className="flex items-center justify-between mt-4 border-t border-slate-100 dark:border-slate-700 pt-3">
+                                        <span className="text-xs text-muted-foreground">
+                                            {currentStep + 1} / {tooltips.length}
+                                        </span>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={handlePrev}
+                                                disabled={currentStep === 0}
+                                                className="h-8 px-2"
+                                            >
+                                                <ChevronRight className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                onClick={handleNext}
+                                                className="h-8 px-3 bg-[#323338] hover:bg-black text-white"
+                                            >
+                                                {currentStep === tooltips.length - 1 ? 'סיום' : 'הבא'}
+                                                {currentStep !== tooltips.length - 1 && <ChevronLeft className="w-4 h-4 mr-1" />}
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                                    {t.config.text}
-                                </p>
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Footer instruction */}
-            <div className="fixed bottom-10 left-0 right-0 text-center text-white/80 text-sm pointer-events-none z-50">
-                לחץ בכל מקום על המסך כדי לסגור
+                    )
+                })}
             </div>
         </div>,
         document.body
