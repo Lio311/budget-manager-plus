@@ -17,11 +17,21 @@ import { formatCurrency } from '@/lib/utils'
 import { ClientSelector } from './ClientSelector'
 import { RichTextEditor } from '@/components/ui/RichTextEditor'
 
+
+interface LineItem {
+    id: string
+    description: string
+    quantity: number
+    price: number
+    total: number
+}
+
 interface InvoiceFormProps {
     clients: any[]
     initialData?: any
     onSuccess: () => void
 }
+
 
 export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProps) {
     const { budgetType } = useBudget()
