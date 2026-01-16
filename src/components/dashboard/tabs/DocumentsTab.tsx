@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Receipt, CreditCard, Eye, Link as LinkIcon, Pencil, Trash2, CheckCircle } from 'lucide-react'
+import { FileText, Receipt, CreditCard, Eye, Link as LinkIcon, Pencil, Trash2, CheckCircle, Info } from 'lucide-react'
+import { DocumentsTutorial } from '@/components/dashboard/tutorial/DocumentsTutorial'
 import { cn } from '@/lib/utils'
 import { QuoteForm } from '@/components/dashboard/forms/QuoteForm'
 import { InvoiceForm } from '@/components/dashboard/forms/InvoiceForm'
@@ -71,6 +72,7 @@ const documentTypes = [
 export function DocumentsTab() {
     const { budgetType } = useBudget()
     const { isDemo, data: demoData, interceptAction } = useDemo()
+    const [showTutorial, setShowTutorial] = useState(false)
 
     const [selectedType, setSelectedType] = useState<DocumentType>(null)
     const [filterType, setFilterType] = useState<'all' | 'quote' | 'invoice' | 'credit'>('all')
@@ -357,15 +359,26 @@ export function DocumentsTab() {
     return (
         <div className="space-y-6" dir="rtl">
             {/* Header */}
-            <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">הפקת מסמכים</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    ניהול הצעות מחיר, חשבוניות וזיכויים
-                </p>
+            <div className="flex justify-between items-start">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">הפקת מסמכים</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        ניהול הצעות מחיר, חשבוניות וזיכויים
+                    </p>
+                </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                    onClick={() => setShowTutorial(true)}
+                    title="הדרכה"
+                >
+                    <Info className="h-5 w-5" />
+                </Button>
             </div>
 
             {/* Document Type Selection */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4" id="documents-types-grid">
                 {documentTypes.map((docType) => {
                     const Icon = docType.icon
                     const isSelected = selectedType === docType.value
@@ -416,7 +429,7 @@ export function DocumentsTab() {
 
 
             {/* Documents List */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm" id="documents-list-container">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                         רשימת מסמכים
@@ -705,6 +718,10 @@ export function DocumentsTab() {
                     )}
                 </DialogContent>
             </Dialog>
+            <DocumentsTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
+            />
         </div>
     )
 }

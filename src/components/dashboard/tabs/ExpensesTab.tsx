@@ -8,8 +8,9 @@ import {
     Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X,
     ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn,
     Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane, RefreshCw,
-    Umbrella, Dumbbell, Shield, ArrowUpDown
+    Umbrella, Dumbbell, Shield, ArrowUpDown, Info
 } from 'lucide-react'
+import { ExpensesTutorial } from '@/components/dashboard/tutorial/ExpensesTutorial'
 import { format } from 'date-fns'
 import { useAutoPaginationCorrection } from '@/hooks/useAutoPaginationCorrection'
 
@@ -118,6 +119,7 @@ export function ExpensesTab() {
 
     const confirm = useConfirm()
     const { isDemo, data: demoData, interceptAction } = useDemo()
+    const [showTutorial, setShowTutorial] = useState(false)
 
     const isBusiness = budgetType === 'BUSINESS'
 
@@ -439,8 +441,23 @@ export function ExpensesTab() {
 
     return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0" dir="rtl">
+            <div className="flex justify-between items-start">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-[#e2445c] to-[#ff5d75] bg-clip-text text-transparent mb-4">
+                    {isBusiness ? 'הוצאות ותשלומים' : 'הוצאות שוטפות'}
+                </h2>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                    onClick={() => setShowTutorial(true)}
+                    title="הדרכה"
+                >
+                    <Info className="h-5 w-5" />
+                </Button>
+            </div>
+
             {/* Summary Card */}
-            <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-orange-600' : 'border-r-[#e2445c]'} dark:bg-slate-800`}>
+            <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-orange-600' : 'border-r-[#e2445c]'} dark:bg-slate-800`} id="expenses-stats-cards">
                 <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך עלויות / הוצאות חודשיות (נקי)' : 'סך הוצאות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'} ${loadingExpenses ? 'animate-pulse' : ''}`}>
                     {loadingExpenses ? '...' : formatCurrency(isBusiness ? totalNetExpensesILS : totalExpensesILS, '₪')}
@@ -666,6 +683,11 @@ export function ExpensesTab() {
                 onConfirm={handleRecurrenceConfirm}
                 action={pendingAction?.type || 'delete'}
                 entityName="הוצאה"
+            />
+
+            <ExpensesTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
             />
         </div>
     )

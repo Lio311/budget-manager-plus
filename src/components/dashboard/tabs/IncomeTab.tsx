@@ -29,7 +29,8 @@ import { Settings } from 'lucide-react'
 import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
-import { Briefcase, DollarSign, TrendingUp, Gift, Home, Landmark, PiggyBank, Wallet } from 'lucide-react'
+import { Briefcase, DollarSign, TrendingUp, Gift, Home, Landmark, PiggyBank, Wallet, Info } from 'lucide-react'
+import { IncomeTutorial } from '@/components/dashboard/tutorial/IncomeTutorial'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useDemo } from '@/contexts/DemoContext'
 
@@ -85,6 +86,7 @@ export function IncomeTab() {
     const confirm = useConfirm()
     const isBusiness = budgetType === 'BUSINESS'
     const { isDemo, data: demoData, interceptAction } = useDemo()
+    const [showTutorial, setShowTutorial] = useState(false)
 
     const [taxRate, setTaxRate] = useState(0)
     const [isTaxDialogOpen, setIsTaxDialogOpen] = useState(false)
@@ -320,288 +322,316 @@ export function IncomeTab() {
 
     return (
         <div className="space-y-4 w-full max-w-full overflow-x-hidden pb-10 px-2 md:px-0" dir="rtl">
-            {/* Summary Card */}
-            <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-green-600' : 'border-r-[#00c875]'} dark:bg-slate-800`}>
-                <div className="flex justify-between items-start">
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {isBusiness ? 'סך מכירות/הכנסות חודשיות (לפני מע"מ)' : 'סך הכנסות חודשיות'}
-                    </h3>
-                    {isBusiness && (
-                        <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
-                            <DialogTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-gray-600">
-                                    <Settings className="h-4 w-4" />
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogTitle>הגדרת מס הכנסה</DialogTitle>
-                                <div className="space-y-4 pt-4">
-                                    <div>
-                                        <label className="text-sm font-medium mb-1 block">שיעור מס (באחוזים)</label>
-                                        <div className="flex items-center gap-2 justify-center">
-                                            <span className="text-lg font-bold">%</span>
-                                            <Input
-                                                type="number"
-                                                min="0"
-                                                max="100"
-                                                value={taxRateInput}
-                                                onChange={(e) => setTaxRateInput(e.target.value)}
-                                                className="max-w-[100px] text-center"
-                                            />
+            <div className="flex justify-between items-start mb-6">
+                <div>
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-2xl font-bold bg-gradient-to-r from-[#00c875] to-[#00a86b] bg-clip-text text-transparent">
+                            {isBusiness ? 'הכנסות ומכירות' : 'הכנסות אישיות'}
+                        </h2>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                            onClick={() => setShowTutorial(true)}
+                            title="הדרכה"
+                        >
+                            <Info className="h-5 w-5" />
+                        </Button>
+                    </div>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                        {isBusiness ? 'מעקב אחר מכירות, עסקאות והכנסות שוטפות' : 'מעקב אחר משכורות, מענקים והכנסות נוספות'}
+                    </p>
+                </div>
+
+                <div className="text-right" id="income-stats-cards">
+                    <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-green-600' : 'border-r-[#00c875]'} dark:bg-slate-800`}>
+
+                        <div className="flex justify-between items-start">
+                            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                {isBusiness ? 'סך מכירות/הכנסות חודשיות (לפני מע"מ)' : 'סך הכנסות חודשיות'}
+                            </h3>
+                            {isBusiness && (
+                                <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-gray-600">
+                                            <Settings className="h-4 w-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogTitle>הגדרת מס הכנסה</DialogTitle>
+                                        <div className="space-y-4 pt-4">
+                                            <div>
+                                                <label className="text-sm font-medium mb-1 block">שיעור מס (באחוזים)</label>
+                                                <div className="flex items-center gap-2 justify-center">
+                                                    <span className="text-lg font-bold">%</span>
+                                                    <Input
+                                                        type="number"
+                                                        min="0"
+                                                        max="100"
+                                                        value={taxRateInput}
+                                                        onChange={(e) => setTaxRateInput(e.target.value)}
+                                                        className="max-w-[100px] text-center"
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-1">אחוז זה יופחת אוטומטית מההכנסה הנקייה בחישוב הסופי.</p>
+                                            </div>
+                                            <Button onClick={handleUpdateTaxRate} className="w-full bg-green-600 hover:bg-green-700 text-white">שמור</Button>
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-1">אחוז זה יופחת אוטומטית מההכנסה הנקייה בחישוב הסופי.</p>
-                                    </div>
-                                    <Button onClick={handleUpdateTaxRate} className="w-full bg-green-600 hover:bg-green-700 text-white">שמור</Button>
+                                    </DialogContent>
+                                </Dialog>
+                            )}
+                        </div>
+
+                        <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
+                            {loadingIncomes ? '...' : formatCurrency(isBusiness ? totalNetILS : totalIncomeILS, '₪')}
+                        </div>
+
+                        {/* Tax Deduction Breakdown */}
+                        {isBusiness && taxRate > 0 && !loadingIncomes && (
+                            <div className="mt-2 text-xs border-t pt-2 border-gray-100 dark:border-gray-700">
+                                <div className="flex justify-between text-gray-500 mb-1">
+                                    <span>הפרשה למס ({taxRate}%):</span>
+                                    <span className="text-red-500">{formatCurrency(-(totalNetILS * (taxRate / 100)), '₪')}</span>
                                 </div>
+                                <div className="flex justify-between font-bold text-gray-700 dark:text-gray-300">
+                                    <span>נשאר בכיס (נטו):</span>
+                                    <span className="text-green-600">{formatCurrency(totalNetILS * (1 - taxRate / 100), '₪')}</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Split View */}
+                <div className="grid gap-4 lg:grid-cols-12">
+                    {/* Add Form */}
+                    {/* Add Form - Desktop Only */}
+                    <div className="hidden lg:block lg:col-span-5 glass-panel p-5 h-fit sticky top-4" id="income-add-section">
+                        <IncomeForm
+                            categories={categories}
+                            clients={clientsData}
+                            onCategoriesChange={mutateCategories}
+                        />
+                    </div>
+
+                    {/* Mobile FAB and Dialog */}
+                    <div className="lg:hidden">
+                        <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                            <DialogTrigger asChild>
+                                <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-green-600' : 'bg-green-600'} label="הוסף הכנסה" />
+                            </DialogTrigger>
+                            <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
+                                <DialogTitle className="sr-only">הוספת הכנסה</DialogTitle>
+                                <IncomeForm
+                                    categories={categories}
+                                    clients={clientsData}
+                                    onCategoriesChange={mutateCategories}
+                                    isMobile={true}
+                                    onSuccess={() => setIsMobileOpen(false)}
+                                />
                             </DialogContent>
                         </Dialog>
-                    )}
-                </div>
-
-                <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
-                    {loadingIncomes ? '...' : formatCurrency(isBusiness ? totalNetILS : totalIncomeILS, '₪')}
-                </div>
-
-                {/* Tax Deduction Breakdown */}
-                {isBusiness && taxRate > 0 && !loadingIncomes && (
-                    <div className="mt-2 text-xs border-t pt-2 border-gray-100 dark:border-gray-700">
-                        <div className="flex justify-between text-gray-500 mb-1">
-                            <span>הפרשה למס ({taxRate}%):</span>
-                            <span className="text-red-500">{formatCurrency(-(totalNetILS * (taxRate / 100)), '₪')}</span>
-                        </div>
-                        <div className="flex justify-between font-bold text-gray-700 dark:text-gray-300">
-                            <span>נשאר בכיס (נטו):</span>
-                            <span className="text-green-600">{formatCurrency(totalNetILS * (1 - taxRate / 100), '₪')}</span>
-                        </div>
                     </div>
-                )}
-            </div>
 
-            {/* Split View */}
-            <div className="grid gap-4 lg:grid-cols-12">
-                {/* Add Form */}
-                {/* Add Form - Desktop Only */}
-                <div className="hidden lg:block lg:col-span-5 glass-panel p-5 h-fit sticky top-4">
-                    <IncomeForm
-                        categories={categories}
-                        clients={clientsData}
-                        onCategoriesChange={mutateCategories}
-                    />
-                </div>
-
-                {/* Mobile FAB and Dialog */}
-                <div className="lg:hidden">
-                    <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
-                        <DialogTrigger asChild>
-                            <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-green-600' : 'bg-green-600'} label="הוסף הכנסה" />
-                        </DialogTrigger>
+                    {/* Edit Dialog */}
+                    <Dialog open={isEditMobileOpen} onOpenChange={setIsEditMobileOpen}>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
-                            <DialogTitle className="sr-only">הוספת הכנסה</DialogTitle>
-                            <IncomeForm
-                                categories={categories}
-                                clients={clientsData}
-                                onCategoriesChange={mutateCategories}
-                                isMobile={true}
-                                onSuccess={() => setIsMobileOpen(false)}
-                            />
+                            <DialogTitle className="text-right">עריכת הכנסה</DialogTitle>
+                            {editingIncome && (
+                                <IncomeForm
+                                    categories={categories}
+                                    clients={clientsData}
+                                    onCategoriesChange={mutateCategories}
+                                    isMobile={true}
+                                    onSuccess={() => setIsEditMobileOpen(false)}
+                                    initialData={editingIncome}
+                                />
+                            )}
                         </DialogContent>
                     </Dialog>
-                </div>
 
-                {/* Edit Dialog */}
-                <Dialog open={isEditMobileOpen} onOpenChange={setIsEditMobileOpen}>
-                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
-                        <DialogTitle className="text-right">עריכת הכנסה</DialogTitle>
-                        {editingIncome && (
-                            <IncomeForm
-                                categories={categories}
-                                clients={clientsData}
-                                onCategoriesChange={mutateCategories}
-                                isMobile={true}
-                                onSuccess={() => setIsEditMobileOpen(false)}
-                                initialData={editingIncome}
-                            />
-                        )}
-                    </DialogContent>
-                </Dialog>
+                    {/* List View */}
+                    <div className="lg:col-span-7 space-y-3">
+                        <div className="flex items-center justify-between px-1 flex-wrap gap-2" id="income-controls">
+                            <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'פירוט הכנסות ומכירות' : 'רשימת הכנסות'}</h3>
 
-                {/* List View */}
-                <div className="lg:col-span-7 space-y-3">
-                    <div className="flex items-center justify-between px-1 flex-wrap gap-2">
-                        <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'פירוט הכנסות ומכירות' : 'רשימת הכנסות'}</h3>
-
-                        <div className="flex items-center gap-2">
-                            {/* Sort Controls */}
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
-                                <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
-                                    <SelectTrigger className="h-8 text-xs w-[110px] bg-white/80 border-gray-200">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent dir="rtl">
-                                        <SelectItem value="DATE">תאריך</SelectItem>
-                                        <SelectItem value="AMOUNT">סכום</SelectItem>
-                                        <SelectItem value="SOURCE">תיאור</SelectItem>
-                                        <SelectItem value="CATEGORY">קטגוריה</SelectItem>
-                                        <SelectItem value="PAYMENT">אמצעי תשלום</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                                    className="h-8 w-8 p-0 border border-gray-200 bg-white/80 hover:bg-white"
-                                    title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
-                                >
-                                    <ArrowUpDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                </Button>
-                            </div>
-
-                            <span className="text-xs text-gray-400 font-medium">{incomes.length} שורות</span>
-                        </div>
-                    </div>
-
-                    {incomes.length === 0 ? (
-                        <div className="glass-panel text-center py-20 text-gray-400">
-                            לא נמצאו נתונים לחודש זה
-                        </div>
-                    ) : (
-                        paginatedIncomes.map((income: any) => (
-                            <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
-
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
-                                    <div className="flex items-start gap-3 w-full sm:w-auto">
-                                        <div className="shrink-0">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
-                                                {getCategoryIcon(income.category)}
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col min-w-0 gap-0.5 flex-1">
-                                            <div className="flex items-center gap-2 min-w-0">
-                                                <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
-                                                {income.isRecurring && (
-                                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-green-50 text-green-600 border border-green-100">
-                                                        <span className="w-1 h-1 rounded-full bg-current" />
-                                                        קבועה
-                                                    </div>
-                                                )}
-                                                {income.client && (
-                                                    <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100 font-bold hidden sm:inline-block shrink-0">
-                                                        {income.client.name}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#676879] dark:text-gray-400 mt-0.5">
-                                                <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                <span className="">{income.category}</span>
-                                                {income.payer && (
-                                                    <>
-                                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                        <span className="">מאת: {income.payer}</span>
-                                                    </>
-                                                )}
-                                                {income.paymentMethod && (
-                                                    <>
-                                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                        <span className="">
-                                                            {(() => {
-                                                                const pm = income.paymentMethod
-                                                                const map: Record<string, string> = {
-                                                                    'CHECK': "צ'ק",
-                                                                    'CREDIT_CARD': 'כרטיס אשראי',
-                                                                    'BANK_TRANSFER': 'העברה בנקאית',
-                                                                    'CASH': 'מזומן',
-                                                                    'BIT': 'ביט/פייבוקס',
-                                                                    'OTHER': 'אחר'
-                                                                }
-                                                                return map[pm] || pm
-                                                            })()}
-                                                        </span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
-                                        {isBusiness && income.vatAmount && income.vatAmount > 0 ? (
-                                            <div className="flex flex-row items-center gap-3 sm:gap-4">
-                                                <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
-                                                    <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((income.amountBeforeVat ?? (income.amount - (income.vatAmount || 0))))} {getCurrencySymbol(income.currency || 'ILS')}</span>
-                                                    <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(income.vatAmount || 0)} {getCurrencySymbol(income.currency || 'ILS')}</span>
-                                                </div>
-                                                <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
-                                                    {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col items-end">
-                                                <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
-                                                    {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        <div className="flex text-left sm:text-right flex-col items-end gap-1">
-                                            {/* Status Badge */}
-                                            <button
-                                                onClick={async (e) => {
-                                                    e.stopPropagation()
-                                                    const newStatus = income.status === 'PENDING' ? 'PAID' : 'PENDING'
-                                                    const res = await toggleIncomeStatus(income.id, newStatus)
-                                                    if (res.success) {
-                                                        mutateIncomes()
-                                                        toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
-                                                    }
-                                                }}
-                                                className={`text-[10px] px-2 py-0.5 rounded-full border mb-0 transition-all ${income.status === 'PENDING'
-                                                    ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
-                                                    : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
-                                                    }`}
-                                            >
-                                                {income.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
-                                            </button>
-
-                                            {income.invoice && (
-                                                <div className="text-[10px] text-gray-400 font-medium hidden sm:block">#{income.invoice.invoiceNumber}</div>
-                                            )}
-                                        </div>
-                                        <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                                            <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
-                                            <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(income)}>
-                                                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
+                                {/* Sort Controls */}
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
+                                    <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
+                                        <SelectTrigger className="h-8 text-xs w-[110px] bg-white/80 border-gray-200">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent dir="rtl">
+                                            <SelectItem value="DATE">תאריך</SelectItem>
+                                            <SelectItem value="AMOUNT">סכום</SelectItem>
+                                            <SelectItem value="SOURCE">תיאור</SelectItem>
+                                            <SelectItem value="CATEGORY">קטגוריה</SelectItem>
+                                            <SelectItem value="PAYMENT">אמצעי תשלום</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                        className="h-8 w-8 p-0 border border-gray-200 bg-white/80 hover:bg-white"
+                                        title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
+                                    >
+                                        <ArrowUpDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                    </Button>
                                 </div>
 
+                                <span className="text-xs text-gray-400 font-medium">{incomes.length} שורות</span>
                             </div>
-                        ))
-                    )}
-
-                    {totalPages > 1 && (
-                        <div className="mt-4 flex justify-center direction-ltr">
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={setCurrentPage}
-                            />
                         </div>
-                    )}
-                </div>
-            </div>
 
-            <RecurrenceActionDialog
-                isOpen={recurrenceDialogOpen}
-                onClose={() => {
-                    setRecurrenceDialogOpen(false)
-                    setPendingAction(null)
-                }}
-                onConfirm={handleRecurrenceConfirm}
-                action={pendingAction?.type || 'delete'}
-                entityName="הכנסה"
-            />
-        </div >
-    )
+                        {incomes.length === 0 ? (
+                            <div className="glass-panel text-center py-20 text-gray-400">
+                                לא נמצאו נתונים לחודש זה
+                            </div>
+                        ) : (
+                            paginatedIncomes.map((income: any) => (
+                                <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
+
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
+                                        <div className="flex items-start gap-3 w-full sm:w-auto">
+                                            <div className="shrink-0">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
+                                                    {getCategoryIcon(income.category)}
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col min-w-0 gap-0.5 flex-1">
+                                                <div className="flex items-center gap-2 min-w-0">
+                                                    <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base flex-1 min-w-0 md:flex-none">{income.source}</span>
+                                                    {income.isRecurring && (
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-green-50 text-green-600 border border-green-100">
+                                                            <span className="w-1 h-1 rounded-full bg-current" />
+                                                            קבועה
+                                                        </div>
+                                                    )}
+                                                    {income.client && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100 font-bold hidden sm:inline-block shrink-0">
+                                                            {income.client.name}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#676879] dark:text-gray-400 mt-0.5">
+                                                    <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                    <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                    <span className="">{income.category}</span>
+                                                    {income.payer && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                            <span className="">מאת: {income.payer}</span>
+                                                        </>
+                                                    )}
+                                                    {income.paymentMethod && (
+                                                        <>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
+                                                            <span className="">
+                                                                {(() => {
+                                                                    const pm = income.paymentMethod
+                                                                    const map: Record<string, string> = {
+                                                                        'CHECK': "צ'ק",
+                                                                        'CREDIT_CARD': 'כרטיס אשראי',
+                                                                        'BANK_TRANSFER': 'העברה בנקאית',
+                                                                        'CASH': 'מזומן',
+                                                                        'BIT': 'ביט/פייבוקס',
+                                                                        'OTHER': 'אחר'
+                                                                    }
+                                                                    return map[pm] || pm
+                                                                })()}
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
+                                            {isBusiness && income.vatAmount && income.vatAmount > 0 ? (
+                                                <div className="flex flex-row items-center gap-3 sm:gap-4">
+                                                    <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
+                                                        <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((income.amountBeforeVat ?? (income.amount - (income.vatAmount || 0))))} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                                        <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(income.vatAmount || 0)} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                                    </div>
+                                                    <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
+                                                        {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-end">
+                                                    <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
+                                                        {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <div className="flex text-left sm:text-right flex-col items-end gap-1">
+                                                {/* Status Badge */}
+                                                <button
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation()
+                                                        const newStatus = income.status === 'PENDING' ? 'PAID' : 'PENDING'
+                                                        const res = await toggleIncomeStatus(income.id, newStatus)
+                                                        if (res.success) {
+                                                            mutateIncomes()
+                                                            toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
+                                                        }
+                                                    }}
+                                                    className={`text-[10px] px-2 py-0.5 rounded-full border mb-0 transition-all ${income.status === 'PENDING'
+                                                        ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
+                                                        : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                                                        }`}
+                                                >
+                                                    {income.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
+                                                </button>
+
+                                                {income.invoice && (
+                                                    <div className="text-[10px] text-gray-400 font-medium hidden sm:block">#{income.invoice.invoiceNumber}</div>
+                                                )}
+                                            </div>
+                                            <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
+                                                <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(income)}>
+                                                    <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            ))
+                        )}
+
+                        {totalPages > 1 && (
+                            <div className="mt-4 flex justify-center direction-ltr">
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={setCurrentPage}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <RecurrenceActionDialog
+                    isOpen={recurrenceDialogOpen}
+                    onClose={() => {
+                        setRecurrenceDialogOpen(false)
+                        setPendingAction(null)
+                    }}
+                    onConfirm={handleRecurrenceConfirm}
+                    action={pendingAction?.type || 'delete'}
+                    entityName="הכנסה"
+                />
+
+                <IncomeTutorial
+                    isOpen={showTutorial}
+                    onClose={() => setShowTutorial(false)}
+                />
+            </div>
+            )
 }
