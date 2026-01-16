@@ -269,7 +269,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                             <SelectItem value="RECEIPT">קבלה</SelectItem>
                             <SelectItem value="INVOICE">חשבונית (רגילה)</SelectItem>
                             <SelectItem value="DEAL_INVOICE">חשבונית עסקה</SelectItem>
-                            <SelectItem value="REFUND_INVOICE">חשבונית זיכוי</SelectItem>
+
                         </SelectContent>
                     </Select>
                 </div>
