@@ -274,7 +274,7 @@ export function InvoicesTab() {
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-3xl rounded-xl" dir="rtl">
                             <DialogTitle className="sr-only">הוספת חשבונית</DialogTitle>
                             <div className="p-2">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">חשבונית (מס, קבלה, עסקה)</h3>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">יצירת חשבונית חדשה</h3>
                                 <InvoiceForm
                                     clients={clients}
                                     onSuccess={() => {
@@ -318,7 +318,7 @@ export function InvoicesTab() {
                     <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
                         <DialogTitle className="sr-only">הוספת חשבונית</DialogTitle>
                         <div className="mt-4">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">חשבונית (מס, קבלה, עסקה)</h3>
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">יצירת חשבונית חדשה</h3>
                             <InvoiceForm
                                 clients={clients}
                                 onSuccess={() => {
