@@ -620,7 +620,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 )}
 
                 <Button
-                    type="submit"
+                    onClick={handleAdd}
                     className={`w-full ${isBusiness ? 'bg-green-600 hover:bg-green-700' : 'bg-green-600 hover:bg-green-700'} text-white transition-all duration-200 shadow-md hover:shadow-lg`}
                     disabled={submitting}
                 >

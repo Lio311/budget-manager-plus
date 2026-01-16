@@ -113,7 +113,12 @@ export async function getSavingsGoals(
             let date = saving.targetDate
             if (!date) {
                 // Fallback to budget month/year if no specific date
-                date = new Date(saving.budget.year, saving.budget.month - 1, 1)
+                if (saving.budget) {
+                    date = new Date(saving.budget.year, saving.budget.month - 1, 1)
+                } else {
+                    // Should technically not happen if filtered by budget, but for safety
+                    date = new Date()
+                }
             }
 
             const amount = saving.monthlyDeposit || 0

@@ -730,7 +730,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
 
 
                 <Button
-                    type="submit"
+                    onClick={handleAdd}
                     className={`w-full ${isBusiness ? 'bg-red-600 hover:bg-red-700' : 'bg-[#e2445c] hover:bg-[#d03d54]'} text-white transition-all duration-200 shadow-md hover:shadow-lg`}
                     disabled={submitting}
                 >
