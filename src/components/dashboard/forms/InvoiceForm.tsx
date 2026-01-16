@@ -6,6 +6,16 @@ import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { getNextInvoiceNumber, createInvoice, updateInvoice, type InvoiceFormData } from '@/lib/actions/invoices'
+import { useBudget } from '@/contexts/BudgetContext'
+import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
+import { toast } from 'sonner'
+import { Trash2 } from 'lucide-react'
+import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
+import { getIncomes, getClientUninvoicedIncomes } from '@/lib/actions/income'
+import useSWR from 'swr'
+import { formatCurrency } from '@/lib/utils'
+import { ClientSelector } from './ClientSelector'
+import { RichTextEditor } from '@/components/ui/RichTextEditor'
 
 interface InvoiceFormProps {
     clients: any[]
