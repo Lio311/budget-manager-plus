@@ -280,7 +280,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                                              text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden whitespace-nowrap`}
                                 >
                                     <div className="relative z-10 flex items-center gap-4 shrink-0 transition-all duration-300 group-hover/item:scale-110">
-                                        <Icon className={`h-5 w-5 ${tab.rotate ? 'rotate-180' : ''}`} />
+                                        <Icon className="h-5 w-5" />
                                         <span className="opacity-100 md:opacity-0 md:group-hover:opacity-100 md:w-0 md:group-hover:w-auto transition-all duration-500 delay-75 origin-right">
                                             {tab.label}
                                         </span>
