@@ -26,6 +26,54 @@ export async function getProjects(type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     }
 }
 
+export async function getProjectsWithStats(type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
+    try {
+        const { userId } = await auth()
+        if (!userId) return { success: false, error: 'Unauthorized' }
+
+        const db = await authenticatedPrisma(userId)
+
+        const projects = await db.project.findMany({
+            where: {
+                userId,
+                scope: type
+            },
+            include: {
+                incomes: {
+                    select: { amount: true }
+                },
+                expenses: {
+                    select: { amount: true }
+                }
+            },
+            orderBy: { name: 'asc' }
+        })
+
+        const projectsWithStats = projects.map(project => {
+            const totalIncome = project.incomes.reduce((sum, item) => sum + item.amount, 0)
+            const totalExpenses = project.expenses.reduce((sum, item) => sum + item.amount, 0)
+            const balance = totalIncome - totalExpenses
+
+            // Remove large arrays to save bandwidth
+            const { incomes, expenses, ...projectData } = project
+            
+            return {
+                ...projectData,
+                stats: {
+                    totalIncome,
+                    totalExpenses,
+                    balance
+                }
+            }
+        })
+
+        return { success: true, data: projectsWithStats }
+    } catch (error) {
+        console.error('Error fetching projects with stats:', error)
+        return { success: false, error: 'Failed to fetch projects with stats' }
+    }
+}
+
 export async function addProject(
     data: {
         name: string

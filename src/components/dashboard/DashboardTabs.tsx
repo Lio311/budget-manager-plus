@@ -7,7 +7,7 @@ import { getUserSubscriptionStatus, getOnboardingStatus } from '@/lib/actions/us
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BarChart3, Calendar, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator, Target } from 'lucide-react'
+import { BarChart3, Calendar, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator, Target, FolderOpen, Mail, CreditCard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
@@ -22,6 +22,7 @@ import { SuppliersTab } from './tabs/SuppliersTab'
 import { DocumentsTab } from './tabs/DocumentsTab'
 import { BudgetLimitsTab } from './tabs/BudgetLimitsTab'
 import ProfitLossTab from './tabs/ProfitLossTab'
+import { ProjectsTab } from './tabs/ProjectsTab'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useSWRConfig } from 'swr'
 import { UserButton } from '@clerk/nextjs'
@@ -31,7 +32,6 @@ import { useAuthModal } from '@/contexts/AuthModalContext'
 import { LinkedEmails } from './UserProfile/LinkedEmails'
 import { SubscriptionStatus } from './UserProfile/SubscriptionStatus'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { Mail, CreditCard } from 'lucide-react'
 
 interface DashboardTabsProps {
     mobileMenuOpen: boolean
@@ -159,7 +159,9 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeClass: 'data-[state=active]:bg-red-600' },
         { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard, activeClass: 'data-[state=active]:bg-orange-500' },
         { value: 'debts', label: 'הלוואות', icon: Wallet, activeClass: 'data-[state=active]:bg-purple-600' },
+        { value: 'debts', label: 'הלוואות', icon: Wallet, activeClass: 'data-[state=active]:bg-purple-600' },
         { value: 'savings', label: 'חסכונות', icon: PiggyBank, activeClass: 'data-[state=active]:bg-blue-600' },
+        { value: 'projects', label: 'פרויקטים', icon: FolderOpen, activeClass: 'data-[state=active]:bg-pink-500' },
         { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeClass: 'data-[state=active]:bg-black' },
     ]
 
@@ -336,6 +338,9 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </TabsContent>
                     <TabsContent value="documents" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
                         <DocumentsTab />
+                    </TabsContent>
+                    <TabsContent value="projects" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
+                        <ProjectsTab />
                     </TabsContent>
                 </div>
             </div>
