@@ -18,7 +18,7 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                     <div className="flex items-center gap-3">
                         <div
@@ -92,13 +92,13 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
 
                     <TabsContent value="incomes" className="mt-4">
                         <div className="border rounded-lg overflow-hidden">
-                            <table className="w-full text-sm text-right">
+                            <table className="w-full text-sm text-center">
                                 <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500">
                                     <tr>
-                                        <th className="p-3">תאריך</th>
-                                        <th className="p-3">תיאור source</th>
-                                        <th className="p-3">סכום</th>
-                                        <th className="p-3 hidden sm:table-cell">אמצעי תשלום</th>
+                                        <th className="p-3 text-center">תאריך</th>
+                                        <th className="p-3 text-center">תיאור</th>
+                                        <th className="p-3 text-center">סכום</th>
+                                        <th className="p-3 hidden sm:table-cell text-center">אמצעי תשלום</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y dark:divide-slate-700">
@@ -111,13 +111,13 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
                                     )}
                                     {project.incomes?.map((income: any) => (
                                         <tr key={income.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
-                                            <td className="p-3 flex items-center gap-2">
+                                            <td className="p-3 flex items-center justify-center gap-2">
                                                 <Calendar className="h-4 w-4 text-gray-400" />
                                                 {income.date ? new Date(income.date).toLocaleDateString('he-IL') : '-'}
                                             </td>
-                                            <td className="p-3 font-medium">{income.source}</td>
-                                            <td className="p-3 text-green-600 font-bold">{formatCurrency(income.amount)}</td>
-                                            <td className="p-3 hidden sm:table-cell text-gray-500">{income.paymentMethod || '-'}</td>
+                                            <td className="p-3 font-medium text-center">{income.source}</td>
+                                            <td className="p-3 text-green-600 font-bold text-center">{formatCurrency(income.amount)}</td>
+                                            <td className="p-3 hidden sm:table-cell text-gray-500 text-center">{income.paymentMethod || '-'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -127,13 +127,13 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
 
                     <TabsContent value="expenses" className="mt-4">
                         <div className="border rounded-lg overflow-hidden">
-                            <table className="w-full text-sm text-right">
+                            <table className="w-full text-sm text-center">
                                 <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500">
                                     <tr>
-                                        <th className="p-3">תאריך</th>
-                                        <th className="p-3">תיאור</th>
-                                        <th className="p-3">קטגוריה</th>
-                                        <th className="p-3">סכום</th>
+                                        <th className="p-3 text-center">תאריך</th>
+                                        <th className="p-3 text-center">תיאור</th>
+                                        <th className="p-3 text-center">קטגוריה</th>
+                                        <th className="p-3 text-center">סכום</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y dark:divide-slate-700">
@@ -146,15 +146,15 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
                                     )}
                                     {project.expenses?.map((expense: any) => (
                                         <tr key={expense.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
-                                            <td className="p-3 flex items-center gap-2">
+                                            <td className="p-3 flex items-center justify-center gap-2">
                                                 <Calendar className="h-4 w-4 text-gray-400" />
                                                 {expense.date ? new Date(expense.date).toLocaleDateString('he-IL') : '-'}
                                             </td>
-                                            <td className="p-3 font-medium">
+                                            <td className="p-3 font-medium text-center">
                                                 {expense.description || expense.category}
                                             </td>
-                                            <td className="p-3 text-gray-500">{expense.category}</td>
-                                            <td className="p-3 text-red-600 font-bold">{formatCurrency(expense.amount)}</td>
+                                            <td className="p-3 text-gray-500 text-center">{expense.category}</td>
+                                            <td className="p-3 text-red-600 font-bold text-center">{formatCurrency(expense.amount)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
