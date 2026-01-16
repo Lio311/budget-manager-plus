@@ -45,6 +45,7 @@ model User {
   workEvents WorkEvent[]
   storedReports StoredReport[]
   createdTasks ProjectTask[]
+  projects   Project[]
   marketingCampaigns MarketingCampaign[]
   businessExpenses   BusinessExpense[]
   managementNotifications ManagementNotification[]
@@ -241,6 +242,10 @@ model Income {
   acceptedBy        String?   // NEW: Optional Accepted By
   currency          String   @default("ILS")
   
+  // Personal Fields
+  projectId         String?
+  project           Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   @@index([budgetId])
@@ -284,6 +289,10 @@ model Expense {
   paymentMethod     String?    // Changed from Enum to String for flexibility
   paymentTerms      Int?     @default(0)
   paidBy            String?   // Who paid this expense
+  
+  // Personal Fields
+  projectId         String?
+  project           Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
   
 
   createdAt         DateTime @default(now())
@@ -376,6 +385,24 @@ model SavingCategoryGoal {
   
   @@unique([budgetId, category])
   @@map("saving_category_goals")
+}
+
+model Project {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  color     String?
+  scope     BudgetType @default(PERSONAL)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  
+  incomes   Income[]
+  expenses  Expense[]
+  
+  @@unique([userId, name, scope])
+  @@index([userId, scope])
+  @@map("projects")
 }
 
 model Subscription {
