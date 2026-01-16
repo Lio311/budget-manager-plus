@@ -324,7 +324,7 @@ export function IncomeTab() {
             <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-green-600' : 'border-r-[#00c875]'} dark:bg-slate-800`}>
                 <div className="flex justify-between items-start">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {isBusiness ? 'סך מכירות/הכנסות חודשיות' : 'סך הכנסות חודשיות'}
+                        {isBusiness ? 'סך מכירות/הכנסות חודשיות (לפני מע"מ)' : 'סך הכנסות חודשיות'}
                     </h3>
                     {isBusiness && (
                         <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
@@ -359,7 +359,7 @@ export function IncomeTab() {
                 </div>
 
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
-                    {loadingIncomes ? '...' : formatCurrency(totalIncomeILS, '₪')}
+                    {loadingIncomes ? '...' : formatCurrency(isBusiness ? totalNetILS : totalIncomeILS, '₪')}
                 </div>
 
                 {/* Tax Deduction Breakdown */}
@@ -367,11 +367,11 @@ export function IncomeTab() {
                     <div className="mt-2 text-xs border-t pt-2 border-gray-100 dark:border-gray-700">
                         <div className="flex justify-between text-gray-500 mb-1">
                             <span>הפרשה למס ({taxRate}%):</span>
-                            <span className="text-red-500">{formatCurrency(totalIncomeILS * (taxRate / 100), '₪')}-</span>
+                            <span className="text-red-500">{formatCurrency(totalNetILS * (taxRate / 100), '₪')}-</span>
                         </div>
                         <div className="flex justify-between font-bold text-gray-700 dark:text-gray-300">
                             <span>נשאר בכיס (נטו):</span>
-                            <span className="text-green-600">{formatCurrency(totalIncomeILS * (1 - taxRate / 100), '₪')}</span>
+                            <span className="text-green-600">{formatCurrency(totalNetILS * (1 - taxRate / 100), '₪')}</span>
                         </div>
                     </div>
                 )}
