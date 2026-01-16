@@ -324,6 +324,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     return (
         <div className="space-y-6 pb-20 animate-in fade-in-50 duration-500 font-sans px-2 md:px-0" dir="rtl">
+            <OverviewTutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
 
             {/* Header & Action Buttons Row */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -345,7 +346,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
                             title="עזרה / הסברים"
                         >
-                            <Info className="w-4 h-4 text-blue-500" />
+                            <Info className="w-4 h-4 text-[#323338] dark:text-gray-100" />
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                         </Button>
                     )}
