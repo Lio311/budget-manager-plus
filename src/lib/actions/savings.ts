@@ -167,6 +167,8 @@ export async function addSaving(
         monthlyDeposit: number
         currency: string
         goal?: string
+        targetAmount?: number
+        currentAmount?: number
         date: Date
         isRecurring?: boolean
         recurringStartDate?: Date
@@ -212,6 +214,8 @@ export async function addSaving(
                 monthlyDeposit: data.monthlyDeposit,
                 currency: data.currency,
                 notes: data.goal,
+                targetAmount: data.targetAmount,
+                currentAmount: data.currentAmount || 0,
                 targetDate: data.date ? new Date(data.date) : new Date(),
                 paymentMethod: data.paymentMethod
             }
@@ -233,6 +237,8 @@ export async function updateSaving(
         monthlyDeposit?: number
         currency?: string
         goal?: string
+        targetAmount?: number
+        currentAmount?: number
         date?: Date
         paymentMethod?: string
     },
@@ -252,6 +258,8 @@ export async function updateSaving(
                     ...(data.monthlyDeposit && { monthlyDeposit: data.monthlyDeposit }),
                     ...(data.currency && { currency: data.currency }),
                     ...(data.goal && { notes: data.goal }),
+                    ...(data.targetAmount !== undefined && { targetAmount: data.targetAmount }),
+                    ...(data.currentAmount !== undefined && { currentAmount: data.currentAmount }),
                     ...(data.date && { targetDate: data.date }),
                     ...(data.paymentMethod && { paymentMethod: data.paymentMethod })
                 }
@@ -282,6 +290,8 @@ export async function updateSaving(
                     ...(data.monthlyDeposit && { monthlyDeposit: data.monthlyDeposit }),
                     ...(data.currency && { currency: data.currency }),
                     ...(data.goal && { notes: data.goal }),
+                    ...(data.targetAmount !== undefined && { targetAmount: data.targetAmount }),
+                    ...(data.currentAmount !== undefined && { currentAmount: data.currentAmount }),
                     // Exclude targetDate to prevent collapsing recurring dates to a single date
                     ...(data.paymentMethod && { paymentMethod: data.paymentMethod })
                 }

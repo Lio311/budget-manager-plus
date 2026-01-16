@@ -60,6 +60,8 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 monthlyDeposit: initialData.monthlyDeposit?.toString() || '',
                 currency: initialData.currency || 'ILS',
                 goal: initialData.notes || '',
+                targetAmount: initialData.targetAmount?.toString() || '',
+                currentAmount: initialData.currentAmount?.toString() || '',
                 date: initialData.targetDate ? new Date(initialData.targetDate) : new Date(),
                 isRecurring: initialData.isRecurring || false,
                 recurringEndDate: undefined, // TODO: Map extended props if available
@@ -72,6 +74,8 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
             monthlyDeposit: '',
             currency: 'ILS',
             goal: '',
+            targetAmount: '',
+            currentAmount: '',
             date: new Date(),
             isRecurring: false,
             recurringEndDate: undefined as Date | undefined,
@@ -159,6 +163,8 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
             monthlyDeposit: parseFloat(newSaving.monthlyDeposit),
             currency: newSaving.currency,
             goal: newSaving.goal || undefined,
+            targetAmount: newSaving.targetAmount ? parseFloat(newSaving.targetAmount) : undefined,
+            currentAmount: newSaving.currentAmount ? parseFloat(newSaving.currentAmount) : undefined,
             date: newSaving.date,
             isRecurring: newSaving.isRecurring,
             recurringStartDate: newSaving.isRecurring ? newSaving.date : undefined,
@@ -188,6 +194,8 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                         monthlyDeposit: '',
                         currency: budgetCurrency,
                         goal: '',
+                        targetAmount: '',
+                        currentAmount: '',
                         date: new Date(),
                         isRecurring: false,
                         recurringEndDate: undefined,
@@ -376,12 +384,35 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 {isAdvancedOpen && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700/50 w-full">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">יעד</label>
-                            <FormattedNumberInput
-                                placeholder="מטרה"
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תיאור יעד</label>
+                            <Input
+                                placeholder="למשל: דירה, חופשה, קרן חירום"
                                 value={newSaving.goal}
                                 onChange={(e) => setNewSaving({ ...newSaving, goal: e.target.value })}
                             />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום יעד</label>
+                                <Input
+                                    type="number"
+                                    placeholder="0.00"
+                                    className="h-10"
+                                    value={newSaving.targetAmount}
+                                    onChange={(e) => setNewSaving({ ...newSaving, targetAmount: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום נוכחי</label>
+                                <Input
+                                    type="number"
+                                    placeholder="0.00"
+                                    className="h-10"
+                                    value={newSaving.currentAmount}
+                                    onChange={(e) => setNewSaving({ ...newSaving, currentAmount: e.target.value })}
+                                />
+                            </div>
                         </div>
 
                         <div className="w-full">
