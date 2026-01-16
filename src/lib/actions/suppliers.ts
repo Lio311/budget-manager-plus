@@ -63,9 +63,7 @@ export async function getSuppliers(scope: string = 'BUSINESS') {
                 package: true, // Include Package
                 _count: {
                     select: {
-                        expenses: {
-                            expenses: true
-                        }
+                        expenses: true
                     }
                 }
             },
