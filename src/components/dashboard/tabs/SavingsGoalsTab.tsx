@@ -126,6 +126,7 @@ export function SavingsGoalsTab() {
                         </div>
                     ) : (
                         goals.map((goal) => {
+                            const hasTarget = goal.targetAmount > 0
                             const isComplete = goal.progress >= 100
                             const progressColor = isComplete
                                 ? 'bg-green-500 dark:bg-green-400'
@@ -148,7 +149,7 @@ export function SavingsGoalsTab() {
                                                     <span className="font-bold text-base text-gray-900 dark:text-gray-100">
                                                         {goal.name}
                                                     </span>
-                                                    {isComplete && (
+                                                    {isComplete && hasTarget && (
                                                         <Award className="h-5 w-5 text-green-500 dark:text-green-400" />
                                                     )}
                                                 </div>
@@ -165,32 +166,49 @@ export function SavingsGoalsTab() {
                                             </div>
                                         </div>
                                         <div className="text-left shrink-0">
-                                            <div className="text-lg font-bold text-cyan-600 dark:text-cyan-400">
-                                                {Math.round(goal.progress)}%
-                                            </div>
-                                            {goal.monthlyDeposit && (
-                                                <div className="text-xs text-gray-500 dark:text-gray-400">
-                                                    {formatCurrency(goal.monthlyDeposit, getCurrencySymbol(goal.currency))}/חודש
-                                                </div>
+                                            {hasTarget ? (
+                                                <>
+                                                    <div className="text-lg font-bold text-cyan-600 dark:text-cyan-400">
+                                                        {Math.round(goal.progress)}%
+                                                    </div>
+                                                    {goal.monthlyDeposit && (
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                            {formatCurrency(goal.monthlyDeposit, getCurrencySymbol(goal.currency))}/חודש
+                                                        </div>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                goal.monthlyDeposit && (
+                                                    <div className="text-right">
+                                                        <div className="text-lg font-bold text-cyan-600 dark:text-cyan-400">
+                                                            {formatCurrency(goal.monthlyDeposit, getCurrencySymbol(goal.currency))}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                            לחודש
+                                                        </div>
+                                                    </div>
+                                                )
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <Progress
-                                            value={goal.progress}
-                                            className="h-3 rotate-180 bg-gray-100 dark:bg-slate-700"
-                                            indicatorClassName={progressColor}
-                                        />
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-gray-600 dark:text-gray-400">
-                                                {formatCurrency(goal.currentAmount, getCurrencySymbol(goal.currency))} / {formatCurrency(goal.targetAmount, getCurrencySymbol(goal.currency))}
-                                            </span>
-                                            <span className="text-gray-500 dark:text-gray-400">
-                                                נותרו {formatCurrency(goal.remainingAmount, getCurrencySymbol(goal.currency))}
-                                            </span>
+                                    {hasTarget && (
+                                        <div className="space-y-2">
+                                            <Progress
+                                                value={goal.progress}
+                                                className="h-3 rotate-180 bg-gray-100 dark:bg-slate-700"
+                                                indicatorClassName={progressColor}
+                                            />
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-gray-600 dark:text-gray-400">
+                                                    {formatCurrency(goal.currentAmount, getCurrencySymbol(goal.currency))} / {formatCurrency(goal.targetAmount, getCurrencySymbol(goal.currency))}
+                                                </span>
+                                                <span className="text-gray-500 dark:text-gray-400">
+                                                    נותרו {formatCurrency(goal.remainingAmount, getCurrencySymbol(goal.currency))}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             )
                         })

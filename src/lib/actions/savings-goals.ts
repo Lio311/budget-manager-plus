@@ -41,11 +41,11 @@ export async function getSavingsGoals(
         const db = await authenticatedPrisma(userId)
         const budget = await getCurrentBudget(month, year, '₪', type)
 
-        // Fetch all savings with target amounts set
+        // Fetch all savings with notes (goals) defined
         const savings = await db.saving.findMany({
             where: {
                 budgetId: budget.id,
-                targetAmount: { not: null, gt: 0 }
+                notes: { not: null }
             },
             orderBy: { createdAt: 'desc' }
         })
