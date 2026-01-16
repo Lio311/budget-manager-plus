@@ -35,6 +35,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { RenewSubscriptionDialog } from '@/components/dashboard/dialogs/RenewSubscriptionDialog'
 import { ComboboxInput } from '@/components/ui/combobox-input'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
+import { ClientsTutorial } from '@/components/dashboard/tutorial/ClientsTutorial'
 
 const ClientSchema = z.object({
     name: z.string().min(2, 'שם הלקוח חייב להכיל לפחות 2 תווים').max(100, 'שם הלקוח ארוך מדי'),
@@ -105,6 +106,7 @@ export function ClientsTab() {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [subscriptionDialogClient, setSubscriptionDialogClient] = useState<any>(null)
     const [renewSubscriptionClient, setRenewSubscriptionClient] = useState<any>(null)
+    const [showTutorial, setShowTutorial] = useState(false)
 
     // Load settings from localStorage
     useEffect(() => {
@@ -416,7 +418,11 @@ export function ClientsTab() {
                 <div className="flex gap-2">
                     <Popover open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" size="icon">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                id="clients-settings-btn"
+                            >
                                 <Settings className="h-4 w-4" />
                             </Button>
                         </PopoverTrigger>
@@ -476,6 +482,7 @@ export function ClientsTab() {
                             onChange={handleFileUpload}
                         />
                         <Button
+                            id="clients-import-btn"
                             variant="outline"
                             className="gap-2 border-gray-300 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 px-3 sm:px-4"
                             onClick={() => document.getElementById('import-clients')?.click()}
@@ -496,9 +503,20 @@ export function ClientsTab() {
                             setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', packageId: '', isActive: true, city: '', bankName: '', bankBranch: '', bankAccount: '' })
                         }}
                         className="bg-green-600 hover:bg-green-700 hidden lg:flex"
+                        id="clients-add-btn"
                     >
                         <Plus className="h-4 w-4 ml-2" />
                         לקוח חדש
+                    </Button>
+
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                        onClick={() => setShowTutorial(true)}
+                        title="הדרכה"
+                    >
+                        <Info className="h-5 w-5" />
                     </Button>
                 </div>
             </div>
@@ -508,7 +526,7 @@ export function ClientsTab() {
             </Dialog>
             {/* Search and Sort Section */}
             <div className="space-y-4">
-                <div className="relative">
+                <div className="relative" id="clients-search-bar">
                     <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <input
                         type="text"
@@ -522,7 +540,7 @@ export function ClientsTab() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
                     {/* Sort Dropdown & Toggle */}
                     <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2" id="clients-sort-controls">
                             <span className="text-sm text-gray-500 font-medium hidden xs:inline">מיון:</span>
                             <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
                                 <SelectTrigger className="w-[110px] sm:w-[140px] h-9 gap-1 sm:gap-2 text-xs sm:text-sm">
@@ -558,7 +576,7 @@ export function ClientsTab() {
                         </div>
 
                         {/* View Toggle */}
-                        <div className="flex items-center bg-gray-100 dark:bg-slate-800 rounded-lg p-1 border border-gray-200 dark:border-slate-700">
+                        <div className="flex items-center bg-gray-100 dark:bg-slate-800 rounded-lg p-1 border border-gray-200 dark:border-slate-700" id="clients-view-toggle">
                             <button
                                 onClick={() => setViewMode('grid')}
                                 className={`p-1.5 rounded-md transition-all ${viewMode === 'grid'
@@ -968,7 +986,7 @@ export function ClientsTab() {
             {/* Clients List */}
             {
                 viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4" id="clients-list-container">
                         {filteredClients.map((client: any) => (
                             <div
                                 key={client.id}
@@ -1282,6 +1300,11 @@ export function ClientsTab() {
                 onClose={() => setRenewSubscriptionClient(null)}
                 client={renewSubscriptionClient}
                 onSuccess={() => mutate()}
+            />
+
+            <ClientsTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
             />
         </div >
     )
