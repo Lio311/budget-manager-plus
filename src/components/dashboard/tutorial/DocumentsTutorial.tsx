@@ -54,11 +54,21 @@ const cards: CardConfig[] = [
 
 export function DocumentsTutorial({ isOpen, onClose }: DocumentsTutorialProps) {
     const [currentStep, setCurrentStep] = useState(0)
+    const [, forceUpdate] = useState(0)
     const isMobile = useMediaQuery('(max-width: 768px)')
 
     useEffect(() => {
         if (isOpen) {
             setCurrentStep(0)
+            // Add scroll and resize listeners to recalculate positions
+            const handleUpdate = () => forceUpdate(prev => prev + 1)
+            window.addEventListener('scroll', handleUpdate, true)
+            window.addEventListener('resize', handleUpdate)
+
+            return () => {
+                window.removeEventListener('scroll', handleUpdate, true)
+                window.removeEventListener('resize', handleUpdate)
+            }
         }
     }, [isOpen])
 
