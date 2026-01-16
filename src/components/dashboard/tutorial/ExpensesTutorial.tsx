@@ -147,9 +147,21 @@ export function ExpensesTutorial({ isOpen, onClose }: TutorialProps) {
         ]
 
         cards.forEach(config => {
-            const el = document.getElementById(config.id)
+            let targetId = config.id
+
+            // Mobile ID overrides
+            if (isMobileView) {
+                if (config.id === 'expenses-add-section') targetId = 'expenses-add-fab'
+            }
+
+            const el = document.getElementById(targetId)
+
             if (el) {
                 const rect = el.getBoundingClientRect()
+
+                // Skip invisible elements (display: none or hidden parent)
+                if (rect.width === 0 && rect.height === 0) return
+
                 const absLeft = rect.left + scrollX
                 const absTop = rect.top + scrollY
                 const absRight = rect.right + scrollX

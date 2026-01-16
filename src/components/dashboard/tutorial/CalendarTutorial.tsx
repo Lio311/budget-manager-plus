@@ -91,7 +91,7 @@ export function CalendarTutorial({ isOpen, onClose }: TutorialProps) {
             {
                 id: 'calendar-mode-toggle',
                 title: 'מעבר בין תצוגות',
-                text: 'בממשק עסקי: החלף בין "יומן עבודה" (ניהול פגישות ואירועים) ל"תשלומים" (מעקב אחר חשבונות וחובות).',
+                text: 'החלף בין "יומן עבודה" (ניהול פגישות ואירועים) ל"תשלומים" (מעקב אחר חשבונות וחובות).',
                 placement: 'bottom',
                 align: 'start',
                 maxWidth: 320

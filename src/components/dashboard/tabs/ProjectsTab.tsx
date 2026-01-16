@@ -165,12 +165,12 @@ export function ProjectsTab() {
                     <p className="text-muted-foreground">ניהול ומעקב אחרי פרויקטים אישיים</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} title="הדרכה">
-                        <Info className="h-5 w-5 text-gray-500" />
-                    </Button>
                     <Button id="projects-add-btn" onClick={() => setIsAddOpen(true)} className="gap-2">
                         <Plus className="h-4 w-4" />
                         פרויקט חדש
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} title="הדרכה">
+                        <Info className="h-5 w-5 text-gray-500" />
                     </Button>
                 </div>
             </div>

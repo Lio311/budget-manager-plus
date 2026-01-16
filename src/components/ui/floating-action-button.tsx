@@ -7,11 +7,13 @@ interface FloatingActionProps {
     onClick: () => void
     colorClass?: string // Allow passing arbitrary classes like "bg-red-600"
     label?: string
+    id?: string
 }
 
-export function FloatingActionButton({ onClick, colorClass = "bg-primary", label = "הוסף" }: FloatingActionProps) {
+export function FloatingActionButton({ onClick, colorClass = "bg-primary", label = "הוסף", id }: FloatingActionProps) {
     return (
         <Button
+            id={id}
             onClick={onClick}
             className={cn(
                 "fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full shadow-lg transition-all hover:scale-110 active:scale-95 lg:hidden flex items-center justify-center p-0",

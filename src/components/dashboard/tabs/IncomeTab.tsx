@@ -417,7 +417,7 @@ export function IncomeTab() {
                 <div className="lg:hidden">
                     <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                         <DialogTrigger asChild>
-                            <FloatingActionButton onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-green-600' : 'bg-green-600'} label="הוסף הכנסה" />
+                            <FloatingActionButton id="income-add-fab" onClick={() => setIsMobileOpen(true)} colorClass={isBusiness ? 'bg-green-600' : 'bg-green-600'} label="הוסף הכנסה" />
                         </DialogTrigger>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] rounded-xl" dir="rtl">
                             <DialogTitle className="sr-only">הוספת הכנסה</DialogTitle>

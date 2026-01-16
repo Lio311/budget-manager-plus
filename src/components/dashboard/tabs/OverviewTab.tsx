@@ -325,10 +325,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
     return (
         <div className="space-y-6 pb-20 animate-in fade-in-50 duration-500 font-sans px-2 md:px-0" dir="rtl">
-            <OverviewTutorial
-                isOpen={isTutorialOpen}
-                onClose={() => setIsTutorialOpen(false)}
-            />
+            {isBusiness && (
+                <OverviewTutorial
+                    isOpen={isTutorialOpen}
+                    onClose={() => setIsTutorialOpen(false)}
+                />
+            )}
 
             {/* Header & Action Buttons Row */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">

@@ -312,6 +312,7 @@ export function SuppliersTab() {
                 {/* Mobile FAB */}
                 <div className="lg:hidden">
                     <FloatingActionButton
+                        id="suppliers-add-fab"
                         onClick={() => {
                             setShowForm(true)
                             setEditingSupplier(null)

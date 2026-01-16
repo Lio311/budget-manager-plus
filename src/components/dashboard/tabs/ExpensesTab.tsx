@@ -481,7 +481,7 @@ export function ExpensesTab() {
                 <div className="lg:hidden">
                     <Dialog open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                         <DialogTrigger asChild>
-                            <FloatingActionButton onClick={() => {
+                            <FloatingActionButton id="expenses-add-fab" onClick={() => {
                                 if (isDemo) { interceptAction(); return; }
                                 setIsMobileOpen(true)
                             }} colorClass={isBusiness ? 'bg-red-600' : 'bg-[#e2445c]'} label="הוסף הוצאה" />

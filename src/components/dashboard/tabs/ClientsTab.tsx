@@ -401,6 +401,7 @@ export function ClientsTab() {
                 {/* Mobile FAB */}
                 <div className="lg:hidden">
                     <FloatingActionButton
+                        id="clients-add-fab"
                         onClick={() => {
                             setShowForm(true)
                             setEditingClient(null)
