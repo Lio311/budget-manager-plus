@@ -4,7 +4,8 @@ import useSWR from 'swr'
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowDown, ArrowUp, TrendingUp, Wallet, Loader2, PieChart as PieChartIcon, TrendingDown, CreditCard, Settings, Save, AlertCircle, PiggyBank, Briefcase, Share2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, TrendingUp, Wallet, Loader2, PieChart as PieChartIcon, TrendingDown, CreditCard, Settings, Save, AlertCircle, PiggyBank, Briefcase, Share2, Info } from 'lucide-react'
+import { OverviewTutorial } from '@/components/dashboard/tutorial/OverviewTutorial'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
@@ -69,6 +70,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const [activeSettingsTab, setActiveSettingsTab] = useState('details')
     const [isReferralOpen, setIsReferralOpen] = useState(false)
     const [isIntegrationsOpen, setIsIntegrationsOpen] = useState(false)
+    const [isTutorialOpen, setIsTutorialOpen] = useState(false)
 
     useEffect(() => {
         const timer = setTimeout(() => setShowProgress(true), 100)
@@ -334,6 +336,20 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                 {/* Buttons Group - Second in DOM -> Left in RTL */}
                 <div className="flex gap-2 items-center w-full md:w-auto justify-end md:justify-end">
+                    {/* Info / Tutorial Button - Right of Settings in RTL (Before in DOM) */}
+                    {isBusiness && (
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setIsTutorialOpen(true)}
+                            className="relative overflow-hidden group border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                            title="עזרה / הסברים"
+                        >
+                            <Info className="w-4 h-4 text-blue-500" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+                        </Button>
+                    )}
+
                     <Button
                         variant="outline"
                         size="icon"
@@ -399,7 +415,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
                 {/* 1. Income (Rightmost) */}
-                <Card className="glass-panel border-r-4 border-r-green-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('income')}>
+                <Card id="overview-card-income" className="glass-panel border-r-4 border-r-green-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('income')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'מכירות' : 'סך הכנסות'}</CardTitle>
                         <TrendingUp className="h-4 w-4 text-green-500" />
@@ -415,7 +431,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card>
 
                 {/* 2. Expenses */}
-                <Card className="glass-panel border-r-4 border-r-red-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('expenses')}>
+                <Card id="overview-card-expenses" className="glass-panel border-r-4 border-r-red-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => onNavigateToTab?.('expenses')}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'הוצאות תפעול' : 'סך הוצאות'}</CardTitle>
                         <TrendingDown className="h-4 w-4 text-red-500" />
@@ -431,7 +447,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card>
 
                 {/* 3. Month Savings (Calculated) */}
-                <Card className="glass-panel border-r-4 border-r-blue-500 shadow-sm transition-all">
+                <Card id="overview-card-profit" className="glass-panel border-r-4 border-r-blue-500 shadow-sm transition-all">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-xs md:text-sm font-medium text-muted-foreground whitespace-nowrap">{isBusiness ? 'רווח נקי' : 'יתרה חודשית'}</CardTitle>
                         <PiggyBank className="h-4 w-4 text-blue-500" />
@@ -447,7 +463,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                 </Card>
 
                 {/* 4. Equity / Bills (Leftmost) */}
-                <Card className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => {
+                <Card id="overview-card-balance" className="glass-panel border-r-4 border-r-orange-500 shadow-sm hover:shadow-md transition-all cursor-pointer" onClick={() => {
                     if (isBusiness) {
                         setActiveSettingsTab('financials')
                         setIsSettingsOpen(true)
