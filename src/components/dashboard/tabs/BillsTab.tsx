@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import useSWR, { useSWRConfig } from 'swr'
-import { CreditCard, Loader2, Pencil, Trash2, Check, X, ArrowUpDown } from 'lucide-react'
+import { CreditCard, Loader2, Pencil, Trash2, Check, X, ArrowUpDown, Info } from 'lucide-react'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { BillForm } from '@/components/dashboard/forms/BillForm'
 import { useDemo } from '@/contexts/DemoContext'
+import { BillsTutorial } from '@/components/dashboard/tutorial/BillsTutorial'
 
 interface Bill {
     id: string
@@ -74,6 +75,7 @@ export function BillsTab() {
     const [editingBill, setEditingBill] = useState<Bill | null>(null)
     const [isEditMobileOpen, setIsEditMobileOpen] = useState(false)
     const [submitting, setSubmitting] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1)
@@ -211,7 +213,13 @@ export function BillsTab() {
 
     return (
         <div className="space-y-4 p-1" dir="rtl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-[#323338] dark:text-gray-100">ניהול חשבונות</h2>
+                <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} title="הדרכה">
+                    <Info className="h-5 w-5 text-gray-500" />
+                </Button>
+            </div>
+            <div id="bills-summary" className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="monday-card p-4 border-l-4 border-l-blue-500 min-w-0 dark:bg-slate-800 dark:border-blue-500/50">
                     <p className="text-xs text-gray-500 mb-1 truncate">סה"כ לתשלום (חודשי)</p>
                     <p className={`text-base md:text-xl font-bold text-[#323338] dark:text-gray-100 truncate ${loading ? 'animate-pulse' : ''}`}>
@@ -234,7 +242,7 @@ export function BillsTab() {
 
             <div className="grid gap-4 md:grid-cols-2">
                 {/* Desktop Form */}
-                <div className="glass-panel p-5 h-fit hidden md:block">
+                <div id="bills-form" className="glass-panel p-5 h-fit hidden md:block">
                     <div className="flex items-center gap-2 mb-4 min-w-0">
                         <CreditCard className="h-5 w-5 text-orange-500 flex-shrink-0" />
                         <h3 className="text-base md:text-lg font-bold text-[#323338] dark:text-gray-100 truncate flex-1 min-w-0">הוספת חשבון חדש</h3>
@@ -273,7 +281,7 @@ export function BillsTab() {
 
 
                 <div className="glass-panel p-5 block">
-                    <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <div id="bills-list-header" className="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">רשימת חשבונות</h3>
                         <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
@@ -300,7 +308,7 @@ export function BillsTab() {
                             </Button>
                         </div>
                     </div>
-                    <div className="space-y-3">
+                    <div id="bills-list-container" className="space-y-3">
                         {loading ? (
                             // Skeleton loader while loading
                             <>
@@ -410,6 +418,11 @@ export function BillsTab() {
                     </div>
                 </div>
             </div>
+
+            <BillsTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
+            />
         </div >
     )
 }

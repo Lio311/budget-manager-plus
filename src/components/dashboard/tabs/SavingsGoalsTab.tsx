@@ -12,6 +12,8 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { getSavingsGoals, updateCategoryGoalTarget, SavingsGoalsData } from '@/lib/actions/savings-goals'
 import { useToast } from '@/hooks/use-toast'
 import { mutate } from 'swr'
+import { SavingsGoalsTutorial } from '@/components/dashboard/tutorial/SavingsGoalsTutorial'
+import { Info } from 'lucide-react'
 
 export function SavingsGoalsTab() {
     const { month, year, budgetType } = useBudget()
@@ -19,6 +21,7 @@ export function SavingsGoalsTab() {
     const [editingCategory, setEditingCategory] = useState<string | null>(null)
     const [editValue, setEditValue] = useState('')
     const [hasShownWarning, setHasShownWarning] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
 
     // Fetch savings goals data
     const { data: goalsData, isLoading } = useSWR<SavingsGoalsData>(
@@ -94,10 +97,15 @@ export function SavingsGoalsTab() {
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">יעדי חיסכון</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">עקוב אחר ההתקדמות שלך לפי קטגוריות</p>
                 </div>
+                <div className="mr-auto">
+                    <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} title="הדרכה">
+                        <Info className="h-5 w-5 text-gray-500" />
+                    </Button>
+                </div>
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div id="goals-summary" className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
@@ -161,7 +169,7 @@ export function SavingsGoalsTab() {
             </div>
 
             {/* Goals List by Category */}
-            <div className="glass-panel p-5">
+            <div id="goals-list" className="glass-panel p-5">
                 <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4 px-2">יעדים לפי קטגוריה</h3>
 
                 <div className="space-y-4">
@@ -282,6 +290,11 @@ export function SavingsGoalsTab() {
                     )}
                 </div>
             </div>
+
+            <SavingsGoalsTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
+            />
         </div>
     )
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import useSWR from 'swr'
-import { Plus, FolderOpen, ArrowUpCircle, ArrowDownCircle, Wallet, Pencil, Trash2 } from 'lucide-react'
+import { Plus, FolderOpen, ArrowUpCircle, ArrowDownCircle, Wallet, Pencil, Trash2, Info } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { getProjectsWithStats, addProject, updateProject, deleteProject, getProjectDetails } from '@/lib/actions/projects'
 import { ProjectDetailsDialog } from '@/components/dashboard/dialogs/ProjectDetailsDialog'
+import { ProjectsTutorial } from '@/components/dashboard/tutorial/ProjectsTutorial'
 import { PRESET_COLORS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/utils'
@@ -59,6 +60,7 @@ export function ProjectsTab() {
     const [name, setName] = useState('')
     const [color, setColor] = useState(PRESET_COLORS[0].hex)
     const [submitting, setSubmitting] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
 
     const handleAdd = async () => {
         if (!name.trim()) return
@@ -162,10 +164,15 @@ export function ProjectsTab() {
                     <h2 className="text-3xl font-bold tracking-tight">פרויקטים</h2>
                     <p className="text-muted-foreground">ניהול ומעקב אחרי פרויקטים אישיים</p>
                 </div>
-                <Button onClick={() => setIsAddOpen(true)} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    פרויקט חדש
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} title="הדרכה">
+                        <Info className="h-5 w-5 text-gray-500" />
+                    </Button>
+                    <Button id="projects-add-btn" onClick={() => setIsAddOpen(true)} className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        פרויקט חדש
+                    </Button>
+                </div>
             </div>
 
             {isLoading ? (
@@ -193,7 +200,7 @@ export function ProjectsTab() {
                     </CardContent>
                 </Card>
             ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div id="projects-list" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {/* @ts-ignore */}
                     {projects.map((project: Project) => (
                         <Card
@@ -362,6 +369,11 @@ export function ProjectsTab() {
                 project={viewProject}
                 isOpen={isDetailsOpen}
                 onClose={() => setIsDetailsOpen(false)}
+            />
+
+            <ProjectsTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
             />
         </div>
     )

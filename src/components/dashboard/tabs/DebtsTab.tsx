@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
-import { Plus, Trash2, Check, Loader2, Pencil, X, TrendingDown, Wallet, ArrowUpDown } from 'lucide-react'
+import { Plus, Trash2, Check, Loader2, Pencil, X, TrendingDown, Wallet, ArrowUpDown, Info } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getDebts, deleteDebt, toggleDebtPaid, updateDebt } from '@/lib/actions/debts'
@@ -25,6 +25,7 @@ import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
 
 import { PaymentMethodSelector } from '@/components/dashboard/PaymentMethodSelector'
 import { useDemo } from '@/contexts/DemoContext'
+import { DebtsTutorial } from '@/components/dashboard/tutorial/DebtsTutorial'
 
 interface Debt {
     id: string
@@ -58,6 +59,7 @@ export function DebtsTab() {
     const { mutate: globalMutate } = useSWRConfig()
     const [isMobileOpen, setIsMobileOpen] = useState(false)
     const { isDemo, data: demoData, interceptAction } = useDemo()
+    const [showTutorial, setShowTutorial] = useState(false)
 
     const fetcher = async () => {
         const result = await getDebts(month, year, budgetType)
@@ -208,8 +210,14 @@ export function DebtsTab() {
 
     return (
         <div className="space-y-4 p-1" dir="rtl">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-[#323338] dark:text-gray-100">ניהול הלוואות</h2>
+                <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} title="הדרכה">
+                    <Info className="h-5 w-5 text-gray-500" />
+                </Button>
+            </div>
             {/* Summary Cards */}
-            <div className="grid gap-3 grid-cols-1 md:grid-cols-3">
+            <div id="debts-summary" className="grid gap-3 grid-cols-1 md:grid-cols-3">
                 <div className="monday-card p-4 border-l-4 border-l-[#00c875] dark:bg-slate-800">
                     <h3 className="text-sm font-medium text-muted-foreground dark:text-gray-200 mb-1">יתרה כוללת (נטו)</h3>
                     <div className={`text-2xl font-bold ${loading ? 'animate-pulse text-purple-600' : stats.netDebtILS > 0 ? 'text-red-500' : 'text-green-500'}`}>
@@ -240,7 +248,7 @@ export function DebtsTab() {
             {/* Split View */}
             <div className="grid gap-4 md:grid-cols-2">
                 {/* Add Debt Form - Desktop Only */}
-                <div className="hidden md:block glass-panel p-5 h-fit">
+                <div id="debts-form" className="hidden md:block glass-panel p-5 h-fit">
                     <DebtForm />
                 </div>
 
@@ -263,7 +271,7 @@ export function DebtsTab() {
 
                 {/* Debts List */}
                 <div className="glass-panel p-5 block">
-                    <div className="flex items-center justify-between mb-4 px-2 flex-wrap gap-2">
+                    <div id="debts-list-header" className="flex items-center justify-between mb-4 px-2 flex-wrap gap-2">
                         <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">רשימת הלוואות</h3>
                         <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
@@ -292,7 +300,7 @@ export function DebtsTab() {
                         </div>
                     </div>
 
-                    <div className="space-y-3">
+                    <div id="debts-list-container" className="space-y-3">
                         {loading ? (
                             <div className="text-center py-10 text-gray-400">טוען...</div>
                         ) : debts.length === 0 ? (
@@ -392,6 +400,11 @@ export function DebtsTab() {
                     )}
                 </DialogContent>
             </Dialog>
+
+            <DebtsTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
+            />
         </div>
     )
 }

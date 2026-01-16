@@ -9,7 +9,7 @@ import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Pagination } from '@/components/ui/Pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Trash2, Loader2, Pencil, X, Check, PiggyBank, ArrowUpDown } from 'lucide-react'
+import { Plus, Trash2, Loader2, Pencil, X, Check, PiggyBank, ArrowUpDown, Info } from 'lucide-react'
 import { useBudget } from '@/contexts/BudgetContext'
 import { formatCurrency } from '@/lib/utils'
 import { getSavings, addSaving, deleteSaving, updateSaving } from '@/lib/actions/savings'
@@ -32,6 +32,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { SavingForm } from '@/components/dashboard/forms/SavingForm'
 import { useDemo } from '@/contexts/DemoContext'
+import { SavingsTutorial } from '@/components/dashboard/tutorial/SavingsTutorial'
 
 interface Saving {
     id: string
@@ -130,6 +131,7 @@ export function SavingsTab() {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 5
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
 
     // Sorting State
     const [sortMethod, setSortMethod] = useState<'AMOUNT' | 'NAME' | 'CATEGORY' | 'PAYMENT'>('AMOUNT')
@@ -251,8 +253,14 @@ export function SavingsTab() {
 
     return (
         <div className="space-y-6 w-full pb-10 px-2 md:px-0" dir="rtl">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-[#323338] dark:text-gray-100">ניהול חסכונות</h2>
+                <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} title="הדרכה">
+                    <Info className="h-5 w-5 text-gray-500" />
+                </Button>
+            </div>
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="savings-summary" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="monday-card border-l-4 border-l-[#0073ea] p-6 flex flex-col justify-center gap-2 dark:bg-slate-800 dark:border-l-blue-500">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">סך הפקדות חודשיות</h3>
                     <div className={`text-2xl font-bold text-[#0073ea] dark:text-blue-400 break-all ${loadingSavings ? 'animate-pulse' : ''}`}>
@@ -271,7 +279,7 @@ export function SavingsTab() {
             {/* Split View */}
             <div className="grid gap-4 md:grid-cols-2">
                 {/* Add New Saving - Desktop Only */}
-                <div className="hidden md:block glass-panel p-5 h-fit">
+                <div id="savings-form" className="hidden md:block glass-panel p-5 h-fit">
                     <SavingForm
                         categories={categories}
                         onCategoriesChange={mutateCategories}
@@ -302,7 +310,7 @@ export function SavingsTab() {
 
                 {/* Savings List */}
                 <div className="glass-panel p-5 block">
-                    <div className="flex items-center justify-between mb-4 px-2 flex-wrap gap-2">
+                    <div id="savings-list-header" className="flex items-center justify-between mb-4 px-2 flex-wrap gap-2">
                         <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">רשימת חסכונות</h3>
                         <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
@@ -329,7 +337,7 @@ export function SavingsTab() {
                         </div>
                     </div>
 
-                    <div className="space-y-3">
+                    <div id="savings-list-container" className="space-y-3">
                         {loadingSavings ? (
                             <div className="text-center py-10 text-gray-400">טוען...</div>
                         ) : savings.length === 0 ? (
@@ -453,6 +461,11 @@ export function SavingsTab() {
                 onConfirm={handleRecurrenceConfirm}
                 action={pendingAction?.type || 'delete'}
                 entityName="חיסכון"
+            />
+
+            <SavingsTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
             />
         </div >
     )

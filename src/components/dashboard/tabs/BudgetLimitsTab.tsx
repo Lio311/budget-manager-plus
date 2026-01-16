@@ -20,6 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Pagination } from '@/components/ui/Pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useConfirm } from '@/hooks/useConfirm'
+import { BudgetLimitsTutorial } from '@/components/dashboard/tutorial/BudgetLimitsTutorial'
 
 const getCategoryIcon = (name: string) => {
     switch (name) {
@@ -116,6 +117,7 @@ export function BudgetLimitsTab() {
 
     const [saving, setSaving] = useState<string | null>(null) // categoryId currently saving
     const [activeDefaults, setActiveDefaults] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1)
@@ -185,8 +187,14 @@ export function BudgetLimitsTab() {
 
     return (
         <div className="space-y-6 pb-20" dir="rtl">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-[#323338] dark:text-gray-100">מגבלות תקציב</h2>
+                <Button variant="ghost" size="icon" onClick={() => setShowTutorial(true)} title="הדרכה">
+                    <Info className="h-5 w-5 text-gray-500" />
+                </Button>
+            </div>
             {/* Header / Summary */}
-            <div className="grid gap-4 md:grid-cols-3">
+            <div id="limits-summary" className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-muted-foreground">תקציב חודשי כולל</CardTitle>
@@ -209,7 +217,7 @@ export function BudgetLimitsTab() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card className="flex flex-col justify-center items-center p-0 bg-transparent border-none shadow-none h-full w-full">
+                <Card id="limits-auto-calc" className="flex flex-col justify-center items-center p-0 bg-transparent border-none shadow-none h-full w-full">
                     <Button
                         onClick={handleSmartRecommendations}
                         disabled={activeDefaults}
@@ -244,7 +252,7 @@ export function BudgetLimitsTab() {
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">תקציבים פעילים</h3>
 
-                <div className="w-64">
+                <div id="limits-add" className="w-64">
                     <Select
                         onValueChange={(val) => {
                             setNewlyAddedIds(prev => [...prev, val])
@@ -268,7 +276,7 @@ export function BudgetLimitsTab() {
                 </div>
             </div>
 
-            <div className="grid gap-3">
+            <div id="limits-list" className="grid gap-3">
                 {loading ? (
                     <div className="flex flex-col gap-3">
                         {[1, 2, 3].map(i => (
@@ -384,6 +392,11 @@ export function BudgetLimitsTab() {
                     </div>
                 )}
             </div>
+
+            <BudgetLimitsTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
+            />
         </div>
     )
 }
