@@ -44,6 +44,7 @@ interface Invoice {
     status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED'
     totalAmount: number
     vatAmount: number
+    invoiceType: string
     items: any[]
 }
 
@@ -72,6 +73,7 @@ export function InvoicesTab() {
             status: inv.status as any,
             totalAmount: inv.total,
             vatAmount: inv.vatAmount,
+            invoiceType: inv.invoiceType || 'INVOICE',
             items: []
         }))
     }
@@ -347,6 +349,15 @@ export function InvoicesTab() {
                                     <div>
                                         <div className="font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                                             {inv.clientName}
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300">
+                                                {{
+                                                    'TAX_INVOICE': 'חשבונית מס',
+                                                    'RECEIPT': 'קבלה',
+                                                    'INVOICE': 'חשבונית',
+                                                    'DEAL_INVOICE': 'חשבונית עסקה',
+                                                    'REFUND_INVOICE': 'חשבונית זיכוי'
+                                                }[inv.invoiceType] || 'חשבונית'}
+                                            </span>
                                         </div>
                                         <div className="text-xs text-gray-500">
                                             #{inv.invoiceNumber} • {format(new Date(inv.date), 'dd/MM/yyyy')}
