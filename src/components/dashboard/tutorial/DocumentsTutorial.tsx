@@ -1,90 +1,218 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { X, Info, ChevronRight, ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
-function useMediaQuery(query: string) {
-    const [matches, setMatches] = useState(false)
-    useEffect(() => {
-        const media = window.matchMedia(query)
-        if (media.matches !== matches) {
-            setMatches(media.matches)
-        }
-        const listener = () => setMatches(media.matches)
-        window.addEventListener('resize', listener)
-        return () => window.removeEventListener('resize', listener)
-    }, [matches, query])
-    return matches
-}
-
-interface DocumentsTutorialProps {
+interface TutorialProps {
     isOpen: boolean
     onClose: () => void
 }
+
+type Placement = 'top' | 'bottom' | 'left' | 'right'
+type Alignment = 'start' | 'center' | 'end'
 
 interface CardConfig {
     id: string
     title: string
     text: string
-    placement: 'top' | 'bottom' | 'left' | 'right'
-    align?: 'start' | 'center' | 'end'
+    placement?: Placement
+    align?: Alignment
     maxWidth?: number
 }
 
-const cards: CardConfig[] = [
-    {
-        id: 'documents-types-grid',
-        title: 'יצירת מסמכים',
-        text: 'בחר את סוג המסמך שברצונך ליצור: הצעת מחיר, חשבונית או זיכוי. לחיצה על הכרטיס תפתח את טופס היצירה המתאים.',
-        placement: 'bottom',
-        align: 'center',
-        maxWidth: 350
-    },
-    {
-        id: 'documents-list-container',
-        title: 'ניהול מסמכים',
-        text: 'כאן מרוכזים כל המסמכים שהפקת. ניתן לחפש לפי שם לקוח או מספר מסמך, ולסנן לפי סוג המסמך.',
-        placement: 'top',
-        align: 'center',
-        maxWidth: 320
-    }
-]
+interface TooltipState {
+    config: CardConfig
+    rect: DOMRect
+    style: React.CSSProperties
+    arrowStyle: React.CSSProperties
+}
 
-export function DocumentsTutorial({ isOpen, onClose }: DocumentsTutorialProps) {
+export function DocumentsTutorial({ isOpen, onClose }: TutorialProps) {
+    const [tooltips, setTooltips] = useState<TooltipState[]>([])
+    const [mounted, setMounted] = useState(false)
     const [currentStep, setCurrentStep] = useState(0)
-    const [, forceUpdate] = useState(0)
-    const isMobile = useMediaQuery('(max-width: 768px)')
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     useEffect(() => {
         if (isOpen) {
+            calculatePositions()
+            window.addEventListener('resize', calculatePositions)
+            window.addEventListener('scroll', calculatePositions)
             setCurrentStep(0)
-            // Add scroll and resize listeners to recalculate positions
-            const handleUpdate = () => forceUpdate(prev => prev + 1)
-            window.addEventListener('scroll', handleUpdate, true)
-            window.addEventListener('resize', handleUpdate)
+        } else {
+            window.removeEventListener('resize', calculatePositions)
+            window.removeEventListener('scroll', calculatePositions)
+        }
 
-            return () => {
-                window.removeEventListener('scroll', handleUpdate, true)
-                window.removeEventListener('resize', handleUpdate)
-            }
+        return () => {
+            window.removeEventListener('resize', calculatePositions)
+            window.removeEventListener('scroll', calculatePositions)
         }
     }, [isOpen])
 
+    // Scroll effect for step change
     useEffect(() => {
-        if (isOpen && cards[currentStep]) {
-            const element = document.getElementById(cards[currentStep].id)
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        if (isOpen && tooltips.length > 0 && tooltips[currentStep]) {
+            const current = tooltips[currentStep]
+            const el = document.getElementById(current.config.id)
+
+            if (el) {
+                const rect = el.getBoundingClientRect()
+                const absoluteTop = rect.top + window.scrollY
+                const placement = current.config.placement || 'bottom'
+
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+                if (placement === 'top') {
+                    const y = absoluteTop - 250
+                    window.scrollTo({ top: Math.max(0, y - 100), behavior: 'smooth' })
+                } else {
+                    const y = absoluteTop - 100
+                    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+                }
             }
         }
-    }, [isOpen, currentStep])
+    }, [currentStep, isOpen, tooltips.length])
 
-    if (!isOpen) return null
+    const calculatePositions = () => {
+        const newTooltips: TooltipState[] = []
+
+        const scrollX = window.scrollX
+        const scrollY = window.scrollY
+        const isMobileView = window.innerWidth < 768
+
+        const cards: CardConfig[] = [
+            {
+                id: 'documents-types-grid',
+                title: 'יצירת מסמכים',
+                text: 'בחר את סוג המסמך שברצונך ליצור: הצעת מחיר, חשבונית או זיכוי. לחיצה על הכרטיס תפתח את טופס היצירה המתאים.',
+                placement: 'bottom',
+                align: 'center',
+                maxWidth: 350
+            },
+            {
+                id: 'documents-list-container',
+                title: 'ניהול מסמכים',
+                text: 'כאן מרוכזים כל המסמכים שהפקת. ניתן לחפש לפי שם לקוח או מספר מסמך, ולסנן לפי סוג המסמך.',
+                placement: 'top',
+                align: 'center',
+                maxWidth: 320
+            }
+        ]
+
+        cards.forEach(config => {
+            const el = document.getElementById(config.id)
+            if (el) {
+                const rect = el.getBoundingClientRect()
+                const absLeft = rect.left + scrollX
+                const absTop = rect.top + scrollY
+                const absRight = rect.right + scrollX
+                const absBottom = rect.bottom + scrollY
+
+                let style: React.CSSProperties = {}
+                let arrowStyle: React.CSSProperties = {}
+
+                const width = isMobileView ? 280 : (config.maxWidth || 300)
+                const placement = isMobileView ? (config.placement === 'top' ? 'top' : 'bottom') : (config.placement || 'bottom')
+                const align = isMobileView ? 'center' : (config.align || 'center')
+
+                const gap = 10
+
+                if (placement === 'bottom') {
+                    style.top = absBottom + gap
+                    style.marginTop = '15px'
+
+                    if (align === 'center') style.left = absLeft + (rect.width / 2) - (width / 2)
+                    if (align === 'start') style.left = absRight - width + 10
+                    if (align === 'end') style.left = absLeft - 10
+
+                    arrowStyle = {
+                        top: '-6px',
+                        left: '50%',
+                        transform: 'translateX(-50%) rotate(45deg)',
+                        borderTop: '1px solid #e2e8f0',
+                        borderLeft: '1px solid #e2e8f0'
+                    }
+                    if (align === 'start') arrowStyle.left = `${width - 30}px`, arrowStyle.transform = 'translateX(0) rotate(45deg)'
+                    if (align === 'end') arrowStyle.left = '20px', arrowStyle.transform = 'translateX(0) rotate(45deg)'
+
+                } else if (placement === 'top') {
+                    style.top = absTop - gap
+                    style.transform = 'translateY(-100%)'
+                    style.marginTop = '-15px'
+
+                    if (align === 'center') style.left = absLeft + (rect.width / 2) - (width / 2)
+                    if (align === 'start') style.left = absRight - width + 10
+                    if (align === 'end') style.left = absLeft - 10
+
+                    arrowStyle = {
+                        bottom: '-6px',
+                        left: '50%',
+                        transform: 'translateX(-50%) rotate(225deg)',
+                        borderTop: '1px solid #e2e8f0',
+                        borderLeft: '1px solid #e2e8f0'
+                    }
+                    if (align === 'start') arrowStyle.left = `${width - 30}px`, arrowStyle.transform = 'translateX(0) rotate(225deg)'
+                    if (align === 'end') arrowStyle.left = '20px', arrowStyle.transform = 'translateX(0) rotate(225deg)'
+                }
+
+                // Screen Edge Clamping
+                let leftVal = parseFloat(style.left?.toString() || '0')
+                const maxLeft = window.innerWidth - width - 20
+                const minLeft = 20
+
+                if (leftVal < minLeft) {
+                    leftVal = minLeft
+                    const centerOfElement = absLeft + (rect.width / 2)
+                    const newArrowLeft = centerOfElement - leftVal
+                    arrowStyle.left = `${Math.max(10, Math.min(newArrowLeft, width - 10))}px`
+                    arrowStyle.transform = placement === 'top'
+                        ? 'translateX(-50%) rotate(225deg)'
+                        : 'translateX(-50%) rotate(45deg)'
+
+                } else if (leftVal > maxLeft) {
+                    leftVal = maxLeft
+                    const centerOfElement = absLeft + (rect.width / 2)
+                    const newArrowLeft = centerOfElement - leftVal
+                    arrowStyle.left = `${Math.max(10, Math.min(newArrowLeft, width - 10))}px`
+                    arrowStyle.transform = placement === 'top'
+                        ? 'translateX(-50%) rotate(225deg)'
+                        : 'translateX(-50%) rotate(45deg)'
+                }
+
+                style.left = leftVal
+
+                newTooltips.push({
+                    config,
+                    rect,
+                    style: {
+                        position: 'absolute',
+                        width: `${width}px`,
+                        ...style
+                    },
+                    arrowStyle: {
+                        position: 'absolute',
+                        width: '12px',
+                        height: '12px',
+                        background: 'inherit',
+                        zIndex: 10,
+                        ...arrowStyle
+                    }
+                })
+            }
+        })
+
+        setTooltips(newTooltips)
+    }
 
     const handleNext = () => {
-        if (currentStep < cards.length - 1) {
+        if (currentStep < tooltips.length - 1) {
             setCurrentStep(prev => prev + 1)
         } else {
             onClose()
@@ -97,153 +225,90 @@ export function DocumentsTutorial({ isOpen, onClose }: DocumentsTutorialProps) {
         }
     }
 
-    const currentCard = cards[currentStep]
+    if (!mounted || !isOpen) return null
 
-    if (isMobile) {
-        return (
-            <AnimatePresence>
-                <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-black/50 pointer-events-auto"
-                        onClick={onClose}
-                    />
-                    <motion.div
-                        key="mobile-card"
-                        initial={{ y: 100, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 100, opacity: 0 }}
-                        className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-t-2xl p-6 shadow-xl z-50 m-4 pointer-events-auto"
-                    >
-                        <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">{currentCard.title}</h3>
-                            <Button variant="ghost" size="icon" onClick={onClose} className="h-6 w-6 -mt-1 -mr-2">
-                                <X className="h-4 w-4" />
-                            </Button>
-                        </div>
-                        <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed">
-                            {currentCard.text}
-                        </p>
-                        <div className="flex justify-between items-center">
-                            <div className="text-sm text-gray-400" dir="ltr">
-                                {currentStep + 1} / {cards.length}
-                            </div>
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="sm" onClick={handlePrev} disabled={currentStep === 0}>
-                                    הקודם
-                                </Button>
-                                <Button className="bg-[#323338] hover:bg-black text-white" size="sm" onClick={handleNext}>
-                                    {currentStep === cards.length - 1 ? 'סיום' : 'הבא'}
-                                </Button>
-                            </div>
-                        </div>
-                    </motion.div>
-                </div>
-            </AnimatePresence>
-        )
-    }
+    return createPortal(
+        <div className="absolute inset-0 z-[9999] isolate w-full min-h-screen h-full pointer-events-none">
+            <div
+                className="fixed inset-0 bg-black/70 backdrop-blur-[2px] transition-opacity duration-300 animate-in fade-in pointer-events-auto"
+                onClick={onClose}
+            />
 
-    const targetElement = document.getElementById(currentCard.id)
-    const rect = targetElement?.getBoundingClientRect()
-
-    return (
-        <AnimatePresence>
-            <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-black/40 pointer-events-auto"
+            <div className="fixed top-4 left-4 z-50">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:bg-white/20 rounded-full w-12 h-12 pointer-events-auto"
                     onClick={onClose}
-                />
+                >
+                    <X className="w-6 h-6" />
+                </Button>
+            </div>
 
-                {rect && (
-                    <motion.div
-                        layoutId="highlight-ring-documents"
-                        className="absolute border-2 border-white rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.5)] pointer-events-none z-40 transition-all duration-500 ease-in-out"
-                        style={{
-                            top: rect.top + window.scrollY - 8,
-                            left: rect.left + window.scrollX - 8,
-                            width: rect.width + 16,
-                            height: rect.height + 16,
-                        }}
-                    />
-                )}
+            <div className="absolute inset-0 w-full h-full">
+                {tooltips.map((t, i) => {
+                    if (i !== currentStep) return null
 
-                {rect && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute z-50 pointer-events-auto"
-                        style={{
-                            top: (currentCard.placement === 'bottom' ? rect.bottom + 24 :
-                                currentCard.placement === 'top' ? rect.top - 200 :
-                                    rect.top) + window.scrollY,
-                            left: (currentCard.placement === 'left' ? rect.left - 340 :
-                                currentCard.placement === 'right' ? rect.right + 24 :
-                                    rect.left + (rect.width / 2) - 150) + window.scrollX,
-                            ...(currentCard.placement === 'bottom' && currentCard.align === 'end' ? { left: rect.right - 300 + window.scrollX } : {}),
-                            ...(currentCard.placement === 'bottom' && currentCard.align === 'start' ? { left: rect.left + window.scrollX } : {}),
-                        }}
-                    >
-                        <div
-                            className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-5 border border-gray-200 dark:border-slate-700 relative"
-                            style={{ width: currentCard.maxWidth || 300 }}
-                        >
-                            <div className={`absolute w-4 h-4 bg-white dark:bg-slate-800 transform rotate-45 border-l border-t border-gray-200 dark:border-slate-700
-                                ${currentCard.placement === 'bottom' ? '-top-2 left-1/2 -ml-2' : ''}
-                                ${currentCard.placement === 'top' ? '-bottom-2 left-1/2 -ml-2 border-l-0 border-t-0 border-r border-b' : ''}
-                                ${currentCard.placement === 'right' ? 'top-6 -left-2' : ''}
-                                ${currentCard.placement === 'left' ? 'top-6 -right-2 border-l-0 border-t-0 border-r border-b' : ''}
-                            `} />
+                    return (
+                        <div key={t.config.id}>
+                            <div
+                                className="absolute rounded-xl border-2 border-white/50 box-content shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] pointer-events-none transition-all duration-500 ease-in-out"
+                                style={{
+                                    left: t.rect.left + window.scrollX,
+                                    top: t.rect.top + window.scrollY,
+                                    width: t.rect.width,
+                                    height: t.rect.height,
+                                    boxShadow: '0 0 30px rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.2)'
+                                }}
+                            />
 
-                            <div className="relative z-10">
-                                <div className="flex justify-between items-start mb-2">
-                                    <h4 className="font-bold text-lg text-gray-900 dark:text-white">{currentCard.title}</h4>
-                                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                                        <X className="h-4 w-4" />
-                                    </button>
-                                </div>
-                                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
-                                    {currentCard.text}
-                                </p>
-                                <div className="flex items-center justify-between mt-4">
-                                    <div className="text-xs text-muted-foreground" dir="ltr">
-                                        {currentStep + 1} / {cards.length}
+                            <div
+                                className="pointer-events-auto transition-all duration-300 ease-in-out bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-gray-100 dark:border-gray-700 p-4 text-right animate-in fade-in slide-in-from-bottom-4"
+                                style={t.style}
+                                dir="rtl"
+                            >
+                                <div className="bg-white dark:bg-slate-800" style={t.arrowStyle} />
+
+                                <div className="relative z-20">
+                                    <div className="flex items-center gap-2 mb-2 text-[#323338] dark:text-gray-100 font-bold border-b pb-2 border-slate-100 dark:border-slate-700">
+                                        <Info className="w-4 h-4" />
+                                        <span>{t.config.title}</span>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={handlePrev}
-                                            disabled={currentStep === 0}
-                                            className="h-8 w-8 p-0 rounded-full"
-                                        >
-                                            <ChevronRight className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            onClick={handleNext}
-                                            className="h-8 px-4 bg-[#323338] hover:bg-black text-white rounded-full text-xs"
-                                        >
-                                            {currentStep === cards.length - 1 ? 'סיום' : (
-                                                <div className="flex items-center gap-1">
-                                                    הבא
-                                                    <ChevronLeft className="h-3 w-3" />
-                                                </div>
-                                            )}
-                                        </Button>
+                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                                        {t.config.text}
+                                    </p>
+
+                                    <div className="flex items-center justify-between mt-4 border-t border-slate-100 dark:border-slate-700 pt-3">
+                                        <span className="text-xs text-muted-foreground" dir="ltr">
+                                            {currentStep + 1} / {tooltips.length}
+                                        </span>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={handlePrev}
+                                                disabled={currentStep === 0}
+                                                className="h-8 px-2"
+                                            >
+                                                <ChevronRight className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                onClick={handleNext}
+                                                className="h-8 px-3 bg-[#323338] hover:bg-black text-white"
+                                            >
+                                                {currentStep === tooltips.length - 1 ? 'סיום' : 'הבא'}
+                                                {currentStep !== tooltips.length - 1 && <ChevronLeft className="w-4 h-4 mr-1" />}
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
-                )}
+                    )
+                })}
             </div>
-        </AnimatePresence>
+        </div>,
+        document.body
     )
 }
