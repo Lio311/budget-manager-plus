@@ -107,7 +107,7 @@ export function IncomeTab() {
         const rate = parseFloat(taxRateInput)
         if (isNaN(rate) || rate < 0 || rate > 100) return
 
-        const result = await updateBusinessProfile({ companyName: 'temp', taxRate: rate } as any) // Partial update workaround or need to fetch full data first
+        // const result = await updateBusinessProfile({ companyName: 'temp', taxRate: rate } as any) - REMOVED DANGEROUS LINE
         // Actually, updateBusinessProfile validates all keys. We need to be careful.
         // Better strategy: fetch current profile, merge, then update.
         // Or create a specific action for tax rate to avoid overwriting.

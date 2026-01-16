@@ -32,7 +32,10 @@ export interface BusinessProfileData {
     taxRate?: number
 }
 
+import { unstable_noStore as noStore } from 'next/cache'
+
 export async function getBusinessProfile() {
+    noStore()
     try {
         const user = await currentUser()
         if (!user) throw new Error('Unauthorized')
