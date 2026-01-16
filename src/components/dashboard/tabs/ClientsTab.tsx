@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw, Check, Upload, FileSpreadsheet, FileText, Receipt, CreditCard } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw, Check, Upload, FileSpreadsheet, FileText, Receipt, CreditCard, Info } from 'lucide-react'
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command"
 import { read, utils } from 'xlsx'
 import { importClients } from '@/lib/actions/import-clients'
