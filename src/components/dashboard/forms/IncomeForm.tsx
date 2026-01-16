@@ -88,7 +88,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     const [newIncome, setNewIncome] = useState(initialData ? {
         source: initialData.source || '',
         category: initialData.category || '',
-        amount: initialData.amount?.toString() || '',
+        amount: (budgetType === 'BUSINESS' && initialData.amountBeforeVat)
+            ? initialData.amountBeforeVat.toString()
+            : (initialData.amount?.toString() || ''),
         currency: initialData.currency || 'ILS',
         date: initialData.date ? format(new Date(initialData.date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
         isRecurring: initialData.isRecurring || false,
@@ -234,7 +236,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         const incomeData = {
             source: newIncome.source,
             category: newIncome.category,
-            amount: parseFloat(newIncome.amount),
+            amount: isBusiness
+                ? (parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0)
+                : parseFloat(newIncome.amount),
             currency: newIncome.currency,
             date: newIncome.date,
             isRecurring: newIncome.isRecurring,
