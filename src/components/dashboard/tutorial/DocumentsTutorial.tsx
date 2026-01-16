@@ -154,8 +154,8 @@ export function DocumentsTutorial({ isOpen, onClose }: DocumentsTutorialProps) {
                         layoutId="highlight-ring-documents"
                         className="absolute border-2 border-white rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.5)] pointer-events-none z-40 transition-all duration-500 ease-in-out"
                         style={{
-                            top: rect.top - 8,
-                            left: rect.left - 8,
+                            top: rect.top + window.scrollY - 8,
+                            left: rect.left + window.scrollX - 8,
                             width: rect.width + 16,
                             height: rect.height + 16,
                         }}
@@ -170,14 +170,14 @@ export function DocumentsTutorial({ isOpen, onClose }: DocumentsTutorialProps) {
                         transition={{ duration: 0.3 }}
                         className="absolute z-50 pointer-events-auto"
                         style={{
-                            top: currentCard.placement === 'bottom' ? rect.bottom + 24 :
+                            top: (currentCard.placement === 'bottom' ? rect.bottom + 24 :
                                 currentCard.placement === 'top' ? rect.top - 200 :
-                                    rect.top,
-                            left: currentCard.placement === 'left' ? rect.left - 340 :
+                                    rect.top) + window.scrollY,
+                            left: (currentCard.placement === 'left' ? rect.left - 340 :
                                 currentCard.placement === 'right' ? rect.right + 24 :
-                                    rect.left + (rect.width / 2) - 150,
-                            ...(currentCard.placement === 'bottom' && currentCard.align === 'end' ? { left: rect.right - 300 } : {}),
-                            ...(currentCard.placement === 'bottom' && currentCard.align === 'start' ? { left: rect.left } : {}),
+                                    rect.left + (rect.width / 2) - 150) + window.scrollX,
+                            ...(currentCard.placement === 'bottom' && currentCard.align === 'end' ? { left: rect.right - 300 + window.scrollX } : {}),
+                            ...(currentCard.placement === 'bottom' && currentCard.align === 'start' ? { left: rect.left + window.scrollX } : {}),
                         }}
                     >
                         <div
