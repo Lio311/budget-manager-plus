@@ -7,7 +7,14 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatCurrency(amount: number | null | undefined, currency: string = '₪'): string {
   const safeAmount = amount || 0
-  return `${safeAmount.toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ${currency}`
+  const absAmount = Math.abs(safeAmount)
+  const formattedNumber = absAmount.toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+
+  if (safeAmount < 0) {
+    // For RTL: Symbol then Minus then Number -> "₪-500"
+    return `${currency}-${formattedNumber}`
+  }
+  return `${formattedNumber} ${currency}`
 }
 
 export function formatNumberWithCommas(num: number | null | undefined): string {

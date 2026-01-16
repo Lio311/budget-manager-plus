@@ -196,7 +196,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     // Current Month Calculations (Moved up for dependencies)
     const paidBills = current.bills.filter((b: any) => b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
     const paidDebts = current.debts.filter((d: any) => d.isPaid).reduce((sum: number, item: any) => sum + (item.monthlyPaymentILS || 0), 0)
-    const monthlySavingsCalculated = totalIncome - totalExpenses - paidBills - totalSavingsObserved - paidDebts
+
+    // Tax Rate Logic
+    const taxRate = (overviewData?.user as any)?.taxRate || 0
+    const incomeAfterTaxes = isBusiness ? totalIncome * (1 - (taxRate / 100)) : totalIncome
+
+    const monthlySavingsCalculated = incomeAfterTaxes - totalExpenses - paidBills - totalSavingsObserved - paidDebts
     const currentBillsDisplay = current.bills.filter((b: any) => !b.isPaid).reduce((sum: number, b: any) => sum + (b.amountILS || 0), 0)
 
     const incomeChange = prevTotalIncome > 0 ? ((totalIncome - prevTotalIncome) / prevTotalIncome) * 100 : 0

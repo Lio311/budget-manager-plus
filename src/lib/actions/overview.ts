@@ -33,6 +33,11 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 referralProgramActive: true,
                 trialEndsAt: true,
                 hasUsedTrial: true,
+                businessProfile: {
+                    select: {
+                        taxRate: true
+                    }
+                },
                 subscriptions: {
                     where: { status: 'active', planType: type === 'BUSINESS' ? 'BUSINESS' : 'PERSONAL' },
                     select: {
@@ -312,7 +317,8 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     monthlySavingsOverride: currentBudget?.initialSavings,
                     referralProgramActive: user.referralProgramActive,
                     trialEndsAt: user.trialEndsAt,
-                    activeSubscription: user.subscriptions[0] || null
+                    activeSubscription: user.subscriptions[0] || null,
+                    taxRate: user.businessProfile?.taxRate || 0
                 }
             }
         }
