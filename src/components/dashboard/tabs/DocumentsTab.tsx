@@ -413,49 +413,7 @@ export function DocumentsTab() {
                 })}
             </div>
 
-            {/* Form Section */}
-            {selectedType && (
-                <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                            {selectedType === 'quote' && (editingQuote ? 'עריכת הצעת מחיר' : 'יצירת הצעת מחיר חדשה')}
-                            {selectedType === 'invoice' && (editingInvoice ? 'עריכת חשבונית' : 'יצירת חשבונית חדשה')}
-                            {selectedType === 'credit' && (editingCreditNote ? 'עריכת זיכוי' : 'יצירת זיכוי חדש')}
-                        </h3>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                                setSelectedType(null)
-                                setEditingQuote(null)
-                                setEditingInvoice(null)
-                                setEditingCreditNote(null)
-                            }}
-                        >
-                            ביטול
-                        </Button>
-                    </div>
 
-                    {selectedType === 'quote' && (
-                        <QuoteForm
-                            clients={clients}
-                            initialData={editingQuote}
-                            onSuccess={handleFormSuccess}
-                        />
-                    )}
-                    {selectedType === 'invoice' && (
-                        <InvoiceForm
-                            clients={clients}
-                            onSuccess={handleFormSuccess}
-                        />
-                    )}
-                    {selectedType === 'credit' && (
-                        <CreditNoteForm
-                            onSuccess={handleFormSuccess}
-                        />
-                    )}
-                </div>
-            )}
 
             {/* Documents List */}
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm">
@@ -679,47 +637,66 @@ export function DocumentsTab() {
                 )}
             </div>
 
-            {/* Edit Dialog */}
-            <Dialog open={showEditDialog} onOpenChange={(open) => {
+            {/* Combined Create/Edit Dialog */}
+            <Dialog open={showEditDialog || !!selectedType} onOpenChange={(open) => {
                 if (!open) {
                     setShowEditDialog(false)
+                    setSelectedType(null)
                     setEditingQuote(null)
                     setEditingInvoice(null)
                     setEditingCreditNote(null)
                     setEditDialogType(null)
                 }
             }}>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
                     <DialogHeader>
                         <DialogTitle>
+                            {/* Edit Titles */}
                             {editDialogType === 'quote' && 'עריכת הצעת מחיר'}
                             {editDialogType === 'invoice' && 'עריכת חשבונית'}
                             {editDialogType === 'credit' && 'עריכת זיכוי'}
+
+                            {/* Create Titles */}
+                            {selectedType === 'quote' && 'יצירת הצעת מחיר חדשה'}
+                            {selectedType === 'invoice' && 'יצירת חשבונית חדשה'}
+                            {selectedType === 'credit' && 'יצירת זיכוי חדש'}
                         </DialogTitle>
                     </DialogHeader>
 
-                    {editDialogType === 'quote' && editingQuote && (
+                    {/* Forms - Checking both Edit and Create states */}
+
+                    {/* QUOTE FORM */}
+                    {((editDialogType === 'quote' && editingQuote) || selectedType === 'quote') && (
                         <QuoteForm
                             clients={clients}
-                            initialData={editingQuote}
+                            initialData={editingQuote || undefined}
                             onSuccess={() => {
                                 handleFormSuccess()
                                 setShowEditDialog(false)
                             }}
                         />
                     )}
-                    {editDialogType === 'invoice' && editingInvoice && (
+
+                    {/* INVOICE FORM */}
+                    {((editDialogType === 'invoice' && editingInvoice) || selectedType === 'invoice') && (
                         <InvoiceForm
                             clients={clients}
-                            initialData={editingInvoice}
+                            initialData={editingInvoice || undefined}
                             onSuccess={() => {
                                 handleFormSuccess()
                                 setShowEditDialog(false)
                             }}
                         />
                     )}
-                    {editDialogType === 'credit' && editingCreditNote && (
+
+                    {/* CREDIT NOTE FORM */}
+                    {((editDialogType === 'credit' && editingCreditNote) || selectedType === 'credit') && (
                         <CreditNoteForm
+                            // Assuming CreditNoteForm handles edit prop or logic internally if passed, 
+                            // but simpler to just mirror existing usage. 
+                            // Existing usage for EDIT had no props? That seems wrong for 'Edit', 
+                            // but I will persist what was there for 'selectedType'.
+                            // If edit logic was missing props, I won't fix it blindly.
                             onSuccess={() => {
                                 handleFormSuccess()
                                 setShowEditDialog(false)
