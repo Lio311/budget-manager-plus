@@ -187,6 +187,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             date: input.date ? new Date(input.date) : new Date(),
                             client: isBusiness && input.clientId ? { id: input.clientId, name: '...' } : null,
                             vatAmount: input.vatAmount || 0,
+                            amountBeforeVat: input.amountBeforeVat || (isBusiness ? (input.amount - (input.vatAmount || 0)) : input.amount),
                             payer: input.payer || '',
                             paymentMethod: input.paymentMethod || '',
                             isRecurring: input.isRecurring || false

@@ -528,7 +528,7 @@ export function IncomeTab() {
                                         {isBusiness && income.vatAmount && income.vatAmount > 0 ? (
                                             <div className="flex flex-row items-center gap-3 sm:gap-4">
                                                 <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
-                                                    <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((income.amount - (income.vatAmount || 0)))} {getCurrencySymbol(income.currency || 'ILS')}</span>
+                                                    <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((income.amountBeforeVat ?? (income.amount - (income.vatAmount || 0))))} {getCurrencySymbol(income.currency || 'ILS')}</span>
                                                     <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(income.vatAmount || 0)} {getCurrencySymbol(income.currency || 'ILS')}</span>
                                                 </div>
                                                 <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
