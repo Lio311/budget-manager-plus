@@ -523,7 +523,7 @@ export function ExpensesTab() {
                     <div className="flex items-center justify-between px-1 flex-wrap gap-2">
                         <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'פירוט עלויות והוצאות' : 'רשימת הוצאות'}</h3>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2" id="expenses-controls">
                             {/* Sort Controls */}
                             <div className="flex items-center gap-2">
                                 <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>

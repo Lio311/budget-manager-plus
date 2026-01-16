@@ -106,8 +106,8 @@ export function ExpensesTutorial({ isOpen, onClose }: TutorialProps) {
             },
             {
                 id: 'expenses-controls',
-                title: 'חיפוש ומיון',
-                text: 'ניתן לחפש הוצאות ספציפיות, לסנן לפי קטגוריות ולמיין את הרשימה כדי לראות את ההוצאות הגבוהות ביותר בראש.',
+                title: 'מיון ותצוגה',
+                text: 'ניתן למיין את רשימת ההוצאות לפי תאריך, סכום, תיאור, קטגוריה או אמצעי תשלום. השתמש בכפתור החץ להחלפת כיוון המיון (עולה/יורד).',
                 placement: 'bottom',
                 align: 'end',
                 maxWidth: 300
