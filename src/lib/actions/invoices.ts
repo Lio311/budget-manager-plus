@@ -72,7 +72,8 @@ export async function getInvoices(scope: string = 'BUSINESS') {
             },
             include: {
                 client: true,
-                lineItems: true
+                lineItems: true,
+                incomes: true // Include incomes to check status
             },
             orderBy: {
                 issueDate: 'desc'

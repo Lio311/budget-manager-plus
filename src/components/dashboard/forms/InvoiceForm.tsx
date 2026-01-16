@@ -49,7 +49,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                 total: initialData.total || 0,
                 paymentMethod: initialData.paymentMethod || '',
                 notes: initialData.notes || '',
-                createIncomeFromInvoice: false,
+                createIncomeFromInvoice: initialData.incomes && initialData.incomes.length > 0,
                 invoiceType: initialData.invoiceType || 'TAX_INVOICE',
                 lineItems: initialData.lineItems?.map((item: any) => ({
                     id: item.id, // Keep ID for updates if needed, though we often recreate
