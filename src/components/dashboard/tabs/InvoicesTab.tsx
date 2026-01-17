@@ -46,6 +46,7 @@ interface Invoice {
     vatAmount: number
     invoiceType: string
     items: any[]
+    guestClientName?: string | null
 }
 
 const getInvoiceLabel = (type: string) => {
@@ -85,7 +86,8 @@ export function InvoicesTab() {
             totalAmount: inv.total,
             vatAmount: inv.vatAmount,
             invoiceType: inv.invoiceType || 'INVOICE',
-            items: []
+            items: [],
+            guestClientName: inv.guestClientName
         }))
     }
 
