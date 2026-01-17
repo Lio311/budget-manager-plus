@@ -357,6 +357,25 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
 
         if (data.invoiceType) updateData.invoiceType = data.invoiceType
 
+        // Allow updating Client / Guest Name
+        if (data.isGuestClient !== undefined) {
+            // If switching to guest or updating guest name
+            if (data.isGuestClient) {
+                updateData.clientId = null
+                updateData.guestClientName = data.guestClientName
+            } else {
+                // Switching to real client
+                updateData.clientId = data.clientId
+                updateData.guestClientName = null
+            }
+        } else {
+            // Backward compatibility or partial updates where only one field might be sent? 
+            // Form sends all, so the block above handles strict switching. 
+            // But if we just want to update name for existing guest:
+            if (data.guestClientName !== undefined) updateData.guestClientName = data.guestClientName
+            if (data.clientId !== undefined) updateData.clientId = data.clientId
+        }
+
         if (data.subtotal !== undefined) {
             const vatRate = data.vatRate ?? existing.vatRate
             const vatAmount = data.subtotal * vatRate

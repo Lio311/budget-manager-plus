@@ -322,6 +322,7 @@ export function DebtForm({ isMobile, onSuccess, initialData }: DebtFormProps) {
                                             min="1"
                                             className="h-10 w-24 border-gray-200 focus:ring-purple-500/20 focus:border-purple-500"
                                             value={newDebt.numberOfInstallments}
+                                            onWheel={(e) => e.currentTarget.blur()}
                                             onChange={(e) => setNewDebt({ ...newDebt, numberOfInstallments: e.target.value })}
                                             disabled={submitting}
                                             dir="ltr"

@@ -181,6 +181,7 @@ export function NewCampaignDialog() {
                                     type="number"
                                     placeholder="0.00"
                                     value={formData.cost}
+                                    onWheel={(e) => e.currentTarget.blur()}
                                     onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
                                 />
                                 <span className="absolute left-3 top-2.5 text-gray-400 text-sm">₪</span>

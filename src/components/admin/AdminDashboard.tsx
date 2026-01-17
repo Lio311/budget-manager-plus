@@ -509,6 +509,7 @@ export function AdminDashboard({ initialData, maintenanceMode: initialMaintenanc
                                         className="text-left"
                                         type="number"
                                         value={newCoupon.discountPercent}
+                                        onWheel={(e) => e.currentTarget.blur()}
                                         onChange={e => setNewCoupon({ ...newCoupon, discountPercent: Number(e.target.value) })}
                                         dir="ltr"
                                     />

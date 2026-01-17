@@ -80,8 +80,8 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
     const [formData, setFormData] = useState<InvoiceFormData>(getInitialState())
 
     const [errors, setErrors] = useState<Record<string, boolean>>({})
-    const [isGuestClient, setIsGuestClient] = useState(false)
-    const [guestClientName, setGuestClientName] = useState('')
+    const [isGuestClient, setIsGuestClient] = useState(!!initialData?.guestClientName)
+    const [guestClientName, setGuestClientName] = useState(initialData?.guestClientName || '')
 
     const [loadingNumber, setLoadingNumber] = useState(false)
     const { year, month } = useBudget()
@@ -449,6 +449,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             step="0.01"
                                             className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1"
                                             value={item.price}
+                                            onWheel={(e) => e.currentTarget.blur()}
                                             onChange={(e) => {
                                                 const val = parseFloat(e.target.value) || 0
                                                 const newItems = [...lineItems]

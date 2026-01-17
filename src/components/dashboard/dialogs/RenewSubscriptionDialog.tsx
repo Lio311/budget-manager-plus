@@ -158,6 +158,7 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                             <Input
                                 type="number"
                                 value={subscriptionPrice}
+                                onWheel={(e) => e.currentTarget.blur()}
                                 onChange={(e) => setSubscriptionPrice(e.target.value)}
                                 placeholder="0.00"
                             />

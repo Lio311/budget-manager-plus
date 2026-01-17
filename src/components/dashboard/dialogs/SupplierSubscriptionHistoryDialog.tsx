@@ -240,6 +240,7 @@ export function SupplierSubscriptionHistoryDialog({ isOpen, onClose, supplier, o
                                     <Input
                                         type="number"
                                         value={editingExpense.amount}
+                                        onWheel={(e) => e.currentTarget.blur()}
                                         onChange={(e) => setEditingExpense({ ...editingExpense, amount: parseFloat(e.target.value) })}
                                     />
                                 </div>
@@ -322,8 +323,8 @@ function ExpenseRow({ expense, onStatusChange, onEdit, onDelete, updatingId, isP
                     disabled={updatingId === expense.id}
                 >
                     <SelectTrigger className={`w-[130px] h-9 ${expense.status === 'PAID' ? 'text-green-600 border-green-200 bg-green-50' :
-                            expense.status === 'PENDING' ? 'text-yellow-600 border-yellow-200 bg-yellow-50' :
-                                expense.status === 'OVERDUE' ? 'text-red-600 border-red-200 bg-red-50' : ''
+                        expense.status === 'PENDING' ? 'text-yellow-600 border-yellow-200 bg-yellow-50' :
+                            expense.status === 'OVERDUE' ? 'text-red-600 border-red-200 bg-red-50' : ''
                         }`}>
                         <SelectValue />
                     </SelectTrigger>

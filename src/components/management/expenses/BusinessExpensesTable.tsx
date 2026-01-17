@@ -293,6 +293,7 @@ export function BusinessExpensesTable({
                                         <Input
                                             type="number"
                                             value={formData.amount}
+                                            onWheel={(e) => e.currentTarget.blur()}
                                             onChange={e => setFormData({ ...formData, amount: e.target.value })}
                                             placeholder="0.00"
                                             required

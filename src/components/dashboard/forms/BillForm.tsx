@@ -235,6 +235,7 @@ export function BillForm({ onSuccess, isMobile = false, initialData }: BillFormP
                     type="number"
                     min="1"
                     max="31"
+                    onWheel={(e) => e.currentTarget.blur()}
                     value={formData.dueDay}
                     onChange={(e) => {
                         setFormData({ ...formData, dueDay: e.target.value })

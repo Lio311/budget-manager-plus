@@ -236,6 +236,7 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client, onUpd
                                     <Input
                                         type="number"
                                         value={editingIncome.amount}
+                                        onWheel={(e) => e.currentTarget.blur()}
                                         onChange={(e) => setEditingIncome({ ...editingIncome, amount: parseFloat(e.target.value) })}
                                     />
                                 </div>

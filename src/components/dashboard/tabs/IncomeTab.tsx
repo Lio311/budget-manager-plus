@@ -367,6 +367,7 @@ export function IncomeTab() {
                                                     type="number"
                                                     min="0"
                                                     max="100"
+                                                    onWheel={(e) => e.currentTarget.blur()}
                                                     value={taxRateInput}
                                                     onChange={(e) => setTaxRateInput(e.target.value)}
                                                     className="max-w-[100px] text-center"

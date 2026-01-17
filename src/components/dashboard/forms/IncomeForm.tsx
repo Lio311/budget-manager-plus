@@ -563,6 +563,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                     type="number"
                                     step={timeUnit === 'hours' ? "0.1" : "1"}
                                     min="0"
+                                    onWheel={(e) => e.currentTarget.blur()}
                                     className="h-10 border-gray-200 focus:ring-green-500/20"
                                     placeholder={timeUnit === 'hours' ? "לדוגמה: 1.5" : "לדוגמה: 90"}
                                     value={newIncome.workTime}

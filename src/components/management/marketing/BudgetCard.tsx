@@ -56,6 +56,7 @@ export function BudgetCard({ initialBudget = 0 }: { initialBudget: number }) {
                                 <Input
                                     type="number"
                                     value={tempBudget}
+                                    onWheel={(e) => e.currentTarget.blur()}
                                     onChange={(e) => setTempBudget(e.target.value)}
                                     className="text-right"
                                 />

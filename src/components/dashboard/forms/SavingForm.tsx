@@ -340,6 +340,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                         <Input
                             type="number"
                             placeholder="0.00"
+                            onWheel={(e) => e.currentTarget.blur()}
                             className={`h-10 focus:ring-[#00c875]/20 focus:border-[#00c875] w-full ${errors.monthlyDeposit ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200'}`}
                             value={newSaving.monthlyDeposit}
                             onChange={(e) => {
