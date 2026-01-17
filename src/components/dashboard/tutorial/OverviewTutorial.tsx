@@ -37,7 +37,11 @@ export function OverviewTutorial({ isOpen, onClose, onStepChange, isBusiness = t
     // ... (keep useEffects) ...
 
     const calculatePositions = () => {
-        // ... (keep variables) ...
+        const newTooltips: TooltipState[] = []
+
+        const scrollX = window.scrollX
+        const scrollY = window.scrollY
+        const isMobileView = window.innerWidth < 768
 
         // Full Detailed Content
         const cards: CardConfig[] = [

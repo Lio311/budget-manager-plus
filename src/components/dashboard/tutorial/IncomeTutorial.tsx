@@ -147,7 +147,9 @@ export function IncomeTutorial({ isOpen, onClose }: TutorialProps) {
                 let arrowStyle: React.CSSProperties = {}
 
                 const width = isMobileView ? 280 : (config.maxWidth || 300)
-                const placement = isMobileView ? (config.placement === 'top' ? 'top' : 'bottom') : (config.placement || 'bottom')
+                const placement = (isMobileView && targetId.endsWith('fab'))
+                    ? 'top'
+                    : (isMobileView ? (config.placement === 'top' ? 'top' : 'bottom') : (config.placement || 'bottom'))
                 const align = isMobileView ? 'center' : (config.align || 'center')
 
 
