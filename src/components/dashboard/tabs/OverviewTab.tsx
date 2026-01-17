@@ -362,6 +362,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
                     {!isBusiness && (
                         <Button
+                            id="overview-automations-btn"
                             variant="outline"
                             size="icon"
                             onClick={() => {

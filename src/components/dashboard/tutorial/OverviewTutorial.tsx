@@ -32,9 +32,37 @@ interface TooltipState {
 }
 
 export function OverviewTutorial({ isOpen, onClose, onStepChange, isBusiness = true }: TutorialProps & { isBusiness?: boolean }) {
-    // ... (keep state) ...
+    const [mounted, setMounted] = useState(false)
+    const [tooltips, setTooltips] = useState<TooltipState[]>([])
+    const [currentStep, setCurrentStep] = useState(0)
 
-    // ... (keep useEffects) ...
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    useEffect(() => {
+        if (isOpen) {
+            // Small delay to ensure DOM is ready and layout is stable
+            const timer = setTimeout(() => {
+                calculatePositions()
+            }, 100)
+
+            window.addEventListener('resize', calculatePositions)
+            window.addEventListener('scroll', calculatePositions)
+
+            return () => {
+                clearTimeout(timer)
+                window.removeEventListener('resize', calculatePositions)
+                window.removeEventListener('scroll', calculatePositions)
+            }
+        }
+    }, [isOpen, isBusiness])
+
+    useEffect(() => {
+        if (!isOpen) {
+            setCurrentStep(0)
+        }
+    }, [isOpen])
 
     const calculatePositions = () => {
         const newTooltips: TooltipState[] = []
@@ -56,6 +84,15 @@ export function OverviewTutorial({ isOpen, onClose, onStepChange, isBusiness = t
                 align: 'end',
                 maxWidth: 280
             },
+            // Automations (Personal Only)
+            ...(!isBusiness ? [{
+                id: 'overview-automations-btn',
+                title: 'אוטומציות',
+                text: 'כפתור זה מאפשר חיבור לקיצורי דרך (Shortcuts) באייפון, לייעול והאצת פעולות במערכת.',
+                placement: 'bottom' as Placement,
+                align: 'end' as Alignment,
+                maxWidth: 280
+            }] : []),
             {
                 id: 'overview-ai-btn',
                 title: 'יועץ פיננסי (AI)',
