@@ -239,6 +239,8 @@ export function SavingsGoalsTab() {
                                                 <div className="flex items-center gap-2">
                                                     <Input
                                                         type="number"
+                                                        min="0"
+                                                        onWheel={(e) => e.currentTarget.blur()}
                                                         value={editValue}
                                                         onChange={(e) => setEditValue(e.target.value)}
                                                         className="h-8 w-32 text-sm"

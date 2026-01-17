@@ -318,9 +318,50 @@ export async function signInvoice(token: string, signatureBase64: string) {
                 documentHash,
                 signedAt: new Date(),
                 isSigned: true,
-                status: 'SIGNED'
+                status: 'PAID'
             }
         })
+
+        // Generate Income from Signed Invoice
+        try {
+            const invoiceDate = invoice.issueDate
+            const budget = await getCurrentBudget(
+                invoiceDate.getMonth() + 1,
+                invoiceDate.getFullYear(),
+                '₪',
+                'BUSINESS'
+            )
+
+            const mainDescription = invoice.lineItems?.[0]?.description || 'שירות'
+            const incomeSource = `חשבונית ${invoice.invoiceNumber}: ${mainDescription}`
+
+            // Check if income already exists
+            const existingIncomes = await prisma.income.count({ where: { invoiceId: invoice.id } })
+
+            if (existingIncomes === 0) {
+                await prisma.income.create({
+                    data: {
+                        budgetId: budget.id,
+                        source: incomeSource,
+                        category: 'הכנסות מעסק',
+                        amount: invoice.total,
+                        currency: '₪',
+                        date: invoiceDate,
+                        clientId: invoice.clientId,
+                        invoiceId: invoice.id,
+                        amountBeforeVat: invoice.subtotal,
+                        vatRate: invoice.vatRate,
+                        vatAmount: invoice.vatAmount,
+                        invoiceDate: invoiceDate,
+                        paymentMethod: invoice.paymentMethod,
+                        isRecurring: false
+                    }
+                })
+            }
+        } catch (err) {
+            console.error('Failed to create income from signed invoice:', err)
+            // We don't fail the signing if income creation fails, but we verify logic
+        }
 
         // Revalidate dashboard paths so the business owner sees the update
         revalidatePath('/dashboard')
