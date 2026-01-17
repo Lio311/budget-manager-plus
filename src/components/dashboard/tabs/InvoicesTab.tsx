@@ -117,7 +117,6 @@ export function InvoicesTab() {
         status: inv.status,
         totalAmount: inv.amount,
         vatAmount: inv.amount * 0.17, // approximation
-        vatAmount: inv.amount * 0.17, // approximation
         invoiceType: 'INVOICE',
         items: [],
         guestClientName: null // Fix missing property
