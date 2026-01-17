@@ -72,7 +72,18 @@ export function OverviewTutorial({ isOpen, onClose, onStepChange, isBusiness = t
         if (currentConfig) {
             const el = document.getElementById(currentConfig.id)
             if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                const rect = el.getBoundingClientRect()
+                const absoluteTop = rect.top + window.scrollY
+                const placement = currentConfig.placement || 'bottom'
+
+                if (placement === 'top') {
+                    // For top placement, we need strictly more space above
+                    const y = absoluteTop - 280 // increased offset for safety
+                    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+                } else {
+                    // For bottom/others, center is usually fine, but let's ensure space
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }
             }
         }
     }, [currentStep, isOpen, tooltips])
