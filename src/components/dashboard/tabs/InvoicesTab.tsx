@@ -117,8 +117,10 @@ export function InvoicesTab() {
         status: inv.status,
         totalAmount: inv.amount,
         vatAmount: inv.amount * 0.17, // approximation
+        vatAmount: inv.amount * 0.17, // approximation
         invoiceType: 'INVOICE',
-        items: []
+        items: [],
+        guestClientName: null // Fix missing property
     })) : invoicesData
 
     const clients = isDemo ? demoData.clients : clientsData
@@ -387,6 +389,9 @@ export function InvoicesTab() {
                                                     "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
                                             )}>
                                                 {getInvoiceLabel(inv.invoiceType)}
+                                            </span>
+                                            <span className="text-[10px] text-red-500 hidden group-hover:block">
+                                                [DEV DEBUG: Guest="{inv.guestClientName}" Client="{inv.clientName}"]
                                             </span>
                                         </div>
                                         <div className="text-xs text-gray-500">
