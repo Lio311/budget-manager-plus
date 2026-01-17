@@ -439,6 +439,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                                 newItems[index].total = val * newItems[index].price
                                                 setLineItems(newItems)
                                             }}
+                                            onWheel={(e) => e.currentTarget.blur()}
                                         />
                                     </td>
                                     <td className="p-2">
