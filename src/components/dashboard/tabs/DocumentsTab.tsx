@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FileText, Receipt, CreditCard, Eye, Link as LinkIcon, Pencil, Trash2, CheckCircle, Info, Plus } from 'lucide-react'
 import { DocumentsTutorial } from '@/components/dashboard/tutorial/DocumentsTutorial'
 import { cn } from '@/lib/utils'
