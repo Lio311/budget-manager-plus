@@ -195,6 +195,13 @@ export function ClientsTab() {
 
     const sortClients = (clients: any[]) => {
         return [...clients].sort((a, b) => {
+            // Always prioritize Active over Inactive
+            const activeA = a.isActive ?? true
+            const activeB = b.isActive ?? true
+            if (activeA !== activeB) {
+                return activeA ? -1 : 1
+            }
+
             let diff = 0
             switch (sortMethod) {
                 case 'REVENUE':
@@ -210,16 +217,9 @@ export function ClientsTab() {
                     diff = getMonthlyValue(a) - getMonthlyValue(b)
                     break
                 case 'ACTIVITY':
-                    // Active clients first
-                    if ((a.isActive ?? true) !== (b.isActive ?? true)) {
-                        return (a.isActive ?? true) ? -1 : 1
-                    }
+                    // Already handled by top-level active check
                     break
                 case 'STATUS':
-                    // Active clients first
-                    if ((a.isActive ?? true) !== (b.isActive ?? true)) {
-                        return (a.isActive ?? true) ? -1 : 1
-                    }
                     // Then by payment status
                     const statusPriority: Record<string, number> = { 'UNPAID': 3, 'PARTIAL': 2, 'INSTALLMENTS': 1, 'PAID': 0 }
                     const cleanStatusA = a.subscriptionStatus || 'PAID'
@@ -227,15 +227,22 @@ export function ClientsTab() {
                     diff = (statusPriority[cleanStatusA] || 0) - (statusPriority[cleanStatusB] || 0)
                     break
                 case 'NAME':
-                    return sortDirection === 'asc'
-                        ? (a.name || '').localeCompare(b.name || '')
-                        : (b.name || '').localeCompare(a.name || '')
+                    // We only apply direction to the name sort itself here
+                    const nameA = a.name || ''
+                    const nameB = b.name || ''
+                    if (sortDirection === 'asc') {
+                        return nameA.localeCompare(nameB)
+                    } else {
+                        return nameB.localeCompare(nameA)
+                    }
                 case 'PACKAGE':
                     const pkgA = a.package?.name || a.packageName || ''
                     const pkgB = b.package?.name || b.packageName || ''
-                    return sortDirection === 'asc'
-                        ? pkgA.localeCompare(pkgB)
-                        : pkgB.localeCompare(pkgA)
+                    if (sortDirection === 'asc') {
+                        return pkgA.localeCompare(pkgB)
+                    } else {
+                        return pkgB.localeCompare(pkgA)
+                    }
                 case 'CREATED_AT':
                 default:
                     const createdA = a.createdAt ? new Date(a.createdAt).getTime() : 0
@@ -551,7 +558,7 @@ export function ClientsTab() {
                                     <SelectItem value="NAME">שם לקוח</SelectItem>
                                     <SelectItem value="CREATED_AT">תאריך הצטרפות</SelectItem>
                                     <SelectItem value="REVENUE">הכנסות</SelectItem>
-                                    <SelectItem value="ACTIVITY">מצב מנוי</SelectItem>
+                                    <SelectItem value="ACTIVITY">סטטוס לקוח</SelectItem>
                                     <SelectItem value="STATUS">סטטוס תשלום</SelectItem>
                                     <SelectItem value="PACKAGE">סוג חבילה</SelectItem>
                                     {/* Only show these if at least one client has subscription data */}
