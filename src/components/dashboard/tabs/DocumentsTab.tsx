@@ -183,7 +183,7 @@ export function DocumentsTab() {
             displayNumber: i.invoiceNumber,
             displayDate: i.issueDate,
             displayAmount: i.total,
-            clientName: i.client?.name || 'לקוח לא ידוע'
+            clientName: (i.guestClientName && i.guestClientName.trim()) ? i.guestClientName : (i.client?.name || 'לקוח לא ידוע')
         }))
     }
 
