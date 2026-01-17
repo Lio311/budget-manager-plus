@@ -116,10 +116,18 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
         if (selectedIncomeId && selectedIncomeId !== 'none') {
             const income = availableIncomes.find((i: any) => i.id === selectedIncomeId)
             if (income) {
+                // income.amount is TOTAL (Gross). We need to extract Net (Subtotal).
+                // Assuming standard VAT rate of 0.18 (or use formData.vatRate if set, but 0.18 is safer default here)
+                const vatRate = formData.vatRate || 0.18
+                const totalAmount = income.amount
+                const subtotal = totalAmount / (1 + vatRate)
+
                 setFormData(prev => ({
                     ...prev,
                     clientId: income.clientId || prev.clientId,
-                    subtotal: income.amount, // Initial subtotal
+                    subtotal: subtotal,
+                    vatAmount: totalAmount - subtotal,
+                    total: totalAmount,
                     notes: `עבור: ${income.source}`
                 }))
 
@@ -129,8 +137,8 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                         id: crypto.randomUUID(),
                         description: income.source,
                         quantity: 1,
-                        price: income.amount,
-                        total: income.amount
+                        price: subtotal, // Net price
+                        total: subtotal
                     }])
                 }
             }

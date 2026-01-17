@@ -70,6 +70,7 @@ export function InvoicesTab() {
     // Dialog states for desktop and mobile
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null) // Restore Edit State
 
     const invoicesFetcher = async () => {
         const result = await getInvoices(budgetType)
@@ -78,7 +79,8 @@ export function InvoicesTab() {
         return result.data.map((inv: any) => ({
             id: inv.id,
             invoiceNumber: inv.invoiceNumber,
-            clientName: inv.guestClientName || inv.client?.name || 'לקוח לא ידוע',
+            // Logic: If guest name exists and is not empty, use it. Else client name. Else Unknown.
+            clientName: (inv.guestClientName && inv.guestClientName.trim()) ? inv.guestClientName : (inv.client?.name || 'לקוח לא ידוע'),
             clientId: inv.clientId,
             date: inv.issueDate,
             dueDate: inv.dueDate,
@@ -86,8 +88,10 @@ export function InvoicesTab() {
             totalAmount: inv.total,
             vatAmount: inv.vatAmount,
             invoiceType: inv.invoiceType || 'INVOICE',
-            items: [],
-            guestClientName: inv.guestClientName
+            items: inv.lineItems || [], // Ensure items passed for edit
+            guestClientName: inv.guestClientName,
+            createIncomeFromInvoice: inv.createIncomeFromInvoice, // Pass this too
+            incomes: inv.incomes
         }))
     }
 
@@ -283,15 +287,29 @@ export function InvoicesTab() {
                         חשבונית חדשה
                     </Button>
 
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                        setIsDialogOpen(open)
+                        if (!open) setSelectedInvoice(null)
+                    }}>
                         <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-3xl rounded-xl" dir="rtl">
                             <DialogTitle className="sr-only">הוספת חשבונית</DialogTitle>
                             <div className="p-2">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">יצירת חשבונית חדשה</h3>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
+                                    {selectedInvoice ? 'עריכת חשבונית' : 'יצירת חשבונית חדשה'}
+                                </h3>
                                 <InvoiceForm
                                     clients={clients}
+                                    initialData={selectedInvoice ? {
+                                        ...selectedInvoice,
+                                        issueDate: selectedInvoice.date,
+                                        total: selectedInvoice.totalAmount,
+                                        subtotal: selectedInvoice.totalAmount - (selectedInvoice.vatAmount || 0),
+                                        // We need to reconstruct full form data if possible, or fetch singular invoice on edit click specific logic
+                                        // For now, passing mapped data
+                                    } : undefined}
                                     onSuccess={() => {
                                         setIsDialogOpen(false)
+                                        setSelectedInvoice(null)
                                         mutate()
                                     }}
                                 />
@@ -438,16 +456,32 @@ export function InvoicesTab() {
                                     <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">{formatCurrency(inv.totalAmount)}</div>
                                     <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(inv.totalAmount - (inv.vatAmount || 0))}</div>
                                 </div>
-                                <Button variant="outline" size="sm" onClick={() => handleCopyLink(inv.id)} className="gap-2 text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100">
-                                    <LinkIcon className="h-4 w-4" />
-                                    <span className="md:hidden">קישור לחתימה</span>
-                                    <span className="hidden md:inline">קישור לחתימה</span>
-                                </Button>
-                                {(inv.status as string) === 'SIGNED' && (
-                                    <Button variant="outline" size="sm" onClick={() => handleViewInvoice(inv.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100" title="צפה בחשבונית">
-                                        <Eye className="h-4 w-4" />
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                            if (isDemo) { interceptAction(); return; }
+                                            // Ideally fetch full details here, but for now prompt edit with known data
+                                            setSelectedInvoice(inv)
+                                            setIsDialogOpen(true)
+                                        }}
+                                        className="h-8 w-8 p-0 text-gray-500 hover:text-gray-900 border-gray-200"
+                                        title="ערוך"
+                                    >
+                                        <Pencil className="h-4 w-4" />
                                     </Button>
-                                )}
+                                    <Button variant="outline" size="sm" onClick={() => handleCopyLink(inv.id)} className="gap-2 text-purple-600 border-purple-200 bg-purple-50 hover:bg-purple-100">
+                                        <LinkIcon className="h-4 w-4" />
+                                        <span className="md:hidden">קישור לחתימה</span>
+                                        <span className="hidden md:inline">קישור לחתימה</span>
+                                    </Button>
+                                    {(inv.status as string) === 'SIGNED' && (
+                                        <Button variant="outline" size="sm" onClick={() => handleViewInvoice(inv.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100" title="צפה בחשבונית">
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))

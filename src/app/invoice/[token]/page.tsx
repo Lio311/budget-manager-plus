@@ -386,8 +386,8 @@ export default function PublicInvoicePage() {
                             <Button onClick={handleSign} disabled={isSigning || !signatureData} className="flex-1 bg-green-600 hover:bg-green-700">
                                 {isSigning ? (
                                     <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         שומר...
+                                        <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                                     </>
                                 ) : 'אשר חתימה'}
                             </Button>
