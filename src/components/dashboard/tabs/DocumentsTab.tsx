@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Receipt, CreditCard, Eye, Link as LinkIcon, Pencil, Trash2, CheckCircle, Info } from 'lucide-react'
+import { FileText, Receipt, CreditCard, Eye, Link as LinkIcon, Pencil, Trash2, CheckCircle, Info, Plus } from 'lucide-react'
 import { DocumentsTutorial } from '@/components/dashboard/tutorial/DocumentsTutorial'
 import { cn } from '@/lib/utils'
 import { QuoteForm } from '@/components/dashboard/forms/QuoteForm'
@@ -68,6 +68,75 @@ const documentTypes = [
         hoverTextColor: 'group-hover:text-orange-600'
     },
 ]
+
+// Mobile FAB Component
+function MobileDocumentFab({ onSelect }: { onSelect: (type: DocumentType) => void }) {
+    const [isOpen, setIsOpen] = useState(false)
+    const [colorIndex, setColorIndex] = useState(0)
+
+    // Colors: Purple (Invoice) -> Yellow (Quote) -> Orange (Credit)
+    const colors = ['bg-purple-600', 'bg-yellow-500', 'bg-orange-500']
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setColorIndex((prev) => (prev + 1) % colors.length)
+        }, 3000) // Change color every 3 seconds
+        return () => clearInterval(interval)
+    }, [])
+
+    return (
+        <>
+            <div className="fixed bottom-6 left-6 z-50 md:hidden" id="documents-add-fab">
+                <Button
+                    size="icon"
+                    className={cn(
+                        "h-14 w-14 rounded-full shadow-lg transition-colors duration-1000 ease-in-out",
+                        colors[colorIndex],
+                        "hover:opacity-90"
+                    )}
+                    onClick={() => setIsOpen(true)}
+                >
+                    <Plus className="h-6 w-6 text-white" />
+                </Button>
+            </div>
+
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogContent className="w-[95%] rounded-xl" dir="rtl">
+                    <DialogHeader>
+                        <DialogTitle>מה תרצה להפיק?</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid grid-cols-1 gap-4 mt-4">
+                        {documentTypes.map((type) => {
+                            const Icon = type.icon
+                            return (
+                                <button
+                                    key={type.value}
+                                    onClick={() => {
+                                        onSelect(type.value)
+                                        setIsOpen(false)
+                                    }}
+                                    className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                                >
+                                    <div className={cn(
+                                        "w-12 h-12 rounded-full flex items-center justify-center text-white",
+                                        type.color
+                                    )}>
+                                        <Icon className="w-6 h-6" />
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="font-bold text-gray-900 dark:text-gray-100">
+                                            {type.label}
+                                        </div>
+                                    </div>
+                                </button>
+                            )
+                        })}
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
+    )
+}
 
 export function DocumentsTab() {
     const { budgetType } = useBudget()
@@ -377,8 +446,8 @@ export function DocumentsTab() {
                 </Button>
             </div>
 
-            {/* Document Type Selection */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4" id="documents-types-grid">
+            {/* Document Type Selection - Desktop Grid */}
+            <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4" id="documents-types-grid">
                 {documentTypes.map((docType) => {
                     const Icon = docType.icon
                     const isSelected = selectedType === docType.value
@@ -424,6 +493,14 @@ export function DocumentsTab() {
                         </button>
                     )
                 })}
+            </div>
+
+            {/* Mobile FAB and Selection Menu */}
+            <div className="md:hidden">
+                <MobileDocumentFab onSelect={(type) => {
+                    if (isDemo) { interceptAction(); return; }
+                    setSelectedType(type)
+                }} />
             </div>
 
 

@@ -88,14 +88,21 @@ export function DocumentsTutorial({ isOpen, onClose }: TutorialProps) {
         const isMobileView = window.innerWidth < 768
 
         const cards: CardConfig[] = [
-            {
+            (isMobileView ? {
+                id: 'documents-add-fab',
+                title: 'יצירת מסמך חדש',
+                text: 'לחץ על כפתור הפלוס כדי ליצור הצעת מחיר, חשבונית או זיכוי חדש.',
+                placement: 'top',
+                align: 'center',
+                maxWidth: 280
+            } : {
                 id: 'documents-types-grid',
                 title: 'יצירת מסמכים',
                 text: 'בחר את סוג המסמך שברצונך ליצור: הצעת מחיר, חשבונית או זיכוי. לחיצה על הכרטיס תפתח את טופס היצירה המתאים.',
                 placement: 'bottom',
                 align: 'center',
                 maxWidth: 350
-            },
+            }),
             {
                 id: 'documents-list-container',
                 title: 'ניהול מסמכים',
