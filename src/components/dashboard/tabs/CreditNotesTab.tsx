@@ -48,7 +48,7 @@ export function CreditNotesTab() {
             creditAmount: cn.creditAmount,
             totalCredit: cn.totalCredit,
             invoiceNumber: cn.invoice.invoiceNumber,
-            clientName: cn.invoice.client?.name || 'לקוח לא ידוע',
+            clientName: (cn.invoice.guestClientName && cn.invoice.guestClientName.trim()) ? cn.invoice.guestClientName : (cn.invoice.client?.name || 'לקוח לא ידוע'),
             reason: cn.reason
         }))
     }
