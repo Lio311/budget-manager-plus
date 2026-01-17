@@ -259,7 +259,7 @@ export function SuppliersTab() {
             name: supplier.name || '',
             email: supplier.email || '',
             phone: formattedPhone || '',
-            //taxId: supplier.taxId || '',
+            taxId: supplier.taxId || '',
             address: supplier.address || '',
             notes: supplier.notes || '',
             isActive: supplier.isActive,
