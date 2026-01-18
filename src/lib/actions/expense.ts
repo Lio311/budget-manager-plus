@@ -103,9 +103,9 @@ export async function addExpense(
                 // Business Fields
                 supplierId: validatedData.supplierId || null,
                 clientId: validatedData.clientId || null,
-                amountBeforeVat: validatedData.amountBeforeVat,
-                vatRate: validatedData.vatRate,
-                vatAmount: validatedData.vatAmount,
+                amountBeforeVat: validatedData.amountBeforeVat || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? parseFloat(((validatedData.amount / 1.18)).toFixed(2)) : validatedData.amountBeforeVat),
+                vatRate: validatedData.vatRate || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? 0.18 : validatedData.vatRate),
+                vatAmount: validatedData.vatAmount || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? parseFloat(((validatedData.amount - (validatedData.amount / 1.18))).toFixed(2)) : validatedData.vatAmount),
                 vatType: validatedData.vatType,
                 isDeductible: validatedData.isDeductible,
                 deductibleRate: validatedData.deductibleRate,
@@ -226,9 +226,9 @@ async function createRecurringExpenses(
                         supplierId: extraData.supplierId || null,
                         clientId: extraData.clientId || null,
                         projectId: extraData.projectId || null,
-                        amountBeforeVat: extraData.amountBeforeVat,
-                        vatRate: extraData.vatRate,
-                        vatAmount: extraData.vatAmount,
+                        amountBeforeVat: extraData.amountBeforeVat || (extraData.isDeductible && (!extraData.vatAmount || extraData.vatAmount === 0) ? parseFloat(((amount / 1.18)).toFixed(2)) : extraData.amountBeforeVat),
+                        vatRate: extraData.vatRate || (extraData.isDeductible && (!extraData.vatAmount || extraData.vatAmount === 0) ? 0.18 : extraData.vatRate),
+                        vatAmount: extraData.vatAmount || (extraData.isDeductible && (!extraData.vatAmount || extraData.vatAmount === 0) ? parseFloat(((amount - (amount / 1.18))).toFixed(2)) : extraData.vatAmount),
                         isDeductible: extraData.isDeductible,
                         deductibleRate: extraData.deductibleRate,
                         paymentMethod: extraData.paymentMethod,
@@ -556,6 +556,17 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
             // Get appropriate budget
             const budget = await getCurrentBudget(month, year, '₪', budgetType)
 
+            // VAT Enforcement Logic
+            let finalVatAmount = exp.vatAmount
+            let finalVatRate = exp.vatRate
+            let finalAmountBeforeVat = exp.amountBeforeVat
+
+            if (exp.isDeductible && (!finalVatAmount || finalVatAmount === 0)) {
+                finalVatRate = 0.18
+                finalAmountBeforeVat = parseFloat((exp.amount / 1.18).toFixed(2))
+                finalVatAmount = parseFloat((exp.amount - finalAmountBeforeVat).toFixed(2))
+            }
+
             await db.expense.create({
                 data: {
                     budgetId: budget.id,
@@ -566,9 +577,9 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
                     category: exp.category || defaultCategory!.name,
                     isRecurring: false,
                     // Business Fields
-                    amountBeforeVat: exp.amountBeforeVat,
-                    vatRate: exp.vatRate,
-                    vatAmount: exp.vatAmount,
+                    amountBeforeVat: finalAmountBeforeVat,
+                    vatRate: finalVatRate,
+                    vatAmount: finalVatAmount,
                     isDeductible: exp.isDeductible,
                     deductibleRate: exp.deductibleRate,
                     paymentMethod: exp.paymentMethod,
