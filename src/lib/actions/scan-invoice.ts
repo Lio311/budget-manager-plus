@@ -47,7 +47,6 @@ export async function scanInvoiceImage(formData: FormData): Promise<ScanResult> 
         2. "businessName": The name of the merchant/business. string.
         3. "date": The date of the invoice in YYYY-MM-DD format. If not found, null. string | null.
         4. "category": A suggested category for this expense (e.g., "Food", "Transport", "Shopping", "Bills"). string.
-        5. "vatAmount": The VAT/Tax amount (Ma'am) if stated. If not found or if it is 0, return 0.
 
         Return ONLY the JSON object. Do not include markdown code blocks.
         `
@@ -70,18 +69,20 @@ export async function scanInvoiceImage(formData: FormData): Promise<ScanResult> 
 
         try {
             const data = JSON.parse(jsonStr)
+            const amount = typeof data.amount === 'number' ? data.amount : parseFloat(data.amount) || 0
+
+            // Calculate VAT (18%) Programmatically
+            // VAT = Total - (Total / 1.18)
+            const vatAmount = parseFloat((amount - (amount / 1.18)).toFixed(2))
+
             return {
                 success: true,
                 data: {
                     date: data.date || null,
-                    amount: typeof data.amount === 'number' ? data.amount : parseFloat(data.amount) || 0,
+                    amount: amount,
                     businessName: data.businessName || 'עסק לא מזוהה',
                     category: data.category,
-                    // FORCE VAT CALCULATION as per user request: "In every situation"
-                    // If AI found it, use it. If 0 or null, calculate it as 18% (Amount - Amount/1.18)
-                    vatAmount: (typeof data.vatAmount === 'number' && data.vatAmount > 0)
-                        ? data.vatAmount
-                        : parseFloat(((typeof data.amount === 'number' ? data.amount : parseFloat(data.amount) || 0) - ((typeof data.amount === 'number' ? data.amount : parseFloat(data.amount) || 0) / 1.18)).toFixed(2))
+                    vatAmount: vatAmount
                 }
             }
         } catch (e) {
