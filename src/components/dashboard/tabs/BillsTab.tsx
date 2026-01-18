@@ -286,7 +286,7 @@ export function BillsTab() {
                         <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-500 font-medium whitespace-nowrap hidden sm:inline">מיון:</span>
                             <Select value={sortMethod} onValueChange={(val: any) => setSortMethod(val)}>
-                                <SelectTrigger className="h-8 text-xs w-[110px] bg-white/80 border-gray-200">
+                                <SelectTrigger className="h-8 text-xs w-[110px] bg-white/80 border-gray-200 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-200">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent dir="rtl">
@@ -301,10 +301,10 @@ export function BillsTab() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                                className="h-8 w-8 p-0 border border-gray-200 bg-white/80 hover:bg-white"
+                                className="h-8 w-8 p-0 border border-gray-200 bg-white/80 hover:bg-white dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700"
                                 title={sortDirection === 'asc' ? 'סדר עולה' : 'סדר יורד'}
                             >
-                                <ArrowUpDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                <ArrowUpDown className={`w-3.5 h-3.5 text-gray-500 dark:text-gray-400 transition-transform ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                             </Button>
                         </div>
                     </div>
