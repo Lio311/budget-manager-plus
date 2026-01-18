@@ -289,10 +289,10 @@ export default function ProfitLossTab() {
                         variant="ghost"
                         size="icon"
                         onClick={() => setShowTutorial(true)}
-                        className="h-8 w-8"
+                        className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
                         title="הדרכה"
                     >
-                        <Info className="h-4 w-4" />
+                        <Info className="h-5 w-5" />
                     </Button>
                 </div>
                 <p className="text-gray-500">צפייה והורדת דוחות שנתיים עבור העסק</p>

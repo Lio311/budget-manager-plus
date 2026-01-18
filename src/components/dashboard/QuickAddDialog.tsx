@@ -99,11 +99,11 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, pa
                 {/* Existing Payments */}
                 {payments.length > 0 && (
                     <div className="space-y-3 mb-6">
-                        <h3 className="font-bold text-sm text-gray-700">תשלומים קיימים:</h3>
+                        <h3 className="font-bold text-sm text-gray-700 dark:text-gray-300">תשלומים קיימים:</h3>
                         {payments.map((payment) => {
                             const category = categoryLabels[payment.type]
                             return (
-                                <div key={payment.id} className={`p-3 rounded-lg border-r-4 ${payment.isPaid ? 'opacity-60 bg-gray-50' : 'bg-white shadow-sm'} border-gray-200`}>
+                                <div key={payment.id} className={`p-3 rounded-lg border-r-4 ${payment.isPaid ? 'opacity-60 bg-gray-50 dark:bg-slate-800/50' : 'bg-white dark:bg-slate-800 shadow-sm'} border-gray-200 dark:border-slate-700`}>
                                     <div className="flex justify-between items-start gap-2">
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-1">
@@ -122,7 +122,7 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, pa
                             )
                         })}
                         <div className="border-t pt-4 mt-4">
-                            <h3 className="font-bold text-sm text-gray-700 mb-3">הוסף פריט חדש:</h3>
+                            <h3 className="font-bold text-sm text-gray-700 dark:text-gray-300 mb-3">הוסף פריט חדש:</h3>
                         </div>
                     </div>
                 )}
