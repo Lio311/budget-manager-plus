@@ -345,7 +345,7 @@ export async function updateClient(id: string, data: ClientFormData) {
         })
 
         // Generate Incomes
-        await generateSubscriptionIncomes(client, userId, today)
+        await generateSubscriptionIncomes(client, userId)
 
         return { success: true, data: client }
     } catch (error: any) {
@@ -476,11 +476,11 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
         const db = await authenticatedPrisma(userId)
 
         // Fetch existing incomes to avoid duplicates
-        // We match by ClientId and Amount. Date will be checked in loop.
+        // We match by ClientId and Source for the specific date. Amount ignored to prevent duplicates on price change.
         const existingIncomes = await db.income.findMany({
             where: {
                 clientId: client.id,
-                amount: client.subscriptionPrice
+                source: { startsWith: 'מנוי -' }
             },
             select: { date: true }
         })
@@ -498,12 +498,10 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
 
         // Loop through dates
         while (currentDate <= endDate) {
-            // Check minDate constraint
-            if (minDate && currentDate < minDate) {
-                // Skip generation but continue advancing loop to keep cycle
-            }
             // Check if income exists for this date
-            else if (!existingDates.has(currentDate.getTime())) {
+            if (existingDates.has(currentDate.getTime())) {
+                console.log(`Skipping date ${currentDate.toISOString()} - exists`)
+            } else {
                 const status = currentDate > new Date() ? 'PENDING' : 'PAID'
 
                 console.log(`Creating income for date: ${currentDate.toISOString()} Status: ${status}`)
@@ -527,8 +525,6 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
                     } as any,
                     budgetType
                 )
-            } else {
-                console.log(`Skipping date ${currentDate.toISOString()} - exists`)
             }
 
             // Advance Date
