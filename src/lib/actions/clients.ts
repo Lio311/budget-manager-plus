@@ -521,7 +521,7 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
                         isRecurring: false, // We generate individual records
                         clientId: client.id,
                         paymentMethod: 'CREDIT_CARD', // Default assumption or add to form?
-                        subscriptionType: client.subscriptionType, // Logic tracking
+                        // subscriptionType removed as it does not exist on Income model
                         paymentDate: status === 'PAID' ? currentDate.toISOString() : undefined, // Only set paid date if paid
                         status: status
                     } as any,
