@@ -22,6 +22,10 @@ interface ParsedExpense {
     paymentMethod?: string
     branchName?: string
     vatAmount?: number
+    amountBeforeVat?: number
+    vatRate?: number
+    isDeductible?: boolean
+    deductibleRate?: number
 }
 
 export function BankImportModal({ onImport, triggerId }: BankImportModalProps) {
@@ -91,7 +95,12 @@ export function BankImportModal({ onImport, triggerId }: BankImportModalProps) {
                         billingAmount: result.data.amount,
                         paymentMethod: 'כרטיס אשראי',
                         branchName: 'חשבוניות סרוקות', // As requested
-                        vatAmount: result.data.vatAmount
+                        vatAmount: result.data.vatAmount,
+                        // Fix for missing tax data in DB
+                        amountBeforeVat: parseFloat((result.data.amount - (result.data.vatAmount || 0)).toFixed(2)),
+                        vatRate: 0.18,
+                        isDeductible: true,
+                        deductibleRate: 1.0
                     }
                     setPreviewData([scannedExpense])
                 } else {
