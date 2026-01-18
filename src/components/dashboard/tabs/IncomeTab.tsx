@@ -451,7 +451,7 @@ export function IncomeTab() {
                 </Dialog>
 
                 {/* List View */}
-                <div className="lg:col-span-7 space-y-3">
+                <div className="lg:col-span-7 space-y-6">
                     <div className="flex items-center justify-between px-1 flex-wrap gap-2" id="income-controls">
                         <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'פירוט הכנסות ומכירות' : 'רשימת הכנסות'}</h3>
 
