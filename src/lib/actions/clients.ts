@@ -512,7 +512,7 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
                     currentDate.getFullYear(),
                     {
                         source: `מנוי - ${client.name}`,
-                        category: 'הכנסות', // Default category
+                        category: 'כללי', // Default category matches schema default
                         amount: amount,
                         currency: currency,
                         date: currentDate.toISOString(),

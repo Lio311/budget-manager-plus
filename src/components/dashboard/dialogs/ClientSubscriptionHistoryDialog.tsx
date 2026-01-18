@@ -20,9 +20,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { format } from 'date-fns'
-import { Check, X, Loader2, Edit2, Trash2 } from "lucide-react"
+import { Check, X, Loader2, Edit2, Trash2, RefreshCw } from "lucide-react"
 import { toast } from 'sonner'
-import { getClientSubscriptionIncomes, updateIncomeStatus, deleteSubscriptionIncome, updateSubscriptionIncome } from '@/lib/actions/clients'
+import { getClientSubscriptionIncomes, updateIncomeStatus, deleteSubscriptionIncome, updateSubscriptionIncome, syncClientIncomes } from '@/lib/actions/clients'
 import { formatCurrency } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -68,6 +68,24 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client, onUpd
         } catch (error) {
             console.error(error)
             toast.error('שגיאה בטעינת היסטוריית תשלומים')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const handleSync = async () => {
+        setIsLoading(true)
+        try {
+            const result = await syncClientIncomes(client.id)
+            if (result.success) {
+                toast.success('נתונים סונכרנו בהצלחה')
+                await fetchHistory()
+            } else {
+                toast.error('שגיאה בסנכרון נתונים')
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error('שגיאה בסנכרון נתונים')
         } finally {
             setIsLoading(false)
         }
@@ -146,6 +164,13 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client, onUpd
                         ניהול תשלומי מנוי ({SUBSCRIPTION_TYPES_HE[client.subscriptionType] || client.subscriptionType} - {formatCurrency(client.subscriptionPrice || 0)})
                     </DialogDescription>
                 </DialogHeader>
+
+                <div className="flex justify-end px-1">
+                    <Button variant="outline" size="sm" onClick={handleSync} disabled={isLoading} className="gap-2">
+                        <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                        סנכרן נתונים
+                    </Button>
+                </div>
 
                 {isLoading ? (
                     <div className="flex justify-center p-8">
