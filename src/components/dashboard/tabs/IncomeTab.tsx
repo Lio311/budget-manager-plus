@@ -496,7 +496,7 @@ export function IncomeTab() {
                                 <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
 
                                     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
-                                        <div className="flex items-start gap-3 w-full sm:w-auto">
+                                        <div className="flex items-start gap-3 w-full sm:flex-1 sm:min-w-0">
                                             <div className="shrink-0">
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm`}>
                                                     {getCategoryIcon(income.category)}

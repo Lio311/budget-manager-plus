@@ -380,7 +380,7 @@ export default function ProfitLossTab() {
 
             {/* Report Dialog */}
             <Dialog open={isDetailOpen} onOpenChange={(open) => !open && setIsDetailOpen(false)}>
-                <DialogContent className="w-[95vw] md:w-full max-w-6xl max-h-[90vh] overflow-y-auto p-3 md:p-6" dir="rtl">
+                <DialogContent className="w-full sm:max-w-[95vw] md:max-w-6xl max-h-[90vh] overflow-y-auto p-3 md:p-6" dir="rtl">
                     <DialogHeader className="flex flex-col gap-3 md:gap-4 mt-8 md:mt-0">
                         <DialogTitle className="text-xl md:text-2xl font-bold text-center">
                             דוח רווח והפסד - {selectedPeriod?.label.includes(selectedYear.toString()) ? selectedPeriod?.label : `${selectedPeriod?.label} ${selectedYear}`}
@@ -598,7 +598,7 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                         לא נמצאו נתונים
                     </div>
                 ) : filtered.map((t) => (
-                    <div key={t.id} className="glass-panel p-3 sm:p-4 rounded-xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-all" dir="rtl">
+                    <div key={t.id} className="glass-panel p-3 sm:p-4 rounded-xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-all">
                         <div className="flex flex-row items-center justify-between gap-3">
                             {/* Right Side: Icon & Info */}
                             <div className="flex items-center gap-3 flex-1 min-w-0">
