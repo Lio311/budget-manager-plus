@@ -599,9 +599,9 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                     </div>
                 ) : filtered.map((t) => (
                     <div key={t.id} className="glass-panel p-3 sm:p-4 rounded-xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-all">
-                        <div className="flex flex-row-reverse items-center justify-between gap-3">
-                            {/* Left Side: Icon & Info */}
-                            <div className="flex flex-row-reverse items-center gap-3 flex-1 min-w-0 text-right">
+                        <div className="flex items-center justify-between gap-3">
+                            {/* Right Side: Icon & Info */}
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <div className="shrink-0">
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${t.category ? getCategoryColor(t.category) : 'bg-gray-100 text-gray-500'}`}>
                                         {t.category ? getCategoryIcon(t.category) : <FileText size={16} />}
@@ -629,9 +629,9 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                                 </div>
                             </div>
 
-                            {/* Right Side: Amount */}
-                            <div className="flex flex-col items-start shrink-0 pl-1">
-                                <div className={`text-base font-bold ${t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' ? 'text-emerald-600' : 'text-red-600'}`}>
+                            {/* Left Side: Amount */}
+                            <div className="flex flex-col items-end shrink-0 pl-1">
+                                <div className={`text-base font-bold ${t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`}>
                                     {formatMoney(t.amount)}
                                 </div>
                                 {(t.vat > 0 || t.amountNet !== t.amount) && (
