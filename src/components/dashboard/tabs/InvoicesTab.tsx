@@ -403,11 +403,11 @@ export function InvoicesTab() {
                                         onValueChange={(value) => handleStatusChange(inv.id, value)}
                                     >
                                         <SelectTrigger className={cn("h-7 text-xs px-2 border-0 shadow-none font-medium",
-                                            inv.status === 'DRAFT' ? 'bg-gray-100 text-gray-700' :
-                                                inv.status === 'SENT' ? 'bg-blue-100 text-blue-700' :
-                                                    inv.status === 'PAID' ? 'bg-green-100 text-green-700' :
-                                                        inv.status === 'OVERDUE' ? 'bg-red-100 text-red-700' :
-                                                            'bg-gray-100 text-gray-700'
+                                            inv.status === 'DRAFT' ? 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-gray-300' :
+                                                inv.status === 'SENT' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' :
+                                                    inv.status === 'PAID' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' :
+                                                        inv.status === 'OVERDUE' ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300' :
+                                                            'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-gray-300'
                                         )}>
                                             <SelectValue />
                                         </SelectTrigger>
@@ -430,10 +430,10 @@ export function InvoicesTab() {
                                     onValueChange={(value) => handleStatusChange(inv.id, value)}
                                 >
                                     <SelectTrigger className={cn("h-8 w-[120px] text-xs px-2 border border-gray-200 shadow-sm",
-                                        inv.status === 'DRAFT' ? 'bg-gray-50 text-gray-700' :
-                                            inv.status === 'SENT' ? 'bg-blue-50 text-blue-700' :
-                                                inv.status === 'PAID' ? 'bg-green-50 text-green-700' :
-                                                    inv.status === 'OVERDUE' ? 'bg-red-50 text-red-700' :
+                                        inv.status === 'DRAFT' ? 'bg-gray-50 text-gray-700 dark:bg-slate-800 dark:text-gray-300 dark:border-slate-700' :
+                                            inv.status === 'SENT' ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800' :
+                                                inv.status === 'PAID' ? 'bg-green-50 text-green-700 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800' :
+                                                    inv.status === 'OVERDUE' ? 'bg-red-50 text-red-700 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800' :
                                                         'bg-gray-50 text-gray-700 dark:bg-slate-700 dark:text-gray-300 dark:border-slate-600'
                                     )}>
                                         <span className="w-full text-center font-medium">
