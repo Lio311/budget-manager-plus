@@ -486,7 +486,7 @@ export function IncomeTab() {
                         </div>
                     </div>
 
-                    <div id="income-list-container">
+                    <div id="income-list-container" className="space-y-6">
                         {incomes.length === 0 ? (
                             <div className="glass-panel text-center py-20 text-gray-400">
                                 לא נמצאו נתונים לחודש זה

@@ -124,21 +124,33 @@ export async function addExpense(
         })
 
         // If recurring, create copies for future months
-        if (data.isRecurring && data.recurringEndDate) {
-            const startDate = data.recurringStartDate || data.date || new Date().toISOString()
+        if (validatedData.isRecurring && validatedData.recurringEndDate) {
+            // Helper to create future instances
             await createRecurringExpenses(
                 expense.id,
-                data.category,
-                data.description,
-                data.amount,
-                data.currency,
-                startDate,
-                data.recurringEndDate,
-                type
+                validatedData.category,
+                validatedData.description,
+                validatedData.amount,
+                validatedData.currency,
+                validatedData.date as string,
+                validatedData.recurringEndDate,
+                type,
+                {
+                    supplierId: validatedData.supplierId,
+                    clientId: validatedData.clientId,
+                    projectId: validatedData.projectId,
+                    amountBeforeVat: validatedData.amountBeforeVat,
+                    vatRate: validatedData.vatRate,
+                    vatAmount: validatedData.vatAmount,
+                    isDeductible: validatedData.isDeductible,
+                    deductibleRate: validatedData.deductibleRate,
+                    paymentMethod: validatedData.paymentMethod,
+                    paidBy: validatedData.paidBy
+                }
             )
         }
 
-        revalidatePath('/dashboard')
+        revalidatePath('/')
         return { success: true, data: expense }
     } catch (error) {
         console.error('Error adding expense:', error)
@@ -155,7 +167,7 @@ async function createRecurringExpenses(
     startDateStr: string,
     endDateStr: string,
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL',
-
+    extraData: any = {}
 ) {
     const startDate = new Date(startDateStr)
     const endDate = new Date(endDateStr)
@@ -210,7 +222,17 @@ async function createRecurringExpenses(
                         recurringSourceId: sourceId,
                         recurringStartDate: startDate,
                         recurringEndDate: endDate,
-
+                        // Business Fields
+                        supplierId: extraData.supplierId || null,
+                        clientId: extraData.clientId || null,
+                        projectId: extraData.projectId || null,
+                        amountBeforeVat: extraData.amountBeforeVat,
+                        vatRate: extraData.vatRate,
+                        vatAmount: extraData.vatAmount,
+                        isDeductible: extraData.isDeductible,
+                        deductibleRate: extraData.deductibleRate,
+                        paymentMethod: extraData.paymentMethod,
+                        paidBy: extraData.paidBy || null,
                     }
                 })
             }
