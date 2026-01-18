@@ -604,11 +604,11 @@ export function DocumentsTab() {
                                                 >
                                                     <SelectTrigger className={cn(
                                                         "h-8 w-[120px] text-xs px-2 border shadow-sm",
-                                                        doc.status === 'DRAFT' ? 'bg-gray-50 text-gray-700 border-gray-200' :
-                                                            doc.status === 'SENT' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                                                                doc.status === 'ACCEPTED' || doc.status === 'PAID' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                                    doc.status === 'EXPIRED' || doc.status === 'OVERDUE' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                                                                        'bg-gray-50 text-gray-700 border-gray-200'
+                                                        doc.status === 'DRAFT' ? 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-gray-300 dark:border-slate-700' :
+                                                            doc.status === 'SENT' ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800' :
+                                                                doc.status === 'ACCEPTED' || doc.status === 'PAID' ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800' :
+                                                                    doc.status === 'EXPIRED' || doc.status === 'OVERDUE' ? 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/40 dark:text-orange-300 dark:border-orange-800' :
+                                                                        'bg-gray-50 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-gray-300 dark:border-slate-700'
                                                     )}>
                                                         <span className="w-full text-center font-medium">
                                                             <SelectValue />
