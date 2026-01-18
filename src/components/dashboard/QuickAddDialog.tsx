@@ -33,8 +33,8 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, pa
             icon: TrendingDown,
             color: 'from-red-500 to-red-600',
             hoverColor: 'hover:from-red-600 hover:to-red-700',
-            bgColor: 'bg-red-50',
-            textColor: 'text-red-600',
+            bgColor: 'bg-red-50 dark:bg-red-950/30',
+            textColor: 'text-red-600 dark:text-red-400',
             show: true
         },
         {
@@ -43,8 +43,8 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, pa
             icon: TrendingUp,
             color: 'from-green-500 to-green-600',
             hoverColor: 'hover:from-green-600 hover:to-green-700',
-            bgColor: 'bg-green-50',
-            textColor: 'text-green-600',
+            bgColor: 'bg-green-50 dark:bg-green-950/30',
+            textColor: 'text-green-600 dark:text-green-400',
             show: true
         },
         {
@@ -53,8 +53,8 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, pa
             icon: PiggyBank,
             color: 'from-blue-500 to-blue-600',
             hoverColor: 'hover:from-blue-600 hover:to-blue-700',
-            bgColor: 'bg-blue-50',
-            textColor: 'text-blue-600',
+            bgColor: 'bg-blue-50 dark:bg-blue-950/30',
+            textColor: 'text-blue-600 dark:text-blue-400',
             show: !isBusiness // Only show for personal
         },
         {
@@ -63,8 +63,8 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, pa
             icon: CreditCard,
             color: 'from-purple-500 to-purple-600',
             hoverColor: 'hover:from-purple-600 hover:to-purple-700',
-            bgColor: 'bg-purple-50',
-            textColor: 'text-purple-600',
+            bgColor: 'bg-purple-50 dark:bg-purple-950/30',
+            textColor: 'text-purple-600 dark:text-purple-400',
             show: !isBusiness // Only show for personal
         },
         {
@@ -73,8 +73,8 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, pa
             icon: Receipt,
             color: 'from-orange-500 to-orange-600',
             hoverColor: 'hover:from-orange-600 hover:to-orange-700',
-            bgColor: 'bg-orange-50',
-            textColor: 'text-orange-600',
+            bgColor: 'bg-orange-50 dark:bg-orange-950/30',
+            textColor: 'text-orange-600 dark:text-orange-400',
             show: !isBusiness // Only show for personal
         }
     ].filter(action => action.show)

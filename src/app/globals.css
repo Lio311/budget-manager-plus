@@ -70,16 +70,16 @@
   }
 
   .dark {
-    /* Base Backgrounds - Obsidian Theme */
-    --background: 0 0% 3.9%;
-    /* #0F172A - Deep Slate/Black */
-    --foreground: 0 0% 98%;
-    /* #F8FAFC - Off-white */
+    /* Base Backgrounds - Obsidian Theme -> Deep Navy/Slate Refinement */
+    --background: 224 71% 4%;
+    /* #020817 - Deepest Navy/Black */
+    --foreground: 210 40% 98%;
+    /* #e2e8f0 - Cool White */
 
     /* Cards & Glass */
-    --card: 0 0% 3.9%;
-    /* #1E293B - Lighter than bg */
-    --card-foreground: 0 0% 98%;
+    --card: 222 47% 11%;
+    /* #0f172a - Slate 900 */
+    --card-foreground: 210 40% 98%;
     --glass-border: 217 33% 17%;
     /* Matching card for seamless look or lighter for bezel */
 
