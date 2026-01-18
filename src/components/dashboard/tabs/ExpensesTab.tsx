@@ -564,97 +564,111 @@ export function ExpensesTab() {
                                 const usage = getUsage(exp.category)
 
                                 return (
-                                    <div key={exp.id} className="glass-panel p-2.5 sm:p-4 hover:shadow-md transition-all group relative">
-                                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-3">
-                                            <div className="flex items-start gap-3 w-full sm:flex-1 sm:min-w-0">
-                                                <div className="shrink-0">
-                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} shadow-sm`}>
-                                                        {getCategoryIcon(exp.category)}
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col min-w-0 gap-0.5 flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-[#323338] dark:text-gray-100 truncate text-sm sm:text-base">{exp.description}</span>
-                                                        {exp.isRecurring && (
-                                                            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${isBusiness ? 'bg-red-100 text-red-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
-                                                                <span className="w-1 h-1 rounded-full bg-current" />
-                                                                קבועה
-                                                            </div>
-                                                        )}
-                                                        {isBusiness && exp.isDeductible && (
-                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
-                                                                <span className="w-1 h-1 rounded-full bg-current" />
-                                                                הוצאה מוכרת
-                                                            </div>
-                                                        )}
-                                                        {exp.paidBy && (
-                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-purple-50 text-purple-600 border border-purple-100">
-                                                                <span className="w-1 h-1 rounded-full bg-current" />
-                                                                {exp.paidBy}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5 sm:gap-3 text-xs text-[#676879] dark:text-gray-400 flex-wrap">
-                                                        <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
-                                                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                        <span className="truncate max-w-[80px] sm:max-w-none">{exp.category}</span>
-                                                        {exp.paymentMethod && (
-                                                            <>
-                                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                                <span className="truncate max-w-[60px] sm:max-w-none">{PAYMENT_METHOD_LABELS[exp.paymentMethod] || exp.paymentMethod}</span>
-                                                            </>
-                                                        )}
-                                                    </div>
+                                    <div key={exp.id} className="glass-panel p-3 sm:p-4 hover:shadow-md transition-all group relative">
+                                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 items-center">
+
+                                            {/* Icon Section - Spans 1 column on desktop, Auto on mobile */}
+                                            <div className="sm:col-span-1 flex justify-start">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(exp.category)} shadow-sm shrink-0`}>
+                                                    {getCategoryIcon(exp.category)}
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-wrap items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1 shrink-0">
-                                                {/* Amount Display Logic */}
-                                                {isBusiness && exp.isDeductible ? (
-                                                    // Deductible: Red Total + Gray Breakdown horizontal layout
-                                                    <div className="flex flex-row items-center gap-3 sm:gap-4">
-                                                        <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
-                                                            <span className="whitespace-nowrap">לפני מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))} {getCurrencySymbol(exp.currency || 'ILS')}</span>
-                                                            <span className="whitespace-nowrap">מע"מ: {formatNumberWithCommas(exp.vatAmount || 0)} {getCurrencySymbol(exp.currency || 'ILS')}</span>
+                                            {/* Main Content Section - Spans 6 columns */}
+                                            <div className="sm:col-span-6 flex flex-col gap-1.5 min-w-0">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className="font-bold text-[#323338] dark:text-gray-100 text-sm sm:text-base truncate max-w-full">
+                                                        {exp.description}
+                                                    </span>
+                                                    {exp.isRecurring && (
+                                                        <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 ${isBusiness ? 'bg-red-100 text-red-700' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                                                            <span className="w-1 h-1 rounded-full bg-current" />
+                                                            קבועה
                                                         </div>
-                                                        <div className="text-base sm:text-lg font-bold text-red-600 whitespace-nowrap">
-                                                            {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
+                                                    )}
+                                                    {isBusiness && exp.isDeductible && (
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
+                                                            <span className="w-1 h-1 rounded-full bg-current" />
+                                                            הוצאה מוכרת
+                                                        </div>
+                                                    )}
+                                                    {exp.paidBy && (
+                                                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-purple-50 text-purple-600 border border-purple-100">
+                                                            <span className="w-1 h-1 rounded-full bg-current" />
+                                                            {exp.paidBy}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex items-center gap-2 text-xs text-[#676879] dark:text-gray-400">
+                                                    <span>{exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                    <span className="text-gray-300">•</span>
+                                                    <span className="truncate">{exp.category}</span>
+                                                    {exp.paymentMethod && (
+                                                        <>
+                                                            <span className="text-gray-300">•</span>
+                                                            <span className="truncate">{PAYMENT_METHOD_LABELS[exp.paymentMethod] || exp.paymentMethod}</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Financials Section - Spans 5 columns */}
+                                            <div className="sm:col-span-5 flex flex-col items-end gap-1 mt-2 sm:mt-0 border-t sm:border-0 pt-2 sm:pt-0 border-gray-100 dark:border-gray-800">
+                                                {/* Amount Display */}
+                                                {isBusiness && exp.isDeductible ? (
+                                                    <div className="flex flex-col items-end w-full">
+                                                        <div className="flex flex-row-reverse sm:flex-row items-baseline gap-2 w-full justify-between sm:justify-end">
+                                                            <span className="text-base sm:text-lg font-bold text-red-600 whitespace-nowrap">
+                                                                {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
+                                                            </span>
+                                                            {/* Mobile Breakdown moved here or kept stacked? Keeping stacked for clean look */}
+                                                        </div>
+
+                                                        {/* VAT Breakdown - Always visible but smaller */}
+                                                        <div className="flex items-center gap-3 text-[10px] text-gray-400 font-medium">
+                                                            <span>לפני מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))}</span>
+                                                            <span>מע"מ: {formatNumberWithCommas(exp.vatAmount || 0)}</span>
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    // Non-Deductible or Personal: Only Total Amount
-                                                    <div className="flex flex-col items-end">
-                                                        <div className={`text-base sm:text-lg font-bold whitespace-nowrap ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`}>
-                                                            {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
-                                                        </div>
+                                                    <div className="text-base sm:text-lg font-bold text-[#e2445c] whitespace-nowrap">
+                                                        {formatNumberWithCommas(exp.amount)} {getCurrencySymbol(exp.currency || 'ILS')}
                                                     </div>
                                                 )}
 
-                                                {/* Status Badge - Only for expenses with Client (in Business mode) */}
-                                                {(exp as any).clientId && (
-                                                    <button
-                                                        onClick={async (e) => {
-                                                            e.stopPropagation()
-                                                            const newStatus = exp.paymentDate ? 'PENDING' : 'PAID'
-                                                            const res = await toggleExpenseStatus(exp.id, newStatus)
-                                                            if (res.success) {
-                                                                mutateExpenses()
-                                                                toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
-                                                            }
-                                                        }}
-                                                        className={`text-[10px] px-2 py-0.5 rounded-full border mb-1 transition-all ${!exp.paymentDate
-                                                            ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
-                                                            : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
-                                                            }`}
-                                                    >
-                                                        {!exp.paymentDate ? 'בהמתנה לתשלום' : 'שולם'}
-                                                    </button>
-                                                )}
-                                                <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity shrink-0">
-                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
-                                                    <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(exp)}>
-                                                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                                    </Button>
+                                                {/* Action Bar */}
+                                                <div className="flex items-center justify-end gap-2 w-full mt-1">
+                                                    {/* Status Badge */}
+                                                    {(exp as any).clientId && (
+                                                        <button
+                                                            onClick={async (e) => {
+                                                                e.stopPropagation()
+                                                                const newStatus = exp.paymentDate ? 'PENDING' : 'PAID'
+                                                                const res = await toggleExpenseStatus(exp.id, newStatus)
+                                                                if (res.success) {
+                                                                    mutateExpenses()
+                                                                    toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
+                                                                }
+                                                            }}
+                                                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${!exp.paymentDate
+                                                                ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
+                                                                : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                                                                }`}
+                                                        >
+                                                            {!exp.paymentDate ? 'בהמתנה לתשלום' : 'שולם'}
+                                                        </button>
+                                                    )}
+
+                                                    {/* Edit/Delete Buttons */}
+                                                    <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                                        <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-7 w-7 text-blue-500 hover:bg-blue-50 rounded-full">
+                                                            <Pencil className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(exp)}>
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
