@@ -357,7 +357,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         title="הגדרות"
                     >
                         <Settings className="w-4 h-4" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/40 dark:to-blue-950/40 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                     </Button>
 
                     {!isBusiness && (
@@ -375,7 +375,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             <svg className="w-4 h-4 fill-current text-[#323338] dark:text-gray-100" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 49 126.7 83.6 126.1 27.2-.5 38-19.1 82.9-19.1s54.9 19.1 83.6 18.9c35.5-.3 67.2-76.5 87.8-109.2-25.2-13.8-49.9-46.7-47.6-102.7zM245.8 48.9c30.1-39.1 24.8-82.5 24.4-86.4-29.2 2.8-55.5 17.5-74 40.6-16.7 20.9-24.6 57-19.8 86.1 32 3.8 54.4-23.9 69.4-40.3z" />
                             </svg>
-                            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-stone-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-stone-50 dark:from-gray-950/40 dark:to-stone-950/40 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                         </Button>
                     )}
 
@@ -406,7 +406,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     : 'text-[#323338] dark:text-gray-100'
                                     }`}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-r from-green-50 to-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/40 dark:to-emerald-950/40 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                         </Button>
                     )}
 
