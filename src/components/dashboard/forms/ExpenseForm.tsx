@@ -473,9 +473,13 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
 
     return (
         <div>
+            <div className={`p-6 border-b ${isBusiness ? 'bg-red-50/50 dark:bg-red-900/10' : ''}`}>
+                <h2 className={`text-xl font-bold flex items-center gap-2 ${isBusiness ? 'text-red-700 dark:text-red-400' : ''}`}>
+                    {isBusiness ? <TrendingDown className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+                    {isBusiness ? 'תיעוד הוצאה' : 'הוספת הוצאה חדשה'}
+                </h2>
+            </div>
             <div className="mb-4 flex items-center gap-2">
-                <TrendingDown className={`h-5 w-5 ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'}`} />
-                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד הוצאה / עלות' : 'הוספת הוצאה'}</h3>
                 <div className="mr-auto flex items-center gap-2">
                     <Button
                         id="expenses-delete-all-btn"

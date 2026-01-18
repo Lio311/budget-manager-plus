@@ -218,7 +218,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const fourthMetricChange = fourthMetricPrev !== 0 ? ((fourthMetricCurrent - fourthMetricPrev) / Math.abs(fourthMetricPrev)) * 100 : 0
 
     const incomeVsExpenses = (isBusiness ? [
-        { name: 'מכירות', value: totalIncome, color: '#22c55e' }, // Green
+        { name: 'הכנסות', value: totalIncome, color: '#22c55e' }, // Green
         { name: 'הוצאות', value: totalExpenses, color: '#ef4444' } // Red
     ] : [
         { name: 'הכנסות', value: totalIncome, color: COLORS.income },
@@ -671,9 +671,9 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                             onClick={() => isBusiness ? router.push('?tab=clients') : router.push('?tab=bills')}
                         >
                             <div className="flex justify-between text-sm">
-                                <span className="font-medium text-gray-700 dark:text-gray-300">
-                                    {isBusiness ? 'לקוחות חדשים' : 'חשבונות ששולמו'}
-                                </span>
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    {isBusiness ? 'הכנסות החודש' : 'הכנסות החודש'}
+                                </p>
                                 <span className="font-medium text-gray-900 dark:text-gray-100">
                                     {isBusiness ? newClientsCount : formatCurrency(paidBills)}
                                 </span>
