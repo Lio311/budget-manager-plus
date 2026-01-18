@@ -156,11 +156,25 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
     }
 
     useEffect(() => {
-        if (isBusiness && newExpense.amount && newExpense.vatRate) {
-            const { net, vat } = calculateFromGross(newExpense.amount, newExpense.vatRate)
-            setNewExpense(prev => ({ ...prev, amountBeforeVat: net, vatAmount: vat }))
+        if (isBusiness && newExpense.amount) {
+            let currentRate = parseFloat(newExpense.vatRate) || 0
+
+            // AUTO-FIX: If detected as deductible (checked) but rate is 0, force standard 18% VAT
+            // This fixes key issue where imported/scanned expenses with 0 VAT stayed 0 even when edited
+            if (newExpense.isDeductible && currentRate === 0) {
+                setNewExpense(prev => ({ ...prev, vatRate: '0.18' }))
+                return // Will re-run effect with correct rate
+            }
+
+            if (currentRate > 0) {
+                const { net, vat } = calculateFromGross(newExpense.amount, newExpense.vatRate)
+                // Avoid infinite loops by checking if values actually changed
+                if (net !== newExpense.amountBeforeVat || vat !== newExpense.vatAmount) {
+                    setNewExpense(prev => ({ ...prev, amountBeforeVat: net, vatAmount: vat }))
+                }
+            }
         }
-    }, [newExpense.amount, newExpense.vatRate, isBusiness])
+    }, [newExpense.amount, newExpense.vatRate, newExpense.isDeductible, isBusiness])
 
     // Effect to auto-select first category when categories load if no category is selected
     useEffect(() => {
