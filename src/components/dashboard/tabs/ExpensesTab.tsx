@@ -608,7 +608,7 @@ export function ExpensesTab() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
                                                 {/* Amount Display Logic */}
                                                 {isBusiness && exp.isDeductible ? (
                                                     // Deductible: Red Total + Gray Breakdown horizontal layout
@@ -650,7 +650,7 @@ export function ExpensesTab() {
                                                         {!exp.paymentDate ? 'בהמתנה לתשלום' : 'שולם'}
                                                     </button>
                                                 )}
-                                                <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                                                <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity shrink-0">
                                                     <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-7 w-7 sm:h-8 sm:w-8 text-blue-500 hover:bg-blue-50 rounded-full"><Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Button>
                                                     <Button size="icon" variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(exp)}>
                                                         <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
