@@ -74,6 +74,7 @@ export async function scanInvoiceImage(formData: FormData): Promise<ScanResult> 
             // Calculate VAT (18%) Programmatically
             // VAT = Total - (Total / 1.18)
             const vatAmount = parseFloat((amount - (amount / 1.18)).toFixed(2))
+            console.log(`[ScanInvoice] Calculated VAT for amount ${amount}: ${vatAmount}`)
 
             return {
                 success: true,
