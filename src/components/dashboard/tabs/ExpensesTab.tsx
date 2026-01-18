@@ -608,7 +608,7 @@ export function ExpensesTab() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-wrap items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1 shrink-0">
                                                 {/* Amount Display Logic */}
                                                 {isBusiness && exp.isDeductible ? (
                                                     // Deductible: Red Total + Gray Breakdown horizontal layout

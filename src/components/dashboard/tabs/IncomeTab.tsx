@@ -550,7 +550,7 @@ export function IncomeTab() {
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-wrap items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1">
+                                        <div className="flex flex-wrap items-center gap-2 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0 pl-1 shrink-0">
                                             {isBusiness && income.vatAmount && income.vatAmount > 0 ? (
                                                 <div className="flex flex-row items-center gap-3 sm:gap-4">
                                                     <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium border-l border-gray-200 pl-3 ml-1 dark:border-gray-700">
