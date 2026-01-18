@@ -139,7 +139,7 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client, onUpd
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogContent className="w-full sm:max-w-[95vw] md:max-w-2xl max-h-[85vh] overflow-y-auto px-4 content-start">
                 <DialogHeader>
                     <DialogTitle>היסטוריית תשלומי מנוי - {client.name}</DialogTitle>
                     <DialogDescription>
@@ -172,8 +172,8 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client, onUpd
                                         <PastPaymentsAccordion incomes={pastIncomes} onStatusChange={handleStatusChange} onEdit={setEditingIncome} onDelete={handleDelete} updatingId={updatingId} />
                                     )}
 
-                                    {/* Future Payments Table */}
-                                    <div className="bg-white dark:bg-slate-900 rounded-md border overflow-hidden">
+                                    {/* Future Payments Table (Desktop) */}
+                                    <div className="bg-white dark:bg-slate-900 rounded-md border overflow-hidden hidden md:block">
                                         <div className="bg-gray-50/50 p-3 border-b">
                                             <h3 className="font-medium text-sm text-gray-700">תשלומים עתידיים</h3>
                                         </div>
@@ -209,6 +209,27 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client, onUpd
                                                 </TableBody>
                                             </Table>
                                         </div>
+                                    </div>
+
+                                    {/* Future Payments Cards (Mobile) */}
+                                    <div className="md:hidden space-y-3">
+                                        <h3 className="font-medium text-sm text-gray-700 px-1">תשלומים עתידיים</h3>
+                                        {futureIncomes.length === 0 ? (
+                                            <div className="text-center text-gray-500 py-8 border rounded-xl bg-gray-50 border-dashed">
+                                                אין תשלומים עתידיים
+                                            </div>
+                                        ) : (
+                                            futureIncomes.map((income) => (
+                                                <MobileIncomeCard
+                                                    key={income.id}
+                                                    income={income}
+                                                    onStatusChange={handleStatusChange}
+                                                    onEdit={setEditingIncome}
+                                                    onDelete={handleDelete}
+                                                    updatingId={updatingId}
+                                                />
+                                            ))
+                                        )}
                                     </div>
                                 </>
                             )
@@ -289,7 +310,8 @@ function PastPaymentsAccordion({ incomes, onStatusChange, onEdit, onDelete, upda
 
             {isOpen && (
                 <div className="border-t bg-white dark:bg-slate-900 animate-in slide-in-from-top-2 duration-200">
-                    <div className="overflow-x-auto">
+                    {/* Desktop Table */}
+                    <div className="overflow-x-auto hidden md:block">
                         <Table dir="rtl" className="min-w-[600px] sm:min-w-full">
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent">
@@ -313,6 +335,21 @@ function PastPaymentsAccordion({ incomes, onStatusChange, onEdit, onDelete, upda
                                 ))}
                             </TableBody>
                         </Table>
+                    </div>
+
+                    {/* Mobile Cards */}
+                    <div className="md:hidden space-y-2 p-2">
+                        {incomes.map((income: any) => (
+                            <MobileIncomeCard
+                                key={income.id}
+                                income={income}
+                                onStatusChange={onStatusChange}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
+                                updatingId={updatingId}
+                                isPast={true}
+                            />
+                        ))}
                     </div>
                 </div>
             )}
@@ -372,5 +409,60 @@ function IncomeRow({ income, onStatusChange, onEdit, onDelete, updatingId, isPas
                 </div>
             </TableCell>
         </TableRow>
+    )
+}
+
+function MobileIncomeCard({ income, onStatusChange, onEdit, onDelete, updatingId, isPast }: any) {
+    return (
+        <div className={`p-3 rounded-xl border bg-white shadow-sm hover:shadow-md transition-all ${isPast ? 'opacity-75' : ''}`}>
+            <div className="flex justify-between items-start mb-2">
+                <div className="flex flex-col gap-0.5">
+                    <span className="font-bold text-gray-900 text-lg">
+                        {formatCurrency(income.amount)}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                        {format(new Date(income.date), 'dd/MM/yyyy')}
+                    </span>
+                </div>
+
+                <Select
+                    value={income.status}
+                    onValueChange={(val) => onStatusChange(income.id, val)}
+                    disabled={updatingId === income.id}
+                >
+                    <SelectTrigger className={`w-[110px] h-8 text-xs ${income.status === 'PAID' ? 'text-green-600 border-green-200 bg-green-50' :
+                        income.status === 'PENDING' ? 'text-yellow-600 border-yellow-200 bg-yellow-50' :
+                            income.status === 'OVERDUE' ? 'text-red-600 border-red-200 bg-red-50' : ''
+                        }`}>
+                        <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="PAID" className="text-green-600 text-xs">שולם</SelectItem>
+                        <SelectItem value="PENDING" className="text-yellow-600 text-xs">ממתין</SelectItem>
+                        <SelectItem value="OVERDUE" className="text-red-600 text-xs">באיחור</SelectItem>
+                        <SelectItem value="CANCELLED" className="text-gray-500 text-xs">בוטל</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="flex justify-end gap-1 border-t pt-2 mt-2">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 rounded-full text-blue-500 hover:bg-blue-50"
+                    onClick={() => onEdit(income)}
+                >
+                    <Edit2 className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 rounded-full text-red-500 hover:bg-red-50"
+                    onClick={() => onDelete(income.id)}
+                >
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </div>
+        </div>
     )
 }
