@@ -371,12 +371,17 @@ export function ExpensesTab() {
     const handleImportExpenses = async (data: any[]) => {
         const expensesToImport = data.map(row => ({
             description: row.description,
-            amount: parseFloat(row.billingAmount), // Use billing amount as the final expense amount
-            category: row.branchName || 'כללי', // Use branch as category if available
+            amount: parseFloat(row.billingAmount),
+            category: row.branchName || 'כללי',
             currency: 'ILS' as 'ILS' | 'USD' | 'EUR' | 'GBP',
             date: row.date,
             isRecurring: false,
-            paymentMethod: row.paymentMethod || 'כרטיס אשראי'
+            paymentMethod: row.paymentMethod || 'כרטיס אשראי',
+            vatAmount: row.vatAmount,
+            amountBeforeVat: row.amountBeforeVat,
+            vatRate: row.vatRate,
+            isDeductible: row.isDeductible,
+            deductibleRate: row.deductibleRate
         }))
 
         const result = await importExpenses(expensesToImport, budgetType)

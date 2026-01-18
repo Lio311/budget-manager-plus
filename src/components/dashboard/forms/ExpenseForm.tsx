@@ -419,6 +419,11 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
             date: row.date,
             isRecurring: false,
             paymentMethod: row.paymentMethod || 'כרטיס אשראי',
+            vatAmount: row.vatAmount,
+            amountBeforeVat: row.amountBeforeVat,
+            vatRate: row.vatRate,
+            isDeductible: row.isDeductible,
+            deductibleRate: row.deductibleRate,
             // VAT Logic for Business
             ...(isBusiness ? (() => {
                 // If VAT exists from scan, use it
