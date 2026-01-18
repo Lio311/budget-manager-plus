@@ -532,7 +532,7 @@ function TransactionsTable({ data, type, searchTerm }: { data: TransactionItem[]
             ) : (
                 Object.entries(groupedByMonth).map(([month, transactions]) => (
                     <div key={month} className="space-y-4">
-                        <h4 className="text-lg font-bold text-gray-700 sticky top-0 bg-white py-2 z-10 border-b text-right">
+                        <h4 className="text-lg font-bold text-gray-700 dark:text-gray-200 sticky top-0 bg-white dark:bg-slate-900 py-2 z-10 border-b dark:border-slate-800 text-right">
                             {month}
                         </h4>
                         <TransactionList filtered={transactions as TransactionItem[]} type={type} />
@@ -555,15 +555,15 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
             {/* Desktop View (Table) */}
             <div className="hidden md:block border rounded-xl overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-gray-50">
-                        <TableRow>
-                            <TableHead className="text-center w-[120px]">נטו</TableHead>
-                            <TableHead className="text-center w-[100px]">מע"מ</TableHead>
-                            <TableHead className="text-center w-[120px]">סכום ברוטו</TableHead>
-                            <TableHead className="text-center">תיאור</TableHead>
-                            <TableHead className="text-center">{type === 'income' ? 'לקוח' : 'ספק'}</TableHead>
-                            <TableHead className="text-center">אסמכתא</TableHead>
-                            <TableHead className="text-center w-[120px]">תאריך</TableHead>
+                    <TableHeader className="bg-gray-50 dark:bg-slate-900/50">
+                        <TableRow className="border-b-gray-200 dark:border-b-slate-800">
+                            <TableHead className="text-center w-[120px] text-gray-500 dark:text-gray-400">נטו</TableHead>
+                            <TableHead className="text-center w-[100px] text-gray-500 dark:text-gray-400">מע"מ</TableHead>
+                            <TableHead className="text-center w-[120px] text-gray-500 dark:text-gray-400">סכום ברוטו</TableHead>
+                            <TableHead className="text-center text-gray-500 dark:text-gray-400">תיאור</TableHead>
+                            <TableHead className="text-center text-gray-500 dark:text-gray-400">{type === 'income' ? 'לקוח' : 'ספק'}</TableHead>
+                            <TableHead className="text-center text-gray-500 dark:text-gray-400">אסמכתא</TableHead>
+                            <TableHead className="text-center w-[120px] text-gray-500 dark:text-gray-400">תאריך</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -574,17 +574,17 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                                 </TableCell>
                             </TableRow>
                         ) : filtered.map((t) => (
-                            <TableRow key={t.id} className="hover:bg-gray-50">
-                                <TableCell className="text-center font-bold">{formatMoney(t.amountNet)}</TableCell>
-                                <TableCell className="text-center text-gray-500">{formatMoney(t.vat)}</TableCell>
+                            <TableRow key={t.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 border-b-gray-100 dark:border-b-slate-800/50">
+                                <TableCell className="text-center font-bold text-gray-900 dark:text-gray-100">{formatMoney(t.amountNet)}</TableCell>
+                                <TableCell className="text-center text-gray-500 dark:text-gray-400">{formatMoney(t.vat)}</TableCell>
                                 <TableCell className="text-center text-muted-foreground line-through decoration-red-500/30 decoration-1">{formatMoney(t.amount)}</TableCell>
-                                <TableCell className="text-center max-w-[200px] truncate" title={t.description}>{t.description}</TableCell>
-                                <TableCell className="text-center">{t.entityName || '-'}</TableCell>
-                                <TableCell className="text-center font-medium">
-                                    {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200 ml-2">זיכוי</Badge>}
+                                <TableCell className="text-center max-w-[200px] truncate text-gray-700 dark:text-gray-300" title={t.description}>{t.description}</TableCell>
+                                <TableCell className="text-center text-gray-700 dark:text-gray-300">{t.entityName || '-'}</TableCell>
+                                <TableCell className="text-center font-medium text-gray-700 dark:text-gray-300">
+                                    {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200 dark:text-red-400 dark:border-red-900 ml-2">זיכוי</Badge>}
                                     {t.number || '-'}
                                 </TableCell>
-                                <TableCell className="text-center text-gray-500">{new Date(t.date).toLocaleDateString('he-IL')}</TableCell>
+                                <TableCell className="text-center text-gray-500 dark:text-gray-400">{new Date(t.date).toLocaleDateString('he-IL')}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
