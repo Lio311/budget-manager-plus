@@ -299,23 +299,23 @@ export default function ProfitLossTab() {
             </div>
 
             {/* Controls */}
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between glass-panel p-4 rounded-xl">
-                <div id="pl-view-toggle" className="flex bg-gray-100 p-1 rounded-lg">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between glass-panel p-4 rounded-xl border border-gray-200 dark:border-slate-800">
+                <div id="pl-view-toggle" className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-lg">
                     <button
                         onClick={() => setViewType('ANNUAL')}
-                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'ANNUAL' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-900'}`}
+                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'ANNUAL' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
                     >
                         שנתי
                     </button>
                     <button
                         onClick={() => setViewType('BI_MONTHLY')}
-                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'BI_MONTHLY' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-900'}`}
+                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'BI_MONTHLY' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
                     >
                         דו-חודשי
                     </button>
                     <button
                         onClick={() => setViewType('MONTHLY')}
-                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'MONTHLY' ? 'bg-white shadow-sm text-emerald-600' : 'text-gray-500 hover:text-gray-900'}`}
+                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewType === 'MONTHLY' ? 'bg-white dark:bg-slate-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
                     >
                         חודשי
                     </button>
@@ -326,7 +326,7 @@ export default function ProfitLossTab() {
                     <select
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                        className="h-9 px-3 py-1 rounded-md border border-gray-200 bg-white text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                        className="h-9 px-3 py-1 rounded-md border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"
                     >
                         {years.map(y => (
                             <option key={y} value={y}>{y}</option>
@@ -337,10 +337,10 @@ export default function ProfitLossTab() {
 
             <div id="pl-periods-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {getPeriods().map((period, idx) => (
-                    <Card key={idx} className="p-6 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden group border-t-4 border-t-transparent hover:border-t-emerald-500">
+                    <Card key={idx} className="p-6 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden group border-t-4 border-t-transparent hover:border-t-emerald-500 dark:bg-card dark:border-slate-800">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-800">{period.label}</h3>
+                                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">{period.label}</h3>
                                 <div className="flex items-center gap-2 mt-1">
                                     <span className={`inline-block w-2 h-2 rounded-full 
                                         ${period.status === 'CLOSED' ? 'bg-gray-400' :
@@ -359,17 +359,17 @@ export default function ProfitLossTab() {
                             />
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-gray-100">
+                        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800">
                             {period.status !== 'FUTURE' ? (
                                 <Button
                                     variant="outline"
-                                    className="w-full group-hover:bg-emerald-50 group-hover:text-emerald-700 group-hover:border-emerald-200"
+                                    className="w-full group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/30 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 group-hover:border-emerald-200 dark:group-hover:border-emerald-800"
                                     onClick={() => handlePeriodSelect(period)}
                                 >
                                     צפה בדוח
                                 </Button>
                             ) : (
-                                <div className="text-center py-2 text-sm text-gray-400 bg-gray-50 rounded-md select-none">
+                                <div className="text-center py-2 text-sm text-gray-400 bg-gray-50 dark:bg-slate-800 rounded-md select-none">
                                     טרם הגיע מועד הדוח
                                 </div>
                             )}
@@ -408,41 +408,41 @@ export default function ProfitLossTab() {
                             {/* Summary Cards */}
                             {/* Summary Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 direction-rtl">
-                                <Card className="p-4 md:p-6 bg-emerald-50 border-emerald-100">
+                                <Card className="p-4 md:p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50">
                                     <div className="flex items-center gap-3 md:gap-4">
-                                        <div className="p-2 md:p-3 bg-emerald-100 rounded-full text-emerald-600">
+                                        <div className="p-2 md:p-3 bg-emerald-100 dark:bg-emerald-900/50 rounded-full text-emerald-600 dark:text-emerald-400">
                                             <TrendingUp className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-xs md:text-sm text-emerald-700 font-medium">סה"כ הכנסות (חייבות)</p>
-                                            <h3 className="text-lg md:text-2xl font-bold text-emerald-900">{formatMoney(reportData.revenue.taxable)}</h3>
-                                            <p className="text-[10px] md:text-xs text-emerald-600 mt-1">מע"מ: {formatMoney(reportData.revenue.vat)}</p>
+                                            <p className="text-xs md:text-sm text-emerald-700 dark:text-emerald-300 font-medium">סה"כ הכנסות (חייבות)</p>
+                                            <h3 className="text-lg md:text-2xl font-bold text-emerald-900 dark:text-emerald-100">{formatMoney(reportData.revenue.taxable)}</h3>
+                                            <p className="text-[10px] md:text-xs text-emerald-600 dark:text-emerald-400 mt-1">מע"מ: {formatMoney(reportData.revenue.vat)}</p>
                                         </div>
                                     </div>
                                 </Card>
 
-                                <Card className="p-4 md:p-6 bg-red-50 border-red-100">
+                                <Card className="p-4 md:p-6 bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50">
                                     <div className="flex items-center gap-3 md:gap-4">
-                                        <div className="p-2 md:p-3 bg-red-100 rounded-full text-red-600">
+                                        <div className="p-2 md:p-3 bg-red-100 dark:bg-red-900/50 rounded-full text-red-600 dark:text-red-400">
                                             <TrendingDown className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-xs md:text-sm text-red-700 font-medium">סה"כ הוצאות (מוכרות)</p>
-                                            <h3 className="text-lg md:text-2xl font-bold text-red-900">{formatMoney(reportData.expenses.recognized)}</h3>
-                                            <p className="text-[10px] md:text-xs text-red-600 mt-1">מע"מ: {formatMoney(reportData.expenses.vatRecognized)}</p>
+                                            <p className="text-xs md:text-sm text-red-700 dark:text-red-300 font-medium">סה"כ הוצאות (מוכרות)</p>
+                                            <h3 className="text-lg md:text-2xl font-bold text-red-900 dark:text-red-100">{formatMoney(reportData.expenses.recognized)}</h3>
+                                            <p className="text-[10px] md:text-xs text-red-600 dark:text-red-400 mt-1">מע"מ: {formatMoney(reportData.expenses.vatRecognized)}</p>
                                         </div>
                                     </div>
                                 </Card>
 
-                                <Card className="p-4 md:p-6 bg-blue-50 border-blue-100">
+                                <Card className="p-4 md:p-6 bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/50">
                                     <div className="flex items-center gap-3 md:gap-4">
-                                        <div className="p-2 md:p-3 bg-blue-100 rounded-full text-blue-600">
+                                        <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full text-blue-600 dark:text-blue-400">
                                             <DollarSign className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-xs md:text-sm text-blue-700 font-medium">רווח נקי</p>
-                                            <h3 className="text-lg md:text-2xl font-bold text-blue-900">{formatMoney(reportData.netProfit)}</h3>
-                                            <p className="text-[10px] md:text-xs text-blue-600 mt-1">לפני מס הכנסה</p>
+                                            <p className="text-xs md:text-sm text-blue-700 dark:text-blue-300 font-medium">רווח נקי</p>
+                                            <h3 className="text-lg md:text-2xl font-bold text-blue-900 dark:text-blue-100">{formatMoney(reportData.netProfit)}</h3>
+                                            <p className="text-[10px] md:text-xs text-blue-600 dark:text-blue-400 mt-1">לפני מס הכנסה</p>
                                         </div>
                                     </div>
                                 </Card>
