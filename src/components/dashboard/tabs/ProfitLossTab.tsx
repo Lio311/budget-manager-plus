@@ -598,7 +598,7 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                         לא נמצאו נתונים
                     </div>
                 ) : filtered.map((t) => (
-                    <div key={t.id} className="glass-panel p-3 sm:p-4 rounded-xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-all">
+                    <div key={t.id} className="glass-panel p-3 sm:p-4 rounded-xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-all" dir="rtl">
                         <div className="flex flex-row items-center justify-between gap-3">
                             {/* Right Side: Icon & Info */}
                             <div className="flex items-center gap-3 flex-1 min-w-0">
