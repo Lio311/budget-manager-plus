@@ -425,7 +425,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                 if (row.vatAmount !== undefined && row.vatAmount > 0) {
                     return {
                         vatAmount: parseFloat(row.vatAmount),
-                        vatRate: 0.18, // Assume 18% or calculate: vat / net
+                        vatRate: 0.18, // Assume 18%
                         amountBeforeVat: parseFloat(row.billingAmount) - parseFloat(row.vatAmount),
                         isDeductible: true,
                         deductibleRate: 1.0

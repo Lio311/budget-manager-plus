@@ -47,7 +47,11 @@ export async function scanInvoiceImage(formData: FormData): Promise<ScanResult> 
         2. "businessName": The name of the merchant/business. string.
         3. "date": The date of the invoice in YYYY-MM-DD format. If not found, null. string | null.
         4. "category": A suggested category for this expense (e.g., "Food", "Transport", "Shopping", "Bills"). string.
-        5. "vatAmount": The VAT/Tax amount if stated. If 0 or not found, null or 0. number.
+        5. "vatAmount": The VAT/Tax amount (Ma'am) if stated. 
+           - If the VAT amount is explicitly stated on the receipt, use that value.
+           - If VAT is NOT stated but the receipt looks like a standard Israeli receipt (ILS), CALCULATE it as: amount - (amount / 1.18). Round to 2 decimal places.
+           - If the receipt is clearly from a VAT-exempt entity (e.g. Eilat, or specific exempt query), return 0. 
+           - Default to calculating 18% VAT if unsure (Amount * 0.17 is wrong! Use the extraction method: Amount - (Amount/1.18)).
 
         Return ONLY the JSON object. Do not include markdown code blocks.
         `
