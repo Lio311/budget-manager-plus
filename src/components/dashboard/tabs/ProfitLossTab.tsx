@@ -380,20 +380,22 @@ export default function ProfitLossTab() {
 
             {/* Report Dialog */}
             <Dialog open={isDetailOpen} onOpenChange={(open) => !open && setIsDetailOpen(false)}>
-                <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-y-auto p-4 md:p-6" dir="rtl">
-                    <DialogHeader className="flex flex-col gap-4">
-                        <DialogTitle className="text-2xl font-bold text-center">
+                <DialogContent className="w-[95vw] md:w-full max-w-6xl max-h-[90vh] overflow-y-auto p-3 md:p-6" dir="rtl">
+                    <DialogHeader className="flex flex-col gap-3 md:gap-4 mt-8 md:mt-0">
+                        <DialogTitle className="text-xl md:text-2xl font-bold text-center">
                             דוח רווח והפסד - {selectedPeriod?.label.includes(selectedYear.toString()) ? selectedPeriod?.label : `${selectedPeriod?.label} ${selectedYear}`}
                         </DialogTitle>
 
                         {/* Centered Action Buttons */}
-                        <div className="flex flex-col md:flex-row justify-center gap-4 w-full">
-                            <Button variant="outline" onClick={() => selectedPeriod && fetchReport(selectedPeriod)} disabled={isLoading} className="gap-2 min-w-[200px]">
-                                רענן נתונים
+                        <div className="grid grid-cols-2 md:flex md:flex-row justify-center gap-3 md:gap-4 w-full">
+                            <Button variant="outline" onClick={() => selectedPeriod && fetchReport(selectedPeriod)} disabled={isLoading} className="gap-2 w-full md:min-w-[200px]">
+                                <span className="hidden sm:inline">רענן נתונים</span>
+                                <span className="sm:hidden">רענן</span>
                                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                             </Button>
-                            <Button variant="outline" onClick={() => handleDownloadPDF(selectedYear!)} className="gap-2 min-w-[200px]">
-                                הורד PDF
+                            <Button variant="outline" onClick={() => handleDownloadPDF(selectedYear!)} className="gap-2 w-full md:min-w-[200px]">
+                                <span className="hidden sm:inline">הורד PDF</span>
+                                <span className="sm:hidden">PDF</span>
                                 <Download size={16} />
                             </Button>
                         </div>
@@ -404,42 +406,43 @@ export default function ProfitLossTab() {
                     ) : reportData ? (
                         <div className="mt-6 space-y-8">
                             {/* Summary Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 direction-rtl">
-                                <Card className="p-6 bg-emerald-50 border-emerald-100">
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-emerald-100 rounded-full text-emerald-600">
-                                            <TrendingUp size={24} />
+                            {/* Summary Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 direction-rtl">
+                                <Card className="p-4 md:p-6 bg-emerald-50 border-emerald-100">
+                                    <div className="flex items-center gap-3 md:gap-4">
+                                        <div className="p-2 md:p-3 bg-emerald-100 rounded-full text-emerald-600">
+                                            <TrendingUp className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-sm text-emerald-700 font-medium">סה"כ הכנסות (חייבות)</p>
-                                            <h3 className="text-2xl font-bold text-emerald-900">{formatMoney(reportData.revenue.taxable)}</h3>
-                                            <p className="text-xs text-emerald-600 mt-1">מע"מ: {formatMoney(reportData.revenue.vat)}</p>
+                                            <p className="text-xs md:text-sm text-emerald-700 font-medium">סה"כ הכנסות (חייבות)</p>
+                                            <h3 className="text-lg md:text-2xl font-bold text-emerald-900">{formatMoney(reportData.revenue.taxable)}</h3>
+                                            <p className="text-[10px] md:text-xs text-emerald-600 mt-1">מע"מ: {formatMoney(reportData.revenue.vat)}</p>
                                         </div>
                                     </div>
                                 </Card>
 
-                                <Card className="p-6 bg-red-50 border-red-100">
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-red-100 rounded-full text-red-600">
-                                            <TrendingDown size={24} />
+                                <Card className="p-4 md:p-6 bg-red-50 border-red-100">
+                                    <div className="flex items-center gap-3 md:gap-4">
+                                        <div className="p-2 md:p-3 bg-red-100 rounded-full text-red-600">
+                                            <TrendingDown className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-sm text-red-700 font-medium">סה"כ הוצאות (מוכרות)</p>
-                                            <h3 className="text-2xl font-bold text-red-900">{formatMoney(reportData.expenses.recognized)}</h3>
-                                            <p className="text-xs text-red-600 mt-1">מע"מ: {formatMoney(reportData.expenses.vatRecognized)}</p>
+                                            <p className="text-xs md:text-sm text-red-700 font-medium">סה"כ הוצאות (מוכרות)</p>
+                                            <h3 className="text-lg md:text-2xl font-bold text-red-900">{formatMoney(reportData.expenses.recognized)}</h3>
+                                            <p className="text-[10px] md:text-xs text-red-600 mt-1">מע"מ: {formatMoney(reportData.expenses.vatRecognized)}</p>
                                         </div>
                                     </div>
                                 </Card>
 
-                                <Card className="p-6 bg-blue-50 border-blue-100">
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-blue-100 rounded-full text-blue-600">
-                                            <DollarSign size={24} />
+                                <Card className="p-4 md:p-6 bg-blue-50 border-blue-100">
+                                    <div className="flex items-center gap-3 md:gap-4">
+                                        <div className="p-2 md:p-3 bg-blue-100 rounded-full text-blue-600">
+                                            <DollarSign className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-sm text-blue-700 font-medium">רווח נקי</p>
-                                            <h3 className="text-2xl font-bold text-blue-900">{formatMoney(reportData.netProfit)}</h3>
-                                            <p className="text-xs text-blue-600 mt-1">לפני מס הכנסה</p>
+                                            <p className="text-xs md:text-sm text-blue-700 font-medium">רווח נקי</p>
+                                            <h3 className="text-lg md:text-2xl font-bold text-blue-900">{formatMoney(reportData.netProfit)}</h3>
+                                            <p className="text-[10px] md:text-xs text-blue-600 mt-1">לפני מס הכנסה</p>
                                         </div>
                                     </div>
                                 </Card>
