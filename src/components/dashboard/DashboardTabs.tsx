@@ -170,7 +170,9 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
     const userButtonAppearance = {
         elements: {
-            userButtonPopoverActionButton__manageAccount: "hidden md:flex"
+            userButtonPopoverActionButton__manageAccount: "hidden md:flex",
+            userButtonTrigger: "w-14 h-14",
+            avatarBox: "w-14 h-14"
         }
     }
 
