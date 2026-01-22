@@ -112,7 +112,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
     }
 
     return (
-        <div className="sticky top-4 z-50 mx-4 mb-6">
+        <div className="sticky top-4 z-50 mx-4 mb-6 md:mr-[100px] transition-all duration-300">
             <div className="glass-panel w-full flex h-[72px] items-center px-6 justify-between gap-4 transition-all duration-300 hover:shadow-2xl hover:border-white/60">
 
                 {/* Right Section - Date Navigation */}
@@ -197,24 +197,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                     </div>
                 </div>
 
-                {/* Logo - Centered */}
-                <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105"
-                    onClick={() => {
-                        const params = new URLSearchParams(searchParams)
-                        params.set('tab', 'overview')
-                        router.push(`${pathname}?${params.toString()}`)
-                    }}>
-                    <Image
-                        src={logoSrc}
-                        alt="Logo"
-                        width={120}
-                        height={120}
-                        className="h-14 w-auto object-contain"
-                        priority
-                    />
-                </div>
-
-                {/* Left Section */}
+                {/* Left Section (Desktop) */}
                 <div className="hidden md:flex items-center justify-end gap-4">
                     <div className="flex bg-gray-100/50 p-1.5 rounded-full border border-white/50 shadow-inner dark:bg-slate-800/50 dark:border-slate-700/50">
                         <button

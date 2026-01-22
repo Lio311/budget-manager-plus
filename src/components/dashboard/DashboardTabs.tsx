@@ -21,6 +21,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { OverviewTab } from './tabs/OverviewTab'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
 import { IncomeTab } from './tabs/IncomeTab'
 import { ExpensesTab } from './tabs/ExpensesTab'
 import { BillsTab } from './tabs/BillsTab'
