@@ -485,10 +485,19 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
             select: { date: true }
         })
 
-        const existingDates = new Set(existingIncomes.map((inc: any) => startOfDay(inc.date).getTime()))
+        const existingDates = new Set(existingIncomes.map((inc: any) => {
+            const d = new Date(inc.date)
+            d.setHours(12, 0, 0, 0)
+            return d.getTime()
+        }))
 
-        let currentDate = startOfDay(new Date(client.subscriptionStart))
-        const endDate = startOfDay(new Date(client.subscriptionEnd))
+        // Fix: Set time to Noon (12:00) to avoid timezone shifts (UTC vs Local)
+        let currentDate = new Date(client.subscriptionStart)
+        currentDate.setHours(12, 0, 0, 0)
+
+        const endDate = new Date(client.subscriptionEnd)
+        endDate.setHours(12, 0, 0, 0)
+
         const amount = client.subscriptionPrice
         const currency = '₪' // Default currency
         const budgetType = 'BUSINESS' // Clients are always business scope as per user request
