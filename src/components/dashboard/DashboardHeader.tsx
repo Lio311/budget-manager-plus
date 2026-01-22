@@ -216,7 +216,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
 
                 {/* Left Section */}
                 <div className="hidden md:flex items-center justify-end gap-4">
-                    <ModeToggle />
                     <div className="flex bg-gray-100/50 p-1.5 rounded-full border border-white/50 shadow-inner dark:bg-slate-800/50 dark:border-slate-700/50">
                         <button
                             onClick={() => handleToggle('PERSONAL')}
@@ -236,46 +235,6 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                         >
                             עסקי
                         </button>
-                    </div>
-
-                    <div className="pl-2">
-                        {isDemo ? (
-                            <div className="flex items-center gap-2">
-                                {/* Badge removed per user request */}
-                                <Button
-                                    onClick={() => openModal()}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-md transition-all px-6"
-                                >
-                                    התחברות למערכת
-                                </Button>
-                            </div>
-                        ) : (
-                            <UserButton
-                                userProfileProps={userProfileProps}
-                                appearance={userButtonAppearance}
-                            >
-                                <UserButton.UserProfilePage
-                                    label="מיילים מקושרים"
-                                    labelIcon={<Mail className="w-4 h-4" />}
-                                    url="linked-emails"
-                                >
-                                    <LinkedEmails />
-                                </UserButton.UserProfilePage>
-                                <UserButton.MenuItems>
-                                    <UserButton.Action
-                                        label="מנוי"
-                                        labelIcon={<CreditCard className="w-4 h-4" />}
-                                        onClick={() => setIsSubscriptionOpen(true)}
-                                    />
-                                    <UserButton.Action
-                                        label="החלף משתמש"
-                                        labelIcon={<Users className="w-4 h-4" />}
-                                        onClick={() => signOut(() => router.push('/sign-in?force_google=true'))}
-                                    />
-                                </UserButton.MenuItems>
-
-                            </UserButton>
-                        )}
                     </div>
                 </div>
             </div>

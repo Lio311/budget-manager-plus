@@ -7,8 +7,13 @@ import { getUserSubscriptionStatus, getOnboardingStatus } from '@/lib/actions/us
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BarChart3, Calendar, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator, Target, FolderOpen, Mail, CreditCard } from 'lucide-react'
+import { BarChart3, Calendar, DollarSign, Menu, PieChart, TrendingDown, Wallet, X, PiggyBank, Users, Building2, FileText, Shield, TrendingUp, Calculator, Target, FolderOpen, Mail, CreditCard, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
 import { ExpensesTab } from './tabs/ExpensesTab'
@@ -36,6 +41,82 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 interface DashboardTabsProps {
     mobileMenuOpen: boolean
     setMobileMenuOpen: (open: boolean) => void
+}
+
+function QuickActionButton({ budgetType, router }: { budgetType: 'PERSONAL' | 'BUSINESS', router: any }) {
+    const [open, setOpen] = useState(false)
+
+    type ActionItem = {
+        label: string
+        icon: any
+        tab: string
+        action?: string
+        type?: string
+    }
+
+    const businessActions: ActionItem[] = [
+        { label: 'יצירת לקוח', icon: Users, tab: 'clients', action: 'new' }, // You might need a way to trigger 'new' specifically
+        { label: 'יצירת ספק', icon: Building2, tab: 'suppliers', action: 'new' },
+        { label: 'הוספת הוצאה', icon: TrendingDown, tab: 'expenses', action: 'new' },
+        { label: 'הוספת הכנסה', icon: TrendingUp, tab: 'income', action: 'new' },
+        { label: 'יצירת חשבונית', icon: FileText, tab: 'documents', type: 'invoice' },
+        { label: 'יצירת הצעת מחיר', icon: FileText, tab: 'documents', type: 'quote' },
+    ]
+
+    const personalActions: ActionItem[] = [
+        { label: 'הוספת הוצאה', icon: TrendingDown, tab: 'expenses', action: 'new' },
+        { label: 'הוספת הכנסה', icon: TrendingUp, tab: 'income', action: 'new' },
+        { label: 'הוספת חסכון', icon: PiggyBank, tab: 'savings', action: 'new' },
+        { label: 'הוספת הלוואה', icon: Wallet, tab: 'debts', action: 'new' },
+        { label: 'הוספת חשבון קבוע', icon: CreditCard, tab: 'bills', action: 'new' },
+    ]
+
+    const actions = budgetType === 'BUSINESS' ? businessActions : personalActions
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    size="icon"
+                    className="h-10 w-10 md:w-12 md:h-12 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105"
+                >
+                    <Plus className="h-6 w-6" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent side="left" align="end" className="w-56 p-1 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 shadow-xl rounded-xl ml-2">
+                <div className="flex flex-col gap-1">
+                    {actions.map((action, index) => {
+                        const Icon = action.icon
+                        return (
+                            <button
+                                key={index}
+                                onClick={() => {
+                                    setOpen(false)
+                                    // Construct URL with query params to auto-trigger modals if needed
+                                    // For now, simpler navigation. 
+                                    // TODO: Add support for 'autoOpen=true' or similar in target tabs if not present.
+                                    let url = `?tab=${action.tab}`
+                                    if (action.action === 'new') url += '&new=true' // Conceptual
+                                    if (action.type) url += `&type=${action.type}` // Conceptual
+
+                                    // The user request said "lead to the page". 
+                                    // For specific "Create X" actions, we might want to pass a param that opens the dialog.
+                                    // Assuming the tabs check for query params or we just navigate for now.
+                                    // Let's just navigate to the tab for now as a baseline, 
+                                    // knowing that some tabs might not auto-open the dialog yet without further changes.
+                                    router.push(url)
+                                }}
+                                className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-lg transition-colors w-full text-right"
+                            >
+                                <Icon className="h-4 w-4 text-gray-500" />
+                                <span>{action.label}</span>
+                            </button>
+                        )
+                    })}
+                </div>
+            </PopoverContent>
+        </Popover>
+    )
 }
 
 export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTabsProps) {
@@ -211,39 +292,112 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
             {/* Sidebar Navigation - Floating Dock */}
             <aside className={`
                 fixed md:sticky 
-                top-0 md:top-[100px] 
-                h-[100dvh] md:h-fit md:max-h-[calc(100vh-120px)]
+                top-0 md:top-0
+                h-[100dvh] md:h-screen
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
                 z-40 md:z-50
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
-                flex flex-col
+                flex flex-col justify-between
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
                 md:w-20 md:hover:w-64 group
-                m-0 md:m-4 md:rounded-3xl
-                bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white/40 dark:md:bg-slate-900/40 md:backdrop-blur-md border-l md:border border-white/50 dark:border-slate-800/50 shadow-2xl
+                m-0 
+                bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white dark:md:bg-slate-900 border-l md:border-l border-white/50 dark:border-slate-800/50 shadow-xl
             `}>
-                <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10 dark:border-white/5">
-                    <div className="flex items-center gap-3">
-                        <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-[#323338] dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/10">
-                            <X className="h-5 w-5" />
-                        </Button>
-                        <span className="font-bold text-lg text-[#323338] dark:text-gray-100">תפריט</span>
+                <div className="flex-1 w-full">
+                    <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10 dark:border-white/5">
+                        <div className="flex items-center gap-3">
+                            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-[#323338] dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/10">
+                                <X className="h-5 w-5" />
+                            </Button>
+                            <span className="font-bold text-lg text-[#323338] dark:text-gray-100">תפריט</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <ModeToggle />
+                            {isDemo ? (
+                                <Button
+                                    onClick={() => openModal()}
+                                    variant="outline"
+                                    size="sm"
+                                    className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600 h-8"
+                                >
+                                    התחבר
+                                </Button>
+                            ) : (
+                                <UserButton
+                                    userProfileProps={userProfileProps}
+                                    appearance={userButtonAppearance}
+                                >
+                                    <UserButton.UserProfilePage
+                                        label="מיילים מקושרים"
+                                        labelIcon={<Mail className="w-4 h-4" />}
+                                        url="linked-emails"
+                                    >
+                                        <LinkedEmails />
+                                    </UserButton.UserProfilePage>
+                                    <UserButton.MenuItems>
+                                        <UserButton.Action
+                                            label="מנוי"
+                                            labelIcon={<CreditCard className="w-4 h-4" />}
+                                            onClick={() => setIsSubscriptionOpen(true)}
+                                        />
+                                    </UserButton.MenuItems>
+                                </UserButton>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <ModeToggle />
+                    <div className="p-3 overflow-y-auto flex-1 scrollbar-hide">
+                        <TabsList className="flex flex-col h-auto bg-transparent gap-2 p-0 w-full text-right">
+                            {tabs.map((tab) => {
+                                const Icon = tab.icon
+                                return (
+                                    <TabsTrigger
+                                        key={tab.value}
+                                        value={tab.value}
+                                        className={`w-full relative group/item justify-start gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                                             ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
+                                             hover:bg-white/40 dark:hover:bg-white/10
+                                             text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden whitespace-nowrap`}
+                                    >
+                                        <div className="relative z-10 flex items-center gap-4 shrink-0 transition-all duration-300 group-hover/item:scale-110">
+                                            <Icon className="h-5 w-5" />
+                                            <span className="opacity-100 md:opacity-0 md:group-hover:opacity-100 md:w-0 md:group-hover:w-auto transition-all duration-500 delay-75 origin-right">
+                                                {tab.label}
+                                            </span>
+                                        </div>
+
+                                        {/* Active Indicator Glow */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/item:animate-[shimmer_1.5s_infinite] z-0" />
+                                    </TabsTrigger>
+                                )
+                            })}
+                        </TabsList>
+                    </div>
+                </div>
+
+                {/* Footer Section: Actions & User Profile */}
+                <div className="p-3 hidden md:flex flex-col gap-4 items-center mb-6">
+                    {/* Quick Action Button */}
+                    <div className="w-full flex justify-center">
+                        <QuickActionButton budgetType={budgetType} router={router} />
+                    </div>
+
+                    {/* Desktop User Profile */}
+                    <div className="flex items-center justify-center w-full mt-2">
                         {isDemo ? (
                             <Button
                                 onClick={() => openModal()}
-                                variant="outline"
-                                size="sm"
-                                className="bg-emerald-600 text-white hover:bg-emerald-700 border-emerald-600 h-8"
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-600"
                             >
-                                התחבר
+                                <Shield className="h-6 w-6" />
                             </Button>
                         ) : (
                             <UserButton
+                                afterSignOutUrl="/sign-in"
                                 userProfileProps={userProfileProps}
                                 appearance={userButtonAppearance}
                             >
@@ -264,34 +418,6 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                             </UserButton>
                         )}
                     </div>
-                </div>
-
-                <div className="p-3 overflow-y-auto flex-1 scrollbar-hide">
-                    <TabsList className="flex flex-col h-auto bg-transparent gap-2 p-0 w-full text-right">
-                        {tabs.map((tab) => {
-                            const Icon = tab.icon
-                            return (
-                                <TabsTrigger
-                                    key={tab.value}
-                                    value={tab.value}
-                                    className={`w-full relative group/item justify-start gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300
-                                             ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
-                                             hover:bg-white/40 dark:hover:bg-white/10
-                                             text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden whitespace-nowrap`}
-                                >
-                                    <div className="relative z-10 flex items-center gap-4 shrink-0 transition-all duration-300 group-hover/item:scale-110">
-                                        <Icon className="h-5 w-5" />
-                                        <span className="opacity-100 md:opacity-0 md:group-hover:opacity-100 md:w-0 md:group-hover:w-auto transition-all duration-500 delay-75 origin-right">
-                                            {tab.label}
-                                        </span>
-                                    </div>
-
-                                    {/* Active Indicator Glow */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/item:animate-[shimmer_1.5s_infinite] z-0" />
-                                </TabsTrigger>
-                            )
-                        })}
-                    </TabsList>
                 </div>
             </aside>
 
