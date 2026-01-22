@@ -487,16 +487,15 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
 
         const existingDates = new Set(existingIncomes.map((inc: any) => {
             const d = new Date(inc.date)
-            d.setHours(12, 0, 0, 0)
-            return d.getTime()
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0, 0).getTime()
         }))
 
-        // Fix: Set time to Noon (12:00) to avoid timezone shifts (UTC vs Local)
-        let currentDate = new Date(client.subscriptionStart)
-        currentDate.setHours(12, 0, 0, 0)
+        // Fix: Create dates at noon to avoid timezone shifts
+        const startDate = new Date(client.subscriptionStart)
+        let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 12, 0, 0, 0)
 
-        const endDate = new Date(client.subscriptionEnd)
-        endDate.setHours(12, 0, 0, 0)
+        const endDateInput = new Date(client.subscriptionEnd)
+        const endDate = new Date(endDateInput.getFullYear(), endDateInput.getMonth(), endDateInput.getDate(), 12, 0, 0, 0)
 
         const amount = client.subscriptionPrice
         const currency = '₪' // Default currency
@@ -508,229 +507,231 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
         // Loop through dates
         while (currentDate <= endDate) {
             // Check if income exists for this date
-            if (existingDates.has(currentDate.getTime())) {
-                console.log(`Skipping date ${currentDate.toISOString()} - exists`)
-            } else {
-                const status = currentDate > new Date() ? 'PENDING' : 'PAID'
+            const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 12, 0, 0, 0)
+            if (existingDates.has(checkDate.getTime())) {
+                if (existingDates.has(currentDate.getTime())) {
+                    console.log(`Skipping date ${currentDate.toISOString()} - exists`)
+                } else {
+                    const status = currentDate > new Date() ? 'PENDING' : 'PAID'
 
-                console.log(`Creating income for date: ${currentDate.toISOString()} Status: ${status}`)
+                    console.log(`Creating income for date: ${currentDate.toISOString()} Status: ${status}`)
 
-                // Create Income
-                await addIncome(
-                    currentDate.getMonth() + 1,
-                    currentDate.getFullYear(),
-                    {
-                        source: `מנוי - ${client.name}`,
-                        category: 'כללי', // Default category matches schema default
-                        amount: amount,
-                        currency: currency,
-                        date: currentDate.toISOString(),
-                        isRecurring: false, // We generate individual records
-                        clientId: client.id,
-                        paymentMethod: 'CREDIT_CARD', // Default assumption or add to form?
-                        // subscriptionType removed as it does not exist on Income model
-                        paymentDate: status === 'PAID' ? currentDate.toISOString() : undefined, // Only set paid date if paid
-                        status: status
-                    } as any,
-                    budgetType
-                )
+                    // Create Income
+                    await addIncome(
+                        currentDate.getMonth() + 1,
+                        currentDate.getFullYear(),
+                        {
+                            source: `מנוי - ${client.name}`,
+                            category: 'כללי', // Default category matches schema default
+                            amount: amount,
+                            currency: currency,
+                            date: currentDate.toISOString(),
+                            isRecurring: false, // We generate individual records
+                            clientId: client.id,
+                            paymentMethod: 'CREDIT_CARD', // Default assumption or add to form?
+                            // subscriptionType removed as it does not exist on Income model
+                            paymentDate: status === 'PAID' ? currentDate.toISOString() : undefined, // Only set paid date if paid
+                            status: status
+                        } as any,
+                        budgetType
+                    )
+                }
+
+                // Advance Date
+                switch (client.subscriptionType) {
+                    case 'WEEKLY':
+                        currentDate = addDays(currentDate, 7)
+                        break
+                    case 'MONTHLY':
+                        currentDate = addMonths(currentDate, 1)
+                        break
+                    case 'YEARLY':
+                        currentDate = addYears(currentDate, 1)
+                        break
+                    case 'PROJECT':
+                        // Project is one-time, but if start != end maybe we want to split? 
+                        // Usually project is one-time. If "Subscription" is "PROJECT", maybe just one at start?
+                        // Or if they set start and end, maybe they mean spread?
+                        // For now, let's assume PROJECT is one-time at start.
+                        if (currentDate.getTime() === startOfDay(new Date(client.subscriptionStart)).getTime()) {
+                            // It's the first execution, so we let it happen.
+                            // But for loop, we must break or advance past end
+                            currentDate = addDays(endDate, 1) // Force break
+                        } else {
+                            currentDate = addDays(endDate, 1) // Force break
+                        }
+                        break
+                    default:
+                        currentDate = addDays(endDate, 1) // Force break
+                }
             }
 
-            // Advance Date
-            switch (client.subscriptionType) {
-                case 'WEEKLY':
-                    currentDate = addDays(currentDate, 7)
-                    break
-                case 'MONTHLY':
-                    currentDate = addMonths(currentDate, 1)
-                    break
-                case 'YEARLY':
-                    currentDate = addYears(currentDate, 1)
-                    break
-                case 'PROJECT':
-                    // Project is one-time, but if start != end maybe we want to split? 
-                    // Usually project is one-time. If "Subscription" is "PROJECT", maybe just one at start?
-                    // Or if they set start and end, maybe they mean spread?
-                    // For now, let's assume PROJECT is one-time at start.
-                    if (currentDate.getTime() === startOfDay(new Date(client.subscriptionStart)).getTime()) {
-                        // It's the first execution, so we let it happen.
-                        // But for loop, we must break or advance past end
-                        currentDate = addDays(endDate, 1) // Force break
-                    } else {
-                        currentDate = addDays(endDate, 1) // Force break
-                    }
-                    break
-                default:
-                    currentDate = addDays(endDate, 1) // Force break
-            }
+        } catch (error) {
+            console.error('Error generating subscription incomes:', error)
         }
-
-    } catch (error) {
-        console.error('Error generating subscription incomes:', error)
     }
-}
 
 
 export async function syncClientIncomes(clientId: string) {
-    try {
-        const { userId } = await auth()
-        if (!userId) return { success: false, error: 'Unauthorized' }
+        try {
+            const { userId } = await auth()
+            if (!userId) return { success: false, error: 'Unauthorized' }
 
-        const db = await authenticatedPrisma(userId)
-        const client = await db.client.findUnique({ where: { id: clientId } })
+            const db = await authenticatedPrisma(userId)
+            const client = await db.client.findUnique({ where: { id: clientId } })
 
-        if (!client) return { success: false, error: 'Client not found' }
+            if (!client) return { success: false, error: 'Client not found' }
 
-        await generateSubscriptionIncomes(client, userId)
-        revalidatePath('/dashboard')
-        return { success: true }
-    } catch (error) {
-        console.error('syncClientIncomes error:', error)
-        return { success: false, error: 'Failed' }
-    }
-}
-
-function maskScope(scope: string) {
-    return scope
-}
-
-export async function getClientSubscriptionIncomes(clientId: string) {
-    try {
-        const { userId } = await auth()
-        if (!userId) throw new Error('Unauthorized')
-
-        const db = await authenticatedPrisma(userId)
-
-        const incomes = await db.income.findMany({
-            where: {
-                clientId,
-                source: { startsWith: 'מנוי -' } // Filter for subscription generated incomes
-            },
-            orderBy: { date: 'desc' },
-            select: {
-                id: true,
-                date: true,
-                amount: true,
-                status: true,
-                currency: true
-            }
-        })
-
-        return { success: true, data: incomes }
-    } catch (error) {
-        console.error('getClientSubscriptionIncomes error:', error)
-        return { success: false, error: 'Failed to fetch subscription incomes' }
-    }
-}
-
-export async function updateIncomeStatus(incomeId: string, status: string) {
-    try {
-        const { userId } = await auth()
-        if (!userId) throw new Error('Unauthorized')
-
-        const db = await authenticatedPrisma(userId)
-
-        await db.income.update({
-            where: { id: incomeId },
-            data: { status: status as any }
-        })
-
-        revalidatePath('/dashboard')
-        return { success: true }
-    } catch (error) {
-        console.error('updateIncomeStatus error:', error)
-        return { success: false, error: 'Failed to update status' }
-    }
-}
-
-export async function deleteSubscriptionIncome(incomeId: string) {
-    try {
-        const { userId } = await auth()
-        if (!userId) throw new Error('Unauthorized')
-
-        const db = await authenticatedPrisma(userId)
-
-        await db.income.delete({
-            where: { id: incomeId }
-        })
-
-        revalidatePath('/dashboard')
-        return { success: true }
-    } catch (error) {
-        console.error('deleteSubscriptionIncome error:', error)
-        return { success: false, error: 'Failed to delete income' }
-    }
-}
-
-
-export async function updateSubscriptionIncome(incomeId: string, data: { date: Date, amount: number }) {
-    try {
-        const { userId } = await auth()
-        if (!userId) throw new Error('Unauthorized')
-
-        const db = await authenticatedPrisma(userId)
-
-        await db.income.update({
-            where: { id: incomeId },
-            data: {
-                date: data.date,
-                amount: data.amount
-            }
-        })
-
-        revalidatePath('/dashboard')
-        return { success: true }
-    } catch (error) {
-        console.error('updateSubscriptionIncome error:', error)
-        return { success: false, error: 'Failed to update income' }
-    }
-}
-
-export async function renewSubscription(
-    clientId: string,
-    start: Date,
-    end: Date | undefined,
-    data: {
-        subscriptionType: string
-        packageName?: string
-        subscriptionPrice: number
-        packageId?: string
-        subscriptionStatus?: string
-    }
-) {
-    try {
-        const { userId } = await auth()
-        if (!userId) throw new Error('Unauthorized')
-
-        const db = await authenticatedPrisma(userId)
-
-        // Verify ownership
-        const client = await db.client.findUnique({ where: { id: clientId } })
-        if (!client || client.userId !== userId) {
-            throw new Error('Client not found')
+            await generateSubscriptionIncomes(client, userId)
+            revalidatePath('/dashboard')
+            return { success: true }
+        } catch (error) {
+            console.error('syncClientIncomes error:', error)
+            return { success: false, error: 'Failed' }
         }
-
-        // Update Client
-        const updatedClient = await db.client.update({
-            where: { id: clientId },
-            data: {
-                subscriptionStart: start,
-                subscriptionEnd: end,
-                subscriptionType: data.subscriptionType,
-                packageName: data.packageName,
-                subscriptionPrice: data.subscriptionPrice,
-                packageId: data.packageId,
-                subscriptionStatus: data.subscriptionStatus
-            }
-        })
-
-        // Generate Incomes for the new period
-        await generateSubscriptionIncomes(updatedClient, userId, start)
-
-        revalidatePath('/dashboard')
-        return { success: true }
-    } catch (error) {
-        console.error('renewSubscription error:', error)
-        return { success: false, error: 'Failed to renew subscription' }
     }
-}
+
+    function maskScope(scope: string) {
+        return scope
+    }
+
+    export async function getClientSubscriptionIncomes(clientId: string) {
+        try {
+            const { userId } = await auth()
+            if (!userId) throw new Error('Unauthorized')
+
+            const db = await authenticatedPrisma(userId)
+
+            const incomes = await db.income.findMany({
+                where: {
+                    clientId,
+                    source: { startsWith: 'מנוי -' } // Filter for subscription generated incomes
+                },
+                orderBy: { date: 'desc' },
+                select: {
+                    id: true,
+                    date: true,
+                    amount: true,
+                    status: true,
+                    currency: true
+                }
+            })
+
+            return { success: true, data: incomes }
+        } catch (error) {
+            console.error('getClientSubscriptionIncomes error:', error)
+            return { success: false, error: 'Failed to fetch subscription incomes' }
+        }
+    }
+
+    export async function updateIncomeStatus(incomeId: string, status: string) {
+        try {
+            const { userId } = await auth()
+            if (!userId) throw new Error('Unauthorized')
+
+            const db = await authenticatedPrisma(userId)
+
+            await db.income.update({
+                where: { id: incomeId },
+                data: { status: status as any }
+            })
+
+            revalidatePath('/dashboard')
+            return { success: true }
+        } catch (error) {
+            console.error('updateIncomeStatus error:', error)
+            return { success: false, error: 'Failed to update status' }
+        }
+    }
+
+    export async function deleteSubscriptionIncome(incomeId: string) {
+        try {
+            const { userId } = await auth()
+            if (!userId) throw new Error('Unauthorized')
+
+            const db = await authenticatedPrisma(userId)
+
+            await db.income.delete({
+                where: { id: incomeId }
+            })
+
+            revalidatePath('/dashboard')
+            return { success: true }
+        } catch (error) {
+            console.error('deleteSubscriptionIncome error:', error)
+            return { success: false, error: 'Failed to delete income' }
+        }
+    }
+
+
+    export async function updateSubscriptionIncome(incomeId: string, data: { date: Date, amount: number }) {
+        try {
+            const { userId } = await auth()
+            if (!userId) throw new Error('Unauthorized')
+
+            const db = await authenticatedPrisma(userId)
+
+            await db.income.update({
+                where: { id: incomeId },
+                data: {
+                    date: data.date,
+                    amount: data.amount
+                }
+            })
+
+            revalidatePath('/dashboard')
+            return { success: true }
+        } catch (error) {
+            console.error('updateSubscriptionIncome error:', error)
+            return { success: false, error: 'Failed to update income' }
+        }
+    }
+
+    export async function renewSubscription(
+        clientId: string,
+        start: Date,
+        end: Date | undefined,
+        data: {
+            subscriptionType: string
+            packageName?: string
+            subscriptionPrice: number
+            packageId?: string
+            subscriptionStatus?: string
+        }
+    ) {
+        try {
+            const { userId } = await auth()
+            if (!userId) throw new Error('Unauthorized')
+
+            const db = await authenticatedPrisma(userId)
+
+            // Verify ownership
+            const client = await db.client.findUnique({ where: { id: clientId } })
+            if (!client || client.userId !== userId) {
+                throw new Error('Client not found')
+            }
+
+            // Update Client
+            const updatedClient = await db.client.update({
+                where: { id: clientId },
+                data: {
+                    subscriptionStart: start,
+                    subscriptionEnd: end,
+                    subscriptionType: data.subscriptionType,
+                    packageName: data.packageName,
+                    subscriptionPrice: data.subscriptionPrice,
+                    packageId: data.packageId,
+                    subscriptionStatus: data.subscriptionStatus
+                }
+            })
+
+            // Generate Incomes for the new period
+            await generateSubscriptionIncomes(updatedClient, userId, start)
+
+            revalidatePath('/dashboard')
+            return { success: true }
+        } catch (error) {
+            console.error('renewSubscription error:', error)
+            return { success: false, error: 'Failed to renew subscription' }
+        }
+    }
