@@ -78,7 +78,7 @@ function QuickActionButton({ budgetType, router }: { budgetType: 'PERSONAL' | 'B
             <PopoverTrigger asChild>
                 <Button
                     size="icon"
-                    className="h-10 w-10 md:w-12 md:h-12 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105"
+                    className="h-10 w-10 md:w-12 md:h-12 rounded-2xl bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105"
                 >
                     <Plus className="h-6 w-6" />
                 </Button>
