@@ -365,9 +365,9 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                                                 <TabsTrigger
                                                     value={tab.value}
                                                     className={`relative group/item justify-center p-3 rounded-xl transition-all duration-300 aspect-square
-                                                         ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
+                                                         data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
                                                          hover:bg-white/40 dark:hover:bg-white/10
-                                                         text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden`}
+                                                         text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden ${tab.activeClass}`}
                                                 >
                                                     <div className="relative z-10 flex items-center justify-center transition-all duration-300 group-hover/item:scale-110">
                                                         <Icon className="h-6 w-6" />
