@@ -219,6 +219,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
                             עסקי
                         </button>
                     </div>
+                    <ModeToggle />
                 </div>
             </div>
 
