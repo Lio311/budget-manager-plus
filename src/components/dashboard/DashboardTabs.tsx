@@ -357,7 +357,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </div>
 
                     <div className="p-2 overflow-y-auto flex-1 scrollbar-hide">
-                        <TabsList className="h-auto bg-transparent p-0 w-full grid grid-cols-2 gap-2">
+                        <TabsList className="h-auto bg-transparent p-0 w-full flex flex-col gap-1 md:grid md:grid-cols-2 md:gap-2">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon
                                 return (
@@ -366,14 +366,14 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                                             <TooltipTrigger asChild>
                                                 <TabsTrigger
                                                     value={tab.value}
-                                                    className={`relative group/item justify-center p-3 rounded-xl transition-all duration-300 aspect-square
+                                                    className={`relative group/item justify-start md:justify-center px-4 py-3 md:p-3 rounded-xl transition-all duration-300 w-full md:aspect-square
                                                          data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
                                                          hover:bg-white/40 dark:hover:bg-white/10
                                                          text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden ${tab.activeClass}`}
                                                 >
-                                                    <div className="relative z-10 flex items-center justify-center transition-all duration-300 group-hover/item:scale-110">
-                                                        <Icon className="h-6 w-6" />
-                                                        <span className="md:hidden mr-3">
+                                                    <div className="relative z-10 flex items-center w-full md:justify-center transition-all duration-300 group-hover/item:scale-110">
+                                                        <Icon className="h-5 w-5 md:h-6 md:w-6 shrink-0" />
+                                                        <span className="md:hidden mr-3 font-medium whitespace-nowrap">
                                                             {tab.label}
                                                         </span>
                                                     </div>
