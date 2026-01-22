@@ -311,13 +311,13 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
             )}
 
             {/* Sidebar Navigation - Floating Dock */}
-            <div className="hidden md:flex fixed top-4 right-8 z-[60] justify-center items-center h-[72px] w-[80px]">
+            <div className="hidden md:flex fixed top-4 right-6 z-[60] justify-center items-center h-[72px] w-[90px] bg-transparent">
                 <Image
                     src={logoSrc}
                     alt="Logo"
                     width={50}
                     height={50}
-                    className="h-12 w-auto object-contain transition-transform hover:scale-105"
+                    className="h-14 w-auto object-contain transition-transform hover:scale-105"
                     priority
                 />
             </div>
@@ -328,6 +328,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 h-[100dvh] md:h-[calc(100vh-100px)]
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
+                pt-6
                 z-[60] md:z-40
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                 flex flex-col justify-between

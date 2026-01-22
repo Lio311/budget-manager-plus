@@ -112,7 +112,7 @@ export function DashboardHeader({ onMenuToggle, menuOpen = false, userPlan = 'PE
     }
 
     return (
-        <div className="sticky top-4 z-50 mx-4 mb-6 md:mr-[100px] transition-all duration-300">
+        <div className="sticky top-4 z-50 mx-4 mb-6 md:mr-[140px] transition-all duration-300">
             <div className="glass-panel w-full flex h-[72px] items-center px-6 justify-between gap-4 transition-all duration-300 hover:shadow-2xl hover:border-white/60">
 
                 {/* Right Section - Date Navigation */}
