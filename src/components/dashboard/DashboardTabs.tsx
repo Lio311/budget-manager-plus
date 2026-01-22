@@ -241,27 +241,27 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
     }, [budgetType, prevBudgetType, router, pathname])
 
     const personalTabs = [
-        { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:!bg-black data-[state=active]:!text-white' },
-        { value: 'budget_limits', label: 'תקציבים', icon: Shield, activeClass: 'data-[state=active]:!bg-yellow-500 data-[state=active]:!text-black' },
-        { value: 'savings_goals', label: 'יעדי חיסכון', icon: Target, activeClass: 'data-[state=active]:!bg-cyan-500 data-[state=active]:!text-white' },
-        { value: 'projects', label: 'פרויקטים', icon: FolderOpen, activeClass: 'data-[state=active]:!bg-pink-500 data-[state=active]:!text-white' },
-        { value: 'income', label: 'הכנסות', icon: TrendingUp, activeClass: 'data-[state=active]:!bg-green-600 data-[state=active]:!text-white' },
-        { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeClass: 'data-[state=active]:!bg-red-600 data-[state=active]:!text-white' },
-        { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard, activeClass: 'data-[state=active]:!bg-orange-500 data-[state=active]:!text-white' },
-        { value: 'debts', label: 'הלוואות', icon: Wallet, activeClass: 'data-[state=active]:!bg-purple-600 data-[state=active]:!text-white' },
-        { value: 'savings', label: 'חסכונות', icon: PiggyBank, activeClass: 'data-[state=active]:!bg-blue-600 data-[state=active]:!text-white' },
-        { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeClass: 'data-[state=active]:!bg-black data-[state=active]:!text-white' },
+        { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeColor: '#000000', activeTextColor: '#ffffff' },
+        { value: 'budget_limits', label: 'תקציבים', icon: Shield, activeColor: '#eab308', activeTextColor: '#000000' },
+        { value: 'savings_goals', label: 'יעדי חיסכון', icon: Target, activeColor: '#06b6d4', activeTextColor: '#ffffff' },
+        { value: 'projects', label: 'פרויקטים', icon: FolderOpen, activeColor: '#ec4899', activeTextColor: '#ffffff' },
+        { value: 'income', label: 'הכנסות', icon: TrendingUp, activeColor: '#16a34a', activeTextColor: '#ffffff' },
+        { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeColor: '#dc2626', activeTextColor: '#ffffff' },
+        { value: 'bills', label: 'חשבונות קבועים', icon: CreditCard, activeColor: '#f97316', activeTextColor: '#ffffff' },
+        { value: 'debts', label: 'הלוואות', icon: Wallet, activeColor: '#9333ea', activeTextColor: '#ffffff' },
+        { value: 'savings', label: 'חסכונות', icon: PiggyBank, activeColor: '#2563eb', activeTextColor: '#ffffff' },
+        { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeColor: '#000000', activeTextColor: '#ffffff' },
     ]
 
     const businessTabs = [
-        { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeClass: 'data-[state=active]:!bg-black data-[state=active]:!text-white' },
-        { value: 'clients', label: 'לקוחות', icon: Users, activeClass: 'data-[state=active]:!bg-green-600 data-[state=active]:!text-white' },
-        { value: 'suppliers', label: 'ספקים', icon: Building2, activeClass: 'data-[state=active]:!bg-blue-600 data-[state=active]:!text-white' },
-        { value: 'income', label: 'הכנסות', icon: TrendingUp, activeClass: 'data-[state=active]:!bg-green-600 data-[state=active]:!text-white' },
-        { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeClass: 'data-[state=active]:!bg-red-600 data-[state=active]:!text-white' },
-        { value: 'documents', label: 'הפקת מסמכים', icon: FileText, activeClass: 'data-[state=active]:!bg-blue-500 data-[state=active]:!text-white' },
-        { value: 'profit_loss', label: 'דוח רווח והפסד', icon: Calculator, activeClass: 'data-[state=active]:bg-emerald-600' },
-        { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeClass: 'data-[state=active]:bg-black' },
+        { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeColor: '#000000', activeTextColor: '#ffffff' },
+        { value: 'clients', label: 'לקוחות', icon: Users, activeColor: '#16a34a', activeTextColor: '#ffffff' },
+        { value: 'suppliers', label: 'ספקים', icon: Building2, activeColor: '#2563eb', activeTextColor: '#ffffff' },
+        { value: 'income', label: 'הכנסות', icon: TrendingUp, activeColor: '#16a34a', activeTextColor: '#ffffff' },
+        { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeColor: '#dc2626', activeTextColor: '#ffffff' },
+        { value: 'documents', label: 'הפקת מסמכים', icon: FileText, activeColor: '#3b82f6', activeTextColor: '#ffffff' },
+        { value: 'profit_loss', label: 'דוח רווח והפסד', icon: Calculator, activeColor: '#059669', activeTextColor: '#ffffff' },
+        { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeColor: '#000000', activeTextColor: '#ffffff' },
     ]
 
     const tabs = budgetType === 'BUSINESS' ? businessTabs : personalTabs
@@ -294,7 +294,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
             {/* Mobile Sidebar Overlay */}
             {mobileMenuOpen && (
-                <div className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-all" onClick={() => setMobileMenuOpen(false)} />
+                <div className="fixed inset-0 bg-black/60 z-[55] md:hidden backdrop-blur-sm transition-all" onClick={() => setMobileMenuOpen(false)} />
             )}
 
             {/* Sidebar Navigation - Floating Dock */}
@@ -304,7 +304,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 h-[100dvh] md:h-[calc(100vh-100px)]
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
-                z-40 md:z-40
+                z-[60] md:z-40
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                 flex flex-col justify-between
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
@@ -360,16 +360,21 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                         <TabsList className="h-auto bg-transparent p-0 w-full flex flex-col gap-1 md:grid md:grid-cols-2 md:gap-2">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon
+                                const isActive = activeTab === tab.value
                                 return (
                                     <TooltipProvider key={tab.value} delayDuration={300}>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <TabsTrigger
                                                     value={tab.value}
+                                                    style={{
+                                                        backgroundColor: isActive ? tab.activeColor : undefined,
+                                                        color: isActive ? tab.activeTextColor : undefined
+                                                    }}
                                                     className={`relative group/item justify-start md:justify-center px-4 py-3 md:p-3 rounded-xl transition-all duration-300 w-full md:aspect-square
                                                          data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
                                                          hover:bg-white/40 dark:hover:bg-white/10
-                                                         text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden ${tab.activeClass}`}
+                                                         text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden`}
                                                 >
                                                     <div className="relative z-10 flex items-center w-full md:justify-center transition-all duration-300 group-hover/item:scale-110">
                                                         <Icon className="h-5 w-5 md:h-6 md:w-6 shrink-0" />
