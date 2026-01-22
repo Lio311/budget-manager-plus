@@ -311,10 +311,21 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
             )}
 
             {/* Sidebar Navigation - Floating Dock */}
+            <div className="hidden md:flex fixed top-4 right-8 z-[60] justify-center items-center h-[72px] w-[80px]">
+                <Image
+                    src={logoSrc}
+                    alt="Logo"
+                    width={50}
+                    height={50}
+                    className="h-12 w-auto object-contain transition-transform hover:scale-105"
+                    priority
+                />
+            </div>
+            {/* Sidebar Navigation - Floating Dock */}
             <aside className={`
                 fixed md:sticky 
-                top-0 md:top-0
-                h-[100dvh] md:h-screen
+                top-0 md:top-[90px]
+                h-[100dvh] md:h-[calc(100vh-100px)]
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
                 z-[60] md:z-40
@@ -323,21 +334,11 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
                 md:w-fit md:min-w-[80px] group
                 m-0 
-                bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white dark:md:bg-slate-900 border-l md:border-l border-white/50 dark:border-slate-800/50 shadow-xl md:rounded-0
+                bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white dark:md:bg-slate-900 border-l md:border-l border-white/50 dark:border-slate-800/50 shadow-xl md:rounded-2xl
             `}>
                 <div className="flex-1 w-full flex flex-col min-h-0">
 
-                    {/* Desktop Logo Placement */}
-                    <div className="hidden md:flex justify-center items-center py-6">
-                        <Image
-                            src={logoSrc}
-                            alt="Logo"
-                            width={50}
-                            height={50}
-                            className="h-10 w-auto object-contain transition-transform hover:scale-105"
-                            priority
-                        />
-                    </div>
+
 
                     <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10 dark:border-white/5">
                         <div className="flex items-center gap-3">
