@@ -4,6 +4,7 @@ import { prisma, authenticatedPrisma } from '@/lib/db'
 import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
+import { seedCategories } from './category'
 
 export interface CategoryBudgetUsage {
     categoryId: string
@@ -28,12 +29,24 @@ export async function getCategoryBudgets(month: number, year: number): Promise<G
         const db = await authenticatedPrisma(userId)
 
         const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
-        const categories = await db.category.findMany({
+        let categories = await db.category.findMany({
             where: {
                 userId: budget.userId,
                 type: { in: ['expense'] }, // Explicitly only expense
+                scope: 'PERSONAL'
             }
         })
+
+        if (categories.length === 0) {
+            await seedCategories('expense', 'PERSONAL')
+            categories = await db.category.findMany({
+                where: {
+                    userId: budget.userId,
+                    type: { in: ['expense'] },
+                    scope: 'PERSONAL'
+                }
+            })
+        }
 
         const categoryBudgets = await db.categoryBudget.findMany({
             where: { budgetId: budget.id }
