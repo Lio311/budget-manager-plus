@@ -14,6 +14,12 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { OverviewTab } from './tabs/OverviewTab'
 import { IncomeTab } from './tabs/IncomeTab'
 import { ExpensesTab } from './tabs/ExpensesTab'
@@ -292,17 +298,17 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
             {/* Sidebar Navigation - Floating Dock */}
             <aside className={`
                 fixed md:sticky 
-                top-0 md:top-0
-                h-[100dvh] md:h-screen
+                top-0 md:top-[90px]
+                h-[100dvh] md:h-[calc(100vh-100px)]
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
-                z-40 md:z-30
+                z-40 md:z-40
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                 flex flex-col justify-between
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
-                md:w-20 md:hover:w-64 group
+                md:w-fit md:min-w-[80px] group
                 m-0 
-                bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white dark:md:bg-slate-900 border-l md:border-l border-white/50 dark:border-slate-800/50 shadow-xl
+                bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white dark:md:bg-slate-900 border-l md:border-l border-white/50 dark:border-slate-800/50 shadow-xl md:rounded-2xl
             `}>
                 <div className="flex-1 w-full">
                     <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10 dark:border-white/5">
@@ -349,28 +355,36 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </div>
 
                     <div className="p-2 overflow-y-auto flex-1 scrollbar-hide">
-                        <TabsList className="flex flex-col h-auto bg-transparent gap-1 p-0 w-full text-right">
+                        <TabsList className={`h-auto bg-transparent p-0 w-full ${budgetType === 'PERSONAL' ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-3'}`}>
                             {tabs.map((tab) => {
                                 const Icon = tab.icon
                                 return (
-                                    <TabsTrigger
-                                        key={tab.value}
-                                        value={tab.value}
-                                        className={`w-full relative group/item justify-start gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300
-                                             ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
-                                             hover:bg-white/40 dark:hover:bg-white/10
-                                             text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden whitespace-nowrap`}
-                                    >
-                                        <div className="relative z-10 flex items-center gap-4 shrink-0 transition-all duration-300 group-hover/item:scale-110">
-                                            <Icon className="h-5 w-5" />
-                                            <span className="opacity-100 md:opacity-0 md:group-hover:opacity-100 md:w-0 md:group-hover:w-auto transition-all duration-500 delay-75 origin-right">
-                                                {tab.label}
-                                            </span>
-                                        </div>
+                                    <TooltipProvider key={tab.value} delayDuration={300}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <TabsTrigger
+                                                    value={tab.value}
+                                                    className={`relative group/item justify-center p-3 rounded-xl transition-all duration-300 aspect-square
+                                                         ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
+                                                         hover:bg-white/40 dark:hover:bg-white/10
+                                                         text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden`}
+                                                >
+                                                    <div className="relative z-10 flex items-center justify-center transition-all duration-300 group-hover/item:scale-110">
+                                                        <Icon className="h-6 w-6" />
+                                                        <span className="md:hidden mr-3">
+                                                            {tab.label}
+                                                        </span>
+                                                    </div>
 
-                                        {/* Active Indicator Glow */}
-                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/item:animate-[shimmer_1.5s_infinite] z-0" />
-                                    </TabsTrigger>
+                                                    {/* Active Indicator Glow */}
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover/item:animate-[shimmer_1.5s_infinite] z-0" />
+                                                </TabsTrigger>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="left" className="hidden md:block">
+                                                <p>{tab.label}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 )
                             })}
                         </TabsList>
