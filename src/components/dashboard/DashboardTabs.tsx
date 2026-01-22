@@ -178,6 +178,17 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         }
     }
 
+    const { resolvedTheme } = useTheme()
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    const logoSrc = mounted && resolvedTheme === 'dark'
+        ? '/images/branding/K-LOGO2.png'
+        : '/images/branding/K-LOGO.png'
+
     const [subscriptionStatus, setSubscriptionStatus] = useState<{
         trialEndsAt?: Date | null
         activeSubscription?: { endDate: Date | null, planType: 'PERSONAL' | 'BUSINESS' } | null
@@ -302,8 +313,8 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
             {/* Sidebar Navigation - Floating Dock */}
             <aside className={`
                 fixed md:sticky 
-                top-0 md:top-[90px]
-                h-[100dvh] md:h-[calc(100vh-100px)]
+                top-0 md:top-0
+                h-[100dvh] md:h-screen
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
                 z-[60] md:z-40
@@ -312,9 +323,22 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
                 md:w-fit md:min-w-[80px] group
                 m-0 
-                bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white dark:md:bg-slate-900 border-l md:border-l border-white/50 dark:border-slate-800/50 shadow-xl md:rounded-2xl
+                bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl md:bg-white dark:md:bg-slate-900 border-l md:border-l border-white/50 dark:border-slate-800/50 shadow-xl md:rounded-0
             `}>
-                <div className="flex-1 w-full">
+                <div className="flex-1 w-full flex flex-col min-h-0">
+
+                    {/* Desktop Logo Placement */}
+                    <div className="hidden md:flex justify-center items-center py-6">
+                        <Image
+                            src={logoSrc}
+                            alt="Logo"
+                            width={50}
+                            height={50}
+                            className="h-10 w-auto object-contain transition-transform hover:scale-105"
+                            priority
+                        />
+                    </div>
+
                     <div className="p-4 md:hidden flex justify-between items-center border-b border-white/10 dark:border-white/5">
                         <div className="flex items-center gap-3">
                             <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)} className="text-[#323338] dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/10">
