@@ -296,7 +296,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                 h-[100dvh] md:h-screen
                 overflow-y-auto
                 pb-[env(safe-area-inset-bottom)]
-                z-40 md:z-50
+                z-40 md:z-30
                 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]
                 flex flex-col justify-between
                 ${mobileMenuOpen ? 'translate-x-0 w-64' : 'translate-x-[200%] md:translate-x-0'}
@@ -348,15 +348,15 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                         </div>
                     </div>
 
-                    <div className="p-3 overflow-y-auto flex-1 scrollbar-hide">
-                        <TabsList className="flex flex-col h-auto bg-transparent gap-2 p-0 w-full text-right">
+                    <div className="p-2 overflow-y-auto flex-1 scrollbar-hide">
+                        <TabsList className="flex flex-col h-auto bg-transparent gap-1 p-0 w-full text-right">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon
                                 return (
                                     <TabsTrigger
                                         key={tab.value}
                                         value={tab.value}
-                                        className={`w-full relative group/item justify-start gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                                        className={`w-full relative group/item justify-start gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300
                                              ${tab.activeClass} data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:ring-1 data-[state=active]:ring-white/20
                                              hover:bg-white/40 dark:hover:bg-white/10
                                              text-gray-700 dark:text-gray-300 outline-none ring-0 focus:ring-0 overflow-hidden whitespace-nowrap`}
