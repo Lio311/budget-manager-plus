@@ -355,7 +355,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                     </div>
 
                     <div className="p-2 overflow-y-auto flex-1 scrollbar-hide">
-                        <TabsList className={`h-auto bg-transparent p-0 w-full ${budgetType === 'PERSONAL' ? 'grid grid-cols-2 gap-2' : 'flex flex-col gap-3'}`}>
+                        <TabsList className="h-auto bg-transparent p-0 w-full grid grid-cols-2 gap-2">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon
                                 return (
