@@ -102,7 +102,7 @@ function Calendar({
                                         // Actually DayPicker passes all children options.
                                         // Month options are 0-11, Year options are YYYY.
                                         // Simple style tweak:
-                                        "min-w-[80px]"
+                                        "min-w-[120px]"
                                     )}
                                 >
                                     <SelectValue>{selected?.props?.children}</SelectValue>
