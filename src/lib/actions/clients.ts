@@ -8,31 +8,30 @@ import { addIncome } from './income'
 import { addDays, addMonths, addYears, isSameDay, startOfDay } from 'date-fns'
 
 // Helper function to parse dates safely without timezone issues
+// Helper function to parse dates safely
 const parseDate = (dateInput: string | Date | undefined): Date | null => {
     if (!dateInput) return null;
 
-    // If already a Date object, extract components and recreate at noon
+    // If already a Date object, use it directly (respecting the time set by frontend)
     if (dateInput instanceof Date) {
-        return new Date(dateInput.getFullYear(), dateInput.getMonth(), dateInput.getDate(), 12, 0, 0, 0);
+        return dateInput;
     }
 
     const dateStr = String(dateInput);
 
-    // Try YYYY-MM-DD format first
+    // Try YYYY-MM-DD format first - default to Noon to be safe if no time provided
     const dashParts = dateStr.split('-');
-    if (dashParts.length === 3 && dashParts[0].length === 4) {
+    if (dashParts.length === 3 && dashParts[0].length === 4 && !dateStr.includes('T')) {
         return new Date(parseInt(dashParts[0]), parseInt(dashParts[1]) - 1, parseInt(dashParts[2]), 12, 0, 0, 0);
     }
 
-    // Handle ISO string format (e.g., "2026-01-01T00:00:00.000Z")
+    // Handle ISO string format - Create date object directly
     if (dateStr.includes('T') || dateStr.includes('Z')) {
-        const isoDate = new Date(dateStr);
-        return new Date(isoDate.getFullYear(), isoDate.getMonth(), isoDate.getDate(), 12, 0, 0, 0);
+        return new Date(dateStr);
     }
 
-    // Fallback - parse and recreate at noon
-    const fallbackDate = new Date(dateStr);
-    return new Date(fallbackDate.getFullYear(), fallbackDate.getMonth(), fallbackDate.getDate(), 12, 0, 0, 0);
+    // Fallback
+    return new Date(dateStr);
 };
 
 const emptyToUndefined = (val: unknown) => {
@@ -519,15 +518,15 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
         }))
 
 
-        // Fix: Create dates at noon to avoid timezone shifts
+        // Fix: Use parseDate which now respects exact time if provided
         console.log('[DEBUG] client.subscriptionStart:', client.subscriptionStart, 'type:', typeof client.subscriptionStart)
         console.log('[DEBUG] client.subscriptionEnd:', client.subscriptionEnd, 'type:', typeof client.subscriptionEnd)
 
         const startDate = parseDate(client.subscriptionStart as any)!
-        let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 12, 0, 0, 0)
+        let currentDate = new Date(startDate) // Copy date with time
 
         const endDateInput = parseDate(client.subscriptionEnd as any)!
-        const endDate = new Date(endDateInput.getFullYear(), endDateInput.getMonth(), endDateInput.getDate(), 12, 0, 0, 0)
+        const endDate = new Date(endDateInput) // Copy date with time
 
         console.log('[DEBUG] Parsed startDate:', startDate)
         console.log('[DEBUG] Parsed endDate:', endDateInput)
@@ -543,7 +542,7 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
 
         // Loop through dates
         while (currentDate <= endDate) {
-            // Check if income exists for this date
+            // Check if income exists for this date - normalize to Noon for comparison only
             const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 12, 0, 0, 0)
             if (existingDates.has(checkDate.getTime())) {
                 console.log(`Skipping date ${checkDate.toISOString()} - exists`)

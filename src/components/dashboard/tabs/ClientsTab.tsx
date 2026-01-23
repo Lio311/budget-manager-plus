@@ -883,11 +883,19 @@ export function ClientsTab() {
                                             <div className="w-full">
                                                 <DatePicker
                                                     date={formData.subscriptionStart ? new Date(formData.subscriptionStart) : undefined}
-                                                    setDate={(date) => setFormData({ ...formData, subscriptionStart: date })}
+                                                    setDate={(date) => {
+                                                        if (!date) {
+                                                            setFormData({ ...formData, subscriptionStart: undefined })
+                                                            return
+                                                        }
+                                                        const now = new Date()
+                                                        const dateWithTime = new Date(date)
+                                                        dateWithTime.setHours(now.getHours(), now.getMinutes(), now.getSeconds())
+                                                        setFormData({ ...formData, subscriptionStart: dateWithTime })
+                                                    }}
                                                     placeholder="בחר תאריך התחלה"
                                                 />
                                             </div>
-                                        </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                                 תאריך סיום (אופציונלי)
@@ -895,7 +903,16 @@ export function ClientsTab() {
                                             <div className="w-full">
                                                 <DatePicker
                                                     date={formData.subscriptionEnd ? new Date(formData.subscriptionEnd) : undefined}
-                                                    setDate={(date) => setFormData({ ...formData, subscriptionEnd: date })}
+                                                    setDate={(date) => {
+                                                        if (!date) {
+                                                            setFormData({ ...formData, subscriptionEnd: undefined })
+                                                            return
+                                                        }
+                                                        const now = new Date()
+                                                        const dateWithTime = new Date(date)
+                                                        dateWithTime.setHours(now.getHours(), now.getMinutes(), now.getSeconds())
+                                                        setFormData({ ...formData, subscriptionEnd: dateWithTime })
+                                                    }}
                                                     placeholder="בחר תאריך סיום"
                                                 />
                                             </div>
