@@ -7,6 +7,18 @@ import { z } from 'zod'
 import { addIncome } from './income'
 import { addDays, addMonths, addYears, isSameDay, startOfDay } from 'date-fns'
 
+// Helper function to parse dates safely without timezone issues
+const parseDate = (dateInput: string | Date | undefined): Date | null => {
+    if (!dateInput) return null;
+    if (dateInput instanceof Date) return dateInput;
+    const dateStr = String(dateInput);
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0, 0);
+    }
+    return new Date(dateStr);
+};
+
 const emptyToUndefined = (val: unknown) => {
     if (val === '' || val === null || val === undefined) return undefined;
     return val;
@@ -256,8 +268,8 @@ export async function createClient(data: ClientFormData, scope: string = 'BUSINE
 
                 // SaaS Fields
                 subscriptionType: validData.subscriptionType || null,
-                subscriptionStart: validData.subscriptionStart ? new Date(validData.subscriptionStart) : null,
-                subscriptionEnd: validData.subscriptionEnd ? new Date(validData.subscriptionEnd) : null,
+                subscriptionStart: parseDate(validData.subscriptionStart),
+                subscriptionEnd: parseDate(validData.subscriptionEnd),
                 subscriptionPrice: validData.subscriptionPrice || null,
                 subscriptionStatus: validData.subscriptionStatus || null,
                 packageName: validData.packageName || null,
@@ -320,8 +332,8 @@ export async function updateClient(id: string, data: ClientFormData) {
 
                 // SaaS Fields
                 subscriptionType: validData.subscriptionType || null,
-                subscriptionStart: validData.subscriptionStart ? new Date(validData.subscriptionStart) : null,
-                subscriptionEnd: validData.subscriptionEnd ? new Date(validData.subscriptionEnd) : null,
+                subscriptionStart: parseDate(validData.subscriptionStart),
+                subscriptionEnd: parseDate(validData.subscriptionEnd),
                 subscriptionPrice: validData.subscriptionPrice || null,
                 subscriptionStatus: validData.subscriptionStatus || null,
                 packageName: validData.packageName || null,
