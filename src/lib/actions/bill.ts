@@ -65,7 +65,8 @@ export async function addBill(
         const budget = await getCurrentBudget(month, year, '₪', type)
 
         // Create date object for the specific day in the budget month
-        const dueDate = new Date(year, month - 1, data.dueDay)
+        // Create date object for the specific day in the budget month - Force UTC Noon to avoid timezone shifts
+        const dueDate = new Date(Date.UTC(year, month - 1, data.dueDay, 12, 0, 0))
 
         const { userId } = await auth();
         if (!userId) return { success: false, error: 'Unauthorized' };
@@ -166,7 +167,7 @@ async function createRecurringBills(
             // Handle invalid days (e.g., Feb 31 -> Feb 28/29)
             const lastDayOfMonth = new Date(currentYear, currentMonth, 0).getDate()
             const dayToUse = Math.min(dueDay, lastDayOfMonth)
-            const dueDate = new Date(currentYear, currentMonth - 1, dayToUse)
+            const dueDate = new Date(Date.UTC(currentYear, currentMonth - 1, dayToUse, 12, 0, 0))
 
             const { userId } = await auth();
             if (userId) {
@@ -226,7 +227,7 @@ export async function updateBill(
         let newDueDate = undefined
         if (data.dueDay) {
             const currentDate = new Date(existingBill.dueDate)
-            newDueDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), data.dueDay)
+            newDueDate = new Date(Date.UTC(currentDate.getFullYear(), currentDate.getMonth(), data.dueDay, 12, 0, 0))
         }
 
         const bill = await db.bill.update({
