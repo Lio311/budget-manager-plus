@@ -184,7 +184,16 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                         <Label>תאריך התחלה חדש</Label>
                         <DatePicker
                             date={startDate}
-                            setDate={setStartDate}
+                            setDate={(date) => {
+                                if (!date) {
+                                    setStartDate(undefined)
+                                    return
+                                }
+                                const now = new Date()
+                                const dateWithTime = new Date(date)
+                                dateWithTime.setHours(now.getHours(), now.getMinutes(), now.getSeconds())
+                                setStartDate(dateWithTime)
+                            }}
                             placeholder="בחר תאריך התחלה"
                         />
                     </div>
@@ -192,7 +201,16 @@ export function RenewSubscriptionDialog({ isOpen, onClose, client, onSuccess }: 
                         <Label>תאריך סיום חדש (אופציונלי)</Label>
                         <DatePicker
                             date={endDate}
-                            setDate={setEndDate}
+                            setDate={(date) => {
+                                if (!date) {
+                                    setEndDate(undefined)
+                                    return
+                                }
+                                const now = new Date()
+                                const dateWithTime = new Date(date)
+                                dateWithTime.setHours(now.getHours(), now.getMinutes(), now.getSeconds())
+                                setEndDate(dateWithTime)
+                            }}
                             placeholder="בחר תאריך סיום"
                         />
                     </div>
