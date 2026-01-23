@@ -268,12 +268,12 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
     const businessTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeColor: '#000000', activeTextColor: '#ffffff' },
-        { value: 'clients', label: 'לקוחות', icon: Users, activeColor: '#16a34a', activeTextColor: '#ffffff' },
-        { value: 'suppliers', label: 'ספקים', icon: Building2, activeColor: '#2563eb', activeTextColor: '#ffffff' },
+        { value: 'profit_loss', label: 'דוח רווח והפסד', icon: Calculator, activeColor: '#059669', activeTextColor: '#ffffff' },
         { value: 'income', label: 'הכנסות', icon: TrendingUp, activeColor: '#16a34a', activeTextColor: '#ffffff' },
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeColor: '#dc2626', activeTextColor: '#ffffff' },
+        { value: 'clients', label: 'לקוחות', icon: Users, activeColor: '#16a34a', activeTextColor: '#ffffff' },
+        { value: 'suppliers', label: 'ספקים', icon: Building2, activeColor: '#2563eb', activeTextColor: '#ffffff' },
         { value: 'documents', label: 'הפקת מסמכים', icon: FileText, activeColor: '#3b82f6', activeTextColor: '#ffffff' },
-        { value: 'profit_loss', label: 'דוח רווח והפסד', icon: Calculator, activeColor: '#059669', activeTextColor: '#ffffff' },
         { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeColor: '#000000', activeTextColor: '#ffffff' },
     ]
 
