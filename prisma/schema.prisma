@@ -563,6 +563,7 @@ model Client {
   // Metadata
   scope     String   @default("BUSINESS")
   isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   

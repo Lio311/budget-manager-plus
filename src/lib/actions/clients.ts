@@ -101,7 +101,8 @@ export async function getClients(scope: string = 'BUSINESS') {
         const clients = await db.client.findMany({
             where: {
                 userId,
-                scope
+                scope,
+                isDeleted: false
             },
             include: {
                 package: true,
@@ -397,18 +398,11 @@ export async function deleteClient(id: string) {
             throw new Error('Client not found')
         }
 
-        // Check if client has associated incomes or invoices
-        const hasIncomes = await db.income.count({ where: { clientId: id } })
-        const hasInvoices = await db.invoice.count({ where: { clientId: id } })
-
-        if (hasIncomes > 0 || hasInvoices > 0) {
-            return {
-                success: false,
-                error: 'לא ניתן למחוק לקוח עם הכנסות או חשבוניות קיימות. אפשר לסמן כלא פעיל במקום.'
-            }
-        }
-
-        await db.client.delete({ where: { id } })
+        // Soft Delete: Mark as deleted instead of removing
+        await db.client.update({
+            where: { id },
+            data: { isDeleted: true }
+        })
 
         revalidatePath('/dashboard')
         return { success: true }
