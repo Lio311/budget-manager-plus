@@ -503,10 +503,10 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
         }))
 
         // Fix: Create dates at noon to avoid timezone shifts
-        const startDate = new Date(client.subscriptionStart)
+        const startDate = parseDate(client.subscriptionStart as any)!
         let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 12, 0, 0, 0)
 
-        const endDateInput = new Date(client.subscriptionEnd)
+        const endDateInput = parseDate(client.subscriptionEnd as any)!
         const endDate = new Date(endDateInput.getFullYear(), endDateInput.getMonth(), endDateInput.getDate(), 12, 0, 0, 0)
 
         const amount = client.subscriptionPrice
