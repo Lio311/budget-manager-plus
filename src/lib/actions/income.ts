@@ -87,7 +87,14 @@ export async function addIncome(
                 category: data.category,
                 amount: data.amount,
                 currency: data.currency,
-                date: data.date ? new Date(data.date) : null,
+                date: data.date ? (() => {
+                    // Parse YYYY-MM-DD format explicitly to avoid UTC timezone issues
+                    const parts = data.date.split('-')
+                    if (parts.length === 3) {
+                        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0, 0)
+                    }
+                    return new Date(data.date)
+                })() : null,
                 isRecurring: data.isRecurring || false,
                 recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : (data.date ? new Date(data.date) : new Date()),
                 recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null,
