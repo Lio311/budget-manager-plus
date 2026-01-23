@@ -171,6 +171,18 @@ export async function updateQuote(id: string, data: Partial<QuoteFormData>) {
             updateData.items = JSON.parse(JSON.stringify(data.items))
         }
 
+        // Auto-update status if validUntil date is extended
+        if (data.validUntil !== undefined && existing.status === 'EXPIRED') {
+            const newValidUntil = new Date(data.validUntil)
+            const now = new Date()
+
+            // If new date is in the future, change status back to SENT (or DRAFT if never sent)
+            if (newValidUntil > now) {
+                updateData.status = existing.isSigned ? 'SENT' : 'DRAFT'
+                console.log(`[updateQuote] Reverting EXPIRED quote ${id} to ${updateData.status} due to extended validUntil`)
+            }
+        }
+
         const quote = await db.quote.update({
             where: { id },
             data: updateData,
