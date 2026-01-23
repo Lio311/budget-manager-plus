@@ -52,7 +52,6 @@ export function DatePicker({ date, setDate, className, placeholder = "בחר ת�
                     fromDate={fromDate}
                     toDate={toDate}
                     disableNavigation={disableNavigation}
-                    initialFocus
                 />
             </PopoverContent>
         </Popover>
