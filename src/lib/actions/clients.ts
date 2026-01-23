@@ -101,8 +101,7 @@ export async function getClients(scope: string = 'BUSINESS') {
         const clients = await db.client.findMany({
             where: {
                 userId,
-                scope,
-                isDeleted: false
+                scope
             },
             include: {
                 package: true,
@@ -414,11 +413,11 @@ export async function deleteClient(id: string) {
             throw new Error('Client not found')
         }
 
-        // Soft Delete: Mark as deleted instead of removing
-        await db.client.update({
-            where: { id },
-            data: { isDeleted: true }
-        })
+        // Check if client has associated incomes or invoices
+        // For now, we allow deletion even with history as per user preference (or we can restore the check if needed)
+        // But since we are reverting soft delete due to DB mismatch, we go back to hard delete.
+
+        await db.client.delete({ where: { id } })
 
         revalidatePath('/dashboard')
         return { success: true }
