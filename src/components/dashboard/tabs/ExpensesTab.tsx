@@ -632,7 +632,7 @@ export function ExpensesTab() {
 
                                                         {/* VAT Breakdown - Always visible but smaller */}
                                                         <div className="flex items-center gap-3 text-[10px] text-gray-400 font-medium">
-                                                            <span>לפני מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))}</span>
+                                                            <span>ללא מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))}</span>
                                                             <span>מע"מ: {formatNumberWithCommas(exp.vatAmount || 0)}</span>
                                                         </div>
                                                     </div>

@@ -500,18 +500,6 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* REMOVED: Manual Subtotal Input */}
-                {/* <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        סכום לפני מע"מ *
-                    </label>
-                    <FormattedNumberInput
-                        required
-                        min="0"
-                        value={formData.subtotal.toString()}
-                        onChange={(e) => setFormData({ ...formData, subtotal: parseFloat(e.target.value) || 0 })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
-                    />
-                </div> */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         שיעור מע"מ
@@ -559,7 +547,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
 
             <div className="bg-gray-50 p-4 rounded-md dark:bg-slate-800/50">
                 <div className="flex justify-between text-sm mb-2">
-                    <span className="dark:text-gray-300">סכום לפני מע"מ:</span>
+                    <span className="dark:text-gray-300">סכום ללא מע"מ:</span>
                     <span className="dark:text-gray-100">₪{formData.subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">

@@ -457,7 +457,7 @@ export function InvoicesTab() {
                             <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto md:flex-1 mt-2 md:mt-0 pt-2 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-slate-700">
                                 <div className="text-right md:text-left">
                                     <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">{formatCurrency(inv.totalAmount)}</div>
-                                    <div className="text-[10px] text-gray-400">לפני מע"מ: {formatCurrency(inv.totalAmount - (inv.vatAmount || 0))}</div>
+                                    <div className="text-[10px] text-gray-400">ללא מע"מ: {formatCurrency(inv.totalAmount - (inv.vatAmount || 0))}</div>
                                 </div>
                                 <div className="flex gap-2">
                                     <Button

@@ -212,7 +212,7 @@ export function CreditNotesTab() {
                                 {/* Amount */}
                                 <div className="text-right">
                                     <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">{formatCurrency(creditNote.totalCredit)}</div>
-                                    <div className="text-xs text-gray-400">לפני מע"מ: {formatCurrency(creditNote.creditAmount)}</div>
+                                    <div className="text-xs text-gray-400">ללא מע"מ: {formatCurrency(creditNote.creditAmount)}</div>
                                 </div>
 
                                 {/* Actions */}

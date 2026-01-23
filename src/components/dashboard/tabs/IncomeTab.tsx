@@ -347,7 +347,7 @@ export function IncomeTab() {
 
                     <div className="flex justify-between items-start">
                         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {isBusiness ? 'סך מכירות/הכנסות חודשיות (לפני מע"מ)' : 'סך הכנסות חודשיות'}
+                            {isBusiness ? 'סך מכירות/הכנסות חודשיות (ללא מע"מ)' : 'סך הכנסות חודשיות'}
                         </h3>
                         {isBusiness && (
                             <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
@@ -544,7 +544,7 @@ export function IncomeTab() {
 
                                                 {isBusiness && income.vatAmount && income.vatAmount > 0 && (
                                                     <div className="flex items-center gap-3 text-[10px] text-gray-400 font-medium">
-                                                        <span>לפני מע"מ: {formatNumberWithCommas((income.amountBeforeVat ?? (income.amount - (income.vatAmount || 0))))}</span>
+                                                        <span>ללא מע"מ: {formatNumberWithCommas((income.amountBeforeVat ?? (income.amount - (income.vatAmount || 0))))}</span>
                                                         <span>מע"מ: {formatNumberWithCommas(income.vatAmount || 0)}</span>
                                                     </div>
                                                 )}

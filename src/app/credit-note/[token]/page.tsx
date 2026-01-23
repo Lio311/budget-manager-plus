@@ -208,7 +208,7 @@ export default function PublicCreditNotePage() {
                         <div className="w-[90%] bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6 shadow-md">
                             <div className="space-y-3">
                                 <div className="flex justify-between text-green-50 font-medium">
-                                    <span>סכום לפני מע"מ:</span>
+                                    <span>סכום ללא מע"מ:</span>
                                     <span>{formatCurrency(creditNote.creditAmount)}</span>
                                 </div>
                                 <div className="flex justify-between text-green-50 font-medium">

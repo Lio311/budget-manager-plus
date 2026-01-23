@@ -699,7 +699,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         >
                             <div className="flex justify-between text-sm">
                                 <span className="font-medium text-gray-700 dark:text-gray-300">
-                                    {isBusiness ? 'מכירות לפני מע"מ' : 'הלוואות ששולמו'}
+                                    {isBusiness ? 'מכירות ללא מע"מ' : 'הלוואות ששולמו'}
                                 </span>
                                 <span className="font-medium text-gray-900 dark:text-gray-100">
                                     {isBusiness

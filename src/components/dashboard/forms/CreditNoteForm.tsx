@@ -174,7 +174,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        סכום זיכוי (לפני מע"מ) *
+                        סכום זיכוי (ללא מע"מ) *
                     </label>
                     <FormattedNumberInput
                         value={formData.creditAmount}
@@ -198,7 +198,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                 <div className="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-lg border border-orange-100 dark:border-orange-900/30">
                     <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                            <span className="dark:text-purple-100">סכום לפני מע"מ:</span>
+                            <span className="dark:text-purple-100">סכום ללא מע"מ:</span>
                             <span className="dark:text-purple-100">{formatCurrency(formData.creditAmount)}</span>
                         </div>
                         <div className="flex justify-between text-sm">

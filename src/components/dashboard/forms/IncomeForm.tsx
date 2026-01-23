@@ -416,7 +416,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         </Select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום לפני מע"מ *' : 'סכום כולל *'}</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום ללא מע"מ *' : 'סכום כולל *'}</label>
                         <FormattedNumberInput
                             id="income-amount-input"
                             className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-green-500/20' : 'focus:ring-green-500/20'}`}

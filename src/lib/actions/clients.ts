@@ -8,30 +8,39 @@ import { addIncome } from './income'
 import { addDays, addMonths, addYears, isSameDay, startOfDay } from 'date-fns'
 
 // Helper function to parse dates safely without timezone issues
-// Helper function to parse dates safely
 const parseDate = (dateInput: string | Date | undefined): Date | null => {
     if (!dateInput) return null;
 
-    // If already a Date object, use it directly (respecting the time set by frontend)
-    if (dateInput instanceof Date) {
-        return dateInput;
+    let dateToProcess: Date;
+
+    // Resolve input to a Date object first (if string) or use as is
+    if (typeof dateInput === 'string') {
+        // Check for basic YYYY-MM-DD format to avoid UTC/Local ambiguity
+        const dashParts = dateInput.split('-');
+        if (dashParts.length === 3 && dashParts[0].length === 4 && !dateInput.includes('T')) {
+            // Construct directly as Noon Local (Server Time) - simplest generic approach
+            // But better: use the IL-target logic below to be consistent.
+            // Let's rely on the robust logic below which standardizes everything.
+            // We'll create a temporary date to extract YMD from.
+            dateToProcess = new Date(parseInt(dashParts[0]), parseInt(dashParts[1]) - 1, parseInt(dashParts[2]), 12, 0, 0);
+        } else {
+            dateToProcess = new Date(dateInput);
+        }
+    } else {
+        dateToProcess = dateInput;
     }
 
-    const dateStr = String(dateInput);
+    // Now, we want to extract the "Intended Day" according to Israel Timezone (target audience)
+    // This solves the issue where Midnight UTC might be read as Previous Day in Western zones,
+    // or Midnight IL (22:00 UTC prev day) might be read as Previous Day if checking UTC.
+    // We convert the moment to IL time string YYYY-MM-DD.
+    const ilDateStr = dateToProcess.toLocaleDateString('en-CA', { timeZone: 'Asia/Jerusalem' });
 
-    // Try YYYY-MM-DD format first - default to Noon to be safe if no time provided
-    const dashParts = dateStr.split('-');
-    if (dashParts.length === 3 && dashParts[0].length === 4 && !dateStr.includes('T')) {
-        return new Date(parseInt(dashParts[0]), parseInt(dashParts[1]) - 1, parseInt(dashParts[2]), 12, 0, 0, 0);
-    }
-
-    // Handle ISO string format - Create date object directly
-    if (dateStr.includes('T') || dateStr.includes('Z')) {
-        return new Date(dateStr);
-    }
-
-    // Fallback
-    return new Date(dateStr);
+    // Now convert that clean YYYY-MM-DD string back to a Date object at Noon.
+    // We use manual construction to ensure it's exactly Noon Local (or we can imply UTC).
+    // Using Noon avoids any DST/Timezone shift issues when moving between systems.
+    const [y, m, d] = ilDateStr.split('-').map(Number);
+    return new Date(y, m - 1, d, 12, 0, 0, 0);
 };
 
 const emptyToUndefined = (val: unknown) => {

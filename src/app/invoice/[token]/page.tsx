@@ -276,7 +276,7 @@ export default function PublicInvoicePage() {
                         <div className="w-[90%] bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl p-6 shadow-md">
                             <div className="space-y-3">
                                 <div className="flex justify-between text-emerald-50 font-medium">
-                                    <span>סה"כ לפני מע"מ:</span>
+                                    <span>סה"כ ללא מע"מ:</span>
                                     <span>{formatCurrency(invoice.subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-emerald-50 font-medium">

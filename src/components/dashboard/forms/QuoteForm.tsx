@@ -282,7 +282,7 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
 
             <div className="bg-yellow-50 p-4 rounded-md border border-yellow-100 dark:bg-yellow-900/20 dark:border-yellow-900/50">
                 <div className="flex justify-between text-sm mb-2">
-                    <span className="dark:text-yellow-100">סכום לפני מע"מ:</span>
+                    <span className="dark:text-yellow-100">סכום ללא מע"מ:</span>
                     <span className="dark:text-yellow-100">₪{formData.subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">

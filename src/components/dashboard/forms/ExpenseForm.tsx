@@ -630,7 +630,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                             <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
                         </div>
                         <div>
-                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">סכום לפני מע"מ</label>
+                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">סכום ללא מע"מ</label>
                             <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</div>
                         </div>
                     </div>
