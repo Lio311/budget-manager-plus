@@ -1085,7 +1085,7 @@ export function ClientsTab() {
                                                 backgroundColor: (client.package?.color || client.subscriptionColor || '#3B82F6'),
                                                 color: '#ffffff'
                                             }}
-                                            className="hover:opacity-90 transition-opacity border-transparent"
+                                            className="hover:opacity-90 transition-opacity border-transparent whitespace-nowrap w-auto"
                                         >
                                             {client.package?.name || client.packageName}
                                         </Badge>
