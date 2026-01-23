@@ -54,6 +54,8 @@ const getInvoiceLabel = (type: string) => {
         'TAX_INVOICE': 'חשבונית מס',
         'RECEIPT': 'קבלה',
         'INVOICE': 'חשבונית מס \\ קבלה',
+        'invoice': 'חשבונית מס \\ קבלה',
+        'Invoice': 'חשבונית מס \\ קבלה',
         'DEAL_INVOICE': 'חשבונית עסקה',
         'REFUND_INVOICE': 'חשבונית זיכוי'
     }

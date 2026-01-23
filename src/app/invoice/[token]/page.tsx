@@ -200,6 +200,8 @@ export default function PublicInvoicePage() {
                                         'TAX_INVOICE': 'חשבונית מס',
                                         'RECEIPT': 'קבלה',
                                         'INVOICE': 'חשבונית מס \\ קבלה',
+                                        'invoice': 'חשבונית מס \\ קבלה',
+                                        'Invoice': 'חשבונית מס \\ קבלה',
                                         'DEAL_INVOICE': 'חשבונית עסקה',
                                         'REFUND_INVOICE': 'חשבונית זיכוי'
                                     }[invoice.invoiceType as string] || 'חשבונית מס'}
