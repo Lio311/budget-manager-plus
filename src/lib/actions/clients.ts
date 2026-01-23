@@ -541,7 +541,7 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
         if (minDate) console.log(`With minDate: ${minDate.toISOString()}`)
 
         // Loop through dates
-        while (currentDate <= endDate) {
+        while (currentDate < endDate) {
             // Check if income exists for this date - normalize to Noon for comparison only
             const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 12, 0, 0, 0)
             if (existingDates.has(checkDate.getTime())) {
