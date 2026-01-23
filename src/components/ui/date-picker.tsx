@@ -20,13 +20,14 @@ interface DatePickerProps {
     fromDate?: Date
     toDate?: Date
     disableNavigation?: boolean
+    modal?: boolean
 }
 
-export function DatePicker({ date, setDate, className, placeholder = "בחר תאריך", fromDate, toDate, disableNavigation = false }: DatePickerProps) {
+export function DatePicker({ date, setDate, className, placeholder = "בחר תאריך", fromDate, toDate, disableNavigation = false, modal = true }: DatePickerProps) {
     const [open, setOpen] = React.useState(false)
 
     return (
-        <Popover open={open} onOpenChange={setOpen} modal={true}>
+        <Popover open={open} onOpenChange={setOpen} modal={modal}>
             <PopoverTrigger asChild>
                 <Button
                     variant={"outline"}

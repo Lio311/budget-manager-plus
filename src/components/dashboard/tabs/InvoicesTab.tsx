@@ -53,7 +53,7 @@ const getInvoiceLabel = (type: string) => {
     const map: Record<string, string> = {
         'TAX_INVOICE': 'חשבונית מס',
         'RECEIPT': 'קבלה',
-        'INVOICE': 'חשבונית מס-קבלה',
+        'INVOICE': 'חשבונית מס \\ קבלה',
         'DEAL_INVOICE': 'חשבונית עסקה',
         'REFUND_INVOICE': 'חשבונית זיכוי'
     }
