@@ -10,13 +10,29 @@ import { addDays, addMonths, addYears, isSameDay, startOfDay } from 'date-fns'
 // Helper function to parse dates safely without timezone issues
 const parseDate = (dateInput: string | Date | undefined): Date | null => {
     if (!dateInput) return null;
-    if (dateInput instanceof Date) return dateInput;
-    const dateStr = String(dateInput);
-    const parts = dateStr.split('-');
-    if (parts.length === 3) {
-        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0, 0);
+
+    // If already a Date object, extract components and recreate at noon
+    if (dateInput instanceof Date) {
+        return new Date(dateInput.getFullYear(), dateInput.getMonth(), dateInput.getDate(), 12, 0, 0, 0);
     }
-    return new Date(dateStr);
+
+    const dateStr = String(dateInput);
+
+    // Try YYYY-MM-DD format first
+    const dashParts = dateStr.split('-');
+    if (dashParts.length === 3 && dashParts[0].length === 4) {
+        return new Date(parseInt(dashParts[0]), parseInt(dashParts[1]) - 1, parseInt(dashParts[2]), 12, 0, 0, 0);
+    }
+
+    // Handle ISO string format (e.g., "2026-01-01T00:00:00.000Z")
+    if (dateStr.includes('T') || dateStr.includes('Z')) {
+        const isoDate = new Date(dateStr);
+        return new Date(isoDate.getFullYear(), isoDate.getMonth(), isoDate.getDate(), 12, 0, 0, 0);
+    }
+
+    // Fallback - parse and recreate at noon
+    const fallbackDate = new Date(dateStr);
+    return new Date(fallbackDate.getFullYear(), fallbackDate.getMonth(), fallbackDate.getDate(), 12, 0, 0, 0);
 };
 
 const emptyToUndefined = (val: unknown) => {
