@@ -9,6 +9,14 @@ import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
 function Calendar({
@@ -34,9 +42,9 @@ function Calendar({
                     caption: "flex justify-center pt-1 relative items-center gap-2 mb-4",
                     caption_label: "hidden",
                     caption_dropdowns: "flex gap-2 items-center",
-                    dropdown: "text-sm font-medium px-3 py-2 border border-input bg-background rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-right relative z-[9999]",
-                    dropdown_month: "min-w-[140px]",
-                    dropdown_year: "min-w-[100px]",
+                    dropdown: "hidden", // Hide native dropdowns completely
+                    dropdown_month: "hidden",
+                    dropdown_year: "hidden",
                     vhidden: "hidden",
                     nav: "hidden",
                     nav_button: "hidden",
@@ -71,6 +79,47 @@ function Calendar({
                 components={{
                     IconLeft: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
                     IconRight: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
+                    Dropdown: ({ value, onChange, children, ...props }: any) => {
+                        const options = React.Children.toArray(children) as React.ReactElement<React.OptionHTMLAttributes<HTMLOptionElement>>[]
+                        const selected = options.find((child) => child.props.value === value)
+                        const handleChange = (value: string) => {
+                            const changeEvent = {
+                                target: { value },
+                            } as React.ChangeEvent<HTMLSelectElement>
+                            onChange?.(changeEvent)
+                        }
+                        return (
+                            <Select
+                                value={value?.toString()}
+                                onValueChange={(value) => {
+                                    handleChange(value)
+                                }}
+                            >
+                                <SelectTrigger
+                                    className={cn(
+                                        "h-8 w-fit px-2 py-1 font-medium bg-transparent hover:bg-accent hover:text-accent-foreground focus:ring-0 focus:ring-offset-0 border-input shadow-sm z-[9999]",
+                                        // Distinguish Month vs Year dropdown by checking value type or context?
+                                        // Actually DayPicker passes all children options.
+                                        // Month options are 0-11, Year options are YYYY.
+                                        // Simple style tweak:
+                                        "min-w-[80px]"
+                                    )}
+                                >
+                                    <SelectValue>{selected?.props?.children}</SelectValue>
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="max-h-[200px] z-[99999]">
+                                    {options.map((option) => (
+                                        <SelectItem
+                                            key={option.props.value as string}
+                                            value={option.props.value?.toString() ?? ""}
+                                        >
+                                            {option.props.children}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        )
+                    },
                 }}
                 {...props}
             />

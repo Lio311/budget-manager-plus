@@ -309,7 +309,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
     return (
         <div>
-            <div className="mb-4 flex items-center gap-2">
+            <div className="mb-4 flex items-center gap-2 mt-4 md:mt-0">
                 <TrendingUp className={`h-5 w-5 ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`} />
                 <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{isBusiness ? 'תיעוד מכירה' : 'הוספת הכנסה'}</h3>
                 <div className="mr-auto">
