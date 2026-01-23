@@ -80,6 +80,16 @@ export async function addIncome(
         if (!userId) return { success: false, error: 'Unauthorized' };
         const db = await authenticatedPrisma(userId);
 
+        // Helper function to parse dates safely without timezone issues
+        const parseDate = (dateStr: string | undefined): Date | null => {
+            if (!dateStr) return null;
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0, 0);
+            }
+            return new Date(dateStr);
+        };
+
         const income = await db.income.create({
             data: {
                 budgetId: budget.id,
@@ -87,17 +97,10 @@ export async function addIncome(
                 category: data.category,
                 amount: data.amount,
                 currency: data.currency,
-                date: data.date ? (() => {
-                    // Parse YYYY-MM-DD format explicitly to avoid UTC timezone issues
-                    const parts = data.date.split('-')
-                    if (parts.length === 3) {
-                        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 12, 0, 0, 0)
-                    }
-                    return new Date(data.date)
-                })() : null,
+                date: parseDate(data.date),
                 isRecurring: data.isRecurring || false,
-                recurringStartDate: data.recurringStartDate ? new Date(data.recurringStartDate) : (data.date ? new Date(data.date) : new Date()),
-                recurringEndDate: data.recurringEndDate ? new Date(data.recurringEndDate) : null,
+                recurringStartDate: parseDate(data.recurringStartDate || data.date) || new Date(),
+                recurringEndDate: parseDate(data.recurringEndDate),
                 // Business Fields
                 clientId: data.clientId,
                 projectId: data.projectId, // Added projectId
@@ -105,8 +108,8 @@ export async function addIncome(
                 amountBeforeVat: data.amountBeforeVat,
                 vatRate: data.vatRate,
                 vatAmount: data.vatAmount,
-                invoiceDate: data.invoiceDate ? new Date(data.invoiceDate) : null,
-                paymentDate: data.paymentDate ? new Date(data.paymentDate) : null,
+                invoiceDate: parseDate(data.invoiceDate),
+                paymentDate: parseDate(data.paymentDate),
                 paymentMethod: data.paymentMethod,
                 paymentTerms: data.paymentTerms,
                 payer: data.payer,
