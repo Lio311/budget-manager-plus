@@ -133,7 +133,7 @@ export async function getClients(scope: string = 'BUSINESS') {
         const clientIds = clients.map((c: any) => c.id)
 
         // Bulk aggregates for better performance
-        const [incomeGroups, paidInvoiceGroups, allInvoiceGroups, expenseGroups] = await Promise.all([
+        const [incomeGroups, incomeVatGroups, paidInvoiceGroups, allInvoiceGroups, expenseGroups] = await Promise.all([
             db.income.groupBy({
                 by: ['clientId'],
                 where: {
@@ -142,10 +142,18 @@ export async function getClients(scope: string = 'BUSINESS') {
                 },
                 _sum: { amount: true }
             }),
+            db.income.groupBy({
+                by: ['clientId'],
+                where: {
+                    clientId: { in: clientIds },
+                    status: 'PAID'
+                },
+                _sum: { vatAmount: true }
+            }),
             db.invoice.groupBy({
                 by: ['clientId'],
                 where: { clientId: { in: clientIds }, status: 'PAID' },
-                _sum: { total: true }
+                _sum: { total: true, vatAmount: true }
             }),
             db.invoice.groupBy({
                 by: ['clientId'],
@@ -161,29 +169,37 @@ export async function getClients(scope: string = 'BUSINESS') {
 
         // Create lookup maps
         const incomeMap = new Map(incomeGroups.map((g: any) => [g.clientId, g._sum.amount || 0]))
+        const incomeVatMap = new Map(incomeVatGroups.map((g: any) => [g.clientId, g._sum.vatAmount || 0]))
+
         const paidInvoiceMap = new Map(paidInvoiceGroups.map((g: any) => [g.clientId, g._sum.total || 0]))
+        const paidInvoiceVatMap = new Map(paidInvoiceGroups.map((g: any) => [g.clientId, g._sum.vatAmount || 0]))
+
         const allInvoiceMap = new Map(allInvoiceGroups.map((g: any) => [g.clientId, g._count.id || 0]))
         const expenseMap = new Map(expenseGroups.map((g: any) => [g.clientId, g._sum.amount || 0]))
 
         const clientsWithStats = clients.map((client: any) => {
             const incomeTotal = incomeMap.get(client.id) || 0
+            const incomeVat = incomeVatMap.get(client.id) || 0
+
             const paidInvoiceTotal = paidInvoiceMap.get(client.id) || 0
+            const paidInvoiceVat = paidInvoiceVatMap.get(client.id) || 0
+
             const expenseTotal = expenseMap.get(client.id) || 0
+
+            const totalRevenue = incomeTotal + paidInvoiceTotal
+            const totalVat = incomeVat + paidInvoiceVat
+            const netRevenue = totalRevenue - totalVat
 
             // Calculate document counts from the included data
             const quotesCount = client.quotes.length
-            // NOTE: We trust the array length from 'include' for invoicesCount, or we could use the _count if we didn't include.
-            // But since we include invoices for creditNotes, we can use the array.
-            // However, the original code used a bulk group by for specific invoice status? No, it used it for 'allInvoiceMap'.
-
             const invoicesCount = client.invoices.length
             const creditNotesCount = client.invoices.reduce((acc: number, inv: any) => acc + inv.creditNotes.length, 0)
 
             return {
                 ...client,
-                totalRevenue: incomeTotal + paidInvoiceTotal,
+                totalRevenue: totalRevenue,
                 totalExpenses: expenseTotal,
-                netProfit: (incomeTotal + paidInvoiceTotal) - expenseTotal,
+                netProfit: netRevenue - expenseTotal,
                 _count: {
                     ...client._count,
                     invoices: allInvoiceMap.get(client.id) || 0

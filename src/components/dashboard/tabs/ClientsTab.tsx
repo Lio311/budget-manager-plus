@@ -1154,12 +1154,7 @@ export function ClientsTab() {
                                 </div>
 
                                 <div className="border-t pt-3 mt-3 dark:border-slate-700">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600 dark:text-gray-400">סה"כ הכנסות:</span>
-                                        <span className="font-semibold text-green-600">
-                                            {formatCurrency(client.totalRevenue || 0)}
-                                        </span>
-                                    </div>
+
                                     <div className="flex justify-between text-sm mt-1">
                                         <span className="text-gray-600 dark:text-gray-400">עסקאות:</span>
                                         <span className="font-semibold dark:text-gray-200">{client._count?.incomes || 0}</span>
