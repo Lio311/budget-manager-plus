@@ -206,10 +206,10 @@ export function ClientSubscriptionHistoryDialog({ isOpen, onClose, client, onUpd
                                             <Table dir="rtl" className="min-w-[600px] sm:min-w-full">
                                                 <TableHeader>
                                                     <TableRow className="hover:bg-transparent">
-                                                        <TableHead className="text-right h-12">תאריך</TableHead>
-                                                        <TableHead className="text-right h-12">סכום</TableHead>
-                                                        <TableHead className="text-right h-12 w-[200px]">סטטוס</TableHead>
-                                                        <TableHead className="text-right h-12">פעולות</TableHead>
+                                                        <TableHead className="text-center h-12">תאריך</TableHead>
+                                                        <TableHead className="text-center h-12">סכום</TableHead>
+                                                        <TableHead className="text-center h-12 w-[200px]">סטטוס</TableHead>
+                                                        <TableHead className="text-center h-12">פעולות</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
@@ -340,10 +340,10 @@ function PastPaymentsAccordion({ incomes, onStatusChange, onEdit, onDelete, upda
                         <Table dir="rtl" className="min-w-[600px] sm:min-w-full">
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent">
-                                    <TableHead className="text-right h-10 text-xs">תאריך</TableHead>
-                                    <TableHead className="text-right h-10 text-xs">סכום</TableHead>
-                                    <TableHead className="text-right h-10 text-xs w-[200px]">סטטוס</TableHead>
-                                    <TableHead className="text-right h-10 text-xs">פעולות</TableHead>
+                                    <TableHead className="text-center h-10 text-xs">תאריך</TableHead>
+                                    <TableHead className="text-center h-10 text-xs">סכום</TableHead>
+                                    <TableHead className="text-center h-10 text-xs w-[200px]">סטטוס</TableHead>
+                                    <TableHead className="text-center h-10 text-xs">פעולות</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -385,34 +385,36 @@ function PastPaymentsAccordion({ incomes, onStatusChange, onEdit, onDelete, upda
 function IncomeRow({ income, onStatusChange, onEdit, onDelete, updatingId, isPast }: any) {
     return (
         <TableRow className={isPast ? "opacity-75 hover:opacity-100 transition-opacity" : ""}>
-            <TableCell className="font-medium whitespace-nowrap py-4">
+            <TableCell className="font-medium whitespace-nowrap py-4 text-center">
                 {format(new Date(income.date), 'dd/MM/yyyy')}
             </TableCell>
-            <TableCell className="whitespace-nowrap py-4 text-base">
+            <TableCell className="whitespace-nowrap py-4 text-base text-center">
                 {formatCurrency(income.amount)}
             </TableCell>
-            <TableCell className="py-2">
-                <Select
-                    value={income.status}
-                    onValueChange={(val) => onStatusChange(income.id, val)}
-                    disabled={updatingId === income.id}
-                >
-                    <SelectTrigger className={`w-[130px] h-9 ${income.status === 'PAID' ? 'text-green-600 border-green-200 bg-green-50' :
-                        income.status === 'PENDING' ? 'text-yellow-600 border-yellow-200 bg-yellow-50' :
-                            income.status === 'OVERDUE' ? 'text-red-600 border-red-200 bg-red-50' : ''
-                        }`}>
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="PAID" className="text-green-600">שולם</SelectItem>
-                        <SelectItem value="PENDING" className="text-yellow-600">ממתין</SelectItem>
-                        <SelectItem value="OVERDUE" className="text-red-600">באיחור</SelectItem>
-                        <SelectItem value="CANCELLED" className="text-gray-500">בוטל</SelectItem>
-                    </SelectContent>
-                </Select>
+            <TableCell className="py-2 text-center">
+                <div className="flex justify-center">
+                    <Select
+                        value={income.status}
+                        onValueChange={(val) => onStatusChange(income.id, val)}
+                        disabled={updatingId === income.id}
+                    >
+                        <SelectTrigger className={`w-[130px] h-9 mx-auto ${income.status === 'PAID' ? 'text-green-600 border-green-200 bg-green-50' :
+                            income.status === 'PENDING' ? 'text-yellow-600 border-yellow-200 bg-yellow-50' :
+                                income.status === 'OVERDUE' ? 'text-red-600 border-red-200 bg-red-50' : ''
+                            }`}>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="PAID" className="text-green-600">שולם</SelectItem>
+                            <SelectItem value="PENDING" className="text-yellow-600">ממתין</SelectItem>
+                            <SelectItem value="OVERDUE" className="text-red-600">באיחור</SelectItem>
+                            <SelectItem value="CANCELLED" className="text-gray-500">בוטל</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </TableCell>
-            <TableCell className="py-2">
-                <div className="flex items-center gap-1">
+            <TableCell className="py-2 text-center">
+                <div className="flex items-center gap-1 justify-center">
                     <Button
                         variant="ghost"
                         size="icon"
