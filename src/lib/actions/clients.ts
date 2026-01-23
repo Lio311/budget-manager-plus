@@ -543,7 +543,11 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
             } else {
                 const status = currentDate > new Date() ? 'PENDING' : 'PAID'
 
-                console.log(`Creating income for date: ${currentDate.toISOString()} Status: ${status}`)
+                const vatRate = 0.18
+                const vatAmount = amount * vatRate
+                const totalAmount = amount + vatAmount
+
+                console.log(`Creating income for date: ${currentDate.toISOString()} Status: ${status} Amount: ${totalAmount} (Net: ${amount} + VAT: ${vatAmount})`)
 
                 // Create Income - Pass Date object directly to avoid timezone issues
                 await addIncome(
@@ -552,13 +556,15 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
                     {
                         source: `מנוי - ${client.name}`,
                         category: 'כללי', // Default category matches schema default
-                        amount: amount,
+                        amount: totalAmount, // Total including VAT
                         currency: currency,
                         date: currentDate.toISOString().split('T')[0], // Pass YYYY-MM-DD format only
                         isRecurring: false, // We generate individual records
                         clientId: client.id,
                         paymentMethod: 'CREDIT_CARD', // Default assumption or add to form?
-                        // subscriptionType removed as it does not exist on Income model
+                        amountBeforeVat: amount,
+                        vatRate: vatRate,
+                        vatAmount: vatAmount,
                         paymentDate: status === 'PAID' ? currentDate.toISOString().split('T')[0] : undefined, // Only set paid date if paid
                         status: status
                     } as any,
