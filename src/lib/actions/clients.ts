@@ -132,22 +132,14 @@ export async function getClients(scope: string = 'BUSINESS') {
         const clientIds = clients.map((c: any) => c.id)
 
         // Bulk aggregates for better performance
-        const [incomeGroups, incomeVatGroups, paidInvoiceGroups, allInvoiceGroups, expenseGroups] = await Promise.all([
+        const [incomeGroups, paidInvoiceGroups, allInvoiceGroups, expenseGroups] = await Promise.all([
             db.income.groupBy({
                 by: ['clientId'],
                 where: {
                     clientId: { in: clientIds },
                     status: 'PAID'
                 },
-                _sum: { amount: true }
-            }),
-            db.income.groupBy({
-                by: ['clientId'],
-                where: {
-                    clientId: { in: clientIds },
-                    status: 'PAID'
-                },
-                _sum: { vatAmount: true }
+                _sum: { amount: true, vatAmount: true }
             }),
             db.invoice.groupBy({
                 by: ['clientId'],
@@ -168,7 +160,7 @@ export async function getClients(scope: string = 'BUSINESS') {
 
         // Create lookup maps
         const incomeMap = new Map(incomeGroups.map((g: any) => [g.clientId, g._sum.amount || 0]))
-        const incomeVatMap = new Map(incomeVatGroups.map((g: any) => [g.clientId, g._sum.vatAmount || 0]))
+        const incomeVatMap = new Map(incomeGroups.map((g: any) => [g.clientId, g._sum.vatAmount || 0]))
 
         const paidInvoiceMap = new Map(paidInvoiceGroups.map((g: any) => [g.clientId, g._sum.total || 0]))
         const paidInvoiceVatMap = new Map(paidInvoiceGroups.map((g: any) => [g.clientId, g._sum.vatAmount || 0]))
