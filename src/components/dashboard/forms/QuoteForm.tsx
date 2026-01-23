@@ -173,7 +173,6 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                     <DatePicker
                         date={formData.issueDate}
                         setDate={(date) => date && setFormData({ ...formData, issueDate: date })}
-                        modal={false}
                     />
                 </div>
                 <div>
@@ -183,7 +182,6 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                     <DatePicker
                         date={formData.validUntil}
                         setDate={(date) => setFormData({ ...formData, validUntil: date })}
-                        modal={false}
                     />
                 </div>
 

@@ -582,7 +582,9 @@ export function DocumentsTab() {
                                                             ({
                                                                 'TAX_INVOICE': 'חשבונית מס',
                                                                 'RECEIPT': 'קבלה',
-                                                                'INVOICE': 'חשבונית',
+                                                                'INVOICE': 'חשבונית מס \\ קבלה',
+                                                                'invoice': 'חשבונית מס \\ קבלה',
+                                                                'Invoice': 'חשבונית מס \\ קבלה',
                                                                 'DEAL_INVOICE': 'חשבונית עסקה',
                                                                 'REFUND_INVOICE': 'חשבונית זיכוי'
                                                             } as Record<string, string>)[doc.invoiceType] || config.label

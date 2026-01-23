@@ -393,7 +393,7 @@ export function InvoicesTab() {
                                             </span>
                                         </div>
                                         <div className="text-xs text-gray-500">
-                                            #{inv.invoiceNumber} • {format(new Date(inv.date), 'dd/MM/yyyy')} • <span className="text-[10px] text-red-500">{inv.invoiceType}</span>
+                                            #{inv.invoiceNumber} • {format(new Date(inv.date), 'dd/MM/yyyy')}
                                         </div>
                                     </div>
                                 </div>
