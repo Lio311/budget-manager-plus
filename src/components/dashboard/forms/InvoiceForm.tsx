@@ -326,6 +326,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                     <DatePicker
                         date={formData.issueDate}
                         setDate={(date) => date && setFormData({ ...formData, issueDate: date })}
+                        modal={false}
                     />
                 </div>
                 <div>
@@ -335,6 +336,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                     <DatePicker
                         date={formData.dueDate}
                         setDate={(date) => setFormData({ ...formData, dueDate: date })}
+                        modal={false}
                     />
                 </div>
             </div>

@@ -33,7 +33,7 @@ function Calendar({
                     caption: "flex justify-center pt-1 relative items-center gap-2 mb-4",
                     caption_label: "hidden",
                     caption_dropdowns: "flex gap-2 items-center",
-                    dropdown: "text-sm font-medium px-3 py-2 border border-input bg-background rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-right relative z-50",
+                    dropdown: "text-sm font-medium px-3 py-2 border border-input bg-background rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-right relative z-[9999]",
                     dropdown_month: "min-w-[140px]",
                     dropdown_year: "min-w-[100px]",
                     vhidden: "hidden",
