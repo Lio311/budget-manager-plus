@@ -502,12 +502,21 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
             return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0, 0).getTime()
         }))
 
+
         // Fix: Create dates at noon to avoid timezone shifts
+        console.log('[DEBUG] client.subscriptionStart:', client.subscriptionStart, 'type:', typeof client.subscriptionStart)
+        console.log('[DEBUG] client.subscriptionEnd:', client.subscriptionEnd, 'type:', typeof client.subscriptionEnd)
+
         const startDate = parseDate(client.subscriptionStart as any)!
         let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 12, 0, 0, 0)
 
         const endDateInput = parseDate(client.subscriptionEnd as any)!
         const endDate = new Date(endDateInput.getFullYear(), endDateInput.getMonth(), endDateInput.getDate(), 12, 0, 0, 0)
+
+        console.log('[DEBUG] Parsed startDate:', startDate)
+        console.log('[DEBUG] Parsed endDate:', endDateInput)
+        console.log('[DEBUG] currentDate:', currentDate)
+
 
         const amount = client.subscriptionPrice
         const currency = '₪' // Default currency
