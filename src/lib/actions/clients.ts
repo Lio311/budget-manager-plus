@@ -544,10 +544,11 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
                 const status = currentDate > new Date() ? 'PENDING' : 'PAID'
 
                 const vatRate = 0.18
-                const vatAmount = amount * vatRate
-                const totalAmount = amount + vatAmount
+                const totalAmount = amount // Subscription price is the Total (Inclusive)
+                const amountBeforeVat = totalAmount / (1 + vatRate) // Extract Net
+                const vatAmount = totalAmount - amountBeforeVat
 
-                console.log(`Creating income for date: ${currentDate.toISOString()} Status: ${status} Amount: ${totalAmount} (Net: ${amount} + VAT: ${vatAmount})`)
+                console.log(`Creating income for date: ${currentDate.toISOString()} Status: ${status} Total: ${totalAmount} (Net: ${amountBeforeVat.toFixed(2)} + VAT: ${vatAmount.toFixed(2)})`)
 
                 // Create Income - Pass Date object directly to avoid timezone issues
                 await addIncome(
@@ -556,13 +557,13 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
                     {
                         source: `מנוי - ${client.name}`,
                         category: 'כללי', // Default category matches schema default
-                        amount: totalAmount, // Total including VAT
+                        amount: totalAmount,
                         currency: currency,
                         date: currentDate.toISOString().split('T')[0], // Pass YYYY-MM-DD format only
                         isRecurring: false, // We generate individual records
                         clientId: client.id,
                         paymentMethod: 'CREDIT_CARD', // Default assumption or add to form?
-                        amountBeforeVat: amount,
+                        amountBeforeVat: amountBeforeVat,
                         vatRate: vatRate,
                         vatAmount: vatAmount,
                         paymentDate: status === 'PAID' ? currentDate.toISOString().split('T')[0] : undefined, // Only set paid date if paid
