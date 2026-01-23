@@ -4,6 +4,7 @@ import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
 import { he } from "date-fns/locale"
+import { format } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -23,21 +24,29 @@ function Calendar({
                 dir="rtl"
                 showOutsideDays={showOutsideDays}
                 fixedWeeks
-                captionLayout="buttons"
+                captionLayout="dropdown-buttons"
                 fromYear={2023}
                 toYear={2030}
+                formatters={{
+                    formatCaption: (date, options) => format(date, "LLLL", options),
+                }}
                 className={cn("p-3", className)}
                 classNames={{
                     months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                     month: "space-y-4",
-                    caption: "flex justify-center pt-1 relative items-center",
+                    caption: "flex justify-center pt-1 relative items-center gap-2 mb-4",
                     caption_label: "text-sm font-medium",
+                    caption_dropdowns: "flex gap-2 items-center",
+                    dropdown: "text-sm font-medium px-2 py-1 border border-input bg-background rounded-md hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-right relative z-[9999]",
+                    dropdown_month: "hidden",
+                    dropdown_year: "min-w-[80px]",
+                    vhidden: "hidden",
                     nav: "space-x-1 flex items-center bg-transparent p-0",
                     nav_button: cn(
                         buttonVariants({ variant: "outline" }),
                         "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
                     ),
-                    nav_button_previous: "absolute left-1", // RTL: This might need adjustment, but usually left/right is physical
+                    nav_button_previous: "absolute left-1",
                     nav_button_next: "absolute right-1",
                     table: "w-full border-collapse",
                     head_row: "flex mb-1",
