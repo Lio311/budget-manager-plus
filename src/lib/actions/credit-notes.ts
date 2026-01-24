@@ -4,7 +4,7 @@ import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { getCurrentBudget } from './budget'
-import { createHash } from 'crypto'
+import { createHash, randomUUID } from 'crypto'
 
 export interface CreditNoteFormData {
     invoiceId: string
@@ -37,6 +37,8 @@ export async function getCreditNotes(scope: string = 'BUSINESS') {
                 issueDate: 'desc'
             }
         })
+
+
 
         return { success: true, data: creditNotes }
     } catch (error) {
@@ -247,7 +249,7 @@ export async function generateCreditNoteLink(id: string) {
         if (!creditNote.token) {
             const updated = await db.creditNote.update({
                 where: { id },
-                data: { token: undefined } // Will use default cuid()
+                data: { token: randomUUID() } // Generate new token
             })
             return { success: true, token: updated.token }
         }
