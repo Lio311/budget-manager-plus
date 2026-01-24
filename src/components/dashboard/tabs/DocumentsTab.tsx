@@ -196,7 +196,7 @@ export function DocumentsTab() {
             displayNumber: c.creditNoteNumber,
             displayDate: c.issueDate,
             displayAmount: c.totalCredit,
-            clientName: c.client?.name || 'לקוח לא ידוע'
+            clientName: c.invoice?.guestClientName || c.invoice?.client?.name || 'לקוח לא ידוע'
         }))
     }
 
@@ -307,7 +307,8 @@ export function DocumentsTab() {
             }
 
             if (result.success && result.token) {
-                window.location.href = `${window.location.origin}/${type}/${result.token}`
+                const path = type === 'credit' ? 'credit-note' : type
+                window.location.href = `${window.location.origin}/${path}/${result.token}`
             } else {
                 toast.error('שגיאה בפתיחת המסמך')
             }
@@ -329,7 +330,8 @@ export function DocumentsTab() {
             }
 
             if (result.success && result.token) {
-                const url = `${window.location.origin}/${type}/${result.token}`
+                const path = type === 'credit' ? 'credit-note' : type
+                const url = `${window.location.origin}/${path}/${result.token}`
 
                 // Try native share first (mobile)
                 if (navigator.share) {
