@@ -50,6 +50,7 @@ model User {
   businessExpenses   BusinessExpense[]
   managementNotifications ManagementNotification[]
   agreement  EmployeeAgreement?
+  auditLogs  AuditLog[]
 
   initialBalance Float @default(0) 
   initialSavings Float @default(0) 
@@ -796,6 +797,30 @@ model Quote {
   @@unique([userId, quoteNumber])
   @@map("quotes")
 }
+
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  action    String   // e.g., "LOGIN", "UPDATE_INVOICE", "DELETE_CLIENT"
+  entity    String   // e.g., "Invoice", "Client", "Settings"
+  entityId  String?  // The ID of the item being affected
+  
+  details   String?  @db.Text // JSON or text description of changes
+  
+  ipAddress String?
+  userAgent String?
+  
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
 
 model CreditNote {
   id              String   @id @default(cuid())

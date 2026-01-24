@@ -13,6 +13,7 @@ import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
+import DOMPurify from 'isomorphic-dompurify';
 
 export default function PublicInvoicePage() {
     const params = useParams()
@@ -296,7 +297,7 @@ export default function PublicInvoicePage() {
                     {invoice.notes && (
                         <div className="mb-12 p-4 bg-gray-50 rounded text-sm text-gray-600">
                             <strong>הערות:</strong>
-                            <div className="mt-1 prose prose-sm max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: invoice.notes }} />
+                            <div className="mt-1 prose prose-sm max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(invoice.notes) }} />
                         </div>
                     )}
 

@@ -26,8 +26,18 @@ const isPublicRoute = createRouteMatcher([
     '/sso-callback'
 ]);
 
+import { checkRateLimit } from "@/lib/rate-limit";
+
 export default clerkMiddleware(async (auth, req) => {
     const { pathname } = req.nextUrl;
+
+    // 0. Rate Limiting (Skip for internal APIs to avoid blocking self)
+    if (!pathname.startsWith('/api/maintenance')) {
+        const ip = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+        if (!checkRateLimit(ip)) {
+            return new NextResponse('Too Many Requests', { status: 429 });
+        }
+    }
 
     // Skip maintenance check for maintenance page and status API, AND critical Shortcuts API
     if (pathname === '/maintenance' || pathname.startsWith('/api/maintenance') || pathname.startsWith('/api/v1/expenses') || pathname.startsWith('/api/quick-add') || pathname.startsWith('/api/quick-stats') || pathname.startsWith('/api/scan-invoice')) {
