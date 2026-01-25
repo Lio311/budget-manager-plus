@@ -4,7 +4,7 @@ import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { ensureUserExists } from './budget'
-import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_SAVINGS_CATEGORIES } from '@/lib/constants/categories'
+import { DEFAULT_EXPENSE_CATEGORIES, DEFAULT_BUSINESS_EXPENSE_CATEGORIES, DEFAULT_INCOME_CATEGORIES, DEFAULT_SAVINGS_CATEGORIES } from '@/lib/constants/categories'
 
 // Helper to serialize category for safe transport over the wire
 function serializeCategory(cat: any) {
@@ -34,9 +34,15 @@ export async function getCategories(type: string = 'expense', scope: 'PERSONAL' 
 
         // Auto-seed if no categories found
         if (categories.length === 0) {
-            const defaults = type === 'expense' ? DEFAULT_EXPENSE_CATEGORIES :
-                (type === 'income' ? DEFAULT_INCOME_CATEGORIES :
-                    (type === 'saving' ? DEFAULT_SAVINGS_CATEGORIES : []))
+            let defaults: any[] = []
+
+            if (type === 'expense') {
+                defaults = scope === 'BUSINESS' ? DEFAULT_BUSINESS_EXPENSE_CATEGORIES : DEFAULT_EXPENSE_CATEGORIES
+            } else if (type === 'income') {
+                defaults = DEFAULT_INCOME_CATEGORIES
+            } else if (type === 'saving') {
+                defaults = DEFAULT_SAVINGS_CATEGORIES
+            }
 
             if (defaults.length > 0) {
                 console.log(`[getCategories] Seeding ${defaults.length} categories for user ${user.id} type ${type} scope ${scope}`)
@@ -72,9 +78,14 @@ export async function getCategories(type: string = 'expense', scope: 'PERSONAL' 
 
         // Helper to check if default
         const isDefault = (name: string) => {
-            const defaults = type === 'expense' ? DEFAULT_EXPENSE_CATEGORIES :
-                (type === 'income' ? DEFAULT_INCOME_CATEGORIES :
-                    (type === 'saving' ? DEFAULT_SAVINGS_CATEGORIES : []))
+            let defaults: any[] = []
+            if (type === 'expense') {
+                defaults = scope === 'BUSINESS' ? DEFAULT_BUSINESS_EXPENSE_CATEGORIES : DEFAULT_EXPENSE_CATEGORIES
+            } else if (type === 'income') {
+                defaults = DEFAULT_INCOME_CATEGORIES
+            } else if (type === 'saving') {
+                defaults = DEFAULT_SAVINGS_CATEGORIES
+            }
             return defaults.some(d => d.name === name)
         }
 
