@@ -307,7 +307,7 @@ export function CalendarTab() {
                         </div>
 
                         {/* Controls moved inside the card */}
-                        <div className="flex flex-row-reverse md:flex-row items-center gap-4 overflow-x-auto max-w-full">
+                        <div className="flex flex-row-reverse md:flex-row items-center gap-4 overflow-x-auto max-w-full p-1">
 
 
                             {/* Summary (Only for Financial) */}
