@@ -49,7 +49,7 @@ export function CalendarSyncButton() {
             <Calendar className={`h-4 w-4 ${loading ? 'animate-pulse' : ''}`} />
             {loading ? 'מסנכרן...' : (
                 <div className="flex items-center gap-1">
-                    סנכרן עם
+                    סנכרון עם
                     <img src="/calender.png" alt="Google Calendar" className="h-9 w-auto object-contain" />
                 </div>
             )}
