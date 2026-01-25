@@ -100,7 +100,7 @@ export const metadata: Metadata = {
     },
     icons: {
         icon: [
-            { url: '/favicon.svg', type: 'image/svg+xml' },
+            { url: '/icon.png', type: 'image/png', sizes: 'any' },
             { url: '/images/branding/K-LOGO.png', sizes: '192x192', type: 'image/png' },
             { url: '/images/branding/K-LOGO.png', sizes: '512x512', type: 'image/png' }
         ],
