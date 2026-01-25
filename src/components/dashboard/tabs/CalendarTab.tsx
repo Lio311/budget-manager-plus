@@ -171,7 +171,7 @@ export function CalendarTab() {
     const { data: billsData, mutate: mutateBills } = useSWR(['bills', month, year, budgetType], fetchBills)
     const { data: debtsData, mutate: mutateDebts } = useSWR(['debts', month, year, budgetType], fetchDebts)
     const { data: incomesData } = useSWR(['incomes', month, year, budgetType], fetchIncomes)
-    const { data: expensesData } = useSWR(['expenses', month, year, budgetType], fetchExpenses)
+    const { data: expensesData, mutate: mutateExpenses } = useSWR(['expenses', month, year, budgetType], fetchExpenses)
     const { data: savingsData } = useSWR(['savings', month, year, budgetType], fetchSavings)
 
     const bills = billsData?.bills || []
@@ -643,107 +643,107 @@ export function CalendarTab() {
                 </Dialog>
             )}
 
-                {/* Quick Add Dialog for Financial Mode */}
-                <QuickAddDialog
-                    open={isQuickAddOpen}
-                    onOpenChange={setIsQuickAddOpen}
-                    selectedDay={selectedDay}
-                    isBusiness={isBusiness}
-                    payments={selectedDay ? getPaymentsForDay(selectedDay) : []}
-                    onTogglePaid={togglePaid}
-                    onSelectAction={handleQuickAddAction}
-                />
+            {/* Quick Add Dialog for Financial Mode */}
+            <QuickAddDialog
+                open={isQuickAddOpen}
+                onOpenChange={setIsQuickAddOpen}
+                selectedDay={selectedDay}
+                isBusiness={isBusiness}
+                payments={selectedDay ? getPaymentsForDay(selectedDay) : []}
+                onTogglePaid={togglePaid}
+                onSelectAction={handleQuickAddAction}
+            />
 
-                {/* --- Local Add Dialogs --- */}
+            {/* --- Local Add Dialogs --- */}
 
-                {/* Expense Dialog */}
-                <Dialog open={activeDialog === 'expense'} onOpenChange={(open) => !open && handleDialogClose()}>
-                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
-                        <DialogHeader>
-                            <DialogTitle className="text-right">הוספת הוצאה</DialogTitle>
-                        </DialogHeader>
-                        {activeDialog === 'expense' && (
-                            <ExpenseForm
-                                categories={expenseCategories}
-                                suppliers={suppliers}
-                                clients={clientsList}
-                                onCategoriesChange={mutateExpenseCategories}
-                                isMobile={true} // Reusing mobile layout for dialog
-                                onSuccess={() => handleSuccess('expense')}
-                                initialData={{ date: selectedDateForAdd }}
-                            />
-                        )}
-                    </DialogContent>
-                </Dialog>
+            {/* Expense Dialog */}
+            <Dialog open={activeDialog === 'expense'} onOpenChange={(open) => !open && handleDialogClose()}>
+                <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                    <DialogHeader>
+                        <DialogTitle className="text-right">הוספת הוצאה</DialogTitle>
+                    </DialogHeader>
+                    {activeDialog === 'expense' && (
+                        <ExpenseForm
+                            categories={expenseCategories}
+                            suppliers={suppliers}
+                            clients={clientsList}
+                            onCategoriesChange={mutateExpenseCategories}
+                            isMobile={true} // Reusing mobile layout for dialog
+                            onSuccess={() => handleSuccess('expense')}
+                            initialData={{ date: selectedDateForAdd }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
 
-                {/* Income Dialog */}
-                <Dialog open={activeDialog === 'income'} onOpenChange={(open) => !open && handleDialogClose()}>
-                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
-                        <DialogHeader>
-                            <DialogTitle className="text-right">{isBusiness ? 'תיעוד מכירה' : 'הוספת הכנסה'}</DialogTitle>
-                        </DialogHeader>
-                        {activeDialog === 'income' && (
-                            <IncomeForm
-                                categories={incomeCategories}
-                                clients={clientsList}
-                                onCategoriesChange={mutateIncomeCategories}
-                                isMobile={true}
-                                onSuccess={() => handleSuccess('income')}
-                                initialData={{ date: selectedDateForAdd }}
-                            />
-                        )}
-                    </DialogContent>
-                </Dialog>
+            {/* Income Dialog */}
+            <Dialog open={activeDialog === 'income'} onOpenChange={(open) => !open && handleDialogClose()}>
+                <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                    <DialogHeader>
+                        <DialogTitle className="text-right">{isBusiness ? 'תיעוד מכירה' : 'הוספת הכנסה'}</DialogTitle>
+                    </DialogHeader>
+                    {activeDialog === 'income' && (
+                        <IncomeForm
+                            categories={incomeCategories}
+                            clients={clientsList}
+                            onCategoriesChange={mutateIncomeCategories}
+                            isMobile={true}
+                            onSuccess={() => handleSuccess('income')}
+                            initialData={{ date: selectedDateForAdd }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
 
-                {/* Bill Dialog */}
-                <Dialog open={activeDialog === 'bill'} onOpenChange={(open) => !open && handleDialogClose()}>
-                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
-                        <DialogHeader>
-                            <DialogTitle className="text-right">הוספת חשבון קבוע</DialogTitle>
-                        </DialogHeader>
-                        {activeDialog === 'bill' && (
-                            <BillForm
-                                onSuccess={() => handleSuccess('bill')}
-                                initialData={{ dueDay: selectedDateForAdd?.getDate() }}
-                            />
-                        )}
-                    </DialogContent>
-                </Dialog>
+            {/* Bill Dialog */}
+            <Dialog open={activeDialog === 'bill'} onOpenChange={(open) => !open && handleDialogClose()}>
+                <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                    <DialogHeader>
+                        <DialogTitle className="text-right">הוספת חשבון קבוע</DialogTitle>
+                    </DialogHeader>
+                    {activeDialog === 'bill' && (
+                        <BillForm
+                            onSuccess={() => handleSuccess('bill')}
+                            initialData={{ dueDay: selectedDateForAdd?.getDate() }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
 
-                {/* Debt/Loan Dialog */}
-                <Dialog open={activeDialog === 'debt'} onOpenChange={(open) => !open && handleDialogClose()}>
-                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
-                        <DialogHeader>
-                            <DialogTitle className="text-right">הוספת הלוואה</DialogTitle>
-                        </DialogHeader>
-                        {activeDialog === 'debt' && (
-                            <DebtForm
-                                onSuccess={() => handleSuccess('debt')}
-                                initialData={{ dueDay: selectedDateForAdd?.getDate() }}
-                            />
-                        )}
-                    </DialogContent>
-                </Dialog>
+            {/* Debt/Loan Dialog */}
+            <Dialog open={activeDialog === 'debt'} onOpenChange={(open) => !open && handleDialogClose()}>
+                <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                    <DialogHeader>
+                        <DialogTitle className="text-right">הוספת הלוואה</DialogTitle>
+                    </DialogHeader>
+                    {activeDialog === 'debt' && (
+                        <DebtForm
+                            onSuccess={() => handleSuccess('debt')}
+                            initialData={{ dueDay: selectedDateForAdd?.getDate() }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
 
-                {/* Saving Dialog */}
-                <Dialog open={activeDialog === 'saving'} onOpenChange={(open) => !open && handleDialogClose()}>
-                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
-                        <DialogHeader>
-                            <DialogTitle className="text-right">הוספת חיסכון</DialogTitle>
-                        </DialogHeader>
-                        {activeDialog === 'saving' && (
-                            <SavingForm
-                                onSuccess={() => handleSuccess('saving')}
-                                initialData={{ targetDate: selectedDateForAdd }}
-                            />
-                        )}
-                    </DialogContent>
-                </Dialog>
+            {/* Saving Dialog */}
+            <Dialog open={activeDialog === 'saving'} onOpenChange={(open) => !open && handleDialogClose()}>
+                <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                    <DialogHeader>
+                        <DialogTitle className="text-right">הוספת חיסכון</DialogTitle>
+                    </DialogHeader>
+                    {activeDialog === 'saving' && (
+                        <SavingForm
+                            onSuccess={() => handleSuccess('saving')}
+                            initialData={{ targetDate: selectedDateForAdd }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
 
-                <CalendarTutorial
-                    isOpen={showTutorial}
-                    onClose={() => setShowTutorial(false)}
-                />
-            </div>
-            )
+            <CalendarTutorial
+                isOpen={showTutorial}
+                onClose={() => setShowTutorial(false)}
+            />
+        </div>
+    )
 }
