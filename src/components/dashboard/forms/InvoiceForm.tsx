@@ -458,6 +458,11 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1"
                                             value={item.price}
                                             onWheel={(e) => e.currentTarget.blur()}
+                                            onFocus={(e) => {
+                                                if (item.price === 0) {
+                                                    e.target.value = ''
+                                                }
+                                            }}
                                             onChange={(e) => {
                                                 const val = parseFloat(e.target.value) || 0
                                                 const newItems = [...lineItems]

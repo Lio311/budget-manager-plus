@@ -230,6 +230,11 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                                                 value={item.price}
                                                 onChange={(e) => { }}
                                                 onValueChange={(value) => updateItem(item.id, 'price', value)}
+                                                onFocus={() => {
+                                                    if (item.price === 0) {
+                                                        updateItem(item.id, 'price', '')
+                                                    }
+                                                }}
                                                 className="w-full text-right bg-transparent border-none focus:ring-0 p-1"
                                             />
                                         </td>
