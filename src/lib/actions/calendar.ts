@@ -141,9 +141,7 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number, ty
         }
 
         // 5. Insert New Events
-        let successCount = 0
-        let failCount = 0
-        const errors: string[] = []
+
 
         // 5. Insert New Events (Parallel Batches)
         const batchSize = 10
