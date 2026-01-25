@@ -6,6 +6,8 @@ import { auth } from '@clerk/nextjs/server'
 import { getCurrentBudget } from './budget'
 import { convertToILS } from '@/lib/currency'
 
+// ... (rest of imports remains same, just replacing function body)
+
 export async function syncBudgetToGoogleCalendar(month: number, year: number) {
     try {
         const { userId } = await auth()
@@ -28,70 +30,81 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
             return { success: false, error: 'Google Calendar connection expired. Please reconnect.' }
         }
 
-        // 2. Fetch Budget Data
-        // Use 'PERSONAL' by default or iterate both? 
-        // For simplicity, let's sync the active dashboard context if passed, or just PERSONAL for now. 
-        // The user didn't specify, but usually they want everything. 
-        // Let's assume passed month/year is relevant.
-        // We'll sync PERSONAL budget items.
-
+        // 2. Fetch Budget Data & All Items
         const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
         if (!budget) return { success: false, error: 'No budget found' }
 
-        // Fetch bills and debts explicitly
-        const bills = await db.bill.findMany({
-            where: { budgetId: budget.id }
-        })
+        const bills = await db.bill.findMany({ where: { budgetId: budget.id } })
+        const debts = await db.debt.findMany({ where: { budgetId: budget.id } })
+        const incomes = await db.income.findMany({ where: { budgetId: budget.id } })
+        const expenses = await db.expense.findMany({ where: { budgetId: budget.id } })
 
-        const debts = await db.debt.findMany({
-            where: { budgetId: budget.id }
-        })
-
-        // 3. Prepare Events
+        // 3. Prepare Events List
         const events = []
         const calendarId = user.googleCalendarId || 'primary'
 
-        // Bills (Due Date)
+        // Bills (Due Date) -> Red (11)
         if (bills) {
             for (const bill of bills) {
                 if (bill.dueDate) {
                     events.push({
                         summary: `🛒 חוב/הוצאה: ${bill.name}`,
-                        description: `סכום: ${bill.amount} ${bill.currency}\nסטטוס: ${bill.isPaid ? 'שולם' : 'לא שולם'}`,
+                        description: `[Budget Manager]\nסכום: ${bill.amount} ${bill.currency}\nסטטוס: ${bill.isPaid ? 'שולם' : 'לא שולם'}`,
                         start: { date: new Date(bill.dueDate).toISOString().split('T')[0] },
                         end: { date: new Date(bill.dueDate).toISOString().split('T')[0] },
-                        colorId: '11' // Red-ish
+                        colorId: '11'
                     })
                 }
             }
         }
 
-        // Debts (Due Day)
+        // Debts (Due Day) -> Blueberry (9)
         if (debts) {
             for (const debt of debts) {
-                // Construct date from dueDay + month/year
-                // Be careful with day validity (e.g. 31st in Feb)
                 const safeDay = Math.min(debt.dueDay, new Date(year, month, 0).getDate())
                 const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(safeDay).padStart(2, '0')}`
 
                 events.push({
                     summary: `💳 הלוואה: ${debt.creditor}`,
-                    description: `סכום: ${debt.monthlyPayment} ${debt.currency}\nיתרה: ${debt.totalAmount}`,
+                    description: `[Budget Manager]\nסכום: ${debt.monthlyPayment} ${debt.currency}\nיתרה: ${debt.totalAmount}`,
                     start: { date: dateStr },
                     end: { date: dateStr },
-                    colorId: '9' // Blueberry
+                    colorId: '9'
                 })
             }
         }
 
-        // 4. Push to Google
-        // Strategy: "Sync Day" - We can't easily track individual updates without IDs.
-        // Simple approach: Create events. 
-        // Risk: Duplicates if run multiple times.
-        // Fix: Query existing events in this month range with signature "Created by Budget Manager" property?
-        // Or simply trust the user won't spam the button? 
-        // Better: Search events by timeMin/timeMax and title matching.
+        // Incomes (Date) -> Green (10)
+        if (incomes) {
+            for (const income of incomes) {
+                if (income.date) {
+                    events.push({
+                        summary: `💰 הכנסה: ${income.source}`,
+                        description: `[Budget Manager]\nסכום: ${income.amount} ${income.currency}`,
+                        start: { date: new Date(income.date).toISOString().split('T')[0] },
+                        end: { date: new Date(income.date).toISOString().split('T')[0] },
+                        colorId: '10'
+                    })
+                }
+            }
+        }
 
+        // Expenses (Date) -> Red (11)
+        if (expenses) {
+            for (const expense of expenses) {
+                if (expense.date) {
+                    events.push({
+                        summary: `💸 הוצאה: ${expense.description}`,
+                        description: `[Budget Manager]\nסכום: ${expense.amount} ${expense.currency}\nקטגוריה: ${expense.category}`,
+                        start: { date: new Date(expense.date).toISOString().split('T')[0] },
+                        end: { date: new Date(expense.date).toISOString().split('T')[0] },
+                        colorId: '11'
+                    })
+                }
+            }
+        }
+
+        // 4. Delete Old Events (Fix Duplication Bug)
         const startDate = new Date(year, month - 1, 1).toISOString()
         const endDate = new Date(year, month, 0, 23, 59, 59).toISOString()
 
@@ -100,22 +113,24 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
             timeMin: startDate,
             timeMax: endDate,
             singleEvents: true,
-            q: 'Budget Manager' // Tag search
+            maxResults: 250 // Fetch enough to cover
         })
 
-        // Simple Dedup: If event exists at same day with same title, skip.
-        // Or Delete All "Budget Manager" events in this range and Re-create. (Destructive but clean)
-
-        // Let's trying "Delete All Tagged" approach for this month range to ensure perfect sync.
         if (existingEvents.data.items) {
-            const batch = existingEvents.data.items.map(evt =>
+            // Client-side filter because 'q' doesn't work well with private props
+            const eventsToDelete = existingEvents.data.items.filter(evt =>
+                // Check private prop OR description tag as fallback
+                evt.extendedProperties?.private?.app === 'Budget Manager' ||
+                evt.description?.includes('[Budget Manager]')
+            )
+
+            const deletePromises = eventsToDelete.map(evt =>
                 calendar.events.delete({ calendarId, eventId: evt.id! })
             )
-            await Promise.all(batch)
+            await Promise.all(deletePromises)
         }
 
-        // Create New
-        // Use a batch? Google API supports batching but loop is fine for < 50 items.
+        // 5. Insert New Events
         for (const evt of events) {
             await calendar.events.insert({
                 calendarId,
