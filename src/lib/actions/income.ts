@@ -143,7 +143,10 @@ export async function addIncome(
         }
 
         try {
-            await syncBudgetToGoogleCalendar(month, year, type)
+            const incDate = parseDate(data.date) || new Date()
+            const syncMonth = incDate.getMonth() + 1
+            const syncYear = incDate.getFullYear()
+            await syncBudgetToGoogleCalendar(syncMonth, syncYear, type)
         } catch (e) {
             console.error('Auto-sync failed', e)
         }

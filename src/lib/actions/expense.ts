@@ -153,7 +153,15 @@ export async function addExpense(
 
         // AUTO-SYNC
         try {
-            await syncBudgetToGoogleCalendar(month, year, type)
+            const expDate = new Date(validatedData.date || new Date())
+            const syncMonth = expDate.getMonth() + 1
+            const syncYear = expDate.getFullYear()
+
+            // Sync the expense's month
+            await syncBudgetToGoogleCalendar(syncMonth, syncYear, type)
+
+            // If the expense date is different from the current view, we might want to sync both? 
+            // Usually just the expense month is enough as that's where it appears.
         } catch (e) {
             console.error('Auto-sync failed', e)
         }
