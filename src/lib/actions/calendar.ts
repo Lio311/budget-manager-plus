@@ -129,33 +129,56 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number, ty
                 (type === 'PERSONAL' && evt.description?.includes('[Budget Manager]'))
             )
 
-            const deletePromises = eventsToDelete.map(evt =>
-                calendar.events.delete({ calendarId, eventId: evt.id! })
-            )
-            await Promise.all(deletePromises)
+            // Delete in parallel but catch errors individually
+            await Promise.all(eventsToDelete.map(async (evt) => {
+                try {
+                    await calendar.events.delete({ calendarId, eventId: evt.id! })
+                } catch (err: any) {
+                    console.warn(`Failed to delete event ${evt.id}:`, err.message)
+                    // Ignore 404/410 (already deleted)
+                }
+            }))
         }
 
         // 5. Insert New Events
+        let successCount = 0
+        let failCount = 0
+        const errors: string[] = []
+
+        // Use sequential insert to avoid rate limits
         for (const evt of events) {
-            await calendar.events.insert({
-                calendarId,
-                requestBody: {
-                    ...evt,
-                    extendedProperties: {
-                        private: {
-                            app: 'Budget Manager',
-                            appTag: appTag, // New scoped tag
-                            type: 'auto-sync'
+            try {
+                await calendar.events.insert({
+                    calendarId,
+                    requestBody: {
+                        ...evt,
+                        extendedProperties: {
+                            private: {
+                                app: 'Budget Manager',
+                                appTag: appTag, // New scoped tag
+                                type: 'auto-sync'
+                            }
                         }
                     }
-                }
-            })
+                })
+                successCount++
+                // Tiny delay to be nice to API
+                await new Promise(resolve => setTimeout(resolve, 100))
+            } catch (err: any) {
+                console.error('Failed to insert event:', evt.summary, err.message)
+                failCount++
+                errors.push(err.message)
+            }
         }
 
-        return { success: true, count: events.length }
+        if (successCount === 0 && failCount > 0) {
+            return { success: false, error: `נכשל בסנכרון כל האירועים (${errors[0]})` }
+        }
 
-    } catch (error) {
+        return { success: true, count: successCount }
+
+    } catch (error: any) {
         console.error('Sync Error:', error)
-        return { success: false, error: 'Failed to sync calendar' }
+        return { success: false, error: error.message || 'Failed to sync calendar' }
     }
 }
