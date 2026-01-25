@@ -145,30 +145,37 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number, ty
         let failCount = 0
         const errors: string[] = []
 
-        // Use sequential insert to avoid rate limits
-        for (const evt of events) {
-            try {
-                await calendar.events.insert({
-                    calendarId,
-                    requestBody: {
-                        ...evt,
-                        extendedProperties: {
-                            private: {
-                                app: 'Budget Manager',
-                                appTag: appTag, // New scoped tag
-                                type: 'auto-sync'
+        // 5. Insert New Events (Parallel Batches)
+        const batchSize = 10
+        let successCount = 0
+        let failCount = 0
+        const errors: string[] = []
+
+        // Process in chunks to avoid hitting rate limits too hard but still be fast
+        for (let i = 0; i < events.length; i += batchSize) {
+            const chunk = events.slice(i, i + batchSize)
+            await Promise.all(chunk.map(async (evt) => {
+                try {
+                    await calendar.events.insert({
+                        calendarId,
+                        requestBody: {
+                            ...evt,
+                            extendedProperties: {
+                                private: {
+                                    app: 'Budget Manager',
+                                    appTag: appTag,
+                                    type: 'auto-sync'
+                                }
                             }
                         }
-                    }
-                })
-                successCount++
-                // Tiny delay to be nice to API
-                await new Promise(resolve => setTimeout(resolve, 100))
-            } catch (err: any) {
-                console.error('Failed to insert event:', evt.summary, err.message)
-                failCount++
-                errors.push(err.message)
-            }
+                    })
+                    successCount++
+                } catch (err: any) {
+                    console.error('Failed to insert event:', evt.summary, err.message)
+                    failCount++
+                    errors.push(err.message)
+                }
+            }))
         }
 
         if (successCount === 0 && failCount > 0) {

@@ -1,6 +1,6 @@
 'use client'
 
-import useSWR, { mutate } from 'swr'
+import useSWR, { mutate, useSWRConfig } from 'swr'
 import { useState, useRef } from 'react'
 import { format } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -94,6 +94,9 @@ export function CalendarTab() {
     const router = useRouter()
     const searchParams = useSearchParams()
 
+    // Moved isBusiness up to avoid TDZ errors
+    const isBusiness = budgetType === 'BUSINESS'
+
     // --- State for Local Dialogs ---
     const [activeDialog, setActiveDialog] = useState<'expense' | 'income' | 'bill' | 'debt' | 'saving' | null>(null)
     const [selectedDateForAdd, setSelectedDateForAdd] = useState<Date | null>(null)
@@ -152,7 +155,6 @@ export function CalendarTab() {
         if (type === 'saving') globalMutate(['savings', month, year, budgetType])
     }
 
-    const isBusiness = budgetType === 'BUSINESS'
 
     // Fetchers
     const fetchBills = async () => (await getBills(month, year, budgetType)).data

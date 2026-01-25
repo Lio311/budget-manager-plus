@@ -75,11 +75,8 @@ export async function addIncome(
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
-        const budget = await getCurrentBudget(month, year, '₪', type)
-
         const { userId } = await auth();
         if (!userId) return { success: false, error: 'Unauthorized' };
-        const db = await authenticatedPrisma(userId);
 
         // Helper function to parse dates safely without timezone issues
         const parseDate = (dateStr: string | undefined): Date | null => {
@@ -90,6 +87,16 @@ export async function addIncome(
             }
             return new Date(dateStr);
         };
+
+        // Determine Budget Month/Year based on the Income Date
+        const incDate = parseDate(data.date) || new Date()
+        const targetMonth = incDate.getMonth() + 1
+        const targetYear = incDate.getFullYear()
+
+        // Get the budget for the ACTUAL date of the income, not the current view
+        const budget = await getCurrentBudget(targetMonth, targetYear, '₪', type)
+
+        const db = await authenticatedPrisma(userId);
 
         const income = await db.income.create({
             data: {
@@ -122,6 +129,7 @@ export async function addIncome(
 
         if (data.isRecurring && data.recurringEndDate) {
             const startDate = data.recurringStartDate || data.date || new Date().toISOString()
+            // Recurrence creation - we await this as it is DB operation
             await createRecurringIncomes(
                 income.id,
                 data.source,
@@ -142,14 +150,15 @@ export async function addIncome(
             )
         }
 
-        try {
-            const incDate = parseDate(data.date) || new Date()
-            const syncMonth = incDate.getMonth() + 1
-            const syncYear = incDate.getFullYear()
-            await syncBudgetToGoogleCalendar(syncMonth, syncYear, type)
-        } catch (e) {
-            console.error('Auto-sync failed', e)
-        }
+        // Fire-and-Forget Sync (Do not await)
+        // We use void to explicitly ignore the promise
+        void (async () => {
+            try {
+                await syncBudgetToGoogleCalendar(targetMonth, targetYear, type)
+            } catch (e) {
+                console.error('Background Auto-sync failed', e)
+            }
+        })()
 
         revalidatePath('/dashboard')
         return { success: true, data: income }

@@ -106,13 +106,15 @@ export async function addBill(
         }
 
         // Hook: Update Google Calendar with current Type
-        try {
-            const syncMonth = dueDate.getMonth() + 1
-            const syncYear = dueDate.getFullYear()
-            await syncBudgetToGoogleCalendar(syncMonth, syncYear, type)
-        } catch (e) {
-            console.error('Auto-sync failed', e)
-        }
+        void (async () => {
+            try {
+                const syncMonth = dueDate.getMonth() + 1
+                const syncYear = dueDate.getFullYear()
+                await syncBudgetToGoogleCalendar(syncMonth, syncYear, type)
+            } catch (e) {
+                console.error('Background Auto-sync failed', e)
+            }
+        })()
 
         revalidatePath('/dashboard')
         revalidatePath('/dashboard')

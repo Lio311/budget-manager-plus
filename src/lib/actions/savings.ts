@@ -177,7 +177,12 @@ export async function addSaving(
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL'
 ) {
     try {
-        const budget = await getCurrentBudget(month, year, '₪', type)
+        // Determine Budget Month/Year based on the Saving Date
+        const saveDate = data.date ? new Date(data.date) : new Date()
+        const targetMonth = saveDate.getMonth() + 1
+        const targetYear = saveDate.getFullYear()
+
+        const budget = await getCurrentBudget(targetMonth, targetYear, '₪', type)
 
         // Handle recurring savings
         if (data.isRecurring && data.recurringEndDate) {

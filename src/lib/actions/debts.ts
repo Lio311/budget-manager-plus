@@ -222,11 +222,13 @@ export async function addDebt(
         }
 
         // AUTO-SYNC
-        try {
-            await syncBudgetToGoogleCalendar(month, year, type)
-        } catch (e) {
-            console.error('Auto-sync failed', e)
-        }
+        void (async () => {
+            try {
+                await syncBudgetToGoogleCalendar(month, year, type)
+            } catch (e) {
+                console.error('Background Auto-sync failed', e)
+            }
+        })()
 
         revalidatePath('/dashboard')
         return { success: true }

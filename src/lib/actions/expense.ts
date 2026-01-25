@@ -82,7 +82,13 @@ export async function addExpense(
         // Validate input
         const validatedData = expenseSchema.parse(data)
 
-        const budget = await getCurrentBudget(month, year, '₪', type)
+        // Determine Budget Month/Year based on the Expense Date
+        const expDate = new Date(validatedData.date)
+        const targetMonth = expDate.getMonth() + 1
+        const targetYear = expDate.getFullYear()
+
+        // Get the budget for the ACTUAL date of the expense
+        const budget = await getCurrentBudget(targetMonth, targetYear, '₪', type)
 
         const { userId } = await auth();
         if (!userId) return { success: false, error: 'Unauthorized' };
@@ -151,20 +157,15 @@ export async function addExpense(
             )
         }
 
-        // AUTO-SYNC
-        try {
-            const expDate = new Date(validatedData.date || new Date())
-            const syncMonth = expDate.getMonth() + 1
-            const syncYear = expDate.getFullYear()
-
-            // Sync the expense's month
-            await syncBudgetToGoogleCalendar(syncMonth, syncYear, type)
-
-            // If the expense date is different from the current view, we might want to sync both? 
-            // Usually just the expense month is enough as that's where it appears.
-        } catch (e) {
-            console.error('Auto-sync failed', e)
-        }
+        // Fire-and-Forget Sync (Do not await)
+        // We use void to explicitly ignore the promise
+        void (async () => {
+            try {
+                await syncBudgetToGoogleCalendar(targetMonth, targetYear, type)
+            } catch (e) {
+                console.error('Background Auto-sync failed', e)
+            }
+        })()
 
         revalidatePath('/')
         return { success: true, data: expense }
