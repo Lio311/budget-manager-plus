@@ -18,6 +18,14 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DatePicker } from '@/components/ui/date-picker'
 import { RecurringEndDatePicker } from '@/components/ui/recurring-end-date-picker'
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 interface BillFormProps {
     onSuccess?: () => void
     isMobile?: boolean
@@ -189,6 +197,11 @@ export function BillForm({ onSuccess, isMobile = false, initialData }: BillFormP
 
     return (
         <div className="space-y-4">
+            {/* Header added for consistency if needed, though usually dialog handles it. Adding mostly for consistency with others if used standalone */}
+            <div className="mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{initialData ? 'עריכת חשבון' : 'הוספת חשבון קבוע'}</h3>
+            </div>
+
             <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-200">שם החשבון *</label>
                 <Input
@@ -204,15 +217,19 @@ export function BillForm({ onSuccess, isMobile = false, initialData }: BillFormP
             <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-1 space-y-2">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-200">מטבע</label>
-                    <select
-                        className="w-full p-2.5 border border-gray-200 rounded-lg h-10 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 text-sm outline-none"
+                    <Select
                         value={formData.currency}
-                        onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                        onValueChange={(value) => setFormData({ ...formData, currency: value })}
                     >
-                        {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
-                            <option key={code} value={code}>{code} ({symbol})</option>
-                        ))}
-                    </select>
+                        <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent dir="rtl" className="text-right">
+                            {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                <SelectItem key={code} value={code} className="pr-8">{code} ({symbol})</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="col-span-2 space-y-2">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-200">סכום *</label>
@@ -291,14 +308,18 @@ export function BillForm({ onSuccess, isMobile = false, initialData }: BillFormP
                             <div className="grid grid-cols-2 gap-3 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg animate-in slide-in-from-top-2">
                                 <div className="space-y-1">
                                     <label className="text-xs text-gray-500 dark:text-gray-400">תדירות</label>
-                                    <select
-                                        className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-md h-9 text-sm outline-none bg-white dark:bg-slate-800 dark:text-gray-100"
+                                    <Select
                                         value={formData.frequency}
-                                        onChange={(e) => setFormData({ ...formData, frequency: e.target.value as 'MONTHLY' | 'BI_MONTHLY' })}
+                                        onValueChange={(value) => setFormData({ ...formData, frequency: value as 'MONTHLY' | 'BI_MONTHLY' })}
                                     >
-                                        <option value="MONTHLY">כל חודש</option>
-                                        <option value="BI_MONTHLY">דו-חודשי (כל חודשיים)</option>
-                                    </select>
+                                        <SelectTrigger className="w-full h-9 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent dir="rtl" className="text-right">
+                                            <SelectItem value="MONTHLY">כל חודש</SelectItem>
+                                            <SelectItem value="BI_MONTHLY">דו-חודשי (כל חודשיים)</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div className="flex gap-4 flex-1">
                                     <div className="space-y-2 w-full">

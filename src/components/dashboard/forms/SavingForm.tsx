@@ -23,6 +23,14 @@ import { addSaving, updateSaving } from '@/lib/actions/savings'
 import { addCategory } from '@/lib/actions/category'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 interface Category {
     id: string
     name: string
@@ -257,24 +265,30 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 <h3 className="text-lg font-bold text-[#323338] dark:text-gray-100">{initialData ? 'עריכת חיסכון' : 'הוספת חיסכון'}</h3>
             </div>
 
-            <div className="flex flex-wrap gap-4 items-end">
-                <div className="w-full space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">קטגוריה *</label>
-                    <div className="flex gap-2">
-                        <select
-                            className={`w-full p-2.5 border rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none transition-all ${errors.category ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200 dark:border-slate-700'} focus:ring-2 focus:ring-[#00c875]/20 focus:border-[#00c875]`}
+            <div className="flex flex-col gap-4">
+                <div className="flex gap-2 w-full">
+                    <div className="flex-1">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5 block">קטגוריה *</label>
+                        <Select
                             value={newSaving.category}
-                            onChange={(e) => {
-                                setNewSaving({ ...newSaving, category: e.target.value })
-                                if (e.target.value) setErrors(prev => ({ ...prev, category: false }))
+                            onValueChange={(value) => {
+                                setNewSaving({ ...newSaving, category: value })
+                                if (value) setErrors(prev => ({ ...prev, category: false }))
                             }}
                             disabled={submitting}
                         >
-                            <option value="" disabled>בחר סוג</option>
-                            {categories.map(cat => (
-                                <option key={cat.id} value={cat.name}>{cat.name}</option>
-                            ))}
-                        </select>
+                            <SelectTrigger className={`w-full h-10 border bg-white dark:bg-slate-800 dark:text-gray-100 ${errors.category ? 'border-red-500 ring-1 ring-red-500/20' : 'border-gray-200 dark:border-slate-700'} focus:ring-2 focus:ring-[#00c875]/20 focus:border-[#00c875]`}>
+                                <SelectValue placeholder="בחר קטגוריה" />
+                            </SelectTrigger>
+                            <SelectContent dir="rtl">
+                                {categories.map(cat => (
+                                    <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="pt-[26px]">
                         <Popover open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
                             <PopoverTrigger asChild>
                                 <Button variant="outline" size="icon" className="shrink-0 h-10 w-10 rounded-lg border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-800">
@@ -311,7 +325,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 <div className="w-full space-y-2">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תיאור *</label>
                     <Input
-                        placeholder="תיאור"
+                        placeholder="תיאור החיסכון"
                         className={`h-10 focus:ring-[#00c875]/20 focus:border-[#00c875] ${errors.description ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200'}`}
                         value={newSaving.description}
                         onChange={(e) => {
@@ -321,26 +335,28 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                     />
                 </div>
 
-                <div className="w-full space-y-2">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">מטבע</label>
-                    <select
-                        className="w-full p-2 border border-gray-200 dark:border-slate-700 rounded-lg h-10 bg-white dark:bg-slate-800 dark:text-gray-100 text-sm outline-none"
-                        value={newSaving.currency}
-                        onChange={(e) => setNewSaving({ ...newSaving, currency: e.target.value })}
-                    >
-                        {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
-                            <option key={code} value={code}>{code} ({symbol})</option>
-                        ))}
-                    </select>
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
+                    <div className="col-span-1 space-y-2">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">מטבע</label>
+                        <Select
+                            value={newSaving.currency}
+                            onValueChange={(value) => setNewSaving({ ...newSaving, currency: value })}
+                        >
+                            <SelectTrigger className="w-full h-10 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 dark:text-gray-100">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {Object.entries(SUPPORTED_CURRENCIES).map(([code, symbol]) => (
+                                    <SelectItem key={code} value={code}>{code} ({symbol})</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                <div className="w-full grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    <div className="col-span-2 space-y-2">
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-200">הפקדה *</label>
-                        <Input
-                            type="number"
+                        <FormattedNumberInput
                             placeholder="0.00"
-                            onWheel={(e) => e.currentTarget.blur()}
                             className={`h-10 focus:ring-[#00c875]/20 focus:border-[#00c875] w-full ${errors.monthlyDeposit ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200'}`}
                             value={newSaving.monthlyDeposit}
                             onChange={(e) => {
@@ -349,16 +365,16 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                             }}
                         />
                     </div>
+                </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תאריך הפקדה</label>
-                        <DatePicker
-                            date={newSaving.date ? new Date(newSaving.date) : undefined}
-                            setDate={(date) => setNewSaving({ ...newSaving, date: date || new Date() })}
-                            fromDate={startOfMonth}
-                            toDate={endOfMonth}
-                        />
-                    </div>
+                <div className="w-full space-y-2">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">תאריך הפקדה</label>
+                    <DatePicker
+                        date={newSaving.date ? new Date(newSaving.date) : undefined}
+                        setDate={(date) => setNewSaving({ ...newSaving, date: date || new Date() })}
+                        fromDate={startOfMonth}
+                        toDate={endOfMonth}
+                    />
                 </div>
 
                 <button
