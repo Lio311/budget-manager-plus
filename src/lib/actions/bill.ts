@@ -21,8 +21,6 @@ export async function getBills(month: number, year: number, type: 'PERSONAL' | '
             orderBy: { dueDate: 'asc' }
         })
 
-
-
         // Calculate totals in ILS
         let totalILS = 0
         let totalPaidILS = 0
@@ -108,9 +106,6 @@ export async function addBill(
         }
 
         // Hook: Update Google Calendar if enabled
-        // We fire and forget (don't await to block UI, or log error)
-        // Actually, in Server Actions, usually best to await or verify.
-        // We'll await but catch error so it doesn't fail the bill creation.
         try {
             await syncBudgetToGoogleCalendar(month, year)
         } catch (e) {
@@ -241,6 +236,15 @@ export async function updateBill(
             }
         })
 
+        if (bill.dueDate) {
+            try {
+                const date = new Date(bill.dueDate)
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
+        }
+
         revalidatePath('/dashboard')
         return { success: true, data: bill }
     } catch (error) {
@@ -263,6 +267,15 @@ export async function toggleBillPaid(id: string, isPaid: boolean) {
             }
         })
 
+        if (bill.dueDate) {
+            try {
+                const date = new Date(bill.dueDate)
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
+        }
+
         revalidatePath('/dashboard')
         return { success: true, data: bill }
     } catch (error) {
@@ -277,9 +290,20 @@ export async function deleteBill(id: string) {
         if (!userId) return { success: false, error: 'Unauthorized' };
         const db = await authenticatedPrisma(userId);
 
+        const bill = await db.bill.findUnique({ where: { id } })
+
         await db.bill.delete({
             where: { id }
         })
+
+        if (bill?.dueDate) {
+            try {
+                const date = new Date(bill.dueDate)
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
+        }
 
         revalidatePath('/dashboard')
         return { success: true }

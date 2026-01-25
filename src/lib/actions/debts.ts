@@ -109,7 +109,6 @@ export async function getDebts(month: number, year: number, type: 'PERSONAL' | '
 }
 
 // Helper function to create debt installments
-// Helper function to create debt installments
 async function createDebtInstallments(
     creditor: string,
     debtType: string,
@@ -203,6 +202,8 @@ export async function addDebt(
                 type,
                 data.paymentMethod
             )
+            // For recurring, we should probably sync at least the first month or all?
+            // Let's sync just the current requested month
         } else {
             // Regular single debt
             await db.debt.create({
@@ -218,6 +219,13 @@ export async function addDebt(
                     paymentMethod: data.paymentMethod
                 }
             })
+        }
+
+        // AUTO-SYNC
+        try {
+            await syncBudgetToGoogleCalendar(month, year)
+        } catch (e) {
+            console.error('Auto-sync failed', e)
         }
 
         revalidatePath('/dashboard')
@@ -245,7 +253,7 @@ export async function updateDebt(
         if (!userId) return { success: false, error: 'Unauthorized' };
         const db = await authenticatedPrisma(userId);
 
-        await db.debt.update({
+        const updatedDebt = await db.debt.update({
             where: { id },
             data: {
                 creditor: data.creditor,
@@ -255,8 +263,18 @@ export async function updateDebt(
                 monthlyPayment: data.monthlyPayment,
                 dueDay: data.dueDay,
                 ...(data.paymentMethod !== undefined && { paymentMethod: data.paymentMethod })
-            }
+            },
+            include: { budget: true }
         })
+
+        // AUTO-SYNC
+        if (updatedDebt.budget) {
+            try {
+                await syncBudgetToGoogleCalendar(updatedDebt.budget.month, updatedDebt.budget.year)
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
+        }
 
         revalidatePath('/dashboard')
         return { success: true }
@@ -272,9 +290,24 @@ export async function deleteDebt(id: string) {
         if (!userId) return { success: false, error: 'Unauthorized' };
         const db = await authenticatedPrisma(userId);
 
+        // Fetch before delete to get budget
+        const debt = await db.debt.findUnique({
+            where: { id },
+            include: { budget: true }
+        })
+
         await db.debt.delete({
             where: { id }
         })
+
+        // AUTO-SYNC
+        if (debt?.budget) {
+            try {
+                await syncBudgetToGoogleCalendar(debt.budget.month, debt.budget.year)
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
+        }
 
         revalidatePath('/dashboard')
         return { success: true }
@@ -290,13 +323,23 @@ export async function toggleDebtPaid(id: string, isPaid: boolean) {
         if (!userId) return { success: false, error: 'Unauthorized' };
         const db = await authenticatedPrisma(userId);
 
-        await db.debt.update({
+        const updatedDebt = await db.debt.update({
             where: { id },
             data: {
                 isPaid,
                 paidDate: isPaid ? new Date() : null
-            }
+            },
+            include: { budget: true }
         })
+
+        // AUTO-SYNC
+        if (updatedDebt.budget) {
+            try {
+                await syncBudgetToGoogleCalendar(updatedDebt.budget.month, updatedDebt.budget.year)
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
+        }
 
         revalidatePath('/dashboard')
         return { success: true }

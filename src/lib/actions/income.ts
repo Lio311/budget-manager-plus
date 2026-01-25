@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
 
 import { convertToILS } from '@/lib/currency'
+import { syncBudgetToGoogleCalendar } from './calendar'
 
 export async function getIncomes(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
@@ -141,6 +142,12 @@ export async function addIncome(
             )
         }
 
+        try {
+            await syncBudgetToGoogleCalendar(month, year)
+        } catch (e) {
+            console.error('Auto-sync failed', e)
+        }
+
         revalidatePath('/dashboard')
         return { success: true, data: income }
     } catch (error) {
@@ -155,10 +162,19 @@ export async function toggleIncomeStatus(id: string, newStatus: 'PAID' | 'PENDIN
         if (!userId) return { success: false, error: 'Unauthorized' }
 
         const db = await authenticatedPrisma(userId)
-        await db.income.update({
+        const updated = await db.income.update({
             where: { id },
             data: { status: newStatus }
         })
+
+        if (updated.date) {
+            try {
+                const date = new Date(updated.date)
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
+        }
 
         revalidatePath('/dashboard')
         return { success: true }
@@ -334,6 +350,16 @@ export async function updateIncome(
                 where: { id },
                 data: formatIncomeDataForUpdate(data)
             })
+
+            if (income.date) {
+                try {
+                    const date = new Date(income.date)
+                    await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                } catch (e) {
+                    console.error('Auto-sync failed', e)
+                }
+            }
+
             revalidatePath('/dashboard')
             return { success: true, data: income }
         } else {
@@ -361,6 +387,15 @@ export async function updateIncome(
                 },
                 data: updateData
             })
+
+            if (currentIncome.date) {
+                try {
+                    const date = new Date(currentIncome.date)
+                    await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                } catch (e) {
+                    console.error('Auto-sync failed', e)
+                }
+            }
 
             revalidatePath('/dashboard')
             return { success: true, count: updateResult.count }
@@ -401,11 +436,14 @@ export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SING
         if (!userId) return { success: false, error: 'Unauthorized' };
         const db = await authenticatedPrisma(userId);
 
+        // Find the income first to check for credit notes AND for sync
+        const income = await db.income.findUnique({
+            where: { id }
+        })
+
         if (mode === 'SINGLE') {
             // Find the income first to check for credit notes
-            const income = await db.income.findUnique({
-                where: { id }
-            })
+            // (fetched above)
 
             // If it's linked to a credit note, delete the credit note first
             // (The credit note deletion logic also handles cleaning up income entries,
@@ -448,6 +486,15 @@ export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SING
                     }
                 }
             })
+        }
+
+        if (income?.date) {
+            try {
+                const date = new Date(income.date)
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
         }
 
         revalidatePath('/dashboard')

@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
 
 import { convertToILS } from '@/lib/currency'
+import { syncBudgetToGoogleCalendar } from './calendar'
 
 export async function getExpenses(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
@@ -148,6 +149,13 @@ export async function addExpense(
                     paidBy: validatedData.paidBy
                 }
             )
+        }
+
+        // AUTO-SYNC
+        try {
+            await syncBudgetToGoogleCalendar(month, year)
+        } catch (e) {
+            console.error('Auto-sync failed', e)
         }
 
         revalidatePath('/')
@@ -309,6 +317,17 @@ export async function updateExpense(
                 where: { id },
                 data: formatExpenseDataForUpdate(validatedData)
             })
+
+            // AUTO-SYNC
+            if (expense.date) {
+                try {
+                    const date = new Date(expense.date)
+                    await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                } catch (e) {
+                    console.error('Auto-sync failed', e)
+                }
+            }
+
             revalidatePath('/dashboard')
             return { success: true, data: expense }
         } else {
@@ -335,6 +354,15 @@ export async function updateExpense(
                 },
                 data: updateData
             })
+
+            if (currentExpense.date) {
+                try {
+                    const date = new Date(currentExpense.date)
+                    await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                } catch (e) {
+                    console.error('Auto-sync failed', e)
+                }
+            }
 
             revalidatePath('/dashboard')
             return { success: true, count: updateResult.count }
@@ -377,13 +405,15 @@ export async function deleteExpense(id: string, mode: 'SINGLE' | 'FUTURE' = 'SIN
         if (!userId) return { success: false, error: 'Unauthorized' };
         const db = await authenticatedPrisma(userId);
 
+        const currentExpense = await db.expense.findUnique({ where: { id } })
+
         if (mode === 'SINGLE') {
             await db.expense.delete({
                 where: { id }
             })
         } else {
             // FUTURE Mode
-            const currentExpense = await db.expense.findUnique({ where: { id } })
+            // const currentExpense = await db.expense.findUnique({ where: { id } }) // fetched above
             if (!currentExpense) return { success: false, error: 'Expense not found' }
 
             const sourceId = currentExpense.recurringSourceId || currentExpense.id
@@ -400,6 +430,15 @@ export async function deleteExpense(id: string, mode: 'SINGLE' | 'FUTURE' = 'SIN
                     }
                 }
             })
+        }
+
+        if (currentExpense?.date) {
+            try {
+                const date = new Date(currentExpense.date)
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
         }
 
         revalidatePath('/dashboard')
@@ -548,10 +587,14 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
 
         // Process expenses
         let addedCount = 0
+        const monthsEffected = new Set<string>()
+
         for (const exp of expensesToImport) {
             const date = exp.date ? new Date(exp.date) : new Date()
             const month = date.getMonth() + 1
             const year = date.getFullYear()
+
+            monthsEffected.add(`${month}-${year}`)
 
             // Get appropriate budget
             const budget = await getCurrentBudget(month, year, '₪', budgetType)
@@ -589,6 +632,16 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
             addedCount++
         }
 
+        // Auto Sync all effected months
+        for (const key of Array.from(monthsEffected)) {
+            const [m, y] = key.split('-')
+            try {
+                await syncBudgetToGoogleCalendar(parseInt(m), parseInt(y))
+            } catch (e) {
+                console.error(`Auto-sync failed for ${key}`, e)
+            }
+        }
+
         revalidatePath('/')
         return { success: true, count: addedCount, skipped: skippedCount }
     } catch (error: any) {
@@ -610,6 +663,13 @@ export async function deleteAllMonthlyExpenses(month: number, year: number, type
                 budgetId: budget.id
             }
         })
+
+        // AUTO-SYNC
+        try {
+            await syncBudgetToGoogleCalendar(month, year)
+        } catch (e) {
+            console.error('Auto-sync failed', e)
+        }
 
         revalidatePath('/')
         return { success: true, count: result.count }
@@ -633,10 +693,20 @@ export async function toggleExpenseStatus(id: string, newStatus: 'PAID' | 'PENDI
             data.paymentDate = null
         }
 
-        await db.expense.update({
+        const updated = await db.expense.update({
             where: { id },
             data
         })
+
+        // AUTO-SYNC
+        if (updated.date) {
+            try {
+                const date = new Date(updated.date)
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+            } catch (e) {
+                console.error('Auto-sync failed', e)
+            }
+        }
 
         revalidatePath('/dashboard')
         revalidatePath('/')
