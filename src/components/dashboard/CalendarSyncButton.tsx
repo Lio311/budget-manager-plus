@@ -29,8 +29,9 @@ export function CalendarSyncButton() {
                     toast.error(result.error || 'שגיאה בסנכרון')
                 }
             }
-        } catch (err) {
-            toast.error('שגיאה בסנכרון')
+        } catch (err: any) {
+            console.error('Client Sync Error:', err)
+            toast.error('שגיאה בסנכרון: ' + (err.message || 'שגיאה לא ידועה'))
         } finally {
             setLoading(false)
         }
