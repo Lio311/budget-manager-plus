@@ -266,51 +266,56 @@ export function CalendarTab() {
     return (
         <div className="space-y-6">
             {/* Header / Toggle */}
-            <div className="flex flex-row justify-between items-center gap-4 overflow-x-auto pb-1">
-                {isBusiness ? (
-                    <div id="calendar-mode-toggle" className="flex items-center space-x-2 rtl:space-x-reverse bg-white dark:bg-slate-800 p-2 rounded-lg border border-gray-200 dark:border-slate-700">
-                        <Switch
-                            id="calendar-mode"
-                            dir="ltr"
-                            checked={viewMode === 'work'}
-                            onCheckedChange={(checked) => setViewMode(checked ? 'work' : 'financial')}
-                        />
-                        <Label htmlFor="calendar-mode" className="cursor-pointer flex items-center gap-2">
-                            {viewMode === 'work' ? <Briefcase className="h-4 w-4" /> : <CalendarIcon className="h-4 w-4" />}
-                            {viewMode === 'work' ? 'יומן עבודה' : 'תשלומים'}
-                        </Label>
-                    </div>
-                ) : <div />}
-
-                {/* Summary (Only for Financial) */}
-                {viewMode === 'financial' && (
-                    <div id="calendar-summary" className="text-sm text-muted-foreground">
-                        סה"כ תשלומים: <span className="font-bold text-blue-600">{formatCurrency(totalPayments, getCurrencySymbol(currency))}</span>
-                    </div>
-                )}
-
-                <CalendarSyncButton />
+            {/* Header / Info Button moved here */}
+            <div className="flex justify-end px-1">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowTutorial(true)}
+                    className="h-8 w-8 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                    title="הדרכה"
+                >
+                    <Info className="h-5 w-5" />
+                </Button>
             </div>
 
             {/* Calendar */}
             <Card>
                 <CardHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
                             <CalendarIcon className="h-5 w-5 text-blue-600" />
                             <CardTitle>
                                 {viewMode === 'work' ? 'יומן עבודה' : 'לוח שנה'} - {getMonthName(month)} {year}
                             </CardTitle>
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setShowTutorial(true)}
-                            className="h-8 w-8"
-                            title="הדרכה"
-                        >
-                            <Info className="h-4 w-4" />
-                        </Button>
+
+                        {/* Controls moved inside the card */}
+                        <div className="flex flex-row-reverse md:flex-row items-center gap-4 overflow-x-auto max-w-full">
+                            {isBusiness ? (
+                                <div id="calendar-mode-toggle" className="flex items-center space-x-2 rtl:space-x-reverse bg-gray-50 dark:bg-slate-800 p-1.5 rounded-lg border border-gray-100 dark:border-slate-700">
+                                    <Switch
+                                        id="calendar-mode"
+                                        dir="ltr"
+                                        checked={viewMode === 'work'}
+                                        onCheckedChange={(checked) => setViewMode(checked ? 'work' : 'financial')}
+                                    />
+                                    <Label htmlFor="calendar-mode" className="cursor-pointer flex items-center gap-2 text-xs md:text-sm">
+                                        {viewMode === 'work' ? <Briefcase className="h-3.5 w-3.5" /> : <CalendarIcon className="h-3.5 w-3.5" />}
+                                        {viewMode === 'work' ? 'יומן' : 'תשלומים'}
+                                    </Label>
+                                </div>
+                            ) : null}
+
+                            {/* Summary (Only for Financial) */}
+                            {viewMode === 'financial' && (
+                                <div id="calendar-summary" className="text-xs md:text-sm text-muted-foreground whitespace-nowrap">
+                                    סה"כ: <span className="font-bold text-blue-600">{formatCurrency(totalPayments, getCurrencySymbol(currency))}</span>
+                                </div>
+                            )}
+
+                            <CalendarSyncButton />
+                        </div>
                     </div>
                 </CardHeader>
                 <CardContent>
