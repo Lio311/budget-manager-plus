@@ -410,10 +410,10 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                     <table className="w-full text-right text-sm">
                         <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 font-medium">
                             <tr>
-                                <th className="p-2 w-[40%]">תיאור</th>
-                                <th className="p-2 w-[15%]">כמות</th>
-                                <th className="p-2 w-[20%]">מחיר יח'</th>
-                                <th className="p-2 w-[20%]">סה"כ</th>
+                                <th className="p-2 w-[40%] text-center">תיאור</th>
+                                <th className="p-2 w-[15%] text-center">כמות</th>
+                                <th className="p-2 w-[20%] text-center">מחיר יח'</th>
+                                <th className="p-2 w-[20%] text-center">סה"כ</th>
                                 <th className="p-2 w-[5%]"></th>
                             </tr>
                         </thead>
@@ -423,7 +423,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                     <td className="p-2">
                                         <input
                                             type="text"
-                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1"
+                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center"
                                             value={item.description}
                                             onChange={(e) => {
                                                 const newItems = [...lineItems]
@@ -438,7 +438,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             type="number"
                                             min="0"
                                             step="0.01"
-                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1"
+                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center"
                                             value={item.quantity}
                                             onChange={(e) => {
                                                 const val = parseFloat(e.target.value) || 0
@@ -455,7 +455,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             type="number"
                                             min="0"
                                             step="0.01"
-                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1"
+                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center"
                                             value={item.price}
                                             onWheel={(e) => e.currentTarget.blur()}
                                             onFocus={(e) => {
@@ -472,7 +472,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             }}
                                         />
                                     </td>
-                                    <td className="p-2 font-bold">
+                                    <td className="p-2 font-bold text-center">
                                         {formatCurrency(item.total)}
                                     </td>
                                     <td className="p-2 text-center">
