@@ -419,7 +419,7 @@ export function ClientsTab() {
                             setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', packageId: '', isActive: true, city: '', bankName: '', bankBranch: '', bankAccount: '' })
                         }}
                         label="לקוח חדש"
-                        colorClass="bg-green-600"
+                        colorClass="bg-pink-600"
                     />
                 </div>
 
@@ -511,7 +511,7 @@ export function ClientsTab() {
                             setIsAddingPackage(false)
                             setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', packageId: '', isActive: true, city: '', bankName: '', bankBranch: '', bankAccount: '' })
                         }}
-                        className="bg-green-600 hover:bg-green-700 hidden lg:flex"
+                        className="bg-pink-600 hover:bg-pink-700 hidden lg:flex"
                         id="clients-add-btn"
                     >
                         <Plus className="h-4 w-4 ml-2" />
@@ -542,7 +542,7 @@ export function ClientsTab() {
                         placeholder="חיפוש לקוח..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400 text-base md:text-sm"
+                        className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder:text-gray-400 text-base md:text-sm"
                     />
                 </div>
 
@@ -589,7 +589,7 @@ export function ClientsTab() {
                             <button
                                 onClick={() => setViewMode('grid')}
                                 className={`p-1.5 rounded-md transition-all ${viewMode === 'grid'
-                                    ? 'bg-white dark:bg-slate-700 shadow-sm text-green-600 dark:text-green-400'
+                                    ? 'bg-white dark:bg-slate-700 shadow-sm text-pink-600 dark:text-pink-400'
                                     : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                                     }`}
                                 title="תצוגת כרטיסים"
@@ -599,7 +599,7 @@ export function ClientsTab() {
                             <button
                                 onClick={() => setViewMode('list')}
                                 className={`p-1.5 rounded-md transition-all ${viewMode === 'list'
-                                    ? 'bg-white dark:bg-slate-700 shadow-sm text-green-600 dark:text-green-400'
+                                    ? 'bg-white dark:bg-slate-700 shadow-sm text-pink-600 dark:text-pink-400'
                                     : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                                     }`}
                                 title="תצוגת רשימה"
@@ -652,7 +652,7 @@ export function ClientsTab() {
                                                 return newErrors
                                             })
                                         }}
-                                        className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-pink-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                                     />
                                 </div>
                                 <div className="mt-7 flex items-center justify-between gap-4 border p-2 rounded-md bg-gray-50 dark:bg-slate-800/50 h-[42px]">
@@ -678,7 +678,7 @@ export function ClientsTab() {
                                         type="email"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-pink-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                                     />
                                 </div>
                                 <div>
@@ -712,7 +712,7 @@ export function ClientsTab() {
                                     type="text"
                                     value={formData.address}
                                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-pink-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
                                 />
                             </div>
                             <div>
@@ -755,7 +755,7 @@ export function ClientsTab() {
                                     type="text"
                                     value={formData.bankBranch}
                                     onChange={(e) => setFormData({ ...formData, bankBranch: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                                     placeholder="מספר סניף"
                                 />
                             </div>
@@ -767,7 +767,7 @@ export function ClientsTab() {
                                     type="text"
                                     value={formData.bankAccount || ''}
                                     onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
-                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.bankAccount ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-pink-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.bankAccount ? 'border-red-500' : 'border-gray-300'}`}
                                     placeholder="מספר חשבון"
                                 />
                             </div>
@@ -781,7 +781,7 @@ export function ClientsTab() {
                                 value={formData.notes}
                                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                 rows={3}
-                                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.notes ? 'border-red-500' : 'border-gray-300'}`}
+                                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-pink-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.notes ? 'border-red-500' : 'border-gray-300'}`}
                             />
                         </div>
 
@@ -847,7 +847,7 @@ export function ClientsTab() {
                                                             </SelectItem>
                                                         ))}
                                                         <div className="h-px bg-gray-100 my-1 mx-1" />
-                                                        <SelectItem value="NEW_PACKAGE" className="text-green-600 bg-green-50/50 hover:bg-green-50 focus:bg-green-50 cursor-pointer font-medium">
+                                                        <SelectItem value="NEW_PACKAGE" className="text-pink-600 bg-pink-50/50 hover:bg-pink-50 focus:bg-pink-50 cursor-pointer font-medium">
                                                             <div className="flex items-center gap-2">
                                                                 <Plus className="w-4 h-4" />
                                                                 הוסף חדש
@@ -966,7 +966,7 @@ export function ClientsTab() {
                                                 }
                                             }}
                                             placeholder="מספר חברה / עוסק"
-                                            className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.taxId ? 'border-red-500' : 'border-gray-300'}`}
+                                            className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-pink-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 ${errors.taxId ? 'border-red-500' : 'border-gray-300'}`}
                                         />
                                         <p className="text-xs text-gray-500 mt-1">שדה רשות - נדרש רק עבור הפקת חשבוניות מס ללקוח עסקי</p>
                                     </div>
@@ -982,7 +982,7 @@ export function ClientsTab() {
                                                 value={formData.eventLocation || ''}
                                                 onChange={(e) => setFormData({ ...formData, eventLocation: e.target.value })}
                                                 placeholder="לדוגמה: אולם אירועים, משרדי החברה"
-                                                className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
+                                                className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100"
                                             />
                                         </div>
                                         <p className="text-xs text-gray-500 mt-1">מלא רק במידה והשירות ניתן פיזית במיקום מסויים</p>
@@ -991,7 +991,7 @@ export function ClientsTab() {
                             )}
                         </div>
                         <div className="flex gap-2">
-                            <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                            <Button type="submit" className="bg-pink-600 hover:bg-pink-700">
                                 {editingClient ? 'עדכן' : 'הוסף'}
                             </Button>
                             <Button
@@ -1022,7 +1022,7 @@ export function ClientsTab() {
                             >
                                 <div className="flex justify-between items-start mb-3">
                                     <div className="flex items-center gap-2 flex-1 min-w-0 ml-2">
-                                        <Building2 className="h-5 w-5 text-green-600 shrink-0" />
+                                        <Building2 className="h-5 w-5 text-pink-600 shrink-0" />
                                         <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 break-words line-clamp-2 md:line-clamp-1">{client.name}</h3>
                                     </div>
                                     <div className="flex gap-1">
@@ -1201,7 +1201,7 @@ export function ClientsTab() {
                                         <tr key={client.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
-                                                    <Building2 className="h-4 w-4 text-green-600 shrink-0" />
+                                                    <Building2 className="h-4 w-4 text-pink-600 shrink-0" />
                                                     <span className="font-medium">{client.name}</span>
                                                 </div>
                                                 {client.taxId && <div className="text-xs text-gray-400 mr-6">{client.taxId}</div>}
