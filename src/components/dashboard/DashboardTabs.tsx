@@ -268,7 +268,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
 
     const businessTabs = [
         { value: 'overview', label: 'סקירה כללית', icon: PieChart, activeColor: '#000000', activeTextColor: '#ffffff' },
-        { value: 'documents', label: 'הפקת מסמכים', icon: FileText, activeColor: '#3b82f6', activeTextColor: '#ffffff' },
+        { value: 'documents', label: 'הפקת מסמכים', icon: FileText, activeColor: '#9333ea', activeTextColor: '#ffffff' },
         { value: 'income', label: 'הכנסות', icon: TrendingUp, activeColor: '#16a34a', activeTextColor: '#ffffff' },
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeColor: '#dc2626', activeTextColor: '#ffffff' },
         { value: 'clients', label: 'לקוחות', icon: Users, activeColor: '#16a34a', activeTextColor: '#ffffff' },
