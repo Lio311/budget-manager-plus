@@ -49,7 +49,7 @@ export function CalendarSyncButton() {
             {loading ? 'מסנכרן...' : (
                 <div className="flex items-center gap-1">
                     סנכרן עם
-                    <img src="/calender.png" alt="Google Calendar" className="h-5 w-auto object-contain" />
+                    <img src="/calender.png" alt="Google Calendar" className="h-9 w-auto object-contain" />
                 </div>
             )}
         </Button>
