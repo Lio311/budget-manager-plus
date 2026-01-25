@@ -643,6 +643,88 @@ export function CalendarTab() {
                 </Dialog>
             )}
 
+    // --- Added Imports & Hooks for Local Dialogs ---
+            import {getCategories} from '@/lib/actions/category'
+            import {getSuppliers} from '@/lib/actions/suppliers'
+            import {ExpenseForm} from '@/components/dashboard/forms/ExpenseForm'
+            import {IncomeForm} from '@/components/dashboard/forms/IncomeForm'
+            import {BillForm} from '@/components/dashboard/forms/BillForm'
+            import {DebtForm} from '@/components/dashboard/forms/DebtForm'
+            import {SavingForm} from '@/components/dashboard/forms/SavingForm'
+
+            // --- State for Local Dialogs ---
+            const [activeDialog, setActiveDialog] = useState<'expense' | 'income' | 'bill' | 'debt' | 'saving' | null>(null)
+            const [selectedDateForAdd, setSelectedDateForAdd] = useState<Date | null>(null)
+
+            // --- Data Fetching for Forms ---
+            // Expense Categories
+            const {data: expenseCategories = [], mutate: mutateExpenseCategories } = useSWR(
+            ['categories', 'expense', budgetType],
+        async () => (await getCategories('expense', budgetType)).data || [],
+            {revalidateOnFocus: false }
+            )
+
+            // Income Categories
+            const {data: incomeCategories = [], mutate: mutateIncomeCategories } = useSWR(
+            ['categories', 'income', budgetType],
+        async () => (await getCategories('income', budgetType)).data || [],
+            {revalidateOnFocus: false }
+            )
+
+            // Suppliers
+            const {data: suppliers = [] } = useSWR(
+            isBusiness ? ['suppliers'] : null,
+        async () => (await getSuppliers()).data || []
+            )
+
+            // Clients
+            const {data: clientsList = [] } = useSWR(
+            ['clients-list'],
+        async () => {
+            const {getClientsList} = await import('@/lib/actions/clients')
+            return await getClientsList()
+        }
+            )
+
+    // Handlers
+    const handleQuickAddAction = (action: 'expense' | 'income' | 'saving' | 'debt' | 'bill') => {
+        const date = selectedDay ? new Date(year, month - 1, selectedDay) : new Date()
+            setSelectedDateForAdd(date)
+            setActiveDialog(action)
+            setIsQuickAddOpen(false)
+    }
+
+    const handleDialogClose = () => {
+                setActiveDialog(null)
+        setSelectedDateForAdd(null)
+    }
+
+    const handleSuccess = (type: 'expense' | 'income' | 'bill' | 'debt' | 'saving') => {
+                handleDialogClose()
+        // Mutate relevant data
+        if (type === 'expense') mutateExpenses()
+            if (type === 'income') globalMutate(['incomes', month, year, budgetType]) // using globalMutate for consistency
+            if (type === 'bill') mutateBills()
+            if (type === 'debt') mutateDebts()
+            if (type === 'saving') globalMutate(['savings', month, year, budgetType])
+
+        // Also refresh calendar summary/work events if needed
+        // mutate(key => Array.isArray(key) && key[0] === 'overview') // Optional if we want to update overview
+    }
+
+            // Also need to get mutate from SWRConfig
+            const {mutate: globalMutate } = useSWRConfig()
+
+
+            // ... (rest of component)
+
+            // Replace QuickAddDialog onSelectAction
+            // ...
+
+            return (
+            <div className="space-y-6">
+                {/* ... existing JSX ... */}
+
                 {/* Quick Add Dialog for Financial Mode */}
                 <QuickAddDialog
                     open={isQuickAddOpen}
