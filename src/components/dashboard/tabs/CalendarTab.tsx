@@ -117,6 +117,13 @@ export function CalendarTab() {
         { revalidateOnFocus: false }
     )
 
+    // Saving Categories
+    const { data: savingCategories = [], mutate: mutateSavingCategories } = useSWR(
+        ['categories', 'saving', budgetType],
+        async () => (await getCategories('saving', budgetType)).data || [],
+        { revalidateOnFocus: false }
+    )
+
     // Suppliers
     const { data: suppliers = [] } = useSWR(
         isBusiness ? ['suppliers'] : null,
@@ -733,6 +740,8 @@ export function CalendarTab() {
                     </DialogHeader>
                     {activeDialog === 'saving' && (
                         <SavingForm
+                            categories={savingCategories}
+                            onCategoriesChange={mutateSavingCategories}
                             onSuccess={() => handleSuccess('saving')}
                             initialData={{ targetDate: selectedDateForAdd }}
                         />
