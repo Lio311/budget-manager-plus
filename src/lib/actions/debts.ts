@@ -223,7 +223,7 @@ export async function addDebt(
 
         // AUTO-SYNC
         try {
-            await syncBudgetToGoogleCalendar(month, year)
+            await syncBudgetToGoogleCalendar(month, year, type)
         } catch (e) {
             console.error('Auto-sync failed', e)
         }
@@ -269,8 +269,9 @@ export async function updateDebt(
 
         // AUTO-SYNC
         if (updatedDebt.budget) {
+            const budgetType = updatedDebt.budget.type as 'PERSONAL' | 'BUSINESS'
             try {
-                await syncBudgetToGoogleCalendar(updatedDebt.budget.month, updatedDebt.budget.year)
+                await syncBudgetToGoogleCalendar(updatedDebt.budget.month, updatedDebt.budget.year, budgetType)
             } catch (e) {
                 console.error('Auto-sync failed', e)
             }
@@ -302,8 +303,9 @@ export async function deleteDebt(id: string) {
 
         // AUTO-SYNC
         if (debt?.budget) {
+            const budgetType = debt.budget.type as 'PERSONAL' | 'BUSINESS'
             try {
-                await syncBudgetToGoogleCalendar(debt.budget.month, debt.budget.year)
+                await syncBudgetToGoogleCalendar(debt.budget.month, debt.budget.year, budgetType)
             } catch (e) {
                 console.error('Auto-sync failed', e)
             }
@@ -334,8 +336,9 @@ export async function toggleDebtPaid(id: string, isPaid: boolean) {
 
         // AUTO-SYNC
         if (updatedDebt.budget) {
+            const budgetType = updatedDebt.budget.type as 'PERSONAL' | 'BUSINESS'
             try {
-                await syncBudgetToGoogleCalendar(updatedDebt.budget.month, updatedDebt.budget.year)
+                await syncBudgetToGoogleCalendar(updatedDebt.budget.month, updatedDebt.budget.year, budgetType)
             } catch (e) {
                 console.error('Auto-sync failed', e)
             }

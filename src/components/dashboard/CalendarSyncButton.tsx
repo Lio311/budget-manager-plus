@@ -16,7 +16,8 @@ export function CalendarSyncButton() {
             // But let's assume if it fails with "connected expired", we show that.
 
             // Trigger Sync
-            const result = await syncBudgetToGoogleCalendar(month, year)
+            const { budgetType } = useBudget()
+            const result = await syncBudgetToGoogleCalendar(month, year, budgetType)
 
             if (result.success) {
                 toast.success(`סונכרנו ${result.count} אירועים ליומן גוגל!`)

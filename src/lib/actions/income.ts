@@ -143,7 +143,7 @@ export async function addIncome(
         }
 
         try {
-            await syncBudgetToGoogleCalendar(month, year)
+            await syncBudgetToGoogleCalendar(month, year, type)
         } catch (e) {
             console.error('Auto-sync failed', e)
         }
@@ -162,15 +162,21 @@ export async function toggleIncomeStatus(id: string, newStatus: 'PAID' | 'PENDIN
         if (!userId) return { success: false, error: 'Unauthorized' }
 
         const db = await authenticatedPrisma(userId)
+
+        // Ensure fetching with budget for sync
         const updated = await db.income.update({
             where: { id },
-            data: { status: newStatus }
+            data: { status: newStatus },
+            include: { budget: true }
         })
 
-        if (updated.date) {
+        if (updated.budget) {
+            const budgetType = updated.budget.type as 'PERSONAL' | 'BUSINESS'
             try {
-                const date = new Date(updated.date)
-                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                // If it has a date, use it. If not, use budget month/year (fallback)
+                const syncMonth = updated.date ? (updated.date.getMonth() + 1) : updated.budget.month
+                const syncYear = updated.date ? updated.date.getFullYear() : updated.budget.year
+                await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
             } catch (e) {
                 console.error('Auto-sync failed', e)
             }
@@ -348,13 +354,16 @@ export async function updateIncome(
         if (mode === 'SINGLE') {
             const income = await db.income.update({
                 where: { id },
-                data: formatIncomeDataForUpdate(data)
+                data: formatIncomeDataForUpdate(data),
+                include: { budget: true }
             })
 
-            if (income.date) {
+            if (income.budget) {
+                const budgetType = income.budget.type as 'PERSONAL' | 'BUSINESS'
                 try {
-                    const date = new Date(income.date)
-                    await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                    const syncMonth = income.date ? (income.date.getMonth() + 1) : income.budget.month
+                    const syncYear = income.date ? income.date.getFullYear() : income.budget.year
+                    await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
                 } catch (e) {
                     console.error('Auto-sync failed', e)
                 }
@@ -387,15 +396,6 @@ export async function updateIncome(
                 },
                 data: updateData
             })
-
-            if (currentIncome.date) {
-                try {
-                    const date = new Date(currentIncome.date)
-                    await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
-                } catch (e) {
-                    console.error('Auto-sync failed', e)
-                }
-            }
 
             revalidatePath('/dashboard')
             return { success: true, count: updateResult.count }
@@ -438,18 +438,15 @@ export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SING
 
         // Find the income first to check for credit notes AND for sync
         const income = await db.income.findUnique({
-            where: { id }
+            where: { id },
+            include: { budget: true }
         })
 
-        if (mode === 'SINGLE') {
-            // Find the income first to check for credit notes
-            // (fetched above)
+        if (!income) return { success: false, error: 'Income not found' }
 
+        if (mode === 'SINGLE') {
             // If it's linked to a credit note, delete the credit note first
-            // (The credit note deletion logic also handles cleaning up income entries,
-            // but since we're starting from the income side, we clean up the doc explicitly)
             if (income?.invoiceId) {
-                // Check if there's a credit note for this invoice where this income might be the ledger entry
                 const creditNote = await db.creditNote.findFirst({
                     where: {
                         userId,
@@ -469,11 +466,8 @@ export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SING
             })
         } else {
             // FUTURE Mode
-            const currentIncome = await db.income.findUnique({ where: { id } })
-            if (!currentIncome) return { success: false, error: 'Income not found' }
-
-            const sourceId = currentIncome.recurringSourceId || currentIncome.id
-            const fromDate = currentIncome.date || new Date()
+            const sourceId = income.recurringSourceId || income.id
+            const fromDate = income.date || new Date()
 
             await db.income.deleteMany({
                 where: {
@@ -488,10 +482,12 @@ export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SING
             })
         }
 
-        if (income?.date) {
+        if (income?.budget) {
+            const budgetType = income.budget.type as 'PERSONAL' | 'BUSINESS'
             try {
-                const date = new Date(income.date)
-                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                const syncMonth = income.date ? (income.date.getMonth() + 1) : income.budget.month
+                const syncYear = income.date ? income.date.getFullYear() : income.budget.year
+                await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
             } catch (e) {
                 console.error('Auto-sync failed', e)
             }

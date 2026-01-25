@@ -8,7 +8,7 @@ import { convertToILS } from '@/lib/currency'
 
 // ... (rest of imports remains same, just replacing function body)
 
-export async function syncBudgetToGoogleCalendar(month: number, year: number) {
+export async function syncBudgetToGoogleCalendar(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const { userId } = await auth()
         if (!userId) return { success: false, error: 'Unauthorized' }
@@ -31,7 +31,7 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
         }
 
         // 2. Fetch Budget Data & All Items
-        const budget = await getCurrentBudget(month, year, '₪', 'PERSONAL')
+        const budget = await getCurrentBudget(month, year, '₪', type)
         if (!budget) return { success: false, error: 'No budget found' }
 
         const bills = await db.bill.findMany({ where: { budgetId: budget.id } })
@@ -42,6 +42,8 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
         // 3. Prepare Events List
         const events = []
         const calendarId = user.googleCalendarId || 'primary'
+        const appTag = `Budget Manager - ${type}`
+        const appSignature = `[Budget Manager - ${type}]`
 
         // Bills (Due Date) -> Red (11)
         if (bills) {
@@ -49,7 +51,7 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
                 if (bill.dueDate) {
                     events.push({
                         summary: `🛒 חוב/הוצאה: ${bill.name}`,
-                        description: `[Budget Manager]\nסכום: ${bill.amount} ${bill.currency}\nסטטוס: ${bill.isPaid ? 'שולם' : 'לא שולם'}`,
+                        description: `${appSignature}\nסכום: ${bill.amount} ${bill.currency}\nסטטוס: ${bill.isPaid ? 'שולם' : 'לא שולם'}`,
                         start: { date: new Date(bill.dueDate).toISOString().split('T')[0] },
                         end: { date: new Date(bill.dueDate).toISOString().split('T')[0] },
                         colorId: '11'
@@ -66,7 +68,7 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
 
                 events.push({
                     summary: `💳 הלוואה: ${debt.creditor}`,
-                    description: `[Budget Manager]\nסכום: ${debt.monthlyPayment} ${debt.currency}\nיתרה: ${debt.totalAmount}`,
+                    description: `${appSignature}\nסכום: ${debt.monthlyPayment} ${debt.currency}\nיתרה: ${debt.totalAmount}`,
                     start: { date: dateStr },
                     end: { date: dateStr },
                     colorId: '9'
@@ -80,7 +82,7 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
                 if (income.date) {
                     events.push({
                         summary: `💰 הכנסה: ${income.source}`,
-                        description: `[Budget Manager]\nסכום: ${income.amount} ${income.currency}`,
+                        description: `${appSignature}\nסכום: ${income.amount} ${income.currency}`,
                         start: { date: new Date(income.date).toISOString().split('T')[0] },
                         end: { date: new Date(income.date).toISOString().split('T')[0] },
                         colorId: '10'
@@ -95,7 +97,7 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
                 if (expense.date) {
                     events.push({
                         summary: `💸 הוצאה: ${expense.description}`,
-                        description: `[Budget Manager]\nסכום: ${expense.amount} ${expense.currency}\nקטגוריה: ${expense.category}`,
+                        description: `${appSignature}\nסכום: ${expense.amount} ${expense.currency}\nקטגוריה: ${expense.category}`,
                         start: { date: new Date(expense.date).toISOString().split('T')[0] },
                         end: { date: new Date(expense.date).toISOString().split('T')[0] },
                         colorId: '11'
@@ -104,7 +106,7 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
             }
         }
 
-        // 4. Delete Old Events (Fix Duplication Bug)
+        // 4. Delete Old Events (Fix Duplication Bug - Scoped by Type)
         const startDate = new Date(year, month - 1, 1).toISOString()
         const endDate = new Date(year, month, 0, 23, 59, 59).toISOString()
 
@@ -117,11 +119,14 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
         })
 
         if (existingEvents.data.items) {
-            // Client-side filter because 'q' doesn't work well with private props
+            // Client-side filter: Match specific type signature
             const eventsToDelete = existingEvents.data.items.filter(evt =>
                 // Check private prop OR description tag as fallback
-                evt.extendedProperties?.private?.app === 'Budget Manager' ||
-                evt.description?.includes('[Budget Manager]')
+                evt.extendedProperties?.private?.appTag === appTag ||
+                evt.description?.includes(appSignature) ||
+                // Backward compatibility: if it was generic 'Budget Manager', treat as PERSONAL or clean up?
+                // Let's assume generic legacy items are PERSONAL.
+                (type === 'PERSONAL' && evt.description?.includes('[Budget Manager]'))
             )
 
             const deletePromises = eventsToDelete.map(evt =>
@@ -139,6 +144,7 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number) {
                     extendedProperties: {
                         private: {
                             app: 'Budget Manager',
+                            appTag: appTag, // New scoped tag
                             type: 'auto-sync'
                         }
                     }

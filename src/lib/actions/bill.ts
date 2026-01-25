@@ -105,9 +105,9 @@ export async function addBill(
             );
         }
 
-        // Hook: Update Google Calendar if enabled
+        // Hook: Update Google Calendar with current Type
         try {
-            await syncBudgetToGoogleCalendar(month, year)
+            await syncBudgetToGoogleCalendar(month, year, type)
         } catch (e) {
             console.error('Auto-sync failed', e)
         }
@@ -233,13 +233,15 @@ export async function updateBill(
                 ...(data.currency && { currency: data.currency }),
                 ...(newDueDate && { dueDate: newDueDate }),
                 ...(data.paymentMethod !== undefined && { paymentMethod: data.paymentMethod })
-            }
+            },
+            include: { budget: true }
         })
 
-        if (bill.dueDate) {
+        if (bill.dueDate && bill.budget) {
+            const budgetType = bill.budget.type as 'PERSONAL' | 'BUSINESS'
             try {
                 const date = new Date(bill.dueDate)
-                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear(), budgetType)
             } catch (e) {
                 console.error('Auto-sync failed', e)
             }
@@ -264,13 +266,15 @@ export async function toggleBillPaid(id: string, isPaid: boolean) {
             data: {
                 isPaid,
                 paidDate: isPaid ? new Date() : null
-            }
+            },
+            include: { budget: true }
         })
 
-        if (bill.dueDate) {
+        if (bill.dueDate && bill.budget) {
+            const budgetType = bill.budget.type as 'PERSONAL' | 'BUSINESS'
             try {
                 const date = new Date(bill.dueDate)
-                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear(), budgetType)
             } catch (e) {
                 console.error('Auto-sync failed', e)
             }
@@ -290,16 +294,20 @@ export async function deleteBill(id: string) {
         if (!userId) return { success: false, error: 'Unauthorized' };
         const db = await authenticatedPrisma(userId);
 
-        const bill = await db.bill.findUnique({ where: { id } })
+        const bill = await db.bill.findUnique({
+            where: { id },
+            include: { budget: true }
+        })
 
         await db.bill.delete({
             where: { id }
         })
 
-        if (bill?.dueDate) {
+        if (bill?.dueDate && bill.budget) {
+            const budgetType = bill.budget.type as 'PERSONAL' | 'BUSINESS'
             try {
                 const date = new Date(bill.dueDate)
-                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear())
+                await syncBudgetToGoogleCalendar(date.getMonth() + 1, date.getFullYear(), budgetType)
             } catch (e) {
                 console.error('Auto-sync failed', e)
             }
