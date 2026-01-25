@@ -93,10 +93,18 @@ export function ClientDetailsDialog({ client, isOpen, onClose }: ClientDetailsDi
                                     </div>
                                 )}
                                 {client.phone && (
-                                    <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-                                        <Phone className="h-4 w-4 shrink-0" />
-                                        <span dir="ltr">{formatIsraeliPhoneNumber(client.phone)}</span>
-                                    </div>
+                                    <a
+                                        href={`https://wa.me/${client.phone.replace(/\D/g, '').replace(/^0/, '972')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-3 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-500 transition-colors group"
+                                        title="שלח הודעה ב-WhatsApp"
+                                    >
+                                        <Phone className="h-4 w-4 shrink-0 group-hover:scale-110 transition-transform" />
+                                        <span dir="ltr" className="group-hover:underline">
+                                            {formatIsraeliPhoneNumber(client.phone)}
+                                        </span>
+                                    </a>
                                 )}
                                 {(client.address || client.city) && (
                                     <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
