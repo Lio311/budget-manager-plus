@@ -41,7 +41,7 @@ import { useToast } from '@/hooks/use-toast'
 import { QuickAddDialog } from '@/components/dashboard/QuickAddDialog'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CalendarTutorial } from '@/components/dashboard/tutorial/CalendarTutorial'
-// import { CalendarSyncButton } from '@/components/dashboard/CalendarSyncButton'
+import { CalendarSyncButton } from '@/components/dashboard/CalendarSyncButton'
 
 interface Payment {
     id: string
@@ -289,7 +289,7 @@ export function CalendarTab() {
                     </div>
                 )}
 
-                {/* <CalendarSyncButton /> */}
+                <CalendarSyncButton />
             </div>
 
             {/* Calendar */}
