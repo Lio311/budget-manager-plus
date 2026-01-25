@@ -45,7 +45,7 @@ export function CalendarSyncButton() {
             title="סנכרן עם גוגל יומן"
         >
             <Calendar className={`h-4 w-4 ${loading ? 'animate-pulse' : ''}`} />
-            {loading ? 'מסנכרן...' : 'סנכרן יומן'}
+            {loading ? 'מסנכרן...' : 'סנכרן עם גוגל קלנדר'}
         </Button>
     )
 }

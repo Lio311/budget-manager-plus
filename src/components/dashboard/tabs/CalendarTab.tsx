@@ -266,7 +266,7 @@ export function CalendarTab() {
     return (
         <div className="space-y-6">
             {/* Header / Toggle */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-row justify-between items-center gap-4 overflow-x-auto pb-1">
                 {isBusiness ? (
                     <div id="calendar-mode-toggle" className="flex items-center space-x-2 rtl:space-x-reverse bg-white dark:bg-slate-800 p-2 rounded-lg border border-gray-200 dark:border-slate-700">
                         <Switch
