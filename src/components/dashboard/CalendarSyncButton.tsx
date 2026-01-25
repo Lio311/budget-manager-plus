@@ -43,6 +43,7 @@ export function CalendarSyncButton() {
             onClick={handleSync}
             disabled={loading}
             className="gap-2 text-gray-600 hover:text-blue-600 border-gray-200 hover:border-blue-200"
+            id="calendar-sync-btn"
             title="סנכרן עם גוגל יומן"
         >
             <Calendar className={`h-4 w-4 ${loading ? 'animate-pulse' : ''}`} />

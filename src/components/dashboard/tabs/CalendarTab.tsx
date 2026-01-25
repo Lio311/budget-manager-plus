@@ -283,15 +283,13 @@ export function CalendarTab() {
             <Card>
                 <CardHeader>
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                            <CalendarIcon className="h-5 w-5 text-blue-600" />
-                            <CardTitle>
-                                {viewMode === 'work' ? 'יומן עבודה' : 'לוח שנה'} - {getMonthName(month)} {year}
-                            </CardTitle>
-                        </div>
-
-                        {/* Controls moved inside the card */}
-                        <div className="flex flex-row-reverse md:flex-row items-center gap-4 overflow-x-auto max-w-full">
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                                <CalendarIcon className="h-5 w-5 text-blue-600" />
+                                <CardTitle>
+                                    {viewMode === 'work' ? 'יומן עבודה' : 'לוח שנה'} - {getMonthName(month)} {year}
+                                </CardTitle>
+                            </div>
                             {isBusiness ? (
                                 <div id="calendar-mode-toggle" className="flex items-center space-x-2 rtl:space-x-reverse bg-gray-50 dark:bg-slate-800 p-1.5 rounded-lg border border-gray-100 dark:border-slate-700">
                                     <Switch
@@ -306,6 +304,11 @@ export function CalendarTab() {
                                     </Label>
                                 </div>
                             ) : null}
+                        </div>
+
+                        {/* Controls moved inside the card */}
+                        <div className="flex flex-row-reverse md:flex-row items-center gap-4 overflow-x-auto max-w-full">
+
 
                             {/* Summary (Only for Financial) */}
                             {viewMode === 'financial' && (

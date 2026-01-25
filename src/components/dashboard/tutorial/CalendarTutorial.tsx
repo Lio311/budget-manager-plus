@@ -105,6 +105,14 @@ export function CalendarTutorial({ isOpen, onClose }: TutorialProps) {
                 maxWidth: 300
             },
             {
+                id: 'calendar-sync-btn',
+                title: 'סנכרון עם גוגל קלנדר',
+                text: 'סנכרן את התשלומים והאירועים שלך ישירות ליומן גוגל שלך לגישה נוחה מכל מקום.',
+                placement: 'bottom',
+                align: 'center',
+                maxWidth: 300
+            },
+            {
                 id: 'calendar-grid',
                 title: 'לוח השנה',
                 text: 'תצוגה חודשית של כל התשלומים והאירועים. לחץ על יום כדי לראות פרטים או להוסיף אירוע חדש.',
