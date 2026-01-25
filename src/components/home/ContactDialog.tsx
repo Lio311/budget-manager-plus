@@ -51,7 +51,7 @@ export function ContactDialog({ open, onOpenChange }: ContactDialogProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
+            <DialogContent className="max-w-2xl" dir="rtl">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold text-gray-800 text-right">
                         צור קשר
