@@ -42,6 +42,13 @@ import { QuickAddDialog } from '@/components/dashboard/QuickAddDialog'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CalendarTutorial } from '@/components/dashboard/tutorial/CalendarTutorial'
 import { CalendarSyncButton } from '@/components/dashboard/CalendarSyncButton'
+import { getCategories } from '@/lib/actions/category'
+import { getSuppliers } from '@/lib/actions/suppliers'
+import { ExpenseForm } from '@/components/dashboard/forms/ExpenseForm'
+import { IncomeForm } from '@/components/dashboard/forms/IncomeForm'
+import { BillForm } from '@/components/dashboard/forms/BillForm'
+import { DebtForm } from '@/components/dashboard/forms/DebtForm'
+import { SavingForm } from '@/components/dashboard/forms/SavingForm'
 
 interface Payment {
     id: string
@@ -86,6 +93,64 @@ export function CalendarTab() {
     const [showTutorial, setShowTutorial] = useState(false)
     const router = useRouter()
     const searchParams = useSearchParams()
+
+    // --- State for Local Dialogs ---
+    const [activeDialog, setActiveDialog] = useState<'expense' | 'income' | 'bill' | 'debt' | 'saving' | null>(null)
+    const [selectedDateForAdd, setSelectedDateForAdd] = useState<Date | null>(null)
+    const { mutate: globalMutate } = useSWRConfig()
+
+    // --- Data Fetching for Forms ---
+    // Expense Categories
+    const { data: expenseCategories = [], mutate: mutateExpenseCategories } = useSWR(
+        ['categories', 'expense', budgetType],
+        async () => (await getCategories('expense', budgetType)).data || [],
+        { revalidateOnFocus: false }
+    )
+
+    // Income Categories
+    const { data: incomeCategories = [], mutate: mutateIncomeCategories } = useSWR(
+        ['categories', 'income', budgetType],
+        async () => (await getCategories('income', budgetType)).data || [],
+        { revalidateOnFocus: false }
+    )
+
+    // Suppliers
+    const { data: suppliers = [] } = useSWR(
+        isBusiness ? ['suppliers'] : null,
+        async () => (await getSuppliers()).data || []
+    )
+
+    // Clients
+    const { data: clientsList = [] } = useSWR(
+        ['clients-list'],
+        async () => {
+            const { getClientsList } = await import('@/lib/actions/clients')
+            return await getClientsList()
+        }
+    )
+
+    // Handlers
+    const handleQuickAddAction = (action: 'expense' | 'income' | 'saving' | 'debt' | 'bill') => {
+        const date = selectedDay ? new Date(year, month - 1, selectedDay) : new Date()
+        setSelectedDateForAdd(date)
+        setActiveDialog(action)
+        setIsQuickAddOpen(false)
+    }
+
+    const handleDialogClose = () => {
+        setActiveDialog(null)
+        setSelectedDateForAdd(null)
+    }
+
+    const handleSuccess = (type: 'expense' | 'income' | 'bill' | 'debt' | 'saving') => {
+        handleDialogClose()
+        // Mutate relevant data
+        if (type === 'expense') mutateExpenses()
+        if (type === 'income') globalMutate(['incomes', month, year, budgetType])
+        if (type === 'bill') mutateBills()
+        if (type === 'debt') mutateDebts()
+        if (type === 'saving') globalMutate(['savings', month, year, budgetType])
+    }
 
     const isBusiness = budgetType === 'BUSINESS'
 
@@ -576,36 +641,189 @@ export function CalendarTab() {
                 </Dialog>
             )}
 
-            {/* Quick Add Dialog for Financial Mode */}
-            <QuickAddDialog
-                open={isQuickAddOpen}
-                onOpenChange={setIsQuickAddOpen}
-                selectedDay={selectedDay}
-                isBusiness={isBusiness}
-                payments={selectedDay ? getPaymentsForDay(selectedDay) : []}
-                onTogglePaid={togglePaid}
-                onSelectAction={(action) => {
-                    // Calculate the date for the selected day
-                    const selectedDate = new Date(year, month - 1, selectedDay || 1)
-                    const dateStr = format(selectedDate, 'yyyy-MM-dd')
+    // --- Added Imports & Hooks for Local Dialogs ---
+            import {getCategories} from '@/lib/actions/category'
+            import {getSuppliers} from '@/lib/actions/suppliers'
+            import {ExpenseForm} from '@/components/dashboard/forms/ExpenseForm'
+            import {IncomeForm} from '@/components/dashboard/forms/IncomeForm'
+            import {BillForm} from '@/components/dashboard/forms/BillForm'
+            import {DebtForm} from '@/components/dashboard/forms/DebtForm'
+            import {SavingForm} from '@/components/dashboard/forms/SavingForm'
 
-                    // Navigate to the appropriate tab with date parameter
-                    const tabMap = {
-                        'expense': 'expenses',
-                        'income': 'income',
-                        'saving': 'savings',
-                        'debt': 'debts',
-                        'bill': 'bills'
-                    }
-                    router.push(`?tab=${tabMap[action]}&date=${dateStr}`)
-                    setIsQuickAddOpen(false)
-                }}
-            />
+            // --- State for Local Dialogs ---
+            const [activeDialog, setActiveDialog] = useState<'expense' | 'income' | 'bill' | 'debt' | 'saving' | null>(null)
+            const [selectedDateForAdd, setSelectedDateForAdd] = useState<Date | null>(null)
 
-            <CalendarTutorial
-                isOpen={showTutorial}
-                onClose={() => setShowTutorial(false)}
-            />
-        </div>
-    )
+            // --- Data Fetching for Forms ---
+            // Expense Categories
+            const {data: expenseCategories = [], mutate: mutateExpenseCategories } = useSWR(
+            ['categories', 'expense', budgetType],
+        async () => (await getCategories('expense', budgetType)).data || [],
+            {revalidateOnFocus: false }
+            )
+
+            // Income Categories
+            const {data: incomeCategories = [], mutate: mutateIncomeCategories } = useSWR(
+            ['categories', 'income', budgetType],
+        async () => (await getCategories('income', budgetType)).data || [],
+            {revalidateOnFocus: false }
+            )
+
+            // Suppliers
+            const {data: suppliers = [] } = useSWR(
+            isBusiness ? ['suppliers'] : null,
+        async () => (await getSuppliers()).data || []
+            )
+
+            // Clients
+            const {data: clientsList = [] } = useSWR(
+            ['clients-list'],
+        async () => {
+            const {getClientsList} = await import('@/lib/actions/clients')
+            return await getClientsList()
+        }
+            )
+
+    // Handlers
+    const handleQuickAddAction = (action: 'expense' | 'income' | 'saving' | 'debt' | 'bill') => {
+        const date = selectedDay ? new Date(year, month - 1, selectedDay) : new Date()
+            setSelectedDateForAdd(date)
+            setActiveDialog(action)
+            setIsQuickAddOpen(false)
+    }
+
+    const handleDialogClose = () => {
+                setActiveDialog(null)
+        setSelectedDateForAdd(null)
+    }
+
+    const handleSuccess = (type: 'expense' | 'income' | 'bill' | 'debt' | 'saving') => {
+                handleDialogClose()
+        // Mutate relevant data
+        if (type === 'expense') mutateExpenses()
+            if (type === 'income') globalMutate(['incomes', month, year, budgetType]) // using globalMutate for consistency
+            if (type === 'bill') mutateBills()
+            if (type === 'debt') mutateDebts()
+            if (type === 'saving') globalMutate(['savings', month, year, budgetType])
+
+        // Also refresh calendar summary/work events if needed
+        // mutate(key => Array.isArray(key) && key[0] === 'overview') // Optional if we want to update overview
+    }
+
+            // Also need to get mutate from SWRConfig
+            const {mutate: globalMutate } = useSWRConfig()
+
+
+            // ... (rest of component)
+
+            // Replace QuickAddDialog onSelectAction
+            // ...
+
+            return (
+            <div className="space-y-6">
+                {/* ... existing JSX ... */}
+
+                {/* Quick Add Dialog for Financial Mode */}
+                <QuickAddDialog
+                    open={isQuickAddOpen}
+                    onOpenChange={setIsQuickAddOpen}
+                    selectedDay={selectedDay}
+                    isBusiness={isBusiness}
+                    payments={selectedDay ? getPaymentsForDay(selectedDay) : []}
+                    onTogglePaid={togglePaid}
+                    onSelectAction={handleQuickAddAction}
+                />
+
+                {/* --- Local Add Dialogs --- */}
+
+                {/* Expense Dialog */}
+                <Dialog open={activeDialog === 'expense'} onOpenChange={(open) => !open && handleDialogClose()}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                        <DialogHeader>
+                            <DialogTitle className="text-right">הוספת הוצאה</DialogTitle>
+                        </DialogHeader>
+                        {activeDialog === 'expense' && (
+                            <ExpenseForm
+                                categories={expenseCategories}
+                                suppliers={suppliers}
+                                clients={clientsList}
+                                onCategoriesChange={mutateExpenseCategories}
+                                isMobile={true} // Reusing mobile layout for dialog
+                                onSuccess={() => handleSuccess('expense')}
+                                initialData={{ date: selectedDateForAdd }}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* Income Dialog */}
+                <Dialog open={activeDialog === 'income'} onOpenChange={(open) => !open && handleDialogClose()}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                        <DialogHeader>
+                            <DialogTitle className="text-right">{isBusiness ? 'תיעוד מכירה' : 'הוספת הכנסה'}</DialogTitle>
+                        </DialogHeader>
+                        {activeDialog === 'income' && (
+                            <IncomeForm
+                                categories={incomeCategories}
+                                clients={clientsList}
+                                onCategoriesChange={mutateIncomeCategories}
+                                isMobile={true}
+                                onSuccess={() => handleSuccess('income')}
+                                initialData={{ date: selectedDateForAdd }}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* Bill Dialog */}
+                <Dialog open={activeDialog === 'bill'} onOpenChange={(open) => !open && handleDialogClose()}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                        <DialogHeader>
+                            <DialogTitle className="text-right">הוספת חשבון קבוע</DialogTitle>
+                        </DialogHeader>
+                        {activeDialog === 'bill' && (
+                            <BillForm
+                                onSuccess={() => handleSuccess('bill')}
+                                initialData={{ dueDay: selectedDateForAdd?.getDate() }}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* Debt/Loan Dialog */}
+                <Dialog open={activeDialog === 'debt'} onOpenChange={(open) => !open && handleDialogClose()}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                        <DialogHeader>
+                            <DialogTitle className="text-right">הוספת הלוואה</DialogTitle>
+                        </DialogHeader>
+                        {activeDialog === 'debt' && (
+                            <DebtForm
+                                onSuccess={() => handleSuccess('debt')}
+                                initialData={{ dueDay: selectedDateForAdd?.getDate() }}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+                {/* Saving Dialog */}
+                <Dialog open={activeDialog === 'saving'} onOpenChange={(open) => !open && handleDialogClose()}>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto w-[95%] max-w-lg rounded-xl" dir="rtl">
+                        <DialogHeader>
+                            <DialogTitle className="text-right">הוספת חיסכון</DialogTitle>
+                        </DialogHeader>
+                        {activeDialog === 'saving' && (
+                            <SavingForm
+                                onSuccess={() => handleSuccess('saving')}
+                                initialData={{ targetDate: selectedDateForAdd }}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+                <CalendarTutorial
+                    isOpen={showTutorial}
+                    onClose={() => setShowTutorial(false)}
+                />
+            </div>
+            )
 }
