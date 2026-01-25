@@ -6,7 +6,7 @@ import { syncBudgetToGoogleCalendar } from "@/lib/actions/calendar"
 import { useBudget } from "@/contexts/BudgetContext"
 
 export function CalendarSyncButton() {
-    const { month, year } = useBudget()
+    const { month, year, budgetType } = useBudget()
     const [loading, setLoading] = useState(false)
 
     const handleSync = async () => {
@@ -16,7 +16,7 @@ export function CalendarSyncButton() {
             // But let's assume if it fails with "connected expired", we show that.
 
             // Trigger Sync
-            const { budgetType } = useBudget()
+            // Trigger Sync
             const result = await syncBudgetToGoogleCalendar(month, year, budgetType)
 
             if (result.success) {
