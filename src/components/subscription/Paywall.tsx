@@ -235,7 +235,16 @@ export function Paywall({ initialPlan = 'PERSONAL', errorMessage }: { initialPla
                                 if (result.success) {
                                     toast.dismiss(toastId);
                                     toast.success('הופעל בהצלחה! מעביר...');
-                                    window.location.href = '/dashboard';
+                                    // Redirect based on plan type
+                                    const redirectPath = initialPlan === 'PERSONAL' ? '/personal' :
+                                        initialPlan === 'BUSINESS' ? '/business' :
+                                            '/dashboard';
+                                    window.location.href = redirectPath;
+                                } else if ((result as any).alreadyActive && (result as any).redirectPath) {
+                                    // User already has active subscription, redirect them
+                                    toast.dismiss(toastId);
+                                    toast.success('כבר יש לך מנוי פעיל! מעביר...');
+                                    window.location.href = (result as any).redirectPath;
                                 } else {
                                     toast.dismiss(toastId);
                                     toast.error(result.reason || 'שגיאה');

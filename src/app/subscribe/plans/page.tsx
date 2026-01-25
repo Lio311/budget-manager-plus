@@ -26,7 +26,7 @@ export default function PlansPage() {
         },
         {
             id: 'BUSINESS',
-            name: 'עסקי (SMB)',
+            name: 'עסקי',
             title: 'בחר בתוכנית העסקית',
             price: 129,
             description: 'ניהול פיננסי מלא לעסק',

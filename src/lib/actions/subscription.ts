@@ -181,6 +181,37 @@ export async function startTrial(userId: string, email: string, planType: string
 
         if (existingTracker) {
             console.log(`[startTrial] Trial already used for email: ${email} on plan: ${plan}`)
+
+            // Check if user has an active subscription for this plan
+            // @ts-ignore
+            const activeSubscription = await prisma.subscription.findUnique({
+                where: {
+                    userId_planType: {
+                        userId,
+                        planType: plan as any
+                    }
+                }
+            })
+
+            // If subscription exists and is active or trial (not expired)
+            if (activeSubscription &&
+                (activeSubscription.status === 'active' || activeSubscription.status === 'trial') &&
+                activeSubscription.endDate &&
+                activeSubscription.endDate > new Date()) {
+
+                console.log(`[startTrial] User has active subscription, redirecting`)
+                // Return with redirect flag instead of error
+                const redirectPath = plan === 'PERSONAL' ? '/personal' :
+                    plan === 'BUSINESS' ? '/business' :
+                        '/dashboard'
+                return {
+                    success: false,
+                    alreadyActive: true,
+                    redirectPath,
+                    reason: `יש לך כבר מנוי פעיל ל${plan === 'BUSINESS' ? 'תוכנית עסקית' : 'תוכנית פרטית'}`
+                }
+            }
+
             return { success: false, reason: `תקופת הניסיון לתוכנית ${plan === 'BUSINESS' ? 'עסקית' : 'פרטית'} כבר נוצלה` }
         }
     }
