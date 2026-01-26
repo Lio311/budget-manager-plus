@@ -201,9 +201,7 @@ export async function startTrial(userId: string, email: string, planType: string
 
                 console.log(`[startTrial] User has active subscription, redirecting`)
                 // Return with redirect flag instead of error
-                const redirectPath = plan === 'PERSONAL' ? '/personal' :
-                    plan === 'BUSINESS' ? '/business' :
-                        '/dashboard'
+                const redirectPath = '/dashboard'
                 return {
                     success: false,
                     alreadyActive: true,

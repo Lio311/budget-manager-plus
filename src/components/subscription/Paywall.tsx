@@ -236,9 +236,7 @@ export function Paywall({ initialPlan = 'PERSONAL', errorMessage }: { initialPla
                                     toast.dismiss(toastId);
                                     toast.success('הופעל בהצלחה! מעביר...');
                                     // Redirect based on plan type
-                                    const redirectPath = initialPlan === 'PERSONAL' ? '/personal' :
-                                        initialPlan === 'BUSINESS' ? '/business' :
-                                            '/dashboard';
+                                    const redirectPath = '/dashboard';
                                     window.location.href = redirectPath;
                                 } else if ((result as any).alreadyActive && (result as any).redirectPath) {
                                     // User already has active subscription, redirect them
