@@ -9,6 +9,7 @@ import SecurityBadge from '@/components/SecurityBadge'
 import { Button } from '@/components/ui/button'
 import { AuthModalTrigger } from '@/components/auth/AuthModalTrigger'
 import { ContactDialog } from '@/components/home/ContactDialog'
+import { ThreeDStack } from '@/components/personal/ThreeDStack'
 
 export default function LandingPage() {
     const [currentSection, setCurrentSection] = useState(0)
@@ -306,20 +307,27 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                         </div>
 
                         {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
-                        <div className="grid grid-cols-3 lg:grid-cols-3 gap-2 md:gap-6 overflow-y-auto max-h-[70vh] p-1 custom-scrollbar content-start">
-                            {section.features.map((feature: any, idx: number) => (
-                                <motion.div
-                                    key={idx}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={isActive ? { opacity: 1, y: 0 } : {}}
-                                    transition={{ delay: 0.4 + idx * 0.1 }}
-                                    className="bg-white/10 backdrop-blur-md p-2 md:p-6 rounded-xl md:rounded-2xl border border-white/10 hover:bg-white/20 transition-colors flex flex-col items-center text-center shadow-lg"
-                                >
-                                    <h4 className="text-xs md:text-lg font-bold text-white mb-1 md:mb-3 leading-tight">{feature.title}</h4>
-                                    <p className="text-white/60 text-[10px] md:text-sm leading-tight block">{feature.desc}</p>
-                                </motion.div>
-                            ))}
-                        </div>
+                        {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
+                        {section.type === 'personal' ? (
+                            <div className="w-full flex items-center justify-center h-full">
+                                <ThreeDStack />
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-3 lg:grid-cols-3 gap-2 md:gap-6 overflow-y-auto max-h-[70vh] p-1 custom-scrollbar content-start">
+                                {section.features.map((feature: any, idx: number) => (
+                                    <motion.div
+                                        key={idx}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={isActive ? { opacity: 1, y: 0 } : {}}
+                                        transition={{ delay: 0.4 + idx * 0.1 }}
+                                        className="bg-white/10 backdrop-blur-md p-2 md:p-6 rounded-xl md:rounded-2xl border border-white/10 hover:bg-white/20 transition-colors flex flex-col items-center text-center shadow-lg"
+                                    >
+                                        <h4 className="text-xs md:text-lg font-bold text-white mb-1 md:mb-3 leading-tight">{feature.title}</h4>
+                                        <p className="text-white/60 text-[10px] md:text-sm leading-tight block">{feature.desc}</p>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
