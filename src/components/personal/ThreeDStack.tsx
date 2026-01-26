@@ -14,14 +14,18 @@ export interface StackImage {
 
 interface ThreeDStackProps {
     images?: StackImage[]
+    isActive?: boolean
 }
 
-export function ThreeDStack({ images = [
-    { src: '/images/Personal/PERSONAL1.png', z: -60, scale: 0.85, opacity: 0.8, y: 30 },
-    { src: '/images/Personal/PERSONAL2.png', z: -20, scale: 0.9, opacity: 0.9, y: 15 },
-    { src: '/images/Personal/PERSONAL3.png', z: 20, scale: 0.95, opacity: 1, y: 0 },
-    { src: '/images/Personal/PERSONAL4.png', z: 60, scale: 1, opacity: 1, y: -15 },
-] }: ThreeDStackProps) {
+export function ThreeDStack({
+    images = [
+        { src: '/images/Personal/PERSONAL1.png', z: -60, scale: 0.85, opacity: 0.8, y: 30 },
+        { src: '/images/Personal/PERSONAL2.png', z: -20, scale: 0.9, opacity: 0.9, y: 15 },
+        { src: '/images/Personal/PERSONAL3.png', z: 20, scale: 0.95, opacity: 1, y: 0 },
+        { src: '/images/Personal/PERSONAL4.png', z: 60, scale: 1, opacity: 1, y: -15 },
+    ],
+    isActive = false
+}: ThreeDStackProps) {
     const [hovered, setHovered] = useState(false)
 
     // Mouse position for tilt effect
@@ -34,6 +38,8 @@ export function ThreeDStack({ images = [
     const [permissionGranted, setPermissionGranted] = useState(false)
 
     useEffect(() => {
+        if (!isActive) return
+
         let isRequested = false
 
         const requestPermission = async () => {
@@ -74,7 +80,7 @@ export function ThreeDStack({ images = [
             window.removeEventListener('touchstart', handleInteraction, { capture: true })
             window.removeEventListener('pointerdown', handleInteraction, { capture: true })
         }
-    }, [])
+    }, [isActive])
 
     useEffect(() => {
         if (!permissionGranted) return

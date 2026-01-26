@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Loader2 } from 'lucide-react'
+import { Plus, Loader2, Maximize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -16,6 +16,7 @@ import useSWR from 'swr'
 import { formatCurrency } from '@/lib/utils'
 import { ClientSelector } from './ClientSelector'
 import { RichTextEditor } from '@/components/ui/RichTextEditor'
+import { MobileDescriptionEditor } from './MobileDescriptionEditor'
 
 
 interface LineItem {
@@ -87,6 +88,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
     const { year, month } = useBudget()
 
     const [selectedIncomeId, setSelectedIncomeId] = useState<string>('none')
+    const [editingItemId, setEditingItemId] = useState<string | null>(null)
     const [lineItems, setLineItems] = useState<LineItem[]>(
         initialData?.lineItems?.map((item: any) => ({
             id: item.id || crypto.randomUUID(),
@@ -420,18 +422,28 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                         <tbody className="divide-y dark:divide-slate-700">
                             {lineItems.map((item, index) => (
                                 <tr key={item.id} className="group hover:bg-gray-50 dark:hover:bg-slate-800/50">
-                                    <td className="p-2">
-                                        <input
-                                            type="text"
-                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center"
-                                            value={item.description}
-                                            onChange={(e) => {
-                                                const newItems = [...lineItems]
-                                                newItems[index].description = e.target.value
-                                                setLineItems(newItems)
-                                            }}
-                                            placeholder="תיאור הפריט"
-                                        />
+                                    <td className="p-2 relative">
+                                        <div className="flex items-center gap-1">
+                                            <input
+                                                type="text"
+                                                className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center"
+                                                value={item.description}
+                                                onChange={(e) => {
+                                                    const newItems = [...lineItems]
+                                                    newItems[index].description = e.target.value
+                                                    setLineItems(newItems)
+                                                }}
+                                                placeholder="תיאור הפריט"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setEditingItemId(item.id)}
+                                                className="p-1 text-gray-400 hover:text-blue-600 transition-colors md:hidden"
+                                                title="ערוך תיאור בהרחבה"
+                                            >
+                                                <Maximize2 className="h-4 w-4" />
+                                            </button>
+                                        </div>
                                     </td>
                                     <td className="p-2">
                                         <input
@@ -588,6 +600,19 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                     צור חשבונית
                 </Button>
             </div>
+
+            <MobileDescriptionEditor
+                isOpen={!!editingItemId}
+                onClose={() => setEditingItemId(null)}
+                initialValue={lineItems.find(i => i.id === editingItemId)?.description || ''}
+                onSave={(val) => {
+                    if (editingItemId) {
+                        setLineItems(prev => prev.map(item =>
+                            item.id === editingItemId ? { ...item, description: val } : item
+                        ))
+                    }
+                }}
+            />
         </form>
     )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Loader2, Trash2 } from 'lucide-react'
+import { Plus, Loader2, Trash2, Maximize2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -11,6 +11,7 @@ import { useBudget } from '@/contexts/BudgetContext'
 import { toast } from 'sonner'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { RichTextEditor } from '@/components/ui/RichTextEditor'
+import { MobileDescriptionEditor } from './MobileDescriptionEditor'
 
 interface QuoteFormProps {
     clients: any[]
@@ -22,6 +23,7 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
     const { budgetType } = useBudget()
     const [loadingNumber, setLoadingNumber] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
+    const [editingItemId, setEditingItemId] = useState<string | null>(null)
 
     const [formData, setFormData] = useState<QuoteFormData>({
         clientId: initialData?.clientId || '',
@@ -207,14 +209,24 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                             <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                                 {formData.items?.map((item: any) => (
                                     <tr key={item.id}>
-                                        <td className="p-2">
-                                            <input
-                                                type="text"
-                                                value={item.description}
-                                                onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                                                className="w-full bg-transparent border-none focus:ring-0 p-1 text-center"
-                                                placeholder="תיאור הפריט"
-                                            />
+                                        <td className="p-2 relative">
+                                            <div className="flex items-center gap-1">
+                                                <input
+                                                    type="text"
+                                                    value={item.description}
+                                                    onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                                                    className="w-full bg-transparent border-none focus:ring-0 p-1 text-center"
+                                                    placeholder="תיאור הפריט"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setEditingItemId(item.id)}
+                                                    className="p-1 text-gray-400 hover:text-blue-600 transition-colors md:hidden"
+                                                    title="ערוך תיאור בהרחבה"
+                                                >
+                                                    <Maximize2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                         <td className="p-2">
                                             <FormattedNumberInput
@@ -323,6 +335,17 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                     {isEditing ? 'עדכן הצעת מחיר' : 'צור הצעת מחיר'}
                 </Button>
             </div>
+
+            <MobileDescriptionEditor
+                isOpen={!!editingItemId}
+                onClose={() => setEditingItemId(null)}
+                initialValue={formData.items?.find((i: any) => i.id === editingItemId)?.description || ''}
+                onSave={(val) => {
+                    if (editingItemId) {
+                        updateItem(editingItemId, 'description', val)
+                    }
+                }}
+            />
         </form >
     )
 }

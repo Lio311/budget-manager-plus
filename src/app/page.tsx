@@ -310,18 +310,20 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                         {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
                         {section.type === 'personal' && (
                             <div className="w-full flex items-start md:items-center justify-center h-full pt-4 md:pt-0">
-                                <ThreeDStack />
+                                <ThreeDStack isActive={isActive} />
                             </div>
                         )}
                         {section.type === 'business' && (
                             <div className="w-full flex items-start md:items-center justify-center h-full pt-4 md:pt-0">
-                                <ThreeDStack images={[
-                                    { src: '/images/BUSSINES/BUS1.png', z: -80, scale: 0.85, opacity: 0.8, y: 40 },
-                                    { src: '/images/BUSSINES/BUS2.png', z: -40, scale: 0.9, opacity: 0.9, y: 20 },
-                                    { src: '/images/BUSSINES/BUS3.png', z: 0, scale: 0.95, opacity: 1, y: 0 },
-                                    { src: '/images/BUSSINES/BUS4.png', z: 40, scale: 1, opacity: 1, y: -20 },
-                                    { src: '/images/BUSSINES/BUS5.png', z: 80, scale: 1.05, opacity: 1, y: -40 },
-                                ]} />
+                                <ThreeDStack
+                                    isActive={isActive}
+                                    images={[
+                                        { src: '/images/BUSSINES/BUS1.png', z: -80, scale: 0.85, opacity: 0.8, y: 40 },
+                                        { src: '/images/BUSSINES/BUS2.png', z: -40, scale: 0.9, opacity: 0.9, y: 20 },
+                                        { src: '/images/BUSSINES/BUS3.png', z: 0, scale: 0.95, opacity: 1, y: 0 },
+                                        { src: '/images/BUSSINES/BUS4.png', z: 40, scale: 1, opacity: 1, y: -20 },
+                                        { src: '/images/BUSSINES/BUS5.png', z: 80, scale: 1.05, opacity: 1, y: -40 },
+                                    ]} />
                             </div>
                         )}
                     </div>
