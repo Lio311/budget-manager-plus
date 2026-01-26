@@ -15,13 +15,30 @@ export function ThreeDStack() {
     const mouseY = useSpring(y, { stiffness: 150, damping: 15 })
 
     const [permissionGranted, setPermissionGranted] = useState(false)
-    const [showPermissionBtn, setShowPermissionBtn] = useState(false)
 
     useEffect(() => {
         // Check if permission is needed (iOS 13+)
         if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-            setShowPermissionBtn(true)
+            // iOS 13+ requires user interaction. We attach it to the first touch/click.
+            const handleInteraction = () => {
+                (DeviceOrientationEvent as any).requestPermission()
+                    .then((permissionState: string) => {
+                        if (permissionState === 'granted') {
+                            setPermissionGranted(true)
+                        }
+                    })
+                    .catch(console.error);
+            }
+
+            window.addEventListener('click', handleInteraction, { once: true })
+            window.addEventListener('touchstart', handleInteraction, { once: true })
+
+            return () => {
+                window.removeEventListener('click', handleInteraction)
+                window.removeEventListener('touchstart', handleInteraction)
+            }
         } else {
+            // Non-iOS devices usually don't need permission or it's allowed by default
             setPermissionGranted(true)
         }
     }, [])
@@ -46,21 +63,6 @@ export function ThreeDStack() {
         window.addEventListener('deviceorientation', handleOrientation)
         return () => window.removeEventListener('deviceorientation', handleOrientation)
     }, [x, y, permissionGranted])
-
-    const requestAccess = () => {
-        if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-            (DeviceOrientationEvent as any).requestPermission()
-                .then((permissionState: string) => {
-                    if (permissionState === 'granted') {
-                        setPermissionGranted(true)
-                        setShowPermissionBtn(false)
-                    }
-                })
-                .catch(console.error);
-        } else {
-            setPermissionGranted(true)
-        }
-    }
 
     const handleMouseMove = (e: React.MouseEvent) => {
         const { clientX, clientY } = e
@@ -92,16 +94,6 @@ export function ThreeDStack() {
                 y.set(0)
             }}
         >
-            {/* iOS Permission Button */}
-            {showPermissionBtn && !permissionGranted && (
-                <button
-                    onClick={requestAccess}
-                    className="absolute top-4 right-4 z-50 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-white text-xs font-medium border border-white/20 hover:bg-white/30 transition-colors"
-                >
-                    Enable Motion
-                </button>
-            )}
-
             <motion.div
                 style={{
                     rotateX,
