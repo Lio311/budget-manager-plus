@@ -50,12 +50,12 @@ export function ThreeDStack() {
                     rotateY,
                     transformStyle: 'preserve-3d',
                 }}
-                className="relative w-[90%] max-w-[600px] aspect-video"
+                className="relative w-[90%] max-w-[900px] aspect-video"
             >
                 {images.map((img, index) => (
                     <motion.div
                         key={index}
-                        className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl border border-white/20"
+                        className="absolute inset-0"
                         style={{
                             transformStyle: 'preserve-3d',
                             zIndex: index,
