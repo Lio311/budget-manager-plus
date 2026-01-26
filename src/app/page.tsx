@@ -309,12 +309,12 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                         {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
                         {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
                         {section.type === 'personal' && (
-                            <div className="w-full flex items-center justify-center h-full">
+                            <div className="w-full flex items-start md:items-center justify-center h-full pt-4 md:pt-0">
                                 <ThreeDStack />
                             </div>
                         )}
                         {section.type === 'business' && (
-                            <div className="w-full flex items-center justify-center h-full">
+                            <div className="w-full flex items-start md:items-center justify-center h-full pt-4 md:pt-0">
                                 <ThreeDStack images={[
                                     { src: '/images/BUSSINES/BUS1.png', z: -80, scale: 0.85, opacity: 0.8, y: 40 },
                                     { src: '/images/BUSSINES/BUS2.png', z: -40, scale: 0.9, opacity: 0.9, y: 20 },
