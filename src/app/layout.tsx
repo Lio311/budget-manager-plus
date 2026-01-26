@@ -98,14 +98,7 @@ export const metadata: Metadata = {
             'max-snippet': -1,
         },
     },
-    icons: {
-        icon: [
-            { url: '/icon.png', type: 'image/png', sizes: 'any' },
-            { url: '/images/branding/K-LOGO.png', sizes: '192x192', type: 'image/png' },
-            { url: '/images/branding/K-LOGO.png', sizes: '512x512', type: 'image/png' }
-        ],
-        apple: '/images/branding/apple-touch-icon.png',
-    },
+
     appleWebApp: {
         capable: true,
         statusBarStyle: 'default',
