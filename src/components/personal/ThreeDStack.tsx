@@ -14,7 +14,21 @@ export function ThreeDStack() {
     const mouseX = useSpring(x, { stiffness: 150, damping: 15 })
     const mouseY = useSpring(y, { stiffness: 150, damping: 15 })
 
+    const [permissionGranted, setPermissionGranted] = useState(false)
+    const [showPermissionBtn, setShowPermissionBtn] = useState(false)
+
     useEffect(() => {
+        // Check if permission is needed (iOS 13+)
+        if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+            setShowPermissionBtn(true)
+        } else {
+            setPermissionGranted(true)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (!permissionGranted) return
+
         const handleOrientation = (e: DeviceOrientationEvent) => {
             if (!e.gamma || !e.beta) return
 
@@ -31,7 +45,22 @@ export function ThreeDStack() {
 
         window.addEventListener('deviceorientation', handleOrientation)
         return () => window.removeEventListener('deviceorientation', handleOrientation)
-    }, [x, y])
+    }, [x, y, permissionGranted])
+
+    const requestAccess = () => {
+        if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+            (DeviceOrientationEvent as any).requestPermission()
+                .then((permissionState: string) => {
+                    if (permissionState === 'granted') {
+                        setPermissionGranted(true)
+                        setShowPermissionBtn(false)
+                    }
+                })
+                .catch(console.error);
+        } else {
+            setPermissionGranted(true)
+        }
+    }
 
     const handleMouseMove = (e: React.MouseEvent) => {
         const { clientX, clientY } = e
@@ -63,13 +92,23 @@ export function ThreeDStack() {
                 y.set(0)
             }}
         >
+            {/* iOS Permission Button */}
+            {showPermissionBtn && !permissionGranted && (
+                <button
+                    onClick={requestAccess}
+                    className="absolute top-4 right-4 z-50 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-white text-xs font-medium border border-white/20 hover:bg-white/30 transition-colors"
+                >
+                    Enable Motion
+                </button>
+            )}
+
             <motion.div
                 style={{
                     rotateX,
                     rotateY,
                     transformStyle: 'preserve-3d',
                 }}
-                className="relative w-[90%] max-w-[1400px] aspect-video"
+                className="relative w-full max-w-[1400px] aspect-video"
             >
                 {images.map((img, index) => (
                     <motion.div
