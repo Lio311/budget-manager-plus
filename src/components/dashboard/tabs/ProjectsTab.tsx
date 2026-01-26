@@ -144,6 +144,16 @@ export function ProjectsTab() {
     }
 
     const handleProjectClick = async (project: Project) => {
+        if (isDemo) {
+            setViewProject({
+                ...project,
+                transactions: [], // Demo transactions can be added here if needed
+                income: [],
+                expenses: []
+            })
+            setIsDetailsOpen(true)
+            return
+        }
         setIsLoadingDetails(true)
         try {
             const result = await getProjectDetails(project.id)
