@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 
@@ -13,6 +13,25 @@ export function ThreeDStack() {
 
     const mouseX = useSpring(x, { stiffness: 150, damping: 15 })
     const mouseY = useSpring(y, { stiffness: 150, damping: 15 })
+
+    useEffect(() => {
+        const handleOrientation = (e: DeviceOrientationEvent) => {
+            if (!e.gamma || !e.beta) return
+
+            // Gamma: Left/Right tilt (-90 to 90) -> mapped to -1 to 1
+            const xPos = Math.max(-1, Math.min(1, e.gamma / 45))
+
+            // Beta: Front/Back tilt (-180 to 180) -> mapped to -1 to 1
+            // We center it around 45 degrees for holding position
+            const yPos = Math.max(-1, Math.min(1, (e.beta - 45) / 45))
+
+            x.set(xPos)
+            y.set(yPos)
+        }
+
+        window.addEventListener('deviceorientation', handleOrientation)
+        return () => window.removeEventListener('deviceorientation', handleOrientation)
+    }, [x, y])
 
     const handleMouseMove = (e: React.MouseEvent) => {
         const { clientX, clientY } = e
@@ -50,7 +69,7 @@ export function ThreeDStack() {
                     rotateY,
                     transformStyle: 'preserve-3d',
                 }}
-                className="relative w-[90%] max-w-[1100px] aspect-video"
+                className="relative w-[90%] max-w-[1400px] aspect-video"
             >
                 {images.map((img, index) => (
                     <motion.div
