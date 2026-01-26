@@ -278,7 +278,7 @@ export function BudgetLimitsTab() {
                             {availableCategories.length === 0 ? (
                                 <div className="p-2 text-sm text-gray-500 text-center">אין קטגוריות נוספות</div>
                             ) : (
-                                availableCategories.map(cat => (
+                                availableCategories.map((cat: any) => (
                                     <SelectItem key={cat.categoryId} value={cat.categoryId}>
                                         {cat.categoryName}
                                     </SelectItem>
