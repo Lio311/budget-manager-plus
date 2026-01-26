@@ -385,6 +385,12 @@ export default function ProfitLossTab() {
                         <DialogTitle className="text-xl md:text-2xl font-bold text-center">
                             דוח רווח והפסד - {selectedPeriod?.label.includes(selectedYear.toString()) ? selectedPeriod?.label : `${selectedPeriod?.label} ${selectedYear}`}
                         </DialogTitle>
+                        <div id="dialog-desc" className="sr-only">
+                            פירוט הכנסות והוצאות לתקופה שנבחרה
+                        </div>
+                        <DialogDescription className="text-center text-gray-500 hidden md:block">
+                            סיכום נתונים פיננסיים, הכנסות והוצאות לתקופה זו.
+                        </DialogDescription>
 
                         {/* Centered Action Buttons */}
                         <div className="grid grid-cols-2 md:flex md:flex-row justify-center gap-3 md:gap-4 w-full">
@@ -463,21 +469,21 @@ export default function ProfitLossTab() {
                                     </div>
                                     <TabsList className="w-full md:w-auto justify-end border-b-0 rounded-none h-auto p-0 bg-transparent gap-4 sm:gap-6 overflow-x-auto hide-scrollbar">
                                         <TabsTrigger value="incomes" className="data-[state=active]:border-emerald-500 data-[state=active]:text-emerald-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
-                                            הכנסות ({reportData.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME').length})
+                                            הכנסות ({(reportData.transactions || []).filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME').length})
                                         </TabsTrigger>
                                         <TabsTrigger value="expenses" className="data-[state=active]:border-red-500 data-[state=active]:text-red-600 border-b-2 border-transparent rounded-none pb-4 text-base sm:text-lg whitespace-nowrap">
-                                            הוצאות ({reportData.transactions.filter(t => t.type === 'EXPENSE').length})
+                                            הוצאות ({(reportData.transactions || []).filter(t => t.type === 'EXPENSE').length})
                                         </TabsTrigger>
                                     </TabsList>
                                 </div>
 
                                 <TransactionsTable
-                                    data={reportData.transactions.filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME')}
+                                    data={(reportData.transactions || []).filter(t => t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME')}
                                     type="income"
                                     searchTerm={searchTerm}
                                 />
                                 <TransactionsTable
-                                    data={reportData.transactions.filter(t => t.type === 'EXPENSE')}
+                                    data={(reportData.transactions || []).filter(t => t.type === 'EXPENSE')}
                                     type="expense"
                                     searchTerm={searchTerm}
                                 />
