@@ -17,41 +17,46 @@ export function ThreeDStack() {
     const [permissionGranted, setPermissionGranted] = useState(false)
 
     useEffect(() => {
-        const invokePermission = async () => {
+        let isRequested = false
+
+        const requestPermission = async () => {
+            if (isRequested) return
+            isRequested = true
+
             try {
                 if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-                    // Attempt automatic permission (will likely fail on iOS 13+ without gesture)
                     const permissionState = await (DeviceOrientationEvent as any).requestPermission()
                     if (permissionState === 'granted') {
                         setPermissionGranted(true)
                     }
                 } else {
-                    // Non-iOS or older devices
                     setPermissionGranted(true)
                 }
-            } catch (error) {
-                // If auto-request fails (expected on iOS 13+), attach listener to first user interaction
-                const handleInteraction = async () => {
-                    try {
-                        const permissionState = await (DeviceOrientationEvent as any).requestPermission()
-                        if (permissionState === 'granted') {
-                            setPermissionGranted(true)
-                        }
-                    } catch (e) {
-                        console.error('Permission failed:', e)
-                    } finally {
-                        window.removeEventListener('click', handleInteraction, true)
-                        window.removeEventListener('pointerdown', handleInteraction, true)
-                    }
-                }
-
-                // Use capture phase to ensure we catch it first
-                window.addEventListener('click', handleInteraction, { once: true, capture: true })
-                window.addEventListener('pointerdown', handleInteraction, { once: true, capture: true })
+            } catch (e) {
+                console.error('Permission failed (expected if auto):', e)
+                isRequested = false // Allow retry on next interaction
             }
         }
 
-        invokePermission()
+        const handleInteraction = () => {
+            requestPermission()
+            // We only need to try once per interaction type, but multiple types might fire.
+            // The isRequested flag handles debounce, but we should clean up listeners if success.
+        }
+
+        // Attach listeners IMMEDIATELY to catch the very first interaction
+        window.addEventListener('click', handleInteraction, { once: true, capture: true })
+        window.addEventListener('touchstart', handleInteraction, { once: true, capture: true })
+        window.addEventListener('pointerdown', handleInteraction, { once: true, capture: true })
+
+        // Also try automatic (for testing or if policy changes)
+        requestPermission()
+
+        return () => {
+            window.removeEventListener('click', handleInteraction, { capture: true })
+            window.removeEventListener('touchstart', handleInteraction, { capture: true })
+            window.removeEventListener('pointerdown', handleInteraction, { capture: true })
+        }
     }, [])
 
     useEffect(() => {
