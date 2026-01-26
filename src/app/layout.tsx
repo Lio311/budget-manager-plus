@@ -59,6 +59,10 @@ export const metadata: Metadata = {
     applicationName: 'Kesefly',
     metadataBase: new URL('https://www.kesefly.co.il'),
     manifest: '/manifest.json',
+    icons: {
+        icon: '/icon.png',
+        apple: '/images/branding/mobile-app-icon.png',
+    },
     alternates: {
         canonical: '/',
         languages: {
