@@ -21,6 +21,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useConfirm } from '@/hooks/useConfirm'
 import { BudgetLimitsTutorial } from '@/components/dashboard/tutorial/BudgetLimitsTutorial'
+import { useDemo } from '@/contexts/DemoContext'
 
 const getCategoryIcon = (name: string) => {
     switch (name) {
@@ -96,10 +97,11 @@ export function BudgetLimitsTab() {
     const { toast } = useToast()
     const { mutate } = useSWRConfig()
     const confirm = useConfirm()
+    const { isDemo, data: demoData, interceptAction } = useDemo()
 
     // Load Data with SWR
     const { data: budgetsData, isLoading: loading, mutate: mutateThis } = useSWR(
-        ['categoryBudgets', month, year],
+        isDemo ? null : ['categoryBudgets', month, year],
         async () => {
             const res = await getCategoryBudgets(month, year)
             if (res.success && res.data) {
@@ -112,8 +114,17 @@ export function BudgetLimitsTab() {
         }
     )
 
-    const budgets = budgetsData?.budgets || []
-    const avgIncome = budgetsData?.avgIncome || 0
+    // Mock Budgets for Demo
+    const demoBudgets = isDemo ? (demoData as any).expenses.map((e: any, idx: number) => ({
+        categoryId: `cat-${idx}`,
+        categoryName: e.category,
+        limit: e.amount * 1.2,
+        spent: e.amount,
+        period: `${month}-${year}`
+    })) : []
+
+    const budgets = isDemo ? demoBudgets : (budgetsData?.budgets || [])
+    const avgIncome = isDemo ? (demoData as any).overview.totalIncome : (budgetsData?.avgIncome || 0)
 
     const [saving, setSaving] = useState<string | null>(null) // categoryId currently saving
     const [activeDefaults, setActiveDefaults] = useState(false)
@@ -133,6 +144,7 @@ export function BudgetLimitsTab() {
     }
 
     async function handleLimitCommit(categoryId: string, newValue: number[]) {
+        if (isDemo) { interceptAction(); return; }
         const value = newValue[0]
         setSaving(categoryId)
         const res = await updateCategoryLimit(month, year, categoryId, value)
@@ -148,6 +160,7 @@ export function BudgetLimitsTab() {
     }
 
     async function handleSmartRecommendations() {
+        if (isDemo) { interceptAction(); return; }
         setActiveDefaults(true)
         const res = await getSmartRecommendations(month, year)
         if (res.success && res.data) {

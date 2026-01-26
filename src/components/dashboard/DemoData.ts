@@ -255,5 +255,27 @@ export const DEMO_DATA = {
             { id: 'demo-3', date: new Date(Date.now() - 172800000).toISOString(), amount: 450, amountNet: 384, vat: 66, description: 'חשבון חשמל', category: 'חשבונות', type: 'EXPENSE', entityName: 'חברת החשמל' },
             { id: 'demo-5', date: new Date(Date.now() - 432000000).toISOString(), amount: 2800, amountNet: 2800, vat: 0, description: 'ביטוח רכב', category: 'ביטוח', type: 'EXPENSE', entityName: 'ביטוח ישיר' }
         ]
-    }
+    },
+    projects: [
+        {
+            id: 'proj-1',
+            name: 'שיפוץ המטבח',
+            color: '#f87171',
+            stats: {
+                totalIncome: 0,
+                totalExpenses: 25000,
+                balance: -25000
+            }
+        },
+        {
+            id: 'proj-2',
+            name: 'חופשה משפחתית',
+            color: '#60a5fa',
+            stats: {
+                totalIncome: 12000,
+                totalExpenses: 8000,
+                balance: 4000
+            }
+        }
+    ]
 }

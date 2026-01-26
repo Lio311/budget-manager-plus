@@ -42,8 +42,9 @@ interface Project {
 }
 
 export function ProjectsTab() {
-    const { data: response, error, isLoading, mutate } = useSWR(['projects-stats'], () => getProjectsWithStats('PERSONAL'))
-    const projects = response?.data || []
+    const { isDemo, data: demoData, interceptAction } = useDemo()
+    const { data: response, error, isLoading, mutate } = useSWR(isDemo ? null : ['projects-stats'], () => getProjectsWithStats('PERSONAL'))
+    const projects = isDemo ? (demoData as any).projects : (response?.data || [])
     const { toast } = useToast()
     const confirm = useConfirm()
 
@@ -63,6 +64,7 @@ export function ProjectsTab() {
     const [showTutorial, setShowTutorial] = useState(false)
 
     const handleAdd = async () => {
+        if (isDemo) { interceptAction(); return; }
         if (!name.trim()) return
 
         setSubmitting(true)
@@ -84,6 +86,7 @@ export function ProjectsTab() {
     }
 
     const handleEdit = async () => {
+        if (isDemo) { interceptAction(); return; }
         if (!editingProject || !name.trim()) return
 
         setSubmitting(true)
@@ -105,6 +108,7 @@ export function ProjectsTab() {
     }
 
     const handleDelete = async (project: Project) => {
+        if (isDemo) { interceptAction(); return; }
         const confirmed = await confirm(
             `האם אתה בטוח שברצונך למחוק את הפרויקט "${project.name}"? הפעולה אינה הפיכה.`,
             'מחק פרויקט'

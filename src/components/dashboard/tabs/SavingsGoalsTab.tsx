@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast'
 import { mutate } from 'swr'
 import { SavingsGoalsTutorial } from '@/components/dashboard/tutorial/SavingsGoalsTutorial'
 import { Info } from 'lucide-react'
+import { useDemo } from '@/contexts/DemoContext'
 
 export function SavingsGoalsTab() {
     const { month, year, budgetType } = useBudget()
@@ -22,10 +23,11 @@ export function SavingsGoalsTab() {
     const [editValue, setEditValue] = useState('')
     const [hasShownWarning, setHasShownWarning] = useState(false)
     const [showTutorial, setShowTutorial] = useState(false)
+    const { isDemo, data: demoData, interceptAction } = useDemo()
 
     // Fetch savings goals data
     const { data: goalsData, isLoading } = useSWR<SavingsGoalsData>(
-        ['savingsGoals', month, year, budgetType],
+        isDemo ? null : ['savingsGoals', month, year, budgetType],
         async () => {
             const result = await getSavingsGoals(month, year, budgetType)
             if (result.success && result.data) return result.data
@@ -34,13 +36,29 @@ export function SavingsGoalsTab() {
         { revalidateOnFocus: false }
     )
 
-    const goals = goalsData?.goals || []
-    const stats = goalsData?.stats || {
+    // Mock Goals for Demo
+    const demoGoals = isDemo ? (demoData as any).savings.map((s: any) => ({
+        category: s.name,
+        targetAmount: s.totalAmount,
+        currentAmount: s.currentAmount,
+        remainingAmount: s.totalAmount - s.currentAmount,
+        progress: (s.currentAmount / s.totalAmount) * 100,
+        monthlyTotal: s.monthlyDeposit,
+        savingsCount: 1
+    })) : []
+
+    const goals = isDemo ? demoGoals : (goalsData?.goals || [])
+    const stats = isDemo ? {
+        totalCategories: demoGoals.length,
+        totalSavedILS: demoGoals.reduce((acc: number, g: any) => acc + g.currentAmount, 0),
+        totalTargetILS: demoGoals.reduce((acc: number, g: any) => acc + g.targetAmount, 0),
+        overallProgress: (demoGoals.reduce((acc: number, g: any) => acc + g.currentAmount, 0) / Math.max(1, demoGoals.reduce((acc: number, g: any) => acc + g.targetAmount, 0))) * 100
+    } : (goalsData?.stats || {
         totalCategories: 0,
         totalSavedILS: 0,
         totalTargetILS: 0,
         overallProgress: 0
-    }
+    })
 
     // Show warning toast if any category has no target
     useEffect(() => {
@@ -64,6 +82,7 @@ export function SavingsGoalsTab() {
     }
 
     const handleSaveTarget = async (category: string) => {
+        if (isDemo) { interceptAction(); return; }
         const targetAmount = parseFloat(editValue)
         if (isNaN(targetAmount) || targetAmount < 0) {
             toast({ title: 'שגיאה', description: 'נא להזין סכום תקין', variant: 'destructive' })

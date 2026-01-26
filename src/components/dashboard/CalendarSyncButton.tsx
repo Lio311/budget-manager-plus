@@ -3,13 +3,19 @@ import { Calendar, RefreshCw } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { syncBudgetToGoogleCalendar } from "@/lib/actions/calendar"
+import { useDemo } from "@/contexts/DemoContext"
 import { useBudget } from "@/contexts/BudgetContext"
 
 export function CalendarSyncButton() {
     const { month, year, budgetType } = useBudget()
+    const { isDemo, interceptAction } = useDemo()
     const [loading, setLoading] = useState(false)
 
     const handleSync = async () => {
+        if (isDemo) {
+            interceptAction()
+            return
+        }
         try {
             setLoading(true)
             // 1. Check if connected (we can just try sync, handling 401 redirect is harder here)
