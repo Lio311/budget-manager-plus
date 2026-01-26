@@ -114,7 +114,7 @@ export function ThreeDStack({ images = [
 
     return (
         <motion.div
-            className="relative w-full h-[500px] flex items-center justify-center perspective-[1200px]"
+            className="relative w-full h-[280px] md:h-[500px] flex items-center justify-center perspective-[1200px]"
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => {
@@ -141,12 +141,12 @@ export function ThreeDStack({ images = [
                         }}
                         initial={{
                             translateZ: img.z * 0.5,
-                            scale: 0.8,
+                            scale: 0.95, // Increased base scale for mobile visibility
                             y: 0
                         }}
                         animate={{
                             translateZ: hovered ? img.z * 1.5 : img.z,
-                            scale: hovered ? img.scale : 0.85 + (index * 0.05),
+                            scale: hovered ? img.scale : 1.0 + (index * 0.05), // Increased scale stack
                             y: hovered ? img.y : index * -10, // Stack effect when not hovered
                             opacity: 1
                         }}
