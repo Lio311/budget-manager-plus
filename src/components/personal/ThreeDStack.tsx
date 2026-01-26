@@ -4,7 +4,24 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 
-export function ThreeDStack() {
+export interface StackImage {
+    src: string
+    z: number
+    scale: number
+    opacity: number
+    y: number
+}
+
+interface ThreeDStackProps {
+    images?: StackImage[]
+}
+
+export function ThreeDStack({ images = [
+    { src: '/images/Personal/PERSONAL1.png', z: -60, scale: 0.85, opacity: 0.8, y: 30 },
+    { src: '/images/Personal/PERSONAL2.png', z: -20, scale: 0.9, opacity: 0.9, y: 15 },
+    { src: '/images/Personal/PERSONAL3.png', z: 20, scale: 0.95, opacity: 1, y: 0 },
+    { src: '/images/Personal/PERSONAL4.png', z: 60, scale: 1, opacity: 1, y: -15 },
+] }: ThreeDStackProps) {
     const [hovered, setHovered] = useState(false)
 
     // Mouse position for tilt effect
@@ -93,12 +110,7 @@ export function ThreeDStack() {
     const rotateX = useTransform(mouseY, [-1, 1], [10, -10])
     const rotateY = useTransform(mouseX, [-1, 1], [-10, 10])
 
-    const images = [
-        { src: '/images/Personal/PERSONAL1.png', z: -60, scale: 0.85, opacity: 0.8, y: 30 },
-        { src: '/images/Personal/PERSONAL2.png', z: -20, scale: 0.9, opacity: 0.9, y: 15 },
-        { src: '/images/Personal/PERSONAL3.png', z: 20, scale: 0.95, opacity: 1, y: 0 },
-        { src: '/images/Personal/PERSONAL4.png', z: 60, scale: 1, opacity: 1, y: -15 },
-    ]
+
 
     return (
         <motion.div

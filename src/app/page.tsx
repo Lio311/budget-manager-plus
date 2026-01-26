@@ -296,7 +296,7 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
                 )}
 
                 {(section.type === 'personal' || section.type === 'business') && (
-                    <div className={`grid md:grid-cols-2 ${section.type === 'personal' ? 'md:grid-cols-[35%_65%]' : ''} gap-2 md:gap-12 items-center content-center w-full h-full pt-20 pb-10 md:pb-20`}>
+                    <div className={`grid md:grid-cols-2 ${(section.type === 'personal' || section.type === 'business') ? 'md:grid-cols-[35%_65%]' : ''} gap-2 md:gap-12 items-center content-center w-full h-full pt-20 pb-10 md:pb-20`}>
                         <div className="text-center md:text-right flex flex-col justify-end md:justify-center items-center md:items-start">
                             <motion.h2 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }} className="text-4xl md:text-6xl font-black text-white mb-1 md:mb-4">{section.title}</motion.h2>
                             <motion.h3 initial={{ opacity: 0, y: 30 }} animate={isActive ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 }} className="text-2xl text-white/80 mb-2 md:mb-6">{section.subtitle}</motion.h3>
@@ -308,24 +308,20 @@ function Section({ section, isActive, index }: { section: any, isActive: boolean
 
                         {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
                         {/* Grid: 3 columns on mobile, 3 on large screens. Restored desktop padding/sizing. */}
-                        {section.type === 'personal' ? (
+                        {section.type === 'personal' && (
                             <div className="w-full flex items-center justify-center h-full">
                                 <ThreeDStack />
                             </div>
-                        ) : (
-                            <div className="grid grid-cols-3 lg:grid-cols-3 gap-2 md:gap-6 overflow-y-auto max-h-[70vh] p-1 custom-scrollbar content-start">
-                                {section.features.map((feature: any, idx: number) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={isActive ? { opacity: 1, y: 0 } : {}}
-                                        transition={{ delay: 0.4 + idx * 0.1 }}
-                                        className="bg-white/10 backdrop-blur-md p-2 md:p-6 rounded-xl md:rounded-2xl border border-white/10 hover:bg-white/20 transition-colors flex flex-col items-center text-center shadow-lg"
-                                    >
-                                        <h4 className="text-xs md:text-lg font-bold text-white mb-1 md:mb-3 leading-tight">{feature.title}</h4>
-                                        <p className="text-white/60 text-[10px] md:text-sm leading-tight block">{feature.desc}</p>
-                                    </motion.div>
-                                ))}
+                        )}
+                        {section.type === 'business' && (
+                            <div className="w-full flex items-center justify-center h-full">
+                                <ThreeDStack images={[
+                                    { src: '/images/BUSSINES/BUS1.png', z: -80, scale: 0.85, opacity: 0.8, y: 40 },
+                                    { src: '/images/BUSSINES/BUS2.png', z: -40, scale: 0.9, opacity: 0.9, y: 20 },
+                                    { src: '/images/BUSSINES/BUS3.png', z: 0, scale: 0.95, opacity: 1, y: 0 },
+                                    { src: '/images/BUSSINES/BUS4.png', z: 40, scale: 1, opacity: 1, y: -20 },
+                                    { src: '/images/BUSSINES/BUS5.png', z: 80, scale: 1.05, opacity: 1, y: -40 },
+                                ]} />
                             </div>
                         )}
                     </div>
