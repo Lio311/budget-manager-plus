@@ -76,7 +76,7 @@ export function ThreeDStack() {
                             ease: "easeOut"
                         }}
                     >
-                        <div className="relative w-full h-full bg-slate-900/80 backdrop-blur-md">
+                        <div className="relative w-full h-full">
                             <Image
                                 src={img.src}
                                 alt={`Layer ${index + 1}`}
