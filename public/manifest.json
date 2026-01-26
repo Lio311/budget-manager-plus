@@ -11,7 +11,7 @@
     "lang": "he",
     "icons": [
         {
-            "src": "/icon.png",
+            "src": "/images/branding/mobile-app-icon.png",
             "sizes": "1024x1024",
             "type": "image/png",
             "purpose": "any maskable"
