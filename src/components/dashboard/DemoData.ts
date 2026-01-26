@@ -224,8 +224,18 @@ export const DEMO_DATA = {
         { id: '2', quoteNumber: 'QT-2024-002', clientName: 'טק סולושנס בע"מ', amount: 15000, date: new Date(Date.now() - 86400000 * 2).toISOString(), status: 'ACCEPTED', validUntil: new Date(Date.now() + 86400000 * 7).toISOString() }
     ],
     profitLoss: {
-        revenue: 145000,
-        expenses: 68000,
+        revenue: {
+            taxable: 145000,
+            vat: 24650,
+            exempt: 0,
+            total: 169650
+        },
+        expenses: {
+            recognized: 68000,
+            vatRecognized: 11560,
+            unrecognized: 0,
+            total: 79560
+        },
         netProfit: 77000,
         monthlyData: [
             { month: 'ינו', revenue: 12000, expenses: 8000 },
@@ -234,6 +244,16 @@ export const DEMO_DATA = {
             { month: 'אפר', revenue: 14000, expenses: 8500 },
             { month: 'מאי', revenue: 22000, expenses: 12000 },
             { month: 'יוני', revenue: 25000, expenses: 14000 }
+        ],
+        transactions: [
+            // Invoices (Income)
+            { id: '1', date: new Date().toISOString(), amount: 12000 * 1.17, amountNet: 12000, vat: 12000 * 0.17, description: 'פיתוח מערכת', category: 'פיתוח', type: 'INVOICE', entityName: 'טק סולושנס בע"מ', number: 'INV-2024-001' },
+            { id: '2', date: new Date(Date.now() - 86400000 * 5).toISOString(), amount: 4500 * 1.17, amountNet: 4500, vat: 4500 * 0.17, description: 'ייעוץ שוטף', category: 'ייעוץ', type: 'INVOICE', entityName: 'משרד עו"ד לוי', number: 'INV-2024-002' },
+            // Expenses
+            { id: 'demo-1', date: new Date().toISOString(), amount: 850, amountNet: 726, vat: 124, description: 'קניות בסופר (שופרסל)', category: 'מזון', type: 'EXPENSE', entityName: 'שופרסל' },
+            { id: 'demo-2', date: new Date(Date.now() - 86400000).toISOString(), amount: 320, amountNet: 273, vat: 47, description: 'תדלוק פז', category: 'רכב', type: 'EXPENSE', entityName: 'פז' },
+            { id: 'demo-3', date: new Date(Date.now() - 172800000).toISOString(), amount: 450, amountNet: 384, vat: 66, description: 'חשבון חשמל', category: 'חשבונות', type: 'EXPENSE', entityName: 'חברת החשמל' },
+            { id: 'demo-5', date: new Date(Date.now() - 432000000).toISOString(), amount: 2800, amountNet: 2800, vat: 0, description: 'ביטוח רכב', category: 'ביטוח', type: 'EXPENSE', entityName: 'ביטוח ישיר' }
         ]
     }
 }
