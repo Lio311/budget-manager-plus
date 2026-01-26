@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useDemo } from '@/contexts/DemoContext'
 import useSWR from 'swr'
 import { Plus, FolderOpen, ArrowUpCircle, ArrowDownCircle, Wallet, Pencil, Trash2, Info } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
