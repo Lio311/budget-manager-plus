@@ -40,13 +40,14 @@ export function ThreeDStack() {
                     } catch (e) {
                         console.error('Permission failed:', e)
                     } finally {
-                        window.removeEventListener('click', handleInteraction)
-                        window.removeEventListener('touchstart', handleInteraction)
+                        window.removeEventListener('click', handleInteraction, true)
+                        window.removeEventListener('pointerdown', handleInteraction, true)
                     }
                 }
 
-                window.addEventListener('click', handleInteraction, { once: true })
-                window.addEventListener('touchstart', handleInteraction, { once: true })
+                // Use capture phase to ensure we catch it first
+                window.addEventListener('click', handleInteraction, { once: true, capture: true })
+                window.addEventListener('pointerdown', handleInteraction, { once: true, capture: true })
             }
         }
 
