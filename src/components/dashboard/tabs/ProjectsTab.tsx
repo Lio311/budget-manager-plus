@@ -157,7 +157,7 @@ export function ProjectsTab() {
                 ]
             } else if (project.id === 'proj-2') { // Family Vacation
                 mockIncome = [
-                    { id: 'i1', date: new Date().toISOString(), amount: 12000, description: 'הפקדה לחופשה', type: 'INCOME', category: 'חיסכון' }
+                    { id: 'i1', date: new Date().toISOString(), amount: 12000, description: 'הפקדה לחופשה', source: 'חיסכון', type: 'INCOME', category: 'חיסכון' }
                 ]
                 mockExpenses = [
                     { id: 'e1', date: new Date(Date.now() - 86400000).toISOString(), amount: 4500, description: 'הזמנת מלון', type: 'EXPENSE', category: 'תיירות' },
@@ -168,7 +168,7 @@ export function ProjectsTab() {
             setViewProject({
                 ...project,
                 transactions: [...mockIncome, ...mockExpenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-                income: mockIncome,
+                incomes: mockIncome,
                 expenses: mockExpenses
             })
             setIsDetailsOpen(true)
