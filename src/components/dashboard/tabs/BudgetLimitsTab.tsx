@@ -139,7 +139,7 @@ export function BudgetLimitsTab() {
         // Optimistic UI update via mutate
         mutateThis({
             ...budgetsData!,
-            budgets: budgets.map(b => b.categoryId === categoryId ? { ...b, limit: value } : b)
+            budgets: budgets.map((b: any) => b.categoryId === categoryId ? { ...b, limit: value } : b)
         }, false)
     }
 
@@ -168,7 +168,7 @@ export function BudgetLimitsTab() {
             // Update local state optimistically or just wait for mutate
             mutateThis({
                 ...budgetsData!,
-                budgets: budgets.map(b => ({
+                budgets: budgets.map((b: any) => ({
                     ...b,
                     limit: recommended[b.categoryId] !== undefined ? recommended[b.categoryId] : b.limit
                 }))
@@ -182,15 +182,15 @@ export function BudgetLimitsTab() {
         setActiveDefaults(false)
     }
 
-    const totalLimit = budgets.reduce((acc, b) => acc + b.limit, 0)
-    const totalSpent = budgets.reduce((acc, b) => acc + b.spent, 0)
+    const totalLimit = budgets.reduce((acc: number, b: any) => acc + b.limit, 0)
+    const totalSpent = budgets.reduce((acc: number, b: any) => acc + b.spent, 0)
     const totalProgress = totalLimit > 0 ? (totalSpent / totalLimit) * 100 : 0
 
     const [newlyAddedIds, setNewlyAddedIds] = useState<string[]>([])
 
     // Logic for displayed budgets: Limit > 0 OR in newlyAddedIds
-    const activeBudgets = budgets.filter(b => b.limit > 0 || newlyAddedIds.includes(b.categoryId))
-    const availableCategories = budgets.filter(b => !activeBudgets.some(ab => ab.categoryId === b.categoryId))
+    const activeBudgets = budgets.filter((b: any) => b.limit > 0 || newlyAddedIds.includes(b.categoryId))
+    const availableCategories = budgets.filter((b: any) => !activeBudgets.some((ab: any) => ab.categoryId === b.categoryId))
 
     // Pagination Logic
     const totalPages = Math.ceil(activeBudgets.length / itemsPerPage)
@@ -297,7 +297,7 @@ export function BudgetLimitsTab() {
                         ))}
                     </div>
                 ) : (
-                    paginatedBudgets.map(budget => {
+                    paginatedBudgets.map((budget: any) => {
                         const percentage = budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0
                         const isOverBudget = percentage > 100
 
