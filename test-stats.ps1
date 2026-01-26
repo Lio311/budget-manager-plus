@@ -8,7 +8,7 @@ Write-Host "Getting Quick Stats..." -ForegroundColor Yellow
 Write-Host ""
 
 try {
-    $response = Invoke-RestMethod -Uri "https://www.keseflow.com/api/quick-stats" -Method GET -Headers $headers -ContentType "application/json"
+    $response = Invoke-RestMethod -Uri "https://www.kesefly.co.il/api/quick-stats" -Method GET -Headers $headers -ContentType "application/json"
     
     Write-Host "SUCCESS!" -ForegroundColor Green
     Write-Host ""

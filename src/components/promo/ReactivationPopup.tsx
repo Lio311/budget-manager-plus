@@ -24,7 +24,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
             if (!hasSeenPopup) {
                 // Preload image
                 const img = new window.Image()
-                img.src = '/images/marketing/keseflow-pop.png'
+                img.src = '/images/marketing/kesefly-pop.png'
 
                 // Delay to allow page to load a bit before popping up
                 const timer = setTimeout(() => setIsOpen(true), 2000)
@@ -65,7 +65,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
                             {/* Image Section */}
                             <div className="relative w-full aspect-video">
                                 <Image
-                                    src="/images/marketing/keseflow-pop.png"
+                                    src="/images/marketing/kesefly-pop.png"
                                     alt="Kesefly Offer"
                                     fill
                                     className="object-contain object-center"

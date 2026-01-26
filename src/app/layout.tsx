@@ -66,7 +66,7 @@ export const metadata: Metadata = {
         },
     },
     openGraph: {
-        title: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
+        title: 'Kesefly - ניהול תקציב אישי ומשפחתי חכם',
         description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות',
         url: 'https://www.kesefly.co.il',
         siteName: 'Kesefly',
@@ -83,7 +83,7 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Keseflow - ניהול תקציב אישי ומשפחתי חכם',
+        title: 'Kesefly - ניהול תקציב אישי ומשפחתי חכם',
         description: 'מערכת ניהול תקציב חכמה לניהול הכנסות, הוצאות, חשבונות וחיסכונות',
         images: ['/images/marketing/og-image.png'],
     },

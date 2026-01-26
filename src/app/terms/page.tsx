@@ -142,7 +142,7 @@ export default function TermsPage() {
 
                             <div className="mt-16 pt-10 border-t border-gray-100 text-center">
                                 <p className="font-medium text-gray-500 mb-2">יש לך שאלות נוספות?</p>
-                                <a href="mailto:keseflow.il@gmail.com" className="inline-flex items-center gap-2 text-green-600 font-bold hover:text-green-700 transition-colors px-6 py-3 bg-green-50 hover:bg-green-100 rounded-full">
+                                <a href="mailto:info@kesefly.co.il" className="inline-flex items-center gap-2 text-green-600 font-bold hover:text-green-700 transition-colors px-6 py-3 bg-green-50 hover:bg-green-100 rounded-full">
                                     צור קשר עם התמיכה
                                 </a>
                                 <p className="text-sm text-gray-400 mt-8">

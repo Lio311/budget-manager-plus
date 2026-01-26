@@ -1,4 +1,4 @@
-# 💰 Keseflow - Smart Budget Management System
+# 💰 Kesefly - Smart Budget Management System
 
 [![Live Demo](https://img.shields.io/badge/demo-live-success)](https://budget-manager-plus.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)

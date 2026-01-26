@@ -19,7 +19,7 @@ export default function BusinessLandingPage() {
     const sections = [
         {
             id: 0,
-            title: 'KESEFLOW',
+            title: 'KESEFLY',
             subtitle: 'ניהול פיננסי עסקי מתקדם',
             description: 'המערכת המקצועית לניהול פיננסי של עסקים קטנים ובינוניים. כל הכלים שצריך כדי לנהל את העסק בצורה חכמה ויעילה.',
             bgColor: 'from-slate-900 via-slate-800 to-slate-900',
@@ -190,7 +190,7 @@ export default function BusinessLandingPage() {
                         className="flex items-center gap-2"
                     >
                         <Link href="/">
-                            <Image src="/images/branding/K-LOGO2.png" alt="Keseflow" width={140} height={40} className="h-10 w-auto brightness-0 invert" />
+                            <Image src="/images/branding/K-LOGO2.png" alt="Kesefly" width={140} height={40} className="h-10 w-auto brightness-0 invert" />
                         </Link>
                     </motion.div>
 

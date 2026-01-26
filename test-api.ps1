@@ -12,7 +12,7 @@ Write-Host "Sending request to API..." -ForegroundColor Yellow
 Write-Host ""
 
 try {
-    $response = Invoke-RestMethod -Uri "https://www.keseflow.com/api/quick-add" -Method POST -Headers $headers -Body $body -ContentType "application/json"
+    $response = Invoke-RestMethod -Uri "https://www.kesefly.co.il/api/quick-add" -Method POST -Headers $headers -Body $body -ContentType "application/json"
     
     Write-Host "SUCCESS!" -ForegroundColor Green
     Write-Host ""

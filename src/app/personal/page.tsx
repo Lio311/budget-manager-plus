@@ -19,7 +19,7 @@ export default function PersonalLandingPage() {
     const sections = [
         {
             id: 0,
-            title: 'KESEFLOW',
+            title: 'KESEFLY',
             subtitle: 'ניהול פיננסי אישי חכם',
             description: 'המערכת המתקדמת בישראל לניהול תקציב אישי. כל הכלים שצריך כדי לשלוט בכסף שלך, בממשק אחד יפהפה ונוח.',
             bgColor: 'from-slate-900 via-slate-800 to-slate-900',
@@ -178,7 +178,7 @@ export default function PersonalLandingPage() {
                         className="flex items-center gap-2"
                     >
                         <Link href="/">
-                            <Image src="/images/branding/K-LOGO2.png" alt="Keseflow" width={140} height={40} className="h-10 w-auto brightness-0 invert" />
+                            <Image src="/images/branding/K-LOGO2.png" alt="Kesefly" width={140} height={40} className="h-10 w-auto brightness-0 invert" />
                         </Link>
                     </motion.div>
 
