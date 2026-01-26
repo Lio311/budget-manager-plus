@@ -63,7 +63,7 @@ export function SavingsGoalsTab() {
     // Show warning toast if any category has no target
     useEffect(() => {
         if (!isLoading && goals.length > 0 && !hasShownWarning) {
-            const categoriesWithoutTarget = goals.filter(g => g.targetAmount === 0)
+            const categoriesWithoutTarget = goals.filter((g: any) => g.targetAmount === 0)
             if (categoriesWithoutTarget.length > 0) {
                 toast({
                     title: '⚠️ יעדים חסרים',
@@ -203,7 +203,7 @@ export function SavingsGoalsTab() {
                             </p>
                         </div>
                     ) : (
-                        goals.map((goal) => {
+                        goals.map((goal: any) => {
                             const isComplete = goal.progress >= 100
                             const progressColor = isComplete
                                 ? 'bg-green-500 dark:bg-green-400'
