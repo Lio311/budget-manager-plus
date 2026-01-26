@@ -145,11 +145,31 @@ export function ProjectsTab() {
 
     const handleProjectClick = async (project: Project) => {
         if (isDemo) {
+            // Generate mock transactions based on project
+            let mockIncome: any[] = []
+            let mockExpenses: any[] = []
+
+            if (project.id === 'proj-1') { // Kitchen Renovation
+                mockExpenses = [
+                    { id: 't1', date: new Date().toISOString(), amount: 15000, description: 'קבלן עבודות גמר', type: 'EXPENSE', category: 'שיפוצים' },
+                    { id: 't2', date: new Date(Date.now() - 86400000 * 2).toISOString(), amount: 5000, description: 'רכישת קרמיקה', type: 'EXPENSE', category: 'חומרים' },
+                    { id: 't3', date: new Date(Date.now() - 86400000 * 5).toISOString(), amount: 5000, description: 'מקדמה לנגר', type: 'EXPENSE', category: 'ריהוט' }
+                ]
+            } else if (project.id === 'proj-2') { // Family Vacation
+                mockIncome = [
+                    { id: 'i1', date: new Date().toISOString(), amount: 12000, description: 'הפקדה לחופשה', type: 'INCOME', category: 'חיסכון' }
+                ]
+                mockExpenses = [
+                    { id: 'e1', date: new Date(Date.now() - 86400000).toISOString(), amount: 4500, description: 'הזמנת מלון', type: 'EXPENSE', category: 'תיירות' },
+                    { id: 'e2', date: new Date(Date.now() - 86400000 * 3).toISOString(), amount: 3500, description: 'כרטיסי טיסה', type: 'EXPENSE', category: 'תיירות' }
+                ]
+            }
+
             setViewProject({
                 ...project,
-                transactions: [], // Demo transactions can be added here if needed
-                income: [],
-                expenses: []
+                transactions: [...mockIncome, ...mockExpenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+                income: mockIncome,
+                expenses: mockExpenses
             })
             setIsDetailsOpen(true)
             return
