@@ -17,37 +17,48 @@ export function ThreeDStack() {
     const [permissionGranted, setPermissionGranted] = useState(false)
 
     useEffect(() => {
-        // Check if permission is needed (iOS 13+)
-        if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-            // iOS 13+ requires user interaction. We attach it to the first touch/click.
-            const handleInteraction = () => {
-                (DeviceOrientationEvent as any).requestPermission()
-                    .then((permissionState: string) => {
+        const invokePermission = async () => {
+            try {
+                if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+                    // Attempt automatic permission (will likely fail on iOS 13+ without gesture)
+                    const permissionState = await (DeviceOrientationEvent as any).requestPermission()
+                    if (permissionState === 'granted') {
+                        setPermissionGranted(true)
+                    }
+                } else {
+                    // Non-iOS or older devices
+                    setPermissionGranted(true)
+                }
+            } catch (error) {
+                // If auto-request fails (expected on iOS 13+), attach listener to first user interaction
+                const handleInteraction = async () => {
+                    try {
+                        const permissionState = await (DeviceOrientationEvent as any).requestPermission()
                         if (permissionState === 'granted') {
                             setPermissionGranted(true)
                         }
-                    })
-                    .catch(console.error);
-            }
+                    } catch (e) {
+                        console.error('Permission failed:', e)
+                    } finally {
+                        window.removeEventListener('click', handleInteraction)
+                        window.removeEventListener('touchstart', handleInteraction)
+                    }
+                }
 
-            window.addEventListener('click', handleInteraction, { once: true })
-            window.addEventListener('touchstart', handleInteraction, { once: true })
-
-            return () => {
-                window.removeEventListener('click', handleInteraction)
-                window.removeEventListener('touchstart', handleInteraction)
+                window.addEventListener('click', handleInteraction, { once: true })
+                window.addEventListener('touchstart', handleInteraction, { once: true })
             }
-        } else {
-            // Non-iOS devices usually don't need permission or it's allowed by default
-            setPermissionGranted(true)
         }
+
+        invokePermission()
     }, [])
 
     useEffect(() => {
         if (!permissionGranted) return
 
         const handleOrientation = (e: DeviceOrientationEvent) => {
-            if (!e.gamma || !e.beta) return
+            // Check for rotation data
+            if (e.gamma === null || e.beta === null) return
 
             // Gamma: Left/Right tilt (-90 to 90) -> mapped to -1 to 1
             const xPos = Math.max(-1, Math.min(1, e.gamma / 45))
