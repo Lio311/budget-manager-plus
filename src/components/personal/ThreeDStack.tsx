@@ -50,7 +50,7 @@ export function ThreeDStack() {
                     rotateY,
                     transformStyle: 'preserve-3d',
                 }}
-                className="relative w-[90%] max-w-[900px] aspect-video"
+                className="relative w-[90%] max-w-[1100px] aspect-video"
             >
                 {images.map((img, index) => (
                     <motion.div
@@ -83,8 +83,6 @@ export function ThreeDStack() {
                                 fill
                                 className="object-cover"
                             />
-                            {/* Reflection/Sheen effect */}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none" />
                         </div>
                     </motion.div>
                 ))}
