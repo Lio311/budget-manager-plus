@@ -73,51 +73,58 @@ export async function POST(request: NextRequest) {
         const data: QuickAddInput = validationResult.data
 
         // 4. Database Operation
+        const startDb = Date.now()
+
         // Get current month and year from the provided date
         const expenseDate = data.date
         const month = expenseDate.getMonth() + 1
         const year = expenseDate.getFullYear()
 
-        // Find or create the budget for this month
-        // Default to PERSONAL budget type for quick-add
-        const budget = await prisma.budget.upsert({
-            where: {
-                userId_month_year_type: {
+        // Parallelize Budget and Category Upserts
+        const [budget, category] = await Promise.all([
+            // Find or create the budget for this month
+            prisma.budget.upsert({
+                where: {
+                    userId_month_year_type: {
+                        userId,
+                        month,
+                        year,
+                        type: 'PERSONAL'
+                    }
+                },
+                update: {},
+                create: {
                     userId,
                     month,
                     year,
-                    type: 'PERSONAL'
+                    type: 'PERSONAL',
+                    currency: '₪'
                 }
-            },
-            update: {},
-            create: {
-                userId,
-                month,
-                year,
-                type: 'PERSONAL',
-                currency: '₪'
-            }
-        })
+            }),
 
-        // Ensure the category exists for the user
-        const category = await prisma.category.upsert({
-            where: {
-                userId_name_type_scope: {
+            // Ensure the category exists for the user
+            prisma.category.upsert({
+                where: {
+                    userId_name_type_scope: {
+                        userId,
+                        name: data.category,
+                        type: 'expense',
+                        scope: 'PERSONAL'
+                    }
+                },
+                update: {},
+                create: {
                     userId,
                     name: data.category,
                     type: 'expense',
-                    scope: 'PERSONAL'
+                    scope: 'PERSONAL',
+                    color: 'bg-gray-500'
                 }
-            },
-            update: {},
-            create: {
-                userId,
-                name: data.category,
-                type: 'expense',
-                scope: 'PERSONAL',
-                color: 'bg-gray-500'
-            }
-        })
+            })
+        ])
+
+        const midDb = Date.now()
+        console.log(`[API Quick-Add] Budget/Category Upsert took: ${midDb - startDb}ms`)
 
         // Create the expense
         const expense = await prisma.expense.create({
@@ -132,9 +139,19 @@ export async function POST(request: NextRequest) {
             }
         })
 
+        const endDb = Date.now()
+        console.log(`[API Quick-Add] Expense Creation took: ${endDb - midDb}ms`)
+
         // 5. Cache Revalidation
+        // Use a non-blocking approach to prevent timeouts? 
+        // Note: Actions must await revalidatePath if we want valid cache, but for API speed we might assume event consistency.
+        // However, revalidatePath is usually fast unless pages are heavy.
+
+        // We log it just in case.
+        const startReval = Date.now()
         revalidatePath('/dashboard')
-        revalidatePath('/') // Also revalidate home in case of overview data
+        revalidatePath('/')
+        console.log(`[API Quick-Add] Revalidation took: ${Date.now() - startReval}ms`)
 
         // Return Success Response
         return NextResponse.json(

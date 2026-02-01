@@ -160,7 +160,9 @@ export async function POST(request: NextRequest) {
 
         console.log('[API Scan] Extracted:', extractedData)
 
-        // 4. Save to Database
+        // 4. Database Operation
+        const startDb = Date.now()
+
         const expenseDate = extractedData.date ? new Date(extractedData.date) : new Date()
 
         // Validate Date
@@ -172,47 +174,53 @@ export async function POST(request: NextRequest) {
         const month = expenseDate.getMonth() + 1
         const year = expenseDate.getFullYear()
 
-        // Ensure Budget Exists (Personal or Business based on scope)
-        const budget = await prisma.budget.upsert({
-            where: {
-                userId_month_year_type: {
+        const categoryName = 'חשבוניות סרוקות'
+
+        // Parallelize Upserts
+        const [budget, category] = await Promise.all([
+            // Ensure Budget Exists
+            prisma.budget.upsert({
+                where: {
+                    userId_month_year_type: {
+                        userId,
+                        month,
+                        year,
+                        type: targetScope // Updated to use targetScope
+                    }
+                },
+                update: {},
+                create: {
                     userId,
                     month,
                     year,
-                    type: targetScope // Updated to use targetScope
+                    type: targetScope, // Updated to use targetScope
+                    currency: 'ILS'
                 }
-            },
-            update: {},
-            create: {
-                userId,
-                month,
-                year,
-                type: targetScope, // Updated to use targetScope
-                currency: 'ILS'
-            }
-        })
+            }),
 
-        // Ensure Category Exists ("חשבוניות סרוקות")
-        const categoryName = 'חשבוניות סרוקות'
-
-        await prisma.category.upsert({
-            where: {
-                userId_name_type_scope: {
+            // Ensure Category Exists
+            prisma.category.upsert({
+                where: {
+                    userId_name_type_scope: {
+                        userId,
+                        name: categoryName,
+                        type: 'expense',
+                        scope: targetScope // Updated to use targetScope
+                    }
+                },
+                update: {},
+                create: {
                     userId,
                     name: categoryName,
                     type: 'expense',
-                    scope: targetScope // Updated to use targetScope
+                    scope: targetScope, // Updated to use targetScope
+                    color: targetScope === 'BUSINESS' ? 'bg-blue-500' : 'bg-purple-500' // Different color for business
                 }
-            },
-            update: {},
-            create: {
-                userId,
-                name: categoryName,
-                type: 'expense',
-                scope: targetScope, // Updated to use targetScope
-                color: targetScope === 'BUSINESS' ? 'bg-blue-500' : 'bg-purple-500' // Different color for business
-            }
-        })
+            })
+        ])
+
+        const midDb = Date.now()
+        console.log(`[API Scan] Budget/Category Upsert took: ${midDb - startDb}ms`)
 
         // Check for duplicates
         // We consider it a duplicate if: same amount, same date, same description, same budget
@@ -253,8 +261,13 @@ export async function POST(request: NextRequest) {
             }
         })
 
+        const endDb = Date.now()
+        console.log(`[API Scan] Expense Creation took: ${endDb - midDb}ms`)
+
         // 5. Revalidate
+        const startReval = Date.now()
         revalidatePath('/dashboard')
+        console.log(`[API Scan] Revalidation took: ${Date.now() - startReval}ms`)
 
         return NextResponse.json({
             success: true,
