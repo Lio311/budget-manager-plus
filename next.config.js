@@ -42,7 +42,7 @@ const nextConfig = {
                     },
                     {
                         key: 'Access-Control-Allow-Origin',
-                        value: 'https://budget-manager-plus.vercel.app' // Production Domain Only
+                        value: 'https://www.kesefly.co.il' // Production Domain Only
                     },
                     {
                         key: 'Access-Control-Allow-Methods',
