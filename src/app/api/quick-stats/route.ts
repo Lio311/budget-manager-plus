@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { convertToILS } from '@/lib/currency'
+import { convertToILS, getExchangeRates, FALLBACK_RATES } from '@/lib/currency'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,6 +48,9 @@ export async function GET(request: NextRequest) {
         // A. Current Month Budget (for monthly stats)
         // B. All Budgets (for total account balance/net worth)
 
+        // 3a. Fetch Exchange Rates ONCE (Optimization)
+        const exchangeRates = await getExchangeRates()
+
         const allBudgets = await prisma.budget.findMany({
             where: {
                 userId,
@@ -66,6 +69,23 @@ export async function GET(request: NextRequest) {
             },
             orderBy: [{ year: 'asc' }, { month: 'asc' }]
         })
+
+        // Helper for synchronous conversion
+        const convertToILSSync = (amount: number, fromCurrency: string) => {
+            if (fromCurrency === 'ILS') return amount
+
+            // Try live rates first
+            if (exchangeRates && exchangeRates.rates[fromCurrency]) {
+                return amount / exchangeRates.rates[fromCurrency]
+            }
+
+            // Fallback
+            if (FALLBACK_RATES[fromCurrency]) {
+                return amount / FALLBACK_RATES[fromCurrency]
+            }
+
+            return amount
+        }
 
         // 4. Calculate Totals
         let totalAccountBalance = (user.initialBalance || 0) + (user.initialSavings || 0)
@@ -87,29 +107,24 @@ export async function GET(request: NextRequest) {
                 hasStarted = true
             }
 
-            // Convert and Sum Items
-            // Note: convertToILS is async, but we'll map/promise.all here for speed if needed, 
-            // but for a simple loop awaiting might be safer to not flood currency API if it's external.
-            // Assuming convertToILS is fast/cached or internal.
-
             // Helper to sum
-            const sumItems = async (items: any[], isExpense = false) => {
+            const sumItems = (items: any[], isExpense = false) => {
                 let sum = 0
                 for (const item of items) {
                     const val = isExpense ? (item.amount || item.monthlyPayment || item.monthlyDeposit) : item.amount
-                    const amountILS = await convertToILS(val, item.currency)
+                    const amountILS = convertToILSSync(val, item.currency)
                     sum += amountILS
                 }
                 return sum
             }
 
-            const incomeSum = await sumItems(budget.incomes)
+            const incomeSum = sumItems(budget.incomes)
 
             // Expenses include: expenses, bills, debts
-            const expensesSum = await sumItems(budget.expenses, true)
-            const billsSum = await sumItems(budget.bills, true)
-            const debtsSum = await sumItems(budget.debts, true)
-            const savingsSum = await sumItems(budget.savings || [], true) // Treat savings as "outflow" from current cash, but it adds to net worth typically.
+            const expensesSum = sumItems(budget.expenses, true)
+            const billsSum = sumItems(budget.bills, true)
+            const debtsSum = sumItems(budget.debts, true)
+            const savingsSum = sumItems(budget.savings || [], true) // Treat savings as "outflow" from current cash, but it adds to net worth typically.
             // Wait, for "Monthly Balance" (Cash Flow), savings IS an outflow (money moved aside).
             // For Net Worth, Savings IS part of the balance.
 

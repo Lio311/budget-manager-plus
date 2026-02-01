@@ -55,7 +55,7 @@ export const getExchangeRates = unstable_cache(
  * The API gives us ILS -> USD (e.g. 0.27). So 1 ILS = 0.27 USD.
  * To convert USD to ILS: Amount / Rate.
  */
-const FALLBACK_RATES: Record<string, number> = {
+export const FALLBACK_RATES: Record<string, number> = {
     'USD': 0.27, // ~3.70 ILS
     'EUR': 0.25, // ~4.00 ILS
     'GBP': 0.21  // ~4.76 ILS
