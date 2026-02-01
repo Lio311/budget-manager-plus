@@ -107,7 +107,7 @@ export function IntegrationsSettings() {
 
                 <div className="grid grid-cols-1 gap-4">
                     <a
-                        href="https://www.icloud.com/shortcuts/493bb9c4c2ff4c178d885f3cf367cc39"
+                        href="https://www.icloud.com/shortcuts/c1287018e81a4075986a92166f8bf504"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block group"
@@ -129,7 +129,7 @@ export function IntegrationsSettings() {
                     </a>
 
                     <a
-                        href="https://www.icloud.com/shortcuts/0abd8dfb5e234d3c8ffc129c19839640"
+                        href="https://www.icloud.com/shortcuts/1ab6d2dc3b7144c8b0753c4b807c8065"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block group"
@@ -151,7 +151,7 @@ export function IntegrationsSettings() {
                     </a>
 
                     <a
-                        href="https://www.icloud.com/shortcuts/44f587bf1fbf4c3ba371270c204b7a86"
+                        href="https://www.icloud.com/shortcuts/a623add35eaf42869fadc74d4916ea36"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block group"
@@ -172,10 +172,10 @@ export function IntegrationsSettings() {
                         </Card>
                     </a>
                 </div>
-            </div>
+            </div >
 
             {/* Step 3: Setup Guide */}
-            <div className="space-y-6">
+            < div className="space-y-6" >
                 <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-600 font-bold text-lg">3</div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">הגדרת האוטומציה</h3>
@@ -244,7 +244,7 @@ export function IntegrationsSettings() {
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }
