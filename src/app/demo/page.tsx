@@ -1,3 +1,5 @@
+'use client'
+
 import { BudgetProvider } from '@/contexts/BudgetContext'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs'
