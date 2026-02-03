@@ -604,43 +604,49 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                     </div>
                 ) : filtered.map((t) => (
                     <div key={t.id} className="glass-panel p-3 rounded-xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-all" dir="rtl">
-                        <div className="flex items-stretch justify-between gap-3">
-                            {/* Right Side: Icon & Info */}
-                            <div className="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
-                                <div className="shrink-0 self-center">
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${t.category ? getCategoryColor(t.category) : 'bg-gray-100 text-gray-500'}`}>
-                                        {t.category ? getCategoryIcon(t.category) : <FileText size={16} />}
-                                    </div>
-                                </div>
-                                <div className="flex flex-col justify-center min-w-0 gap-0.5 w-full">
-                                    <div className="font-bold text-gray-900 text-sm truncate w-full" title={t.description}>
-                                        {t.description}
-                                    </div>
-                                    <div className="flex items-center gap-2 text-xs text-gray-500 truncate w-full">
-                                        <span className="shrink-0">{new Date(t.date).toLocaleDateString('he-IL')}</span>
-                                        {t.entityName && (
-                                            <>
-                                                <span className="text-gray-300">•</span>
-                                                <span className="truncate">{t.entityName}</span>
-                                            </>
-                                        )}
-                                    </div>
+                        <div className="flex items-start gap-3">
+                            {/* Icon */}
+                            <div className="shrink-0 mt-1">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${t.category ? getCategoryColor(t.category) : 'bg-gray-100 text-gray-500'}`}>
+                                    {t.category ? getCategoryIcon(t.category) : <FileText size={16} />}
                                 </div>
                             </div>
 
-                            {/* Left Side: Amount */}
-                            <div className="flex flex-col justify-center items-end shrink-0 pl-1 border-l-2 border-transparent">
-                                <div
-                                    className={`text-base font-bold whitespace-nowrap ${t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`}
-                                    dir="ltr"
-                                >
-                                    ₪{formatNumberWithCommas(t.amount)}
+                            {/* Content - Vertical Stack */}
+                            <div className="flex flex-col flex-1 min-w-0 gap-1.5">
+                                {/* Top: Description & Date */}
+                                <div className="flex justify-between items-start gap-2">
+                                    <div className="font-bold text-gray-900 text-sm break-words leading-tight">
+                                        {t.description}
+                                    </div>
+                                    <span className="text-[11px] text-gray-400 whitespace-nowrap shrink-0 mt-0.5">
+                                        {new Date(t.date).toLocaleDateString('he-IL')}
+                                    </span>
                                 </div>
-                                {(t.vat > 0 || t.amountNet !== t.amount) && (
-                                    <div className="text-[10px] text-gray-400 whitespace-nowrap mt-0.5" dir="rtl">
-                                        נטו: <span dir="ltr">{formatNumberWithCommas(t.amountNet)}</span>
+
+                                {/* Middle: Entity / Category */}
+                                {(t.entityName || t.category) && (
+                                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                                        {t.entityName && <span className="truncate max-w-[150px]">{t.entityName}</span>}
+                                        {t.entityName && t.category && <span className="text-gray-300">•</span>}
+                                        {t.category && <span className="truncate text-gray-400">{t.category}</span>}
                                     </div>
                                 )}
+
+                                {/* Bottom: Amount */}
+                                <div className="flex items-center gap-3 mt-1">
+                                    <div
+                                        className={`text-lg font-bold ${t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`}
+                                        dir="ltr"
+                                    >
+                                        ₪{formatNumberWithCommas(t.amount)}
+                                    </div>
+                                    {(t.vat > 0 || t.amountNet !== t.amount) && (
+                                        <div className="text-xs text-gray-400" dir="rtl">
+                                            (נטו: <span dir="ltr">{formatNumberWithCommas(t.amountNet)}</span>)
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
