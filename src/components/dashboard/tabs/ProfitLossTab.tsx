@@ -390,7 +390,7 @@ export default function ProfitLossTab() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 ml-10 md:ml-0">
                             <Button variant="ghost" size="icon" onClick={() => selectedPeriod && fetchReport(selectedPeriod)} disabled={isLoading} className="h-8 w-8 text-gray-500">
                                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                             </Button>
