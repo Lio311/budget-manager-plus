@@ -243,6 +243,7 @@ KovezMat=BKMVDATA.TXT
 
     return {
         filename: `OpenFormat-${year}.zip`,
-        data: finalZip
+        data: finalZip,
+        count: invoices.length + creditNotes.length
     }
 }
