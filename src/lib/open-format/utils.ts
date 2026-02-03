@@ -57,15 +57,11 @@ export function fmtInt(num: number | null | undefined, length: number): string {
 }
 
 /**
- * Format Date: YYYYMMDD
+ * Format Date: yyyyMMdd
  */
 export function fmtDate(date: Date | null | undefined): string {
     if (!date) return '00000000'
-    try {
-        return format(date, 'yyyyMMdd')
-    } catch (e) {
-        return '00000000'
-    }
+    return format(date, 'yyyyMMdd')
 }
 
 /**

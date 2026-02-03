@@ -49,7 +49,7 @@ function formatInt(num: number | null | undefined, length: number): string {
 
 function formatDate(date: Date | null | undefined): string {
     if (!date) return '00000000'
-    return format(date, 'yyyyMMDD')
+    return format(date, 'yyyyMMdd')
 }
 
 function formatTime(date: Date | null | undefined): string {
