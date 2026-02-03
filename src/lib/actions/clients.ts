@@ -107,33 +107,41 @@ export async function getClients(scope: string = 'BUSINESS') {
 
         const db = await authenticatedPrisma(userId)
 
-        const clients = await db.client.findMany({
-            where: {
-                userId,
-                scope
-            },
-            include: {
-                package: true,
-                quotes: { select: { id: true } }, // Fetch quotes IDs to count them
-                invoices: {
-                    select: {
-                        id: true,
-                        creditNotes: { select: { id: true } } // Fetch credit notes via invoices
+        const [clients, businessProfile] = await Promise.all([
+            db.client.findMany({
+                where: {
+                    userId,
+                    scope
+                },
+                include: {
+                    package: true,
+                    quotes: { select: { id: true } }, // Fetch quotes IDs to count them
+                    invoices: {
+                        select: {
+                            id: true,
+                            creditNotes: { select: { id: true } } // Fetch credit notes via invoices
+                        }
+                    },
+                    _count: {
+                        select: {
+                            incomes: {
+                                where: { status: 'PAID' }
+                            },
+                            expenses: true
+                        }
                     }
                 },
-                _count: {
-                    select: {
-                        incomes: {
-                            where: { status: 'PAID' }
-                        },
-                        expenses: true
-                    }
+                orderBy: {
+                    createdAt: 'desc'
                 }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        })
+            }),
+            db.businessProfile.findUnique({
+                where: { userId },
+                select: { taxRate: true }
+            })
+        ])
+
+        const taxRate = businessProfile?.taxRate || 0
 
 
 
@@ -195,11 +203,14 @@ export async function getClients(scope: string = 'BUSINESS') {
             const invoicesCount = client.invoices.length
             const creditNotesCount = client.invoices.reduce((acc: number, inv: any) => acc + inv.creditNotes.length, 0)
 
+            const rawProfit = netRevenue - expenseTotal
+            const taxAmount = rawProfit > 0 ? rawProfit * (taxRate / 100) : 0
+
             return {
                 ...client,
                 totalRevenue: totalRevenue,
                 totalExpenses: expenseTotal,
-                netProfit: netRevenue - expenseTotal,
+                netProfit: rawProfit - taxAmount,
                 _count: {
                     ...client._count,
                     invoices: allInvoiceMap.get(client.id) || 0
@@ -485,13 +496,24 @@ export async function getClientStats(clientId: string, year: number) {
             }
         })
 
+        const businessProfile = await db.businessProfile.findUnique({
+            where: { userId },
+            select: { taxRate: true }
+        })
+        const taxRate = businessProfile?.taxRate || 0
+
+        const revenue = totalRevenue._sum.amount || 0
+        const expenses = totalExpenses._sum.amount || 0
+        const rawProfit = revenue - expenses
+        const taxAmount = rawProfit > 0 ? rawProfit * (taxRate / 100) : 0
+
         return {
             success: true,
             data: {
                 monthlyRevenue,
-                totalRevenue: totalRevenue._sum.amount || 0,
-                totalExpenses: totalExpenses._sum.amount || 0,
-                netProfit: (totalRevenue._sum.amount || 0) - (totalExpenses._sum.amount || 0),
+                totalRevenue: revenue,
+                totalExpenses: expenses,
+                netProfit: rawProfit - taxAmount,
                 totalTransactions: totalRevenue._count,
                 totalExpenseTransactions: totalExpenses._count,
                 openInvoices
