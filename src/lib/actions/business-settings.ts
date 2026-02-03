@@ -69,23 +69,23 @@ export async function updateBusinessProfile(data: BusinessProfileData) {
             where: { userId: user.id },
             update: {
                 companyName: validData.companyName,
-                companyId: validData.companyId || null,
+                companyId: validData.companyId,
                 vatStatus: validData.vatStatus || 'EXEMPT',
-                address: validData.address || null,
-                phone: validData.phone || null,
-                email: validData.email || null,
-                signatureUrl: validData.signature || null,
-                taxRate: validData.taxRate || 0
+                address: validData.address,
+                phone: validData.phone,
+                email: validData.email,
+                signatureUrl: validData.signature,
+                taxRate: validData.taxRate
             },
             create: {
                 userId: user.id,
                 companyName: validData.companyName,
-                companyId: validData.companyId || null,
+                companyId: validData.companyId,
                 vatStatus: validData.vatStatus || 'EXEMPT',
-                address: validData.address || null,
-                phone: validData.phone || null,
-                email: validData.email || null,
-                signatureUrl: validData.signature || null,
+                address: validData.address,
+                phone: validData.phone,
+                email: validData.email,
+                signatureUrl: validData.signature,
                 taxRate: validData.taxRate || 0
             }
         })
