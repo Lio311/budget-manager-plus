@@ -382,81 +382,72 @@ export default function ProfitLossTab() {
             {/* Report Dialog */}
             <Dialog open={isDetailOpen} onOpenChange={(open) => !open && setIsDetailOpen(false)}>
                 <DialogContent className="w-[95%] sm:max-w-[95vw] md:max-w-6xl max-h-[90vh] overflow-y-auto p-3 md:p-6 rounded-xl" dir="rtl">
-                    <DialogHeader className="flex flex-col gap-3 md:gap-4 mt-8 md:mt-0">
-                        <DialogTitle className="text-xl md:text-2xl font-bold text-center">
-                            דוח רווח והפסד - {selectedPeriod?.label.includes(selectedYear.toString()) ? selectedPeriod?.label : `${selectedPeriod?.label} ${selectedYear}`}
-                        </DialogTitle>
-                        <div id="dialog-desc" className="sr-only">
-                            פירוט הכנסות והוצאות לתקופה שנבחרה
+                    <DialogHeader className="flex flex-row items-center justify-between gap-2 mt-2 md:mt-0 space-y-0">
+                        <div className="flex items-center gap-2">
+                            <DialogTitle className="text-lg md:text-2xl font-bold text-right">
+                                {selectedPeriod?.label.includes(selectedYear.toString()) ? selectedPeriod?.label : `${selectedPeriod?.label} ${selectedYear}`}
+                            </DialogTitle>
                         </div>
-                        <DialogDescription className="text-center text-gray-500 hidden md:block">
-                            סיכום נתונים פיננסיים, הכנסות והוצאות לתקופה זו.
-                        </DialogDescription>
 
-                        {/* Centered Action Buttons */}
-                        <div className="grid grid-cols-2 md:flex md:flex-row justify-center gap-3 md:gap-4 w-full">
-                            <Button variant="outline" onClick={() => selectedPeriod && fetchReport(selectedPeriod)} disabled={isLoading} className="gap-2 w-full md:min-w-[200px]">
-                                <span className="hidden sm:inline">רענן נתונים</span>
-                                <span className="sm:hidden">רענן</span>
+                        {/* Actions */}
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="icon" onClick={() => selectedPeriod && fetchReport(selectedPeriod)} disabled={isLoading} className="h-8 w-8 text-gray-500">
                                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                             </Button>
-                            <Button variant="outline" onClick={() => handleDownloadPDF(selectedYear!)} className="gap-2 w-full md:min-w-[200px]">
-                                <span className="hidden sm:inline">הורד PDF</span>
-                                <span className="sm:hidden">PDF</span>
+                            <Button variant="ghost" size="icon" onClick={() => handleDownloadPDF(selectedYear!)} className="h-8 w-8 text-gray-500">
                                 <Download size={16} />
                             </Button>
                         </div>
                     </DialogHeader>
 
+                    <div id="dialog-desc" className="sr-only">
+                        פירוט הכנסות והוצאות לתקופה שנבחרה
+                    </div>
+
                     {isLoading ? (
                         <div className="py-20 text-center">טוען נתונים...</div>
                     ) : reportData ? (
-                        <div className="mt-6 space-y-8">
-                            {/* Summary Cards */}
-                            {/* Summary Cards */}
-                            {/* Summary Cards */}
-                            <div className="flex md:grid md:grid-cols-3 gap-3 md:gap-6 overflow-x-auto pb-2 md:pb-0 snap-x hide-scrollbar">
-                                <Card className="p-4 md:p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50 min-w-[85%] md:min-w-0 snap-center">
-                                    <div className="flex items-center gap-3 md:gap-4">
-                                        <div className="p-2 md:p-3 bg-emerald-100 dark:bg-emerald-900/50 rounded-full text-emerald-600 dark:text-emerald-400">
-                                            <TrendingUp className="h-5 w-5 md:h-6 md:w-6" />
+                        <div className="mt-4 space-y-4 md:space-y-8">
+                            {/* Summary Cards - Compact 3-Col Grid on Mobile */}
+                            <div className="grid grid-cols-3 gap-2 md:gap-6 direction-rtl">
+                                <Card className="p-2 md:p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50 text-center md:text-right">
+                                    <div className="flex flex-col md:flex-row items-center gap-1 md:gap-4">
+                                        <div className="hidden md:flex p-3 bg-emerald-100 dark:bg-emerald-900/50 rounded-full text-emerald-600 dark:text-emerald-400">
+                                            <TrendingUp className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-xs md:text-sm text-emerald-700 dark:text-emerald-300 font-medium">סה"כ הכנסות (חייבות)</p>
-                                            <h3 className="text-xl md:text-2xl font-bold text-emerald-900 dark:text-emerald-100" dir="ltr">
-                                                ₪{formatNumberWithCommas(Number(reportData.revenue.taxable.toFixed(2)))}
+                                            <p className="text-[10px] md:text-sm text-emerald-700 dark:text-emerald-300 font-medium whitespace-nowrap">הכנסות</p>
+                                            <h3 className="text-sm md:text-2xl font-bold text-emerald-900 dark:text-emerald-100 truncate" dir="ltr">
+                                                ₪{formatNumberWithCommas(Number(reportData.revenue.taxable.toFixed(0)))}
                                             </h3>
-                                            <p className="text-[10px] md:text-xs text-emerald-600 dark:text-emerald-400 mt-1">מע"מ: {formatNumberWithCommas(Number(reportData.revenue.vat.toFixed(2)))}₪</p>
                                         </div>
                                     </div>
                                 </Card>
 
-                                <Card className="p-4 md:p-6 bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50 min-w-[85%] md:min-w-0 snap-center">
-                                    <div className="flex items-center gap-3 md:gap-4">
-                                        <div className="p-2 md:p-3 bg-red-100 dark:bg-red-900/50 rounded-full text-red-600 dark:text-red-400">
-                                            <TrendingDown className="h-5 w-5 md:h-6 md:w-6" />
+                                <Card className="p-2 md:p-6 bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50 text-center md:text-right">
+                                    <div className="flex flex-col md:flex-row items-center gap-1 md:gap-4">
+                                        <div className="hidden md:flex p-3 bg-red-100 dark:bg-red-900/50 rounded-full text-red-600 dark:text-red-400">
+                                            <TrendingDown className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-xs md:text-sm text-red-700 dark:text-red-300 font-medium">סה"כ הוצאות (מוכרות)</p>
-                                            <h3 className="text-xl md:text-2xl font-bold text-red-900 dark:text-red-100" dir="ltr">
-                                                ₪{formatNumberWithCommas(Number(reportData.expenses.recognized.toFixed(2)))}
+                                            <p className="text-[10px] md:text-sm text-red-700 dark:text-red-300 font-medium whitespace-nowrap">הוצאות</p>
+                                            <h3 className="text-sm md:text-2xl font-bold text-red-900 dark:text-red-100 truncate" dir="ltr">
+                                                ₪{formatNumberWithCommas(Number(reportData.expenses.recognized.toFixed(0)))}
                                             </h3>
-                                            <p className="text-[10px] md:text-xs text-red-600 dark:text-red-400 mt-1">מע"מ: {formatNumberWithCommas(Number(reportData.expenses.vatRecognized.toFixed(2)))}₪</p>
                                         </div>
                                     </div>
                                 </Card>
 
-                                <Card className="p-4 md:p-6 bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/50 min-w-[85%] md:min-w-0 snap-center">
-                                    <div className="flex items-center gap-3 md:gap-4">
-                                        <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full text-blue-600 dark:text-blue-400">
-                                            <DollarSign className="h-5 w-5 md:h-6 md:w-6" />
+                                <Card className="p-2 md:p-6 bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/50 text-center md:text-right">
+                                    <div className="flex flex-col md:flex-row items-center gap-1 md:gap-4">
+                                        <div className="hidden md:flex p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full text-blue-600 dark:text-blue-400">
+                                            <DollarSign className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-xs md:text-sm text-blue-700 dark:text-blue-300 font-medium">רווח נקי</p>
-                                            <h3 className="text-xl md:text-2xl font-bold text-blue-900 dark:text-blue-100" dir="ltr">
-                                                ₪{formatNumberWithCommas(Number(reportData.netProfit.toFixed(2)))}
+                                            <p className="text-[10px] md:text-sm text-blue-700 dark:text-blue-300 font-medium whitespace-nowrap">רווח נקי</p>
+                                            <h3 className="text-sm md:text-2xl font-bold text-blue-900 dark:text-blue-100 truncate" dir="ltr">
+                                                ₪{formatNumberWithCommas(Number(reportData.netProfit.toFixed(0)))}
                                             </h3>
-                                            <p className="text-[10px] md:text-xs text-blue-600 dark:text-blue-400 mt-1">לפני מס הכנסה</p>
                                         </div>
                                     </div>
                                 </Card>
