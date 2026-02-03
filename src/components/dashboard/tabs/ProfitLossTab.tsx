@@ -381,7 +381,7 @@ export default function ProfitLossTab() {
 
             {/* Report Dialog */}
             <Dialog open={isDetailOpen} onOpenChange={(open) => !open && setIsDetailOpen(false)}>
-                <DialogContent className="w-full sm:max-w-[95vw] md:max-w-6xl max-h-[90vh] overflow-y-auto p-3 md:p-6" dir="rtl">
+                <DialogContent className="w-[95%] sm:max-w-[95vw] md:max-w-6xl max-h-[90vh] overflow-y-auto p-3 md:p-6 rounded-xl" dir="rtl">
                     <DialogHeader className="flex flex-col gap-3 md:gap-4 mt-8 md:mt-0">
                         <DialogTitle className="text-xl md:text-2xl font-bold text-center">
                             דוח רווח והפסד - {selectedPeriod?.label.includes(selectedYear.toString()) ? selectedPeriod?.label : `${selectedPeriod?.label} ${selectedYear}`}

@@ -109,27 +109,31 @@ export function IncomeTab() {
         const rate = parseFloat(taxRateInput)
         if (isNaN(rate) || rate < 0 || rate > 100) return
 
-        // const result = await updateBusinessProfile({ companyName: 'temp', taxRate: rate } as any) - REMOVED DANGEROUS LINE
-        // Actually, updateBusinessProfile validates all keys. We need to be careful.
-        // Better strategy: fetch current profile, merge, then update.
-        // Or create a specific action for tax rate to avoid overwriting.
-        // For now, I'll fetch-merge-update in this function.
         const current = await getBusinessProfile()
-        if (current.success && current.data) {
-            const update = await updateBusinessProfile({
-                companyName: current.data.companyName,
-                vatStatus: current.data.vatStatus,
-                taxRate: rate,
-                address: current.data.address || undefined,
-                phone: current.data.phone || undefined,
-                email: current.data.email || undefined,
-                signature: current.data.signatureUrl || undefined
-            })
-            if (update.success) {
-                setTaxRate(rate)
-                setIsTaxDialogOpen(false)
-                toast({ title: 'הגדרות מס עודכנו' })
-            }
+
+        // Prepare data for update. If profile exists, use it. If not, use defaults.
+        const currentData = current.success && current.data ? current.data : null
+
+        const updateData = {
+            companyName: currentData?.companyName || 'העסק שלי',
+            vatStatus: currentData?.vatStatus || 'EXEMPT',
+            taxRate: rate,
+            companyId: currentData?.companyId || undefined, // undefined will be filtered by validData logic probably, but upsert needs specific handling?
+            // Actually our action uses specific fields. Let's pass what we have.
+            // If new, these nulls are fine or defaults kick in.
+            address: currentData?.address || undefined,
+            phone: currentData?.phone || undefined,
+            email: currentData?.email || undefined,
+            signature: currentData?.signatureUrl || undefined
+        }
+
+        const update = await updateBusinessProfile(updateData)
+        if (update.success) {
+            setTaxRate(rate)
+            setIsTaxDialogOpen(false)
+            toast({ title: 'הגדרות מס עודכנו' })
+        } else {
+            toast({ title: 'שגיאה', description: update.error || 'נכשל בעדכון ההגדרות', variant: 'destructive' })
         }
     }
 
