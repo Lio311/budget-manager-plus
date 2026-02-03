@@ -6,13 +6,18 @@ import { DashboardTabs } from '@/components/dashboard/DashboardTabs'
 import { ExpiryBanner } from '@/components/subscription/ExpiryBanner'
 import { useBudget } from '@/contexts/BudgetContext'
 
-export function DashboardShell({ userPlan, hasPersonalAccess, hasBusinessAccess }: {
+import { usePathname } from 'next/navigation'
+
+export function DashboardShell({ userPlan, hasPersonalAccess, hasBusinessAccess, children }: {
     userPlan: 'PERSONAL' | 'BUSINESS',
     hasPersonalAccess: boolean,
-    hasBusinessAccess: boolean
+    hasBusinessAccess: boolean,
+    children: React.ReactNode
 }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const { budgetType, setBudgetType } = useBudget()
+    const pathname = usePathname()
+    const isMainDashboard = pathname === '/dashboard'
 
     // Enforce valid budget type based on access rights
     useEffect(() => {
@@ -35,7 +40,13 @@ export function DashboardShell({ userPlan, hasPersonalAccess, hasBusinessAccess 
                 hasPersonalAccess={hasPersonalAccess}
                 hasBusinessAccess={hasBusinessAccess}
             />
-            <DashboardTabs mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+            {isMainDashboard ? (
+                <DashboardTabs mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+            ) : (
+                <div className="animate-in fade-in-50">
+                    {children}
+                </div>
+            )}
         </div>
     )
 }
