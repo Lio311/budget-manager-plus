@@ -190,24 +190,26 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                 </p>
 
                 {currentLogo ? (
-                    <div className="relative inline-block">
-                        <div className="w-48 h-48 border-2 border-gray-300 rounded-lg overflow-hidden bg-white flex items-center justify-center">
-                            <img
-                                src={currentLogo}
-                                alt="לוגו העסק"
-                                className="max-w-full max-h-full object-contain"
-                            />
+                    <div className="flex justify-end">
+                        <div className="relative inline-block">
+                            <div className="w-48 h-48 border-2 border-gray-300 rounded-lg overflow-hidden bg-white flex items-center justify-center">
+                                <img
+                                    src={currentLogo}
+                                    alt="לוגו העסק"
+                                    className="max-w-full max-h-full object-contain"
+                                />
+                            </div>
+                            <button
+                                onClick={handleDelete}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 shadow-lg"
+                                disabled={uploading}
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
                         </div>
-                        <button
-                            onClick={handleDelete}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 shadow-lg"
-                            disabled={uploading}
-                        >
-                            <X className="h-4 w-4" />
-                        </button>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-3 items-start">
+                    <div className="flex flex-col gap-3 items-end">
                         <div
                             onClick={() => fileInputRef.current?.click()}
                             className="w-48 h-48 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 cursor-pointer transition-colors flex flex-col items-center justify-center gap-2 bg-gray-50 inline-flex"
