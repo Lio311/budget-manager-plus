@@ -14,13 +14,20 @@ export async function generateOpenFormatFiles(year: number) {
 }
 
 export async function generateFilesCore(userId: string, year: number) {
+    console.log(`[OpenFormat] Starting generation for user ${userId}, year ${year}`)
     const db = await authenticatedPrisma(userId)
     const business = await db.businessProfile.findUnique({ where: { userId } })
-    if (!business) throw new Error('Business profile missing')
+
+    if (!business) {
+        console.error('[OpenFormat] Business profile missing')
+        throw new Error('Business profile missing')
+    }
+    console.log(`[OpenFormat] Business found: ${business.companyName} (${business.companyId})`)
 
     // 1. Fetch Data
     const startDate = new Date(year, 0, 1)
     const endDate = new Date(year, 11, 31, 23, 59, 59)
+    console.log(`[OpenFormat] Date range: ${startDate.toISOString()} - ${endDate.toISOString()}`)
 
     const invoices = await db.invoice.findMany({
         where: {
@@ -31,12 +38,14 @@ export async function generateFilesCore(userId: string, year: number) {
         include: { client: true, lineItems: true },
         orderBy: { issueDate: 'asc' }
     })
+    console.log(`[OpenFormat] Found ${invoices.length} invoices`)
 
     const creditNotes = await db.creditNote.findMany({
         where: { userId, issueDate: { gte: startDate, lte: endDate } },
         include: { invoice: { include: { client: true } } }, // Link to original invoice for client info
         orderBy: { issueDate: 'asc' }
     })
+    console.log(`[OpenFormat] Found ${creditNotes.length} credit notes`)
 
     // 2. Prepare Indexes (Clients & Items)
     const clientMap = new Map<string, any>()
