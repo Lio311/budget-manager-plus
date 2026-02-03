@@ -635,13 +635,19 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                             </div>
 
                             {/* Left Side: Amount */}
-                            <div className="flex flex-col items-end shrink-0 w-[110px] pl-3 border-l border-transparent">
-                                <div className={`text-base font-bold truncate w-full text-left ${t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`} dir="ltr">
+                            <div className="flex flex-col items-end shrink-0 min-w-[30%] pl-2">
+                                <div
+                                    className={`text-base font-bold whitespace-nowrap w-full text-left ${t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`}
+                                    style={{ direction: 'ltr' }}
+                                >
                                     ₪{formatNumberWithCommas(t.amount)}
                                 </div>
                                 {(t.vat > 0 || t.amountNet !== t.amount) && (
-                                    <div className="text-[10px] text-gray-400 w-full text-left truncate" dir="rtl">
-                                        נטו: {formatNumberWithCommas(t.amountNet)}
+                                    <div
+                                        className="text-[10px] text-gray-400 w-full text-left whitespace-nowrap"
+                                        style={{ direction: 'rtl' }}
+                                    >
+                                        <span style={{ direction: 'ltr', display: 'inline-block' }}>{formatNumberWithCommas(t.amountNet)}</span> :נטו
                                     </div>
                                 )}
                             </div>
