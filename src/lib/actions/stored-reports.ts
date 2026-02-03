@@ -22,25 +22,19 @@ export async function saveBkmvData(year: number) {
             throw new Error('Failed to fetch report data')
         }
 
-        // 2. Generate BKMVDATA String
-        const { generateBkmvData } = await import('@/lib/open-format/generator')
-        const { bkmv } = await generateBkmvData(year)
-        const fileContent = bkmv
+        // 2. Generate Open Format ZIP
+        const { generateOpenFormatFiles } = await import('@/lib/open-format/generator')
+        const result = await generateOpenFormatFiles(year)
 
         // 3. Save to DB
-        const filename = `BKMVDATA-${year}.txt`
-
-        // Check if exists? Optional, maybe we want history.
-        // Schema doesn't enforce unique year/type, so we can store history or update.
-        // Let's create new for history.
-
+        // We store the ZIP base64 data.
         await db.storedReport.create({
             data: {
                 userId,
                 year,
-                type: 'BKMVDATA',
-                data: fileContent,
-                fileName: filename
+                type: 'BKMVDATA', // Keeping type for backward compat, but content is now ZIP
+                data: result.data,
+                fileName: result.filename
             }
         })
 
