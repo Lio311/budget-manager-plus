@@ -414,41 +414,48 @@ export default function ProfitLossTab() {
                         <div className="mt-6 space-y-8">
                             {/* Summary Cards */}
                             {/* Summary Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 direction-rtl">
-                                <Card className="p-4 md:p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50">
+                            {/* Summary Cards */}
+                            <div className="flex md:grid md:grid-cols-3 gap-3 md:gap-6 overflow-x-auto pb-2 md:pb-0 snap-x hide-scrollbar">
+                                <Card className="p-4 md:p-6 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50 min-w-[85%] md:min-w-0 snap-center">
                                     <div className="flex items-center gap-3 md:gap-4">
                                         <div className="p-2 md:p-3 bg-emerald-100 dark:bg-emerald-900/50 rounded-full text-emerald-600 dark:text-emerald-400">
                                             <TrendingUp className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
                                         <div>
                                             <p className="text-xs md:text-sm text-emerald-700 dark:text-emerald-300 font-medium">סה"כ הכנסות (חייבות)</p>
-                                            <h3 className="text-lg md:text-2xl font-bold text-emerald-900 dark:text-emerald-100">{formatMoney(reportData.revenue.taxable)}</h3>
-                                            <p className="text-[10px] md:text-xs text-emerald-600 dark:text-emerald-400 mt-1">מע"מ: {formatMoney(reportData.revenue.vat)}</p>
+                                            <h3 className="text-xl md:text-2xl font-bold text-emerald-900 dark:text-emerald-100" dir="ltr">
+                                                ₪{formatNumberWithCommas(Number(reportData.revenue.taxable.toFixed(2)))}
+                                            </h3>
+                                            <p className="text-[10px] md:text-xs text-emerald-600 dark:text-emerald-400 mt-1">מע"מ: {formatNumberWithCommas(Number(reportData.revenue.vat.toFixed(2)))}₪</p>
                                         </div>
                                     </div>
                                 </Card>
 
-                                <Card className="p-4 md:p-6 bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50">
+                                <Card className="p-4 md:p-6 bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50 min-w-[85%] md:min-w-0 snap-center">
                                     <div className="flex items-center gap-3 md:gap-4">
                                         <div className="p-2 md:p-3 bg-red-100 dark:bg-red-900/50 rounded-full text-red-600 dark:text-red-400">
                                             <TrendingDown className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
                                         <div>
                                             <p className="text-xs md:text-sm text-red-700 dark:text-red-300 font-medium">סה"כ הוצאות (מוכרות)</p>
-                                            <h3 className="text-lg md:text-2xl font-bold text-red-900 dark:text-red-100">{formatMoney(reportData.expenses.recognized)}</h3>
-                                            <p className="text-[10px] md:text-xs text-red-600 dark:text-red-400 mt-1">מע"מ: {formatMoney(reportData.expenses.vatRecognized)}</p>
+                                            <h3 className="text-xl md:text-2xl font-bold text-red-900 dark:text-red-100" dir="ltr">
+                                                ₪{formatNumberWithCommas(Number(reportData.expenses.recognized.toFixed(2)))}
+                                            </h3>
+                                            <p className="text-[10px] md:text-xs text-red-600 dark:text-red-400 mt-1">מע"מ: {formatNumberWithCommas(Number(reportData.expenses.vatRecognized.toFixed(2)))}₪</p>
                                         </div>
                                     </div>
                                 </Card>
 
-                                <Card className="p-4 md:p-6 bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/50">
+                                <Card className="p-4 md:p-6 bg-blue-50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/50 min-w-[85%] md:min-w-0 snap-center">
                                     <div className="flex items-center gap-3 md:gap-4">
                                         <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full text-blue-600 dark:text-blue-400">
                                             <DollarSign className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
                                         <div>
                                             <p className="text-xs md:text-sm text-blue-700 dark:text-blue-300 font-medium">רווח נקי</p>
-                                            <h3 className="text-lg md:text-2xl font-bold text-blue-900 dark:text-blue-100">{formatMoney(reportData.netProfit)}</h3>
+                                            <h3 className="text-xl md:text-2xl font-bold text-blue-900 dark:text-blue-100" dir="ltr">
+                                                ₪{formatNumberWithCommas(Number(reportData.netProfit.toFixed(2)))}
+                                            </h3>
                                             <p className="text-[10px] md:text-xs text-blue-600 dark:text-blue-400 mt-1">לפני מס הכנסה</p>
                                         </div>
                                     </div>
