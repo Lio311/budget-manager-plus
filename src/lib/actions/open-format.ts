@@ -132,10 +132,11 @@ export async function generateOpenFormat(year: number) {
         const invoices = await db.invoice.findMany({
             where: {
                 userId,
-                status: 'SIGNED', // ONLY Signed documents
+                status: { in: ['PAID', 'SENT', 'SIGNED'] },
                 issueDate: { gte: startDate, lte: endDate }
             },
-            include: { client: true, lineItems: true }
+            include: { client: true, lineItems: true },
+            orderBy: { invoiceNumber: 'asc' }
         })
 
         // -- Generate INI.TXT --
@@ -144,21 +145,61 @@ export async function generateOpenFormat(year: number) {
         iniContent += `Year=${year}\r\n`
         iniContent += `Software=BudgetManagerPlus\r\n`
         iniContent += `Version=1.0\r\n`
-        // Add more required fields...
+        iniContent += `CompanyName=${formatString(businessProfile.companyName, 20)}\r\n`
 
 
         // -- Generate BKMVDATA.TXT --
         let bkmvContent = ''
 
-        // 1. C100 & D110 (Documents)
-        // Note: Real implementation uses specialized buffers and formatting.
-        // This is a skeleton to confirm the flow.
+        // Helper for C100 (Document Header)
+        // Fields: RecordType(4), DocType(3), DocNum(20), IssueDate(8), IssueTime(4), ClientName(50), 
+        //         ClientAddress(50), ClientTaxId(9), TotalNoVat(15), VatAmount(15), Total(15),
+        //         Discount(15), Currency(3)...
+        const makeC100 = (inv: typeof invoices[0]) => {
+            let line = 'C100'
+            line += '305' // Invoice Type (Subject to change based on inv.type)
+            line += formatString(inv.invoiceNumber, 20)
+            line += formatDate(inv.issueDate)
+            line += formatTime(inv.issueDate)
+            line += formatString(inv.client?.name || inv.guestClientName || 'General Client', 50)
+            line += formatString(inv.client?.address || '', 50)
+            line += formatString(inv.client?.taxId || '000000000', 9)
+            line += formatNumber(inv.subtotal, 15)
+            line += formatNumber(inv.vatAmount, 15)
+            line += formatNumber(inv.total, 15)
+            line += formatNumber(0, 15) // Discount
+            line += 'ILS' // Currency
+            // Padding to end of record (usually 256 bytes or until newline)
+            return line + '\r\n'
+        }
+
+        // Helper for D110 (Line Items)
+        // Fields: RecordType(4), DocType(3), DocNum(20), LineNum(4), ItemCode(20), ItemName(100),
+        //         Unit(4), Quantity(12.2), Price(12.2), Discount(12.2), Total(12.2), VatRate(4)
+        const makeD110 = (inv: typeof invoices[0], item: typeof invoices[0]['lineItems'][0], idx: number) => {
+            let line = 'D110'
+            line += '305'
+            line += formatString(inv.invoiceNumber, 20)
+            line += formatInt(idx, 4)
+            line += formatString(item.id.slice(-5), 20) // Pseudo code
+            line += formatString(item.description, 100)
+            line += formatString('UNIT', 4)
+            line += formatNumber(item.quantity, 12) // Format might need adjustment for decimals
+            line += formatNumber(item.price, 12)
+            line += formatNumber(0, 12) // Discount
+            line += formatNumber(item.total, 12)
+            line += formatInt(17, 4) // Vat Rate (17%)
+            return line + '\r\n'
+        }
 
         for (const inv of invoices) {
             // C100
-            // bkmvContent += generateC100(...) 
+            bkmvContent += makeC100(inv)
+
             // D110 (Lines)
-            // for (const item of inv.lineItems) { ... }
+            inv.lineItems.forEach((item, idx) => {
+                bkmvContent += makeD110(inv, item, idx + 1)
+            })
         }
 
         // Encode to Windows-1255
