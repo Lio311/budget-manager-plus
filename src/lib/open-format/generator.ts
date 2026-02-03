@@ -36,7 +36,7 @@ export async function generateOpenFormatFiles(year: number) {
     const itemMap = new Map<string, string>() // ID -> Name
 
     // Helper to get/add client
-    const getClientKey = (client: any, guestName?: string) => {
+    const getClientKey = (client: any, guestName?: string | null) => {
         if (client) {
             const key = `C${client.id.slice(-5)}` // internal key
             if (!clientMap.has(key)) clientMap.set(key, { name: client.name, taxId: client.taxId, address: client.address })
