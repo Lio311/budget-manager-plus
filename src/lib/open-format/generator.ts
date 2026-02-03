@@ -20,7 +20,11 @@ export async function generateOpenFormatFiles(year: number) {
     const endDate = new Date(year, 11, 31, 23, 59, 59)
 
     const invoices = await db.invoice.findMany({
-        where: { userId, status: 'SIGNED', issueDate: { gte: startDate, lte: endDate } },
+        where: {
+            userId,
+            status: { in: ['SIGNED', 'PAID', 'SENT', 'OVERDUE'] },
+            issueDate: { gte: startDate, lte: endDate }
+        },
         include: { client: true, lineItems: true },
         orderBy: { issueDate: 'asc' }
     })
