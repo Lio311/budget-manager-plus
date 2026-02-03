@@ -10,7 +10,10 @@ import { DOC_TYPES } from './consts'
 export async function generateOpenFormatFiles(year: number) {
     const { userId } = await auth()
     if (!userId) throw new Error('Unauthorized')
+    return generateFilesCore(userId, year)
+}
 
+export async function generateFilesCore(userId: string, year: number) {
     const db = await authenticatedPrisma(userId)
     const business = await db.businessProfile.findUnique({ where: { userId } })
     if (!business) throw new Error('Business profile missing')
@@ -86,7 +89,7 @@ export async function generateOpenFormatFiles(year: number) {
     }
 
     // --- B110: Accounts ---
-    // We need standard accounts too: 
+    // We need standard accounts too:
     // 100000 - Cash/Bank (Simplified)
     // 800000 - Revenue
     // 900000 - VAT
@@ -165,7 +168,7 @@ export async function generateOpenFormatFiles(year: number) {
                 clientKey: clientKey,
                 clientName: cn.invoice?.client?.name || cn.invoice.guestClientName || 'Guest',
                 clientTaxId: cn.invoice?.client?.taxId || '000000000',
-                amountNoVat: cn.creditAmount, // This is pre-vat usually? Or total? 
+                amountNoVat: cn.creditAmount, // This is pre-vat usually? Or total?
                 // Logic: creditAmount is usually base. totalCredit is w/ VAT.
                 vatAmount: cn.totalCredit - cn.creditAmount,
                 totalAmount: cn.totalCredit
