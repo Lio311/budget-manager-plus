@@ -603,31 +603,25 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                         לא נמצאו נתונים
                     </div>
                 ) : filtered.map((t) => (
-                    <div key={t.id} className="glass-panel p-3 sm:p-4 rounded-xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-all" dir="rtl">
-                        <div className="flex flex-row items-center justify-between gap-3">
+                    <div key={t.id} className="glass-panel p-3 rounded-xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-all" dir="rtl">
+                        <div className="flex items-stretch justify-between gap-3">
                             {/* Right Side: Icon & Info */}
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <div className="shrink-0">
+                            <div className="flex items-center gap-3 flex-1 min-w-0 overflow-hidden">
+                                <div className="shrink-0 self-center">
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${t.category ? getCategoryColor(t.category) : 'bg-gray-100 text-gray-500'}`}>
                                         {t.category ? getCategoryIcon(t.category) : <FileText size={16} />}
                                     </div>
                                 </div>
-                                <div className="flex flex-col min-w-0 gap-0.5">
-                                    <div className="font-bold text-gray-900 text-sm truncate">
+                                <div className="flex flex-col justify-center min-w-0 gap-0.5 w-full">
+                                    <div className="font-bold text-gray-900 text-sm truncate w-full" title={t.description}>
                                         {t.description}
                                     </div>
-                                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                                        <span>{new Date(t.date).toLocaleDateString('he-IL')}</span>
-                                        {t.category && (
-                                            <>
-                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                <span className="truncate max-w-[100px]">{t.category}</span>
-                                            </>
-                                        )}
+                                    <div className="flex items-center gap-2 text-xs text-gray-500 truncate w-full">
+                                        <span className="shrink-0">{new Date(t.date).toLocaleDateString('he-IL')}</span>
                                         {t.entityName && (
                                             <>
-                                                <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                                                <span className="truncate max-w-[100px]">{t.entityName}</span>
+                                                <span className="text-gray-300">•</span>
+                                                <span className="truncate">{t.entityName}</span>
                                             </>
                                         )}
                                     </div>
@@ -635,19 +629,16 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                             </div>
 
                             {/* Left Side: Amount */}
-                            <div className="flex flex-col items-end shrink-0 min-w-[30%] pl-2">
+                            <div className="flex flex-col justify-center items-end shrink-0 pl-1 border-l-2 border-transparent">
                                 <div
-                                    className={`text-base font-bold whitespace-nowrap w-full text-left ${t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`}
-                                    style={{ direction: 'ltr' }}
+                                    className={`text-base font-bold whitespace-nowrap ${t.type === 'INVOICE' || t.type === 'CREDIT_NOTE' || t.type === 'INCOME' ? 'text-emerald-600' : 'text-red-600'}`}
+                                    dir="ltr"
                                 >
                                     ₪{formatNumberWithCommas(t.amount)}
                                 </div>
                                 {(t.vat > 0 || t.amountNet !== t.amount) && (
-                                    <div
-                                        className="text-[10px] text-gray-400 w-full text-left whitespace-nowrap"
-                                        style={{ direction: 'rtl' }}
-                                    >
-                                        <span style={{ direction: 'ltr', display: 'inline-block' }}>{formatNumberWithCommas(t.amountNet)}</span> :נטו
+                                    <div className="text-[10px] text-gray-400 whitespace-nowrap mt-0.5" dir="rtl">
+                                        נטו: <span dir="ltr">{formatNumberWithCommas(t.amountNet)}</span>
                                     </div>
                                 )}
                             </div>
