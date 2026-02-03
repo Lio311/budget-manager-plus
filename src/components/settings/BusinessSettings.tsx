@@ -230,10 +230,10 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                         <Button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={uploading}
-                            className="bg-blue-600 hover:bg-blue-700"
+                            className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
                         >
+                            <Upload className="h-4 w-4" />
                             {uploading ? 'מעלה...' : 'העלה לוגו'}
-                            <Upload className="h-4 w-4 mr-2" />
                         </Button>
                     </div>
                 )}
