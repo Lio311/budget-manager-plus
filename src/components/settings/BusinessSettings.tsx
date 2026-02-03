@@ -34,6 +34,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
     }
 
     const { data: profile, mutate } = useSWR('business-profile', fetcher, {
+        revalidateOnFocus: false,
         onSuccess: (data) => {
             if (data) {
                 setFormData({
@@ -110,8 +111,24 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
 
     const handleSave = async () => {
         // Validate all required fields
-        if (!formData.companyName.trim() || !formData.companyId.trim() || !formData.address.trim() || !formData.phone.trim() || !formData.email.trim()) {
-            toast.error('כל השדות הם שדות חובה')
+        if (!formData.companyName.trim()) {
+            toast.error('נא להזין שם עסק')
+            return
+        }
+        if (!formData.companyId.trim()) {
+            toast.error('נא להזין מספר עוסק מורשה')
+            return
+        }
+        if (!formData.address.trim()) {
+            toast.error('נא להזין כתובת')
+            return
+        }
+        if (!formData.phone.trim()) {
+            toast.error('נא להזין מספר טלפון')
+            return
+        }
+        if (!formData.email.trim()) {
+            toast.error('נא להזין כתובת אימייל')
             return
         }
 
