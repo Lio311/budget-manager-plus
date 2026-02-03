@@ -32,6 +32,7 @@ import { DataExportSettings } from '@/components/settings/DataExportSettings'
 import { IntegrationsSettings } from '@/components/settings/IntegrationsSettings'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { CustomTooltip } from '../charts/CustomTooltip'
+import { EmptyChartState } from '@/components/dashboard/charts/EmptyChartState'
 
 
 interface Category {
