@@ -219,6 +219,8 @@ ShemYezern=LiorDev
 [Isuk]
 OsekMorha=${business.companyId}
 ShemOsek=${business.companyName}
+[Kvatim]
+KovezMat=BKMVDATA.TXT
 `
     const iniBuffer = iconv.encode(iniContent, 'win1255')
 
