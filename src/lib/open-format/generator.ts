@@ -3,7 +3,7 @@ import { auth } from '@clerk/nextjs/server'
 import iconv from 'iconv-lite'
 import JSZip from 'jszip'
 import {
-    makeA100, makeB110, makeM100, makeC100, makeD110, makeB100, makeZ900
+    makeA100, makeB110, makeM100, makeC100, makeD110, makeB100, makeZ900, makeA000
 } from './records'
 import { DOC_TYPES } from './consts'
 
@@ -212,16 +212,12 @@ export async function generateFilesCore(userId: string, year: number) {
     const bkmvContent = lines.join('')
     const bkmvBuffer = iconv.encode(bkmvContent, 'win1255')
 
-    const iniContent = `[MivneAhid]
-CodMivne=1.31
-Yezern=BudgetManager
-ShemYezern=LiorDev
-[Isuk]
-OsekMorha=${business.companyId}
-ShemOsek=${business.companyName}
-[Kvatim]
-KovezMat=BKMVDATA.TXT
-`
+    const iniContent = makeA000({
+        dealerId: business.companyId || '000000000',
+        companyName: business.companyName || 'My Business',
+        softwareName: 'BudgetManager'
+    }, lineCount, year)
+
     const iniBuffer = iconv.encode(iniContent, 'win1255')
 
     const zip = new JSZip()

@@ -8,6 +8,46 @@ export interface OpenFormatOptions {
     softwareName?: string
 }
 
+// --- A000: INI Header Record (Mivne Achid 1.31 Flat) ---
+export function makeA000(opts: OpenFormatOptions, totalRecords: number, year: number): string {
+    return [
+        'A000',
+        // 1001 Future? Skip/6 spaces? Spec usually doesn't have a gap here in standard flat files unless aligned.
+        // Assuming loose concat unless offset specified.
+        fmtNum(totalRecords, 15), // 1002
+        fmtStr(opts.dealerId, 9), // 1003
+        fmtStr(opts.dealerId, 15), // 1004 (File ID/Main ID - padding Osek)
+        '&OF1.31&', // 1005
+        '00000000', // 1006 Soft Reg
+        fmtStr(opts.softwareName || 'BudgetManager', 20), // 1007
+        fmtStr('1.0', 20), // 1008 Version
+        '000000000', // 1009 Man Osek
+        fmtStr('LiorDev', 20), // 1010 Man Name
+        '2', // 1011 Soft Type
+        fmtStr('C:\\OpenFormat', 50), // 1012 Path
+        '2', // 1013 Acc Type
+        '1', // 1014 Balance
+        fmtStr(opts.dealerId, 9), // 1015 Comp Reg
+        '000000000', // 1016 Deduction
+        fmtStr('', 0), // 1017 Future?
+        fmtStr(opts.companyName, 50), // 1018 Name
+        fmtStr('', 50), // 1019 Addr
+        fmtStr('', 10), // 1020 House
+        fmtStr('', 20), // 1021 City
+        fmtStr('', 7),  // 1022 Zip
+        fmtNum(year, 4), // 1023 Year
+        fmtDate(new Date(year, 0, 1)), // 1024 Start
+        fmtDate(new Date(year, 11, 31)), // 1025 End
+        fmtDate(new Date()), // 1026 Gen Date
+        fmtTime(new Date()), // 1027 Gen Time
+        '0', // 1028 Lang
+        '2', // 1029 Charset
+        fmtStr('JSZip', 20), // 1030 Zip Name
+        'ILS', // 1032 Currency
+        '0' // 1034 Branches
+    ].join('') + '\r\n'
+}
+
 // --- A100: File Header ---
 export function makeA100(opts: OpenFormatOptions, date: Date = new Date()): string {
     // Fields: Record(4), Osek(9), Date(8), Time(4), Currency(3), Encd(10), Soft(20)
