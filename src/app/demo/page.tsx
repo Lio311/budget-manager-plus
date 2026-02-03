@@ -1,5 +1,6 @@
 import { BudgetProvider } from '@/contexts/BudgetContext'
 import { DashboardShell } from '@/components/dashboard/DashboardShell'
+import { DashboardTabs } from '@/components/dashboard/DashboardTabs'
 import { DemoProvider } from '@/contexts/DemoContext'
 
 export default function DemoPage() {
@@ -10,7 +11,9 @@ export default function DemoPage() {
                     userPlan="PERSONAL"
                     hasPersonalAccess={true}
                     hasBusinessAccess={true}
-                />
+                >
+                    <DashboardTabs mobileMenuOpen={false} setMobileMenuOpen={() => { }} />
+                </DashboardShell>
             </BudgetProvider>
         </DemoProvider>
     )
