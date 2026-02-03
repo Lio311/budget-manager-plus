@@ -387,6 +387,11 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
             throw new Error('Invoice not found')
         }
 
+        // STRICT IMMUTABILITY CHECK
+        if (existing.isSigned) {
+            throw new Error('לא ניתן לערוך מסמך חתום. יש להפיק מסמך זיכוי לביטול.')
+        }
+
         const updateData: any = {}
 
         if (data.invoiceNumber) updateData.invoiceNumber = data.invoiceNumber
@@ -517,6 +522,11 @@ export async function updateInvoiceStatus(id: string, status: 'DRAFT' | 'SENT' |
             throw new Error('Invoice not found')
         }
 
+        // STRICT IMMUTABILITY CHECK
+        if (existing.isSigned) {
+            throw new Error('לא ניתן לשנות סטטוס למסמך חתום. יש להפיק מסמך זיכוי לביטול.')
+        }
+
         const invoice = await db.invoice.update({
             where: { id },
             data: {
@@ -548,6 +558,11 @@ export async function deleteInvoice(id: string) {
         const existing = await db.invoice.findUnique({ where: { id } })
         if (!existing || existing.userId !== userId) {
             throw new Error('Invoice not found')
+        }
+
+        // STRICT IMMUTABILITY CHECK
+        if (existing.isSigned) {
+            throw new Error('לא ניתן למחוק מסמך חתום. יש להפיק מסמך זיכוי לביטול.')
         }
 
         // Check if invoice has associated incomes

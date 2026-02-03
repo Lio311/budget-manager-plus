@@ -33,6 +33,8 @@ import { IntegrationsSettings } from '@/components/settings/IntegrationsSettings
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { CustomTooltip } from '../charts/CustomTooltip'
 import { EmptyChartState } from '@/components/dashboard/charts/EmptyChartState'
+import { OpenFormatTab } from '@/components/settings/tabs/OpenFormatTab'
+import { LegalComplianceTab } from '@/components/settings/tabs/LegalComplianceTab'
 
 interface Category {
     id: string
@@ -798,9 +800,11 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <DialogTitle className="text-right">הגדרות עסק</DialogTitle>
                             </DialogHeader>
                             <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
-                                <TabsList className="grid w-full grid-cols-3">
+                                <TabsList className="grid w-full grid-cols-5">
                                     <TabsTrigger value="details">פרטי העסק</TabsTrigger>
                                     <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
+                                    <TabsTrigger value="openformat">מבנה אחיד</TabsTrigger>
+                                    <TabsTrigger value="legal">רגולציה</TabsTrigger>
                                     <TabsTrigger value="export">ייצוא נתונים</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="details" className="mt-4">
@@ -847,6 +851,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                             </Button>
                                         </CardContent>
                                     </Card>
+                                </TabsContent>
+                                <TabsContent value="openformat" className="mt-4">
+                                    <OpenFormatTab />
+                                </TabsContent>
+                                <TabsContent value="legal" className="mt-4">
+                                    <LegalComplianceTab />
                                 </TabsContent>
                                 <TabsContent value="export" className="mt-4">
                                     <DataExportSettings />

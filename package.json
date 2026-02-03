@@ -50,6 +50,7 @@
     "googleapis": "^169.0.0",
     "html-react-parser": "^5.2.11",
     "html2canvas": "^1.4.1",
+    "iconv-lite": "^0.7.2",
     "isomorphic-dompurify": "^2.35.0",
     "jspdf": "^3.0.4",
     "jszip": "^3.10.1",
