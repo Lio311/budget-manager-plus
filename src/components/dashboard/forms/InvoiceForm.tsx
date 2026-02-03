@@ -426,13 +426,14 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                         <div className="flex items-center gap-1">
                                             <input
                                                 type="text"
-                                                className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center"
+                                                className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center text-base md:text-sm"
                                                 value={item.description}
                                                 onChange={(e) => {
                                                     const newItems = [...lineItems]
                                                     newItems[index].description = e.target.value
                                                     setLineItems(newItems)
                                                 }}
+                                                onClick={() => window.innerWidth < 768 && setEditingItemId(item.id)}
                                                 placeholder="תיאור הפריט"
                                             />
                                             <button
@@ -450,7 +451,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             type="number"
                                             min="0"
                                             step="0.01"
-                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center"
+                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center text-base md:text-sm"
                                             value={item.quantity}
                                             onChange={(e) => {
                                                 const val = parseFloat(e.target.value) || 0
@@ -467,7 +468,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             type="number"
                                             min="0"
                                             step="0.01"
-                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center"
+                                            className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center text-base md:text-sm"
                                             value={item.price}
                                             onWheel={(e) => e.currentTarget.blur()}
                                             onFocus={(e) => {

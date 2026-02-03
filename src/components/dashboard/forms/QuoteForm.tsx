@@ -215,7 +215,8 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                                                     type="text"
                                                     value={item.description}
                                                     onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                                                    className="w-full bg-transparent border-none focus:ring-0 p-1 text-center"
+                                                    onClick={() => window.innerWidth < 768 && setEditingItemId(item.id)}
+                                                    className="w-full bg-transparent border-none focus:ring-0 p-1 text-center text-base md:text-sm"
                                                     placeholder="תיאור הפריט"
                                                 />
                                                 <button
@@ -233,7 +234,7 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                                                 value={item.quantity}
                                                 onChange={(e) => { }}
                                                 onValueChange={(value) => updateItem(item.id, 'quantity', value)}
-                                                className="w-full text-center bg-transparent border-none focus:ring-0 p-1"
+                                                className="w-full text-center bg-transparent border-none focus:ring-0 p-1 text-base md:text-sm"
                                                 min={1}
                                             />
                                         </td>
@@ -247,7 +248,7 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                                                         updateItem(item.id, 'price', '')
                                                     }
                                                 }}
-                                                className="w-full text-center bg-transparent border-none focus:ring-0 p-1"
+                                                className="w-full text-center bg-transparent border-none focus:ring-0 p-1 text-base md:text-sm"
                                             />
                                         </td>
                                         <td className="p-2 text-center font-medium">
