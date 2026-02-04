@@ -156,8 +156,18 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     }, [searchParams])
 
     // Fetch business profile to check VAT status
-    const { data: businessProfile } = useSWR('business-profile', getBusinessProfile)
-    const isExemptDealer = businessProfile?.data?.vatStatus === 'EXEMPT'
+    const { data: businessProfile } = useSWR('business-profile', async () => {
+        const { getBusinessProfile } = await import('@/lib/actions/business-settings')
+        const res = await getBusinessProfile()
+        return res.data
+    })
+
+    const isLicensedDealer = businessProfile?.vatStatus === 'AUTHORIZED' ||
+        businessProfile?.vatStatus === 'LTD' ||
+        businessProfile?.vatStatus === 'FULL' ||
+        businessProfile?.vatStatus === 'PARTIAL';
+
+    const isExemptDealer = businessProfile?.vatStatus === 'EXEMPT'
 
     useEffect(() => {
         if (isBusiness && newIncome.amount && newIncome.vatRate && !isExemptDealer) {
@@ -447,7 +457,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
 
                 {/* Business Fields - VAT & Calculations: Only for Licensed Dealers */}
-                {isBusiness && !isExemptDealer && (
+                {isBusiness && isLicensedDealer && (
                     <div className="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-900/20 space-y-3">
                         <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-green-200 dark:border-green-900/30">
                             <div className="text-center">

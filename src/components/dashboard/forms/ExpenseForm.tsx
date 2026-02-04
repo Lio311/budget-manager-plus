@@ -98,8 +98,18 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
 
     // Fetch business profile
-    const { data: businessProfile } = useSWR('business-profile', getBusinessProfile)
-    const isExemptDealer = businessProfile?.data?.vatStatus === 'EXEMPT'
+    const { data: businessProfile } = useSWR('business-profile', async () => {
+        const { getBusinessProfile } = await import('@/lib/actions/business-settings')
+        const res = await getBusinessProfile()
+        return res.data
+    })
+
+    const isLicensedDealer = businessProfile?.vatStatus === 'AUTHORIZED' ||
+        businessProfile?.vatStatus === 'LTD' ||
+        businessProfile?.vatStatus === 'FULL' ||
+        businessProfile?.vatStatus === 'PARTIAL';
+
+    const isExemptDealer = businessProfile?.vatStatus === 'EXEMPT'
 
     const [newExpense, setNewExpense] = useState(initialData ? {
         description: initialData.description || '',
