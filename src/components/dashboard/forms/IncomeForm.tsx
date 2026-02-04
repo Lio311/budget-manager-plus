@@ -449,36 +449,19 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 {/* Business Fields - VAT & Calculations: Only for Licensed Dealers */}
                 {isBusiness && !isExemptDealer && (
                     <div className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-800/50 space-y-3">
-                        <div className="flex gap-4">
-                            <div className="w-1/2">
-                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">מע"מ</label>
-                                <Select
-                                    value={newIncome.vatRate}
-                                    onValueChange={(value) => setNewIncome({ ...newIncome, vatRate: value })}
-                                >
-                                    <SelectTrigger className="h-9 bg-white dark:bg-slate-800 text-right">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent dir="rtl">
-                                        <SelectItem value="0.18">18%</SelectItem>
-                                        <SelectItem value="0">0% (פטור/אילת)</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                        <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-green-200 dark:border-green-900/30">
+                            <div>
+                                <span className="block text-gray-500 dark:text-gray-400">סכום כולל:</span>
+                                <span className="font-bold text-gray-700 dark:text-gray-200">
+                                    {formatCurrency((parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0))}
+                                </span>
                             </div>
-                            <div className="w-1/2">
-                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">סכום המע"מ</label>
-                                <Input
-                                    value={formatCurrency(parseFloat(newIncome.vatAmount) || 0)}
-                                    readOnly
-                                    className="h-9 bg-gray-100 dark:bg-slate-900 text-gray-500 text-left ltr"
-                                />
+                            <div className="text-left ltr">
+                                <span className="block text-gray-500 dark:text-gray-400">מע"מ (18%):</span>
+                                <span className="font-bold text-green-600 dark:text-green-400">
+                                    {formatCurrency(parseFloat(newIncome.vatAmount) || 0)}
+                                </span>
                             </div>
-                        </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-slate-700">
-                            <span className="text-sm font-bold text-gray-700 dark:text-gray-300">סה"כ כולל מע"מ:</span>
-                            <span className="text-lg font-bold text-green-600">
-                                {formatCurrency((parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0))}
-                            </span>
                         </div>
                     </div>
                 )}

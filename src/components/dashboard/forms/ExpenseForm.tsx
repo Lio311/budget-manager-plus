@@ -643,7 +643,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                                     }}
                                     className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
                                 />
-                                הוצאה מוכרת למע"מ
+                                הוצאה מוכרת לצרכי מס
                             </label>
 
                         </div>
@@ -651,11 +651,11 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                         {newExpense.isDeductible && (
                             <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-red-200 dark:border-red-900/30">
                                 <div>
-                                    <span className="block text-gray-500 dark:text-gray-400">לפני מע"מ:</span>
+                                    <span className="block text-gray-500 dark:text-gray-400">סכום ללא מע"מ:</span>
                                     <span className="font-bold text-gray-700 dark:text-gray-200">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</span>
                                 </div>
                                 <div className="text-left ltr">
-                                    <span className="block text-gray-500 dark:text-gray-400">מע"מ (17%):</span>
+                                    <span className="block text-gray-500 dark:text-gray-400">מע"מ מוכר (18%):</span>
                                     <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</span>
                                 </div>
                             </div>
