@@ -448,17 +448,17 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
                 {/* Business Fields - VAT & Calculations: Only for Licensed Dealers */}
                 {isBusiness && !isExemptDealer && (
-                    <div className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-800/50 space-y-3">
+                    <div className="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-900/20 space-y-3">
                         <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-green-200 dark:border-green-900/30">
-                            <div className="text-left ltr">
-                                <span className="block text-gray-500 dark:text-gray-400">מע"מ (18%):</span>
-                                <span className="font-bold text-green-600 dark:text-green-400">
+                            <div className="text-center">
+                                <span className="block text-green-700 dark:text-green-300 font-medium">מע"מ ({newIncome.vatRate === '0.18' ? '18%' : '0%'}):</span>
+                                <span className="font-bold text-green-800 dark:text-green-100 text-lg">
                                     {formatCurrency(parseFloat(newIncome.vatAmount) || 0)}
                                 </span>
                             </div>
-                            <div>
-                                <span className="block text-gray-500 dark:text-gray-400">סכום כולל:</span>
-                                <span className="font-bold text-gray-700 dark:text-gray-200">
+                            <div className="text-center">
+                                <span className="block text-green-700 dark:text-green-300 font-medium">סכום כולל:</span>
+                                <span className="font-bold text-green-800 dark:text-green-100 text-lg">
                                     {formatCurrency((parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0))}
                                 </span>
                             </div>
