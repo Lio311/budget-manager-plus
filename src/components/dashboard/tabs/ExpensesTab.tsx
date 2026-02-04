@@ -146,9 +146,9 @@ export function ExpensesTab() {
         const { getBusinessProfile } = await import('@/lib/actions/business-settings')
         const res = await getBusinessProfile()
         return res.data
-    }, { revalidateOnFocus: false })
+    }) // Removed revalidateOnFocus: false to ensure updates from Settings are reflected
 
-    const isExemptDealer = businessProfile?.vatStatus === 'EXEMPT'
+    const isExemptDealer = businessProfile?.vatStatus?.toUpperCase() === 'EXEMPT'
 
     const fetcherSuppliers = async () => {
         const result = await getSuppliers()
