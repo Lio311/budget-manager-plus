@@ -635,8 +635,6 @@ export function ExpensesTab() {
                                             {/* Financials Section - Spans 5 columns */}
                                             <div className="sm:col-span-5 flex flex-col items-end gap-1 mt-2 sm:mt-0 border-t sm:border-0 pt-2 sm:pt-0 border-gray-100 dark:border-gray-800">
                                                 {/* Amount Display */}
-                                                {isBusiness && exp.isDeductible && !isExemptDealer && !loadingProfile ? (
-                                                    {/* Amount Display */ }
                                                 {isBusiness && exp.isDeductible && isLicensedDealer ? (
                                                     <div className="flex flex-col items-end w-full">
                                                         <div className="flex flex-row-reverse sm:flex-row items-baseline gap-2 w-full justify-between sm:justify-end">
