@@ -639,11 +639,13 @@ export function ExpensesTab() {
                                                             {/* Mobile Breakdown moved here or kept stacked? Keeping stacked for clean look */}
                                                         </div>
 
-                                                        {/* VAT Breakdown - Always visible but smaller */}
-                                                        <div className="flex items-center gap-3 text-[10px] text-gray-400 font-medium">
-                                                            <span>ללא מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))}</span>
-                                                            <span>מע"מ: {formatNumberWithCommas(exp.vatAmount || 0)}</span>
-                                                        </div>
+                                                        {/* VAT Breakdown - Only for Licensed Dealers */}
+                                                        {!isExemptDealer && (
+                                                            <div className="flex items-center gap-3 text-[10px] text-gray-400 font-medium">
+                                                                <span>ללא מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))}</span>
+                                                                <span>מע"מ: {formatNumberWithCommas(exp.vatAmount || 0)}</span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <div className="text-base sm:text-lg font-bold text-[#e2445c] whitespace-nowrap">
