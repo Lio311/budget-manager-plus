@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Upload, X, Image as ImageIcon, Save, Pen } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, Save, Pen, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -34,22 +34,24 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
         return result.data
     }
 
-    const { data: profile, mutate } = useSWR('business-profile', fetcher, {
-        revalidateOnFocus: false,
-        onSuccess: (data) => {
-            if (data) {
-                setFormData({
-                    companyName: data.companyName || '',
-                    companyId: data.companyId || '',
-                    vatStatus: data.vatStatus === 'EXEMPT' ? 'EXEMPT' : 'AUTHORIZED',
-                    address: data.address || '',
-                    phone: data.phone || '',
-                    email: data.email || '',
-                    signature: data.signatureUrl || ''
-                })
-            }
-        }
+    const { data: profile, mutate, isLoading } = useSWR('business-profile', fetcher, {
+        revalidateOnFocus: false
     })
+
+    // Sync form data when profile loads
+    useEffect(() => { // Turbo-Fix: Using useEffect ensures form populates even if SWR serves from cache immediately
+        if (profile) {
+            setFormData({
+                companyName: profile.companyName || '',
+                companyId: profile.companyId || '',
+                vatStatus: profile.vatStatus === 'EXEMPT' ? 'EXEMPT' : 'AUTHORIZED',
+                address: profile.address || '',
+                phone: profile.phone || '',
+                email: profile.email || '',
+                signature: profile.signatureUrl || ''
+            })
+        }
+    }, [profile])
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -179,6 +181,14 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
     }
 
     const currentLogo = preview || profile?.logoUrl
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center py-10">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            </div>
+        )
+    }
 
     return (
         <div className="space-y-4 text-right">

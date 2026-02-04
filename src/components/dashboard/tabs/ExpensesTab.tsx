@@ -146,9 +146,14 @@ export function ExpensesTab() {
         const { getBusinessProfile } = await import('@/lib/actions/business-settings')
         const res = await getBusinessProfile()
         return res.data
-    }) // Removed revalidateOnFocus: false to ensure updates from Settings are reflected
+    })
 
-    const isExemptDealer = businessProfile?.vatStatus?.toUpperCase() === 'EXEMPT'
+    // Strict check: Only show VAT if explicitly authorized
+    // If loading, or undefined, or EXEMPT -> fail this check
+    const isLicensedDealer = businessProfile?.vatStatus === 'AUTHORIZED' ||
+        businessProfile?.vatStatus === 'LTD' ||
+        businessProfile?.vatStatus === 'FULL' ||
+        businessProfile?.vatStatus === 'PARTIAL';
 
     const fetcherSuppliers = async () => {
         const result = await getSuppliers()
@@ -472,9 +477,9 @@ export function ExpensesTab() {
 
             {/* Summary Card */}
             <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-orange-600' : 'border-r-[#e2445c]'} dark:bg-slate-800`} id="expenses-stats-cards">
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? (isExemptDealer ? 'סך הוצאות חודשיות' : 'סך עלויות / הוצאות חודשיות (נקי)') : 'סך הוצאות חודשיות'}</h3>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? (isLicensedDealer ? 'סך עלויות / הוצאות חודשיות (נקי)' : 'סך הוצאות חודשיות') : 'סך הוצאות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'} ${loadingExpenses ? 'animate-pulse' : ''}`}>
-                    {loadingExpenses ? '...' : formatCurrency(isBusiness && !isExemptDealer ? totalNetExpensesILS : totalExpensesILS, '₪')}
+                    {loadingExpenses ? '...' : formatCurrency((isBusiness && isLicensedDealer) ? totalNetExpensesILS : totalExpensesILS, '₪')}
                 </div>
             </div>
 
@@ -600,7 +605,7 @@ export function ExpensesTab() {
                                                             קבועה
                                                         </div>
                                                     )}
-                                                    {isBusiness && exp.isDeductible && !isExemptDealer && !loadingProfile && (
+                                                    {isBusiness && exp.isDeductible && isLicensedDealer && (
                                                         <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
                                                             <span className="w-1 h-1 rounded-full bg-current" />
                                                             הוצאה מוכרת
@@ -631,6 +636,8 @@ export function ExpensesTab() {
                                             <div className="sm:col-span-5 flex flex-col items-end gap-1 mt-2 sm:mt-0 border-t sm:border-0 pt-2 sm:pt-0 border-gray-100 dark:border-gray-800">
                                                 {/* Amount Display */}
                                                 {isBusiness && exp.isDeductible && !isExemptDealer && !loadingProfile ? (
+                                                    {/* Amount Display */ }
+                                                {isBusiness && exp.isDeductible && isLicensedDealer ? (
                                                     <div className="flex flex-col items-end w-full">
                                                         <div className="flex flex-row-reverse sm:flex-row items-baseline gap-2 w-full justify-between sm:justify-end">
                                                             <span className="text-base sm:text-lg font-bold text-red-600 whitespace-nowrap">
@@ -640,7 +647,7 @@ export function ExpensesTab() {
                                                         </div>
 
                                                         {/* VAT Breakdown - Only for Licensed Dealers */}
-                                                        {!isExemptDealer && !loadingProfile && (
+                                                        {isLicensedDealer && (
                                                             <div className="flex items-center gap-3 text-[10px] text-gray-400 font-medium">
                                                                 <span>ללא מע"מ: {formatNumberWithCommas((exp.amount - (exp.vatAmount || 0)))}</span>
                                                                 <span>מע"מ: {formatNumberWithCommas(exp.vatAmount || 0)}</span>
