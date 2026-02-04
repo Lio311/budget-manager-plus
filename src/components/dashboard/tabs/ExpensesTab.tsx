@@ -463,6 +463,9 @@ export function ExpensesTab() {
             <div className="flex justify-between items-start">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-[#e2445c] to-[#ff5d75] bg-clip-text text-transparent mb-4">
                     {isBusiness ? 'הוצאות ותשלומים' : 'הוצאות שוטפות'}
+                    <span className="text-xs font-normal text-gray-400 ml-2">
+                        ({isLicensedDealer ? 'מורשה' : 'פטור'} - {businessProfile?.vatStatus || 'אין נתונים'})
+                    </span>
                 </h2>
                 <Button
                     variant="ghost"
