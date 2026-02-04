@@ -38,12 +38,16 @@ export async function getBusinessProfile() {
     noStore()
     try {
         const user = await currentUser()
-        if (!user) throw new Error('Unauthorized')
+        if (!user) {
+            console.error('getBusinessProfile: No user found')
+            throw new Error('Unauthorized')
+        }
 
         const profile = await prisma.businessProfile.findUnique({
             where: { userId: user.id }
         })
 
+        console.log(`getBusinessProfile for ${user.id} (${user.emailAddresses[0]?.emailAddress}):`, profile ? 'Found' : 'Not Found', profile?.vatStatus)
         return { success: true, data: profile }
     } catch (error) {
         console.error('getBusinessProfile error:', error)

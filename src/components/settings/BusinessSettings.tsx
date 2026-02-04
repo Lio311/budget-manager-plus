@@ -35,8 +35,11 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
     }
 
     const { data: profile, mutate, isLoading } = useSWR('business-profile', fetcher, {
-        revalidateOnFocus: false
+        revalidateOnFocus: false,
+        onError: (err) => console.error('SWR BusinessProfile Error:', err)
     })
+
+    console.log('BusinessSettings Render:', { isLoading, hasProfile: !!profile, vatStatus: profile?.vatStatus })
 
     // Sync form data when profile loads
     useEffect(() => { // Turbo-Fix: Using useEffect ensures form populates even if SWR serves from cache immediately
