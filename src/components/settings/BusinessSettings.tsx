@@ -393,8 +393,9 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
             {/* Debug Info */}
             <div className="mt-8 p-4 bg-gray-100 rounded-lg text-xs font-mono text-left text-gray-500" dir="ltr">
                 <p>Debug Info:</p>
-                <p>Profile: {profile ? 'Found' : 'Not Found'}</p>
-                <p>VAT Status: {profile?.vatStatus || 'N/A'}</p>
+                <div className="max-h-40 overflow-auto whitespace-pre-wrap word-break-break-all">
+                    {JSON.stringify(profile, null, 2)}
+                </div>
                 <DebugUserDisplay />
             </div>
         </div>

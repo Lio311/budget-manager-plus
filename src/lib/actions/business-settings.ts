@@ -47,8 +47,25 @@ export async function getBusinessProfile() {
             where: { userId: user.id }
         })
 
-        console.log(`getBusinessProfile for ${user.id} (${user.emailAddresses[0]?.emailAddress}):`, profile ? 'Found' : 'Not Found', profile?.vatStatus)
-        return { success: true, data: profile }
+        console.log(`getBusinessProfile for ${user.id}:`, profile)
+
+        // Ensure serialization by returning a plain object
+        const cleanProfile = profile ? {
+            id: profile.id,
+            userId: profile.userId,
+            companyName: profile.companyName,
+            companyId: profile.companyId,
+            vatStatus: profile.vatStatus,
+            address: profile.address,
+            phone: profile.phone,
+            email: profile.email,
+            signatureUrl: profile.signatureUrl,
+            logoUrl: profile.logoUrl,
+            taxRate: profile.taxRate,
+            marketingBudget: profile.marketingBudget
+        } : null
+
+        return { success: true, data: cleanProfile }
     } catch (error) {
         console.error('getBusinessProfile error:', error)
         return { success: false, error: 'Failed to fetch business profile' }
