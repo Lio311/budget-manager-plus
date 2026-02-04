@@ -390,29 +390,6 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                     {saving ? 'שומר שינויים...' : 'שמור פרטים'}
                 </Button>
             </div>
-            {/* Debug Info */}
-            <div className="mt-8 p-4 bg-gray-100 rounded-lg text-xs font-mono text-left text-gray-500" dir="ltr">
-                <p>Debug Info:</p>
-                <div className="max-h-40 overflow-auto whitespace-pre-wrap word-break-break-all">
-                    {JSON.stringify(profile, null, 2)}
-                </div>
-                <DebugUserDisplay />
-            </div>
-        </div>
-    )
-}
-
-function DebugUserDisplay() {
-    const { data } = useSWR('debug-user', async () => {
-        const { getDebugCurrentUser } = await import('@/lib/actions/debug-user')
-        return getDebugCurrentUser()
-    })
-
-    if (!data) return null
-    return (
-        <div className="mt-2 p-2 bg-slate-200 rounded border border-slate-300">
-            <p>User ID: {data.id}</p>
-            <p>Email: {data.email}</p>
         </div>
     )
 }
