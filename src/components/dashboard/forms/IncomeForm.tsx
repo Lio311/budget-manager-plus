@@ -430,7 +430,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             value={newIncome.amount}
                             onChange={() => { }}
                             onValueChange={(value) => {
-                                setNewIncome({ ...newIncome, amount: value })
+                                setNewIncome({ ...newIncome, amount: value ? value.toString() : '' })
                                 if (value) setErrors(prev => ({ ...prev, amount: false }))
                             }}
                             className={`h-10 text-left ltr ${errors.amount ? 'border-red-500' : 'border-gray-200'}`}
