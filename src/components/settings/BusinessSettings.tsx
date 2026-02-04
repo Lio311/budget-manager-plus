@@ -390,6 +390,13 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                     {saving ? 'שומר שינויים...' : 'שמור פרטים'}
                 </Button>
             </div>
+            {/* Debug Info */}
+            <div className="mt-8 p-4 bg-gray-100 rounded-lg text-xs font-mono text-left text-gray-500" dir="ltr">
+                <p>Debug Info:</p>
+                <p>Profile: {profile ? 'Found' : 'Not Found'}</p>
+                <p>VAT Status: {profile?.vatStatus || 'N/A'}</p>
+                <DebugUserDisplay />
+            </div>
         </div>
     )
 }
