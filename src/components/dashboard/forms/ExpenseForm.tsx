@@ -40,6 +40,7 @@ import { ProjectSelector } from './ProjectSelector'
 import { addProject } from '@/lib/actions/projects'
 import useSWR from 'swr'
 import { getProjects } from '@/lib/actions/projects'
+import { getBusinessProfile } from '@/lib/actions/business-settings'
 
 interface Category {
     id: string
@@ -96,8 +97,14 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
 
+    // Fetch business profile
+    const { data: businessProfile } = useSWR('business-profile', getBusinessProfile)
+    const isExemptDealer = businessProfile?.data?.vatStatus === 'EXEMPT'
+
     const [newExpense, setNewExpense] = useState(initialData ? {
         description: initialData.description || '',
+
+
         amount: initialData.amount?.toString() || '',
         category: initialData.category || '',
         currency: initialData.currency || 'ILS',
@@ -595,7 +602,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                         </Select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום (כולל מע"מ) *' : 'סכום כולל *'}</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness && !isExemptDealer ? 'סכום (כולל מע"מ) *' : 'סכום כולל *'}</label>
                         <FormattedNumberInput
                             id="amount-input"
                             className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-red-500/20' : 'focus:ring-red-500/20'}`}
@@ -623,26 +630,36 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                     />
                 </div>
 
-                {isBusiness && newExpense.isDeductible && (
-                    <div className="grid grid-cols-2 gap-3 p-3 bg-red-50/50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-800/50">
-                        <div>
-                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">מע"מ מוכר (18%)</label>
-                            <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</div>
-                        </div>
-                        <div>
-                            <label className="text-[10px] font-bold text-red-800 dark:text-red-400 uppercase mb-1 block">סכום ללא מע"מ</label>
-                            <div className="text-sm font-bold text-red-900 dark:text-red-300">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</div>
-                        </div>
-                    </div>
-                )}
+                {/* Business VAT Deductible Checkbox - HIDDEN for Exempt Dealers */}
+                {isBusiness && !isExemptDealer && (
+                    <div className="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/20 space-y-3">
+                        <div className="flex justify-between items-center">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                <Checkbox
+                                    checked={newExpense.isDeductible}
+                                    onCheckedChange={(checked) => {
+                                        if (isDemo) { interceptAction(); return; }
+                                        setNewExpense({ ...newExpense, isDeductible: checked === true })
+                                    }}
+                                    className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
+                                />
+                                הוצאה מוכרת למע"מ
+                            </label>
 
-                {isBusiness && (
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-700">
-                        <Checkbox id="is-deductible" checked={newExpense.isDeductible} onCheckedChange={(checked) => {
-                            if (isDemo) { interceptAction(); return; }
-                            setNewExpense({ ...newExpense, isDeductible: checked as boolean })
-                        }} className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600" />
-                        <label htmlFor="is-deductible" className="text-xs font-bold text-[#323338] dark:text-gray-100 cursor-pointer">הוצאה מוכרת לצורכי מס</label>
+                        </div>
+
+                        {newExpense.isDeductible && (
+                            <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-red-200 dark:border-red-900/30">
+                                <div>
+                                    <span className="block text-gray-500 dark:text-gray-400">לפני מע"מ:</span>
+                                    <span className="font-bold text-gray-700 dark:text-gray-200">{formatCurrency(parseFloat(newExpense.amountBeforeVat) || 0, getCurrencySymbol(newExpense.currency))}</span>
+                                </div>
+                                <div className="text-left ltr">
+                                    <span className="block text-gray-500 dark:text-gray-400">מע"מ (17%):</span>
+                                    <span className="font-bold text-red-600 dark:text-red-400">{formatCurrency(parseFloat(newExpense.vatAmount) || 0, getCurrencySymbol(newExpense.currency))}</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
 

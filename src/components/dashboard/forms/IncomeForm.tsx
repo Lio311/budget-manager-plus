@@ -31,6 +31,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { addIncome, updateIncome } from '@/lib/actions/income'
+import { getBusinessProfile } from '@/lib/actions/business-settings'
 import { useOptimisticMutation } from '@/hooks/useOptimisticMutation'
 import { CategoryManagementDialog } from './CategoryManagementDialog'
 import { SimpleClientSelector } from './SimpleClientSelector'
@@ -154,12 +155,19 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         }
     }, [searchParams])
 
+    // Fetch business profile to check VAT status
+    const { data: businessProfile } = useSWR('business-profile', getBusinessProfile)
+    const isExemptDealer = businessProfile?.data?.vatStatus === 'EXEMPT'
+
     useEffect(() => {
-        if (isBusiness && newIncome.amount && newIncome.vatRate) {
+        if (isBusiness && newIncome.amount && newIncome.vatRate && !isExemptDealer) {
             const { total, vat } = calculateFromNet(newIncome.amount, newIncome.vatRate)
             setNewIncome(prev => ({ ...prev, amountBeforeVat: newIncome.amount, vatAmount: vat }))
+        } else if (isBusiness && isExemptDealer && newIncome.amount) {
+            // For Exempt Dealer, amount is just amount. No VAT calc.
+            setNewIncome(prev => ({ ...prev, amountBeforeVat: newIncome.amount, vatAmount: '0' }))
         }
-    }, [newIncome.amount, newIncome.vatRate, isBusiness])
+    }, [newIncome.amount, newIncome.vatRate, isBusiness, isExemptDealer])
 
     // Effect to auto-select first category when categories load if no category is selected
     useEffect(() => {
@@ -416,33 +424,27 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         </Select>
                     </div>
                     <div className="col-span-2">
-                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness ? 'סכום ללא מע"מ *' : 'סכום כולל *'}</label>
+                        <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">{isBusiness && !isExemptDealer ? 'סכום ללא מע"מ *' : 'סכום כולל *'}</label>
                         <FormattedNumberInput
                             id="income-amount-input"
-                            className={`h-10 ${errors.amount ? 'border-red-500' : 'border-gray-200'} ${isBusiness ? 'focus:ring-green-500/20' : 'focus:ring-green-500/20'}`}
-                            placeholder="0.00"
                             value={newIncome.amount}
-                            onFocus={() => isDemo && interceptAction()}
-                            onChange={(e) => {
-                                setNewIncome({ ...newIncome, amount: e.target.value })
-                                if (e.target.value) setErrors(prev => ({ ...prev, amount: false }))
+                            onChange={() => { }}
+                            onValueChange={(value) => {
+                                setNewIncome({ ...newIncome, amount: value })
+                                if (value) setErrors(prev => ({ ...prev, amount: false }))
                             }}
+                            className={`h-10 text-left ltr ${errors.amount ? 'border-red-500' : 'border-gray-200'}`}
+                            placeholder="0.00"
                         />
+                        {isBusiness && !isExemptDealer && newIncome.amount && (
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">
+                                לפני מע"מ
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {isBusiness && (
-                    <div className="grid grid-cols-2 gap-3 p-3 bg-green-50/50 dark:bg-green-900/20 rounded-lg border border-green-100 dark:border-green-800/50">
-                        <div>
-                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">מע"מ (18%)</label>
-                            <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency(parseFloat(newIncome.vatAmount) || 0, getCurrencySymbol(newIncome.currency))}</div>
-                        </div>
-                        <div>
-                            <label className="text-[10px] font-bold text-green-800 dark:text-green-400 uppercase mb-1 block">סכום כולל</label>
-                            <div className="text-sm font-bold text-green-900 dark:text-green-300">{formatCurrency((parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0), getCurrencySymbol(newIncome.currency))}</div>
-                        </div>
-                    </div>
-                )}
+
 
                 {/* Date Selection (Always Visible for both now) */}
                 <div className="w-full">
@@ -484,7 +486,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 />
                             </div>
 
-                            {isBusiness && (
+                            {isBusiness && !isExemptDealer && (
                                 <div className="w-full">
                                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
                                     <Input className="h-10 border-gray-200 focus:ring-green-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />

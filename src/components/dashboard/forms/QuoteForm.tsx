@@ -12,6 +12,8 @@ import { toast } from 'sonner'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { RichTextEditor } from '@/components/ui/RichTextEditor'
 import { MobileDescriptionEditor } from './MobileDescriptionEditor'
+import { getBusinessProfile } from '@/lib/actions/business-settings'
+import useSWR from 'swr'
 
 interface QuoteFormProps {
     clients: any[]
@@ -37,6 +39,17 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
     })
 
     const isEditing = !!initialData
+
+    // Fetch business profile
+    const { data: businessProfile } = useSWR('business-profile', getBusinessProfile)
+    const isExemptDealer = businessProfile?.data?.vatStatus === 'EXEMPT'
+
+    // Force VAT to 0 if Exempt Dealer
+    useEffect(() => {
+        if (isExemptDealer && formData.vatRate !== 0) {
+            setFormData(prev => ({ ...prev, vatRate: 0 }))
+        }
+    }, [isExemptDealer])
 
     const addItem = () => {
         setFormData(prev => ({
@@ -277,37 +290,43 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        שיעור מע"מ
-                    </label>
-                    <div dir="rtl">
-                        <Select
-                            value={(formData.vatRate ?? 0).toString()}
-                            onValueChange={(value) => setFormData((prev) => ({ ...prev, vatRate: parseFloat(value) }))}
-                        >
-                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
-                                <SelectValue placeholder='בחר מע"מ' />
-                            </SelectTrigger>
-                            <SelectContent dir="rtl">
-                                <SelectItem value="0">ללא מע"מ (0%)</SelectItem>
-                                <SelectItem value="0.18">מע"מ רגיל (18%)</SelectItem>
-                            </SelectContent>
-                        </Select>
+                {!isExemptDealer && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            שיעור מע"מ
+                        </label>
+                        <div dir="rtl">
+                            <Select
+                                value={(formData.vatRate ?? 0).toString()}
+                                onValueChange={(value) => setFormData((prev) => ({ ...prev, vatRate: parseFloat(value) }))}
+                            >
+                                <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                                    <SelectValue placeholder='בחר מע"מ' />
+                                </SelectTrigger>
+                                <SelectContent dir="rtl">
+                                    <SelectItem value="0">ללא מע"מ (0%)</SelectItem>
+                                    <SelectItem value="0.18">מע"מ רגיל (18%)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             <div className="bg-yellow-50 p-4 rounded-md border border-yellow-100 dark:bg-yellow-900/20 dark:border-yellow-900/50">
-                <div className="flex justify-between text-sm mb-2">
-                    <span className="dark:text-yellow-100">סכום ללא מע"מ:</span>
-                    <span className="dark:text-yellow-100">₪{formData.subtotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm mb-2">
-                    <span className="dark:text-yellow-100">מע"מ ({(formData.vatRate || 0) * 100}%):</span>
-                    <span className="dark:text-yellow-100">₪{(formData.subtotal * (formData.vatRate || 0)).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-lg font-bold border-t border-yellow-200 pt-2 dark:border-yellow-900/50">
+                {!isExemptDealer && (
+                    <>
+                        <div className="flex justify-between text-sm mb-2">
+                            <span className="dark:text-yellow-100">סכום ללא מע"מ:</span>
+                            <span className="dark:text-yellow-100">₪{formData.subtotal.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-sm mb-2">
+                            <span className="dark:text-yellow-100">מע"מ ({(formData.vatRate || 0) * 100}%):</span>
+                            <span className="dark:text-yellow-100">₪{(formData.subtotal * (formData.vatRate || 0)).toLocaleString()}</span>
+                        </div>
+                    </>
+                )}
+                <div className={`flex justify-between text-lg font-bold ${!isExemptDealer ? 'border-t border-yellow-200 pt-2 dark:border-yellow-900/50' : ''}`}>
                     <span className="dark:text-yellow-100">סה"כ לתשלום:</span>
                     <span className="text-yellow-700 dark:text-yellow-400">₪{total.toLocaleString()}</span>
                 </div>

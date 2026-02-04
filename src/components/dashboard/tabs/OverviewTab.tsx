@@ -32,6 +32,7 @@ import { DataExportSettings } from '@/components/settings/DataExportSettings'
 import { IntegrationsSettings } from '@/components/settings/IntegrationsSettings'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { CustomTooltip } from '../charts/CustomTooltip'
+import { getBusinessProfile } from '@/lib/actions/business-settings'
 import { EmptyChartState } from '../charts/EmptyChartState'
 
 
@@ -73,6 +74,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const [isIntegrationsOpen, setIsIntegrationsOpen] = useState(false)
     const [isTutorialOpen, setIsTutorialOpen] = useState(false)
     const [isAiAdvisorOpen, setIsAiAdvisorOpen] = useState(false)
+
+
+    const { data: businessProfile } = useSWR('business-profile', getBusinessProfile)
+    const isExemptDealer = businessProfile?.data?.vatStatus === 'EXEMPT'
 
     useEffect(() => {
         const timer = setTimeout(() => setShowProgress(true), 100)
@@ -700,7 +705,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         >
                             <div className="flex justify-between text-sm">
                                 <span className="font-medium text-gray-700 dark:text-gray-300">
-                                    {isBusiness ? 'מכירות ללא מע"מ' : 'הלוואות ששולמו'}
+                                    {isBusiness ? (isExemptDealer ? 'מכירות' : 'מכירות ללא מע"מ') : 'הלוואות ששולמו'}
                                 </span>
                                 <span className="font-medium text-gray-900 dark:text-gray-100">
                                     {isBusiness
@@ -763,7 +768,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         )}
                     </CardContent>
 
-                    {isBusiness && (
+                    {isBusiness && !isExemptDealer && (
                         <div className="px-6 pb-6 pt-2">
                             <div className="grid grid-cols-2 gap-3">
                                 {/* VAT Refund (Green) */}

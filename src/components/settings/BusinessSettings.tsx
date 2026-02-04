@@ -277,7 +277,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                     </div>
 
                     <div>
-                        <Label htmlFor="companyName" className="text-right block mb-2">שם העסק *</Label>
+                        <Label htmlFor="companyName" className="text-right block mb-2">שם העסק <span className="text-red-500">*</span></Label>
                         <Input
                             id="companyName"
                             value={formData.companyName}
