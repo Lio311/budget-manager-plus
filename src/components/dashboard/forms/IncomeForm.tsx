@@ -450,16 +450,16 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                 {isBusiness && !isExemptDealer && (
                     <div className="p-3 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-gray-100 dark:border-slate-800/50 space-y-3">
                         <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-green-200 dark:border-green-900/30">
-                            <div>
-                                <span className="block text-gray-500 dark:text-gray-400">סכום כולל:</span>
-                                <span className="font-bold text-gray-700 dark:text-gray-200">
-                                    {formatCurrency((parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0))}
-                                </span>
-                            </div>
                             <div className="text-left ltr">
                                 <span className="block text-gray-500 dark:text-gray-400">מע"מ (18%):</span>
                                 <span className="font-bold text-green-600 dark:text-green-400">
                                     {formatCurrency(parseFloat(newIncome.vatAmount) || 0)}
+                                </span>
+                            </div>
+                            <div>
+                                <span className="block text-gray-500 dark:text-gray-400">סכום כולל:</span>
+                                <span className="font-bold text-gray-700 dark:text-gray-200">
+                                    {formatCurrency((parseFloat(newIncome.amount) || 0) + (parseFloat(newIncome.vatAmount) || 0))}
                                 </span>
                             </div>
                         </div>
