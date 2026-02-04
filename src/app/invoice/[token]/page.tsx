@@ -286,7 +286,7 @@ export default function PublicInvoicePage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {invoice.lineItems.map((item) => (
+                                    {invoice.lineItems.map((item: any) => (
                                         <tr key={item.id}>
                                             <td className="py-4 text-gray-800">{item.description}</td>
                                             <td className="py-4 text-gray-600 text-center">{item.quantity}</td>
