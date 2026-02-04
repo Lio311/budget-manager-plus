@@ -87,6 +87,43 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
     const [loadingNumber, setLoadingNumber] = useState(false)
     const { year, month } = useBudget()
 
+    const [businessProfile, setBusinessProfile] = useState<any>(null)
+    const [isExemptDealer, setIsExemptDealer] = useState(false)
+
+    useEffect(() => {
+        const loadProfile = async () => {
+            // Dynamic import to avoid circular dependencies if any, or just standard import
+            const { getBusinessProfile } = await import('@/lib/actions/business-settings')
+            const res = await getBusinessProfile()
+            if (res.success && res.data) {
+                setBusinessProfile(res.data)
+                if (res.data.vatStatus === 'EXEMPT') {
+                    setIsExemptDealer(true)
+                    // If currently selected type is TAX_INVOICE (default), switch to RECEIPT or DEAL_INVOICE
+                    setFormData(prev => ({
+                        ...prev,
+                        vatRate: 0, // Force 0 VAT
+                        invoiceType: (prev.invoiceType === 'TAX_INVOICE') ? 'RECEIPT' : prev.invoiceType
+                    }))
+                }
+            }
+        }
+        loadProfile()
+    }, [])
+
+    // Effect to enforce Exempt rules if they change or load late
+    useEffect(() => {
+        if (isExemptDealer) {
+            if (formData.vatRate !== 0) {
+                setFormData(prev => ({ ...prev, vatRate: 0 }))
+            }
+            if (formData.invoiceType === 'TAX_INVOICE') {
+                setFormData(prev => ({ ...prev, invoiceType: 'RECEIPT' }))
+            }
+        }
+    }, [isExemptDealer, formData.vatRate, formData.invoiceType])
+
+
     const [selectedIncomeId, setSelectedIncomeId] = useState<string>('none')
     const [editingItemId, setEditingItemId] = useState<string | null>(null)
     const [lineItems, setLineItems] = useState<LineItem[]>(
@@ -127,8 +164,8 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                 setFormData(prev => ({
                     ...prev,
                     clientId: income.clientId || prev.clientId,
-                    subtotal: subtotal,
-                    vatAmount: totalAmount - subtotal,
+                    subtotal: isExemptDealer ? totalAmount : subtotal, // For exempt, subtotal is total
+                    vatAmount: isExemptDealer ? 0 : (totalAmount - subtotal),
                     total: totalAmount,
                     notes: `עבור: ${income.source}`
                 }))
@@ -139,13 +176,13 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                         id: crypto.randomUUID(),
                         description: income.source,
                         quantity: 1,
-                        price: subtotal, // Net price
-                        total: subtotal
+                        price: isExemptDealer ? totalAmount : subtotal, // Net price
+                        total: isExemptDealer ? totalAmount : subtotal
                     }])
                 }
             }
         }
-    }, [selectedIncomeId])
+    }, [selectedIncomeId, isExemptDealer]) // Added isExemptDealer dependency
 
     // Update subtotal when line items change
     useEffect(() => {
@@ -275,11 +312,11 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                             <SelectValue placeholder="בחר סוג מסמך" />
                         </SelectTrigger>
                         <SelectContent dir="rtl">
-                            <SelectItem value="TAX_INVOICE">חשבונית מס</SelectItem>
+                            {!isExemptDealer && <SelectItem value="TAX_INVOICE">חשבונית מס</SelectItem>}
                             <SelectItem value="RECEIPT">קבלה</SelectItem>
-                            <SelectItem value="INVOICE">חשבונית מס / קבלה</SelectItem>
+                            {!isExemptDealer && <SelectItem value="INVOICE">חשבונית מס / קבלה</SelectItem>}
                             <SelectItem value="DEAL_INVOICE">חשבונית עסקה</SelectItem>
-
+                            {/* Refund invoice usually created from context, but can list if needed. Skipping for now as it's advanced */}
                         </SelectContent>
                     </Select>
                 </div>
@@ -518,25 +555,27 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* REMOVED: Manual Subtotal Input */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        שיעור מע"מ
-                    </label>
-                    <div dir="rtl">
-                        <Select
-                            value={(formData.vatRate ?? 0).toString()}
-                            onValueChange={(value) => setFormData((prev) => ({ ...prev, vatRate: parseFloat(value) }))}
-                        >
-                            <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
-                                <SelectValue placeholder='בחר מע"מ' />
-                            </SelectTrigger>
-                            <SelectContent dir="rtl">
-                                <SelectItem value="0">ללא מע"מ (0%)</SelectItem>
-                                <SelectItem value="0.18">מע"מ רגיל (18%)</SelectItem>
-                            </SelectContent>
-                        </Select>
+                {!isExemptDealer && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            שיעור מע"מ
+                        </label>
+                        <div dir="rtl">
+                            <Select
+                                value={(formData.vatRate ?? 0).toString()}
+                                onValueChange={(value) => setFormData((prev) => ({ ...prev, vatRate: parseFloat(value) }))}
+                            >
+                                <SelectTrigger className="w-full bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-right">
+                                    <SelectValue placeholder='בחר מע"מ' />
+                                </SelectTrigger>
+                                <SelectContent dir="rtl">
+                                    <SelectItem value="0">ללא מע"מ (0%)</SelectItem>
+                                    <SelectItem value="0.18">מע"מ רגיל (18%)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
-                </div>
+                )}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         אמצעי תשלום
@@ -564,14 +603,18 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
             </div>
 
             <div className="bg-gray-50 p-4 rounded-md dark:bg-slate-800/50">
-                <div className="flex justify-between text-sm mb-2">
-                    <span className="dark:text-gray-300">סכום ללא מע"מ:</span>
-                    <span className="dark:text-gray-100">₪{formData.subtotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm mb-2">
-                    <span className="dark:text-gray-300">מע"מ ({(formData.vatRate || 0) * 100}%):</span>
-                    <span className="dark:text-gray-100">₪{(formData.subtotal * (formData.vatRate || 0)).toLocaleString()}</span>
-                </div>
+                {!isExemptDealer && (
+                    <>
+                        <div className="flex justify-between text-sm mb-2">
+                            <span className="dark:text-gray-300">סכום ללא מע"מ:</span>
+                            <span className="dark:text-gray-100">₪{formData.subtotal.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-sm mb-2">
+                            <span className="dark:text-gray-300">מע"מ ({(formData.vatRate || 0) * 100}%):</span>
+                            <span className="dark:text-gray-100">₪{(formData.subtotal * (formData.vatRate || 0)).toLocaleString()}</span>
+                        </div>
+                    </>
+                )}
                 <div className="flex justify-between text-lg font-bold border-t pt-2 dark:border-slate-700">
                     <span className="dark:text-gray-100">סה"כ לתשלום:</span>
                     <span className="text-purple-600">₪{total.toLocaleString()}</span>
@@ -598,9 +641,10 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                         }`}
                     disabled={((!isGuestClient && !formData.clientId) || (isGuestClient && !guestClientName)) || !formData.invoiceNumber || lineItems.length === 0 || ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice)}
                 >
-                    צור חשבונית
+                    צור מסמך
                 </Button>
             </div>
+
 
             <MobileDescriptionEditor
                 isOpen={!!editingItemId}

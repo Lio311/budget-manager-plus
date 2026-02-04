@@ -215,6 +215,7 @@ export default function PublicInvoicePage() {
                             </div>
 
                             {/* Client Info */}
+                            {/* Client Info */}
                             <div>
                                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">לכבוד</h3>
                                 <div className="text-gray-900 font-medium text-lg">{invoice.guestClientName || client?.name}</div>
@@ -238,54 +239,81 @@ export default function PublicInvoicePage() {
                                     />
                                 </div>
                             )}
-                            <h2 className="text-2xl font-bold text-gray-900">{business?.companyName || 'שם העסק'}</h2>
-                            <p className="text-gray-500">{business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ'} {business?.companyId}</p>
-                            <div className="text-sm text-gray-500 mt-2">
-                                {business?.address && <p>{business.address}</p>}
-                                {business?.phone && <p>{business.phone}</p>}
-                                {business?.email && <p>{business.email}</p>}
+                            <div className="text-right">
+                                <h2 className="text-2xl font-bold text-gray-900">{business?.companyName || 'שם העסק'}</h2>
+                                <p className="text-gray-500">
+                                    {business?.vatStatus === 'EXEMPT' ? 'עוסק פטור' : (business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ')} {business?.companyId}
+                                </p>
+                                <p className="text-gray-500">{business?.address}</p>
+                                <p className="text-gray-500">{business?.phone} | {business?.email}</p>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Line Items */}
-                    <div className="mb-12 overflow-x-auto">
-                        <table className="w-full text-right min-w-[600px]">
-                            <thead className="border-b-2 border-gray-100">
-                                <tr>
-                                    <th className="py-3 text-sm font-bold text-gray-500">תיאור</th>
-                                    <th className="py-3 text-sm font-bold text-gray-500 text-center w-24">כמות</th>
-                                    <th className="py-3 text-sm font-bold text-gray-500 text-center w-32">מחיר יח'</th>
-                                    <th className="py-3 text-sm font-bold text-gray-500 text-left w-32">סה"כ</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {invoice.lineItems?.map((item: any, idx: number) => (
-                                    <tr key={idx}>
-                                        <td className="py-4 text-gray-900">{item.description}</td>
-                                        <td className="py-4 text-gray-600 text-center">{item.quantity}</td>
-                                        <td className="py-4 text-gray-600 text-center">{formatCurrency(item.price)}</td>
-                                        <td className="py-4 text-gray-900 font-medium text-left">{formatCurrency(item.total)}</td>
+                        {/* Invoice Details Grid */}
+                        <div className="grid grid-cols-2 gap-8 mb-8">
+                            <div className="text-right">
+                                <h3 className="text-gray-500 font-medium mb-1">לכבוד</h3>
+                                <h4 className="text-lg font-bold text-gray-900">{client.name}</h4>
+                                {client.companyName && <p className="text-gray-600">{client.companyName}</p>}
+                                {client.email && <p className="text-gray-600">{client.email}</p>}
+                                {client.phone && <p className="text-gray-600">{client.phone}</p>}
+                            </div>
+                            <div className="text-left">
+                                <div className="space-y-1">
+                                    <div className="flex justify-between">
+                                        <span className="font-bold text-gray-900">תאריך:</span>
+                                        <span className="text-gray-600">{format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</span>
+                                    </div>
+                                    {invoice.dueDate && (
+                                        <div className="flex justify-between">
+                                            <span className="font-bold text-gray-900">תאריך תשלום:</span>
+                                            <span className="text-gray-600">{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Line Items */}
+                        <div className="mb-8">
+                            <table className="w-full text-right">
+                                <thead>
+                                    <tr className="border-b-2 border-gray-200">
+                                        <th className="py-3 text-gray-900 font-bold w-1/2">תיאור</th>
+                                        <th className="py-3 text-gray-900 font-bold w-1/6 text-center">כמות</th>
+                                        <th className="py-3 text-gray-900 font-bold w-1/6 text-center">מחיר יח'</th>
+                                        <th className="py-3 text-gray-900 font-bold w-1/6 text-left">סה"כ</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {invoice.lineItems.map((item) => (
+                                        <tr key={item.id}>
+                                            <td className="py-4 text-gray-800">{item.description}</td>
+                                            <td className="py-4 text-gray-600 text-center">{item.quantity}</td>
+                                            <td className="py-4 text-gray-600 text-center">{formatCurrency(item.price)}</td>
+                                            <td className="py-4 text-gray-900 font-medium text-left">{formatCurrency(item.total)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
-                    {/* Totals - Green Gradient Box */}
-                    <div className="flex justify-center mb-12">
-                        <div className="w-[90%] bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl p-6 shadow-md">
-                            <div className="space-y-3">
-                                <div className="flex justify-between text-emerald-50 font-medium">
-                                    <span>סה"כ ללא מע"מ:</span>
-                                    <span>{formatCurrency(invoice.subtotal)}</span>
-                                </div>
-                                <div className="flex justify-between text-emerald-50 font-medium">
-                                    <span>מע"מ ({invoice.vatRate * 100}%):</span>
-                                    <span>{formatCurrency(invoice.vatAmount)}</span>
-                                </div>
-                                <div className="border-t border-emerald-400 my-2"></div>
-                                <div className="flex justify-between text-2xl font-bold">
+                        {/* Totals */}
+                        <div className="flex justify-end mb-12">
+                            <div className="w-64 space-y-2">
+                                {business?.vatStatus !== 'EXEMPT' && (
+                                    <>
+                                        <div className="flex justify-between text-gray-600">
+                                            <span>סה"כ לפני מע"מ:</span>
+                                            <span>{formatCurrency(invoice.subtotal || invoice.total)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-gray-600">
+                                            <span>מע"מ ({((invoice.vatRate || 0) * 100).toFixed(0)}%):</span>
+                                            <span>{formatCurrency(invoice.vatAmount || 0)}</span>
+                                        </div>
+                                    </>
+                                )}
+                                <div className="flex justify-between text-xl font-bold text-gray-900 border-t-2 border-gray-200 pt-2">
                                     <span>סה"כ לתשלום:</span>
                                     <span>{formatCurrency(invoice.total)}</span>
                                 </div>

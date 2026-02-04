@@ -85,6 +85,15 @@ export function IncomeTab() {
     const { mutate: globalMutate } = useSWRConfig()
     const confirm = useConfirm()
     const isBusiness = budgetType === 'BUSINESS'
+
+    // Add business profile fetch
+    const { data: businessProfile } = useSWR('business-profile', async () => {
+        const { getBusinessProfile } = await import('@/lib/actions/business-settings')
+        const res = await getBusinessProfile()
+        return res.data
+    }, { revalidateOnFocus: false })
+
+    const isExemptDealer = businessProfile?.vatStatus === 'EXEMPT'
     const { isDemo, data: demoData, interceptAction } = useDemo()
     const [showTutorial, setShowTutorial] = useState(false)
 
@@ -346,64 +355,63 @@ export function IncomeTab() {
                 </Button>
             </div>
 
-            <div className="text-right" id="income-stats-cards">
-                <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-green-600' : 'border-r-[#00c875]'} dark:bg-slate-800`}>
+            {/* Summary Card */}
+            <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-green-600' : 'border-r-[#00c875]'} dark:bg-slate-800`} id="income-stats-cards">
+                <div className="flex justify-between items-start">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {isBusiness ? (isExemptDealer ? 'סך הכנסות חודשיות' : 'סך מכירות/הכנסות חודשיות (ללא מע"מ)') : 'סך הכנסות חודשיות'}
+                    </h3>
 
-                    <div className="flex justify-between items-start">
-                        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            {isBusiness ? 'סך מכירות/הכנסות חודשיות (ללא מע"מ)' : 'סך הכנסות חודשיות'}
-                        </h3>
-                        {isBusiness && (
-                            <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-gray-600">
-                                        <Settings className="h-4 w-4" />
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogTitle>הגדרת מס הכנסה</DialogTitle>
-                                    <div className="space-y-4 pt-4">
-                                        <div>
-                                            <label className="text-sm font-medium mb-1 block">שיעור מס (באחוזים)</label>
-                                            <div className="flex items-center gap-2 justify-center">
-                                                <span className="text-lg font-bold">%</span>
-                                                <Input
-                                                    type="number"
-                                                    min="0"
-                                                    max="100"
-                                                    onWheel={(e) => e.currentTarget.blur()}
-                                                    value={taxRateInput}
-                                                    onChange={(e) => setTaxRateInput(e.target.value)}
-                                                    className="max-w-[100px] text-center"
-                                                />
-                                            </div>
-                                            <p className="text-xs text-gray-500 mt-1">אחוז זה יופחת אוטומטית מההכנסה הנקייה בחישוב הסופי.</p>
+                    {isBusiness && !isExemptDealer && (
+                        <Dialog open={isTaxDialogOpen} onOpenChange={setIsTaxDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400 hover:text-gray-600">
+                                    <Settings className="h-4 w-4" />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogTitle>הגדרת מס הכנסה</DialogTitle>
+                                <div className="space-y-4 pt-4">
+                                    <div>
+                                        <label className="text-sm font-medium mb-1 block">שיעור מס (באחוזים)</label>
+                                        <div className="flex items-center gap-2 justify-center">
+                                            <span className="text-lg font-bold">%</span>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                max="100"
+                                                onWheel={(e) => e.currentTarget.blur()}
+                                                value={taxRateInput}
+                                                onChange={(e) => setTaxRateInput(e.target.value)}
+                                                className="max-w-[100px] text-center"
+                                            />
                                         </div>
-                                        <Button onClick={handleUpdateTaxRate} className="w-full bg-green-600 hover:bg-green-700 text-white">שמור</Button>
+                                        <p className="text-xs text-gray-500 mt-1">אחוז זה יופחת אוטומטית מההכנסה הנקייה בחישוב הסופי.</p>
                                     </div>
-                                </DialogContent>
-                            </Dialog>
-                        )}
-                    </div>
-
-                    <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
-                        {loadingIncomes ? '...' : formatCurrency(isBusiness ? totalNetILS : totalIncomeILS, '₪')}
-                    </div>
-
-                    {/* Tax Deduction Breakdown */}
-                    {isBusiness && taxRate > 0 && !loadingIncomes && (
-                        <div className="mt-2 text-xs border-t pt-2 border-gray-100 dark:border-gray-700">
-                            <div className="flex justify-between text-gray-500 mb-1">
-                                <span>הפרשה למס ({taxRate}%):</span>
-                                <span className="text-red-500">{formatCurrency(-(totalNetILS * (taxRate / 100)), '₪')}</span>
-                            </div>
-                            <div className="flex justify-between font-bold text-gray-700 dark:text-gray-300">
-                                <span>נשאר בכיס (נטו):</span>
-                                <span className="text-green-600">{formatCurrency(totalNetILS * (1 - taxRate / 100), '₪')}</span>
-                            </div>
-                        </div>
+                                    <Button onClick={handleUpdateTaxRate} className="w-full bg-green-600 hover:bg-green-700 text-white">שמור</Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                     )}
                 </div>
+
+                <div className={`text-3xl font-bold ${isBusiness ? 'text-green-600' : 'text-[#00c875]'} ${loadingIncomes ? 'animate-pulse' : ''}`}>
+                    {loadingIncomes ? '...' : formatCurrency(isBusiness && !isExemptDealer ? totalNetILS : totalIncomeILS, '₪')}
+                </div>
+
+                {/* Tax Deduction Breakdown */}
+                {isBusiness && !isExemptDealer && taxRate > 0 && !loadingIncomes && (
+                    <div className="mt-2 text-xs border-t pt-2 border-gray-100 dark:border-gray-700">
+                        <div className="flex justify-between text-gray-500 mb-1">
+                            <span>הפרשה למס ({taxRate}%):</span>
+                            <span className="text-red-500">{formatCurrency(-(totalNetILS * (taxRate / 100)), '₪')}</span>
+                        </div>
+                        <div className="flex justify-between font-bold text-gray-700 dark:text-gray-300">
+                            <span>נשאר בכיס (נטו):</span>
+                            <span className="text-green-600">{formatCurrency(totalNetILS * (1 - taxRate / 100), '₪')}</span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Split View */}
@@ -496,14 +504,14 @@ export function IncomeTab() {
                                 לא נמצאו נתונים לחודש זה
                             </div>
                         ) : (
-                            paginatedIncomes.map((income: any) => (
-                                <div key={income.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
+                            paginatedIncomes.map((inc: any) => (
+                                <div key={inc.id} className="glass-panel p-3 sm:p-4 group relative hover:border-green-200 transition-all border-r-4 border-r-blue-100 dark:border-r-blue-900/50">
                                     <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 items-center">
 
                                         {/* Icon Section - Spans 1 column */}
                                         <div className="sm:col-span-1 flex justify-start">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(income.category)} shadow-sm shrink-0`}>
-                                                {getCategoryIcon(income.category)}
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(inc.category)} shadow-sm shrink-0`}>
+                                                {getCategoryIcon(inc.category)}
                                             </div>
                                         </div>
 
@@ -511,45 +519,47 @@ export function IncomeTab() {
                                         <div className="sm:col-span-6 flex flex-col gap-1.5 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <span className="font-bold text-[#323338] dark:text-gray-100 text-sm sm:text-base truncate max-w-full">
-                                                    {income.source}
+                                                    {inc.source}
                                                 </span>
-                                                {income.isRecurring && (
+                                                {inc.isRecurring && (
                                                     <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-green-50 text-green-600 border border-green-100">
                                                         <span className="w-1 h-1 rounded-full bg-current" />
                                                         קבועה
                                                     </div>
                                                 )}
-                                                {income.client && (
+                                                {inc.client && (
                                                     <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded border border-green-100 font-bold hidden sm:inline-block shrink-0">
-                                                        {income.client.name}
+                                                        {inc.client.name}
                                                     </span>
                                                 )}
                                             </div>
 
                                             <div className="flex items-center gap-2 text-xs text-[#676879] dark:text-gray-400">
-                                                <span>{income.date ? format(new Date(income.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
+                                                <span>{inc.date ? format(new Date(inc.date), 'dd/MM/yyyy') : 'ללא תאריך'}</span>
                                                 <span className="text-gray-300">•</span>
-                                                <span className="truncate">{income.category}</span>
-                                                {income.payer && (
+                                                <span className="truncate">{inc.category}</span>
+                                                {inc.payer && (
                                                     <>
                                                         <span className="text-gray-300">•</span>
-                                                        <span className="truncate">מאת: {income.payer}</span>
+                                                        <span className="truncate">מאת: {inc.payer}</span>
                                                     </>
                                                 )}
                                             </div>
                                         </div>
 
-                                        {/* Financials Section - Spans 5 columns */}
+                                        {/* Financials Section */}
                                         <div className="sm:col-span-5 flex flex-col items-end gap-1 mt-2 sm:mt-0 border-t sm:border-0 pt-2 sm:pt-0 border-gray-100 dark:border-gray-800">
                                             <div className="flex flex-col items-end w-full">
-                                                <div className="text-base sm:text-lg font-bold text-green-600 whitespace-nowrap">
-                                                    {formatNumberWithCommas(income.amount)} {getCurrencySymbol(income.currency || 'ILS')}
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className={`text-base sm:text-lg font-bold whitespace-nowrap ${isBusiness ? 'text-green-600' : 'text-[#00c875]'}`}>
+                                                        {formatNumberWithCommas(inc.amount)} {getCurrencySymbol(inc.currency || 'ILS')}
+                                                    </span>
                                                 </div>
 
-                                                {isBusiness && income.vatAmount && income.vatAmount > 0 && (
+                                                {isBusiness && !isExemptDealer && (inc.vatAmount || 0) > 0 && (
                                                     <div className="flex items-center gap-3 text-[10px] text-gray-400 font-medium">
-                                                        <span>ללא מע"מ: {formatNumberWithCommas((income.amountBeforeVat ?? (income.amount - (income.vatAmount || 0))))}</span>
-                                                        <span>מע"מ: {formatNumberWithCommas(income.vatAmount || 0)}</span>
+                                                        <span>נטו: {formatNumberWithCommas((inc.amountBeforeVat || (inc.amount / (1 + (inc.vatRate || 0.18)))))}</span>
+                                                        <span>מע"מ: {formatNumberWithCommas(inc.vatAmount || (inc.amount - (inc.amountBeforeVat || (inc.amount / (1 + (inc.vatRate || 0.18))))))}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -560,30 +570,30 @@ export function IncomeTab() {
                                                 <button
                                                     onClick={async (e) => {
                                                         e.stopPropagation()
-                                                        const newStatus = income.status === 'PENDING' ? 'PAID' : 'PENDING'
-                                                        const res = await toggleIncomeStatus(income.id, newStatus)
+                                                        const newStatus = inc.status === 'PENDING' ? 'PAID' : 'PENDING'
+                                                        const res = await toggleIncomeStatus(inc.id, newStatus)
                                                         if (res.success) {
                                                             mutateIncomes()
                                                             toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
                                                         }
                                                     }}
-                                                    className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${income.status === 'PENDING'
+                                                    className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${inc.status === 'PENDING'
                                                         ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
                                                         : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
                                                         }`}
                                                 >
-                                                    {income.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
+                                                    {inc.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
                                                 </button>
 
-                                                {income.invoice && (
-                                                    <div className="text-[10px] text-gray-400 font-medium hidden sm:block px-2">#{income.invoice.invoiceNumber}</div>
+                                                {inc.invoice && (
+                                                    <div className="text-[10px] text-gray-400 font-medium hidden sm:block px-2">#{inc.invoice.invoiceNumber}</div>
                                                 )}
 
                                                 <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(income)} className="h-7 w-7 text-blue-500 hover:bg-blue-50 rounded-full">
+                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(inc)} className="h-7 w-7 text-blue-500 hover:bg-blue-50 rounded-full">
                                                         <Pencil className="h-3.5 w-3.5" />
                                                     </Button>
-                                                    <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(income)}>
+                                                    <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(inc)}>
                                                         <Trash2 className="h-3.5 w-3.5" />
                                                     </Button>
                                                 </div>
@@ -622,6 +632,6 @@ export function IncomeTab() {
                 isOpen={showTutorial}
                 onClose={() => setShowTutorial(false)}
             />
-        </div>
+        </div >
     )
 }

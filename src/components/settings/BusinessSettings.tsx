@@ -22,6 +22,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
     const [formData, setFormData] = useState({
         companyName: '',
         companyId: '',
+        vatStatus: 'AUTHORIZED', // Default to authorized
         address: '',
         phone: '',
         email: '',
@@ -40,6 +41,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                 setFormData({
                     companyName: data.companyName || '',
                     companyId: data.companyId || '',
+                    vatStatus: data.vatStatus === 'EXEMPT' ? 'EXEMPT' : 'AUTHORIZED',
                     address: data.address || '',
                     phone: data.phone || '',
                     email: data.email || '',
@@ -155,7 +157,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
             const result = await updateBusinessProfile({
                 companyName: formData.companyName,
                 companyId: formData.companyId,
-                vatStatus: 'EXEMPT', // Default value
+                vatStatus: formData.vatStatus,
                 address: formData.address,
                 phone: formData.phone,
                 email: formData.email,
@@ -243,6 +245,32 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
             <div className="border-t pt-6">
                 <h3 className="text-sm font-medium text-gray-700 mb-4 text-right">פרטי העסק</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2 space-y-2 mb-2">
+                        <label className="text-sm font-medium text-gray-700 text-right block">סוג העסק</label>
+                        <div className="flex flex-row-reverse gap-4 justify-start">
+                            <div className="flex items-center space-x-2 space-x-reverse cursor-pointer border rounded-lg p-3 hover:bg-gray-50 flex-1 justify-end transition-colors relative"
+                                onClick={() => setFormData({ ...formData, vatStatus: 'AUTHORIZED' })}
+                            >
+                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center mr-2 ${formData.vatStatus === 'AUTHORIZED' ? 'border-blue-600' : 'border-gray-400'}`}>
+                                    {formData.vatStatus === 'AUTHORIZED' && <div className="w-2 h-2 rounded-full bg-blue-600" />}
+                                </div>
+                                <span className={formData.vatStatus === 'AUTHORIZED' ? 'font-medium text-blue-700' : 'text-gray-600'}>עוסק מורשה (Murshe)</span>
+                            </div>
+
+                            <div className="flex items-center space-x-2 space-x-reverse cursor-pointer border rounded-lg p-3 hover:bg-gray-50 flex-1 justify-end transition-colors"
+                                onClick={() => setFormData({ ...formData, vatStatus: 'EXEMPT' })}
+                            >
+                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center mr-2 ${formData.vatStatus === 'EXEMPT' ? 'border-blue-600' : 'border-gray-400'}`}>
+                                    {formData.vatStatus === 'EXEMPT' && <div className="w-2 h-2 rounded-full bg-blue-600" />}
+                                </div>
+                                <span className={formData.vatStatus === 'EXEMPT' ? 'font-medium text-blue-700' : 'text-gray-600'}>עוסק פטור (Exempt)</span>
+                            </div>
+                        </div>
+                        <p className="text-xs text-gray-400 text-right">
+                            * הגדרה זו תשפיע על חישובי המע"מ וסוגי המסמכים שתוכל להפיק
+                        </p>
+                    </div>
+
                     <div>
                         <Label htmlFor="companyName" className="text-right block mb-2">שם העסק *</Label>
                         <Input
@@ -254,7 +282,9 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                         />
                     </div>
                     <div>
-                        <Label htmlFor="companyId" className="text-right block mb-2">מספר עוסק מורשה (ע.מ) *</Label>
+                        <Label htmlFor="companyId" className="text-right block mb-2">
+                            {formData.vatStatus === 'EXEMPT' ? 'מספר עוסק פטור (ח.פ/ת.ז) *' : 'מספר עוסק מורשה (ע.מ) *'}
+                        </Label>
                         <Input
                             id="companyId"
                             value={formData.companyId}
@@ -284,6 +314,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                             }}
                             placeholder="050-1234567"
                             className="text-right"
+                            dir="ltr"
                         />
                     </div>
                     <div>

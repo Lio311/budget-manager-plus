@@ -141,6 +141,15 @@ export function ExpensesTab() {
     const totalExpensesILS = isDemo ? demoData.overview.totalExpenses : (realData?.totalILS || 0)
     const totalNetExpensesILS = isDemo ? demoData.overview.totalExpenses : (realData?.totalNetILS || 0)
 
+    // Add business profile fetch
+    const { data: businessProfile } = useSWR('business-profile', async () => {
+        const { getBusinessProfile } = await import('@/lib/actions/business-settings')
+        const res = await getBusinessProfile()
+        return res.data
+    }, { revalidateOnFocus: false })
+
+    const isExemptDealer = businessProfile?.vatStatus === 'EXEMPT'
+
     const fetcherSuppliers = async () => {
         const result = await getSuppliers()
         if (result.success && result.data) return result.data
@@ -463,9 +472,9 @@ export function ExpensesTab() {
 
             {/* Summary Card */}
             <div className={`monday-card border-r-4 p-3 md:p-5 flex flex-col justify-center gap-2 ${isBusiness ? 'border-r-orange-600' : 'border-r-[#e2445c]'} dark:bg-slate-800`} id="expenses-stats-cards">
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? 'סך עלויות / הוצאות חודשיות (נקי)' : 'סך הוצאות חודשיות'}</h3>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{isBusiness ? (isExemptDealer ? 'סך הוצאות חודשיות' : 'סך עלויות / הוצאות חודשיות (נקי)') : 'סך הוצאות חודשיות'}</h3>
                 <div className={`text-3xl font-bold ${isBusiness ? 'text-red-600' : 'text-[#e2445c]'} ${loadingExpenses ? 'animate-pulse' : ''}`}>
-                    {loadingExpenses ? '...' : formatCurrency(isBusiness ? totalNetExpensesILS : totalExpensesILS, '₪')}
+                    {loadingExpenses ? '...' : formatCurrency(isBusiness && !isExemptDealer ? totalNetExpensesILS : totalExpensesILS, '₪')}
                 </div>
             </div>
 
@@ -591,7 +600,7 @@ export function ExpensesTab() {
                                                             קבועה
                                                         </div>
                                                     )}
-                                                    {isBusiness && exp.isDeductible && (
+                                                    {isBusiness && exp.isDeductible && !isExemptDealer && (
                                                         <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium shrink-0 bg-blue-50 text-blue-600 border border-blue-100">
                                                             <span className="w-1 h-1 rounded-full bg-current" />
                                                             הוצאה מוכרת
@@ -621,7 +630,7 @@ export function ExpensesTab() {
                                             {/* Financials Section - Spans 5 columns */}
                                             <div className="sm:col-span-5 flex flex-col items-end gap-1 mt-2 sm:mt-0 border-t sm:border-0 pt-2 sm:pt-0 border-gray-100 dark:border-gray-800">
                                                 {/* Amount Display */}
-                                                {isBusiness && exp.isDeductible ? (
+                                                {isBusiness && exp.isDeductible && !isExemptDealer ? (
                                                     <div className="flex flex-col items-end w-full">
                                                         <div className="flex flex-row-reverse sm:flex-row items-baseline gap-2 w-full justify-between sm:justify-end">
                                                             <span className="text-base sm:text-lg font-bold text-red-600 whitespace-nowrap">
