@@ -247,23 +247,28 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2 space-y-2 mb-2">
                         <label className="text-sm font-medium text-gray-700 text-right block">סוג העסק</label>
-                        <div className="flex flex-row-reverse gap-4 justify-start">
-                            <div className="flex items-center space-x-2 space-x-reverse cursor-pointer border rounded-lg p-3 hover:bg-gray-50 flex-1 justify-end transition-colors relative"
-                                onClick={() => setFormData({ ...formData, vatStatus: 'AUTHORIZED' })}
-                            >
-                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center mr-2 ${formData.vatStatus === 'AUTHORIZED' ? 'border-blue-600' : 'border-gray-400'}`}>
-                                    {formData.vatStatus === 'AUTHORIZED' && <div className="w-2 h-2 rounded-full bg-blue-600" />}
-                                </div>
-                                <span className={formData.vatStatus === 'AUTHORIZED' ? 'font-medium text-blue-700' : 'text-gray-600'}>עוסק מורשה (Murshe)</span>
-                            </div>
-
-                            <div className="flex items-center space-x-2 space-x-reverse cursor-pointer border rounded-lg p-3 hover:bg-gray-50 flex-1 justify-end transition-colors"
-                                onClick={() => setFormData({ ...formData, vatStatus: 'EXEMPT' })}
-                            >
-                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center mr-2 ${formData.vatStatus === 'EXEMPT' ? 'border-blue-600' : 'border-gray-400'}`}>
-                                    {formData.vatStatus === 'EXEMPT' && <div className="w-2 h-2 rounded-full bg-blue-600" />}
-                                </div>
-                                <span className={formData.vatStatus === 'EXEMPT' ? 'font-medium text-blue-700' : 'text-gray-600'}>עוסק פטור (Exempt)</span>
+                        <div className="flex justify-end">
+                            <div className="inline-flex bg-gray-100 p-1 rounded-lg border border-gray-200" dir="rtl">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, vatStatus: 'AUTHORIZED' })}
+                                    className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${formData.vatStatus === 'AUTHORIZED'
+                                        ? 'bg-white text-blue-600 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                >
+                                    עוסק מורשה
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, vatStatus: 'EXEMPT' })}
+                                    className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${formData.vatStatus === 'EXEMPT'
+                                        ? 'bg-white text-blue-600 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                >
+                                    עוסק פטור
+                                </button>
                             </div>
                         </div>
                         <p className="text-xs text-gray-400 text-right">
