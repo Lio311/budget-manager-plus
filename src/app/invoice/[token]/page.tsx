@@ -275,25 +275,23 @@ export default function PublicInvoicePage() {
 
 
                     {/* Totals */}
-                    <div className="mb-12 -mx-4 md:-mx-8">
-                        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 space-y-3">
-                            <div className="max-w-4xl mx-auto">
-                                {business?.vatStatus !== 'EXEMPT' && (
-                                    <>
-                                        <div className="flex justify-between text-white">
-                                            <span>סה"כ לפני מע"מ:</span>
-                                            <span className="font-semibold">₪ {formatCurrency(invoice.subtotal || invoice.total)}</span>
-                                        </div>
-                                        <div className="flex justify-between text-white">
-                                            <span>מע"מ ({((invoice.vatRate || 0) * 100).toFixed(0)}%):</span>
-                                            <span className="font-semibold">₪ {formatCurrency(invoice.vatAmount || 0)}</span>
-                                        </div>
-                                    </>
-                                )}
-                                <div className="flex justify-between text-xl font-bold text-white border-t-2 border-white/30 pt-3">
-                                    <span>סה"כ לתשלום:</span>
-                                    <span>₪ {formatCurrency(invoice.total)}</span>
-                                </div>
+                    <div className="mb-12">
+                        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg space-y-3">
+                            {business?.vatStatus !== 'EXEMPT' && (
+                                <>
+                                    <div className="flex justify-between text-white">
+                                        <span>סה"כ לפני מע"מ:</span>
+                                        <span className="font-semibold">₪ {formatCurrency(invoice.subtotal || invoice.total)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-white">
+                                        <span>מע"מ ({((invoice.vatRate || 0) * 100).toFixed(0)}%):</span>
+                                        <span className="font-semibold">₪ {formatCurrency(invoice.vatAmount || 0)}</span>
+                                    </div>
+                                </>
+                            )}
+                            <div className="flex justify-between text-xl font-bold text-white border-t-2 border-white/30 pt-3">
+                                <span>סה"כ לתשלום:</span>
+                                <span>₪ {formatCurrency(invoice.total)}</span>
                             </div>
                         </div>
                     </div>
