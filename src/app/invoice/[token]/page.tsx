@@ -253,10 +253,10 @@ export default function PublicInvoicePage() {
                         <div className="grid grid-cols-2 gap-8 mb-8">
                             <div className="text-right">
                                 <h3 className="text-gray-500 font-medium mb-1">לכבוד</h3>
-                                <h4 className="text-lg font-bold text-gray-900">{client.name}</h4>
-                                {client.companyName && <p className="text-gray-600">{client.companyName}</p>}
-                                {client.email && <p className="text-gray-600">{client.email}</p>}
-                                {client.phone && <p className="text-gray-600">{client.phone}</p>}
+                                <h4 className="text-lg font-bold text-gray-900">{client?.name || invoice.guestClientName}</h4>
+                                {client?.companyName && <p className="text-gray-600">{client.companyName}</p>}
+                                {client?.email && <p className="text-gray-600">{client.email}</p>}
+                                {client?.phone && <p className="text-gray-600">{client.phone}</p>}
                             </div>
                             <div className="text-left">
                                 <div className="space-y-1">
