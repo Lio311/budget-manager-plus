@@ -229,7 +229,7 @@ export default function PublicInvoicePage() {
                                     />
                                 </div>
                             )}
-                            <div className="text-right">
+                            <div className="text-center">
                                 <h2 className="text-2xl font-bold text-gray-900">{business?.companyName || 'שם העסק'}</h2>
                                 <p className="text-gray-500">
                                     {business?.vatStatus === 'EXEMPT' ? 'עוסק פטור' : (business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ')} {business?.companyId}
