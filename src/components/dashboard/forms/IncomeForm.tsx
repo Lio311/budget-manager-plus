@@ -85,6 +85,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes')
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
+    const [formReady, setFormReady] = useState(!initialData)
 
     const [newIncome, setNewIncome] = useState(initialData ? {
         source: initialData.source || '',
@@ -131,6 +132,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
             if (initialData.isRecurring || initialData.clientId || initialData.payer || initialData.workTime) {
                 setIsAdvancedOpen(true)
             }
+            setFormReady(true)
         }
     }, [initialData])
 
@@ -277,9 +279,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
         try {
             let result;
-            if (initialData?.id) {
+            if (newIncome.id || initialData?.id) {
                 // Update mode
-                result = await updateIncome(initialData.id, incomeData, 'SINGLE')
+                result = await updateIncome(newIncome.id || initialData.id, incomeData, 'SINGLE')
             } else {
                 // Create mode
                 result = await addIncome(month, year, incomeData, budgetType) // Reverted to original addIncome signature
@@ -325,6 +327,14 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
 
 
+    if (!formReady) {
+        return (
+            <div className="flex justify-center items-center py-10">
+                <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+            </div>
+        )
+    }
+
     return (
         <div>
             <div className="mb-4 flex items-center gap-2 mt-4 md:mt-0">
@@ -353,7 +363,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">תיאור / מקור *</label>
                     <Input
                         id="income-source-input"
-                        className={`h-10 focus:ring-green-500/20 ${errors.source ? 'border-red-500' : 'border-gray-200'}`}
+                        className={`h-10 focus:ring-green-500/20 text-right ${errors.source ? 'border-red-500' : 'border-gray-200'}`}
                         placeholder={isBusiness ? "תיאור המכירה (למשל: ייעוץ עסקי)" : "שם המקור"}
                         value={newIncome.source}
                         onFocus={() => isDemo && interceptAction()}
@@ -443,7 +453,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 setNewIncome({ ...newIncome, amount: value ? value.toString() : '' })
                                 if (value) setErrors(prev => ({ ...prev, amount: false }))
                             }}
-                            className={`h-10 text-left ltr ${errors.amount ? 'border-red-500' : 'border-gray-200'}`}
+                            className={`h-10 text-right ${errors.amount ? 'border-red-500' : 'border-gray-200'}`}
                             placeholder="0.00"
                         />
                         {isBusiness && !isExemptDealer && newIncome.amount && (
@@ -508,7 +518,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             <div className="w-full">
                                 <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל מ... (אופציונלי)</label>
                                 <Input
-                                    className="h-10 border-gray-200 focus:ring-green-500/20 bg-white dark:bg-slate-800"
+                                    className="h-10 border-gray-200 focus:ring-green-500/20 bg-white dark:bg-slate-800 text-right"
                                     placeholder="שם המשלם"
                                     value={newIncome.payer}
                                     onFocus={() => isDemo && interceptAction()}
@@ -519,7 +529,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             {isBusiness && !isExemptDealer && (
                                 <div className="w-full">
                                     <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">התקבל על ידי (אופציונלי)</label>
-                                    <Input className="h-10 border-gray-200 focus:ring-green-500/20" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
+                                    <Input className="h-10 border-gray-200 focus:ring-green-500/20 text-right" placeholder="שם העובד/מקבל" value={newIncome.acceptedBy} onChange={(e) => setNewIncome({ ...newIncome, acceptedBy: e.target.value })} />
                                 </div>
                             )}
                         </div>
@@ -596,7 +606,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                     step={timeUnit === 'hours' ? "0.1" : "1"}
                                     min="0"
                                     onWheel={(e) => e.currentTarget.blur()}
-                                    className="h-10 border-gray-200 focus:ring-green-500/20"
+                                    className="h-10 border-gray-200 focus:ring-green-500/20 text-right"
                                     placeholder={timeUnit === 'hours' ? "לדוגמה: 1.5" : "לדוגמה: 90"}
                                     value={newIncome.workTime}
                                     onChange={(e) => {
