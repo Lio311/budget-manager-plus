@@ -233,7 +233,7 @@ export default function PublicInvoicePage() {
                                     {business?.vatStatus === 'EXEMPT' ? 'עוסק פטור' : (business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ')} {business?.companyId}
                                 </p>
                                 <p className="text-gray-500">{business?.address}</p>
-                                <p className="text-gray-500">{business?.phone} | {business?.email}</p>
+                                <p className="text-gray-500" dir="ltr">{business?.phone} | {business?.email}</p>
                             </div>
                         </div>
                     </div>
@@ -245,7 +245,7 @@ export default function PublicInvoicePage() {
                             <h4 className="text-lg font-bold text-gray-900">{client?.name || invoice.guestClientName}</h4>
                             {client?.companyName && <p className="text-gray-600">{client.companyName}</p>}
                             {client?.email && <p className="text-gray-600">{client.email}</p>}
-                            {client?.phone && <p className="text-gray-600">{client.phone}</p>}
+                            {client?.phone && <p className="text-gray-600" dir="ltr">{client.phone}</p>}
                         </div>
                         <div className="text-left">
                             <div className="space-y-1">
