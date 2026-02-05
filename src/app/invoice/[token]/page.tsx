@@ -232,7 +232,7 @@ export default function PublicInvoicePage() {
                                 <p className="text-gray-500">
                                     {business?.vatStatus === 'EXEMPT' ? 'עוסק פטור' : (business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ')} {business?.companyId}
                                 </p>
-                                <p className="text-gray-500">{business?.address}</p>
+                                <p className="text-gray-500" dir="rtl">{business?.address}</p>
                                 <p className="text-gray-500" dir="ltr">{business?.phone} | {business?.email}</p>
                             </div>
                         </div>
