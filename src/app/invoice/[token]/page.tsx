@@ -241,7 +241,7 @@ export default function PublicInvoicePage() {
                     </div>
 
                     {/* Client Info */}
-                    <div className="mb-8">
+                    <div className="mb-8 text-right">
                         <h3 className="text-gray-500 font-medium mb-2">לכבוד</h3>
                         <h4 className="text-lg font-bold text-gray-900">{client?.name || invoice.guestClientName}</h4>
                         {client?.companyName && <p className="text-gray-600">{client.companyName}</p>}
