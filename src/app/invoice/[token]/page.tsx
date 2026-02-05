@@ -207,8 +207,10 @@ export default function PublicInvoicePage() {
                                         'REFUND_INVOICE': 'חשבונית זיכוי'
                                     }[invoice.invoiceType as string] || 'חשבונית מס'}
                                 </h1>
-                                <div className="text-gray-600">
+                                <div className="text-gray-600 space-y-1">
                                     <p className="text-lg"><strong>מספר:</strong> {invoice.invoiceNumber}</p>
+                                    <p><strong>תאריך:</strong> {format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</p>
+                                    {invoice.dueDate && <p><strong>תאריך תשלום:</strong> {format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</p>}
                                 </div>
                             </div>
                         </div>
@@ -232,35 +234,19 @@ export default function PublicInvoicePage() {
                                 <p className="text-gray-500">
                                     {business?.vatStatus === 'EXEMPT' ? 'עוסק פטור' : (business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ')} {business?.companyId}
                                 </p>
-                                <p className="text-gray-500" dir="rtl">{business?.address}</p>
+                                <p className="text-gray-500">{business?.address}</p>
                                 <p className="text-gray-500" dir="ltr">{business?.phone} | {business?.email}</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Invoice Details Grid */}
-                    <div className="grid grid-cols-2 gap-8 mb-8">
-                        <div className="text-right">
-                            <h3 className="text-gray-500 font-medium mb-1">לכבוד</h3>
-                            <h4 className="text-lg font-bold text-gray-900">{client?.name || invoice.guestClientName}</h4>
-                            {client?.companyName && <p className="text-gray-600">{client.companyName}</p>}
-                            {client?.email && <p className="text-gray-600">{client.email}</p>}
-                            {client?.phone && <p className="text-gray-600" dir="ltr">{client.phone}</p>}
-                        </div>
-                        <div className="text-left">
-                            <div className="space-y-1">
-                                <div className="flex justify-between">
-                                    <span className="font-bold text-gray-900">תאריך:</span>
-                                    <span className="text-gray-600">{format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</span>
-                                </div>
-                                {invoice.dueDate && (
-                                    <div className="flex justify-between">
-                                        <span className="font-bold text-gray-900">תאריך תשלום:</span>
-                                        <span className="text-gray-600">{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                    {/* Client Info */}
+                    <div className="mb-8">
+                        <h3 className="text-gray-500 font-medium mb-2">לכבוד</h3>
+                        <h4 className="text-lg font-bold text-gray-900">{client?.name || invoice.guestClientName}</h4>
+                        {client?.companyName && <p className="text-gray-600">{client.companyName}</p>}
+                        {client?.email && <p className="text-gray-600">{client.email}</p>}
+                        {client?.phone && <p className="text-gray-600" dir="ltr">{client.phone}</p>}
                     </div>
 
                     {/* Line Items */}
