@@ -289,22 +289,22 @@ export default function PublicInvoicePage() {
 
                     {/* Totals */}
                     <div className="flex justify-end mb-12">
-                        <div className="w-64 space-y-2">
+                        <div className="bg-green-600 text-white p-6 rounded-lg shadow-md space-y-3 min-w-[300px]">
                             {business?.vatStatus !== 'EXEMPT' && (
                                 <>
-                                    <div className="flex justify-between text-gray-600">
+                                    <div className="flex justify-between text-white">
                                         <span>סה"כ לפני מע"מ:</span>
-                                        <span>{formatCurrency(invoice.subtotal || invoice.total)}</span>
+                                        <span className="font-semibold">₪ {formatCurrency(invoice.subtotal || invoice.total)}</span>
                                     </div>
-                                    <div className="flex justify-between text-gray-600">
+                                    <div className="flex justify-between text-white">
                                         <span>מע"מ ({((invoice.vatRate || 0) * 100).toFixed(0)}%):</span>
-                                        <span>{formatCurrency(invoice.vatAmount || 0)}</span>
+                                        <span className="font-semibold">₪ {formatCurrency(invoice.vatAmount || 0)}</span>
                                     </div>
                                 </>
                             )}
-                            <div className="flex justify-between text-xl font-bold text-gray-900 border-t-2 border-gray-200 pt-2">
+                            <div className="flex justify-between text-xl font-bold text-white border-t-2 border-white/30 pt-3">
                                 <span>סה"כ לתשלום:</span>
-                                <span>{formatCurrency(invoice.total)}</span>
+                                <span>₪ {formatCurrency(invoice.total)}</span>
                             </div>
                         </div>
                     </div>
