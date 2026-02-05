@@ -14,6 +14,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
     const [uploading, setUploading] = useState(false)
     const [saving, setSaving] = useState(false)
+    const [formReady, setFormReady] = useState(false)
     const confirm = useConfirm()
 
     const [preview, setPreview] = useState<string | null>(null)
@@ -39,7 +40,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
         onError: (err) => console.error('SWR BusinessProfile Error:', err)
     })
 
-    console.log('BusinessSettings Render:', { isLoading, hasProfile: !!profile, vatStatus: profile?.vatStatus })
+    console.log('BusinessSettings Render:', { isLoading, hasProfile: !!profile, vatStatus: profile?.vatStatus, formReady })
 
     // Sync form data when profile loads
     useEffect(() => { // Turbo-Fix: Using useEffect ensures form populates even if SWR serves from cache immediately
@@ -53,8 +54,12 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                 email: profile.email || '',
                 signature: profile.signatureUrl || ''
             })
+            setFormReady(true)
+        } else if (!isLoading) {
+            // If no profile and not loading, we're ready with empty form
+            setFormReady(true)
         }
-    }, [profile])
+    }, [profile, isLoading])
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -185,7 +190,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
 
     const currentLogo = preview || profile?.logoUrl
 
-    if (isLoading || !profile) {
+    if (!formReady) {
         return (
             <div className="flex justify-center items-center py-10">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
