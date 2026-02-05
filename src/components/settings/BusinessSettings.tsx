@@ -185,7 +185,7 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
 
     const currentLogo = preview || profile?.logoUrl
 
-    if (isLoading) {
+    if (isLoading || !profile) {
         return (
             <div className="flex justify-center items-center py-10">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
