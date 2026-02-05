@@ -281,17 +281,17 @@ export default function PublicInvoicePage() {
                                 <>
                                     <div className="flex justify-between text-white">
                                         <span>סה"כ לפני מע"מ:</span>
-                                        <span className="font-semibold">₪ {formatCurrency(invoice.subtotal || invoice.total)}</span>
+                                        <span className="font-semibold">{formatCurrency(invoice.subtotal || invoice.total)}</span>
                                     </div>
                                     <div className="flex justify-between text-white">
                                         <span>מע"מ ({((invoice.vatRate || 0) * 100).toFixed(0)}%):</span>
-                                        <span className="font-semibold">₪ {formatCurrency(invoice.vatAmount || 0)}</span>
+                                        <span className="font-semibold">{formatCurrency(invoice.vatAmount || 0)}</span>
                                     </div>
                                 </>
                             )}
                             <div className="flex justify-between text-xl font-bold text-white border-t-2 border-white/30 pt-3">
                                 <span>סה"כ לתשלום:</span>
-                                <span>₪ {formatCurrency(invoice.total)}</span>
+                                <span>{formatCurrency(invoice.total)}</span>
                             </div>
                         </div>
                     </div>
