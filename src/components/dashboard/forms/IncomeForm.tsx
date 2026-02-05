@@ -456,11 +456,6 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                             className={`h-10 text-right ${errors.amount ? 'border-red-500' : 'border-gray-200'}`}
                             placeholder="0.00"
                         />
-                        {isBusiness && !isExemptDealer && newIncome.amount && (
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">
-                                לפני מע"מ
-                            </div>
-                        )}
                     </div>
                 </div>
 
