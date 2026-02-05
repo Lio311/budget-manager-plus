@@ -54,40 +54,85 @@ export function GitAnalytics() {
 
     // 1. Commits over time (aggregated by day)
     const processCommitsByDate = () => {
-        const dateMap: { [key: string]: number } = {}
         const now = new Date()
         let startDate = new Date(0) // default all
+        let groupByMonth = false
 
-        if (timeRange === 'WEEK') startDate = subDays(now, 7)
-        if (timeRange === 'MONTH') startDate = subDays(now, 30)
-        if (timeRange === 'YEAR') startDate = subDays(now, 365)
-
-        // Fill in all dates in range with 0
-        const currentDate = new Date(startDate)
-        while (currentDate <= now) {
-            const dateKey = format(currentDate, 'yyyy-MM-dd')
-            dateMap[dateKey] = 0
-            currentDate.setDate(currentDate.getDate() + 1)
+        if (timeRange === 'WEEK') {
+            startDate = subDays(now, 7)
+        } else if (timeRange === 'MONTH') {
+            startDate = subDays(now, 30)
+        } else if (timeRange === 'YEAR') {
+            startDate = subDays(now, 365)
+            groupByMonth = true
+        } else if (timeRange === 'ALL') {
+            // Find first and last commit dates
+            if (stats.commits.length > 0) {
+                const dates = stats.commits.map(c => parseISO(c.date))
+                startDate = new Date(Math.min(...dates.map(d => d.getTime())))
+                // Determine if we should group by month based on range
+                const daysDiff = (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+                groupByMonth = daysDiff > 90 // Group by month if more than 3 months
+            }
         }
 
-        // Add actual commits
-        stats.commits.forEach(commit => {
-            const date = parseISO(commit.date)
-            if (date >= startDate) {
-                const dateKey = format(date, 'yyyy-MM-dd')
-                dateMap[dateKey] = (dateMap[dateKey] || 0) + 1
+        if (groupByMonth) {
+            // Group by month
+            const monthMap: { [key: string]: number } = {}
+
+            // Fill in all months in range with 0
+            const currentDate = new Date(startDate)
+            currentDate.setDate(1) // Start from first day of month
+            while (currentDate <= now) {
+                const monthKey = format(currentDate, 'yyyy-MM')
+                monthMap[monthKey] = 0
+                currentDate.setMonth(currentDate.getMonth() + 1)
             }
-        })
 
-        const data = Object.entries(dateMap)
-            .map(([date, count]) => ({ date, count }))
-            .sort((a, b) => a.date.localeCompare(b.date))
+            // Add actual commits
+            stats.commits.forEach(commit => {
+                const date = parseISO(commit.date)
+                if (date >= startDate) {
+                    const monthKey = format(date, 'yyyy-MM')
+                    monthMap[monthKey] = (monthMap[monthKey] || 0) + 1
+                }
+            })
 
-        return data
+            return Object.entries(monthMap)
+                .map(([date, count]) => ({ date: date + '-01', count }))
+                .sort((a, b) => a.date.localeCompare(b.date))
+        } else {
+            // Group by day
+            const dateMap: { [key: string]: number } = {}
+
+            // Fill in all dates in range with 0
+            const currentDate = new Date(startDate)
+            while (currentDate <= now) {
+                const dateKey = format(currentDate, 'yyyy-MM-dd')
+                dateMap[dateKey] = 0
+                currentDate.setDate(currentDate.getDate() + 1)
+            }
+
+            // Add actual commits
+            stats.commits.forEach(commit => {
+                const date = parseISO(commit.date)
+                if (date >= startDate) {
+                    const dateKey = format(date, 'yyyy-MM-dd')
+                    dateMap[dateKey] = (dateMap[dateKey] || 0) + 1
+                }
+            })
+
+            return Object.entries(dateMap)
+                .map(([date, count]) => ({ date, count }))
+                .sort((a, b) => a.date.localeCompare(b.date))
+        }
     }
 
     const commitsData = processCommitsByDate()
     const totalCommitsInRange = commitsData.reduce((acc, curr) => acc + curr.count, 0)
+
+    // Determine if we're showing monthly data
+    const isMonthlyView = timeRange === 'YEAR' || (timeRange === 'ALL' && commitsData.length > 0 && commitsData[0].date.endsWith('-01'))
 
     // 2. Security Commits
     const securityCommits = stats.commits.filter(c =>
@@ -194,7 +239,10 @@ export function GitAnalytics() {
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                 <XAxis
                                     dataKey="date"
-                                    tickFormatter={(str) => format(parseISO(str), 'dd/MM')}
+                                    tickFormatter={(str) => {
+                                        const date = parseISO(str)
+                                        return isMonthlyView ? format(date, 'MM/yy') : format(date, 'dd/MM')
+                                    }}
                                     stroke="#9CA3AF"
                                     fontSize={12}
                                 />
@@ -226,7 +274,10 @@ export function GitAnalytics() {
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                 <XAxis
                                     dataKey="date"
-                                    tickFormatter={(str) => format(parseISO(str), 'dd/MM')}
+                                    tickFormatter={(str) => {
+                                        const date = parseISO(str)
+                                        return isMonthlyView ? format(date, 'MM/yy') : format(date, 'dd/MM')
+                                    }}
                                     stroke="#9CA3AF"
                                     fontSize={12}
                                 />
