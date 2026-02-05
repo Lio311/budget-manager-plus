@@ -184,14 +184,17 @@ export async function toggleIncomeStatus(id: string, newStatus: 'PAID' | 'PENDIN
 
         if (updated.budget) {
             const budgetType = updated.budget.type as 'PERSONAL' | 'BUSINESS'
-            try {
-                // If it has a date, use it. If not, use budget month/year (fallback)
-                const syncMonth = updated.date ? (updated.date.getMonth() + 1) : updated.budget.month
-                const syncYear = updated.date ? updated.date.getFullYear() : updated.budget.year
-                await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
-            } catch (e) {
-                console.error('Auto-sync failed', e)
-            }
+            const syncMonth = updated.date ? (updated.date.getMonth() + 1) : updated.budget.month
+            const syncYear = updated.date ? updated.date.getFullYear() : updated.budget.year
+
+            // Fire-and-Forget Sync (Do not await)
+            void (async () => {
+                try {
+                    await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
+                } catch (e) {
+                    console.error('Background Auto-sync failed', e)
+                }
+            })()
         }
 
         revalidatePath('/dashboard')
@@ -372,13 +375,17 @@ export async function updateIncome(
 
             if (income.budget) {
                 const budgetType = income.budget.type as 'PERSONAL' | 'BUSINESS'
-                try {
-                    const syncMonth = income.date ? (income.date.getMonth() + 1) : income.budget.month
-                    const syncYear = income.date ? income.date.getFullYear() : income.budget.year
-                    await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
-                } catch (e) {
-                    console.error('Auto-sync failed', e)
-                }
+                const syncMonth = income.date ? (income.date.getMonth() + 1) : income.budget.month
+                const syncYear = income.date ? income.date.getFullYear() : income.budget.year
+
+                // Fire-and-Forget Sync (Do not await)
+                void (async () => {
+                    try {
+                        await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
+                    } catch (e) {
+                        console.error('Background Auto-sync failed', e)
+                    }
+                })()
             }
 
             revalidatePath('/dashboard')
@@ -496,13 +503,17 @@ export async function deleteIncome(id: string, mode: 'SINGLE' | 'FUTURE' = 'SING
 
         if (income?.budget) {
             const budgetType = income.budget.type as 'PERSONAL' | 'BUSINESS'
-            try {
-                const syncMonth = income.date ? (income.date.getMonth() + 1) : income.budget.month
-                const syncYear = income.date ? income.date.getFullYear() : income.budget.year
-                await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
-            } catch (e) {
-                console.error('Auto-sync failed', e)
-            }
+            const syncMonth = income.date ? (income.date.getMonth() + 1) : income.budget.month
+            const syncYear = income.date ? income.date.getFullYear() : income.budget.year
+
+            // Fire-and-Forget Sync (Do not await)
+            void (async () => {
+                try {
+                    await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
+                } catch (e) {
+                    console.error('Background Auto-sync failed', e)
+                }
+            })()
         }
 
         revalidatePath('/dashboard')
