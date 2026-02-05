@@ -62,6 +62,15 @@ export function GitAnalytics() {
         if (timeRange === 'MONTH') startDate = subDays(now, 30)
         if (timeRange === 'YEAR') startDate = subDays(now, 365)
 
+        // Fill in all dates in range with 0
+        const currentDate = new Date(startDate)
+        while (currentDate <= now) {
+            const dateKey = format(currentDate, 'yyyy-MM-dd')
+            dateMap[dateKey] = 0
+            currentDate.setDate(currentDate.getDate() + 1)
+        }
+
+        // Add actual commits
         stats.commits.forEach(commit => {
             const date = parseISO(commit.date)
             if (date >= startDate) {
