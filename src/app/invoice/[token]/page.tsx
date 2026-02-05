@@ -208,20 +208,8 @@ export default function PublicInvoicePage() {
                                     }[invoice.invoiceType as string] || 'חשבונית מס'}
                                 </h1>
                                 <div className="text-gray-600">
-                                    <p><strong>מספר חשבונית:</strong> {invoice.invoiceNumber}</p>
-                                    <p><strong>תאריך:</strong> {new Date(invoice.issueDate).toLocaleDateString('he-IL')}</p>
-                                    {invoice.dueDate && <p><strong>לתשלום עד:</strong> {new Date(invoice.dueDate).toLocaleDateString('he-IL')}</p>}
+                                    <p className="text-lg"><strong>מספר:</strong> {invoice.invoiceNumber}</p>
                                 </div>
-                            </div>
-
-                            {/* Client Info */}
-                            {/* Client Info */}
-                            <div>
-                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">לכבוד</h3>
-                                <div className="text-gray-900 font-medium text-lg">{invoice.guestClientName || client?.name}</div>
-                                {client?.taxId && <div className="text-gray-600">ח.פ / ת.ז: {client.taxId}</div>}
-                                {client?.address && <div className="text-gray-600">{client.address}</div>}
-                                {client?.email && <div className="text-gray-600">{client.email}</div>}
                             </div>
                         </div>
 
