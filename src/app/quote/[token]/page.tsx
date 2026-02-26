@@ -15,6 +15,13 @@ import { toast } from 'sonner'
 import { format } from 'date-fns'
 import parse from 'html-react-parser'
 
+const formatPhone = (phone: string | null | undefined) => {
+    if (!phone) return ''
+    if (phone.startsWith('+972')) return '0' + phone.slice(4).trim()
+    if (!phone.startsWith('0') && !phone.startsWith('+')) return '0' + phone
+    return phone
+}
+
 export default function PublicQuotePage() {
     const params = useParams()
     const token = params.token as string
@@ -214,7 +221,7 @@ export default function PublicQuotePage() {
                                 {client?.taxId && <div className="text-gray-600">ח.פ / ע.מ: {client.taxId}</div>}
                                 {client?.address && <div className="text-gray-600">{client.address}{client.city ? `, ${client.city}` : ''}</div>}
                                 {client?.email && <div className="text-gray-600">{client.email}</div>}
-                                {client?.phone && <div className="text-gray-600" dir="ltr">{client.phone.startsWith('+972') ? '0' + client.phone.slice(4).trim() : client.phone}</div>}
+                                {client?.phone && <div className="text-gray-600" dir="ltr">{formatPhone(client.phone)}</div>}
                             </div>
                         </div>
 
@@ -236,7 +243,7 @@ export default function PublicQuotePage() {
                             <p className="text-gray-500">{business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ'} {business?.companyId}</p>
                             <div className="text-sm text-gray-500 mt-2">
                                 {business?.address && <p>{business.address}</p>}
-                                {business?.phone && <p dir="ltr">{business.phone.startsWith('+972') ? '0' + business.phone.slice(4).trim() : business.phone}</p>}
+                                {business?.phone && <p dir="ltr">{formatPhone(business.phone)}</p>}
                                 {business?.email && <p>{business.email}</p>}
                             </div>
                         </div>
