@@ -17,7 +17,10 @@ import parse from 'html-react-parser'
 
 const formatPhone = (phone: string | null | undefined) => {
     if (!phone) return ''
-    if (phone.startsWith('+972')) return '0' + phone.slice(4).trim()
+    if (phone.startsWith('+972')) {
+        const local = phone.slice(4).trim()
+        return local.startsWith('0') ? local : '0' + local
+    }
     if (!phone.startsWith('0') && !phone.startsWith('+')) return '0' + phone
     return phone
 }
