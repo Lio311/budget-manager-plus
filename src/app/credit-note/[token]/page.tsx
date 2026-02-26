@@ -167,9 +167,10 @@ export default function PublicCreditNotePage() {
                                 <div>
                                     <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">לכבוד</h3>
                                     <div className="text-gray-900 font-medium text-lg">{client.name}</div>
-                                    {client.taxId && <div className="text-gray-600">ח.פ / ת.ז: {client.taxId}</div>}
-                                    {client.address && <div className="text-gray-600">{client.address}</div>}
+                                    {client.taxId && <div className="text-gray-600">ח.פ / ע.מ: {client.taxId}</div>}
+                                    {client.address && <div className="text-gray-600">{client.address}{client.city ? `, ${client.city}` : ''}</div>}
                                     {client.email && <div className="text-gray-600">{client.email}</div>}
+                                    {client.phone && <div className="text-gray-600" dir="ltr">{client.phone.startsWith('+972') ? '0' + client.phone.slice(4).trim() : client.phone}</div>}
                                 </div>
                             )}
                         </div>
@@ -189,7 +190,7 @@ export default function PublicCreditNotePage() {
                             <p className="text-gray-500">{business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ'} {business?.companyId}</p>
                             <div className="text-sm text-gray-500 mt-2">
                                 {business?.address && <p>{business.address}</p>}
-                                {business?.phone && <p>{business.phone}</p>}
+                                {business?.phone && <p dir="ltr">{business.phone.startsWith('+972') ? '0' + business.phone.slice(4).trim() : business.phone}</p>}
                                 {business?.email && <p>{business.email}</p>}
                             </div>
                         </div>

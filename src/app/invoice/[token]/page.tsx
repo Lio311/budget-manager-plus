@@ -235,7 +235,7 @@ export default function PublicInvoicePage() {
                                     {business?.vatStatus === 'EXEMPT' ? 'עוסק פטור' : (business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ')} {business?.companyId}
                                 </p>
                                 <p className="text-gray-500">{business?.address}</p>
-                                <p className="text-gray-500" dir="ltr">{business?.phone} | {business?.email}</p>
+                                <p className="text-gray-500" dir="ltr">{business?.phone?.startsWith('+972') ? '0' + business.phone.slice(4).trim() : business?.phone} {business?.phone && business?.email ? '|' : ''} {business?.email}</p>
                             </div>
                         </div>
                     </div>
@@ -244,9 +244,10 @@ export default function PublicInvoicePage() {
                     <div className="mb-8 text-right">
                         <h3 className="text-gray-500 font-medium mb-2">לכבוד</h3>
                         <h4 className="text-lg font-bold text-gray-900">{client?.name || invoice.guestClientName}</h4>
-                        {client?.companyName && <p className="text-gray-600">{client.companyName}</p>}
+                        {client?.taxId && <p className="text-gray-600">ח.פ/ע.מ: {client.taxId}</p>}
+                        {client?.address && <p className="text-gray-600">{client.address}{client.city ? `, ${client.city}` : ''}</p>}
                         {client?.email && <p className="text-gray-600">{client.email}</p>}
-                        {client?.phone && <p className="text-gray-600" dir="ltr">{client.phone}</p>}
+                        {client?.phone && <p className="text-gray-600" dir="ltr">{client.phone.startsWith('+972') ? '0' + client.phone.slice(4).trim() : client.phone}</p>}
                     </div>
 
                     {/* Line Items */}
