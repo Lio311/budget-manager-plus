@@ -61,7 +61,10 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
         const invoices = await db.invoice.findMany({
             where: {
                 userId,
-                status: 'SIGNED', // Only signed invoices
+                OR: [
+                    { status: 'SIGNED' },
+                    { isSigned: true }
+                ],
                 issueDate: {
                     gte: startDate,
                     lte: endDate
