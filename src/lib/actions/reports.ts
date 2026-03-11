@@ -63,6 +63,7 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
                 userId,
                 OR: [
                     { status: 'SIGNED' },
+                    { status: 'PAID' },
                     { isSigned: true }
                 ],
                 issueDate: {
