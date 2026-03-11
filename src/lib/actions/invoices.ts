@@ -21,6 +21,7 @@ export interface InvoiceFormData {
     incomeId?: string // Optional: Link to specific income
     invoiceType: string // NEW
     invoiceNumber: string
+    allocationNumber?: string // מספר הקצאה
     issueDate: Date
     dueDate?: Date
     subtotal: number
@@ -40,6 +41,7 @@ const InvoiceSchema = z.object({
     incomeId: z.string().optional(),
     invoiceType: z.string().default('INVOICE'),
     invoiceNumber: z.string().min(1, 'חובה להזין מספר חשבונית'),
+    allocationNumber: z.string().optional().nullable(),
     issueDate: z.date(),
     dueDate: z.date().optional().nullable(),
     subtotal: z.number().min(0, 'סכום לא יכול להיות שלילי'),
@@ -148,6 +150,7 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
                 scope,
                 invoiceType: validData.invoiceType,
                 invoiceNumber: validData.invoiceNumber,
+                allocationNumber: validData.allocationNumber || null,
                 issueDate: validData.issueDate,
                 dueDate: validData.dueDate || null,
                 subtotal: validData.subtotal,
@@ -395,6 +398,7 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
         const updateData: any = {}
 
         if (data.invoiceNumber) updateData.invoiceNumber = data.invoiceNumber
+        if (data.allocationNumber !== undefined) updateData.allocationNumber = data.allocationNumber
         if (data.issueDate) updateData.issueDate = data.issueDate
         if (data.dueDate !== undefined) updateData.dueDate = data.dueDate
 

@@ -73,6 +73,7 @@ export async function generateQuotePDF({ quoteId, userId }: GenerateQuotePDFPara
             title: 'הצעת מחיר',
             documentNumberLabel: 'מספר הצעה',
             invoiceNumber: quote.quoteNumber,
+            allocationNumber: quote.allocationNumber || undefined,
             issueDate: quote.issueDate.toISOString(),
             dueDate: quote.validUntil?.toISOString() || quote.issueDate.toISOString(),
             status: getStatusLabel(quote.status),

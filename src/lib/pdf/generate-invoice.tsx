@@ -43,6 +43,7 @@ export function mapInvoiceToPDFData(invoice: any, businessProfile: any, business
     return {
         title: 'חשבונית',
         invoiceNumber: invoice.invoiceNumber,
+        allocationNumber: invoice.allocationNumber || undefined,
         issueDate: invoice.issueDate.toISOString(),
         dueDate: invoice.dueDate?.toISOString() || invoice.issueDate.toISOString(),
         status: getStatusLabel(invoice.status),

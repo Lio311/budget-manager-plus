@@ -42,6 +42,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
             return {
                 clientId: initialData.clientId || '',
                 invoiceNumber: initialData.invoiceNumber || '',
+                allocationNumber: initialData.allocationNumber || '',
                 issueDate: initialData.issueDate ? new Date(initialData.issueDate) : new Date(),
                 dueDate: initialData.dueDate ? new Date(initialData.dueDate) : undefined,
                 subtotal: initialData.subtotal || 0,
@@ -64,6 +65,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
         return {
             clientId: '',
             invoiceNumber: '',
+            allocationNumber: '',
             issueDate: new Date(),
             dueDate: undefined,
             subtotal: 0,
@@ -339,6 +341,18 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                             </div>
                         )}
                     </div>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        מספר הקצאה
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.allocationNumber || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, allocationNumber: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-slate-800 dark:border-slate-700 text-right focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="הזן מספר הקצאה (אופציונלי)"
+                    />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

@@ -588,6 +588,7 @@ function TransactionList({ filtered, type }: { filtered: TransactionItem[], type
                                 <TableCell className="text-center font-medium text-gray-700 dark:text-gray-300">
                                     {t.type === 'CREDIT_NOTE' && <Badge variant="outline" className="text-red-600 border-red-200 dark:text-red-400 dark:border-red-900 ml-2">זיכוי</Badge>}
                                     {t.number || '-'}
+                                    {t.allocationNumber && <span className="text-gray-500 text-xs text-nowrap mr-2">- {t.allocationNumber}</span>}
                                 </TableCell>
                                 <TableCell className="text-center text-gray-500 dark:text-gray-400">{new Date(t.date).toLocaleDateString('he-IL')}</TableCell>
                             </TableRow>

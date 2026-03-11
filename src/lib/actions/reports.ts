@@ -9,6 +9,7 @@ export interface TransactionItem {
     date: Date
     type: 'INCOME' | 'EXPENSE' | 'CREDIT_NOTE' | 'INVOICE'
     number?: string // Invoice/Receipt number
+    allocationNumber?: string // מספר הקצאה
     description: string
     category?: string
     entityName?: string // Client or Supplier
@@ -142,6 +143,7 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
                 date: inv.issueDate,
                 type: 'INVOICE',
                 number: inv.invoiceNumber,
+                allocationNumber: inv.allocationNumber || undefined,
                 description: `חשבונית ${inv.invoiceNumber}`,
                 entityName: inv.guestClientName || inv.client?.name,
                 amount: totalILS,

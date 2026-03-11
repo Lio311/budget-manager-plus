@@ -8,6 +8,7 @@ import { createInvoice, getNextInvoiceNumber, InvoiceFormData } from './invoices
 export interface QuoteFormData {
     clientId: string
     quoteNumber: string
+    allocationNumber?: string // מספר הקצאה
     issueDate: Date
     validUntil?: Date
     subtotal: number
@@ -108,6 +109,7 @@ export async function createQuote(data: QuoteFormData, scope: string = 'BUSINESS
                 clientId: data.clientId,
                 scope,
                 quoteNumber: data.quoteNumber,
+                allocationNumber: data.allocationNumber || null,
                 issueDate: data.issueDate,
                 validUntil: data.validUntil,
                 subtotal: data.subtotal,
@@ -150,6 +152,7 @@ export async function updateQuote(id: string, data: Partial<QuoteFormData>) {
         const updateData: any = {}
 
         if (data.quoteNumber) updateData.quoteNumber = data.quoteNumber
+        if (data.allocationNumber !== undefined) updateData.allocationNumber = data.allocationNumber
         if (data.issueDate) updateData.issueDate = data.issueDate
         if (data.validUntil !== undefined) updateData.validUntil = data.validUntil
         if (data.notes !== undefined) updateData.notes = data.notes

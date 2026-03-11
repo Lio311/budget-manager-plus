@@ -687,6 +687,8 @@ model Invoice {
   dueDate       DateTime?
   status        InvoiceStatus @default(DRAFT)
   invoiceType   String        @default("INVOICE") // INVOICE, OPT_INVOICE (Tax Invoice), RECEIPT, DEAL_INVOICE
+  allocationNumber String?    // מספר הקצאה
+
   
   // Amounts
   subtotal      Float
@@ -763,6 +765,8 @@ model Quote {
   issueDate     DateTime    @default(now())
   validUntil    DateTime?
   status        QuoteStatus @default(DRAFT)
+  allocationNumber String?  // מספר הקצאה
+
   
   // Amounts
   subtotal      Float

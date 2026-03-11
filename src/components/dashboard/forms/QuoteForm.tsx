@@ -30,6 +30,7 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
     const [formData, setFormData] = useState<QuoteFormData>({
         clientId: initialData?.clientId || '',
         quoteNumber: initialData?.quoteNumber || '',
+        allocationNumber: initialData?.allocationNumber || '',
         issueDate: initialData?.date ? new Date(initialData.date) : new Date(),
         validUntil: initialData?.validUntil ? new Date(initialData.validUntil) : undefined,
         subtotal: initialData?.totalAmount || 0,
@@ -157,6 +158,18 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                             </div>
                         )}
                     </div>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        מספר הקצאה
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.allocationNumber || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, allocationNumber: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-slate-800 dark:border-slate-700 text-right focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="הזן מספר הקצאה (אופציונלי)"
+                    />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

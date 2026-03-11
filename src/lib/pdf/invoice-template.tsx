@@ -174,6 +174,7 @@ const styles = StyleSheet.create({
 
 interface InvoiceData {
     invoiceNumber: string
+    allocationNumber?: string
     issueDate: string
     dueDate: string
     status: string
@@ -322,6 +323,9 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                     <View style={{ alignItems: 'flex-end' }}>
                         <Text style={styles.invoiceTitle}>{data.title || 'חשבונית'}</Text>
                         <Text style={styles.invoiceNumber}>{data.invoiceNumber} :{data.documentNumberLabel || 'מספר חשבונית'}</Text>
+                        {data.allocationNumber && (
+                            <Text style={styles.invoiceNumber}>{data.allocationNumber} :מספר הקצאה</Text>
+                        )}
                     </View>
                     {data.businessLogo && (
                         <Image src={data.businessLogo} style={styles.logo} />
