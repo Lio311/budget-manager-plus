@@ -212,6 +212,7 @@ export default function PublicQuotePage() {
                                 <h1 className="text-3xl md:text-4xl font-light text-green-600 mb-2">הצעת מחיר</h1>
                                 <div className="text-gray-600">
                                     <p><strong>מספר הצעה:</strong> {quote.quoteNumber}</p>
+                                    {quote.allocationNumber && <p><strong>מספר הקצאה:</strong> {quote.allocationNumber}</p>}
                                     <p><strong>תאריך:</strong> {new Date(quote.issueDate).toLocaleDateString('he-IL')}</p>
                                     {quote.validUntil && <p><strong>בתוקף עד:</strong> {new Date(quote.validUntil).toLocaleDateString('he-IL')}</p>}
                                 </div>

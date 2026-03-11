@@ -219,6 +219,7 @@ export default function PublicInvoicePage() {
                                 </h1>
                                 <div className="text-gray-600 space-y-1">
                                     <p className="text-lg"><strong>מספר:</strong> {invoice.invoiceNumber}</p>
+                                    {invoice.allocationNumber && <p><strong>מספר הקצאה:</strong> {invoice.allocationNumber}</p>}
                                     <p><strong>תאריך:</strong> {format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</p>
                                     {invoice.dueDate && <p><strong>תאריך תשלום:</strong> {format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</p>}
                                 </div>
