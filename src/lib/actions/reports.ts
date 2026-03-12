@@ -17,6 +17,7 @@ export interface TransactionItem {
     amountNet: number // Before VAT
     vat: number
     isRecognized?: boolean // For expenses
+    deductibleRate?: number
 }
 
 export interface ProfitLossReport {
@@ -253,20 +254,22 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
             const vat = (exp.vatAmount || 0) * rate
             const net = amountILS - vat
 
-            // Filter: User requested ONLY recognized expenses
-            if (exp.isDeductible === false) {
-                continue
+            const isDeductible = exp.isDeductible !== false
+            const deductibleRate = exp.deductibleRate ?? 1.0
+            
+            let recognizedCost = 0
+            if (isDeductible) {
+                recognizedCost = net * deductibleRate
+                // For deductible expenses, we track the total gross for the list, 
+                // but the P&L 'Recognized' is net (pre-tax profit calc)
+                expensesRecognized += recognizedCost
+                expensesVatRecognized += vat // Simplified: include full VAT if deductible
+            } else {
+                // For non-deductible, recognized cost is 0 for tax purposes, 
+                // but we include the full amount in total business cost
             }
 
-            let recognizedCost = 0
-            const deductibleRate = exp.deductibleRate ?? 1.0
-            recognizedCost = net * deductibleRate
-
             expensesTotal += amountILS
-            expensesRecognized += recognizedCost
-            expensesVatRecognized += vat // Assuming fully recognized for VAT if recognized? Or separate rate?
-            // Usually if expense is 45% recognized, VAT is also partial? 
-            // Simplified: If deductible, include VAT. 
 
             transactions.push({
                 id: exp.id,
@@ -278,7 +281,8 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
                 amount: amountILS,
                 amountNet: net,
                 vat: vat,
-                isRecognized: true
+                isRecognized: isDeductible,
+                deductibleRate: deductibleRate
             })
         }
 

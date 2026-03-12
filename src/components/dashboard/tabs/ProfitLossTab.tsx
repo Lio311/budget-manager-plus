@@ -430,9 +430,9 @@ export default function ProfitLossTab() {
                                             <TrendingDown className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] md:text-sm text-red-700 dark:text-red-300 font-medium whitespace-nowrap">הוצאות</p>
+                                            <p className="text-[10px] md:text-sm text-red-700 dark:text-red-300 font-medium whitespace-nowrap">הוצאות עסקיות</p>
                                             <h3 className="text-sm md:text-2xl font-bold text-red-900 dark:text-red-100 truncate" dir="ltr">
-                                                ₪{formatNumberWithCommas(Number(reportData.expenses.recognized.toFixed(0)))}
+                                                ₪{formatNumberWithCommas(Number(reportData.expenses.total.toFixed(0)))}
                                             </h3>
                                         </div>
                                     </div>
@@ -444,7 +444,7 @@ export default function ProfitLossTab() {
                                             <DollarSign className="h-6 w-6" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] md:text-sm text-blue-700 dark:text-blue-300 font-medium whitespace-nowrap">רווח נקי</p>
+                                            <p className="text-[10px] md:text-sm text-blue-700 dark:text-blue-300 font-medium whitespace-nowrap">רווח נקי (מוכר)</p>
                                             <h3 className="text-sm md:text-2xl font-bold text-blue-900 dark:text-blue-100 truncate" dir="ltr">
                                                 ₪{formatNumberWithCommas(Number(reportData.netProfit.toFixed(0)))}
                                             </h3>
