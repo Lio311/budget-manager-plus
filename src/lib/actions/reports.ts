@@ -48,12 +48,9 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
         if (dateRange) {
             startDate = dateRange.from
             endDate = dateRange.to
-            // Ensure full day coverage
-            startDate.setHours(0, 0, 0, 0)
-            endDate.setHours(23, 59, 59, 999)
         } else {
-            startDate = new Date(year, 0, 1) // Jan 1st
-            endDate = new Date(year, 11, 31, 23, 59, 59) // Dec 31st
+            startDate = new Date(year, 0, 1, 0, 0, 0, 0) // Jan 1st
+            endDate = new Date(year, 11, 31, 23, 59, 59, 999) // Dec 31st
         }
 
         // 1. Fetch Invoices (Revenue)

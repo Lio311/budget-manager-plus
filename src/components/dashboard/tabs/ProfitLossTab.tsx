@@ -211,8 +211,8 @@ export default function ProfitLossTab() {
         startDateLimit.setHours(0, 0, 0, 0)
 
         if (viewType === 'ANNUAL') {
-            const start = new Date(selectedYear, 0, 1)
-            const end = new Date(selectedYear, 11, 31)
+            const start = new Date(selectedYear, 0, 1, 0, 0, 0, 0)
+            const end = new Date(selectedYear, 11, 31, 23, 59, 59, 999)
 
             // Filter: If period ends before registration, skip it
             if (end < startDateLimit) return []
@@ -233,8 +233,8 @@ export default function ProfitLossTab() {
             ]
 
             monthPairs.forEach(pair => {
-                const start = new Date(selectedYear, pair.start, 1)
-                const end = new Date(selectedYear, pair.end + 1, 0)
+                const start = new Date(selectedYear, pair.start, 1, 0, 0, 0, 0)
+                const end = new Date(selectedYear, pair.end + 1, 0, 23, 59, 59, 999)
 
                 // Filter: Skip if period ends before registration
                 if (end < startDateLimit) return
@@ -253,8 +253,8 @@ export default function ProfitLossTab() {
             ]
 
             months.forEach((name, index) => {
-                const start = new Date(selectedYear, index, 1)
-                const end = new Date(selectedYear, index + 1, 0)
+                const start = new Date(selectedYear, index, 1, 0, 0, 0, 0)
+                const end = new Date(selectedYear, index + 1, 0, 23, 59, 59, 999)
 
                 // Filter: Skip if period ends before registration
                 if (end < startDateLimit) return
