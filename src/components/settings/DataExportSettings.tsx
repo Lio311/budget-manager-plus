@@ -52,8 +52,10 @@ const EXPORT_OPTIONS = [
 export function DataExportSettings() {
     const [loading, setLoading] = useState<Record<string, boolean>>({})
     const [generatingPDF, setGeneratingPDF] = useState(false)
-    const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString())
-    const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString())
+    const [invoiceYear, setInvoiceYear] = useState<string>(new Date().getFullYear().toString())
+    const [invoiceMonth, setInvoiceMonth] = useState<string>((new Date().getMonth() + 1).toString())
+    const [expenseYear, setExpenseYear] = useState<string>(new Date().getFullYear().toString())
+    const [expenseMonth, setExpenseMonth] = useState<string>((new Date().getMonth() + 1).toString())
 
     const months = [
         { label: 'ינואר', value: '1' },
@@ -73,7 +75,7 @@ export function DataExportSettings() {
     const handleGenerateMonthlyPDF = async () => {
         setGeneratingPDF(true)
         try {
-            const result = await generateMonthlyConsolidatedPDF(parseInt(selectedMonth), parseInt(selectedYear))
+            const result = await generateMonthlyConsolidatedPDF(parseInt(invoiceMonth), parseInt(invoiceYear))
             if (result.success && result.data) {
                 toast.success('הפקת PDF הסתיימה בהצלחה')
                 
@@ -107,7 +109,7 @@ export function DataExportSettings() {
     const handleGenerateMonthlyExpensesPDF = async () => {
         setGeneratingPDF(true)
         try {
-            const result = await generateMonthlyExpenseReportPDF(parseInt(selectedMonth), parseInt(selectedYear))
+            const result = await generateMonthlyExpenseReportPDF(parseInt(expenseMonth), parseInt(expenseYear))
             if (result.success && result.data) {
                 toast.success('הפקת דוח הוצאות הסתיימה בהצלחה')
                 
@@ -122,7 +124,7 @@ export function DataExportSettings() {
                 const url = URL.createObjectURL(blob)
                 const link = document.createElement('a')
                 link.href = url
-                link.setAttribute('download', result.filename || `Expense_Report_${selectedYear}_${selectedMonth}.pdf`)
+                link.setAttribute('download', result.filename || `Expense_Report_${expenseYear}_${expenseMonth}.pdf`)
                 document.body.appendChild(link)
                 link.click()
                 document.body.removeChild(link)
@@ -281,7 +283,7 @@ export function DataExportSettings() {
                                 {option.id === 'invoices' && (
                                     <>
                                         <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 p-2 rounded-md border text-xs">
-                                            <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                            <Select value={invoiceYear} onValueChange={setInvoiceYear}>
                                                 <SelectTrigger className="h-8 w-[80px] text-right">
                                                     <SelectValue />
                                                 </SelectTrigger>
@@ -292,7 +294,7 @@ export function DataExportSettings() {
                                                     <SelectItem value="2023">2023</SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                                            <Select value={invoiceMonth} onValueChange={setInvoiceMonth}>
                                                 <SelectTrigger className="h-8 w-[90px] text-right">
                                                     <SelectValue />
                                                 </SelectTrigger>
@@ -329,7 +331,7 @@ export function DataExportSettings() {
                                 )}
                                 {option.id === 'expenses' && (
                                     <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 p-2 rounded-md border text-xs">
-                                        <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                        <Select value={expenseYear} onValueChange={setExpenseYear}>
                                             <SelectTrigger className="h-8 w-[80px] text-right">
                                                 <SelectValue />
                                             </SelectTrigger>
@@ -340,7 +342,7 @@ export function DataExportSettings() {
                                                 <SelectItem value="2023">2023</SelectItem>
                                             </SelectContent>
                                         </Select>
-                                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                                        <Select value={expenseMonth} onValueChange={setExpenseMonth}>
                                             <SelectTrigger className="h-8 w-[90px] text-right">
                                                 <SelectValue />
                                             </SelectTrigger>
