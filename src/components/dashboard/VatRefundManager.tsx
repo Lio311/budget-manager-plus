@@ -13,6 +13,8 @@ import { formatCurrency, cn } from '@/lib/utils'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useRef } from 'react'
+import { DatePicker } from '@/components/ui/date-picker'
+import { format } from 'date-fns'
 
 interface ManualVatRefund {
     id: string
@@ -152,13 +154,11 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
                                             onValueChange={(val) => setAmount(val.toString())}
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label>תאריך</Label>
-                                        <Input 
-                                            type="date" 
-                                            value={date} 
-                                            onChange={(e) => setDate(e.target.value)}
-                                            className="text-right"
+                                    <div className="space-y-1">
+                                        <Label className="text-xs font-bold text-gray-500">תאריך</Label>
+                                        <DatePicker 
+                                            date={date ? new Date(date) : undefined}
+                                            setDate={(d) => setDate(d ? format(d, 'yyyy-MM-dd') : '')}
                                         />
                                     </div>
                                 </div>
