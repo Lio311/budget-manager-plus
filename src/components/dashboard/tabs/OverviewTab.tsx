@@ -108,9 +108,10 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
             expenses: [{ amountILS: demoData.overview.totalExpenses, vatAmountILS: 0 }],
             bills: [{ amountILS: demoData.overview.upcomingBills, isPaid: false }],
             debts: [{ monthlyPaymentILS: demoData.overview.debts }],
-            savings: [{ monthlyDepositILS: demoData.overview.savings }]
+            savings: [{ monthlyDepositILS: demoData.overview.savings }],
+            manualVatRefunds: []
         },
-        previous: { incomes: [], expenses: [], bills: [], debts: [], savings: [] },
+        previous: { incomes: [], expenses: [], bills: [], debts: [], savings: [], manualVatRefunds: [] },
         categories: [],
         netWorthHistory: [],
         user: {
@@ -147,8 +148,8 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
         }
     }, [overviewData, budgetType])
 
-    const current = overviewData?.current || { incomes: [], expenses: [], bills: [], debts: [], savings: [] }
-    const previous = overviewData?.previous || { incomes: [], expenses: [], bills: [], debts: [], savings: [] }
+    const current = overviewData?.current || { incomes: [], expenses: [], bills: [], debts: [], savings: [], manualVatRefunds: [] }
+    const previous = overviewData?.previous || { incomes: [], expenses: [], bills: [], debts: [], savings: [], manualVatRefunds: [] }
     const categories = overviewData?.categories || []
     const netWorthHistory = overviewData?.netWorthHistory || []
 

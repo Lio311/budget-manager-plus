@@ -77,6 +77,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },
+                    // @ts-ignore
                     manualVatRefunds: { select: { id: true, amount: true, description: true, date: true } },
                     // @ts-ignore
                     initialBalance: true,
@@ -93,6 +94,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },
+                    // @ts-ignore
                     manualVatRefunds: { select: { id: true, amount: true, description: true, date: true } },
                     // @ts-ignore
                     initialBalance: true,

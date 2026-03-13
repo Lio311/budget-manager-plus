@@ -104,7 +104,9 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         vatAmount: initialData.vatAmount?.toString() || '',
         paymentMethod: initialData.paymentMethod || '',
         payer: initialData.payer || '',
-        workTime: initialData.workTime?.toString() || '',
+        workTime: initialData.workTime 
+            ? (timeUnit === 'minutes' ? Math.round(parseFloat(initialData.workTime) * 60).toString() : initialData.workTime.toString())
+            : '',
         acceptedBy: initialData.acceptedBy || '',
         id: initialData.id // Store ID for update
     } : {
