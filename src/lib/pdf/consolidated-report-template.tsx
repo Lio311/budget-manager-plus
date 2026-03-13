@@ -93,7 +93,7 @@ export const ConsolidatedReportTemplate: React.FC<ConsolidatedReportProps> = ({ 
                 <View style={styles.table}>
                     <View style={[styles.tableRow, styles.tableHeader]}>
                         <Text style={[styles.tableCell, styles.tableCellHeader]}>תאריך</Text>
-                        <Text style={[styles.tableCell, styles.tableCellHeader]}>מספר</Text>
+                        <Text style={[styles.tableCell, styles.tableCellHeader]}>אסמכתא</Text>
                         <Text style={[styles.tableCell, styles.tableCellHeader]}>לקוח</Text>
                         <Text style={[styles.tableCell, styles.tableCellHeader]}>נטו</Text>
                         <Text style={[styles.tableCell, styles.tableCellHeader]}>מע"מ</Text>
@@ -102,7 +102,10 @@ export const ConsolidatedReportTemplate: React.FC<ConsolidatedReportProps> = ({ 
                     {invoices.map((inv, idx) => (
                         <View key={idx} style={styles.tableRow}>
                             <Text style={styles.tableCell}>{formatDate(inv.issueDate)}</Text>
-                            <Text style={styles.tableCell}>{inv.invoiceNumber}</Text>
+                            <Text style={styles.tableCell}>
+                                {inv.invoiceNumber}
+                                {inv.allocationNumber ? ` / ${inv.allocationNumber}` : ''}
+                            </Text>
                             <Text style={styles.tableCell}>{inv.clientName}</Text>
                             <Text style={styles.tableCell}>{formatCurrency(inv.subtotal)}</Text>
                             <Text style={styles.tableCell}>{formatCurrency(inv.vatAmount)}</Text>
@@ -112,7 +115,7 @@ export const ConsolidatedReportTemplate: React.FC<ConsolidatedReportProps> = ({ 
                 </View>
 
                 <View style={styles.totalSection}>
-                    <Text style={styles.totalText}>סה"כ לתקופה:</Text>
+                    <Text style={styles.totalText}>:סה"כ לתקופה</Text>
                     <Text style={styles.totalText}>{formatCurrency(totalAmount)}</Text>
                 </View>
 
