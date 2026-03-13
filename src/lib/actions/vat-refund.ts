@@ -78,6 +78,15 @@ export async function addManualVatRefund(
                 description: data.description,
                 date: new Date(data.date),
                 attachmentUrl: data.attachmentUrl
+            },
+            select: {
+                id: true,
+                budgetId: true,
+                amount: true,
+                description: true,
+                date: true,
+                createdAt: true,
+                updatedAt: true
             }
         })
 
@@ -111,6 +120,15 @@ export async function updateManualVatRefund(
                 ...(data.description !== undefined && { description: data.description }),
                 ...(data.date !== undefined && { date: new Date(data.date) }),
                 ...(data.attachmentUrl !== undefined && { attachmentUrl: data.attachmentUrl })
+            },
+            select: {
+                id: true,
+                budgetId: true,
+                amount: true,
+                description: true,
+                date: true,
+                createdAt: true,
+                updatedAt: true
             }
         })
 

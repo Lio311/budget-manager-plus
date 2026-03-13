@@ -173,6 +173,22 @@ export async function addExpense(
                 paidBy: validatedData.paidBy || null,
                 attachmentUrl: validatedData.attachmentUrl,
 
+            },
+            select: {
+                id: true,
+                budgetId: true,
+                category: true,
+                amount: true,
+                currency: true,
+                description: true,
+                date: true,
+                isRecurring: true,
+                supplierId: true,
+                clientId: true,
+                amountBeforeVat: true,
+                vatAmount: true,
+                paymentMethod: true,
+                // Does NOT include attachmentUrl
             }
         })
 
@@ -375,7 +391,23 @@ export async function updateExpense(
             const expense = await db.expense.update({
                 where: { id },
                 data: formatExpenseDataForUpdate(validatedData),
-                include: { budget: true }
+                select: {
+                    id: true,
+                    budgetId: true,
+                    category: true,
+                    amount: true,
+                    currency: true,
+                    description: true,
+                    date: true,
+                    isRecurring: true,
+                    supplierId: true,
+                    clientId: true,
+                    amountBeforeVat: true,
+                    vatAmount: true,
+                    paymentMethod: true,
+                    budget: true
+                    // Does NOT include attachmentUrl
+                }
             })
 
             // AUTO-SYNC
