@@ -104,14 +104,14 @@ export const ExpenseReportTemplate = ({ expenses, month, year, businessName, tot
                         <Text style={styles.colDate}>{exp.date ? format(new Date(exp.date), 'dd/MM/yy') : '-'}</Text>
                         <Text style={styles.colDesc}>{exp.description}</Text>
                         <Text style={styles.colCat}>{exp.category}</Text>
-                        <Text style={styles.colAmount}>{exp.amount.toLocaleString()} ₪</Text>
+                        <Text style={styles.colAmount}>₪ {exp.amount.toLocaleString()}</Text>
                     </View>
                 ))}
             </View>
 
             <View style={styles.summary}>
-                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>סה"כ הוצאות:</Text>
-                <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#e2445c' }}>{totalAmount.toLocaleString()} ₪</Text>
+                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>:סה"כ הוצאות</Text>
+                <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#e2445c' }}>₪ {totalAmount.toLocaleString()}</Text>
             </View>
         </Page>
 
