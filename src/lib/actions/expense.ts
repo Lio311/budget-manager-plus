@@ -231,7 +231,8 @@ export async function addExpense(
         })()
 
         revalidatePath('/')
-        return { success: true, data: expense }
+        // Return plain object to avoid serialization/logging crashes with Prisma extended objects
+        return { success: true, data: JSON.parse(JSON.stringify(expense)) }
     } catch (error) {
         console.error('Error adding expense:', error)
         return { success: false, error: 'Failed to add expense' }
@@ -400,13 +401,22 @@ export async function updateExpense(
                     description: true,
                     date: true,
                     isRecurring: true,
+                    recurringStartDate: true,
+                    recurringEndDate: true,
                     supplierId: true,
                     clientId: true,
+                    projectId: true,
                     amountBeforeVat: true,
                     vatAmount: true,
                     paymentMethod: true,
-                    budget: true
-                    // Does NOT include attachmentUrl
+                    budget: {
+                        select: {
+                            id: true,
+                            month: true,
+                            year: true,
+                            type: true
+                        }
+                    }
                 }
             })
 
@@ -415,8 +425,10 @@ export async function updateExpense(
                 const budgetType = expense.budget.type as 'PERSONAL' | 'BUSINESS'
                 void (async () => {
                     try {
-                        const syncMonth = expense.date ? (expense.date.getMonth() + 1) : expense.budget.month
-                        const syncYear = expense.date ? expense.date.getFullYear() : expense.budget.year
+                        // Cast to Date if needed, Prisma usually returns Date objects for DateTime fields
+                        const dateObj = expense.date ? new Date(expense.date) : null
+                        const syncMonth = dateObj ? (dateObj.getMonth() + 1) : expense.budget.month
+                        const syncYear = dateObj ? dateObj.getFullYear() : expense.budget.year
                         await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
                     } catch (e) {
                         console.error('Auto-sync failed', e)
@@ -425,7 +437,9 @@ export async function updateExpense(
             }
 
             revalidatePath('/dashboard')
-            return { success: true, data: expense }
+            // Return plain data, exclude complex relations from final return to client if needed
+            const { budget, ...cleanExpense } = expense as any
+            return { success: true, data: JSON.parse(JSON.stringify(cleanExpense)) }
         } else {
             // FUTURE Mode
             const currentExpense = await db.expense.findUnique({ where: { id } })
@@ -470,7 +484,9 @@ function formatExpenseDataForUpdate(validatedData: any) {
         ...(validatedData.amount && { amount: validatedData.amount }),
         ...(validatedData.currency && { currency: validatedData.currency }),
         ...(validatedData.date && { date: new Date(validatedData.date) }),
-        // Business Fields
+        isRecurring: validatedData.isRecurring,
+        recurringStartDate: validatedData.recurringStartDate ? new Date(validatedData.recurringStartDate) : undefined,
+        recurringEndDate: validatedData.recurringEndDate ? new Date(validatedData.recurringEndDate) : undefined,
         supplierId: validatedData.supplierId,
         clientId: validatedData.clientId,
         projectId: validatedData.projectId,

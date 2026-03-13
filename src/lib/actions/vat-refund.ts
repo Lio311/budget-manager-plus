@@ -47,7 +47,7 @@ export async function getManualVatRefunds(month: number, year: number) {
             orderBy: { date: 'desc' }
         })
 
-        return { success: true, data: refunds }
+        return { success: true, data: JSON.parse(JSON.stringify(refunds)) }
     } catch (error) {
         console.error('Error fetching manual VAT refunds:', error)
         return { success: false, error: 'Failed to fetch refunds' }
