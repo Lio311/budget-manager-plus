@@ -342,21 +342,7 @@ export const InvoicePage: React.FC<{ data: InvoiceData }> = ({ data }) => {
                             <Text style={styles.companyInfoValue}>{data.businessId}</Text>
                         </View>
                     )}
-                    {data.businessAddress && (
-                        <View style={styles.companyInfoRow}>
-                            <Text style={styles.companyInfoValue}>{data.businessAddress}</Text>
-                            {/* Address usually doesn't have a label in the original single-block text, but let's leave it as just text if no label needed, or format as row if we want consistency. Original was just address line. */}
-                        </View>
-                    )}
-                    {/* Actually original was: businessAddress\n */}
-                    {/* If address is pure text, better to stick to Text block? Or Row?
-                         If address has mixed English/Hebrew, Row is safer?
-                         Original: Just `${data.businessAddress}\n`
-                         Let's keep Address simple, or just put it in a View.
-                         Wait, if I split into rows, I lose the single-block "Text" container wrapping.
-                         I should just render a Text for address.
-                      */}
-                    {data.businessAddress && (
+                      {data.businessAddress && (
                         <View style={{ flexDirection: 'row-reverse', justifyContent: 'flex-start', marginBottom: 1 }}>
                             <Text style={{ fontSize: 9, color: '#6b7280' }}>{data.businessAddress}</Text>
                         </View>

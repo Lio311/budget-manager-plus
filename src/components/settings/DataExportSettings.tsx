@@ -111,7 +111,14 @@ export function DataExportSettings() {
             if (result.success && result.data) {
                 toast.success('הפקת דוח הוצאות הסתיימה בהצלחה')
                 
-                const blob = await (await fetch(`data:application/pdf;base64,${result.data}`)).blob()
+                const byteCharacters = atob(result.data)
+                const byteNumbers = new Array(byteCharacters.length)
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i)
+                }
+                const byteArray = new Uint8Array(byteNumbers)
+                const blob = new Blob([byteArray], { type: 'application/pdf' })
+
                 const url = URL.createObjectURL(blob)
                 const link = document.createElement('a')
                 link.href = url
