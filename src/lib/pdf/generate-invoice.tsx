@@ -56,6 +56,7 @@ export function mapInvoiceToPDFData(invoice: any, businessProfile: any, business
         businessEmail: businessProfile?.email || undefined,
         businessLogo: businessProfile?.logoUrl || undefined,
         businessSignature: businessProfile?.signatureUrl || undefined,
+        documentSignature: invoice.signature || undefined,
 
         clientName: invoice.guestClientName || invoice.client?.name || 'N/A',
         clientId: invoice.client?.taxId || undefined,

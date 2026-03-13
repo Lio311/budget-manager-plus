@@ -87,6 +87,7 @@ export async function generateQuotePDF({ quoteId, userId }: GenerateQuotePDFPara
             businessEmail: businessProfile?.email || undefined,
             businessLogo: businessProfile?.logoUrl || undefined,
             businessSignature: businessProfile?.signatureUrl || undefined,
+            documentSignature: quote.signature || undefined,
 
             // Client info
             clientName: quote.client.name,

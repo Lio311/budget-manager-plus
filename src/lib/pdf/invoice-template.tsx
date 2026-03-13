@@ -189,8 +189,6 @@ interface InvoiceData {
     businessPhone?: string
     businessEmail?: string
     businessLogo?: string
-    businessSignature?: string
-
     // Client info
     clientName: string
     clientId?: string
@@ -204,6 +202,10 @@ interface InvoiceData {
 
     // Notes
     notes?: string
+
+    // Signatures
+    documentSignature?: string // Client signature on the document
+    businessSignature?: string // Business profile signature
 
     // System
     poweredByLogoPath?: string
@@ -426,10 +428,20 @@ export const InvoicePage: React.FC<{ data: InvoiceData }> = ({ data }) => {
                 <View style={{ flex: 1 }} />
 
                 {/* Signature - Moved out of footer for consistent layout */}
-                {data.businessSignature && (
-                    <View style={{ position: 'absolute', bottom: 100, left: 30, right: 30, alignItems: 'center' }} wrap={false}>
-                        <Text style={{ fontSize: 8, color: '#6b7280', marginBottom: 5 }}>חתימה</Text>
-                        <Image src={data.businessSignature} style={{ width: 120, height: 40, objectFit: 'contain' }} />
+                {(data.businessSignature || data.documentSignature) && (
+                    <View style={{ position: 'absolute', bottom: 100, left: 30, right: 30, flexDirection: 'row-reverse', justifyContent: 'space-around', alignItems: 'center' }} wrap={false}>
+                        {data.businessSignature && (
+                            <View style={{ alignItems: 'center' }}>
+                                <Text style={{ fontSize: 8, color: '#6b7280', marginBottom: 5 }}>חתימת העסק</Text>
+                                <Image src={data.businessSignature} style={{ width: 120, height: 40, objectFit: 'contain' }} />
+                            </View>
+                        )}
+                        {data.documentSignature && (
+                            <View style={{ alignItems: 'center' }}>
+                                <Text style={{ fontSize: 8, color: '#6b7280', marginBottom: 5 }}>חתימת הלקוח</Text>
+                                <Image src={data.documentSignature} style={{ width: 120, height: 40, objectFit: 'contain' }} />
+                            </View>
+                        )}
                     </View>
                 )}
 
