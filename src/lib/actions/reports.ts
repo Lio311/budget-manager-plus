@@ -100,7 +100,22 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
                     lte: endDate
                 }
             },
-            include: { supplier: true }
+            select: {
+                id: true,
+                date: true,
+                amount: true,
+                currency: true,
+                description: true,
+                category: true,
+                isDeductible: true,
+                deductibleRate: true,
+                vatAmount: true,
+                supplier: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
         })
 
         console.log(`[P&L Debug] User: ${userId}, Year: ${year}`)

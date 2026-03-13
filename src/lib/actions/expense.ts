@@ -410,16 +410,18 @@ export async function updateExpense(
                 }
             })
 
-            // AUTO-SYNC
+            // AUTO-SYNC (Non-blocking)
             if (expense.budget) {
                 const budgetType = expense.budget.type as 'PERSONAL' | 'BUSINESS'
-                try {
-                    const syncMonth = expense.date ? (expense.date.getMonth() + 1) : expense.budget.month
-                    const syncYear = expense.date ? expense.date.getFullYear() : expense.budget.year
-                    await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
-                } catch (e) {
-                    console.error('Auto-sync failed', e)
-                }
+                void (async () => {
+                    try {
+                        const syncMonth = expense.date ? (expense.date.getMonth() + 1) : expense.budget.month
+                        const syncYear = expense.date ? expense.date.getFullYear() : expense.budget.year
+                        await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
+                    } catch (e) {
+                        console.error('Auto-sync failed', e)
+                    }
+                })()
             }
 
             revalidatePath('/dashboard')

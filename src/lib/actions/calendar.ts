@@ -34,10 +34,22 @@ export async function syncBudgetToGoogleCalendar(month: number, year: number, ty
         const budget = await getCurrentBudget(month, year, '₪', type)
         if (!budget) return { success: false, error: 'No budget found' }
 
-        const bills = await db.bill.findMany({ where: { budgetId: budget.id } })
-        const debts = await db.debt.findMany({ where: { budgetId: budget.id } })
-        const incomes = await db.income.findMany({ where: { budgetId: budget.id } })
-        const expenses = await db.expense.findMany({ where: { budgetId: budget.id } })
+        const bills = await db.bill.findMany({ 
+            where: { budgetId: budget.id },
+            select: { id: true, name: true, amount: true, currency: true, dueDate: true, isPaid: true }
+        })
+        const debts = await db.debt.findMany({ 
+            where: { budgetId: budget.id },
+            select: { id: true, creditor: true, monthlyPayment: true, totalAmount: true, currency: true, dueDay: true }
+        })
+        const incomes = await db.income.findMany({ 
+            where: { budgetId: budget.id },
+            select: { id: true, source: true, amount: true, currency: true, date: true }
+        })
+        const expenses = await db.expense.findMany({ 
+            where: { budgetId: budget.id },
+            select: { id: true, description: true, amount: true, currency: true, date: true, category: true }
+        })
 
         // 3. Prepare Events List
         const events = []

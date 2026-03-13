@@ -112,10 +112,18 @@ export async function getSupplier(id: string) {
         const supplier = await db.supplier.findUnique({
             where: { id },
             include: {
-                package: true, // Include Package
+                package: true,
                 expenses: {
                     orderBy: { date: 'desc' },
-                    take: 10
+                    take: 10,
+                    select: {
+                        id: true,
+                        date: true,
+                        amount: true,
+                        currency: true,
+                        description: true,
+                        category: true
+                    }
                 }
             }
         })

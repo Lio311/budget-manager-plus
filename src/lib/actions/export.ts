@@ -44,8 +44,17 @@ export async function getExportData(type: ExportType) {
             case 'expenses':
                 data = await db.expense.findMany({
                     where: { budget: { userId } },
-                    include: { supplier: true, client: true },
-                    orderBy: { date: 'desc' }
+                    orderBy: { date: 'desc' },
+                    select: {
+                        id: true,
+                        date: true,
+                        amount: true,
+                        currency: true,
+                        description: true,
+                        category: true,
+                        supplier: { select: { name: true } },
+                        client: { select: { name: true } }
+                    }
                 })
                 break
             case 'suppliers':
