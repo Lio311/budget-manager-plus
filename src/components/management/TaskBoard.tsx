@@ -37,6 +37,7 @@ import { toast } from 'sonner'
 import { TaskAnalytics } from '@/components/management/TaskAnalytics'
 import { format, isBefore, startOfDay } from 'date-fns'
 import { NewTaskDialog } from '@/components/management/NewTaskDialog'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface Task {
     id: string
@@ -72,9 +73,11 @@ export function TaskBoard({ initialTasks }: { initialTasks: any[] }) {
     const [editingTask, setEditingTask] = useState<Task | null>(null)
     const [showCompleted, setShowCompleted] = useState(false)
     const [sortBy, setSortBy] = useState<'priority' | 'createdAt'>('priority')
+    const confirm = useConfirm()
 
     const handleDeleteTask = async (taskId: string) => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק משימה זו?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק משימה זו?', 'מחיקת משימה')
+        if (!confirmed) return
 
         // Optimistic delete
         const oldTasks = [...tasks]

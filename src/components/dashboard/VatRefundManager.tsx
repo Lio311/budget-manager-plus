@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { addManualVatRefund, updateManualVatRefund, deleteManualVatRefund } from '@/lib/actions/vat-refund'
 import { formatCurrency } from '@/lib/utils'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface ManualVatRefund {
     id: string
@@ -32,6 +33,7 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
     const [isAdding, setIsAdding] = useState(false)
     const [loading, setLoading] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
+    const confirm = useConfirm()
     
     // Form state
     const [amount, setAmount] = useState('')
@@ -88,7 +90,8 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק החזר זה?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק החזר זה?', 'מחיקת החזר מע"מ')
+        if (!confirmed) return
 
         setLoading(true)
         const result = await deleteManualVatRefund(id)

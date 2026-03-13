@@ -48,7 +48,8 @@ import { ExpenseForm } from '@/components/dashboard/forms/ExpenseForm'
 import { IncomeForm } from '@/components/dashboard/forms/IncomeForm'
 import { BillForm } from '@/components/dashboard/forms/BillForm'
 import { DebtForm } from '@/components/dashboard/forms/DebtForm'
-import { SavingForm } from '@/components/dashboard/forms/SavingForm'
+import { SavingForm } from '@/components/dashboard/forms/SavingForm' // Note the correct path from earlier view_file
+import { useConfirm } from '@/hooks/useConfirm'
 
 interface Payment {
     id: string
@@ -76,6 +77,7 @@ interface WorkEvent {
 export function CalendarTab() {
     const { month, year, currency, budgetType } = useBudget()
     const { toast } = useToast()
+    const confirm = useConfirm()
     const [selectedDay, setSelectedDay] = useState<number | null>(null)
     const [viewMode, setViewMode] = useState<'financial' | 'work'>('financial')
     const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
@@ -299,7 +301,8 @@ export function CalendarTab() {
     }
 
     const handleDeleteEvent = async (id: string) => {
-        if (confirm('האם אתה בטוח שברצונך למחוק אירוע זה?')) {
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק אירוע זה?', 'מחיקת אירוע')
+        if (confirmed) {
             const result = await deleteWorkEvent(id)
             if (result.success) {
                 mutateWorkEvents()

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useRouter } from 'next/navigation'
+import { useConfirm } from '@/hooks/useConfirm'
 
 export function LinkedEmails() {
     const { user, isLoaded } = useUser()
@@ -16,6 +17,7 @@ export function LinkedEmails() {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const confirm = useConfirm()
     const [reLoginRequired, setReLoginRequired] = useState(false)
 
     // Force reload user data when this component mounts to ensure we show the latest emails
@@ -29,7 +31,8 @@ export function LinkedEmails() {
     if (!isLoaded || !user) return null
 
     const handleDeleteEmail = async (emailId: string) => {
-        if (!confirm('האם אתה בטוח שברצונך להסיר מייל זה?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך להסיר מייל זה?', 'הסרת מייל')
+        if (!confirmed) return
 
         try {
             const emailToDelete = user.emailAddresses.find(e => e.id === emailId)
@@ -55,7 +58,8 @@ export function LinkedEmails() {
     }
 
     const handleDisconnectExternal = async (accountId: string, emailIdToDelete?: string) => {
-        if (!confirm('האם אתה בטוח שברצונך לנתק חשבון זה?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך לנתק חשבון זה?', 'ניתוק חשבון')
+        if (!confirmed) return
 
         try {
             const accountToDelete = user.externalAccounts.find(a => a.id === accountId)

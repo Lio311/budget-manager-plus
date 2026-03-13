@@ -35,6 +35,7 @@ import { createBusinessExpense, deleteBusinessExpense, updateBusinessExpense } f
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
+import { useConfirm } from '@/hooks/useConfirm'
 
 export function BusinessExpensesTable({
     initialExpenses
@@ -47,6 +48,7 @@ export function BusinessExpensesTable({
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [editingExpense, setEditingExpense] = useState<any | null>(null)
+    const confirm = useConfirm()
 
     // New Expense Form State
     const [formData, setFormData] = useState({
@@ -195,7 +197,8 @@ export function BusinessExpensesTable({
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) return
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?', 'מחיקת הוצאה')
+        if (!confirmed) return
 
         const oldExpenses = [...expenses]
         setExpenses(expenses.filter(e => e.id !== id))

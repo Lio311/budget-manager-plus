@@ -10,11 +10,14 @@ import { deleteCampaign } from '@/lib/actions/business-expenses'
 import { toast } from 'sonner'
 import { NewCampaignDialog } from './NewCampaignDialog'
 import { motion } from 'framer-motion'
+import { useConfirm } from '@/hooks/useConfirm'
 
 export function MarketingCampaigns({ campaigns }: { campaigns: any[] }) {
+    const confirm = useConfirm()
 
     const handleDelete = async (id: string) => {
-        if (confirm('האם אתה בטוח שברצונך למחוק קמפיין זה? ההוצאה המקושרת לא תימחק אוטומטית.')) {
+        const confirmed = await confirm('האם אתה בטוח שברצונך למחוק קמפיין זה? ההוצאה המקושרת לא תימחק אוטומטית.', 'מחיקת קמפיין')
+        if (confirmed) {
             const res = await deleteCampaign(id)
             if (res.success) {
                 toast.success('קמפיין נמחק בהצלחה')
