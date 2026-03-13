@@ -209,7 +209,7 @@ interface InvoiceData {
     poweredByLogoPath?: string
 }
 
-export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
+export const InvoicePage: React.FC<{ data: InvoiceData }> = ({ data }) => {
     const formatCurrency = (amount: number) => {
         return `${data.currency === 'ILS' ? '₪' : data.currency}${amount.toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
     }
@@ -316,8 +316,7 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
     }
 
     return (
-        <Document>
-            <Page size="A4" style={styles.page}>
+        <Page size="A4" style={styles.page}>
                 {/* Header */}
                 <View style={styles.header}>
                     <View style={{ alignItems: 'flex-end' }}>
@@ -461,7 +460,14 @@ export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
                         )}
                     </View>
                 </View>
-            </Page>
+        </Page>
+    )
+}
+
+export const InvoiceTemplate: React.FC<{ data: InvoiceData }> = ({ data }) => {
+    return (
+        <Document>
+            <InvoicePage data={data} />
         </Document>
     )
 }

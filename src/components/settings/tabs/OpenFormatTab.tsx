@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, FileText, Download, CheckCircle, AlertTriangle } from 'lucide-react'
 import { generateOpenFormat } from '@/lib/actions/open-format'
+import { generateMonthlyConsolidatedPDF } from '@/lib/actions/consolidated-report'
 import { getBusinessProfile } from '@/lib/actions/business-settings'
 import { toast } from 'sonner'
 import { saveAs } from 'file-saver'
@@ -22,7 +23,9 @@ export function OpenFormatTab() {
     const businessProfile = profile
 
     const [year, setYear] = useState<string>(new Date().getFullYear().toString())
+    const [month, setMonth] = useState<string>((new Date().getMonth() + 1).toString())
     const [generating, setGenerating] = useState(false)
+    const [generatingPDF, setGeneratingPDF] = useState(false)
     const [lastResult, setLastResult] = useState<any>(null)
 
     const handleGenerate = async () => {
@@ -40,11 +43,6 @@ export function OpenFormatTab() {
             if (result.success && result.data) {
                 toast.success('הקבצים הופקו בהצלחה')
                 setLastResult(result)
-
-                // Trigger download
-                // Decoded base64 to blob? Or just use the base64 string if handling locally?
-                // JSZip generateAsync({type: "base64"}) returns string.
-                // We need to convert base64 to Blob to save.
 
                 const byteCharacters = atob(result.data)
                 const byteNumbers = new Array(byteCharacters.length)
@@ -66,6 +64,48 @@ export function OpenFormatTab() {
             setGenerating(false)
         }
     }
+
+    const handleGeneratePDF = async () => {
+        setGeneratingPDF(true)
+        try {
+            const result = await generateMonthlyConsolidatedPDF(parseInt(month), parseInt(year))
+            if (result.success && result.data) {
+                toast.success('הפקת PDF הסתיימה בהצלחה')
+                
+                const byteCharacters = atob(result.data)
+                const byteNumbers = new Array(byteCharacters.length)
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i)
+                }
+                const byteArray = new Uint8Array(byteNumbers)
+                const blob = new Blob([byteArray], { type: 'application/pdf' })
+
+                saveAs(blob, result.filename || 'ConsolidatedReport.pdf')
+            } else {
+                toast.error(result.error || 'נכשל בהפקת ה-PDF')
+            }
+        } catch (error) {
+            toast.error('שגיאה בלתי צפויה')
+            console.error(error)
+        } finally {
+            setGeneratingPDF(false)
+        }
+    }
+
+    const months = [
+        { label: 'ינואר', value: '1' },
+        { label: 'פברואר', value: '2' },
+        { label: 'מרץ', value: '3' },
+        { label: 'אפריל', value: '4' },
+        { label: 'מאי', value: '5' },
+        { label: 'יוני', value: '6' },
+        { label: 'יולי', value: '7' },
+        { label: 'אוגוסט', value: '8' },
+        { label: 'ספטמבר', value: '9' },
+        { label: 'אוקטובר', value: '10' },
+        { label: 'נובמבר', value: '11' },
+        { label: 'דצמבר', value: '12' },
+    ]
 
     return (
         <div className="space-y-6 text-right" dir="rtl">
@@ -160,6 +200,65 @@ export function OpenFormatTab() {
                         </div>
                     )}
 
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>ריכוז חשבוניות שנתי/חודשי (PDF)</CardTitle>
+                    <CardDescription>
+                        הפקת מסמך PDF המכיל את כל החשבוניות ברצף, עם עמוד סיכום בראש המסמך.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                             <label className="text-sm font-medium">שנת מס</label>
+                             <Select value={year} onValueChange={setYear}>
+                                <SelectTrigger className="text-right">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="2026">2026</SelectItem>
+                                    <SelectItem value="2025">2025</SelectItem>
+                                    <SelectItem value="2024">2024</SelectItem>
+                                    <SelectItem value="2023">2023</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">חודש</label>
+                            <Select value={month} onValueChange={setMonth}>
+                                <SelectTrigger className="text-right">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {months.map(m => (
+                                        <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex items-end">
+                            <Button
+                                onClick={handleGeneratePDF}
+                                disabled={generatingPDF}
+                                className="w-full bg-emerald-600 hover:bg-emerald-700"
+                            >
+                                {generatingPDF ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        מפיק PDF...
+                                    </>
+                                ) : (
+                                    <>
+                                        <FileText className="mr-2 h-4 w-4" />
+                                        הורד ריכוז חשבוניות
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
         </div>
