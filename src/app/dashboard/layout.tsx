@@ -19,14 +19,14 @@ export default async function DashboardLayout({
         redirect('/sign-in')
     }
 
-    console.log('[DashboardLayout] User authenticated:', user.id, user.emailAddresses[0]?.emailAddress)
+    console.log('[DashboardLayout] User authenticated:', user.id)
 
     // Ensure user exists in database
     try {
         await syncUser(user.id, user.emailAddresses[0]?.emailAddress || '')
         console.log('[DashboardLayout] User synced to DB')
-    } catch (error) {
-        console.error('[DashboardLayout] Error syncing user:', error)
+    } catch (error: any) {
+        console.error('[DashboardLayout] Error syncing user:', error?.message || String(error))
     }
 
     // Check subscription/trial status
@@ -40,7 +40,7 @@ export default async function DashboardLayout({
     const hasAccess = personalStatus.hasAccess || businessStatus.hasAccess
     const planType = businessStatus.hasAccess ? 'BUSINESS' : (personalStatus.hasAccess ? 'PERSONAL' : 'none')
 
-    console.log('[DashboardLayout] Subscription status:', { personal: personalStatus.hasAccess, business: businessStatus.hasAccess, resolved: planType })
+    console.log('[DashboardLayout] Subscription status personal/business:', personalStatus.hasAccess, businessStatus.hasAccess, 'Resolved:', planType)
 
     // If user has no access, redirect to subscribe page
     if (!hasAccess) {

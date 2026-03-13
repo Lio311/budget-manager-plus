@@ -225,16 +225,16 @@ export async function addExpense(
         void (async () => {
             try {
                 await syncBudgetToGoogleCalendar(targetMonth, targetYear, type)
-            } catch (e) {
-                console.error('Background Auto-sync failed', e)
+            } catch (e: any) {
+                console.error('Background Auto-sync failed:', e?.message || String(e))
             }
         })()
 
         revalidatePath('/')
         // Return plain object to avoid serialization/logging crashes with Prisma extended objects
         return { success: true, data: JSON.parse(JSON.stringify(expense)) }
-    } catch (error) {
-        console.error('Error adding expense:', error)
+    } catch (error: any) {
+        console.error('Error adding expense:', error?.message || String(error))
         return { success: false, error: 'Failed to add expense' }
     }
 }
@@ -430,8 +430,8 @@ export async function updateExpense(
                         const syncMonth = dateObj ? (dateObj.getMonth() + 1) : expense.budget.month
                         const syncYear = dateObj ? dateObj.getFullYear() : expense.budget.year
                         await syncBudgetToGoogleCalendar(syncMonth, syncYear, budgetType)
-                    } catch (e) {
-                        console.error('Auto-sync failed', e)
+                    } catch (e: any) {
+                        console.error('Auto-sync failed:', e?.message || String(e))
                     }
                 })()
             }
@@ -471,8 +471,8 @@ export async function updateExpense(
             revalidatePath('/dashboard')
             return { success: true, count: updateResult.count }
         }
-    } catch (error) {
-        console.error('Error updating expense:', error)
+    } catch (error: any) {
+        console.error('Error updating expense:', error?.message || String(error))
         return { success: false, error: 'Failed to update expense' }
     }
 }

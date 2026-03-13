@@ -18,8 +18,8 @@ export async function getManualVatRefundAttachment(id: string) {
 
         if (!refund) return { success: false, error: 'Refund not found' }
         return { success: true, data: refund.attachmentUrl }
-    } catch (error) {
-        console.error('Error fetching refund attachment:', error)
+    } catch (error: any) {
+        console.error('Error fetching refund attachment:', error?.message || String(error))
         return { success: false, error: 'Failed to fetch attachment' }
     }
 }
@@ -48,8 +48,8 @@ export async function getManualVatRefunds(month: number, year: number) {
         })
 
         return { success: true, data: JSON.parse(JSON.stringify(refunds)) }
-    } catch (error) {
-        console.error('Error fetching manual VAT refunds:', error)
+    } catch (error: any) {
+        console.error('Error fetching manual VAT refunds:', error?.message || String(error))
         return { success: false, error: 'Failed to fetch refunds' }
     }
 }
@@ -92,8 +92,8 @@ export async function addManualVatRefund(
 
         revalidatePath('/')
         return { success: true, data: refund }
-    } catch (error) {
-        console.error('Error adding manual VAT refund:', error)
+    } catch (error: any) {
+        console.error('Error adding manual VAT refund:', error?.message || String(error))
         return { success: false, error: 'Failed to add refund' }
     }
 }
@@ -134,8 +134,8 @@ export async function updateManualVatRefund(
 
         revalidatePath('/')
         return { success: true, data: refund }
-    } catch (error) {
-        console.error('Error updating manual VAT refund:', error)
+    } catch (error: any) {
+        console.error('Error updating manual VAT refund:', error?.message || String(error))
         return { success: false, error: 'Failed to update refund' }
     }
 }
@@ -153,8 +153,8 @@ export async function deleteManualVatRefund(id: string) {
 
         revalidatePath('/')
         return { success: true }
-    } catch (error) {
-        console.error('Error deleting manual VAT refund:', error)
+    } catch (error: any) {
+        console.error('Error deleting manual VAT refund:', error?.message || String(error))
         return { success: false, error: 'Failed to delete refund' }
     }
 }
