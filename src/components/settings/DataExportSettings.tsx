@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { FileSpreadsheet, Download, Loader2, Users, Receipt, CreditCard, Factory, FileText, FileArchive } from 'lucide-react'
 import { getExportData, ExportType } from '@/lib/actions/export'
 import { generateMonthlyConsolidatedPDF } from '@/lib/actions/consolidated-report'
+import { generateMonthlyExpenseReportPDF } from '@/lib/actions/expense-report'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
@@ -94,6 +95,33 @@ export function DataExportSettings() {
                 URL.revokeObjectURL(url)
             } else {
                 toast.error(result.error || 'נכשל בהפקת ה-PDF')
+            }
+        } catch (error) {
+            toast.error('שגיאה בלתי צפויה')
+            console.error(error)
+        } finally {
+            setGeneratingPDF(false)
+        }
+    }
+
+    const handleGenerateMonthlyExpensesPDF = async () => {
+        setGeneratingPDF(true)
+        try {
+            const result = await generateMonthlyExpenseReportPDF(parseInt(selectedMonth), parseInt(selectedYear))
+            if (result.success && result.data) {
+                toast.success('הפקת דוח הוצאות הסתיימה בהצלחה')
+                
+                const blob = await (await fetch(`data:application/pdf;base64,${result.data}`)).blob()
+                const url = URL.createObjectURL(blob)
+                const link = document.createElement('a')
+                link.href = url
+                link.setAttribute('download', result.filename || `Expense_Report_${selectedYear}_${selectedMonth}.pdf`)
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(url)
+            } else {
+                toast.error(result.error || 'נכשל בהפקת הדוח')
             }
         } catch (error) {
             toast.error('שגיאה בלתי צפויה')
@@ -291,6 +319,41 @@ export function DataExportSettings() {
                                             PDF ZIP
                                         </Button>
                                     </>
+                                )}
+                                {option.id === 'expenses' && (
+                                    <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 p-2 rounded-md border text-xs">
+                                        <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                            <SelectTrigger className="h-8 w-[80px] text-right">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="2026">2026</SelectItem>
+                                                <SelectItem value="2025">2025</SelectItem>
+                                                <SelectItem value="2024">2024</SelectItem>
+                                                <SelectItem value="2023">2023</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                                            <SelectTrigger className="h-8 w-[90px] text-right">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {months.map(m => (
+                                                    <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <Button
+                                            onClick={handleGenerateMonthlyExpensesPDF}
+                                            disabled={generatingPDF}
+                                            variant="outline"
+                                            className="h-8 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-bold"
+                                            title="הורד דוח הוצאות חודשי עם נספחים"
+                                        >
+                                            {generatingPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4 mr-1" />}
+                                            דוח חודשי
+                                        </Button>
+                                    </div>
                                 )}
                                 <Button
                                     onClick={() => handleExport(option.id)}

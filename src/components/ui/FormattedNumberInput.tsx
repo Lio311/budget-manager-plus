@@ -16,12 +16,20 @@ export const FormattedNumberInput = forwardRef<HTMLInputElement, FormattedNumber
     ({ value, onChange, onValueChange, ...props }, ref) => {
         const [displayValue, setDisplayValue] = useState('')
 
-        // Update display value when prop value changes
+        // Update display value when prop value changes from outside (not from user typing)
         useEffect(() => {
             if (value === '' || value === null || value === undefined) {
                 setDisplayValue('')
-            } else {
-                setDisplayValue(formatNumberWithCommas(Number(value)))
+                return
+            }
+
+            const numericValue = Number(value)
+            const currentInternalValue = parseNumberFromFormatted(displayValue)
+
+            // Only update if the external value differs significantly from internal, 
+            // or if we have no internal value yet. Use a small epsilon for floating point comparison.
+            if (displayValue === '' || Math.abs(numericValue - currentInternalValue) > 0.0001) {
+                setDisplayValue(formatNumberWithCommas(numericValue))
             }
         }, [value])
 

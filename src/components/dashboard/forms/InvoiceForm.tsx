@@ -523,37 +523,24 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                         </div>
                                     </td>
                                     <td className="p-2">
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
+                                        <FormattedNumberInput
                                             className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center text-base md:text-sm"
                                             value={item.quantity}
-                                            onChange={(e) => {
-                                                const val = parseFloat(e.target.value) || 0
+                                            onChange={() => { }}
+                                            onValueChange={(val) => {
                                                 const newItems = [...lineItems]
                                                 newItems[index].quantity = val
                                                 newItems[index].total = val * newItems[index].price
                                                 setLineItems(newItems)
                                             }}
-                                            onWheel={(e) => e.currentTarget.blur()}
                                         />
                                     </td>
                                     <td className="p-2">
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            step="0.01"
+                                        <FormattedNumberInput
                                             className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center text-base md:text-sm"
-                                            value={amountMode === 'GROSS' ? (item.price * (1 + (formData.vatRate || 0))).toFixed(2) : item.price}
-                                            onWheel={(e) => e.currentTarget.blur()}
-                                            onFocus={(e) => {
-                                                if (item.price === 0) {
-                                                    e.target.value = ''
-                                                }
-                                            }}
-                                            onChange={(e) => {
-                                                const val = parseFloat(e.target.value) || 0
+                                            value={amountMode === 'GROSS' ? (item.price * (1 + (formData.vatRate || 0))) : item.price}
+                                            onChange={() => { }}
+                                            onValueChange={(val) => {
                                                 const newItems = [...lineItems]
                                                 if (amountMode === 'GROSS') {
                                                     newItems[index].price = val / (1 + (formData.vatRate || 0))
@@ -562,6 +549,11 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                                 }
                                                 newItems[index].total = newItems[index].quantity * newItems[index].price
                                                 setLineItems(newItems)
+                                            }}
+                                            onFocus={(e) => {
+                                                if (item.price === 0) {
+                                                    e.target.value = ''
+                                                }
                                             }}
                                         />
                                     </td>
