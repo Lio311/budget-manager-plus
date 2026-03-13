@@ -38,6 +38,7 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
         notes: initialData?.notes || '',
         items: initialData?.items || []
     })
+    const [amountMode, setAmountMode] = useState<'NET' | 'GROSS'>('NET')
 
     const isEditing = !!initialData
 
@@ -215,10 +216,28 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
 
                 {/* Line Items Table */}
                 <div className="md:col-span-2 space-y-4">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center mb-1">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            פירוט העסקה *
+                            피רוט העסקה *
                         </label>
+                        {!isExemptDealer && (
+                            <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-md">
+                                <button
+                                    type="button"
+                                    onClick={() => setAmountMode('NET')}
+                                    className={`px-3 py-1 text-xs rounded-md transition-all ${amountMode === 'NET' ? 'bg-white dark:bg-slate-700 shadow-sm text-yellow-600 font-bold' : 'text-gray-500'}`}
+                                >
+                                    לפני מע"מ (נטו)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setAmountMode('GROSS')}
+                                    className={`px-3 py-1 text-xs rounded-md transition-all ${amountMode === 'GROSS' ? 'bg-white dark:bg-slate-700 shadow-sm text-yellow-600 font-bold' : 'text-gray-500'}`}
+                                >
+                                    כולל מע"מ (ברוטו)
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className={`border rounded-lg overflow-hidden bg-white dark:bg-slate-900 ${errors.items ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : 'border-gray-200 dark:border-slate-800'}`}>
@@ -227,8 +246,12 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                                 <tr>
                                     <th className="px-4 py-3 text-sm font-medium text-gray-500 text-center">תיאור</th>
                                     <th className="px-4 py-3 text-sm font-medium text-gray-500 w-24 text-center">כמות</th>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 w-32 text-center">מחיר יח'</th>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 w-32 text-center">סה"כ</th>
+                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 w-32 text-center">
+                                        {amountMode === 'GROSS' ? 'מחיר כולל' : 'מחיר יח\''}
+                                    </th>
+                                    <th className="px-4 py-3 text-sm font-medium text-gray-500 w-32 text-center">
+                                        {amountMode === 'GROSS' ? 'סה"כ כולל' : 'סה"כ'}
+                                    </th>
                                     <th className="px-4 py-3 w-10"></th>
                                 </tr>
                             </thead>
@@ -266,9 +289,12 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                                         </td>
                                         <td className="p-2">
                                             <FormattedNumberInput
-                                                value={item.price}
+                                                value={amountMode === 'GROSS' ? (item.price * (1 + formData.vatRate)) : item.price}
                                                 onChange={(e) => { }}
-                                                onValueChange={(value) => updateItem(item.id, 'price', value)}
+                                                onValueChange={(value) => {
+                                                    const priceVal = amountMode === 'GROSS' ? (value / (1 + formData.vatRate)) : value
+                                                    updateItem(item.id, 'price', priceVal)
+                                                }}
                                                 onFocus={() => {
                                                     if (item.price === 0) {
                                                         updateItem(item.id, 'price', '')
@@ -278,7 +304,7 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                                             />
                                         </td>
                                         <td className="p-2 text-center font-medium">
-                                            {(item.quantity * item.price).toLocaleString()} ₪
+                                            {((item.quantity * item.price) * (amountMode === 'GROSS' ? (1 + formData.vatRate) : 1)).toLocaleString()} ₪
                                         </td>
                                         <td className="p-2 text-center pointer-events-auto">
                                             <div onClick={() => removeItem(item.id)} className="cursor-pointer text-gray-400 hover:text-red-500 transition-colors p-2">

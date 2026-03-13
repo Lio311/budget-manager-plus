@@ -91,6 +91,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
 
     const [businessProfile, setBusinessProfile] = useState<any>(null)
     const [isExemptDealer, setIsExemptDealer] = useState(false)
+    const [amountMode, setAmountMode] = useState<'NET' | 'GROSS'>('NET')
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -456,17 +457,41 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
 
             {/* Line Items Table */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    פירוט העסקה *
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        פירוט העסקה *
+                    </label>
+                    {!isExemptDealer && (
+                        <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-md">
+                            <button
+                                type="button"
+                                onClick={() => setAmountMode('NET')}
+                                className={`px-3 py-1 text-xs rounded-md transition-all ${amountMode === 'NET' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 font-bold' : 'text-gray-500'}`}
+                            >
+                                לפני מע"מ (נטו)
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setAmountMode('GROSS')}
+                                className={`px-3 py-1 text-xs rounded-md transition-all ${amountMode === 'GROSS' ? 'bg-white dark:bg-slate-700 shadow-sm text-blue-600 font-bold' : 'text-gray-500'}`}
+                            >
+                                כולל מע"מ (ברוטו)
+                            </button>
+                        </div>
+                    )}
+                </div>
                 <div className={`border rounded-lg overflow-hidden dark:border-slate-700 ${errors.lineItems ? '!border-red-500 dark:!border-red-500 ring-1 ring-red-500/20' : ''}`}>
                     <table className="w-full text-right text-sm">
                         <thead className="bg-gray-50 dark:bg-slate-800 text-gray-500 font-medium">
                             <tr>
                                 <th className="p-2 w-[40%] text-center">תיאור</th>
                                 <th className="p-2 w-[15%] text-center">כמות</th>
-                                <th className="p-2 w-[20%] text-center">מחיר יח'</th>
-                                <th className="p-2 w-[20%] text-center">סה"כ</th>
+                                <th className="p-2 w-[20%] text-center">
+                                    {amountMode === 'GROSS' ? 'מחיר כולל' : 'מחיר יח\''}
+                                </th>
+                                <th className="p-2 w-[20%] text-center">
+                                    {amountMode === 'GROSS' ? 'סה"כ כולל' : 'סה"כ'}
+                                </th>
                                 <th className="p-2 w-[5%]"></th>
                             </tr>
                         </thead>
@@ -520,7 +545,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             min="0"
                                             step="0.01"
                                             className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center text-base md:text-sm"
-                                            value={item.price}
+                                            value={amountMode === 'GROSS' ? (item.price * (1 + formData.vatRate)).toFixed(2) : item.price}
                                             onWheel={(e) => e.currentTarget.blur()}
                                             onFocus={(e) => {
                                                 if (item.price === 0) {
@@ -530,14 +555,18 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             onChange={(e) => {
                                                 const val = parseFloat(e.target.value) || 0
                                                 const newItems = [...lineItems]
-                                                newItems[index].price = val
-                                                newItems[index].total = newItems[index].quantity * val
+                                                if (amountMode === 'GROSS') {
+                                                    newItems[index].price = val / (1 + formData.vatRate)
+                                                } else {
+                                                    newItems[index].price = val
+                                                }
+                                                newItems[index].total = newItems[index].quantity * newItems[index].price
                                                 setLineItems(newItems)
                                             }}
                                         />
                                     </td>
                                     <td className="p-2 font-bold text-center">
-                                        {formatCurrency(item.total)}
+                                        {formatCurrency(amountMode === 'GROSS' ? item.total * (1 + formData.vatRate) : item.total)}
                                     </td>
                                     <td className="p-2 text-center">
                                         <button
