@@ -201,7 +201,7 @@ export async function addExpense(
                 validatedData.description,
                 validatedData.amount,
                 validatedData.currency,
-                validatedData.date as string,
+                validatedData.date,
                 validatedData.recurringEndDate,
                 type,
                 {
@@ -245,8 +245,8 @@ async function createRecurringExpenses(
     description: string,
     amount: number,
     currency: string,
-    startDateStr: string,
-    endDateStr: string,
+    startDateStr: string | Date,
+    endDateStr: string | Date,
     type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL',
     extraData: any = {}
 ) {
