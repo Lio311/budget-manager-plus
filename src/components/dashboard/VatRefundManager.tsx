@@ -5,12 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Plus, Trash2, Edit2, Check, X, Loader2, Camera, Paperclip } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 import { addManualVatRefund, updateManualVatRefund, deleteManualVatRefund } from '@/lib/actions/vat-refund'
 import { formatCurrency, cn } from '@/lib/utils'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useRef } from 'react'
-import { Camera, Paperclip } from 'lucide-react'
 
 interface ManualVatRefund {
     id: string
@@ -158,8 +160,6 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
                                             onChange={(e) => setDate(e.target.value)}
                                             className="text-right"
                                         />
-                                    </div>
-                                </div>
                                     </div>
                                 </div>
 
