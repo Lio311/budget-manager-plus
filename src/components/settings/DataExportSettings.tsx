@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { FileSpreadsheet, Download, Loader2, Users, Receipt, CreditCard, Factory, FileText, FileArchive } from 'lucide-react'
 import { getExportData, ExportType } from '@/lib/actions/export'
+import { generateMonthlyConsolidatedPDF } from '@/lib/actions/consolidated-report'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 
@@ -48,6 +50,58 @@ const EXPORT_OPTIONS = [
 
 export function DataExportSettings() {
     const [loading, setLoading] = useState<Record<string, boolean>>({})
+    const [generatingPDF, setGeneratingPDF] = useState(false)
+    const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString())
+    const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString())
+
+    const months = [
+        { label: 'ינואר', value: '1' },
+        { label: 'פברואר', value: '2' },
+        { label: 'מרץ', value: '3' },
+        { label: 'אפריל', value: '4' },
+        { label: 'מאי', value: '5' },
+        { label: 'יוני', value: '6' },
+        { label: 'יולי', value: '7' },
+        { label: 'אוגוסט', value: '8' },
+        { label: 'ספטמבר', value: '9' },
+        { label: 'אוקטובר', value: '10' },
+        { label: 'נובמבר', value: '11' },
+        { label: 'דצמבר', value: '12' },
+    ]
+
+    const handleGenerateMonthlyPDF = async () => {
+        setGeneratingPDF(true)
+        try {
+            const result = await generateMonthlyConsolidatedPDF(parseInt(selectedMonth), parseInt(selectedYear))
+            if (result.success && result.data) {
+                toast.success('הפקת PDF הסתיימה בהצלחה')
+                
+                const byteCharacters = atob(result.data)
+                const byteNumbers = new Array(byteCharacters.length)
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i)
+                }
+                const byteArray = new Uint8Array(byteNumbers)
+                const blob = new Blob([byteArray], { type: 'application/pdf' })
+
+                const url = URL.createObjectURL(blob)
+                const link = document.createElement('a')
+                link.href = url
+                link.setAttribute('download', result.filename || 'Monthly_Report.pdf')
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(url)
+            } else {
+                toast.error(result.error || 'נכשל בהפקת ה-PDF')
+            }
+        } catch (error) {
+            toast.error('שגיאה בלתי צפויה')
+            console.error(error)
+        } finally {
+            setGeneratingPDF(false)
+        }
+    }
 
     const convertToCSV = (data: any[], type: string) => {
         if (!data || !data.length) return ''
@@ -186,27 +240,63 @@ export function DataExportSettings() {
                     {EXPORT_OPTIONS.map((option) => (
                         <div
                             key={option.id}
-                            className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                            className="flex flex-col md:flex-row items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors gap-4"
                         >
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                                 {option.id === 'invoices' && (
-                                    <Button
-                                        onClick={() => {
-                                            window.open('/api/export/invoices/zip', '_blank')
-                                        }}
-                                        variant="outline"
-                                        className="h-10 border-gray-200 hover:border-gray-300 hover:bg-white text-blue-600 hover:text-blue-700"
-                                        title="הורד את כל החשבוניות כ-PDF בקובץ ZIP"
-                                    >
-                                        <FileArchive className="mr-2 h-4 w-4" />
-                                        PDF ZIP
-                                    </Button>
+                                    <>
+                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 p-2 rounded-md border text-xs">
+                                            <Select value={selectedYear} onValueChange={setSelectedYear}>
+                                                <SelectTrigger className="h-8 w-[80px] text-right">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="2026">2026</SelectItem>
+                                                    <SelectItem value="2025">2025</SelectItem>
+                                                    <SelectItem value="2024">2024</SelectItem>
+                                                    <SelectItem value="2023">2023</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                                                <SelectTrigger className="h-8 w-[90px] text-right">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {months.map(m => (
+                                                        <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <Button
+                                                onClick={handleGenerateMonthlyPDF}
+                                                disabled={generatingPDF}
+                                                variant="outline"
+                                                className="h-8 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-bold"
+                                                title="הורד דוח PDF מרוכז לחודש הנבחר"
+                                            >
+                                                {generatingPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4 mr-1" />}
+                                                דוח חודשי
+                                            </Button>
+                                        </div>
+
+                                        <Button
+                                            onClick={() => {
+                                                window.open('/api/export/invoices/zip', '_blank')
+                                            }}
+                                            variant="outline"
+                                            className="h-10 border-gray-200 hover:border-gray-300 hover:bg-white text-blue-600 hover:text-blue-700"
+                                            title="הורד את כל החשבוניות כ-PDF בקובץ ZIP"
+                                        >
+                                            <FileArchive className="mr-2 h-4 w-4" />
+                                            PDF ZIP
+                                        </Button>
+                                    </>
                                 )}
                                 <Button
                                     onClick={() => handleExport(option.id)}
                                     disabled={loading[option.id]}
                                     variant="outline"
-                                    className="h-10 border-gray-200 hover:border-gray-300 hover:bg-white min-w-[140px]"
+                                    className="h-10 border-gray-200 hover:border-gray-300 hover:bg-white min-w-[120px]"
                                 >
                                     {loading[option.id] ? (
                                         <>
@@ -216,7 +306,7 @@ export function DataExportSettings() {
                                     ) : (
                                         <>
                                             <Download className="mr-2 h-4 w-4" />
-                                            CSV הורד
+                                            הורד CSV
                                         </>
                                     )}
                                 </Button>
