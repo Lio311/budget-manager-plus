@@ -7,6 +7,7 @@ import {
     Loader2, Plus, TrendingDown, RefreshCw, Settings, ChevronDown, Camera, Paperclip, X
 } from 'lucide-react'
 import { format } from 'date-fns'
+import { compressImage } from '@/lib/image-utils'
 
 import { useBudget } from '@/contexts/BudgetContext'
 import { useToast } from '@/hooks/use-toast'
@@ -700,13 +701,15 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                             onChange={async (e) => {
                                 const file = e.target.files?.[0]
                                 if (file) {
-                                    toast({ title: 'מעבד קובץ...', description: 'נא להמתין' })
-                                    const reader = new FileReader()
-                                    reader.onloadend = () => {
-                                        setNewExpense(prev => ({ ...prev, attachmentUrl: reader.result as string }))
+                                    try {
+                                        toast({ title: 'מעבד קובץ...', description: 'נא להמתין' })
+                                        const compressed = await compressImage(file)
+                                        setNewExpense(prev => ({ ...prev, attachmentUrl: compressed }))
                                         toast({ title: 'הקובץ נטען בהצלחה' })
+                                    } catch (err) {
+                                        console.error('Compression error:', err)
+                                        toast({ title: 'שגיאה', description: 'נכשל בעיבוד התמונה', variant: 'destructive' })
                                     }
-                                    reader.readAsDataURL(file)
                                 }
                             }}
                         />
@@ -728,13 +731,27 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                             onChange={async (e) => {
                                 const file = e.target.files?.[0]
                                 if (file) {
-                                    toast({ title: 'מעבד קובץ...', description: 'נא להמתין' })
-                                    const reader = new FileReader()
-                                    reader.onloadend = () => {
-                                        setNewExpense(prev => ({ ...prev, attachmentUrl: reader.result as string }))
+                                    try {
+                                        // If it's a PDF, we can't compress it via canvas
+                                        if (file.type === 'application/pdf') {
+                                            toast({ title: 'מעלה קובץ...', description: 'נא להמתין' })
+                                            const reader = new FileReader()
+                                            reader.onloadend = () => {
+                                                setNewExpense(prev => ({ ...prev, attachmentUrl: reader.result as string }))
+                                                toast({ title: 'הקובץ נטען בהצלחה' })
+                                            }
+                                            reader.readAsDataURL(file)
+                                            return
+                                        }
+
+                                        toast({ title: 'מעבד תמונה...', description: 'מכווץ ושומר' })
+                                        const compressed = await compressImage(file)
+                                        setNewExpense(prev => ({ ...prev, attachmentUrl: compressed }))
                                         toast({ title: 'הקובץ נטען בהצלחה' })
+                                    } catch (err) {
+                                        console.error('Processing error:', err)
+                                        toast({ title: 'שגיאה', description: 'נכשל בעיבוד הקובץ', variant: 'destructive' })
                                     }
-                                    reader.readAsDataURL(file)
                                 }
                             }}
                         />

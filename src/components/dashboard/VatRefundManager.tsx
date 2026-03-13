@@ -15,6 +15,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { useRef } from 'react'
 import { DatePicker } from '@/components/ui/date-picker'
 import { format } from 'date-fns'
+import { compressImage } from '@/lib/image-utils'
 
 interface ManualVatRefund {
     id: string
@@ -198,9 +199,13 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
                                             onChange={async (e) => {
                                                 const file = e.target.files?.[0]
                                                 if (file) {
-                                                    const reader = new FileReader()
-                                                    reader.onloadend = () => setAttachmentUrl(reader.result as string)
-                                                    reader.readAsDataURL(file)
+                                                    try {
+                                                        const compressed = await compressImage(file)
+                                                        setAttachmentUrl(compressed)
+                                                    } catch (err) {
+                                                        console.error('Compression error:', err)
+                                                        toast.error('שגיאה בעיבוד התמונה')
+                                                    }
                                                 }
                                             }}
                                         />
@@ -222,9 +227,19 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
                                             onChange={async (e) => {
                                                 const file = e.target.files?.[0]
                                                 if (file) {
-                                                    const reader = new FileReader()
-                                                    reader.onloadend = () => setAttachmentUrl(reader.result as string)
-                                                    reader.readAsDataURL(file)
+                                                    try {
+                                                        if (file.type === 'application/pdf') {
+                                                            const reader = new FileReader()
+                                                            reader.onloadend = () => setAttachmentUrl(reader.result as string)
+                                                            reader.readAsDataURL(file)
+                                                            return
+                                                        }
+                                                        const compressed = await compressImage(file)
+                                                        setAttachmentUrl(compressed)
+                                                    } catch (err) {
+                                                        console.error('Processing error:', err)
+                                                        toast.error('שגיאה בעיבוד הקובץ')
+                                                    }
                                                 }
                                             }}
                                         />
