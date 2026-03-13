@@ -17,7 +17,14 @@ function registerFont() {
     }
 }
 
-export async function generateExpenseReportPDFBuffer(data: { expenses: any[], month: string, year: string, businessName: string, totalAmount: number }): Promise<Buffer> {
+export async function generateExpenseReportPDFBuffer(data: { 
+    expenses: any[], 
+    manualRefunds?: any[],
+    month: string, 
+    year: string, 
+    businessName: string, 
+    totalAmount: number 
+}): Promise<Buffer> {
     registerFont()
     return await renderToBuffer(<ExpenseReportTemplate {...data} />)
 }

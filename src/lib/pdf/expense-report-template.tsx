@@ -74,13 +74,14 @@ const styles = StyleSheet.create({
 
 interface ExpenseReportProps {
     expenses: any[]
+    manualRefunds?: any[]
     month: string
     year: string
     businessName: string
     totalAmount: number
 }
 
-export const ExpenseReportTemplate = ({ expenses, month, year, businessName, totalAmount }: ExpenseReportProps) => (
+export const ExpenseReportTemplate = ({ expenses, manualRefunds, month, year, businessName, totalAmount }: ExpenseReportProps) => (
     <Document>
         <Page size="A4" style={styles.page}>
             <View style={styles.header}>
@@ -100,11 +101,20 @@ export const ExpenseReportTemplate = ({ expenses, month, year, businessName, tot
                 </View>
 
                 {expenses.map((exp, i) => (
-                    <View key={i} style={styles.tableRow}>
+                    <View key={`exp-${i}`} style={styles.tableRow}>
                         <Text style={styles.colDate}>{exp.date ? format(new Date(exp.date), 'dd/MM/yy') : '-'}</Text>
                         <Text style={styles.colDesc}>{exp.description}</Text>
                         <Text style={styles.colCat}>{exp.category}</Text>
                         <Text style={styles.colAmount}>₪ {exp.amount.toLocaleString()}</Text>
+                    </View>
+                ))}
+
+                {manualRefunds?.map((ref, i) => (
+                    <View key={`ref-${i}`} style={styles.tableRow}>
+                        <Text style={styles.colDate}>{ref.date ? format(new Date(ref.date), 'dd/MM/yy') : '-'}</Text>
+                        <Text style={styles.colDesc}>{ref.description}</Text>
+                        <Text style={styles.colCat}>החזר מע"מ ידני</Text>
+                        <Text style={styles.colAmount}>₪ {ref.amount.toLocaleString()}</Text>
                     </View>
                 ))}
             </View>
@@ -117,11 +127,20 @@ export const ExpenseReportTemplate = ({ expenses, month, year, businessName, tot
 
         {/* Append pages for attachments */}
         {expenses.filter(exp => exp.attachmentUrl && exp.attachmentUrl.startsWith('data:image/')).map((exp, i) => (
-            <Page key={`att-${i}`} size="A4" style={styles.attachmentPage}>
+            <Page key={`att-exp-${i}`} size="A4" style={styles.attachmentPage}>
                 <Text style={styles.attachmentTitle}>
                     נספח: {exp.description} ({exp.date ? format(new Date(exp.date), 'dd/MM/yyyy') : ''})
                 </Text>
                 <Image src={exp.attachmentUrl} style={styles.attachmentImage} />
+            </Page>
+        ))}
+
+        {manualRefunds?.filter(ref => ref.attachmentUrl && ref.attachmentUrl.startsWith('data:image/')).map((ref, i) => (
+            <Page key={`att-ref-${i}`} size="A4" style={styles.attachmentPage}>
+                <Text style={styles.attachmentTitle}>
+                    נספח: {ref.description} ({ref.date ? format(new Date(ref.date), 'dd/MM/yyyy') : ''})
+                </Text>
+                <Image src={ref.attachmentUrl} style={styles.attachmentImage} />
             </Page>
         ))}
     </Document>

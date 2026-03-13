@@ -32,6 +32,7 @@ export async function addManualVatRefund(
         amount: number
         description: string
         date: string
+        attachmentUrl?: string | null
     }
 ) {
     try {
@@ -46,7 +47,8 @@ export async function addManualVatRefund(
                 budgetId: budget.id,
                 amount: data.amount,
                 description: data.description,
-                date: new Date(data.date)
+                date: new Date(data.date),
+                attachmentUrl: data.attachmentUrl
             }
         })
 
@@ -64,6 +66,7 @@ export async function updateManualVatRefund(
         amount?: number
         description?: string
         date?: string
+        attachmentUrl?: string | null
     }
 ) {
     try {
@@ -77,7 +80,8 @@ export async function updateManualVatRefund(
             data: {
                 ...(data.amount !== undefined && { amount: data.amount }),
                 ...(data.description !== undefined && { description: data.description }),
-                ...(data.date !== undefined && { date: new Date(data.date) })
+                ...(data.date !== undefined && { date: new Date(data.date) }),
+                ...(data.attachmentUrl !== undefined && { attachmentUrl: data.attachmentUrl })
             }
         })
 

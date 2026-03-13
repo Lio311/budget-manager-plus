@@ -5,19 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Trash2, Edit2, Check, X, Loader2 } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { toast } from 'sonner'
 import { addManualVatRefund, updateManualVatRefund, deleteManualVatRefund } from '@/lib/actions/vat-refund'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, cn } from '@/lib/utils'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { useConfirm } from '@/hooks/useConfirm'
+import { useRef } from 'react'
+import { Camera, Paperclip } from 'lucide-react'
 
 interface ManualVatRefund {
     id: string
     amount: number
     description: string
     date: Date
+    attachmentUrl?: string | null
 }
 
 interface VatRefundManagerProps {
@@ -35,15 +35,20 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
     const [editingId, setEditingId] = useState<string | null>(null)
     const confirm = useConfirm()
     
+    const cameraInputRef = useRef<HTMLInputElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
     // Form state
     const [amount, setAmount] = useState('')
     const [description, setDescription] = useState('')
     const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+    const [attachmentUrl, setAttachmentUrl] = useState<string | null>(null)
 
     const resetForm = () => {
         setAmount('')
         setDescription('')
         setDate(new Date().toISOString().split('T')[0])
+        setAttachmentUrl(null)
         setIsAdding(false)
         setEditingId(null)
     }
@@ -58,7 +63,8 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
         const result = await addManualVatRefund(month, year, {
             amount: parseFloat(amount),
             description,
-            date
+            date,
+            attachmentUrl
         })
 
         if (result.success) {
@@ -76,7 +82,8 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
         const result = await updateManualVatRefund(id, {
             amount: parseFloat(amount),
             description,
-            date
+            date,
+            attachmentUrl
         })
 
         if (result.success) {
@@ -110,6 +117,7 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
         setAmount(refund.amount.toString())
         setDescription(refund.description)
         setDate(new Date(refund.date).toISOString().split('T')[0])
+        setAttachmentUrl(refund.attachmentUrl || null)
         setIsAdding(true)
     }
 
@@ -152,9 +160,86 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
                                         />
                                     </div>
                                 </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold text-gray-500">חבר חשבונית (צילום או קובץ)</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            capture="environment"
+                                            className="hidden"
+                                            ref={cameraInputRef}
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0]
+                                                if (file) {
+                                                    const reader = new FileReader()
+                                                    reader.onloadend = () => setAttachmentUrl(reader.result as string)
+                                                    reader.readAsDataURL(file)
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="flex-1 h-10 gap-2 border-dashed border-2 hover:border-emerald-500 hover:text-emerald-500 transition-all text-xs"
+                                            onClick={() => cameraInputRef.current?.click()}
+                                        >
+                                            <Camera className="h-4 w-4 text-emerald-500" />
+                                            צילום חשבונית
+                                        </Button>
+
+                                        <Input
+                                            type="file"
+                                            accept="image/*,application/pdf"
+                                            className="hidden"
+                                            ref={fileInputRef}
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0]
+                                                if (file) {
+                                                    const reader = new FileReader()
+                                                    reader.onloadend = () => setAttachmentUrl(reader.result as string)
+                                                    reader.readAsDataURL(file)
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="flex-1 h-10 gap-2 border-dashed border-2 hover:border-emerald-500 hover:text-emerald-500 transition-all text-xs"
+                                            onClick={() => fileInputRef.current?.click()}
+                                        >
+                                            <Paperclip className="h-4 w-4 text-emerald-500" />
+                                            בחירת קובץ
+                                        </Button>
+                                    </div>
+
+                                    {attachmentUrl && (
+                                        <div className="relative mt-2 rounded-lg overflow-hidden border border-gray-200 aspect-video bg-gray-50 group">
+                                            {attachmentUrl.startsWith('data:image/') ? (
+                                                <img src={attachmentUrl} alt="Preview" className="w-full h-full object-contain" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                                                    <Paperclip className="h-8 w-8 mb-2" />
+                                                    <span>קובץ צורף</span>
+                                                </div>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => setAttachmentUrl(null)}
+                                                className="absolute top-1 left-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div className="flex justify-end gap-2 pt-2">
                                     <Button variant="ghost" size="sm" onClick={resetForm}>ביטול</Button>
-                                    <Button size="sm" onClick={() => editingId ? handleUpdate(editingId) : handleAdd()} disabled={loading}>
+                                    <Button size="sm" onClick={() => editingId ? handleUpdate(editingId) : handleAdd()} disabled={loading} className="bg-emerald-600 hover:bg-emerald-700">
                                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (editingId ? 'עדכן' : 'שמור')}
                                     </Button>
                                 </div>
@@ -180,7 +265,16 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
                                 <div className="flex-1 min-w-0 ml-4">
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="font-bold text-emerald-600">{formatCurrency(refund.amount)}</span>
-                                        <span className="text-[10px] text-gray-400">{new Date(refund.date).toLocaleDateString('he-IL')}</span>
+                                        <span className="text-[11px] text-gray-400 font-medium" dir="ltr">
+                                            {new Date(refund.date).toLocaleDateString('he-IL', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric'
+                                            })}
+                                        </span>
+                                        {refund.attachmentUrl && (
+                                            <Paperclip className="h-3 w-3 text-emerald-500" />
+                                        )}
                                     </div>
                                     <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{refund.description}</p>
                                 </div>

@@ -148,6 +148,7 @@ model ManualVatRefund {
   amount      Float
   description String
   date        DateTime @default(now())
+  attachmentUrl String?  @db.Text
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

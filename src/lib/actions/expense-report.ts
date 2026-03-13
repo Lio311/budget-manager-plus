@@ -26,15 +26,22 @@ export async function generateMonthlyExpenseReportPDF(month: number, year: numbe
                     lte: endDate
                 }
             },
-            include: {
+            orderBy: {
+                date: 'asc'
+            }
+        })
+
+        const manualRefunds = await prisma.manualVatRefund.findMany({
+            where: {
                 budget: {
-                    include: {
-                        user: {
-                            include: {
-                                businessProfile: true
-                            }
-                        }
-                    }
+                    userId: userId,
+                    type: budgetType,
+                    month,
+                    year
+                },
+                date: {
+                    gte: startDate,
+                    lte: endDate
                 }
             },
             orderBy: {
@@ -42,20 +49,24 @@ export async function generateMonthlyExpenseReportPDF(month: number, year: numbe
             }
         })
 
-        if (!expenses.length) {
-            return { success: false, error: 'לא נמצאו הוצאות לחודש המבוקש' }
+        if (!expenses.length && !manualRefunds.length) {
+            return { success: false, error: 'לא נמצאו הוצאות או החזרי מע"מ לחודש המבוקש' }
         }
 
-        const businessProfile = expenses[0].budget.user.businessProfile
+        const businessProfile = await prisma.businessProfile.findUnique({
+            where: { userId }
+        })
         const businessName = businessProfile?.companyName || 'העסק שלי'
-        const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0)
+        const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0)
+        const totalManualRefunds = manualRefunds.reduce((sum, ref) => sum + ref.amount, 0)
 
         const buffer = await generateExpenseReportPDFBuffer({
             expenses,
+            manualRefunds,
             month: month.toString().padStart(2, '0'),
             year: year.toString(),
             businessName: businessName,
-            totalAmount
+            totalAmount: totalExpenses + totalManualRefunds
         })
 
         return {
