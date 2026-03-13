@@ -96,6 +96,8 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
     const [submitting, setSubmitting] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
+    const cameraInputRef = useRef<HTMLInputElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     // Fetch business profile
     const { data: businessProfile } = useSWR('business-profile', async () => {
@@ -687,13 +689,15 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                             accept="image/*"
                             capture="environment"
                             className="hidden"
-                            id="camera-input"
+                            ref={cameraInputRef}
                             onChange={async (e) => {
                                 const file = e.target.files?.[0]
                                 if (file) {
+                                    toast({ title: 'מעבד קובץ...', description: 'נא להמתין' })
                                     const reader = new FileReader()
                                     reader.onloadend = () => {
                                         setNewExpense(prev => ({ ...prev, attachmentUrl: reader.result as string }))
+                                        toast({ title: 'הקובץ נטען בהצלחה' })
                                     }
                                     reader.readAsDataURL(file)
                                 }
@@ -702,10 +706,10 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                         <Button
                             type="button"
                             variant="outline"
-                            className="flex-1 h-12 gap-2 border-dashed border-2 hover:border-red-500 hover:text-red-500 transition-all"
-                            onClick={() => document.getElementById('camera-input')?.click()}
+                            className="flex-1 h-12 gap-2 border-dashed border-2 hover:border-red-500 hover:text-red-500 transition-all text-sm"
+                            onClick={() => cameraInputRef.current?.click()}
                         >
-                            <Camera className="h-5 w-5" />
+                            <Camera className="h-5 w-5 text-red-500" />
                             צילום חשבונית
                         </Button>
 
@@ -713,13 +717,15 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                             type="file"
                             accept="image/*,application/pdf"
                             className="hidden"
-                            id="file-input"
+                            ref={fileInputRef}
                             onChange={async (e) => {
                                 const file = e.target.files?.[0]
                                 if (file) {
+                                    toast({ title: 'מעבד קובץ...', description: 'נא להמתין' })
                                     const reader = new FileReader()
                                     reader.onloadend = () => {
                                         setNewExpense(prev => ({ ...prev, attachmentUrl: reader.result as string }))
+                                        toast({ title: 'הקובץ נטען בהצלחה' })
                                     }
                                     reader.readAsDataURL(file)
                                 }
@@ -728,10 +734,10 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                         <Button
                             type="button"
                             variant="outline"
-                            className="flex-1 h-12 gap-2 border-dashed border-2 hover:border-red-500 hover:text-red-500 transition-all"
-                            onClick={() => document.getElementById('file-input')?.click()}
+                            className="flex-1 h-12 gap-2 border-dashed border-2 hover:border-red-500 hover:text-red-500 transition-all text-sm"
+                            onClick={() => fileInputRef.current?.click()}
                         >
-                            <Paperclip className="h-5 w-5" />
+                            <Paperclip className="h-5 w-5 text-red-500" />
                             בחירת קובץ
                         </Button>
                     </div>

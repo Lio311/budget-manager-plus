@@ -77,6 +77,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },
+                    manualVatRefunds: { select: { id: true, amount: true, description: true, date: true } },
                     // @ts-ignore
                     initialBalance: true,
                     // @ts-ignore
@@ -92,6 +93,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },
+                    manualVatRefunds: { select: { id: true, amount: true, description: true, date: true } },
                     // @ts-ignore
                     initialBalance: true,
                     // @ts-ignore
@@ -128,7 +130,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
         const convertBudgetItems = async (budget: any) => {
             if (!budget) return null
 
-            const [incomes, expenses, bills, debts, savings] = await Promise.all([
+            const [incomes, expenses, bills, debts, savings, manualVatRefunds] = await Promise.all([
                 Promise.all(budget.incomes?.map(async (item: any) => {
                     const amountILS = await convertToILS(item.amount, item.currency)
                     const ratio = item.amount && item.amount !== 0 ? amountILS / item.amount : 0
@@ -168,10 +170,11 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 Promise.all(budget.savings?.map(async (item: any) => ({
                     ...item,
                     monthlyDepositILS: await convertToILS(item.monthlyDeposit, item.currency)
-                })) || [])
+                })) || []),
+                Promise.resolve(budget.manualVatRefunds || [])
             ])
 
-            return { ...budget, incomes, expenses, bills, debts, savings }
+            return { ...budget, incomes, expenses, bills, debts, savings, manualVatRefunds }
         }
 
         const [currentBudgetConverted, previousBudgetConverted] = await Promise.all([
@@ -293,14 +296,16 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     expenses: currentBudgetConverted?.expenses || [],
                     bills: currentBudgetConverted?.bills || [],
                     debts: currentBudgetConverted?.debts || [],
-                    savings: currentBudgetConverted?.savings || []
+                    savings: currentBudgetConverted?.savings || [],
+                    manualVatRefunds: currentBudgetConverted?.manualVatRefunds || []
                 },
                 previous: {
                     incomes: previousBudgetConverted?.incomes || [],
                     expenses: previousBudgetConverted?.expenses || [],
                     bills: previousBudgetConverted?.bills || [],
                     debts: previousBudgetConverted?.debts || [],
-                    savings: previousBudgetConverted?.savings || []
+                    savings: previousBudgetConverted?.savings || [],
+                    manualVatRefunds: previousBudgetConverted?.manualVatRefunds || []
                 },
                 businessStats: {
                     newClientsCount,

@@ -34,6 +34,8 @@ import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { CustomTooltip } from '../charts/CustomTooltip'
 import { getBusinessProfile } from '@/lib/actions/business-settings'
 import { EmptyChartState } from '../charts/EmptyChartState'
+import { VatRefundManager } from '../VatRefundManager'
+import { Plus } from 'lucide-react'
 
 
 interface Category {
@@ -74,6 +76,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     const [isIntegrationsOpen, setIsIntegrationsOpen] = useState(false)
     const [isTutorialOpen, setIsTutorialOpen] = useState(false)
     const [isAiAdvisorOpen, setIsAiAdvisorOpen] = useState(false)
+    const [isVatManagerOpen, setIsVatManagerOpen] = useState(false)
 
 
     const { data: businessProfile } = useSWR('business-profile', getBusinessProfile)
@@ -173,10 +176,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
     // VAT Calculations
     const totalVatCollected = current.incomes.reduce((sum: number, item: any) => sum + (item.vatAmountILS || 0), 0)
     // Fix: Only sum VAT for expenses that are deductible (recognized for tax/VAT)
-    const totalVatPaid = current.expenses.reduce((sum: number, item: any) => {
+    // Add manual VAT refunds to the total paid VAT
+    const manualRefundsTotal = current.manualVatRefunds?.reduce((sum: number, item: any) => sum + (item.amount || 0), 0) || 0
+    const totalVatPaid = (current.expenses.reduce((sum: number, item: any) => {
         if (isBusiness && item.isDeductible === false) return sum
         return sum + (item.vatAmountILS || 0)
-    }, 0)
+    }, 0)) + manualRefundsTotal
 
     // Net Worth / Balance Logic
     const currentNetWorth = netWorthHistory.length > 0 ? netWorthHistory[netWorthHistory.length - 1].accumulatedNetWorth : 0
@@ -772,8 +777,19 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                         <div className="px-6 pb-6 pt-2">
                             <div className="grid grid-cols-2 gap-3">
                                 {/* VAT Refund (Green) */}
-                                <div className="bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/20">
-                                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium">החזר מע"מ צפוי</div>
+                                <div className="bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/20 relative group">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium flex justify-between items-center">
+                                        <span>החזר מע"מ צפוי</span>
+                                        <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="h-5 w-5 rounded-md hover:bg-emerald-200 dark:hover:bg-emerald-800/50"
+                                            onClick={() => setIsVatManagerOpen(true)}
+                                            title="ניהול החזרים ידניים"
+                                        >
+                                            <Plus className="h-3 w-3 text-emerald-600" />
+                                        </Button>
+                                    </div>
                                     <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                                         {formatCurrency(totalVatPaid)}
                                     </div>
@@ -794,6 +810,15 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
 
 
             </div >
+
+            <VatRefundManager
+                isOpen={isVatManagerOpen}
+                onClose={() => setIsVatManagerOpen(false)}
+                month={month}
+                year={year}
+                refunds={current.manualVatRefunds || []}
+                onUpdate={mutateOverview}
+            />
 
             {/* Settings Dialog */}
             < Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} >

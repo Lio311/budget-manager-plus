@@ -277,12 +277,12 @@ export function DataExportSettings() {
                     {EXPORT_OPTIONS.map((option) => (
                         <div
                             key={option.id}
-                            className="flex flex-col md:flex-row items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors gap-4"
+                            className="flex flex-col lg:flex-row items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors gap-4"
                         >
-                            <div className="flex flex-wrap items-center gap-2">
+                            <div className="flex flex-col sm:flex-row flex-wrap items-center gap-2 w-full lg:w-auto">
                                 {option.id === 'invoices' && (
                                     <>
-                                        <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 p-2 rounded-md border text-xs">
+                                        <div className="flex flex-wrap items-center gap-2 bg-gray-50 dark:bg-slate-800 p-2 rounded-md border text-xs w-full sm:w-auto justify-center sm:justify-start">
                                             <Select value={invoiceYear} onValueChange={setInvoiceYear}>
                                                 <SelectTrigger className="h-8 w-[80px] text-right">
                                                     <SelectValue />
@@ -308,7 +308,7 @@ export function DataExportSettings() {
                                                 onClick={handleGenerateMonthlyPDF}
                                                 disabled={generatingPDF}
                                                 variant="outline"
-                                                className="h-8 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-bold"
+                                                className="h-8 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-bold whitespace-nowrap"
                                                 title="הורד דוח PDF מרוכז לחודש הנבחר"
                                             >
                                                 {generatingPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4 mr-1" />}
@@ -321,7 +321,7 @@ export function DataExportSettings() {
                                                 window.open('/api/export/invoices/zip', '_blank')
                                             }}
                                             variant="outline"
-                                            className="h-10 border-gray-200 hover:border-gray-300 hover:bg-white text-blue-600 hover:text-blue-700"
+                                            className="h-10 border-gray-200 hover:border-gray-300 hover:bg-white text-blue-600 hover:text-blue-700 w-full sm:w-auto"
                                             title="הורד את כל החשבוניות כ-PDF בקובץ ZIP"
                                         >
                                             <FileArchive className="mr-2 h-4 w-4" />
@@ -330,7 +330,7 @@ export function DataExportSettings() {
                                     </>
                                 )}
                                 {option.id === 'expenses' && (
-                                    <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 p-2 rounded-md border text-xs">
+                                    <div className="flex flex-wrap items-center gap-2 bg-gray-50 dark:bg-slate-800 p-2 rounded-md border text-xs w-full sm:w-auto justify-center sm:justify-start">
                                         <Select value={expenseYear} onValueChange={setExpenseYear}>
                                             <SelectTrigger className="h-8 w-[80px] text-right">
                                                 <SelectValue />
@@ -356,7 +356,7 @@ export function DataExportSettings() {
                                             onClick={handleGenerateMonthlyExpensesPDF}
                                             disabled={generatingPDF}
                                             variant="outline"
-                                            className="h-8 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-bold"
+                                            className="h-8 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-bold whitespace-nowrap"
                                             title="הורד דוח הוצאות חודשי עם נספחים"
                                         >
                                             {generatingPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4 mr-1" />}
@@ -368,7 +368,7 @@ export function DataExportSettings() {
                                     onClick={() => handleExport(option.id)}
                                     disabled={loading[option.id]}
                                     variant="outline"
-                                    className="h-10 border-gray-200 hover:border-gray-300 hover:bg-white min-w-[120px]"
+                                    className="h-10 border-gray-200 hover:border-gray-300 hover:bg-white min-w-[120px] w-full sm:w-auto"
                                 >
                                     {loading[option.id] ? (
                                         <>
@@ -384,7 +384,7 @@ export function DataExportSettings() {
                                 </Button>
                             </div>
 
-                            <div className="text-right">
+                            <div className="text-right w-full lg:w-auto order-first lg:order-last">
                                 <div className="flex items-center gap-2 justify-end mb-1">
                                     <h3 className="font-medium text-gray-900 dark:text-gray-100">{option.label}</h3>
                                     <div className="p-1.5 bg-gray-100 dark:bg-slate-700 rounded-md">

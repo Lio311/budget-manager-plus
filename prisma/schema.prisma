@@ -133,10 +133,27 @@ model Budget {
   initialBalance Float? // Monthly override for starting balance
   initialSavings Float? // Monthly override for starting savings
   
+  manualVatRefunds ManualVatRefund[]
+
   // CHANGED: Unique constraint now includes 'type' to allow 2 budgets per month (Personal + Business)
   @@unique([userId, month, year, type])
   @@index([userId, month, year])
   @@map("budgets")
+}
+
+model ManualVatRefund {
+  id          String   @id @default(cuid())
+  budgetId    String
+  budget      Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  amount      Float
+  description String
+  date        DateTime @default(now())
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([budgetId])
+  @@map("manual_vat_refunds")
 }
 
 model Category {
