@@ -58,6 +58,8 @@ const styles = StyleSheet.create({
     },
     attachmentPage: {
         padding: 20,
+        fontFamily: 'Alef',
+        direction: 'rtl',
         alignItems: 'center',
         justifyContent: 'center',
     },
