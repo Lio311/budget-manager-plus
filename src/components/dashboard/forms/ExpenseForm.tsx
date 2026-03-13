@@ -165,6 +165,13 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         }
     }, [initialData])
 
+    // Sync attachmentUrl if it's fetched asynchronously
+    useEffect(() => {
+        if (initialData?.attachmentUrl !== undefined && initialData?.attachmentUrl !== newExpense.attachmentUrl) {
+            setNewExpense(prev => ({ ...prev, attachmentUrl: initialData.attachmentUrl || '' }))
+        }
+    }, [initialData?.attachmentUrl])
+
     // Handle VAT Calculations (Backwards from Gross)
     const calculateFromGross = (gross: string, rate: string) => {
         const g = parseFloat(gross) || 0

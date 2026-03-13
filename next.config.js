@@ -10,6 +10,9 @@ const nextConfig = {
     },
     experimental: {
         optimizePackageImports: ['lucide-react', 'recharts'],
+        serverActions: {
+            bodySizeLimit: '10mb'
+        }
     },
     async headers() {
         return [

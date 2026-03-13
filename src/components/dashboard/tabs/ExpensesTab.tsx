@@ -28,7 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { formatCurrency, cn, formatNumberWithCommas } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
-import { deleteExpense, getExpenses, updateExpense, importExpenses, toggleExpenseStatus } from '@/lib/actions/expense'
+import { deleteExpense, getExpenses, updateExpense, importExpenses, toggleExpenseStatus, getExpenseAttachment } from '@/lib/actions/expense'
 import { getSuppliers } from '@/lib/actions/suppliers'
 import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { getCategories } from '@/lib/actions/category'
@@ -257,7 +257,14 @@ export function ExpensesTab() {
         }
     }
 
-    function handleEdit(expense: any) {
+    async function handleEdit(expense: any) {
+        if (!expense.attachmentUrl && expense.id) {
+            // Fetch attachment only if not already present
+            const res = await getExpenseAttachment(expense.id)
+            if (res.success && res.data) {
+                expense.attachmentUrl = res.data
+            }
+        }
         setEditingExpense(expense)
         setIsEditMobileOpen(true)
     }

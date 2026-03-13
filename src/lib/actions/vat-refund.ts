@@ -5,6 +5,25 @@ import { getCurrentBudget } from './budget'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
 
+export async function getManualVatRefundAttachment(id: string) {
+    try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+
+        const db = await authenticatedPrisma(userId);
+        const refund = await db.manualVatRefund.findUnique({
+            where: { id },
+            select: { attachmentUrl: true }
+        })
+
+        if (!refund) return { success: false, error: 'Refund not found' }
+        return { success: true, data: refund.attachmentUrl }
+    } catch (error) {
+        console.error('Error fetching refund attachment:', error)
+        return { success: false, error: 'Failed to fetch attachment' }
+    }
+}
+
 export async function getManualVatRefunds(month: number, year: number) {
     try {
         const { userId } = await auth();
@@ -15,6 +34,16 @@ export async function getManualVatRefunds(month: number, year: number) {
 
         const refunds = await db.manualVatRefund.findMany({
             where: { budgetId: budget.id },
+            select: {
+                id: true,
+                amount: true,
+                description: true,
+                date: true,
+                budgetId: true,
+                createdAt: true,
+                updatedAt: true
+                // Exclude attachmentUrl here
+            },
             orderBy: { date: 'desc' }
         })
 

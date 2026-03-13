@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Plus, Trash2, Edit2, Check, X, Loader2, Camera, Paperclip } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { addManualVatRefund, updateManualVatRefund, deleteManualVatRefund } from '@/lib/actions/vat-refund'
+import { addManualVatRefund, updateManualVatRefund, deleteManualVatRefund, getManualVatRefundAttachment } from '@/lib/actions/vat-refund'
 import { formatCurrency, cn } from '@/lib/utils'
 import { FormattedNumberInput } from '@/components/ui/FormattedNumberInput'
 import { useConfirm } from '@/hooks/useConfirm'
@@ -116,12 +116,35 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
         setLoading(false)
     }
 
-    const startEdit = (refund: any) => {
+    // Sync attachmentUrl if it's fetched asynchronously
+    useEffect(() => {
+        if (isAdding && editingId) {
+            // Only sync if we are in edit mode
+            const currentRefund = refunds.find(r => r.id === editingId)
+            if (currentRefund?.attachmentUrl && currentRefund.attachmentUrl !== attachmentUrl) {
+                setAttachmentUrl(currentRefund.attachmentUrl)
+            }
+        }
+    }, [refunds, editingId, isAdding])
+
+    const startEdit = async (refund: any) => {
         setEditingId(refund.id)
         setAmount(refund.amount.toString())
         setDescription(refund.description)
         setDate(new Date(refund.date).toISOString().split('T')[0])
-        setAttachmentUrl(refund.attachmentUrl || null)
+        
+        // Fetch attachment if not present
+        if (!refund.attachmentUrl && refund.id) {
+            const res = await getManualVatRefundAttachment(refund.id)
+            if (res.success && res.data) {
+                setAttachmentUrl(res.data)
+            } else {
+                setAttachmentUrl(null)
+            }
+        } else {
+            setAttachmentUrl(refund.attachmentUrl || null)
+        }
+        
         setIsAdding(true)
     }
 

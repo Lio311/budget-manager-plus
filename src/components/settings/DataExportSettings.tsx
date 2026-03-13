@@ -51,7 +51,8 @@ const EXPORT_OPTIONS = [
 
 export function DataExportSettings() {
     const [loading, setLoading] = useState<Record<string, boolean>>({})
-    const [generatingPDF, setGeneratingPDF] = useState(false)
+    const [generatingInvoicesPDF, setGeneratingInvoicesPDF] = useState(false)
+    const [generatingExpensesPDF, setGeneratingExpensesPDF] = useState(false)
     const [invoiceYear, setInvoiceYear] = useState<string>(new Date().getFullYear().toString())
     const [invoiceMonth, setInvoiceMonth] = useState<string>((new Date().getMonth() + 1).toString())
     const [expenseYear, setExpenseYear] = useState<string>(new Date().getFullYear().toString())
@@ -73,7 +74,7 @@ export function DataExportSettings() {
     ]
 
     const handleGenerateMonthlyPDF = async () => {
-        setGeneratingPDF(true)
+        setGeneratingInvoicesPDF(true)
         try {
             const result = await generateMonthlyConsolidatedPDF(parseInt(invoiceMonth), parseInt(invoiceYear))
             if (result.success && result.data) {
@@ -102,12 +103,12 @@ export function DataExportSettings() {
             toast.error('שגיאה בלתי צפויה')
             console.error(error)
         } finally {
-            setGeneratingPDF(false)
+            setGeneratingInvoicesPDF(false)
         }
     }
 
     const handleGenerateMonthlyExpensesPDF = async () => {
-        setGeneratingPDF(true)
+        setGeneratingExpensesPDF(true)
         try {
             const result = await generateMonthlyExpenseReportPDF(parseInt(expenseMonth), parseInt(expenseYear))
             if (result.success && result.data) {
@@ -136,7 +137,7 @@ export function DataExportSettings() {
             toast.error('שגיאה בלתי צפויה')
             console.error(error)
         } finally {
-            setGeneratingPDF(false)
+            setGeneratingExpensesPDF(false)
         }
     }
 
@@ -306,12 +307,12 @@ export function DataExportSettings() {
                                             </Select>
                                             <Button
                                                 onClick={handleGenerateMonthlyPDF}
-                                                disabled={generatingPDF}
+                                                disabled={generatingInvoicesPDF}
                                                 variant="outline"
                                                 className="h-8 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-bold whitespace-nowrap"
                                                 title="הורד דוח PDF מרוכז לחודש הנבחר"
                                             >
-                                                {generatingPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4 mr-1" />}
+                                                {generatingInvoicesPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4 mr-1" />}
                                                 דוח חודשי
                                             </Button>
                                         </div>
@@ -354,12 +355,12 @@ export function DataExportSettings() {
                                         </Select>
                                         <Button
                                             onClick={handleGenerateMonthlyExpensesPDF}
-                                            disabled={generatingPDF}
+                                            disabled={generatingExpensesPDF}
                                             variant="outline"
                                             className="h-8 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 font-bold whitespace-nowrap"
                                             title="הורד דוח הוצאות חודשי עם נספחים"
                                         >
-                                            {generatingPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4 mr-1" />}
+                                            {generatingExpensesPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4 mr-1" />}
                                             דוח חודשי
                                         </Button>
                                     </div>

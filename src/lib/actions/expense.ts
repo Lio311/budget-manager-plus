@@ -8,6 +8,25 @@ import { auth } from '@clerk/nextjs/server'
 import { convertToILS } from '@/lib/currency'
 import { syncBudgetToGoogleCalendar } from './calendar'
 
+export async function getExpenseAttachment(id: string) {
+    try {
+        const { userId } = await auth();
+        if (!userId) return { success: false, error: 'Unauthorized' };
+
+        const db = await authenticatedPrisma(userId);
+        const expense = await db.expense.findUnique({
+            where: { id },
+            select: { attachmentUrl: true }
+        })
+
+        if (!expense) return { success: false, error: 'Expense not found' }
+        return { success: true, data: expense.attachmentUrl }
+    } catch (error) {
+        console.error('Error fetching expense attachment:', error)
+        return { success: false, error: 'Failed to fetch attachment' }
+    }
+}
+
 export async function getExpenses(month: number, year: number, type: 'PERSONAL' | 'BUSINESS' = 'PERSONAL') {
     try {
         const { userId } = await auth();
@@ -18,8 +37,34 @@ export async function getExpenses(month: number, year: number, type: 'PERSONAL' 
 
         const expenses = await db.expense.findMany({
             where: { budgetId: budget.id },
-            include: {
-                supplier: true
+            select: {
+                id: true,
+                category: true,
+                description: true,
+                amount: true,
+                currency: true,
+                date: true,
+                supplierId: true,
+                supplier: true,
+                amountBeforeVat: true,
+                vatRate: true,
+                vatAmount: true,
+                vatType: true,
+                isDeductible: true,
+                deductibleRate: true,
+                expenseType: true,
+                invoiceDate: true,
+                paymentDate: true,
+                paymentMethod: true,
+                paymentTerms: true,
+                paidBy: true,
+                isRecurring: true,
+                recurringSourceId: true,
+                recurringStartDate: true,
+                recurringEndDate: true,
+                projectId: true,
+                clientId: true,
+                // Exclude attachmentUrl here to save payload
             },
             orderBy: { date: 'desc' }
         })
