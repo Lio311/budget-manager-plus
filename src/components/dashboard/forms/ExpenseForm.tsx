@@ -379,7 +379,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
             deductibleRate: parseFloat(newExpense.deductibleRate) || 1.0,
             paymentMethod: newExpense.paymentMethod || undefined,
             paidBy: newExpense.paidBy || undefined,
-            attachmentUrl: newExpense.attachmentUrl || undefined
+            attachmentUrl: newExpense.attachmentUrl === '' ? null : newExpense.attachmentUrl
         }
 
         try {
