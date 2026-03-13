@@ -126,6 +126,7 @@ export async function addExpense(
 
                 paymentTerms: validatedData.paymentTerms,
                 paidBy: validatedData.paidBy || null,
+                attachmentUrl: validatedData.attachmentUrl,
 
             }
         })
@@ -152,7 +153,8 @@ export async function addExpense(
                     isDeductible: validatedData.isDeductible,
                     deductibleRate: validatedData.deductibleRate,
                     paymentMethod: validatedData.paymentMethod,
-                    paidBy: validatedData.paidBy
+                    paidBy: validatedData.paidBy,
+                    attachmentUrl: validatedData.attachmentUrl,
                 }
             )
         }
@@ -404,7 +406,8 @@ function formatExpenseDataForUpdate(validatedData: any) {
         paymentDate: validatedData.paymentDate ? new Date(validatedData.paymentDate) : undefined,
         paymentMethod: validatedData.paymentMethod,
         paymentTerms: validatedData.paymentTerms,
-        paidBy: validatedData.paidBy
+        paidBy: validatedData.paidBy,
+        attachmentUrl: validatedData.attachmentUrl
     } as any // Cast to any to allow property deletion upstream
 }
 

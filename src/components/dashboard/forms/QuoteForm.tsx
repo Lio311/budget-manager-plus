@@ -289,10 +289,10 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                                         </td>
                                         <td className="p-2">
                                             <FormattedNumberInput
-                                                value={amountMode === 'GROSS' ? (item.price * (1 + formData.vatRate)) : item.price}
+                                                value={amountMode === 'GROSS' ? (item.price * (1 + (formData.vatRate || 0))) : item.price}
                                                 onChange={(e) => { }}
                                                 onValueChange={(value) => {
-                                                    const priceVal = amountMode === 'GROSS' ? (value / (1 + formData.vatRate)) : value
+                                                    const priceVal = amountMode === 'GROSS' ? (value / (1 + (formData.vatRate || 0))) : value
                                                     updateItem(item.id, 'price', priceVal)
                                                 }}
                                                 onFocus={() => {
@@ -304,7 +304,7 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                                             />
                                         </td>
                                         <td className="p-2 text-center font-medium">
-                                            {((item.quantity * item.price) * (amountMode === 'GROSS' ? (1 + formData.vatRate) : 1)).toLocaleString()} ₪
+                                            {((item.quantity * item.price) * (amountMode === 'GROSS' ? (1 + (formData.vatRate || 0)) : 1)).toLocaleString()} ₪
                                         </td>
                                         <td className="p-2 text-center pointer-events-auto">
                                             <div onClick={() => removeItem(item.id)} className="cursor-pointer text-gray-400 hover:text-red-500 transition-colors p-2">

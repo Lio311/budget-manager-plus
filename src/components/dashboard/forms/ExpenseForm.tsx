@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSWRConfig } from 'swr'
 import { useSearchParams, useRouter } from 'next/navigation'
 import {
-    Loader2, Plus, TrendingDown, RefreshCw, Settings, ChevronDown
+    Loader2, Plus, TrendingDown, RefreshCw, Settings, ChevronDown, Camera, Paperclip, X
 } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -131,6 +131,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         deductibleRate: initialData.deductibleRate?.toString() || '1.0',
         paymentMethod: initialData.paymentMethod || '',
         paidBy: initialData.paidBy || '',
+        attachmentUrl: initialData.attachmentUrl || '',
         id: initialData.id // Store ID for update
     } : {
         description: '',
@@ -149,7 +150,8 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         isDeductible: true,
         deductibleRate: '1.0',
         paymentMethod: '',
-        paidBy: ''
+        paidBy: '',
+        attachmentUrl: ''
     })
 
     useEffect(() => {
@@ -366,7 +368,8 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
             isDeductible: newExpense.isDeductible,
             deductibleRate: parseFloat(newExpense.deductibleRate) || 1.0,
             paymentMethod: newExpense.paymentMethod || undefined,
-            paidBy: newExpense.paidBy || undefined
+            paidBy: newExpense.paidBy || undefined,
+            attachmentUrl: newExpense.attachmentUrl || undefined
         }
 
         try {
@@ -401,7 +404,8 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                         isDeductible: true,
                         deductibleRate: '1.0',
                         paymentMethod: '',
-                        paidBy: ''
+                        paidBy: '',
+                        attachmentUrl: ''
                     })
                 }
 
@@ -672,6 +676,86 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                         )}
                     </div>
                 )}
+
+                {/* Attachment Section */}
+                <div className="w-full space-y-2 mt-2">
+                    <label className="text-xs font-bold block text-[#676879] dark:text-gray-300">צירף חשבונית / צילום קבלה</label>
+                    
+                    <div className="flex gap-2">
+                        <Input
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            className="hidden"
+                            id="camera-input"
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0]
+                                if (file) {
+                                    const reader = new FileReader()
+                                    reader.onloadend = () => {
+                                        setNewExpense(prev => ({ ...prev, attachmentUrl: reader.result as string }))
+                                    }
+                                    reader.readAsDataURL(file)
+                                }
+                            }}
+                        />
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="flex-1 h-12 gap-2 border-dashed border-2 hover:border-red-500 hover:text-red-500 transition-all"
+                            onClick={() => document.getElementById('camera-input')?.click()}
+                        >
+                            <Camera className="h-5 w-5" />
+                            צילום חשבונית
+                        </Button>
+
+                        <Input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            className="hidden"
+                            id="file-input"
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0]
+                                if (file) {
+                                    const reader = new FileReader()
+                                    reader.onloadend = () => {
+                                        setNewExpense(prev => ({ ...prev, attachmentUrl: reader.result as string }))
+                                    }
+                                    reader.readAsDataURL(file)
+                                }
+                            }}
+                        />
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="flex-1 h-12 gap-2 border-dashed border-2 hover:border-red-500 hover:text-red-500 transition-all"
+                            onClick={() => document.getElementById('file-input')?.click()}
+                        >
+                            <Paperclip className="h-5 w-5" />
+                            בחירת קובץ
+                        </Button>
+                    </div>
+
+                    {newExpense.attachmentUrl && (
+                        <div className="relative mt-2 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 aspect-video bg-gray-50 dark:bg-slate-900 group">
+                            {newExpense.attachmentUrl.startsWith('data:image/') ? (
+                                <img src={newExpense.attachmentUrl} alt="Preview" className="w-full h-full object-contain" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                                    <Paperclip className="h-8 w-8 mb-2" />
+                                    <span>קובץ צורף</span>
+                                </div>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => setNewExpense(prev => ({ ...prev, attachmentUrl: '' }))}
+                                className="absolute top-2 left-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+                    )}
+                </div>
 
                 <button
                     type="button"

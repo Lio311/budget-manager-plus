@@ -545,7 +545,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                             min="0"
                                             step="0.01"
                                             className="w-full bg-transparent border-none focus:outline-none focus:ring-1 rounded px-1 text-center text-base md:text-sm"
-                                            value={amountMode === 'GROSS' ? (item.price * (1 + formData.vatRate)).toFixed(2) : item.price}
+                                            value={amountMode === 'GROSS' ? (item.price * (1 + (formData.vatRate || 0))).toFixed(2) : item.price}
                                             onWheel={(e) => e.currentTarget.blur()}
                                             onFocus={(e) => {
                                                 if (item.price === 0) {
@@ -556,7 +556,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                                 const val = parseFloat(e.target.value) || 0
                                                 const newItems = [...lineItems]
                                                 if (amountMode === 'GROSS') {
-                                                    newItems[index].price = val / (1 + formData.vatRate)
+                                                    newItems[index].price = val / (1 + (formData.vatRate || 0))
                                                 } else {
                                                     newItems[index].price = val
                                                 }
@@ -566,7 +566,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                                         />
                                     </td>
                                     <td className="p-2 font-bold text-center">
-                                        {formatCurrency(amountMode === 'GROSS' ? item.total * (1 + formData.vatRate) : item.total)}
+                                        {formatCurrency(amountMode === 'GROSS' ? item.total * (1 + (formData.vatRate || 0)) : item.total)}
                                     </td>
                                     <td className="p-2 text-center">
                                         <button

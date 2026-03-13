@@ -8,7 +8,7 @@ import {
     Check, Loader2, Pencil, Plus, Trash2, TrendingDown, X,
     ShoppingCart, Utensils, Bus, Heart, GraduationCap, Popcorn,
     Fuel, Car, Phone, Smartphone, Briefcase, Zap, Home, Plane, RefreshCw,
-    Umbrella, Dumbbell, Shield, ArrowUpDown, Info
+    Umbrella, Dumbbell, Shield, ArrowUpDown, Info, FileDown
 } from 'lucide-react'
 import { ExpensesTutorial } from '@/components/dashboard/tutorial/ExpensesTutorial'
 import { format } from 'date-fns'
@@ -24,7 +24,7 @@ import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { ExpenseForm } from '@/components/dashboard/forms/ExpenseForm'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Pagination } from '@/components/ui/Pagination'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
 import { formatCurrency, cn, formatNumberWithCommas } from '@/lib/utils'
 import { PRESET_COLORS } from '@/lib/constants'
 import { SUPPORTED_CURRENCIES, getCurrencySymbol } from '@/lib/currency'
@@ -34,6 +34,7 @@ import { useOptimisticDelete } from '@/hooks/useOptimisticMutation'
 import { getCategories } from '@/lib/actions/category'
 import { getCategoryBudgets, CategoryBudgetUsage } from '@/lib/actions/budget-limits'
 import { RecurrenceActionDialog } from '../dialogs/RecurrenceActionDialog'
+import { BankImportModal } from '@/components/dashboard/modals/BankImportModal'
 
 import { useConfirm } from '@/hooks/useConfirm'
 import { useDemo } from '@/contexts/DemoContext'
@@ -206,6 +207,7 @@ export function ExpensesTab() {
     const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
     const [isEditMobileOpen, setIsEditMobileOpen] = useState(false)
     const [submitting, setSubmitting] = useState(false)
+    const [generatingReport, setGeneratingReport] = useState(false)
 
     const [recurrenceDialogOpen, setRecurrenceDialogOpen] = useState(false)
     const [pendingAction, setPendingAction] = useState<{ type: 'delete' | 'edit', id: string } | null>(null)
@@ -426,8 +428,33 @@ export function ExpensesTab() {
         }
     }
 
-
-
+    const handleDownloadReport = async () => {
+        if (isDemo) { interceptAction(); return; }
+        setGeneratingReport(true)
+        try {
+            const { generateMonthlyExpenseReportPDF } = await import('@/lib/actions/expense-report')
+            const result = await generateMonthlyExpenseReportPDF(month, year, budgetType)
+            if (result.success && result.data) {
+                const blob = await (await fetch(`data:application/pdf;base64,${result.data}`)).blob()
+                const url = window.URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = result.filename || `Expense_Report_${year}_${month}.pdf`
+                document.body.appendChild(a)
+                a.click()
+                a.remove()
+                window.URL.revokeObjectURL(url)
+                toast({ title: 'הצלחה', description: 'הדוח הופק בהצלחה' })
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'נכשל בהפקת הדוח', variant: 'destructive' })
+            }
+        } catch (error) {
+            console.error('Error downloading report:', error)
+            toast({ title: 'שגיאה', description: 'נכשל ביצירת הדוח', variant: 'destructive' })
+        } finally {
+            setGeneratingReport(false)
+        }
+    }
 
 
 
@@ -464,15 +491,29 @@ export function ExpensesTab() {
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-[#e2445c] to-[#ff5d75] bg-clip-text text-transparent mb-4">
                     {isBusiness ? 'הוצאות ותשלומים' : 'הוצאות שוטפות'}
                 </h2>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
-                    onClick={() => setShowTutorial(true)}
-                    title="הדרכה"
-                >
-                    <Info className="h-5 w-5" />
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                        onClick={() => setShowTutorial(true)}
+                        title="הדרכה"
+                    >
+                        <Info className="h-5 w-5" />
+                    </Button>
+                    <BankImportModal onImport={handleImportExpenses} triggerId="expenses-import-btn" />
+
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleDownloadReport}
+                        disabled={generatingReport || expenses.length === 0}
+                        className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+                        title="הורד דוח הוצאות חודשי"
+                    >
+                        {generatingReport ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
+                    </Button>
+                </div>
             </div>
 
             {/* Summary Card */}
