@@ -290,6 +290,11 @@ export function IncomeTab() {
         }
     }
 
+    function handleEdit(income: any) {
+        setEditingIncome(income)
+        setIsEditMobileOpen(true)
+    }
+
     const handleRecurrenceConfirm = async (mode: 'SINGLE' | 'FUTURE') => {
         setRecurrenceDialogOpen(false)
         if (!pendingAction) return
