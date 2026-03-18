@@ -472,6 +472,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
             vatRate: row.vatRate,
             isDeductible: row.isDeductible,
             deductibleRate: row.deductibleRate,
+            attachmentUrl: row.attachmentUrl,
             // VAT Logic for Business
             ...(isBusiness ? (() => {
                 // If VAT exists from scan, use it

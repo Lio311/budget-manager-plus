@@ -115,6 +115,7 @@ export interface ExpenseInput {
     deductibleRate?: number
     paymentMethod?: string
     paidBy?: string
+    attachmentUrl?: string
 }
 
 export async function addExpense(
@@ -727,6 +728,7 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
                     deductibleRate: exp.deductibleRate,
                     paymentMethod: exp.paymentMethod,
                     projectId: exp.projectId,
+                    attachmentUrl: exp.attachmentUrl,
                 }
             })
             addedCount++

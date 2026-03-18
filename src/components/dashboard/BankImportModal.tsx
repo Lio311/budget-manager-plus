@@ -8,6 +8,7 @@ import { format } from 'date-fns'
 import { toast } from 'sonner'
 import { cn, formatCurrency } from '@/lib/utils'
 import { scanInvoiceImage } from '@/lib/actions/scan-invoice'
+import { compressImage } from '@/lib/image-utils'
 
 interface BankImportModalProps {
     onImport: (data: any[]) => Promise<void>
@@ -26,6 +27,7 @@ interface ParsedExpense {
     vatRate?: number
     isDeductible?: boolean
     deductibleRate?: number
+    attachmentUrl?: string
 }
 
 export function BankImportModal({ onImport, triggerId }: BankImportModalProps) {
@@ -88,6 +90,14 @@ export function BankImportModal({ onImport, triggerId }: BankImportModalProps) {
                 const result = await scanInvoiceImage(formData)
 
                 if (result.success && result.data) {
+                    // Compress Image for storage
+                    let attachmentUrl = ''
+                    try {
+                        attachmentUrl = await compressImage(selectedFile)
+                    } catch (err) {
+                        console.error('Failed to compress scan image:', err)
+                    }
+
                     const scannedExpense: ParsedExpense = {
                         date: result.data.date || format(new Date(), 'yyyy-MM-dd'),
                         description: result.data.businessName,
@@ -100,7 +110,8 @@ export function BankImportModal({ onImport, triggerId }: BankImportModalProps) {
                         amountBeforeVat: parseFloat((result.data.amount - (result.data.vatAmount || 0)).toFixed(2)),
                         vatRate: 0.18,
                         isDeductible: true,
-                        deductibleRate: 1.0
+                        deductibleRate: 1.0,
+                        attachmentUrl: attachmentUrl
                     }
                     setPreviewData([scannedExpense])
                 } else {
