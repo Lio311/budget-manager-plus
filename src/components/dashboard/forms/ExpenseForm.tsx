@@ -330,6 +330,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
 
     async function handleAdd() {
         if (isDemo) { interceptAction(); return; }
+        setSubmitting(true)
 
         const newErrors: Record<string, boolean> = {}
         if (!newExpense.amount) newErrors.amount = true
@@ -346,6 +347,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
             else if (firstError === 'amount') document.getElementById('amount-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
             else if (firstError === 'category') document.getElementById('category-trigger')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
+            setSubmitting(false)
             return
         }
         setErrors({})
@@ -357,6 +359,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
             end.setHours(0, 0, 0, 0)
             if (end < start) {
                 toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההוצאה', variant: 'destructive' })
+                setSubmitting(false)
                 return
             }
         }
