@@ -249,11 +249,14 @@ export function ExpensesTab() {
         const confirmed = await confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?', 'מחיקת הוצאה')
         if (!confirmed) return
 
+        setSubmitting(true)
         try {
             await optimisticDeleteExpense(exp.id)
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } catch (error) {
             // Error already handled by hook
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -718,20 +721,27 @@ export function ExpensesTab() {
                                                     {/* Status Badge */}
                                                     {(exp as any).clientId && (
                                                         <button
+                                                            disabled={submitting}
                                                             onClick={async (e) => {
                                                                 e.stopPropagation()
-                                                                const newStatus = exp.paymentDate ? 'PENDING' : 'PAID'
-                                                                const res = await toggleExpenseStatus(exp.id, newStatus)
-                                                                if (res.success) {
-                                                                    mutateExpenses()
-                                                                    toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
+                                                                setSubmitting(true)
+                                                                try {
+                                                                    const newStatus = exp.paymentDate ? 'PENDING' : 'PAID'
+                                                                    const res = await toggleExpenseStatus(exp.id, newStatus)
+                                                                    if (res.success) {
+                                                                        mutateExpenses()
+                                                                        toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
+                                                                    }
+                                                                } finally {
+                                                                    setSubmitting(false)
                                                                 }
                                                             }}
-                                                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${!exp.paymentDate
+                                                            className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${submitting ? 'opacity-50 cursor-not-allowed' : ''} ${!exp.paymentDate
                                                                 ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
                                                                 : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
                                                                 }`}
                                                         >
+                                                            {submitting ? <Loader2 className="h-3 w-3 animate-spin inline-block ml-1" /> : null}
                                                             {!exp.paymentDate ? 'בהמתנה לתשלום' : 'שולם'}
                                                         </button>
                                                     )}
@@ -741,8 +751,8 @@ export function ExpensesTab() {
                                                         <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)} className="h-7 w-7 text-blue-500 hover:bg-blue-50 rounded-full">
                                                             <Pencil className="h-3.5 w-3.5" />
                                                         </Button>
-                                                        <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(exp)}>
-                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(exp)} disabled={submitting}>
+                                                            {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                                                         </Button>
                                                     </div>
                                                 </div>

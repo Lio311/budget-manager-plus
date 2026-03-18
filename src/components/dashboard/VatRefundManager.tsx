@@ -330,6 +330,7 @@ export function VatRefundManager({ isOpen, onClose, month, year, refunds, onUpda
                                         size="icon" 
                                         className="h-8 w-8 text-gray-400 hover:text-red-500"
                                         onClick={() => handleDelete(refund.id)}
+                                        disabled={loading}
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>

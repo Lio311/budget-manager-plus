@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FileText, Receipt, CreditCard, Eye, Link as LinkIcon, Pencil, Trash2, CheckCircle, Info, Plus } from 'lucide-react'
+import { FileText, Receipt, CreditCard, Eye, Link as LinkIcon, Pencil, Trash2, CheckCircle, Info, Plus, Loader2 } from 'lucide-react'
 import { DocumentsTutorial } from '@/components/dashboard/tutorial/DocumentsTutorial'
 import { cn } from '@/lib/utils'
 import { QuoteForm } from '@/components/dashboard/forms/QuoteForm'
@@ -154,6 +154,7 @@ export function DocumentsTab() {
     const [editingCreditNote, setEditingCreditNote] = useState<any | null>(null)
     const [showEditDialog, setShowEditDialog] = useState(false)
     const [editDialogType, setEditDialogType] = useState<'quote' | 'invoice' | 'credit' | null>(null)
+    const [loading, setLoading] = useState(false)
 
     // Fetch data
     const clientsFetcher = async () => {
@@ -295,6 +296,7 @@ export function DocumentsTab() {
 
     // View document
     const handleViewDocument = async (type: 'quote' | 'invoice' | 'credit', id: string) => {
+        setLoading(true)
         try {
             toast.info('פותח מסמך...')
             let result
@@ -314,11 +316,14 @@ export function DocumentsTab() {
             }
         } catch (error) {
             toast.error('שגיאה בפתיחת המסמך')
+        } finally {
+            setLoading(false)
         }
     }
 
     // Copy link
     const handleCopyLink = async (type: 'quote' | 'invoice' | 'credit', id: string) => {
+        setLoading(true)
         try {
             let result
             if (type === 'quote') {
@@ -357,11 +362,14 @@ export function DocumentsTab() {
             }
         } catch (error) {
             toast.error('שגיאה ביצירת הקישור')
+        } finally {
+            setLoading(false)
         }
     }
 
     // Status change
     const handleStatusChange = async (type: 'quote' | 'invoice', id: string, newStatus: any) => {
+        setLoading(true)
         try {
             if (type === 'quote') {
                 await updateQuoteStatus(id, newStatus)
@@ -373,6 +381,8 @@ export function DocumentsTab() {
             mutateInvoices()
         } catch (error) {
             toast.error('שגיאה בעדכון הסטטוס')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -383,6 +393,7 @@ export function DocumentsTab() {
             'המרת הצעה לחשבונית'
         )) return
 
+        setLoading(true)
         try {
             toast.info('ממיר לחשבונית...')
             const result = await convertQuoteToInvoice(quoteId)
@@ -395,6 +406,8 @@ export function DocumentsTab() {
             }
         } catch (error) {
             toast.error('שגיאה ביצירת החשבונית')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -406,6 +419,7 @@ export function DocumentsTab() {
             'מחיקת מסמך'
         )) return
 
+        setLoading(true)
         try {
             if (type === 'quote') {
                 await deleteQuote(id)
@@ -420,6 +434,8 @@ export function DocumentsTab() {
             mutateCreditNotes()
         } catch (error) {
             toast.error('שגיאה במחיקת המסמך')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -708,8 +724,9 @@ export function DocumentsTab() {
                                                 onClick={() => handleDelete(doc.type, doc.id)}
                                                 className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100"
                                                 title="מחיקה"
+                                                disabled={loading}
                                             >
-                                                <Trash2 className="h-4 w-4" />
+                                                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                                             </Button>
                                         </div>
                                     </div>

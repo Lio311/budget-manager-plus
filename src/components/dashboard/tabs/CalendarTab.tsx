@@ -219,14 +219,19 @@ export function CalendarTab() {
     ]
 
     const togglePaid = async (payment: Payment) => {
-        const result = payment.type === 'bill'
-            ? await toggleBillPaid(payment.id, !payment.isPaid)
-            : await toggleDebtPaid(payment.id, !payment.isPaid)
+        setSubmitting(true)
+        try {
+            const result = payment.type === 'bill'
+                ? await toggleBillPaid(payment.id, !payment.isPaid)
+                : await toggleDebtPaid(payment.id, !payment.isPaid)
 
-        if (result.success) {
-            payment.type === 'bill' ? mutateBills() : mutateDebts()
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן סטטוס', variant: 'destructive' })
+            if (result.success) {
+                payment.type === 'bill' ? mutateBills() : mutateDebts()
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן לעדכן סטטוס', variant: 'destructive' })
+            }
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -305,18 +310,23 @@ export function CalendarTab() {
 
     const handleDeleteEvent = async (id: string) => {
         const confirmed = await confirm('האם אתה בטוח שברצונך למחוק אירוע זה?', 'מחיקת אירוע')
-        if (confirmed) {
+        if (!confirmed) return
+
+        setSubmitting(true)
+        try {
             const result = await deleteWorkEvent(id)
             if (result.success) {
+                toast({ title: 'הצלחה', description: 'האירוע נמחק בהצלחה' })
                 mutateWorkEvents()
                 if (editingEventId === id) {
                     setEditingEventId(null)
                     setNewEvent({ title: '', description: '', startTime: '09:00', endTime: '10:00', clientId: 'none', incomeId: 'none' })
                 }
-                toast({ title: 'נמחק בהצלחה' })
             } else {
-                toast({ title: 'שגיאה במחיקה', variant: 'destructive' })
+                toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק את האירוע', variant: 'destructive' })
             }
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -547,8 +557,14 @@ export function CalendarTab() {
                                         <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleEditEvent(event)}>
                                             <Pencil className="h-3 w-3" />
                                         </Button>
-                                        <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-600" onClick={() => handleDeleteEvent(event.id)}>
-                                            <Trash2 className="h-3 w-3" />
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-6 w-6 text-red-500 hover:text-red-600"
+                                            onClick={() => handleDeleteEvent(event.id)}
+                                            disabled={submitting}
+                                        >
+                                            {submitting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                                         </Button>
                                     </div>
                                 </div>
@@ -668,6 +684,7 @@ export function CalendarTab() {
                 payments={selectedDay ? getPaymentsForDay(selectedDay) : []}
                 onTogglePaid={togglePaid}
                 onSelectAction={handleQuickAddAction}
+                isSubmitting={submitting}
             />
 
             {/* --- Local Add Dialogs --- */}

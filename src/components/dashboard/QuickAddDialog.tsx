@@ -1,7 +1,7 @@
 'use client'
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { TrendingDown, TrendingUp, PiggyBank, CreditCard, Receipt } from 'lucide-react'
+import { TrendingDown, TrendingUp, PiggyBank, CreditCard, Receipt, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { formatCurrency } from '@/lib/utils'
 
@@ -23,9 +23,10 @@ interface QuickAddDialogProps {
     payments?: Payment[]
     onTogglePaid?: (payment: Payment) => void
     onSelectAction: (action: 'expense' | 'income' | 'saving' | 'debt' | 'bill') => void
+    isSubmitting?: boolean
 }
 
-export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, payments = [], onTogglePaid, onSelectAction }: QuickAddDialogProps) {
+export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, payments = [], onTogglePaid, onSelectAction, isSubmitting }: QuickAddDialogProps) {
     const actions = [
         {
             type: 'expense' as const,
@@ -115,7 +116,10 @@ export function QuickAddDialog({ open, onOpenChange, selectedDay, isBusiness, pa
                                             <p className="text-xs text-muted-foreground">{formatCurrency(payment.amount, payment.currency)}</p>
                                         </div>
                                         {(!payment.isPaid && (payment.type === 'bill' || payment.type === 'debt') && onTogglePaid) && (
-                                            <Button size="sm" onClick={() => onTogglePaid(payment)}>סמן כשולם</Button>
+                                            <Button size="sm" onClick={() => onTogglePaid(payment)} disabled={isSubmitting}>
+                                                {isSubmitting ? <Loader2 className="h-3 w-3 animate-spin ml-1" /> : null}
+                                                סמן כשולם
+                                            </Button>
                                         )}
                                     </div>
                                 </div>

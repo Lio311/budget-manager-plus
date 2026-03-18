@@ -279,34 +279,36 @@ export function IncomeTab() {
         const confirmed = await confirm('האם אתה בטוח שברצונך למחוק הכנסה זו?', 'מחיקת הכנסה')
         if (!confirmed) return
 
+        setSubmitting(true)
         try {
             await optimisticDeleteIncome(income.id)
             globalMutate(key => Array.isArray(key) && key[0] === 'overview')
         } catch (error) {
             // Error already handled by hook
+        } finally {
+            setSubmitting(false)
         }
     }
-
-    function handleEdit(income: any) {
-        setEditingIncome(income)
-        setIsEditMobileOpen(true)
-    }
-
-    // Removed handleUpdate and executeUpdate as they are now handled by IncomeForm
-
 
     const handleRecurrenceConfirm = async (mode: 'SINGLE' | 'FUTURE') => {
         setRecurrenceDialogOpen(false)
         if (!pendingAction) return
 
         if (pendingAction.type === 'delete') {
-            const result = await deleteIncome(pendingAction.id, mode)
-            if (result.success) {
-                toast({ title: 'הצלחה', description: 'ההכנסה נמחקה בהצלחה' })
-                await mutateIncomes()
-                globalMutate(key => Array.isArray(key) && key[0] === 'overview')
-            } else {
-                toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הכנסה', variant: 'destructive' })
+            setSubmitting(true)
+            try {
+                const result = await deleteIncome(pendingAction.id, mode)
+                if (result.success) {
+                    toast({ title: 'הצלחה', description: 'ההכנסה נמחקה בהצלחה' })
+                    await mutateIncomes()
+                    globalMutate(key => Array.isArray(key) && key[0] === 'overview')
+                } else {
+                    toast({ title: 'שגיאה', description: result.error || 'לא ניתן למחוק הכנסה', variant: 'destructive' })
+                }
+            } finally {
+                setSubmitting(false)
+                setPendingAction(null)
+                setRecurrenceDialogOpen(false)
             }
         } else if (pendingAction.type === 'edit') {
             // Re-open edit dialog if confirmed
@@ -585,20 +587,27 @@ export function IncomeTab() {
                                             <div className="flex items-center justify-end gap-2 w-full mt-1">
                                                 {/* Status Badge */}
                                                 <button
+                                                    disabled={submitting}
                                                     onClick={async (e) => {
                                                         e.stopPropagation()
-                                                        const newStatus = inc.status === 'PENDING' ? 'PAID' : 'PENDING'
-                                                        const res = await toggleIncomeStatus(inc.id, newStatus)
-                                                        if (res.success) {
-                                                            mutateIncomes()
-                                                            toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
+                                                        setSubmitting(true)
+                                                        try {
+                                                            const newStatus = inc.status === 'PENDING' ? 'PAID' : 'PENDING'
+                                                            const res = await toggleIncomeStatus(inc.id, newStatus)
+                                                            if (res.success) {
+                                                                mutateIncomes()
+                                                                toast({ title: newStatus === 'PAID' ? 'סומן כשולם' : 'סומן כבהמתנה', variant: 'default' })
+                                                            }
+                                                        } finally {
+                                                            setSubmitting(false)
                                                         }
                                                     }}
-                                                    className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${inc.status === 'PENDING'
+                                                    className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${submitting ? 'opacity-50 cursor-not-allowed' : ''} ${inc.status === 'PENDING'
                                                         ? 'bg-yellow-50 text-yellow-600 border-yellow-200 hover:bg-yellow-100'
                                                         : 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
                                                         }`}
                                                 >
+                                                    {submitting ? <Loader2 className="h-3 w-3 animate-spin inline-block ml-1" /> : null}
                                                     {inc.status === 'PENDING' ? 'בהמתנה לתשלום' : 'שולם'}
                                                 </button>
 
@@ -610,8 +619,8 @@ export function IncomeTab() {
                                                     <Button variant="ghost" size="icon" onClick={() => handleEdit(inc)} className="h-7 w-7 text-blue-500 hover:bg-blue-50 rounded-full">
                                                         <Pencil className="h-3.5 w-3.5" />
                                                     </Button>
-                                                    <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(inc)}>
-                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                    <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full" onClick={() => handleDelete(inc)} disabled={submitting}>
+                                                        {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                                                     </Button>
                                                 </div>
                                             </div>
