@@ -243,6 +243,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
             return
         }
         setErrors({})
+        setSubmitting(true)
 
         if (newIncome.isRecurring && newIncome.recurringEndDate) {
             const start = new Date(newIncome.date || new Date())
@@ -251,7 +252,6 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
             end.setHours(0, 0, 0, 0)
             if (end < start) {
                 toast({ title: 'שגיאה', description: 'תאריך סיום חייב להיות מאוחר יותר או שווה לתאריך ההכנסה', variant: 'destructive' })
-                setSubmitting(false)
                 return
             }
         }

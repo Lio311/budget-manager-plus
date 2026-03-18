@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, FileText, Download, Trash2, Eye, Link as LinkIcon } from 'lucide-react'
+import { Plus, Search, FileText, Download, Trash2, Eye, Link as LinkIcon, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
 import { getCreditNotes, deleteCreditNote, generateCreditNoteLink } from '@/lib/actions/credit-notes'
@@ -36,6 +36,7 @@ export function CreditNotesTab() {
     const [isMobileOpen, setIsMobileOpen] = useState(false)
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [creditNoteToDelete, setCreditNoteToDelete] = useState<string | null>(null)
+    const [loadingLink, setLoadingLink] = useState<string | null>(null)
 
     const creditNotesFetcher = async () => {
         const result = await getCreditNotes(budgetType)
@@ -105,6 +106,7 @@ export function CreditNotesTab() {
     }
 
     const handleViewCreditNote = async (creditNoteId: string) => {
+        setLoadingLink(creditNoteId)
         try {
             toast.info('פותח חשבונית זיכוי...')
             const result = await generateCreditNoteLink(creditNoteId)
@@ -115,10 +117,13 @@ export function CreditNotesTab() {
             }
         } catch (error) {
             toast.error('שגיאה בפתיחת חשבונית זיכוי')
+        } finally {
+            setLoadingLink(null)
         }
     }
 
     const handleCopyLink = async (creditNoteId: string) => {
+        setLoadingLink(creditNoteId)
         try {
             const result = await generateCreditNoteLink(creditNoteId)
             if (result.success && result.token) {
@@ -146,6 +151,8 @@ export function CreditNotesTab() {
             }
         } catch (error) {
             toast.error('שגיאה ביצירת הקישור')
+        } finally {
+            setLoadingLink(null)
         }
     }
 
@@ -217,12 +224,24 @@ export function CreditNotesTab() {
 
                                 {/* Actions */}
                                 <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" onClick={() => handleCopyLink(creditNote.id)} className="gap-2 text-orange-600 border-orange-200 bg-orange-50 hover:bg-orange-100">
-                                        <LinkIcon className="h-4 w-4" />
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleCopyLink(creditNote.id)}
+                                        className="gap-2 text-orange-600 border-orange-200 bg-orange-50 hover:bg-orange-100"
+                                        disabled={loadingLink === creditNote.id}
+                                    >
+                                        {loadingLink === creditNote.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <LinkIcon className="h-4 w-4" />}
                                         <span className="hidden md:inline">קישור</span>
                                     </Button>
-                                    <Button variant="outline" size="icon" onClick={() => handleViewCreditNote(creditNote.id)} className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100">
-                                        <Eye className="h-4 w-4" />
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => handleViewCreditNote(creditNote.id)}
+                                        className="text-blue-600 border-blue-200 bg-blue-50 hover:bg-blue-100"
+                                        disabled={loadingLink === creditNote.id}
+                                    >
+                                        {loadingLink === creditNote.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
                                     </Button>
                                     <Button variant="outline" size="icon" onClick={() => handleDelete(creditNote.id)} className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100">
                                         <Trash2 className="h-4 w-4" />

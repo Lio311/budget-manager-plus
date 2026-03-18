@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useDemo } from '@/contexts/DemoContext'
 import useSWR from 'swr'
-import { Plus, FolderOpen, ArrowUpCircle, ArrowDownCircle, Wallet, Pencil, Trash2, Info } from 'lucide-react'
+import { Plus, FolderOpen, ArrowUpCircle, ArrowDownCircle, Wallet, Pencil, Trash2, Info, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -348,7 +348,8 @@ export function ProjectsTab() {
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsAddOpen(false)}>ביטול</Button>
                         <Button onClick={handleAdd} disabled={!name.trim() || submitting}>
-                            {submitting ? 'יוצר...' : 'צור פרויקט'}
+                            {submitting ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
+                            צור פרויקט
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -394,7 +395,8 @@ export function ProjectsTab() {
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsEditOpen(false)}>ביטול</Button>
                         <Button onClick={handleEdit} disabled={!name.trim() || submitting}>
-                            {submitting ? 'שומר...' : 'שמור שינויים'}
+                            {submitting ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
+                            שמור שינויים
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Plus, Check, ChevronDown } from 'lucide-react'
+import { Plus, Check, ChevronDown, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import useSWR from 'swr'
@@ -215,11 +215,11 @@ export function PaymentMethodSelector({ value, onChange, className, color = 'pur
                                         onClick={handleCustomSubmit}
                                         disabled={!customValue.trim() || saving}
                                         className={cn(
-                                            "flex-1 text-white text-xs py-1.5 rounded disabled:opacity-50",
+                                            "flex-1 text-white text-xs py-1.5 rounded disabled:opacity-50 flex items-center justify-center gap-2",
                                             styles.button
                                         )}
                                     >
-                                        {saving ? 'שומר...' : 'הוסף'}
+                                        {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : 'הוסף'}
                                     </button>
                                     <button
                                         onClick={() => setIsCustom(false)}

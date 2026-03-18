@@ -100,6 +100,7 @@ export function IncomeTab() {
     const [taxRate, setTaxRate] = useState(0)
     const [isTaxDialogOpen, setIsTaxDialogOpen] = useState(false)
     const [taxRateInput, setTaxRateInput] = useState('0')
+    const [submittingTaxRate, setSubmittingTaxRate] = useState(false)
 
     useEffect(() => {
         if (isBusiness) {
@@ -118,31 +119,34 @@ export function IncomeTab() {
         const rate = parseFloat(taxRateInput)
         if (isNaN(rate) || rate < 0 || rate > 100) return
 
-        const current = await getBusinessProfile()
+        setSubmittingTaxRate(true)
+        try {
+            const current = await getBusinessProfile()
 
-        // Prepare data for update. If profile exists, use it. If not, use defaults.
-        const currentData = current.success && current.data ? current.data : null
+            // Prepare data for update. If profile exists, use it. If not, use defaults.
+            const currentData = current.success && current.data ? current.data : null
 
-        const updateData = {
-            companyName: currentData?.companyName || 'העסק שלי',
-            vatStatus: currentData?.vatStatus || 'EXEMPT',
-            taxRate: rate,
-            companyId: currentData?.companyId || undefined, // undefined will be filtered by validData logic probably, but upsert needs specific handling?
-            // Actually our action uses specific fields. Let's pass what we have.
-            // If new, these nulls are fine or defaults kick in.
-            address: currentData?.address || undefined,
-            phone: currentData?.phone || undefined,
-            email: currentData?.email || undefined,
-            signature: currentData?.signatureUrl || undefined
-        }
+            const updateData = {
+                companyName: currentData?.companyName || 'העסק שלי',
+                vatStatus: currentData?.vatStatus || 'EXEMPT',
+                taxRate: rate,
+                companyId: currentData?.companyId || undefined,
+                address: currentData?.address || undefined,
+                phone: currentData?.phone || undefined,
+                email: currentData?.email || undefined,
+                signature: currentData?.signatureUrl || undefined
+            }
 
-        const update = await updateBusinessProfile(updateData)
-        if (update.success) {
-            setTaxRate(rate)
-            setIsTaxDialogOpen(false)
-            toast({ title: 'הגדרות מס עודכנו' })
-        } else {
-            toast({ title: 'שגיאה', description: update.error || 'נכשל בעדכון ההגדרות', variant: 'destructive' })
+            const update = await updateBusinessProfile(updateData)
+            if (update.success) {
+                setTaxRate(rate)
+                setIsTaxDialogOpen(false)
+                toast({ title: 'הגדרות מס עודכנו' })
+            } else {
+                toast({ title: 'שגיאה', description: update.error || 'נכשל בעדכון ההגדרות', variant: 'destructive' })
+            }
+        } finally {
+            setSubmittingTaxRate(false)
         }
     }
 
@@ -388,7 +392,20 @@ export function IncomeTab() {
                                         </div>
                                         <p className="text-xs text-gray-500 mt-1">אחוז זה יופחת אוטומטית מההכנסה הנקייה בחישוב הסופי.</p>
                                     </div>
-                                    <Button onClick={handleUpdateTaxRate} className="w-full bg-green-600 hover:bg-green-700 text-white">שמור</Button>
+                                    <Button
+                                        onClick={handleUpdateTaxRate}
+                                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                                        disabled={submittingTaxRate}
+                                    >
+                                        {submittingTaxRate ? (
+                                            <>
+                                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                                שומר...
+                                            </>
+                                        ) : (
+                                            'שמור'
+                                        )}
+                                    </Button>
                                 </div>
                             </DialogContent>
                         </Dialog>

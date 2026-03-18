@@ -66,6 +66,7 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
     async function handleUpdate(id: string) {
         if (!editName.trim()) return
 
+        setIsSubmitting(true)
         try {
             const result = await updateCategory(id, {
                 name: editName.trim(),
@@ -81,6 +82,8 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
             }
         } catch (error) {
             toast.error('שגיאה בעדכון')
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -88,6 +91,7 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
         const confirmed = await confirm('האם ברצונך למחוק את הקטגוריה? כל ההוצאות המקושרות לה ימחקו לאחר מכן', 'מחיקת קטגוריה')
         if (!confirmed) return
 
+        setIsSubmitting(true)
         try {
             const result = await deleteCategory(id)
             if (result.success) {
@@ -98,6 +102,8 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
             }
         } catch (error) {
             toast.error('שגיאה במחיקה')
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -163,8 +169,8 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
                                         autoFocus
                                     />
                                     <div className="flex items-center gap-1">
-                                        <Button size="icon" variant="ghost" onClick={() => handleUpdate(cat.id)} className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50">
-                                            <Check className="h-4 w-4" />
+                                        <Button size="icon" variant="ghost" onClick={() => handleUpdate(cat.id)} disabled={isSubmitting} className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50">
+                                            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                         </Button>
                                         <Button size="icon" variant="ghost" onClick={() => setEditingId(null)} className="h-8 w-8 text-gray-400 hover:text-gray-600">
                                             <X className="h-4 w-4" />
@@ -186,8 +192,8 @@ export function CategoryManagementDialog({ categories, type, scope = 'PERSONAL',
                                             <Button size="icon" variant="ghost" onClick={() => startEdit(cat)} className="h-7 w-7 text-gray-400 hover:text-blue-600">
                                                 <Pencil className="h-3.5 w-3.5" />
                                             </Button>
-                                            <Button size="icon" variant="ghost" onClick={() => handleDelete(cat.id)} className="h-7 w-7 text-gray-400 hover:text-red-600">
-                                                <Trash2 className="h-3.5 w-3.5" />
+                                            <Button size="icon" variant="ghost" onClick={() => handleDelete(cat.id)} disabled={isSubmitting} className="h-7 w-7 text-gray-400 hover:text-red-600">
+                                                {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                                             </Button>
                                         </div>
                                     )}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw, Check, Upload, FileSpreadsheet, FileText, Receipt, CreditCard, Info } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, MapPin, Settings, ArrowUpDown, LayoutGrid, List, RefreshCw, Check, Upload, FileSpreadsheet, FileText, Receipt, CreditCard, Info, Loader2 } from 'lucide-react'
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command"
 import { read, utils } from 'xlsx'
 import { importClients } from '@/lib/actions/import-clients'
@@ -62,6 +62,7 @@ export function ClientsTab() {
     const [selectedClientDetails, setSelectedClientDetails] = useState<any>(null)
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
     const [showAdvanced, setShowAdvanced] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
     const [formData, setFormData] = useState<ClientFormData>({
         name: '',
         email: '',
@@ -280,13 +281,12 @@ export function ClientsTab() {
             return
         }
 
+        setSubmitting(true)
         try {
             if (editingClient) {
                 const result = await updateClient(editingClient.id, formData)
                 if (result.success) {
                     toast.success('לקוח עודכן בהצלחה')
-                    setShowForm(false)
-                    setEditingClient(null)
                     setShowForm(false)
                     setEditingClient(null)
                     setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', isActive: true, city: '', bankName: '', bankBranch: '', bankAccount: '' })
@@ -297,11 +297,12 @@ export function ClientsTab() {
             } else {
                 await optimisticCreateClient(formData)
                 setShowForm(false)
-                setShowForm(false)
                 setFormData({ name: '', email: '', phone: '', taxId: '', address: '', notes: '', packageName: '', subscriptionType: '', subscriptionPrice: '', subscriptionStart: undefined, subscriptionEnd: undefined, subscriptionStatus: '', eventLocation: '', subscriptionColor: '#3B82F6', city: '', bankName: '', bankBranch: '', bankAccount: '' })
             }
         } catch (error) {
             // Error handled by hook or update logic
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -991,7 +992,8 @@ export function ClientsTab() {
                             )}
                         </div>
                         <div className="flex gap-2">
-                            <Button type="submit" className="bg-pink-600 hover:bg-pink-700">
+                            <Button type="submit" className="bg-pink-600 hover:bg-pink-700" disabled={submitting}>
+                                {submitting && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
                                 {editingClient ? 'עדכן' : 'הוסף'}
                             </Button>
                             <Button

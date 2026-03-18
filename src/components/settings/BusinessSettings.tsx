@@ -244,7 +244,11 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                             disabled={uploading}
                             className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 w-48 justify-center"
                         >
-                            <Upload className="h-4 w-4" />
+                            {uploading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <Upload className="h-4 w-4" />
+                            )}
                             {uploading ? 'מעלה...' : 'העלה לוגו'}
                         </Button>
                     </div>
@@ -392,7 +396,14 @@ export function BusinessSettings({ onSuccess }: { onSuccess?: () => void }) {
                     className="bg-green-600 hover:bg-green-700 w-full"
                     dir="rtl"
                 >
-                    {saving ? 'שומר שינויים...' : 'שמור פרטים'}
+                    {saving ? (
+                        <>
+                            <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                            שומר שינויים...
+                        </>
+                    ) : (
+                        'שמור פרטים'
+                    )}
                 </Button>
             </div>
         </div>

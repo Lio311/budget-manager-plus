@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Target, TrendingUp, DollarSign, Award, Edit2, Check, X } from 'lucide-react'
+import { Target, TrendingUp, DollarSign, Award, Edit2, Check, X, Loader2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { useBudget } from '@/contexts/BudgetContext'
 import { getSavingsGoals, updateCategoryGoalTarget, SavingsGoalsData } from '@/lib/actions/savings-goals'
@@ -23,6 +23,7 @@ export function SavingsGoalsTab() {
     const [editValue, setEditValue] = useState('')
     const [hasShownWarning, setHasShownWarning] = useState(false)
     const [showTutorial, setShowTutorial] = useState(false)
+    const [submittingTarget, setSubmittingTarget] = useState<string | null>(null)
     const { isDemo, data: demoData, interceptAction } = useDemo()
 
     // Fetch savings goals data
@@ -89,14 +90,19 @@ export function SavingsGoalsTab() {
             return
         }
 
-        const result = await updateCategoryGoalTarget(category, targetAmount, month, year, budgetType)
+        setSubmittingTarget(category)
+        try {
+            const result = await updateCategoryGoalTarget(category, targetAmount, month, year, budgetType)
 
-        if (result.success) {
-            toast({ title: 'הצלחה', description: 'היעד עודכן בהצלחה' })
-            setEditingCategory(null)
-            mutate(['savingsGoals', month, year, budgetType])
-        } else {
-            toast({ title: 'שגיאה', description: result.error || 'שגיאה בעדכון היעד', variant: 'destructive' })
+            if (result.success) {
+                toast({ title: 'הצלחה', description: 'היעד עודכן בהצלחה' })
+                setEditingCategory(null)
+                mutate(['savingsGoals', month, year, budgetType])
+            } else {
+                toast({ title: 'שגיאה', description: result.error || 'שגיאה בעדכון היעד', variant: 'destructive' })
+            }
+        } finally {
+            setSubmittingTarget(null)
         }
     }
 
@@ -271,8 +277,13 @@ export function SavingsGoalsTab() {
                                                         variant="ghost"
                                                         className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
                                                         onClick={() => handleSaveTarget(goal.category)}
+                                                        disabled={submittingTarget === goal.category}
                                                     >
-                                                        <Check className="h-4 w-4" />
+                                                        {submittingTarget === goal.category ? (
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        ) : (
+                                                            <Check className="h-4 w-4" />
+                                                        )}
                                                     </Button>
                                                     <Button
                                                         size="sm"

@@ -23,6 +23,7 @@ interface QuoteFormProps {
 
 export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
     const { budgetType } = useBudget()
+    const [submitting, setSubmitting] = useState(false)
     const [loadingNumber, setLoadingNumber] = useState(false)
     const [errors, setErrors] = useState<Record<string, boolean>>({})
     const [editingItemId, setEditingItemId] = useState<string | null>(null)
@@ -125,13 +126,14 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
             toast.error('נא למלא את שדות החובה המסומנים')
             return
         }
+        setSubmitting(true)
         setErrors({})
 
         try {
             await optimisticCreateQuote(formData)
             onSuccess()
-        } catch (error) {
-            // Error managed by hook
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -389,8 +391,9 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                         ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
                         : 'bg-yellow-500 hover:bg-yellow-600 text-white'
                         }`}
-                    disabled={!formData.clientId || !formData.items || formData.items.length === 0}
+                    disabled={submitting || !formData.clientId || !formData.items || formData.items.length === 0}
                 >
+                    {submitting ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
                     {isEditing ? 'עדכן הצעת מחיר' : 'צור הצעת מחיר'}
                 </Button>
             </div>

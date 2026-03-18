@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { uploadBusinessLogo, deleteBusinessLogo, getBusinessProfile } from '@/lib/actions/business-settings'
 import { toast } from 'sonner'
@@ -136,8 +136,12 @@ export function BusinessLogoUpload() {
                     disabled={uploading}
                     className="bg-blue-600 hover:bg-blue-700"
                 >
+                    {uploading ? (
+                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                    ) : (
+                        <Upload className="h-4 w-4 ml-2" />
+                    )}
                     {uploading ? 'מעלה...' : 'העלה לוגו'}
-                    <Upload className="h-4 w-4 mr-2" />
                 </Button>
             )}
         </div>

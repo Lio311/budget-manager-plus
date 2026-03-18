@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, ArrowUpDown, LayoutGrid, List, Info, Settings } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, Phone, Mail, Building2, ChevronDown, ArrowUpDown, LayoutGrid, List, Info, Settings, Loader2 } from 'lucide-react'
 import { format, differenceInDays, startOfDay } from 'date-fns'
 import { cn, formatIsraeliPhoneNumber, formatCurrency } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -47,6 +47,7 @@ export function SuppliersTab() {
     const [showPackagesManager, setShowPackagesManager] = useState(false)
     const [showAdvanced, setShowAdvanced] = useState(false)
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+    const [submitting, setSubmitting] = useState(false)
     const [sortMethod, setSortMethod] = useState<'CREATED_AT' | 'EXPENSES' | 'NAME' | 'STATUS' | 'PACKAGE'>('NAME')
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
@@ -219,6 +220,7 @@ export function SuppliersTab() {
             subscriptionColor: formData.subscriptionColor || undefined
         }
 
+        setSubmitting(true)
         try {
             if (editingSupplier) {
                 const result = await updateSupplier(editingSupplier.id, payload)
@@ -245,6 +247,8 @@ export function SuppliersTab() {
             }
         } catch (error) {
             // Error handled by hook or update logic
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -692,7 +696,8 @@ export function SuppliersTab() {
                         </div>
 
                         <div className="flex gap-2">
-                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={submitting}>
+                                {submitting && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
                                 {editingSupplier ? 'עדכן' : 'הוסף'}
                             </Button>
                             <Button

@@ -91,6 +91,7 @@ export function CalendarTab() {
         incomeId: 'none'
     })
     const [errors, setErrors] = useState<Record<string, boolean>>({})
+    const [submitting, setSubmitting] = useState(false)
     const [isQuickAddOpen, setIsQuickAddOpen] = useState(false)
     const [showTutorial, setShowTutorial] = useState(false)
     const router = useRouter()
@@ -251,6 +252,7 @@ export function CalendarTab() {
             return
         }
         setErrors({})
+        setSubmitting(true)
 
         let result;
 
@@ -286,6 +288,7 @@ export function CalendarTab() {
         } else {
             toast({ title: 'שגיאה', description: 'שגיאה בהוספת האירוע', variant: 'destructive' })
         }
+        setSubmitting(false)
     }
 
     const handleEditEvent = (event: WorkEvent) => {
@@ -647,7 +650,10 @@ export function CalendarTab() {
 
                         <DialogFooter>
                             <Button variant="outline" onClick={() => setIsEventDialogOpen(false)}>ביטול</Button>
-                            <Button onClick={handleAddEvent}>{editingEventId ? 'עדכן אירוע' : 'שמור אירוע'}</Button>
+                            <Button onClick={handleAddEvent} disabled={submitting}>
+                                {submitting ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
+                                {editingEventId ? 'עדכן אירוע' : 'שמור אירוע'}
+                            </Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>

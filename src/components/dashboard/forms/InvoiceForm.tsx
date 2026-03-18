@@ -86,6 +86,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
     const [isGuestClient, setIsGuestClient] = useState(!!initialData?.guestClientName)
     const [guestClientName, setGuestClientName] = useState(initialData?.guestClientName || '')
 
+    const [submitting, setSubmitting] = useState(false)
     const [loadingNumber, setLoadingNumber] = useState(false)
     const { year, month } = useBudget()
 
@@ -267,6 +268,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                 return
             }
         }
+        setSubmitting(true)
         setErrors({})
 
         try {
@@ -293,8 +295,8 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                 })
             }
             onSuccess()
-        } catch (error) {
-            // Error managed by hook
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -674,8 +676,9 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
                         ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400'
                         : 'bg-purple-600 hover:bg-purple-700'
                         }`}
-                    disabled={((!isGuestClient && !formData.clientId) || (isGuestClient && !guestClientName)) || !formData.invoiceNumber || lineItems.length === 0 || ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice)}
+                    disabled={submitting || ((!isGuestClient && !formData.clientId) || (isGuestClient && !guestClientName)) || !formData.invoiceNumber || lineItems.length === 0 || ((selectedIncomeId === 'none' || !selectedIncomeId) && !formData.createIncomeFromInvoice)}
                 >
+                    {submitting ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
                     צור מסמך
                 </Button>
             </div>

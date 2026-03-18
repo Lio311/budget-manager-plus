@@ -50,16 +50,22 @@ function BudgetEditPopover({
     onCommit
 }: {
     initialLimit: number,
-    onCommit: (val: number) => void
+    onCommit: (val: number) => Promise<void> | void
 }) {
     const [open, setOpen] = useState(false)
     const [val, setVal] = useState(String(initialLimit))
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const num = parseFloat(val)
         if (!isNaN(num)) {
-            onCommit(num)
-            setOpen(false)
+            setIsSubmitting(true)
+            try {
+                await onCommit(num)
+                setOpen(false)
+            } finally {
+                setIsSubmitting(false)
+            }
         }
     }
 
@@ -82,8 +88,8 @@ function BudgetEditPopover({
                                 if (e.key === 'Enter') handleSave()
                             }}
                         />
-                        <Button size="sm" className="h-8 w-8 p-0" onClick={handleSave}>
-                            <Save className="h-3 w-3" />
+                        <Button size="sm" className="h-8 w-8 p-0" onClick={handleSave} disabled={isSubmitting}>
+                            {isSubmitting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
                         </Button>
                     </div>
                 </div>
@@ -320,7 +326,7 @@ export function BudgetLimitsTab() {
                                             {/* Edit Button */}
                                             <BudgetEditPopover
                                                 initialLimit={budget.limit}
-                                                onCommit={(val) => handleLimitCommit(budget.categoryId, [val])}
+                                                onCommit={async (val) => await handleLimitCommit(budget.categoryId, [val])}
                                             />
 
                                             {/* Delete Button */}

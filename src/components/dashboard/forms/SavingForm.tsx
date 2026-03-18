@@ -158,6 +158,7 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
                 return
             }
         }
+        setSubmitting(true)
 
         const savingData = {
             category: newSaving.category,
@@ -214,6 +215,8 @@ export function SavingForm({ categories, onCategoriesChange, isMobile, onSuccess
             }
         } catch (error) {
             toast({ title: 'שגיאה', description: 'אירעה שגיאה', variant: 'destructive' })
+        } finally {
+            setSubmitting(false)
         }
     }
 
