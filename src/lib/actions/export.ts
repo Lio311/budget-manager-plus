@@ -17,7 +17,7 @@ export async function getExportData(type: ExportType) {
         switch (type) {
             case 'clients':
                 data = await db.client.findMany({
-                    where: { userId },
+                    where: { userId, isActive: true, isDeleted: false },
                     orderBy: { name: 'asc' }
                 })
                 break;
@@ -29,21 +29,39 @@ export async function getExportData(type: ExportType) {
                 break
             case 'invoices':
                 data = await db.invoice.findMany({
-                    where: { userId },
+                    where: {
+                        userId,
+                        OR: [
+                            { clientId: null },
+                            { client: { isActive: true, isDeleted: false } }
+                        ]
+                    },
                     include: { client: true },
                     orderBy: { issueDate: 'desc' }
                 })
-                break
+                break;
             case 'incomes':
                 data = await db.income.findMany({
-                    where: { budget: { userId } },
+                    where: {
+                        budget: { userId },
+                        OR: [
+                            { clientId: null },
+                            { client: { isActive: true, isDeleted: false } }
+                        ]
+                    },
                     include: { client: true, invoice: true },
                     orderBy: { date: 'desc' }
                 })
-                break
+                break;
             case 'expenses':
                 data = await db.expense.findMany({
-                    where: { budget: { userId } },
+                    where: {
+                        budget: { userId },
+                        OR: [
+                            { clientId: null },
+                            { client: { isActive: true, isDeleted: false } }
+                        ]
+                    },
                     orderBy: { date: 'desc' },
                     select: {
                         id: true,
@@ -56,7 +74,7 @@ export async function getExportData(type: ExportType) {
                         client: { select: { name: true } }
                     }
                 })
-                break
+                break;
             case 'suppliers':
                 data = await db.supplier.findMany({
                     where: { userId },

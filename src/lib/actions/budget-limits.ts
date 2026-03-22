@@ -56,7 +56,11 @@ export async function getCategoryBudgets(month: number, year: number): Promise<G
         const expenses = await db.expense.groupBy({
             by: ['category'],
             where: {
-                budgetId: budget.id
+                budgetId: budget.id,
+                OR: [
+                    { clientId: null },
+                    { client: { isActive: true, isDeleted: false } }
+                ]
             },
             _sum: {
                 amount: true
@@ -106,7 +110,9 @@ export async function getCategoryBudgets(month: number, year: number): Promise<G
             ],
             take: 4,
             include: {
-                incomes: true
+                incomes: {
+                    where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] }
+                }
             }
         })
 
@@ -237,7 +243,9 @@ export async function getSmartRecommendations(month: number, year: number) {
                 ]
             },
             include: {
-                expenses: true
+                expenses: {
+                    where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] }
+                }
             }
         })
 

@@ -22,7 +22,11 @@ export async function getWorkEvents(month: number, year: number) {
                 start: {
                     gte: startDate,
                     lte: endDate
-                }
+                },
+                OR: [
+                    { clientId: null },
+                    { client: { isActive: true, isDeleted: false } }
+                ]
             },
             include: {
                 client: { select: { id: true, name: true } },

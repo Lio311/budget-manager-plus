@@ -76,7 +76,10 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                         where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
                         select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, status: true, workTime: true } 
                     },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
+                    expenses: { 
+                        where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
+                        select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } 
+                    },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },
@@ -96,7 +99,10 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                         where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
                         select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, status: true, workTime: true } 
                     },
-                    expenses: { select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } },
+                    expenses: { 
+                        where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
+                        select: { id: true, description: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, isDeductible: true } 
+                    },
                     bills: { select: { id: true, name: true, amount: true, currency: true, isPaid: true } },
                     debts: { select: { id: true, creditor: true, monthlyPayment: true, currency: true, isPaid: true } },
                     savings: { select: { id: true, category: true, monthlyDeposit: true, currency: true } },
@@ -124,10 +130,10 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
 
             const [currentClients, prevClients] = await Promise.all([
                 db.client.count({
-                    where: { userId, createdAt: { gte: startDate, lt: endDate } }
+                    where: { userId, isActive: true, isDeleted: false, createdAt: { gte: startDate, lt: endDate } }
                 }),
                 db.client.count({
-                    where: { userId, createdAt: { gte: prevStartDate, lt: prevEndDate } }
+                    where: { userId, isActive: true, isDeleted: false, createdAt: { gte: prevStartDate, lt: prevEndDate } }
                 })
             ])
             newClientsCount = currentClients
@@ -235,7 +241,10 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                     where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
                     select: { amount: true, currency: true } 
                 },
-                expenses: { select: { amount: true, currency: true } },
+                expenses: { 
+                    where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
+                    select: { amount: true, currency: true } 
+                },
                 bills: { select: { amount: true, currency: true } },
                 debts: { select: { monthlyPayment: true, currency: true } },
                 // @ts-ignore

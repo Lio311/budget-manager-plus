@@ -24,7 +24,13 @@ export async function getCreditNotes(scope: string = 'BUSINESS') {
         const creditNotes = await db.creditNote.findMany({
             where: {
                 userId,
-                scope
+                scope,
+                invoice: {
+                    OR: [
+                        { clientId: null },
+                        { client: { isActive: true, isDeleted: false } }
+                    ]
+                }
             },
             include: {
                 invoice: {

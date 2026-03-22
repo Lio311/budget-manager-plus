@@ -23,7 +23,11 @@ export async function generateMonthlyConsolidatedPDF(month: number, year: number
                 },
                 status: {
                     in: ['PAID', 'SIGNED', 'SENT'] // Include relevant invoices
-                }
+                },
+                OR: [
+                    { clientId: null },
+                    { client: { isActive: true, isDeleted: false } }
+                ]
             },
             include: {
                 client: true,

@@ -60,10 +60,20 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
         const invoices = await db.invoice.findMany({
             where: {
                 userId,
-                OR: [
-                    { status: 'SIGNED' },
-                    { status: 'PAID' },
-                    { isSigned: true }
+                AND: [
+                    {
+                        OR: [
+                            { status: 'SIGNED' },
+                            { status: 'PAID' },
+                            { isSigned: true }
+                        ]
+                    },
+                    {
+                        OR: [
+                            { clientId: null },
+                            { client: { isActive: true, isDeleted: false } }
+                        ]
+                    }
                 ],
                 issueDate: {
                     gte: startDate,
@@ -80,6 +90,12 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
                 issueDate: {
                     gte: startDate,
                     lte: endDate
+                },
+                invoice: {
+                    OR: [
+                        { clientId: null },
+                        { client: { isActive: true, isDeleted: false } }
+                    ]
                 }
             },
             include: { invoice: { include: { client: true } } }
@@ -203,7 +219,11 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
                     gte: startDate,
                     lte: endDate
                 },
-                invoiceId: null // Only fetch incomes NOT already counted via invoices
+                invoiceId: null, // Only fetch incomes NOT already counted via invoices
+                OR: [
+                    { clientId: null },
+                    { client: { isActive: true, isDeleted: false } }
+                ]
             },
             include: { client: true }
         })
