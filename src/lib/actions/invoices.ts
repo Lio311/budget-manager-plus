@@ -74,7 +74,7 @@ export async function getInvoices(scope: string = 'BUSINESS') {
                 scope,
                 OR: [
                     { clientId: null },
-                    { client: { isDeleted: false } }
+                    { client: { isActive: true, isDeleted: false } }
                 ]
             },
             include: {

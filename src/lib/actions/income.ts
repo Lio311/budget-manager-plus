@@ -21,7 +21,7 @@ export async function getIncomes(month: number, year: number, type: 'PERSONAL' |
                 budgetId: budget.id,
                 OR: [
                     { clientId: null },
-                    { client: { isDeleted: false } }
+                    { client: { isActive: true, isDeleted: false } }
                 ]
             },
             include: {

@@ -29,7 +29,7 @@ export async function getQuotes(scope: string = 'BUSINESS') {
             where: {
                 userId,
                 scope,
-                client: { isDeleted: false }
+                client: { isActive: true, isDeleted: false }
             },
             include: {
                 client: true

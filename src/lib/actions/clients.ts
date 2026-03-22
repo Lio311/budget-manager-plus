@@ -112,6 +112,7 @@ export async function getClients(scope: string = 'BUSINESS') {
                 where: {
                     userId,
                     scope,
+                    isActive: true,
                     isDeleted: false
                 },
                 include: {
@@ -256,7 +257,7 @@ export async function getClient(id: string) {
         const db = await authenticatedPrisma(userId)
 
         const client = await db.client.findFirst({
-            where: { id, isDeleted: false },
+            where: { id, isActive: true, isDeleted: false },
             include: {
                 incomes: {
                     orderBy: { date: 'desc' },
