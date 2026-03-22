@@ -197,7 +197,9 @@ export default function PublicCreditNotePage() {
                                 </div>
                             )}
                             <h2 className="text-2xl font-bold text-gray-900">{business?.companyName || 'שם העסק'}</h2>
-                            <p className="text-gray-500">{business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ'} {business?.companyId}</p>
+                            <p className="text-gray-500">
+                                {business?.vatStatus === 'EXEMPT' ? 'עוסק פטור' : (business?.vatStatus === 'AUTHORIZED' ? 'עוסק מורשה' : 'ע.מ')} {business?.companyId}
+                            </p>
                             <div className="text-sm text-gray-500 mt-2">
                                 {business?.address && <p>{business.address}</p>}
                                 {business?.phone && <p dir="ltr">{formatPhone(business.phone)}</p>}
@@ -223,7 +225,7 @@ export default function PublicCreditNotePage() {
                                     <span>{formatCurrency(creditNote.creditAmount)}</span>
                                 </div>
                                 <div className="flex justify-between text-green-50 font-medium">
-                                    <span>מע"מ ({(invoice?.vatRate || 0.18) * 100}%):</span>
+                                    <span>מע"מ ({((business?.vatStatus === 'EXEMPT' ? 0 : (invoice?.vatRate ?? 0.18)) * 100).toFixed(0)}%):</span>
                                     <span>{formatCurrency(creditNote.vatAmount)}</span>
                                 </div>
                                 <div className="h-px bg-white/30"></div>

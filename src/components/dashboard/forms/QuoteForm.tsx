@@ -49,10 +49,14 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
 
     // Force VAT to 0 if Exempt Dealer
     useEffect(() => {
-        if (isExemptDealer && formData.vatRate !== 0) {
-            setFormData(prev => ({ ...prev, vatRate: 0 }))
+        if (isExemptDealer) {
+            if (formData.vatRate !== 0) {
+                setFormData(prev => ({ ...prev, vatRate: 0 }))
+            }
+        } else if (!isEditing && !businessProfile && businessProfile === undefined) {
+             // Loading or licensed
         }
-    }, [isExemptDealer])
+    }, [isExemptDealer, isEditing])
 
     const addItem = () => {
         setFormData(prev => ({

@@ -161,7 +161,7 @@ export function InvoiceForm({ clients, initialData, onSuccess }: InvoiceFormProp
             if (income) {
                 // income.amount is TOTAL (Gross). We need to extract Net (Subtotal).
                 // Assuming standard VAT rate of 0.18 (or use formData.vatRate if set, but 0.18 is safer default here)
-                const vatRate = formData.vatRate || 0.18
+                const vatRate = isExemptDealer ? 0 : (formData.vatRate || 0.18)
                 const totalAmount = income.amount
                 const subtotal = totalAmount / (1 + vatRate)
 

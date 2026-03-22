@@ -586,6 +586,11 @@ export function IncomeTab() {
                                                         <span>מע"מ: {formatNumberWithCommas(inc.vatAmount || (inc.amount - (inc.amountBeforeVat || (inc.amount / (1 + (inc.vatRate || 0.18))))))}</span>
                                                     </div>
                                                 )}
+                                                {isBusiness && isExemptDealer && (
+                                                     <div className="flex items-center gap-3 text-[10px] text-gray-400 font-medium font-sans">
+                                                        <span>Exempt Dealer (0% VAT)</span>
+                                                     </div>
+                                                )}
                                             </div>
 
                                             {/* Action Bar */}

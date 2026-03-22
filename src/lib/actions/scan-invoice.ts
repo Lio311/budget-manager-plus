@@ -2,6 +2,8 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { auth } from '@clerk/nextjs/server'
+import { authenticatedPrisma } from '@/lib/db'
+import { getVatRate } from '@/lib/vat'
 
 const apiKey = process.env.GEMINI_API_KEY
 if (!apiKey) {
@@ -71,10 +73,14 @@ export async function scanInvoiceImage(formData: FormData): Promise<ScanResult> 
             const data = JSON.parse(jsonStr)
             const amount = typeof data.amount === 'number' ? data.amount : parseFloat(data.amount) || 0
 
-            // Calculate VAT (18%) Programmatically
-            // VAT = Total - (Total / 1.18)
-            const vatAmount = parseFloat((amount - (amount / 1.18)).toFixed(2))
-            console.log(`[ScanInvoice] Calculated VAT for amount ${amount}: ${vatAmount}`)
+            // Calculate VAT Programmatically based on business profile
+            const db = await authenticatedPrisma(userId)
+            const businessProfile = await db.businessProfile.findUnique({ where: { userId } })
+            const profileVatRate = getVatRate(businessProfile?.vatStatus)
+
+            // VAT = Total - (Total / (1 + Rate))
+            const vatAmount = parseFloat((amount - (amount / (1 + profileVatRate))).toFixed(2))
+            console.log(`[ScanInvoice] Calculated VAT for amount ${amount} (Rate ${profileVatRate}): ${vatAmount}`)
 
             return {
                 success: true,

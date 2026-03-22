@@ -173,13 +173,23 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
 
     const isExemptDealer = businessProfile?.vatStatus === 'EXEMPT'
 
+    // Effect to set default VAT rate based on profile
     useEffect(() => {
-        if (isBusiness && newIncome.amount && newIncome.vatRate && !isExemptDealer) {
-            const { total, vat } = calculateFromNet(newIncome.amount, newIncome.vatRate)
-            setNewIncome(prev => ({ ...prev, amountBeforeVat: newIncome.amount, vatAmount: vat }))
-        } else if (isBusiness && isExemptDealer && newIncome.amount) {
-            // For Exempt Dealer, amount is just amount. No VAT calc.
-            setNewIncome(prev => ({ ...prev, amountBeforeVat: newIncome.amount, vatAmount: '0' }))
+        if (businessProfile && !initialData) {
+            const defaultRate = isExemptDealer ? '0' : '0.18'
+            setNewIncome(prev => ({ ...prev, vatRate: defaultRate }))
+        }
+    }, [businessProfile, isExemptDealer, initialData])
+
+    useEffect(() => {
+        if (isBusiness && newIncome.amount) {
+            if (isExemptDealer) {
+                // For Exempt Dealer, amount is just amount. No VAT calc.
+                setNewIncome(prev => ({ ...prev, amountBeforeVat: newIncome.amount, vatAmount: '0' }))
+            } else if (newIncome.vatRate) {
+                const { total, vat } = calculateFromNet(newIncome.amount, newIncome.vatRate)
+                setNewIncome(prev => ({ ...prev, amountBeforeVat: newIncome.amount, vatAmount: vat }))
+            }
         }
     }, [newIncome.amount, newIncome.vatRate, isBusiness, isExemptDealer])
 

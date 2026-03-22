@@ -9,6 +9,8 @@ import { toast } from 'sonner'
 import { cn, formatCurrency } from '@/lib/utils'
 import { scanInvoiceImage } from '@/lib/actions/scan-invoice'
 import { compressImage } from '@/lib/image-utils'
+import { getBusinessProfile } from '@/lib/actions/business-settings'
+import { getVatRate } from '@/lib/vat'
 
 interface BankImportModalProps {
     onImport: (data: any[]) => Promise<void>
@@ -98,17 +100,26 @@ export function BankImportModal({ onImport, triggerId }: BankImportModalProps) {
                         console.error('Failed to compress scan image:', err)
                     }
 
+                    // Fetch business profile to get current VAT rate
+                    let currentVatRate = 0.18 // Default fallback
+                    const profileResult = await getBusinessProfile()
+                    if (profileResult.success && profileResult.data) {
+                        currentVatRate = getVatRate(profileResult.data.vatStatus)
+                    }
+
+                    const vatAmount = result.data.vatAmount || 0
+                    const amountBeforeVat = parseFloat((result.data.amount - vatAmount).toFixed(2))
+
                     const scannedExpense: ParsedExpense = {
                         date: result.data.date || format(new Date(), 'yyyy-MM-dd'),
                         description: result.data.businessName,
                         amount: result.data.amount,
                         billingAmount: result.data.amount,
                         paymentMethod: 'כרטיס אשראי',
-                        branchName: 'חשבוניות סרוקות', // As requested
-                        vatAmount: result.data.vatAmount,
-                        // Fix for missing tax data in DB
-                        amountBeforeVat: parseFloat((result.data.amount - (result.data.vatAmount || 0)).toFixed(2)),
-                        vatRate: 0.18,
+                        branchName: 'חשבוניות סרוקות',
+                        vatAmount: vatAmount,
+                        amountBeforeVat: amountBeforeVat,
+                        vatRate: currentVatRate,
                         isDeductible: true,
                         deductibleRate: 1.0,
                         attachmentUrl: attachmentUrl

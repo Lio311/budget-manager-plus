@@ -7,6 +7,7 @@ import { auth } from '@clerk/nextjs/server'
 
 import { convertToILS } from '@/lib/currency'
 import { syncBudgetToGoogleCalendar } from './calendar'
+import { getVatRate } from '@/lib/vat'
 
 export async function getExpenseAttachment(id: string) {
     try {
@@ -141,6 +142,12 @@ export async function addExpense(
 
         const db = await authenticatedPrisma(userId);
 
+        // Business Profile for VAT
+        const businessProfile = await db.businessProfile.findUnique({
+            where: { userId }
+        })
+        const vatRate = getVatRate(businessProfile?.vatStatus)
+
         // Use db instead of prisma
         const expense = await db.expense.create({
             data: {
@@ -156,9 +163,9 @@ export async function addExpense(
                 // Business Fields
                 supplierId: validatedData.supplierId || null,
                 clientId: validatedData.clientId || null,
-                amountBeforeVat: validatedData.amountBeforeVat || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? parseFloat(((validatedData.amount / 1.18)).toFixed(2)) : validatedData.amountBeforeVat),
-                vatRate: validatedData.vatRate || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? 0.18 : validatedData.vatRate),
-                vatAmount: validatedData.vatAmount || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? parseFloat(((validatedData.amount - (validatedData.amount / 1.18))).toFixed(2)) : validatedData.vatAmount),
+                amountBeforeVat: validatedData.amountBeforeVat || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? parseFloat(((validatedData.amount / (1 + vatRate))).toFixed(2)) : validatedData.amountBeforeVat),
+                vatRate: validatedData.vatRate || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? vatRate : validatedData.vatRate),
+                vatAmount: validatedData.vatAmount || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? parseFloat(((validatedData.amount - (validatedData.amount / (1 + vatRate)))).toFixed(2)) : validatedData.vatAmount),
                 vatType: validatedData.vatType,
                 isDeductible: validatedData.isDeductible,
                 deductibleRate: validatedData.deductibleRate,
@@ -217,6 +224,7 @@ export async function addExpense(
                     paymentMethod: validatedData.paymentMethod,
                     paidBy: validatedData.paidBy,
                     attachmentUrl: validatedData.attachmentUrl,
+                    profileVatRate: vatRate // Pass the determined rate
                 }
             )
         }
@@ -308,9 +316,9 @@ async function createRecurringExpenses(
                         supplierId: extraData.supplierId || null,
                         clientId: extraData.clientId || null,
                         projectId: extraData.projectId || null,
-                        amountBeforeVat: extraData.amountBeforeVat || (extraData.isDeductible && (!extraData.vatAmount || extraData.vatAmount === 0) ? parseFloat(((amount / 1.18)).toFixed(2)) : extraData.amountBeforeVat),
-                        vatRate: extraData.vatRate || (extraData.isDeductible && (!extraData.vatAmount || extraData.vatAmount === 0) ? 0.18 : extraData.vatRate),
-                        vatAmount: extraData.vatAmount || (extraData.isDeductible && (!extraData.vatAmount || extraData.vatAmount === 0) ? parseFloat(((amount - (amount / 1.18))).toFixed(2)) : extraData.vatAmount),
+                        amountBeforeVat: extraData.amountBeforeVat || (extraData.isDeductible && (!extraData.vatAmount || extraData.vatAmount === 0) ? parseFloat(((amount / (1 + (extraData.profileVatRate ?? 0.18)))).toFixed(2)) : extraData.amountBeforeVat),
+                        vatRate: extraData.vatRate || (extraData.isDeductible && (!extraData.vatAmount || extraData.vatAmount === 0) ? (extraData.profileVatRate ?? 0.18) : extraData.vatRate),
+                        vatAmount: extraData.vatAmount || (extraData.isDeductible && (!extraData.vatAmount || extraData.vatAmount === 0) ? parseFloat(((amount - (amount / (1 + (extraData.profileVatRate ?? 0.18))))).toFixed(2)) : extraData.vatAmount),
                         isDeductible: extraData.isDeductible,
                         deductibleRate: extraData.deductibleRate,
                         paymentMethod: extraData.paymentMethod,
@@ -705,9 +713,13 @@ export async function importExpenses(expenses: ExpenseInput[], budgetType: 'PERS
             let finalVatRate = exp.vatRate
             let finalAmountBeforeVat = exp.amountBeforeVat
 
+            // Fetch Business Profile for VAT context once if needed or reuse
+            const businessProfile = await db.businessProfile.findUnique({ where: { userId } })
+            const profileVatRate = getVatRate(businessProfile?.vatStatus)
+
             if (exp.isDeductible && (!finalVatAmount || finalVatAmount === 0)) {
-                finalVatRate = 0.18
-                finalAmountBeforeVat = parseFloat((exp.amount / 1.18).toFixed(2))
+                finalVatRate = profileVatRate
+                finalAmountBeforeVat = parseFloat((exp.amount / (1 + profileVatRate)).toFixed(2))
                 finalVatAmount = parseFloat((exp.amount - finalAmountBeforeVat).toFixed(2))
             }
 

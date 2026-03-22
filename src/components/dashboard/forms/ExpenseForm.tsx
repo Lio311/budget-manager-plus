@@ -184,13 +184,33 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         return { net: net.toFixed(2), vat: vat.toFixed(2) }
     }
 
+    // Effect to set default VAT rate and deductible status based on profile
+    useEffect(() => {
+        if (businessProfile && !initialData) {
+            const defaultRate = isExemptDealer ? '0' : '0.18'
+            setNewExpense(prev => ({ 
+                ...prev, 
+                vatRate: defaultRate,
+                isDeductible: !isExemptDealer
+            }))
+        }
+    }, [businessProfile, isExemptDealer, initialData])
+
     useEffect(() => {
         if (isBusiness && newExpense.amount) {
             let currentRate = parseFloat(newExpense.vatRate) || 0
 
+            // If exempt dealer, VAT is 0.
+            if (isExemptDealer) {
+                if (newExpense.amountBeforeVat !== newExpense.amount || newExpense.vatAmount !== '0') {
+                    setNewExpense(prev => ({ ...prev, amountBeforeVat: newExpense.amount, vatAmount: '0' }))
+                }
+                return
+            }
+
             // AUTO-FIX: If detected as deductible (checked) but rate is 0, force standard 18% VAT
-            // This fixes key issue where imported/scanned expenses with 0 VAT stayed 0 even when edited
-            if (newExpense.isDeductible && currentRate === 0) {
+            // ONLY for licensed dealers.
+            if (newExpense.isDeductible && currentRate === 0 && !isExemptDealer) {
                 setNewExpense(prev => ({ ...prev, vatRate: '0.18' }))
                 return // Will re-run effect with correct rate
             }
@@ -201,9 +221,14 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                 if (net !== newExpense.amountBeforeVat || vat !== newExpense.vatAmount) {
                     setNewExpense(prev => ({ ...prev, amountBeforeVat: net, vatAmount: vat }))
                 }
+            } else {
+                 // Rate is 0 (and not exempt dealer handled above)
+                 if (newExpense.amountBeforeVat !== newExpense.amount || newExpense.vatAmount !== '0') {
+                    setNewExpense(prev => ({ ...prev, amountBeforeVat: newExpense.amount, vatAmount: '0' }))
+                }
             }
         }
-    }, [newExpense.amount, newExpense.vatRate, newExpense.isDeductible, isBusiness])
+    }, [newExpense.amount, newExpense.vatRate, newExpense.isDeductible, isBusiness, isExemptDealer])
 
     // Effect to auto-select first category when categories load if no category is selected
     useEffect(() => {

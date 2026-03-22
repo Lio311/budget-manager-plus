@@ -4,6 +4,7 @@ import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { createInvoice, getNextInvoiceNumber, InvoiceFormData } from './invoices'
+import { getVatRate } from '@/lib/vat'
 
 export interface QuoteFormData {
     clientId: string
@@ -99,7 +100,10 @@ export async function createQuote(data: QuoteFormData, scope: string = 'BUSINESS
 
         const db = await authenticatedPrisma(userId)
 
-        const vatRate = data.vatRate ?? 0.18
+        const businessProfile = await db.businessProfile.findUnique({ where: { userId } })
+        const profileVatRate = getVatRate(businessProfile?.vatStatus)
+
+        const vatRate = data.vatRate ?? profileVatRate
         const vatAmount = data.subtotal * vatRate
         const total = data.subtotal + vatAmount
 
@@ -159,7 +163,10 @@ export async function updateQuote(id: string, data: Partial<QuoteFormData>) {
         if (data.items !== undefined) updateData.items = data.items
 
         if (data.subtotal !== undefined) {
-            const vatRate = data.vatRate ?? existing.vatRate
+            const businessProfile = await db.businessProfile.findUnique({ where: { userId } })
+            const profileVatRate = getVatRate(businessProfile?.vatStatus)
+
+            const vatRate = data.vatRate ?? existing.vatRate ?? profileVatRate
             const vatAmount = data.subtotal * vatRate
             const total = data.subtotal + vatAmount
 

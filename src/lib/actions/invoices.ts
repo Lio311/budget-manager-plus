@@ -1,10 +1,9 @@
-'use server'
-
 import { prisma, authenticatedPrisma } from '@/lib/db'
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { createHash } from 'crypto'
+import { getVatRate } from '@/lib/vat'
 
 export interface InvoiceLineItemData {
     id?: string
@@ -130,15 +129,20 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
         if (!userId) throw new Error('Unauthorized')
 
         const db = await authenticatedPrisma(userId)
-
         // Validate Input
         const result = InvoiceSchema.safeParse(data)
         if (!result.success) {
             return { success: false, error: result.error.errors[0]?.message || 'נתונים לא תקינים' }
         }
-        const validData = result.data
+        const validData = result.data;
 
-        const vatRate = validData.vatRate ?? 0.18
+        // Business Profile for VAT
+        const businessProfile = await db.businessProfile.findUnique({
+            where: { userId }
+        })
+        const profileVatRate = getVatRate(businessProfile?.vatStatus)
+
+        const vatRate = validData.vatRate ?? profileVatRate
         const vatAmount = validData.subtotal * vatRate
         const total = validData.subtotal + vatAmount
 
@@ -427,7 +431,10 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
         }
 
         if (data.subtotal !== undefined) {
-            const vatRate = data.vatRate ?? existing.vatRate
+            const businessProfile = await db.businessProfile.findUnique({ where: { userId } })
+            const profileVatRate = getVatRate(businessProfile?.vatStatus)
+            
+            const vatRate = data.vatRate ?? existing.vatRate ?? profileVatRate
             const vatAmount = data.subtotal * vatRate
             const total = data.subtotal + vatAmount
 
