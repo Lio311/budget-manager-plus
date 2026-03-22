@@ -137,11 +137,12 @@ export async function getClients(scope: string = 'BUSINESS') {
             }),
             db.businessProfile.findUnique({
                 where: { userId },
-                select: { taxRate: true }
+                select: { taxRate: true, vatStatus: true }
             })
         ])
 
         const taxRate = businessProfile?.taxRate || 0
+        const isExempt = businessProfile?.vatStatus === 'EXEMPT'
 
 
 
@@ -196,7 +197,8 @@ export async function getClients(scope: string = 'BUSINESS') {
 
             const totalRevenue = incomeTotal + paidInvoiceTotal
             const totalVat = incomeVat + paidInvoiceVat
-            const netRevenue = totalRevenue - totalVat
+            // Exempt dealers (עוסק פטור) don't charge VAT, so don't subtract it from revenue
+            const netRevenue = isExempt ? totalRevenue : totalRevenue - totalVat
 
             // Calculate document counts from the included data
             const quotesCount = client.quotes.length
@@ -498,9 +500,10 @@ export async function getClientStats(clientId: string, year: number) {
 
         const businessProfile = await db.businessProfile.findUnique({
             where: { userId },
-            select: { taxRate: true }
+            select: { taxRate: true, vatStatus: true }
         })
         const taxRate = businessProfile?.taxRate || 0
+        const isExempt = businessProfile?.vatStatus === 'EXEMPT'
 
         const revenue = totalRevenue._sum.amount || 0
         const expenses = totalExpenses._sum.amount || 0
@@ -533,6 +536,13 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
 
     try {
         const db = await authenticatedPrisma(userId)
+
+        // Check if the business is an exempt dealer (עוסק פטור)
+        const businessProfile = await db.businessProfile.findUnique({
+            where: { userId },
+            select: { vatStatus: true }
+        })
+        const isExempt = businessProfile?.vatStatus === 'EXEMPT'
 
         // Fetch existing incomes to avoid duplicates
         // We match by ClientId and Source for the specific date. Amount ignored to prevent duplicates on price change.
@@ -581,10 +591,11 @@ export async function generateSubscriptionIncomes(client: any, userId: string, m
             } else {
                 const status = currentDate > new Date() ? 'PENDING' : 'PAID'
 
-                const vatRate = 0.18
+                // Exempt dealers (עוסק פטור) don't charge VAT
+                const vatRate = isExempt ? 0 : 0.18
                 const totalAmount = amount // Subscription price is the Total (Inclusive)
-                const amountBeforeVat = totalAmount / (1 + vatRate) // Extract Net
-                const vatAmount = totalAmount - amountBeforeVat
+                const amountBeforeVat = isExempt ? totalAmount : totalAmount / (1 + vatRate) // Extract Net
+                const vatAmount = isExempt ? 0 : totalAmount - amountBeforeVat
 
                 // Fix: Adjust for timezone (Israel) when converting to string YYYY-MM-DD
                 const dateString = currentDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jerusalem' })
