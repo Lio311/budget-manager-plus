@@ -28,7 +28,8 @@ export async function getQuotes(scope: string = 'BUSINESS') {
         const quotes = await db.quote.findMany({
             where: {
                 userId,
-                scope
+                scope,
+                client: { isDeleted: false }
             },
             include: {
                 client: true

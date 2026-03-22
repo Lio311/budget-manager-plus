@@ -111,7 +111,8 @@ export async function getClients(scope: string = 'BUSINESS') {
             db.client.findMany({
                 where: {
                     userId,
-                    scope
+                    scope,
+                    isDeleted: false
                 },
                 include: {
                     package: true,
@@ -238,7 +239,7 @@ export async function getClientsList() {
 
         const db = await authenticatedPrisma(userId)
         return await db.client.findMany({
-            where: { userId, isActive: true },
+            where: { userId, isActive: true, isDeleted: false },
             select: { id: true, name: true },
             orderBy: { name: 'asc' }
         })
@@ -254,8 +255,8 @@ export async function getClient(id: string) {
 
         const db = await authenticatedPrisma(userId)
 
-        const client = await db.client.findUnique({
-            where: { id },
+        const client = await db.client.findFirst({
+            where: { id, isDeleted: false },
             include: {
                 incomes: {
                     orderBy: { date: 'desc' },
@@ -428,10 +429,11 @@ export async function deleteClient(id: string) {
         }
 
         // Check if client has associated incomes or invoices
-        // For now, we allow deletion even with history as per user preference (or we can restore the check if needed)
-        // But since we are reverting soft delete due to DB mismatch, we go back to hard delete.
-
-        await db.client.delete({ where: { id } })
+        // Switch to soft delete so we can filter these out from calculations
+        await db.client.update({
+            where: { id },
+            data: { isDeleted: true, isActive: false }
+        })
 
         revalidatePath('/dashboard')
         return { success: true }

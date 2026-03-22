@@ -17,7 +17,13 @@ export async function getIncomes(month: number, year: number, type: 'PERSONAL' |
         const budget = await getCurrentBudget(month, year, '₪', type)
 
         const incomes = await db.income.findMany({
-            where: { budgetId: budget.id },
+            where: { 
+                budgetId: budget.id,
+                OR: [
+                    { clientId: null },
+                    { client: { isDeleted: false } }
+                ]
+            },
             include: {
                 client: true,
                 invoice: true

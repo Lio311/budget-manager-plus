@@ -71,7 +71,11 @@ export async function getInvoices(scope: string = 'BUSINESS') {
         const invoices = await db.invoice.findMany({
             where: {
                 userId,
-                scope
+                scope,
+                OR: [
+                    { clientId: null },
+                    { client: { isDeleted: false } }
+                ]
             },
             include: {
                 client: true,
