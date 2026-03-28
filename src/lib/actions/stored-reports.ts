@@ -24,7 +24,7 @@ export async function saveBkmvData(year: number) {
 
         // 2. Generate Open Format ZIP
         const { generateOpenFormatFiles } = await import('@/lib/open-format/generator')
-        const result = await generateOpenFormatFiles(year)
+        const result = await generateOpenFormatFiles({ year })
 
         // 3. Save to DB
         // We store the ZIP base64 data.
