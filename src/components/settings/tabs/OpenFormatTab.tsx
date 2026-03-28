@@ -99,7 +99,7 @@ export function OpenFormatTab() {
                         <div className="space-y-2 md:col-span-3">
                             <Label>סוג הפקה</Label>
                             <Select value={mode} onValueChange={(v) => setMode(v as any)}>
-                                <SelectTrigger className="text-right">
+                                <SelectTrigger className="text-right h-12 text-base">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -113,7 +113,7 @@ export function OpenFormatTab() {
                             <div className="space-y-2 md:col-span-3">
                                 <Label>שנת מס</Label>
                                 <Select value={year} onValueChange={setYear}>
-                                    <SelectTrigger className="text-right">
+                                    <SelectTrigger className="text-right h-12 text-base">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -131,7 +131,7 @@ export function OpenFormatTab() {
                                     <DatePicker 
                                         date={startDate} 
                                         setDate={setStartDate} 
-                                        className="text-right block w-full"
+                                        className="text-right block w-full h-12 text-base"
                                     />
                                 </div>
                                 <div className="space-y-2 md:col-span-3">
@@ -139,7 +139,7 @@ export function OpenFormatTab() {
                                     <DatePicker 
                                         date={endDate} 
                                         setDate={setEndDate} 
-                                        className="text-right block w-full"
+                                        className="text-right block w-full h-12 text-base"
                                     />
                                 </div>
                             </>
@@ -149,7 +149,7 @@ export function OpenFormatTab() {
                             <Button
                                 onClick={handleGenerate}
                                 disabled={generating || !businessProfile?.companyId || (mode === 'range' && (!startDate || !endDate))}
-                                className="w-full bg-blue-600 hover:bg-blue-700 font-bold"
+                                className="w-full bg-blue-600 hover:bg-blue-700 font-bold h-12 text-lg shadow-md transition-all active:scale-[0.98]"
                             >
                                 {generating ? (
                                     <>
