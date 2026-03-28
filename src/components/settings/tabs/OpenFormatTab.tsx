@@ -131,7 +131,7 @@ export function OpenFormatTab() {
                                     <DatePicker 
                                         date={startDate} 
                                         setDate={setStartDate} 
-                                        className="text-right block w-full"
+                                        className="text-right w-full"
                                     />
                                 </div>
                                 <div className="space-y-2 md:col-span-3">
@@ -139,7 +139,7 @@ export function OpenFormatTab() {
                                     <DatePicker 
                                         date={endDate} 
                                         setDate={setEndDate} 
-                                        className="text-right block w-full"
+                                        className="text-right w-full"
                                     />
                                 </div>
                             </>
