@@ -30,6 +30,8 @@ import { ReferralDashboard } from '@/components/dashboard/referral/ReferralDashb
 import { BusinessSettings } from '@/components/settings/BusinessSettings'
 import { DataExportSettings } from '@/components/settings/DataExportSettings'
 import { IntegrationsSettings } from '@/components/settings/IntegrationsSettings'
+import { OpenFormatTab } from '@/components/settings/tabs/OpenFormatTab'
+import { LegalComplianceTab } from '@/components/settings/tabs/LegalComplianceTab'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { CustomTooltip } from '../charts/CustomTooltip'
 import { getBusinessProfile } from '@/lib/actions/business-settings'
@@ -830,15 +832,17 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 <DialogTitle className="text-right">הגדרות עסק</DialogTitle>
                             </DialogHeader>
                             <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
-                                <TabsList className="grid w-full grid-cols-3">
+                                <TabsList className="grid w-full grid-cols-4">
                                     <TabsTrigger value="details">פרטי העסק</TabsTrigger>
                                     <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
                                     <TabsTrigger value="export">ייצוא נתונים</TabsTrigger>
+                                    <TabsTrigger value="compliance">ביקורת וציות</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="details" className="mt-4">
                                     <BusinessSettings onSuccess={() => setIsSettingsOpen(false)} />
                                 </TabsContent>
                                 <TabsContent value="financials" className="mt-4 space-y-4">
+                                    {/* ... existing financials content ... */}
                                     <Card>
                                         <CardHeader>
                                             <CardTitle className="text-base text-right">הגדרות יתרה</CardTitle>
@@ -882,6 +886,12 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                 </TabsContent>
                                 <TabsContent value="export" className="mt-4">
                                     <DataExportSettings />
+                                </TabsContent>
+                                <TabsContent value="compliance" className="mt-4 space-y-4">
+                                    <OpenFormatTab />
+                                    <div className="border-t pt-4">
+                                        <LegalComplianceTab />
+                                    </div>
                                 </TabsContent>
                             </Tabs>
                         </DialogContent>
