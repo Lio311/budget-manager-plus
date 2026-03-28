@@ -836,7 +836,7 @@ export function OverviewTab({ onNavigateToTab }: { onNavigateToTab?: (tab: strin
                                     <TabsTrigger value="details">פרטי העסק</TabsTrigger>
                                     <TabsTrigger value="financials">הגדרות כספיות</TabsTrigger>
                                     <TabsTrigger value="export">ייצוא נתונים</TabsTrigger>
-                                    <TabsTrigger value="compliance">ביקורת וציות</TabsTrigger>
+                                    <TabsTrigger value="compliance">מבנה אחיד</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="details" className="mt-4">
                                     <BusinessSettings onSuccess={() => setIsSettingsOpen(false)} />

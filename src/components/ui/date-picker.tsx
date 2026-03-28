@@ -32,13 +32,15 @@ export function DatePicker({ date, setDate, className, placeholder = "בחר ת�
                 <Button
                     variant={"outline"}
                     className={cn(
-                        "w-full justify-start text-right font-normal",
+                        "w-full flex flex-row-reverse items-center justify-start text-right font-normal h-10 px-3",
                         !date && "text-muted-foreground",
                         className
                     )}
                 >
-                    <CalendarIcon className="ml-2 h-4 w-4" />
-                    {date ? format(date, "dd/MM/yyyy") : <span>{placeholder}</span>}
+                    <CalendarIcon className="h-4 w-4 text-gray-400" />
+                    <span className="flex-1 text-right truncate">
+                        {date ? format(date, "dd/MM/yyyy") : placeholder}
+                    </span>
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="center" side="bottom" sideOffset={8}>
