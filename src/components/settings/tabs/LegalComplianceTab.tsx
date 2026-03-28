@@ -13,7 +13,7 @@ import { format } from 'date-fns'
   These are static or semi-static details about the software that the user needs for registration.
 */
 const SOFTWARE_DETAILS = {
-    name: 'BudgetManagerPlus',
+    name: 'Kesefly',
     version: '1.0.0', // This should match package.json or system config
     manufacturer: 'Independent Developer',
     // In a real scenario, this might need to be dynamic or editable if white-labeled
@@ -37,7 +37,7 @@ export function LegalComplianceTab() {
                 <TabsContent value="registration" className="space-y-4 mt-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg flex items-center gap-2">
+                            <CardTitle className="text-lg flex flex-row-reverse items-center justify-start gap-2">
                                 <FileText className="h-5 w-5 text-blue-600" />
                                 פרטי תוכנה לרישום
                             </CardTitle>
@@ -49,7 +49,7 @@ export function LegalComplianceTab() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="p-3 bg-gray-50 dark:bg-slate-800 rounded-md border">
                                     <div className="text-xs text-gray-500 mb-1">שם התוכנה</div>
-                                    <div className="font-semibold select-all" dir="ltr">{SOFTWARE_DETAILS.name}</div>
+                                    <div className="font-semibold select-all text-right">{SOFTWARE_DETAILS.name}</div>
                                 </div>
                                 <div className="p-3 bg-gray-50 dark:bg-slate-800 rounded-md border">
                                     <div className="text-xs text-gray-500 mb-1">גרסה</div>
@@ -76,7 +76,7 @@ export function LegalComplianceTab() {
                 <TabsContent value="audit" className="space-y-4 mt-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg flex items-center gap-2">
+                            <CardTitle className="text-lg flex flex-row-reverse items-center justify-start gap-2">
                                 <Shield className="h-5 w-5 text-purple-600" />
                                 יומן אירועים קריטיים
                             </CardTitle>

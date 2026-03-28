@@ -57,7 +57,7 @@ export const SummaryReportTemplate: React.FC<SummaryReportData> = ({ companyName
                 </View>
 
                 <View style={{ marginTop: 40, textAlign: 'center' }}>
-                    <Text style={{ fontSize: 10, color: '#9ca3af' }}>הופק על ידי מערכת BudgetManagerPlus בהתאם להוראות הביקורת של רשות המסים (מבנה אחיד 1.31)</Text>
+                    <Text style={{ fontSize: 10, color: '#9ca3af' }}>הופק על ידי מערכת Kesefly בהתאם להוראות הביקורת של רשות המסים (מבנה אחיד 1.31)</Text>
                 </View>
             </Page>
         </Document>
