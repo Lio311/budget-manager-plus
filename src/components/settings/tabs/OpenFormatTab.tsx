@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Loader2, FileText, Download, CheckCircle, AlertTriangle, Table } from 'lucide-react'
 import { generateOpenFormat } from '@/lib/actions/open-format'
 import { getBusinessProfile } from '@/lib/actions/business-settings'
+import { DatePicker } from '@/components/ui/date-picker'
 import { toast } from 'sonner'
 import { saveAs } from 'file-saver'
 import useSWR from 'swr'
@@ -25,8 +26,8 @@ export function OpenFormatTab() {
 
     const [mode, setMode] = useState<'year' | 'range'>('year')
     const [year, setYear] = useState<string>(new Date().getFullYear().toString())
-    const [startDate, setStartDate] = useState<string>('')
-    const [endDate, setEndDate] = useState<string>('')
+    const [startDate, setStartDate] = useState<Date | undefined>(undefined)
+    const [endDate, setEndDate] = useState<Date | undefined>(undefined)
     const [generating, setGenerating] = useState(false)
     const [lastResult, setLastResult] = useState<any>(null)
 
@@ -42,8 +43,8 @@ export function OpenFormatTab() {
         try {
             const result = await generateOpenFormat({
                 year: mode === 'year' ? parseInt(year) : undefined,
-                startDate: mode === 'range' ? startDate : undefined,
-                endDate: mode === 'range' ? endDate : undefined
+                startDate: mode === 'range' && startDate ? startDate.toISOString() : undefined,
+                endDate: mode === 'range' && endDate ? endDate.toISOString() : undefined
             })
 
             if (result.success && result.data) {
@@ -127,19 +128,17 @@ export function OpenFormatTab() {
                             <>
                                 <div className="space-y-2 md:col-span-3">
                                     <Label>תאריך התחלה</Label>
-                                    <Input 
-                                        type="date" 
-                                        value={startDate} 
-                                        onChange={(e) => setStartDate(e.target.value)} 
+                                    <DatePicker 
+                                        date={startDate} 
+                                        setDate={setStartDate} 
                                         className="text-right block w-full"
                                     />
                                 </div>
                                 <div className="space-y-2 md:col-span-3">
                                     <Label>תאריך סיום</Label>
-                                    <Input 
-                                        type="date" 
-                                        value={endDate} 
-                                        onChange={(e) => setEndDate(e.target.value)} 
+                                    <DatePicker 
+                                        date={endDate} 
+                                        setDate={setEndDate} 
                                         className="text-right block w-full"
                                     />
                                 </div>
