@@ -126,7 +126,7 @@ export function OpenFormatTab() {
                             </div>
                         ) : (
                             <>
-                                <div className="space-y-2 md:col-span-4">
+                                <div className="space-y-2 md:col-span-3">
                                     <Label>תאריך התחלה</Label>
                                     <DatePicker 
                                         date={startDate} 
@@ -134,7 +134,7 @@ export function OpenFormatTab() {
                                         className="text-right block w-full"
                                     />
                                 </div>
-                                <div className="space-y-2 md:col-span-4">
+                                <div className="space-y-2 md:col-span-3">
                                     <Label>תאריך סיום</Label>
                                     <DatePicker 
                                         date={endDate} 
@@ -145,7 +145,7 @@ export function OpenFormatTab() {
                             </>
                         )}
 
-                        <div className="md:col-span-4 md:col-start-9 lg:col-span-4 lg:col-start-9 mt-4 md:mt-0">
+                        <div className="md:col-span-3 md:col-start-10 mt-4 md:mt-0">
                             <Button
                                 onClick={handleGenerate}
                                 disabled={generating || !businessProfile?.companyId || (mode === 'range' && (!startDate || !endDate))}
@@ -157,10 +157,7 @@ export function OpenFormatTab() {
                                         מרכז נתונים...
                                     </>
                                 ) : (
-                                    <>
-                                        <Download className="mr-2 h-4 w-4" />
-                                        הפק קובץ (ZIP)
-                                    </>
+                                    <>הפק קובץ (ZIP)</>
                                 )}
                             </Button>
                         </div>
