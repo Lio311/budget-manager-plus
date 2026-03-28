@@ -99,7 +99,7 @@ export function OpenFormatTab() {
                         <div className="space-y-2 md:col-span-3">
                             <Label>סוג הפקה</Label>
                             <Select value={mode} onValueChange={(v) => setMode(v as any)}>
-                                <SelectTrigger className="text-right h-12 text-base">
+                                <SelectTrigger className="text-right">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -113,7 +113,7 @@ export function OpenFormatTab() {
                             <div className="space-y-2 md:col-span-3">
                                 <Label>שנת מס</Label>
                                 <Select value={year} onValueChange={setYear}>
-                                    <SelectTrigger className="text-right h-12 text-base">
+                                    <SelectTrigger className="text-right">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -126,30 +126,30 @@ export function OpenFormatTab() {
                             </div>
                         ) : (
                             <>
-                                <div className="space-y-2 md:col-span-3">
+                                <div className="space-y-2 md:col-span-4">
                                     <Label>תאריך התחלה</Label>
                                     <DatePicker 
                                         date={startDate} 
                                         setDate={setStartDate} 
-                                        className="text-right block w-full h-12 text-base"
+                                        className="text-right block w-full"
                                     />
                                 </div>
-                                <div className="space-y-2 md:col-span-3">
+                                <div className="space-y-2 md:col-span-4">
                                     <Label>תאריך סיום</Label>
                                     <DatePicker 
                                         date={endDate} 
                                         setDate={setEndDate} 
-                                        className="text-right block w-full h-12 text-base"
+                                        className="text-right block w-full"
                                     />
                                 </div>
                             </>
                         )}
 
-                        <div className="md:col-span-3 md:col-start-10 mt-4 md:mt-0">
+                        <div className="md:col-span-4 md:col-start-9 lg:col-span-4 lg:col-start-9 mt-4 md:mt-0">
                             <Button
                                 onClick={handleGenerate}
                                 disabled={generating || !businessProfile?.companyId || (mode === 'range' && (!startDate || !endDate))}
-                                className="w-full bg-blue-600 hover:bg-blue-700 font-bold h-12 text-lg shadow-md transition-all active:scale-[0.98]"
+                                className="w-full bg-blue-600 hover:bg-blue-700 font-bold"
                             >
                                 {generating ? (
                                     <>
