@@ -3,17 +3,20 @@ import { auth } from '@clerk/nextjs/server'
 import iconv from 'iconv-lite'
 import JSZip from 'jszip'
 import {
-    makeA100, makeB110, makeM100, makeC100, makeD110, makeB100, makeZ900, makeA000
+    makeA100, makeB110, makeM100, makeC100, makeD110, makeB100, makeZ900, makeA000, makeD120
 } from './records'
 import { DOC_TYPES } from './consts'
+import { generateSummaryReportPDFBuffer } from './summary-report'
+import { format } from 'date-fns'
 
-export async function generateOpenFormatFiles(year: number) {
+export async function generateOpenFormatFiles(options: { year?: number, startDate?: Date, endDate?: Date }) {
     const { userId } = await auth()
     if (!userId) throw new Error('Unauthorized')
-    return generateFilesCore(userId, year)
+    return generateFilesCore(userId, options)
 }
 
-export async function generateFilesCore(userId: string, year: number) {
+export async function generateFilesCore(userId: string, options: { year?: number, startDate?: Date, endDate?: Date }) {
+    const { year } = options;
     console.log(`[OpenFormat] Starting generation for user ${userId}, year ${year}`)
     const db = await authenticatedPrisma(userId)
     const business = await db.businessProfile.findUnique({ where: { userId } })
@@ -25,8 +28,16 @@ export async function generateFilesCore(userId: string, year: number) {
     console.log(`[OpenFormat] Business found: ${business.companyName} (${business.companyId})`)
 
     // 1. Fetch Data
-    const startDate = new Date(year, 0, 1)
-    const endDate = new Date(year, 11, 31, 23, 59, 59)
+    let startDate = options.startDate;
+    let endDate = options.endDate;
+    
+    if (!startDate || !endDate) {
+        if (!year) throw new Error('Must provide either year or specific date range');
+        startDate = new Date(year, 0, 1);
+        endDate = new Date(year, 11, 31, 23, 59, 59);
+    }
+    const displayYear = year || startDate.getFullYear();
+
     console.log(`[OpenFormat] Date range: ${startDate.toISOString()} - ${endDate.toISOString()}`)
 
     const invoices = await db.invoice.findMany({
@@ -47,6 +58,16 @@ export async function generateFilesCore(userId: string, year: number) {
     })
     console.log(`[OpenFormat] Found ${creditNotes.length} credit notes`)
 
+    // --- Record Counters ---
+    const counters = {
+        A100: 0, B110: 0, B100: 0, C100: 0, D110: 0, D120: 0, M100: 0, Z900: 0, Total: 0
+    }
+    const addLine = (lineStr: string, type: keyof typeof counters) => {
+        lines.push(lineStr)
+        counters[type]++
+        counters.Total++
+    }
+
     // 2. Prepare Indexes (Clients & Items)
     const clientMap = new Map<string, any>()
     const itemMap = new Map<string, string>() // ID -> Name
@@ -66,15 +87,13 @@ export async function generateFilesCore(userId: string, year: number) {
 
     // 3. Begin Generating Stream
     let lines: string[] = []
-    let lineCount = 0
 
     // --- A100: Header ---
-    lines.push(makeA100({
+    addLine(makeA100({
         dealerId: business.companyId || '000000000',
         companyName: business.companyName || 'My Business',
         softwareName: 'BudgetManager'
-    }))
-    lineCount++
+    }), 'A100')
 
     // Collect Data for Indexes
     const allDocs = [
@@ -98,39 +117,47 @@ export async function generateFilesCore(userId: string, year: number) {
     }
 
     // --- B110: Accounts ---
-    // We need standard accounts too:
-    // 100000 - Cash/Bank (Simplified)
-    // 800000 - Revenue
-    // 900000 - VAT
-    lines.push(makeB110('100000', 'Cash/Bank', '000000000'))
-    lines.push(makeB110('800000', 'Revenue', '000000000'))
-    lines.push(makeB110('900000', 'VAT Input', '000000000'))
-    lineCount += 3
+    addLine(makeB110('100000', 'Cash/Bank', '000000000'), 'B110')
+    addLine(makeB110('800000', 'Revenue', '000000000'), 'B110')
+    addLine(makeB110('900000', 'VAT Input', '000000000'), 'B110')
 
-    // Clients
     for (const [key, info] of clientMap.entries()) {
-        lines.push(makeB110(key, info.name, info.taxId || '000000000', info.address))
-        lineCount++
+        addLine(makeB110(key, info.name, info.taxId || '000000000', info.address), 'B110')
     }
 
     // --- M100: Items ---
     for (const [id, name] of itemMap.entries()) {
         const safeCode = id.slice(-15) // Ensure fit
-        lines.push(makeM100(safeCode, name))
-        lineCount++
+        addLine(makeM100(safeCode, name), 'M100')
     }
 
     // --- Documents Processing ---
     let journalCounter = 1
+    
+    // For Visual Report
+    let totalInvCount = 0
+    let totalInvTotal = 0
+    let totalCnCount = 0
+    let totalCnTotal = 0
+    let totalRecCount = 0
+    let totalRecTotal = 0
 
     for (const doc of allDocs) {
         if (doc.type === 'INV') {
             const inv = doc.data as typeof invoices[0]
             const clientKey = getClientKey(inv.client, inv.guestClientName)
+            
+            // Determine DocType code.
+            const isReceipt = inv.invoiceType === 'RECEIPT'
+            const isInvRec = inv.invoiceType === 'INVOICE_RECEIPT'
+            const docTypeCode = isReceipt ? DOC_TYPES.RECEIPT : (isInvRec ? DOC_TYPES.INVOICE_RECEIPT : DOC_TYPES.INVOICE)
+
+            if (isReceipt) { totalRecCount++; totalRecTotal += inv.total; }
+            else { totalInvCount++; totalInvTotal += inv.total; }
 
             // C100
-            lines.push(makeC100({
-                docType: DOC_TYPES.INVOICE,
+            addLine(makeC100({
+                docType: docTypeCode,
                 docNum: inv.invoiceNumber,
                 date: inv.issueDate,
                 clientKey: clientKey,
@@ -139,14 +166,13 @@ export async function generateFilesCore(userId: string, year: number) {
                 amountNoVat: inv.subtotal,
                 vatAmount: inv.vatAmount,
                 totalAmount: inv.total
-            }))
-            lineCount++
+            }), 'C100')
 
-            // D110 Items
+            // D110 Items (Not for pure receipt according to some systems, but budget-manager attaches items)
             let lineNum = 1
             for (const item of inv.lineItems) {
-                lines.push(makeD110({
-                    docType: DOC_TYPES.INVOICE,
+                addLine(makeD110({
+                    docType: docTypeCode,
                     docNum: inv.invoiceNumber,
                     lineNum: lineNum++,
                     itemCode: item.id.slice(-15),
@@ -154,38 +180,47 @@ export async function generateFilesCore(userId: string, year: number) {
                     quantity: item.quantity,
                     price: item.price,
                     total: item.total
-                }))
-                lineCount++
+                }), 'D110')
+            }
+            
+            // D120 Receipt/Payments
+            if (isReceipt || isInvRec || inv.paidAmount) {
+                // If it's a receipt or paid invoice, document the payment.
+                addLine(makeD120({
+                    docType: docTypeCode,
+                    docNum: inv.invoiceNumber,
+                    lineNum: 1, // Payment line
+                    paymentMethodCode: '4', // Default Bank Transfer or parse inv.paymentMethod
+                    date: inv.paidDate || inv.issueDate,
+                    amount: inv.paidAmount || inv.total
+                }), 'D120')
+                
+                if (isInvRec && !isReceipt) {
+                    totalRecCount++; totalRecTotal += (inv.paidAmount || inv.total);
+                }
             }
 
-            // B100 Journal (Simplified: Client Debit, Revenue Credit)
-            // Debit Client (Total)
-            lines.push(makeB100(journalCounter, inv.invoiceNumber, inv.issueDate, clientKey, '800000', inv.total, `Inv ${inv.invoiceNumber}`))
-            lineCount++
-            // Note: Full accounting splits VAT (900000) but standard single-entry for small biz often accepts Total to Revenue or Split.
-            // Let's stick to simple Total for now to satisfy existence validation.
+            addLine(makeB100(journalCounter++, inv.invoiceNumber, inv.issueDate, clientKey, '800000', inv.total, `Inv ${inv.invoiceNumber}`), 'B100')
 
         } else {
             const cn = doc.data as typeof creditNotes[0]
             const clientKey = getClientKey(cn.invoice?.client, cn.invoice.guestClientName)
+            
+            totalCnCount++; totalCnTotal += cn.totalCredit;
 
-            // C100
-            lines.push(makeC100({
+            addLine(makeC100({
                 docType: DOC_TYPES.CREDIT_NOTE,
                 docNum: cn.creditNoteNumber,
                 date: cn.issueDate,
                 clientKey: clientKey,
                 clientName: cn.invoice?.client?.name || cn.invoice.guestClientName || 'Guest',
                 clientTaxId: cn.invoice?.client?.taxId || '000000000',
-                amountNoVat: cn.creditAmount, // This is pre-vat usually? Or total?
-                // Logic: creditAmount is usually base. totalCredit is w/ VAT.
+                amountNoVat: cn.creditAmount,
                 vatAmount: cn.totalCredit - cn.creditAmount,
                 totalAmount: cn.totalCredit
-            }))
-            lineCount++
+            }), 'C100')
 
-            // D110
-            lines.push(makeD110({
+            addLine(makeD110({
                 docType: DOC_TYPES.CREDIT_NOTE,
                 docNum: cn.creditNoteNumber,
                 lineNum: 1,
@@ -194,19 +229,14 @@ export async function generateFilesCore(userId: string, year: number) {
                 quantity: 1,
                 price: cn.creditAmount,
                 total: cn.creditAmount
-            }))
-            lineCount++
+            }), 'D110')
 
-            // B100 Journal (Credit)
-            // Debit Revenue, Credit Client (Reverse)
-            lines.push(makeB100(journalCounter, cn.creditNoteNumber, cn.issueDate, '800000', clientKey, cn.totalCredit, `CN ${cn.creditNoteNumber}`))
-            lineCount++
+            addLine(makeB100(journalCounter++, cn.creditNoteNumber, cn.issueDate, '800000', clientKey, cn.totalCredit, `CN ${cn.creditNoteNumber}`), 'B100')
         }
-        journalCounter++
     }
 
     // --- Z900: Footer ---
-    lines.push(makeZ900(business.companyId || '000000000', lineCount + 1)) // +1 for Z900 itself
+    addLine(makeZ900(business.companyId || '000000000', counters.Total + 1), 'Z900')
 
     // --- Encoding & Zipping ---
     const bkmvContent = lines.join('')
@@ -216,17 +246,33 @@ export async function generateFilesCore(userId: string, year: number) {
         dealerId: business.companyId || '000000000',
         companyName: business.companyName || 'My Business',
         softwareName: 'BudgetManager'
-    }, lineCount, year)
+    }, counters.Total, displayYear)
 
     const iniBuffer = iconv.encode(iniContent, 'win1255')
+
+    // Document Summary Report (PDF)
+    const pdfBuffer = await generateSummaryReportPDFBuffer({
+        companyName: business.companyName || 'My Business',
+        companyId: business.companyId || '000000000',
+        startDate: format(startDate, 'dd/MM/yyyy'),
+        endDate: format(endDate, 'dd/MM/yyyy'),
+        rows: [
+            { docTypeCode: '305', docTypeName: 'חשבונית מס / קבלה', quantity: totalInvCount, totalAmount: totalInvTotal },
+            { docTypeCode: '400', docTypeName: 'קבלה', quantity: totalRecCount, totalAmount: totalRecTotal },
+            { docTypeCode: '330', docTypeName: 'חשבונית זיכוי', quantity: totalCnCount, totalAmount: totalCnTotal },
+            { docTypeCode: '200', docTypeName: 'תעודת משלוח (לא פעיל)', quantity: 0, totalAmount: 0 },
+            { docTypeCode: '300', docTypeName: 'חשבונית עסקה (לא פעיל)', quantity: 0, totalAmount: 0 }
+        ]
+    })
 
     const zip = new JSZip()
     const folder = zip.folder('OPENFRMT')
     if (!folder) throw new Error('Zip error')
-    const sub = folder.folder(`${business.companyId}.${year}`)
+    const sub = folder.folder(`${business.companyId}.${displayYear}`)
     if (!sub) throw new Error('Zip sub error')
 
     sub.file('INI.TXT', iniBuffer)
+    sub.file('DOCUMENT_SUMMARY_REPORT.pdf', pdfBuffer)
 
     // BKMVDATA.ZIP
     const innerZip = new JSZip()
@@ -238,8 +284,12 @@ export async function generateFilesCore(userId: string, year: number) {
     const finalZip = await zip.generateAsync({ type: 'base64' })
 
     return {
-        filename: `OpenFormat-${year}.zip`,
+        filename: `OpenFormat-${displayYear}.zip`,
         data: finalZip,
-        count: invoices.length + creditNotes.length
+        counters,
+        stats: {
+            totalAmount: totalInvTotal + totalRecTotal,
+            invoices: totalInvCount + totalRecCount
+        }
     }
 }

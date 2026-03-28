@@ -118,12 +118,45 @@ export function makeC100(data: C100Data): string {
         fmtStr('', 50), // Client Addr
         fmtStr(data.clientTaxId, 9),
         fmtStr(data.clientKey, 15), // Link to B110
-        fmtStr('', 15), // User Key?
-        fmtNum(data.amountNoVat, 15),
-        fmtNum(data.vatAmount, 15),
-        fmtNum(data.totalAmount, 15),
-        fmtNum(data.discountAmount || 0, 15),
+        fmtNum(data.amountNoVat + (data.discountAmount || 0), 15), // Total before discount
+        fmtNum(data.discountAmount || 0, 15),                      // Discount amount
+        fmtNum(data.amountNoVat, 15),                              // Total before VAT
+        fmtNum(data.vatAmount, 15),                                // VAT amount
+        fmtNum(data.totalAmount, 15),                              // Total with VAT (Field 1223)
+        fmtNum(0, 15),                                             // Withholding Tax
         'ILS'
+    ].join('') + '\r\n'
+}
+
+// --- D120: Receipt Detail (Payment Line) ---
+export interface D120Data {
+    docType: string
+    docNum: string
+    lineNum: number
+    paymentMethodCode: string // '1'=Cash, '2'=Check, '3'=Credit Card, '4'=Bank Transfer
+    bankNum?: string
+    branchNum?: string
+    accountNum?: string
+    checkNum?: string // Check number or Credit Card last 4 digits
+    date: Date
+    amount: number
+}
+
+export function makeD120(data: D120Data): string {
+    // Fields: Rec(4), Type(3), Num(20), Line(4), PayMethod(1), Bank(2), Branch(3), Account(15), 
+    //         Check/CC(20), Date(8), Amount(15.2)
+    return [
+        RECORD_TYPES.DOC_PAYMENT,
+        fmtStr(data.docType, 3),
+        fmtStr(data.docNum, 20),
+        fmtInt(data.lineNum, 4),
+        fmtStr(data.paymentMethodCode, 1),
+        fmtStr(data.bankNum || '00', 2),
+        fmtStr(data.branchNum || '000', 3),
+        fmtStr(data.accountNum || '000000000000000', 15),
+        fmtStr(data.checkNum || '', 20),
+        fmtDate(data.date),
+        fmtNum(data.amount, 15)
     ].join('') + '\r\n'
 }
 
