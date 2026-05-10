@@ -14,7 +14,17 @@ const nextConfig = {
             bodySizeLimit: '10mb'
         }
     },
-    transpilePackages: ['@signpdf/signpdf', '@signpdf/signer-p12', '@signpdf/placeholder-pdf-lib', 'pdf-lib'],
+    transpilePackages: [
+        '@signpdf/signpdf', 
+        '@signpdf/signer-p12', 
+        '@signpdf/placeholder-pdf-lib', 
+        'pdf-lib',
+        'isomorphic-dompurify',
+        'jsdom',
+        'html-encoding-sniffer',
+        'whatwg-mimetype',
+        'whatwg-encoding'
+    ],
     async headers() {
         return [
             {
