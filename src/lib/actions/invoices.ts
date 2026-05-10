@@ -556,6 +556,13 @@ export async function updateInvoiceStatus(id: string, status: 'DRAFT' | 'SENT' |
             }
         })
 
+        // Delete associated incomes if the invoice is cancelled
+        if (status === 'CANCELLED') {
+            await db.income.deleteMany({
+                where: { invoiceId: id }
+            })
+        }
+
         revalidatePath('/dashboard')
         return { success: true, data: invoice }
     } catch (error) {
