@@ -27,9 +27,10 @@ function registerFont() {
     }
 }
 
-interface GenerateInvoicePDFParams {
-    invoiceId: string
-    userId: string
+export interface GenerateInvoicePDFParams {
+    invoiceId?: string
+    userId?: string
+    token?: string
 }
 
 export function mapInvoiceToPDFData(invoice: any, businessProfile: any, businessBudget: any) {
@@ -82,13 +83,18 @@ export async function generatePDFBuffer(data: any): Promise<Buffer> {
     })
 }
 
-export async function generateInvoicePDF({ invoiceId, userId }: GenerateInvoicePDFParams): Promise<{ buffer: Buffer, filename: string }> {
+export async function generateInvoicePDF({ invoiceId, userId, token }: GenerateInvoicePDFParams): Promise<{ buffer: Buffer, filename: string }> {
     try {
+        const where: any = {}
+        if (token) {
+            where.publicToken = token
+        } else {
+            where.id = invoiceId
+            where.userId = userId
+        }
+
         const invoice = await prisma.invoice.findFirst({
-            where: {
-                id: invoiceId,
-                userId: userId
-            },
+            where,
             include: {
                 client: true,
                 user: {

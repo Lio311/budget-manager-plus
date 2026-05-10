@@ -16,12 +16,7 @@ export async function signPdfBuffer(
     const p12Base64 = process.env.PDF_SIGNING_P12_BASE64
     const p12Password = process.env.PDF_SIGNING_P12_PASSWORD
 
-    console.log('[signPdfBuffer] STARTING - Time:', new Date().toISOString())
-    console.log('[signPdfBuffer] Environment Check:', { 
-        hasBase64: !!p12Base64, 
-        hasPassword: !!p12Password,
-        base64Length: p12Base64?.length || 0 
-    })
+    console.log('[signPdfBuffer] Starting signature process...')
 
     try {
         const { SignPdf } = await import('@signpdf/signpdf')
@@ -41,19 +36,17 @@ export async function signPdfBuffer(
             updateMetadata: false 
         })
         
-        // 1. ALWAYS ADD VISIBLE STAMP (for debugging)
-        console.log('[signPdfBuffer] Drawing visible stamp...')
+        // 1. Add Visible Stamp
         await addVisibleStamp(pdfDoc, signerName, { rgb, StandardFonts })
 
-        // 2. If no cert, return the PDF WITH the visible stamp but WITHOUT crypto signature
+        // 2. If no cert, return the PDF with the visual stamp only
         if (!p12Base64 || !p12Password) {
-            console.warn('[signPdfBuffer] No certificate found. Returning PDF with visual stamp only.')
+            console.warn('[signPdfBuffer] Missing environment variables. Returning PDF with visual stamp only.')
             const visualOnlyPdf = await pdfDoc.save()
             return Buffer.from(visualOnlyPdf)
         }
 
-        // 3. Add crypto signature
-        console.log('[signPdfBuffer] Adding cryptographic placeholder...')
+        // 3. Add cryptographic signature
         pdflibAddPlaceholder({
             pdfDoc,
             reason,
@@ -70,10 +63,10 @@ export async function signPdfBuffer(
         const signPdf = new SignPdf()
         const signedPdf = await signPdf.sign(Buffer.from(pdfWithPlaceholder), signer)
 
-        console.log('[signPdfBuffer] SUCCESS - PDF signed cryptographically!')
+        console.log('[signPdfBuffer] PDF signed successfully!')
         return Buffer.from(signedPdf)
     } catch (error) {
-        console.error('[signPdfBuffer] CRITICAL ERROR:', error)
+        console.error('[signPdfBuffer] Failed to sign PDF:', error)
         return pdfBuffer
     }
 }
@@ -82,16 +75,16 @@ async function addVisibleStamp(pdfDoc: any, signerName: string, { rgb, StandardF
     const pages = pdfDoc.getPages()
     if (pages.length === 0) return
     const firstPage = pages[0]
-    const { width, height } = firstPage.getSize()
+    const { width } = firstPage.getSize()
 
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica)
     const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-    // Center-bottom position
+    // Position: Bottom-left, above footer
     const stampWidth = 180
     const stampHeight = 44
-    const stampX = (width - stampWidth) / 2
-    const stampY = 80 
+    const stampX = 40
+    const stampY = 130 
 
     const greenColor = rgb(0.063, 0.725, 0.506) 
     const darkGreenColor = rgb(0.039, 0.553, 0.380) 
@@ -111,7 +104,7 @@ async function addVisibleStamp(pdfDoc: any, signerName: string, { rgb, StandardF
     const now = new Date()
     const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
 
-    firstPage.drawText(`Signer: ${signerName}`, {
+    firstPage.drawText(`By: ${signerName}`, {
         x: stampX + 12, y: stampY + 16, size: 8, font: helvetica, color: rgb(0.3, 0.3, 0.3),
     })
     firstPage.drawText(`Date: ${dateStr}`, {

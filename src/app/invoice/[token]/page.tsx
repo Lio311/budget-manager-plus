@@ -82,74 +82,17 @@ export default function PublicInvoicePage() {
 
     const handleDownloadPDF = async () => {
         try {
-            toast.info('מכין את קובץ ה-PDF...')
-
-            const element = document.getElementById('invoice-content')
-            if (!element) return
-
-            // Create a temporary container to force desktop layout
-            const container = document.createElement('div')
-            container.style.position = 'absolute'
-            container.style.left = '-9999px'
-            container.style.top = '0'
-            container.style.width = '1200px' // Force desktop width to trigger md: styles
-
-            // Clone the element
-            const clone = element.cloneNode(true) as HTMLElement
-            container.appendChild(clone)
-            document.body.appendChild(container)
-
-            const canvas = await html2canvas(clone, {
-                scale: 2, // Higher scale for better quality
-                useCORS: true, // Allow loading cross-origin images (like signatures/logos)
-                logging: false,
-                windowWidth: 1200 // Ensure media queries match desktop
-            })
-
-            // Cleanup
-            document.body.removeChild(container)
-
-            const imgData = canvas.toDataURL('image/png')
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4'
-            })
-
-            let imgWidth = 210 // A4 width in mm
-            const pageHeight = 297 // A4 height in mm
-            let imgHeight = (canvas.height * imgWidth) / canvas.width
-
-            // Scale to fit if slightly bigger than A4 or just to be safe
-            // We scale down to pageHeight - 30mm to ensure bottom margin/footer isn't cut
-            if (imgHeight > pageHeight - 30) {
-                const scale = (pageHeight - 30) / imgHeight
-                imgWidth *= scale
-                imgHeight = (pageHeight - 30)
-            }
-
-            let heightLeft = imgHeight
-            let position = 0
-
-            // Center horizontally if scaled down
-            const xOffset = (210 - imgWidth) / 2
-
-            pdf.addImage(imgData, 'PNG', xOffset, position, imgWidth, imgHeight)
-            heightLeft -= pageHeight
-
-            // Handle multi-page (only if still huge overflow)
-            while (heightLeft > 5) { // Threshold to prevent tiny overflows causing new page
-                position = heightLeft - imgHeight
-                pdf.addPage()
-                pdf.addImage(imgData, 'PNG', xOffset, position, imgWidth, imgHeight)
-                heightLeft -= pageHeight
-            }
-
-            pdf.save(`invoice_${invoice.invoiceNumber}.pdf`)
-            toast.success('הורדה הושלמה')
+            toast.info('מכין את קובץ ה-PDF מהשרת...')
+            
+            // Redirect directly to the public PDF generation endpoint
+            window.location.href = `/api/public/invoices/${token}/pdf`
+            
+            setTimeout(() => {
+                toast.success('הורדה התחילה')
+            }, 1000)
         } catch (err) {
             console.error(err)
-            toast.error('שגיאה ביצירת ה-PDF')
+            toast.error('שגיאה בהורדת ה-PDF')
         }
     }
 
