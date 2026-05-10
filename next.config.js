@@ -14,6 +14,7 @@ const nextConfig = {
             bodySizeLimit: '10mb'
         }
     },
+    transpilePackages: ['@signpdf/signpdf', '@signpdf/signer-p12', '@signpdf/placeholder-pdf-lib', 'pdf-lib'],
     async headers() {
         return [
             {

@@ -3,18 +3,7 @@
  * 
  * Signs PDF buffers with a PKCS#7 (CMS) digital signature using a P12 certificate.
  * Also adds a visible "Digitally Signed" stamp on the first page.
- * 
- * Configuration via environment variables:
- *   PDF_SIGNING_P12_BASE64  — Base64-encoded P12 certificate
- *   PDF_SIGNING_P12_PASSWORD — Password for the P12 certificate
- * 
- * If no certificate is configured, returns the buffer unsigned (graceful fallback).
  */
-
-import { SignPdf } from '@signpdf/signpdf'
-import { P12Signer } from '@signpdf/signer-p12'
-import { pdflibAddPlaceholder } from '@signpdf/placeholder-pdf-lib'
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 
 export interface SignPdfOptions {
     signerName?: string       // Name shown in the signature (default: "Kesefly")
@@ -25,8 +14,6 @@ export interface SignPdfOptions {
 
 /**
  * Signs a PDF buffer with a digital signature and adds a visible stamp.
- * 
- * If no P12 certificate is configured (env vars), returns the original buffer unchanged.
  */
 export async function signPdfBuffer(
     pdfBuffer: Buffer,
@@ -44,6 +31,12 @@ export async function signPdfBuffer(
     }
 
     try {
+        // Dynamic imports to avoid ERR_REQUIRE_ESM issues in Next.js/Vercel
+        const { SignPdf } = await import('@signpdf/signpdf')
+        const { P12Signer } = await import('@signpdf/signer-p12')
+        const { pdflibAddPlaceholder } = await import('@signpdf/placeholder-pdf-lib')
+        const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib')
+
         const p12Buffer = Buffer.from(p12Base64, 'base64')
         const {
             signerName = 'Kesefly',
@@ -59,7 +52,7 @@ export async function signPdfBuffer(
         })
         
         // Draw visible signature stamp on the first page
-        await addVisibleStamp(pdfDoc, signerName)
+        await addVisibleStamp(pdfDoc, signerName, { rgb, StandardFonts })
 
         // Step 2: Add signature placeholder using pdf-lib integration
         pdflibAddPlaceholder({
@@ -68,8 +61,8 @@ export async function signPdfBuffer(
             contactInfo,
             name: signerName,
             location,
-            signatureLength: 8192, // Large enough for most P12 signatures
-            widgetRect: [0, 0, 0, 0], // Invisible widget (visual stamp is separate)
+            signatureLength: 8192,
+            widgetRect: [0, 0, 0, 0],
         })
 
         // Step 3: Save the PDF with placeholder
@@ -81,7 +74,7 @@ export async function signPdfBuffer(
         const signedPdf = await signPdf.sign(Buffer.from(pdfWithPlaceholder), signer)
 
         console.log('[signPdfBuffer] PDF signed successfully!')
-        return signedPdf
+        return Buffer.from(signedPdf)
     } catch (error) {
         console.error('[signPdfBuffer] Failed to sign PDF:', error)
         return pdfBuffer
@@ -90,32 +83,27 @@ export async function signPdfBuffer(
 
 /**
  * Draws a visible "Digitally Signed" stamp on the first page of the PDF.
- * Uses standard Helvetica font (no custom font needed).
  */
-async function addVisibleStamp(pdfDoc: PDFDocument, signerName: string) {
+async function addVisibleStamp(pdfDoc: any, signerName: string, { rgb, StandardFonts }: any) {
     const pages = pdfDoc.getPages()
     if (pages.length === 0) return
 
     const firstPage = pages[0]
     const { width, height } = firstPage.getSize()
 
-    // Load standard fonts
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica)
     const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-    // Stamp dimensions and position
+    // Adjusted position: Higher up and more visible
     const stampWidth = 180
     const stampHeight = 44
-    const stampX = 40  // Move further from left edge
-    const stampY = 120 // Move significantly UP to avoid footer overlap
+    const stampX = 40 
+    const stampY = 130 // Raised significantly
 
-    // Colors
-    const greenColor = rgb(0.063, 0.725, 0.506) // #10b981
-    const darkGreenColor = rgb(0.039, 0.553, 0.380) // #0a8d61
-    const whiteColor = rgb(1, 1, 1)
-    const lightGreenBg = rgb(0.941, 0.992, 0.969) // #f0fdf8
+    const greenColor = rgb(0.063, 0.725, 0.506) 
+    const darkGreenColor = rgb(0.039, 0.553, 0.380) 
+    const lightGreenBg = rgb(0.941, 0.992, 0.969) 
 
-    // Draw stamp background
     firstPage.drawRectangle({
         x: stampX,
         y: stampY,
@@ -127,7 +115,6 @@ async function addVisibleStamp(pdfDoc: PDFDocument, signerName: string) {
         opacity: 0.95,
     })
 
-    // Draw green accent bar on the left
     firstPage.drawRectangle({
         x: stampX,
         y: stampY,
@@ -136,45 +123,39 @@ async function addVisibleStamp(pdfDoc: PDFDocument, signerName: string) {
         color: greenColor,
     })
 
-    // Format current date
     const now = new Date()
     const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
 
-    // Draw checkmark + "Digitally Signed" title
-    const titleY = stampY + stampHeight - 16
     firstPage.drawText('Digitally Signed', {
         x: stampX + 24,
-        y: titleY,
+        y: stampY + stampHeight - 16,
         size: 10,
         font: helveticaBold,
         color: darkGreenColor,
     })
 
-    // Checkmark symbol (using Zapf Dingbats or drawing manually)
     firstPage.drawText('\u2713', {
         x: stampX + 10,
-        y: titleY,
+        y: stampY + stampHeight - 16,
         size: 12,
         font: helvetica,
         color: greenColor,
     })
 
-    // Draw signer name
     firstPage.drawText(`By: ${signerName}`, {
         x: stampX + 12,
         y: stampY + 14,
         size: 7.5,
         font: helvetica,
-        color: rgb(0.373, 0.416, 0.463), // #5f6a76
+        color: rgb(0.373, 0.416, 0.463),
     })
 
-    // Draw date/time
     firstPage.drawText(`${dateStr} ${timeStr}`, {
         x: stampX + 12,
         y: stampY + 4,
         size: 7,
         font: helvetica,
-        color: rgb(0.498, 0.549, 0.596), // #7f8c98
+        color: rgb(0.498, 0.549, 0.596),
     })
 }
