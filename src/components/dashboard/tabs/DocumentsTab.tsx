@@ -718,16 +718,18 @@ export function DocumentsTab() {
                                                 )}
 
                                             {/* Delete Button */}
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                onClick={() => handleDelete(doc.type, doc.id)}
-                                                className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100"
-                                                title="מחיקה"
-                                                disabled={loading}
-                                            >
-                                                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                                            </Button>
+                                            {!(doc.type === 'invoice' && (doc.isSigned || (doc.incomes && doc.incomes.length > 0))) && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => handleDelete(doc.type, doc.id)}
+                                                    className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100"
+                                                    title="מחיקה"
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
