@@ -109,14 +109,22 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
 
         setIsSubmitting(true)
         try {
-            await handleCreate(formData)
+            const submitVatRate = selectedInvoice?.vatRate || 0
+            const submitSubtotal = formData.creditAmount / (1 + submitVatRate)
+            
+            await handleCreate({
+                ...formData,
+                creditAmount: submitSubtotal
+            })
         } finally {
             setIsSubmitting(false)
         }
     }
 
-    const vatAmount = selectedInvoice ? formData.creditAmount * selectedInvoice.vatRate : 0
-    const totalCredit = formData.creditAmount + vatAmount
+    const vatRate = selectedInvoice?.vatRate || 0
+    const subtotal = formData.creditAmount / (1 + vatRate)
+    const vatAmount = formData.creditAmount - subtotal
+    const totalCredit = formData.creditAmount
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -174,7 +182,7 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        סכום זיכוי (ללא מע"מ) *
+                        סכום זיכוי (כולל מע"מ) *
                     </label>
                     <FormattedNumberInput
                         value={formData.creditAmount}
@@ -199,10 +207,10 @@ export function CreditNoteForm({ onSuccess }: CreditNoteFormProps) {
                     <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                             <span className="dark:text-purple-100">סכום ללא מע"מ:</span>
-                            <span className="dark:text-purple-100">{formatCurrency(formData.creditAmount)}</span>
+                            <span className="dark:text-purple-100">{formatCurrency(subtotal)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="dark:text-purple-100">מע"מ ({(selectedInvoice.vatRate * 100)}%):</span>
+                            <span className="dark:text-purple-100">מע"מ ({Math.round(vatRate * 100)}%):</span>
                             <span className="dark:text-purple-100">{formatCurrency(vatAmount)}</span>
                         </div>
                         <div className="flex justify-between text-lg font-bold border-t border-orange-200 pt-2 dark:border-purple-900/50">
