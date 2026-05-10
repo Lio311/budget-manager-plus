@@ -35,8 +35,11 @@ export async function signPdfBuffer(
     const p12Base64 = process.env.PDF_SIGNING_P12_BASE64
     const p12Password = process.env.PDF_SIGNING_P12_PASSWORD
 
+    console.log('[signPdfBuffer] Starting signature process...')
+    
     // Graceful fallback: no certificate configured → return unsigned
     if (!p12Base64 || !p12Password) {
+        console.warn('[signPdfBuffer] Missing environment variables. Base64:', !!p12Base64, 'Password:', !!p12Password)
         return pdfBuffer
     }
 
@@ -77,10 +80,10 @@ export async function signPdfBuffer(
         const signPdf = new SignPdf()
         const signedPdf = await signPdf.sign(Buffer.from(pdfWithPlaceholder), signer)
 
+        console.log('[signPdfBuffer] PDF signed successfully!')
         return signedPdf
     } catch (error) {
         console.error('[signPdfBuffer] Failed to sign PDF:', error)
-        // On error, return the original unsigned buffer rather than breaking the flow
         return pdfBuffer
     }
 }
@@ -100,11 +103,11 @@ async function addVisibleStamp(pdfDoc: PDFDocument, signerName: string) {
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica)
     const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-    // Stamp dimensions and position (bottom-left of page, above footer area)
-    const stampWidth = 200
+    // Stamp dimensions and position
+    const stampWidth = 180
     const stampHeight = 44
-    const stampX = 30  // left margin
-    const stampY = 62  // just above the footer
+    const stampX = 40  // Move further from left edge
+    const stampY = 120 // Move significantly UP to avoid footer overlap
 
     // Colors
     const greenColor = rgb(0.063, 0.725, 0.506) // #10b981
