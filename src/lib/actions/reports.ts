@@ -220,6 +220,7 @@ export async function getProfitLossData(year: number, dateRange?: { from: Date, 
                     lte: endDate
                 },
                 invoiceId: null, // Only fetch incomes NOT already counted via invoices
+                status: { not: 'CANCELLED' },
                 OR: [
                     { clientId: null },
                     { client: { isActive: true, isDeleted: false } }

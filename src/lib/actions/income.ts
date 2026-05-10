@@ -19,6 +19,7 @@ export async function getIncomes(month: number, year: number, type: 'PERSONAL' |
         const incomes = await db.income.findMany({
             where: { 
                 budgetId: budget.id,
+                status: { not: 'CANCELLED' },
                 OR: [
                     { clientId: null },
                     { client: { isActive: true, isDeleted: false } }
@@ -540,7 +541,8 @@ export async function getClientUninvoicedIncomes(clientId: string) {
         const incomes = await db.income.findMany({
             where: {
                 clientId,
-                invoiceId: null
+                invoiceId: null,
+                status: { not: 'CANCELLED' }
             },
             orderBy: { date: 'desc' },
             include: {

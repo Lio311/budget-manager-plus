@@ -73,7 +73,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 select: {
                     id: true,
                     incomes: { 
-                        where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
+                        where: { status: { not: 'CANCELLED' }, OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
                         select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, status: true, workTime: true } 
                     },
                     expenses: { 
@@ -96,7 +96,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 select: {
                     id: true,
                     incomes: { 
-                        where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
+                        where: { status: { not: 'CANCELLED' }, OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
                         select: { id: true, source: true, category: true, amount: true, currency: true, date: true, vatAmount: true, amountBeforeVat: true, status: true, workTime: true } 
                     },
                     expenses: { 
@@ -238,7 +238,7 @@ export async function getOverviewData(month: number, year: number, type: 'PERSON
                 month: true,
                 year: true,
                 incomes: { 
-                    where: { OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
+                    where: { status: { not: 'CANCELLED' }, OR: [{ clientId: null }, { client: { isActive: true, isDeleted: false } }] },
                     select: { amount: true, currency: true } 
                 },
                 expenses: { 

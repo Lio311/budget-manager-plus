@@ -556,10 +556,17 @@ export async function updateInvoiceStatus(id: string, status: 'DRAFT' | 'SENT' |
             }
         })
 
-        // Delete associated incomes if the invoice is cancelled
+        // Sync associated incomes status instead of deleting them
         if (status === 'CANCELLED') {
-            await db.income.deleteMany({
-                where: { invoiceId: id }
+            await db.income.updateMany({
+                where: { invoiceId: id },
+                data: { status: 'CANCELLED' }
+            })
+        } else {
+            const incomeStatus = status === 'PAID' ? 'PAID' : 'PENDING'
+            await db.income.updateMany({
+                where: { invoiceId: id },
+                data: { status: incomeStatus }
             })
         }
 
