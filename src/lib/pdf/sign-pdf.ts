@@ -23,10 +23,11 @@ export async function signPdfBuffer(
     const p12Password = process.env.PDF_SIGNING_P12_PASSWORD
 
     console.log('[signPdfBuffer] Starting signature process...')
+    console.log('[signPdfBuffer] Env check - Base64 defined:', !!p12Base64, 'Password defined:', !!p12Password)
     
     // Graceful fallback: no certificate configured → return unsigned
     if (!p12Base64 || !p12Password) {
-        console.warn('[signPdfBuffer] Missing environment variables. Base64:', !!p12Base64, 'Password:', !!p12Password)
+        console.warn('[signPdfBuffer] Missing environment variables. SIGNATURE SKIPPED.')
         return pdfBuffer
     }
 
@@ -94,11 +95,11 @@ async function addVisibleStamp(pdfDoc: any, signerName: string, { rgb, StandardF
     const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica)
     const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
-    // Adjusted position: Higher up and more visible
+    // Extreme position for testing: TOP RIGHT of the page
     const stampWidth = 180
     const stampHeight = 44
-    const stampX = 40 
-    const stampY = 130 // Raised significantly
+    const stampX = width - stampWidth - 40 
+    const stampY = height - stampHeight - 40
 
     const greenColor = rgb(0.063, 0.725, 0.506) 
     const darkGreenColor = rgb(0.039, 0.553, 0.380) 
