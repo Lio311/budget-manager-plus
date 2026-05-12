@@ -83,8 +83,8 @@ async function addVisibleStamp(pdfDoc: any, signerName: string, { rgb, StandardF
     // Position: Very bottom of the page, below footer
     const stampWidth = 180
     const stampHeight = 44
-    const stampX = 40
-    const stampY = 30
+    const stampX = 20
+    const stampY = 15
 
     const greenColor = rgb(0.063, 0.725, 0.506) 
     const darkGreenColor = rgb(0.039, 0.553, 0.380) 
