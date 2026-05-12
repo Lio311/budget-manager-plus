@@ -84,12 +84,26 @@ export default function PublicInvoicePage() {
         try {
             toast.info('מכין את קובץ ה-PDF מהשרת...')
             
-            // Redirect directly to the public PDF generation endpoint
-            window.location.href = `/api/public/invoices/${token}/pdf`
+            // Use fetch WITHOUT cookies to avoid 400 "Request Header Too Large"
+            const response = await fetch(`/api/public/invoices/${token}/pdf`, {
+                credentials: 'omit'
+            })
             
-            setTimeout(() => {
-                toast.success('הורדה התחילה')
-            }, 1000)
+            if (!response.ok) {
+                throw new Error('Failed to download PDF')
+            }
+            
+            const blob = await response.blob()
+            const url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = `invoice_${invoice.invoiceNumber}.pdf`
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            window.URL.revokeObjectURL(url)
+            
+            toast.success('הורדה הושלמה')
         } catch (err) {
             console.error(err)
             toast.error('שגיאה בהורדת ה-PDF')
