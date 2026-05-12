@@ -87,7 +87,7 @@ export async function generateInvoicePDF({ invoiceId, userId, token }: GenerateI
     try {
         const where: any = {}
         if (token) {
-            where.publicToken = token
+            where.token = token
         } else {
             where.id = invoiceId
             where.userId = userId
