@@ -104,7 +104,10 @@ async function addVisibleStamp(pdfDoc: any, signerName: string, { rgb, StandardF
     const now = new Date()
     const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
 
-    firstPage.drawText(`By: ${signerName}`, {
+    // Sanitize signer name to ASCII only (Helvetica doesn't support Hebrew)
+    const asciiName = signerName.replace(/[^\x20-\x7E]/g, '').trim() || 'Kesefly'
+
+    firstPage.drawText(`By: ${asciiName}`, {
         x: stampX + 12, y: stampY + 16, size: 8, font: helvetica, color: rgb(0.3, 0.3, 0.3),
     })
     firstPage.drawText(`Date: ${dateStr}`, {
