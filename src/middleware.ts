@@ -18,6 +18,7 @@ const isPublicRoute = createRouteMatcher([
     '/api/quick-add(.*)',
     '/api/quick-stats(.*)', // iOS Shortcut API with API key auth
     '/api/scan-invoice(.*)',
+    '/api/public(.*)',
     '/terms(.*)',
     '/security(.*)',
     '/accessibility(.*)',
@@ -40,7 +41,7 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     // Skip maintenance check for maintenance page and status API, AND critical Shortcuts API
-    if (pathname === '/maintenance' || pathname.startsWith('/api/maintenance') || pathname.startsWith('/api/v1/expenses') || pathname.startsWith('/api/quick-add') || pathname.startsWith('/api/quick-stats') || pathname.startsWith('/api/scan-invoice')) {
+    if (pathname === '/maintenance' || pathname.startsWith('/api/maintenance') || pathname.startsWith('/api/v1/expenses') || pathname.startsWith('/api/quick-add') || pathname.startsWith('/api/quick-stats') || pathname.startsWith('/api/scan-invoice') || pathname.startsWith('/api/public')) {
         return;
     }
 
