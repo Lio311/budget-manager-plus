@@ -1,232 +1,196 @@
-import { fmtStr, fmtNum, fmtInt, fmtDate, fmtTime } from './utils'
-import { RECORD_TYPES, DOC_TYPES, VAT_TYPES } from './consts'
+import { format } from 'date-fns'
+import { RECORD_TYPES, DOC_TYPES } from './consts'
 
-// --- Types ---
+class RecordBuilder {
+    str: string;
+    constructor(length: number) {
+        this.str = ' '.repeat(length);
+    }
+    set(offset: number, length: number, val: string | number, padChar = ' ', padLeft = false) {
+        let v = String(val).replace(/[\r\n\t]/g, ' ');
+        if (v.length > length) v = v.substring(0, length);
+        if (padLeft) v = v.padStart(length, padChar);
+        else v = v.padEnd(length, padChar);
+        const idx = offset - 1;
+        this.str = this.str.substring(0, idx) + v + this.str.substring(idx + length);
+    }
+    get() { return this.str + '\r\n'; }
+}
+
+export function fmtNum(num: number | null | undefined, length: number, decimals: number = 2): string {
+    const multiplier = Math.pow(10, decimals);
+    let n = num || 0;
+    let s = Math.round(Math.abs(n) * multiplier).toString();
+    const sign = n < 0 ? '-' : '+';
+    // Mivne Achid signed numeric (X9...v99) has sign as FIRST character
+    return sign + s.padStart(length - 1, '0');
+}
+
+export function fmtDate(date: Date | null | undefined): string {
+    if (!date) return '00000000';
+    return format(date, 'yyyyMMdd');
+}
+
+export function fmtTime(date: Date | null | undefined): string {
+    if (!date) return '0000';
+    try { return format(date, 'HHmm'); } catch { return '0000'; }
+}
+
 export interface OpenFormatOptions {
-    dealerId: string
-    companyName: string
-    softwareName?: string
+    dealerId: string;
+    companyName: string;
+    softwareName?: string;
 }
 
-// --- A000: INI Header Record (Mivne Achid 1.31 Flat) ---
+export function makeIniSummary(recordType: string, count: number): string {
+    const rb = new RecordBuilder(19);
+    rb.set(1, 4, recordType);
+    rb.set(5, 15, count, '0', true);
+    return rb.get();
+}
+
 export function makeA000(opts: OpenFormatOptions, totalRecords: number, year: number): string {
-    return [
-        'A000',
-        // 1001 Future? Skip/6 spaces? Spec usually doesn't have a gap here in standard flat files unless aligned.
-        // Assuming loose concat unless offset specified.
-        fmtNum(totalRecords, 15), // 1002
-        fmtStr(opts.dealerId, 9), // 1003
-        fmtStr(opts.dealerId, 15), // 1004 (File ID/Main ID - padding Osek)
-        '&OF1.31&', // 1005
-        '00000000', // 1006 Soft Reg
-        fmtStr(opts.softwareName || 'BudgetManager', 20), // 1007
-        fmtStr('1.0', 20), // 1008 Version
-        '000000000', // 1009 Man Osek
-        fmtStr('LiorDev', 20), // 1010 Man Name
-        '2', // 1011 Soft Type
-        fmtStr('C:\\OpenFormat', 50), // 1012 Path
-        '2', // 1013 Acc Type
-        '1', // 1014 Balance
-        fmtStr(opts.dealerId, 9), // 1015 Comp Reg
-        '000000000', // 1016 Deduction
-        fmtStr('', 0), // 1017 Future?
-        fmtStr(opts.companyName, 50), // 1018 Name
-        fmtStr('', 50), // 1019 Addr
-        fmtStr('', 10), // 1020 House
-        fmtStr('', 20), // 1021 City
-        fmtStr('', 7),  // 1022 Zip
-        fmtNum(year, 4), // 1023 Year
-        fmtDate(new Date(year, 0, 1)), // 1024 Start
-        fmtDate(new Date(year, 11, 31)), // 1025 End
-        fmtDate(new Date()), // 1026 Gen Date
-        fmtTime(new Date()), // 1027 Gen Time
-        '0', // 1028 Lang
-        '2', // 1029 Charset
-        fmtStr('JSZip', 20), // 1030 Zip Name
-        'ILS', // 1032 Currency
-        '0' // 1034 Branches
-    ].join('') + '\r\n'
+    const rb = new RecordBuilder(421);
+    rb.set(1, 4, 'A000');
+    rb.set(10, 15, totalRecords, '0', true); // 1002
+    rb.set(25, 9, opts.dealerId, '0', true); // 1003
+    rb.set(34, 15, opts.dealerId, '0', true); // 1004 (Main ID, padded with 0)
+    rb.set(49, 8, '&OF1.31&'); // 1005
+    rb.set(57, 8, '99999999'); // 1006 (Registration num, 99999999 for testing to avoid zero-check)
+    rb.set(65, 20, opts.softwareName || 'BudgetManager'); // 1007
+    rb.set(85, 20, '1.0'); // 1008
+    rb.set(105, 9, opts.dealerId, '0', true); // 1009
+    rb.set(114, 20, 'LiorDev'); // 1010
+    rb.set(134, 1, '1'); // 1011
+    rb.set(135, 50, 'C:\\OpenFormat'); // 1012
+    rb.set(185, 1, '2'); // 1013
+    rb.set(186, 1, '1'); // 1014 (Accounting balance required = 1)
+    rb.set(187, 9, opts.dealerId, '0', true); // 1015
+    rb.set(196, 9, '000000000'); // 1016
+    rb.set(226, 50, opts.companyName); // 1017
+    rb.set(363, 4, year, '0', true); // 1022
+    rb.set(367, 8, fmtDate(new Date(year, 0, 1))); // 1023
+    rb.set(375, 8, fmtDate(new Date(year, 11, 31))); // 1024
+    rb.set(383, 8, fmtDate(new Date())); // 1026
+    rb.set(391, 4, fmtTime(new Date())); // 1027
+    rb.set(395, 1, '0'); // 1028
+    rb.set(396, 1, '2'); // 1029
+    rb.set(397, 20, 'BKMVDATA.ZIP'); // 1030
+    rb.set(417, 3, 'ILS'); // 1032
+    rb.set(420, 1, '0'); // 1034
+    return rb.get();
 }
 
-// --- A100: File Header ---
-export function makeA100(opts: OpenFormatOptions, date: Date = new Date()): string {
-    // Fields: Record(4), Osek(9), Date(8), Time(4), Currency(3), Encd(10), Soft(20)
-    return [
-        RECORD_TYPES.HEADER,
-        fmtStr(opts.dealerId, 9),
-        fmtDate(date),
-        fmtTime(date),
-        'ILS',
-        fmtStr('WINDOWS1255', 10), // Encoding hint
-        fmtStr(opts.softwareName || 'BudgetManager', 20),
-        fmtStr('', 50) // Filler
-    ].join('') + '\r\n'
+export function makeA100(opts: OpenFormatOptions, recordNum: number = 1): string {
+    const rb = new RecordBuilder(108);
+    rb.set(1, 4, 'A100');
+    rb.set(5, 9, recordNum, '0', true); // 1101 (Must be 1!)
+    rb.set(14, 9, opts.dealerId, '0', true); // 1102
+    rb.set(23, 15, opts.dealerId, '0', true); // 1103 (Main ID, padded with 0)
+    rb.set(38, 8, '&OF1.31&'); // 1104
+    return rb.get();
 }
 
-// --- B110: Account/Client (Karteset) ---
-export function makeB110(accountKey: string, name: string, taxId: string, address: string = ''): string {
-    // Fields: Record(4), Key(15), Name(50), Address(50), City(20), Zip(7), Osek(9)
-    return [
-        RECORD_TYPES.ACCOUNT,
-        fmtStr(accountKey, 15),
-        fmtStr(name, 50),
-        fmtStr(address, 50),
-        fmtStr('', 20), // City
-        fmtStr('', 7),  // Zip
-        fmtStr(taxId, 9),
-        fmtStr('', 50) // Filler
-    ].join('') + '\r\n'
+export function makeB110(recordNum: number, dealerId: string, accountKey: string, name: string, trialBalanceCode: string, clientTaxId: string = '000000000'): string {
+    const rb = new RecordBuilder(376);
+    rb.set(1, 4, 'B110');
+    rb.set(5, 9, recordNum, '0', true); // 1401
+    rb.set(14, 9, dealerId, '0', true); // 1402
+    rb.set(23, 15, accountKey); // 1403
+    rb.set(38, 50, name); // 1404
+    rb.set(88, 15, trialBalanceCode); // 1405 (Trial Balance Code, MUST NOT BE EMPTY)
+    rb.set(103, 30, 'Account'); // 1406
+    rb.set(278, 15, fmtNum(0, 15, 2)); // 1414 Balance
+    rb.set(293, 15, fmtNum(0, 15, 2)); // 1415 Debit
+    rb.set(308, 15, fmtNum(0, 15, 2)); // 1416 Credit
+    rb.set(327, 9, clientTaxId, '0', true); // 1419
+    return rb.get();
 }
 
-// --- M100: Item (Pritim) ---
-export function makeM100(itemCode: string, name: string): string {
-    // Fields: Record(4), Code(20), Name(50), Unit(4), Class(20)
-    return [
-        RECORD_TYPES.ITEM,
-        fmtStr(itemCode, 20),
-        fmtStr(name, 50),
-        fmtStr('UNIT', 4),
-        fmtStr('', 20), // Classification
-        fmtStr('', 50)  // Filler
-    ].join('') + '\r\n'
+export function makeM100(recordNum: number, dealerId: string, itemCode: string, name: string): string {
+    const rb = new RecordBuilder(229);
+    rb.set(1, 4, 'M100');
+    rb.set(5, 9, recordNum, '0', true); // 1451
+    rb.set(14, 9, dealerId, '0', true); // 1452
+    rb.set(23, 20, itemCode); // 1453
+    rb.set(63, 20, itemCode); // 1455
+    rb.set(83, 50, name); // 1456
+    rb.set(173, 20, 'UNIT'); // 1459
+    rb.set(193, 12, fmtNum(0, 12, 2)); // 1460
+    rb.set(205, 12, fmtNum(0, 12, 2)); // 1461
+    rb.set(217, 12, fmtNum(0, 12, 2)); // 1462
+    return rb.get();
 }
 
-// --- C100: Document Header ---
 export interface C100Data {
-    docType: string // 305, 330
-    docNum: string
-    date: Date
-    clientKey: string // Link to B110
-    clientName: string
-    clientTaxId: string
-    amountNoVat: number
-    vatAmount: number
-    totalAmount: number
-    discountAmount?: number
+    recordNum: number; dealerId: string; docType: string; docNum: string; date: Date; clientKey: string;
+    clientName: string; clientTaxId: string; amountNoVat: number; vatAmount: number; totalAmount: number; discountAmount?: number;
 }
-
 export function makeC100(data: C100Data): string {
-    // Fields: Rec(4), Type(3), Num(20), Date(8), Time(4), ClientName(50), Addr(50), Osek(9), 
-    //         Key(15), UserKey(15), NoVat(15.2), Vat(15.2), Total(15.2), Disc(15.2), Cur(3)
-    return [
-        RECORD_TYPES.DOC_HEADER,
-        fmtStr(data.docType, 3),
-        fmtStr(data.docNum, 20),
-        fmtDate(data.date),
-        fmtTime(data.date),
-        fmtStr(data.clientName, 50),
-        fmtStr('', 50), // Client Addr
-        fmtStr(data.clientTaxId, 9),
-        fmtStr(data.clientKey, 15), // Link to B110
-        fmtNum(data.amountNoVat + (data.discountAmount || 0), 15), // Total before discount
-        fmtNum(data.discountAmount || 0, 15),                      // Discount amount
-        fmtNum(data.amountNoVat, 15),                              // Total before VAT
-        fmtNum(data.vatAmount, 15),                                // VAT amount
-        fmtNum(data.totalAmount, 15),                              // Total with VAT (Field 1223)
-        fmtNum(0, 15),                                             // Withholding Tax
-        'ILS'
-    ].join('') + '\r\n'
+    const rb = new RecordBuilder(409);
+    rb.set(1, 4, 'C100');
+    rb.set(5, 9, data.recordNum, '0', true); // 1201
+    rb.set(14, 9, data.dealerId, '0', true); // 1202
+    rb.set(23, 3, data.docType, '0', true); // 1203
+    rb.set(26, 20, data.docNum); // 1204
+    rb.set(46, 8, fmtDate(data.date)); // 1205
+    rb.set(54, 4, fmtTime(data.date)); // 1206
+    rb.set(58, 50, data.clientName); // 1207
+    rb.set(253, 9, data.clientTaxId, '0', true); // 1215
+    rb.set(262, 8, fmtDate(data.date)); // 1216
+    rb.set(375, 15, data.clientKey); // 1225
+    rb.set(401, 8, fmtDate(data.date)); // 1230
+    return rb.get();
 }
 
-// --- D120: Receipt Detail (Payment Line) ---
-export interface D120Data {
-    docType: string
-    docNum: string
-    lineNum: number
-    paymentMethodCode: string // '1'=Cash, '2'=Check, '3'=Credit Card, '4'=Bank Transfer
-    bankNum?: string
-    branchNum?: string
-    accountNum?: string
-    checkNum?: string // Check number or Credit Card last 4 digits
-    date: Date
-    amount: number
-}
-
-export function makeD120(data: D120Data): string {
-    // Fields: Rec(4), Type(3), Num(20), Line(4), PayMethod(1), Bank(2), Branch(3), Account(15), 
-    //         Check/CC(20), Date(8), Amount(15.2)
-    return [
-        RECORD_TYPES.DOC_PAYMENT,
-        fmtStr(data.docType, 3),
-        fmtStr(data.docNum, 20),
-        fmtInt(data.lineNum, 4),
-        fmtStr(data.paymentMethodCode, 1),
-        fmtStr(data.bankNum || '00', 2),
-        fmtStr(data.branchNum || '000', 3),
-        fmtStr(data.accountNum || '000000000000000', 15),
-        fmtStr(data.checkNum || '', 20),
-        fmtDate(data.date),
-        fmtNum(data.amount, 15)
-    ].join('') + '\r\n'
-}
-
-// --- D110: Document Detail (Line Item) ---
 export interface D110Data {
-    docType: string
-    docNum: string
-    lineNum: number
-    itemCode: string // Link to M100
-    itemName: string
-    quantity: number
-    price: number
-    total: number
+    recordNum: number; dealerId: string; docType: string; docNum: string; lineNum: number;
+    itemCode: string; itemName: string; quantity: number; price: number; total: number; date: Date;
 }
-
 export function makeD110(data: D110Data): string {
-    // Fields: Rec(4), Type(3), Num(20), Line(4), ItmType(1), Code(20), Name(50), Unit(4), 
-    //         Qty(12.2), Price(12.2), Disc(12.2), Total(12.2), VatRate(4)
-    // Note: VatRate is usually index or %. 17.00 -> 1700 or code?
-    // Spec: Vat Rate Code (1) usually? Or Value. 
-    // Let's check common usage: Usually 17.
-
-    return [
-        RECORD_TYPES.DOC_DETAIL,
-        fmtStr(data.docType, 3),
-        fmtStr(data.docNum, 20),
-        fmtInt(data.lineNum, 4),
-        '1', // Item Type (1=Normal)
-        fmtStr(data.itemCode, 20),
-        fmtStr(data.itemName, 50),
-        fmtStr('UNIT', 4),
-        fmtNum(data.quantity, 12),
-        fmtNum(data.price, 12),
-        fmtNum(0, 12), // Discount
-        fmtNum(data.total, 12),
-        '1' // Vat Status Code (1=Normal/Vatable) - Simplification
-    ].join('') + '\r\n'
+    const rb = new RecordBuilder(305);
+    rb.set(1, 4, 'D110');
+    rb.set(5, 9, data.recordNum, '0', true); // 1251
+    rb.set(14, 9, data.dealerId, '0', true); // 1252
+    rb.set(23, 3, data.docType, '0', true); // 1253
+    rb.set(26, 20, data.docNum); // 1254
+    rb.set(46, 4, data.lineNum, '0', true); // 1255
+    rb.set(50, 3, '000'); // 1256 (Base doc type)
+    rb.set(94, 30, data.itemName); // 1260
+    rb.set(224, 17, fmtNum(data.quantity, 17, 4)); // 1264 (Quantity 4 decimals)
+    rb.set(241, 15, fmtNum(data.price, 15, 2)); // 1265 (Price 2 decimals per spec)
+    rb.set(286, 4, '1700'); // 1268 (VAT Rate e.g. 17.00%)
+    rb.set(297, 8, fmtDate(data.date)); // 1272
+    return rb.get();
 }
 
-// --- B100: Journal Entry (Simplified One-to-One) ---
-// Every doc usually creates a header move.
-export function makeB100(
-    num: number,
-    docNum: string,
-    date: Date,
-    debitKey: string,
-    creditKey: string,
-    amount: number,
-    details: string
-): string {
-    // Rec(4), Num(9), Ref(20), Date(8), Deb(15), Cred(15), Val(15), Det(50)
-    return [
-        RECORD_TYPES.JOURNAL,
-        fmtInt(num, 9),
-        fmtStr(docNum, 20),
-        fmtDate(date),
-        fmtStr(debitKey, 15),
-        fmtStr(creditKey, 15),
-        fmtNum(amount, 15),
-        fmtStr(details, 50),
-        fmtDate(date) // Value Date
-    ].join('') + '\r\n'
+export function makeB100(recordNum: number, dealerId: string, journalNum: number, docNum: string, date: Date, debitKey: string, creditKey: string, amount: number, details: string): string {
+    const rb = new RecordBuilder(286);
+    rb.set(1, 4, 'B100');
+    rb.set(5, 9, recordNum, '0', true); // 1351
+    rb.set(14, 9, dealerId, '0', true); // 1352
+    rb.set(23, 10, journalNum, '0', true); // 1353
+    rb.set(33, 5, 1, '0', true); // 1354
+    rb.set(38, 8, '00000001'); // 1355
+    rb.set(157, 8, fmtDate(date)); // 1362
+    rb.set(165, 8, fmtDate(date)); // 1363
+    rb.set(173, 15, debitKey); // 1364
+    rb.set(188, 15, creditKey); // 1365
+    rb.set(203, 1, '1'); // 1366
+    rb.set(204, 3, 'ILS'); // 1367
+    rb.set(207, 15, fmtNum(amount, 15, 2)); // 1368
+    rb.set(222, 15, fmtNum(0, 15, 2)); // 1369
+    rb.set(276, 8, fmtDate(date)); // 1375
+    return rb.get();
 }
 
-// --- Z900: Footer ---
 export function makeZ900(dealerId: string, totalRecords: number): string {
-    // Rec(4), Osek(9), TotalLines(15)
-    return [
-        RECORD_TYPES.FOOTER,
-        fmtStr(dealerId, 9),
-        fmtInt(totalRecords, 15)
-    ].join('') + '\r\n'
+    const rb = new RecordBuilder(61);
+    rb.set(1, 4, 'Z900');
+    rb.set(5, 9, totalRecords, '0', true); // 1151
+    rb.set(14, 9, dealerId, '0', true); // 1152
+    rb.set(23, 15, dealerId, '0', true); // 1153
+    rb.set(38, 8, '&OF1.31&'); // 1154
+    rb.set(46, 15, totalRecords, '0', true); // 1155
+    return rb.get();
 }

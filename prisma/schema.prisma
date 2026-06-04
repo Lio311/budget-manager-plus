@@ -584,6 +584,7 @@ model Client {
   scope     String   @default("BUSINESS")
   isActive  Boolean  @default(true)
   isDeleted Boolean  @default(false)
+  agreedToDigitalInvoices Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -735,6 +736,8 @@ model Invoice {
   documentHash  String?       // SHA-256 Hash
   signedAt      DateTime?
   isSigned      Boolean       @default(false)
+  isLocked      Boolean       @default(false)
+  originalPdfUrl String?      // Path or base64 to original generated PDF
   
   // Relations
   incomes       Income[]
@@ -874,6 +877,8 @@ model CreditNote {
   scope           String   @default("BUSINESS")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  isLocked        Boolean  @default(false)
+  originalPdfUrl  String?
   
   // Public viewing (no signature needed from client)
   token           String?  @unique @default(cuid())

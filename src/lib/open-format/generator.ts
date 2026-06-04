@@ -3,7 +3,7 @@ import { auth } from '@clerk/nextjs/server'
 import iconv from 'iconv-lite'
 import JSZip from 'jszip'
 import {
-    makeA100, makeB110, makeM100, makeC100, makeD110, makeB100, makeZ900, makeA000, makeD120
+    makeA100, makeB110, makeM100, makeC100, makeD110, makeB100, makeZ900, makeA000
 } from './records'
 import { DOC_TYPES } from './consts'
 import { generateSummaryReportPDFBuffer } from './summary-report'
@@ -117,18 +117,19 @@ export async function generateFilesCore(userId: string, options: { year?: number
     }
 
     // --- B110: Accounts ---
-    addLine(makeB110('100000', 'Cash/Bank', '000000000'), 'B110')
-    addLine(makeB110('800000', 'Revenue', '000000000'), 'B110')
-    addLine(makeB110('900000', 'VAT Input', '000000000'), 'B110')
+    let recordCounter = 1;
+    addLine(makeB110(recordCounter++, business.companyId || '000000000', '100000', 'Cash/Bank', '000000000'), 'B110')
+    addLine(makeB110(recordCounter++, business.companyId || '000000000', '800000', 'Revenue', '000000000'), 'B110')
+    addLine(makeB110(recordCounter++, business.companyId || '000000000', '900000', 'VAT Input', '000000000'), 'B110')
 
     for (const [key, info] of clientMap.entries()) {
-        addLine(makeB110(key, info.name, info.taxId || '000000000', info.address), 'B110')
+        addLine(makeB110(recordCounter++, business.companyId || '000000000', key, info.name, info.taxId || '000000000', info.address), 'B110')
     }
 
     // --- M100: Items ---
     for (const [id, name] of itemMap.entries()) {
         const safeCode = id.slice(-15) // Ensure fit
-        addLine(makeM100(safeCode, name), 'M100')
+        addLine(makeM100(recordCounter++, business.companyId || '000000000', safeCode, name), 'M100')
     }
 
     // --- Documents Processing ---
@@ -157,6 +158,8 @@ export async function generateFilesCore(userId: string, options: { year?: number
 
             // C100
             addLine(makeC100({
+                recordNum: recordCounter++,
+                dealerId: business.companyId || '000000000',
                 docType: docTypeCode,
                 docNum: inv.invoiceNumber,
                 date: inv.issueDate,
@@ -172,6 +175,8 @@ export async function generateFilesCore(userId: string, options: { year?: number
             let lineNum = 1
             for (const item of inv.lineItems) {
                 addLine(makeD110({
+                    recordNum: recordCounter++,
+                    dealerId: business.companyId || '000000000',
                     docType: docTypeCode,
                     docNum: inv.invoiceNumber,
                     lineNum: lineNum++,
@@ -179,28 +184,18 @@ export async function generateFilesCore(userId: string, options: { year?: number
                     itemName: item.description,
                     quantity: item.quantity,
                     price: item.price,
-                    total: item.total
+                    total: item.total,
+                    date: inv.issueDate
                 }), 'D110')
             }
             
-            // D120 Receipt/Payments
             if (isReceipt || isInvRec || inv.paidAmount) {
-                // If it's a receipt or paid invoice, document the payment.
-                addLine(makeD120({
-                    docType: docTypeCode,
-                    docNum: inv.invoiceNumber,
-                    lineNum: 1, // Payment line
-                    paymentMethodCode: '4', // Default Bank Transfer or parse inv.paymentMethod
-                    date: inv.paidDate || inv.issueDate,
-                    amount: inv.paidAmount || inv.total
-                }), 'D120')
-                
                 if (isInvRec && !isReceipt) {
                     totalRecCount++; totalRecTotal += (inv.paidAmount || inv.total);
                 }
             }
 
-            addLine(makeB100(journalCounter++, inv.invoiceNumber, inv.issueDate, clientKey, '800000', inv.total, `Inv ${inv.invoiceNumber}`), 'B100')
+            addLine(makeB100(recordCounter++, business.companyId || '000000000', journalCounter++, inv.invoiceNumber, inv.issueDate, clientKey, '800000', inv.total, `Inv ${inv.invoiceNumber}`), 'B100')
 
         } else {
             const cn = doc.data as typeof creditNotes[0]
@@ -209,6 +204,8 @@ export async function generateFilesCore(userId: string, options: { year?: number
             totalCnCount++; totalCnTotal += cn.totalCredit;
 
             addLine(makeC100({
+                recordNum: recordCounter++,
+                dealerId: business.companyId || '000000000',
                 docType: DOC_TYPES.CREDIT_NOTE,
                 docNum: cn.creditNoteNumber,
                 date: cn.issueDate,
@@ -221,6 +218,8 @@ export async function generateFilesCore(userId: string, options: { year?: number
             }), 'C100')
 
             addLine(makeD110({
+                recordNum: recordCounter++,
+                dealerId: business.companyId || '000000000',
                 docType: DOC_TYPES.CREDIT_NOTE,
                 docNum: cn.creditNoteNumber,
                 lineNum: 1,
@@ -228,10 +227,11 @@ export async function generateFilesCore(userId: string, options: { year?: number
                 itemName: cn.reason || 'Sifrot Bickoret',
                 quantity: 1,
                 price: cn.creditAmount,
-                total: cn.creditAmount
+                total: cn.creditAmount,
+                date: cn.issueDate
             }), 'D110')
 
-            addLine(makeB100(journalCounter++, cn.creditNoteNumber, cn.issueDate, '800000', clientKey, cn.totalCredit, `CN ${cn.creditNoteNumber}`), 'B100')
+            addLine(makeB100(recordCounter++, business.companyId || '000000000', journalCounter++, cn.creditNoteNumber, cn.issueDate, '800000', clientKey, cn.totalCredit, `CN ${cn.creditNoteNumber}`), 'B100')
         }
     }
 

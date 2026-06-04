@@ -6,6 +6,8 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { createHash } from 'crypto'
 import { getVatRate } from '@/lib/vat'
+import { createAuditLog } from './audit'
+import { generateInvoicePDF } from '@/lib/pdf/generate-invoice'
 
 export interface InvoiceLineItemData {
     id?: string
@@ -230,6 +232,8 @@ export async function createInvoice(data: InvoiceFormData, scope: string = 'BUSI
             })
         }
 
+        await createAuditLog('INVOICE_CREATED', 'Invoice', invoice.id, { number: invoice.invoiceNumber })
+
         revalidatePath('/dashboard')
         return { success: true, data: invoice }
     } catch (error: any) {
@@ -324,6 +328,10 @@ export async function signInvoice(token: string, signatureBase64: string) {
 
         const documentHash = createHash('sha256').update(hashData).digest('hex')
 
+        // Generate and sign PDF
+        const { buffer } = await generateInvoicePDF({ invoiceId: invoice.id, userId: invoice.userId });
+        const originalPdfUrl = `data:application/pdf;base64,${buffer.toString('base64')}`;
+
         await prisma.invoice.update({
             where: { id: invoice.id },
             data: {
@@ -331,9 +339,13 @@ export async function signInvoice(token: string, signatureBase64: string) {
                 documentHash,
                 signedAt: new Date(),
                 isSigned: true,
+                isLocked: true,
+                originalPdfUrl,
                 status: 'PAID'
             }
         })
+
+        await createAuditLog('INVOICE_SIGNED', 'Invoice', invoice.id, { number: invoice.invoiceNumber, documentHash })
 
         // Generate Income from Signed Invoice
         try {
@@ -515,6 +527,8 @@ export async function updateInvoice(id: string, data: Partial<InvoiceFormData>) 
             }
         })
 
+        await createAuditLog('INVOICE_UPDATED', 'Invoice', id, { number: invoice.invoiceNumber })
+
         revalidatePath('/dashboard')
         return { success: true, data: invoice }
     } catch (error: any) {
@@ -607,6 +621,8 @@ export async function deleteInvoice(id: string) {
         }
 
         await db.invoice.delete({ where: { id } })
+
+        await createAuditLog('INVOICE_DELETED', 'Invoice', id, { number: existing.invoiceNumber })
 
         revalidatePath('/dashboard')
         return { success: true }

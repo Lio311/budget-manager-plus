@@ -5,6 +5,8 @@ import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { getCurrentBudget } from './budget'
 import { createHash, randomUUID } from 'crypto'
+import { createAuditLog } from './audit'
+import { generateCreditNotePDF } from '@/lib/pdf/generate-credit-note'
 
 export interface CreditNoteFormData {
     invoiceId: string
@@ -160,6 +162,20 @@ export async function createCreditNote(data: CreditNoteFormData) {
             }
         })
 
+        // Generate and sign PDF
+        const { buffer } = await generateCreditNotePDF({ creditNoteId: creditNote.id, userId: creditNote.userId });
+        const originalPdfUrl = `data:application/pdf;base64,${buffer.toString('base64')}`;
+
+        await db.creditNote.update({
+            where: { id: creditNote.id },
+            data: {
+                isLocked: true,
+                originalPdfUrl
+            }
+        })
+
+        await createAuditLog('CREDIT_NOTE_CREATED', 'CreditNote', creditNote.id, { number: creditNote.creditNoteNumber })
+
         revalidatePath('/dashboard')
         return { success: true, data: creditNote }
     } catch (error: any) {
@@ -188,6 +204,10 @@ export async function deleteCreditNote(id: string) {
             throw new Error('Credit note not found')
         }
 
+        if ((existing as any).isLocked || existing.signedAt) {
+            throw new Error('לא ניתן למחוק מסמך חתום.')
+        }
+
         // Delete the negative income entry
         await db.income.deleteMany({
             where: {
@@ -201,6 +221,8 @@ export async function deleteCreditNote(id: string) {
         await db.creditNote.delete({
             where: { id }
         })
+
+        await createAuditLog('CREDIT_NOTE_DELETED', 'CreditNote', id, { number: existing.creditNoteNumber })
 
         revalidatePath('/dashboard')
         return { success: true }
