@@ -258,7 +258,7 @@ export function Paywall({ initialPlan = 'PERSONAL', errorMessage }: { initialPla
                             }
                         }}
                     >
-                        בחר בתוכנית {initialPlan === 'COMBINED' ? 'המשולבת' : initialPlan === 'BUSINESS' ? 'העסקית' : 'האישית'} - 10 ימים חינם
+                        בחר בתוכנית {initialPlan === 'COMBINED' ? 'המשולבת' : initialPlan === 'BUSINESS' ? 'העסקית' : 'האישית'} - 30 ימים חינם
                     </Button>
                 )}
 

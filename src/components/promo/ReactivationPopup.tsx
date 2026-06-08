@@ -96,7 +96,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
                                 <div className="space-y-4 mb-8">
                                     <p className="text-gray-600 text-lg leading-relaxed">
                                         שמחים שהגעת אלינו! קבל/י
-                                        <span className="px-1 font-bold text-green-600">10 ימים מתנה</span>
+                                        <span className="px-1 font-bold text-green-600">30 ימים מתנה</span>
                                         לשימוש מלא במערכת.
                                     </p>
                                     <p className="text-sm text-gray-500">
@@ -121,7 +121,7 @@ export function ReactivationPopup({ shouldShow }: ReactivationPopupProps) {
 
                                 <div className="mt-4 space-y-1">
                                     <p className="text-[10px] text-gray-400 text-center">
-                                        *בתוקף עד ה31.1.2026
+                                        *בתוקף עד ה31.08.2026
                                     </p>
                                     <p className="text-[10px] text-gray-400 text-center">
                                         *החברה רשאית לעצור את המבצע בכל רגע נתון
