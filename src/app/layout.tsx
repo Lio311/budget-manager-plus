@@ -17,6 +17,7 @@ import { ConfirmDialogProvider } from '@/hooks/useConfirm'
 import { VisitorLocationTracker } from '@/components/tracking/VisitorLocationTracker'
 import { AuthModalProvider } from '@/contexts/AuthModalContext'
 import { GlobalLoginModal } from '@/components/auth/GlobalLoginModal'
+import Script from 'next/script'
 
 const rubik = Rubik({
     subsets: ['hebrew', 'latin'],
@@ -184,6 +185,22 @@ export default async function RootLayout({
         >
             <html lang="he" dir="rtl" className={`${rubik.variable} ${montserrat.variable} ${openSans.variable}`}>
                 <head>
+                    {/* Google Analytics */}
+                    <Script
+                        strategy="afterInteractive"
+                        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+                    />
+                    <Script id="google-analytics" strategy="afterInteractive">
+                        {`
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            gtag('js', new Date());
+                            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                                page_path: window.location.pathname,
+                            });
+                        `}
+                    </Script>
+
                     {/* Performance Hints */}
                     <link rel="preconnect" href="https://fonts.googleapis.com" />
                     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
