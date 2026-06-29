@@ -8,6 +8,7 @@ import { createHash } from 'crypto'
 import { getVatRate } from '@/lib/vat'
 import { createAuditLog } from './audit'
 import { generateInvoicePDF } from '@/lib/pdf/generate-invoice'
+import { generateAllocationNumber, ItaOfflineError } from '@/lib/services/ita-service'
 
 export interface InvoiceLineItemData {
     id?: string
@@ -328,7 +329,37 @@ export async function signInvoice(token: string, signatureBase64: string) {
 
         const documentHash = createHash('sha256').update(hashData).digest('hex')
 
-        // Generate and sign PDF
+        // 1. ITA Allocation Logic
+        let allocationUpdate = {}
+        const businessProfile = await prisma.businessProfile.findUnique({ where: { userId: invoice.userId } })
+        
+        if (invoice.subtotal >= 5000 && invoice.client?.taxId && businessProfile?.itaRefreshToken) {
+            try {
+                const allocationNumber = await generateAllocationNumber(invoice as any, invoice.client, businessProfile)
+                allocationUpdate = {
+                    allocationNumber,
+                    allocationStatus: 'COMPLETED'
+                }
+            } catch (error) {
+                if (error instanceof ItaOfflineError || (error as Error).name === 'ItaOfflineError') {
+                    allocationUpdate = { allocationStatus: 'PENDING_ITA' }
+                    console.warn(`ITA Offline: Setting invoice ${invoice.id} to PENDING_ITA`)
+                } else {
+                    console.error('ITA Allocation failed:', error)
+                    allocationUpdate = { allocationStatus: 'FAILED' }
+                }
+            }
+        }
+
+        // 2. Pre-update the invoice if we have an allocation number so it appears in the PDF
+        if (Object.keys(allocationUpdate).length > 0) {
+            await prisma.invoice.update({
+                where: { id: invoice.id },
+                data: allocationUpdate
+            })
+        }
+
+        // 3. Generate and sign PDF
         const { buffer } = await generateInvoicePDF({ invoiceId: invoice.id, userId: invoice.userId });
         const originalPdfUrl = `data:application/pdf;base64,${buffer.toString('base64')}`;
 

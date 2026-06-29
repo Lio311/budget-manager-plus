@@ -97,6 +97,7 @@ model BusinessProfile {
   signatureUrl String? // Digital signature (base64)
   taxRate     Float    @default(0) // Income Tax Rate %
   marketingBudget Float @default(0) // Total Marketing Budget
+  itaRefreshToken String? // For Israel Tax Authority API
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -708,6 +709,7 @@ model Invoice {
   status        InvoiceStatus @default(DRAFT)
   invoiceType   String        @default("INVOICE") // INVOICE, OPT_INVOICE (Tax Invoice), RECEIPT, DEAL_INVOICE
   allocationNumber String?    // מספר הקצאה
+  allocationStatus String     @default("NOT_REQUIRED") // NOT_REQUIRED, PENDING_ITA, COMPLETED, FAILED
 
   
   // Amounts
