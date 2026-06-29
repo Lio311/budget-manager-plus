@@ -75,7 +75,7 @@ export async function generateAllocationNumber(
             CustomerTaxId: client.taxId?.replace(/[^0-9]/g, ''),
             CustomerName: client.name,
             TotalAmount: invoice.total,
-            VatAmount: invoice.tax,
+            VatAmount: invoice.vatAmount,
             Currency: invoice.currency || 'ILS'
         }
 
