@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
         if (error) {
             console.error('ITA OAuth Error:', error)
-            return NextResponse.redirect(new URL('/dashboard/settings?ita_error=1', req.url))
+            return NextResponse.redirect(new URL('/business?ita_error=1', req.url))
         }
 
         if (!code) {
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 
         if (!clientId || !clientSecret) {
             console.error('ITA credentials not configured')
-            return NextResponse.redirect(new URL('/dashboard/settings?ita_error=config', req.url))
+            return NextResponse.redirect(new URL('/business?ita_error=config', req.url))
         }
 
         // Token Exchange
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
         if (!response.ok) {
             const errText = await response.text()
             console.error('Failed to get token from ITA:', errText)
-            return NextResponse.redirect(new URL('/dashboard/settings?ita_error=token', req.url))
+            return NextResponse.redirect(new URL('/business?ita_error=token', req.url))
         }
 
         const data = await response.json()
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
 
         if (!refreshToken) {
             console.error('No refresh token received from ITA:', data)
-            return NextResponse.redirect(new URL('/dashboard/settings?ita_error=no_refresh', req.url))
+            return NextResponse.redirect(new URL('/business?ita_error=no_refresh', req.url))
         }
 
         const db = await authenticatedPrisma(userId)
@@ -79,10 +79,10 @@ export async function GET(req: NextRequest) {
         })
 
         // Redirect back to settings with success message
-        return NextResponse.redirect(new URL('/dashboard/settings?ita_success=1', req.url))
+        return NextResponse.redirect(new URL('/business?ita_success=1', req.url))
         
     } catch (error) {
         console.error('ITA callback error:', error)
-        return NextResponse.redirect(new URL('/dashboard/settings?ita_error=server', req.url))
+        return NextResponse.redirect(new URL('/business?ita_error=server', req.url))
     }
 }
