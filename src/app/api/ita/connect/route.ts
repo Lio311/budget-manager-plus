@@ -14,10 +14,14 @@ export async function GET(req: Request) {
 
     // Redirect user to ITA OAuth page
     // Note: This is the sandbox URL. In production, change to the real ITA URL.
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const redirectUri = `${appUrl}/api/ita/callback`
+
     const authorizeUrl = new URL('https://openapi.taxes.gov.il/shaam/tsandbox/longtimetoken/oauth2/authorize')
     authorizeUrl.searchParams.append('response_type', 'code')
     authorizeUrl.searchParams.append('client_id', clientId)
     authorizeUrl.searchParams.append('scope', 'scope') // specific scope required by ITA
+    authorizeUrl.searchParams.append('redirect_uri', redirectUri) // required by ITA
 
     return NextResponse.redirect(authorizeUrl.toString())
 }
