@@ -24,8 +24,9 @@ export async function GET(req: NextRequest) {
 
         const clientId = process.env.ITA_CLIENT_ID
         const clientSecret = process.env.ITA_CLIENT_SECRET
-        // Fallback to localhost if not set in Vercel for testing
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+        const host = req.headers.get('host') || 'localhost:3000'
+        const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+        const appUrl = `${protocol}://${host}`
         const redirectUri = `${appUrl}/api/ita/callback`
 
         if (!clientId || !clientSecret) {

@@ -14,7 +14,9 @@ export async function GET(req: Request) {
 
     // Redirect user to ITA OAuth page
     // Note: This is the sandbox URL. In production, change to the real ITA URL.
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const host = req.headers.get('host') || 'localhost:3000'
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+    const appUrl = `${protocol}://${host}`
     const redirectUri = `${appUrl}/api/ita/callback`
 
     const authorizeUrl = new URL('https://openapi.taxes.gov.il/shaam/tsandbox/longtimetoken/oauth2/authorize')
