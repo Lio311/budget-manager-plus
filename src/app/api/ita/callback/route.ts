@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
         // Token Exchange
         // Note: Using sandbox URL. In production, this should switch based on an env variable or config.
-        const tokenUrl = 'http://151.145.95.175:8080/shaam/tsandbox/longtimetoken/oauth2/token'
+        const tokenUrl = 'http://151.145.86.226:8080/shaam/tsandbox/longtimetoken/oauth2/token'
         
         const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 

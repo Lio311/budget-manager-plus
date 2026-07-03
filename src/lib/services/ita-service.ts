@@ -7,7 +7,7 @@ export class ItaOfflineError extends Error {
     }
 }
 
-const ITA_SANDBOX_URL = 'http://151.145.95.175:8080/shaam/tsandbox'
+const ITA_SANDBOX_URL = 'http://151.145.86.226:8080/shaam/tsandbox'
 
 /**
  * Retrieves a short-lived access token using the long-lived refresh token
