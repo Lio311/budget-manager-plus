@@ -7,7 +7,7 @@ export class ItaOfflineError extends Error {
     }
 }
 
-const ITA_SANDBOX_URL = 'https://openapi.taxes.gov.il/shaam/tsandbox'
+const ITA_SANDBOX_URL = 'http://151.145.95.175:8080/shaam/tsandbox'
 
 /**
  * Retrieves a short-lived access token using the long-lived refresh token
@@ -32,7 +32,10 @@ export async function getItaAccessToken(refreshToken: string): Promise<string> {
         method: 'POST',
         headers: {
             'Authorization': `Basic ${credentials}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'x-ita-proxy-secret': 'kesefly-ita-secret-2026',
+            'x-proxy-secret': 'kesefly-ita-secret-2026',
+            'x-kesefly-proxy-secret': 'kesefly-ita-secret-2026'
         },
         body: body.toString(),
         signal: AbortSignal.timeout(10000) // 10 second timeout
@@ -84,7 +87,10 @@ export async function generateAllocationNumber(
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'x-ita-proxy-secret': 'kesefly-ita-secret-2026',
+                'x-proxy-secret': 'kesefly-ita-secret-2026',
+                'x-kesefly-proxy-secret': 'kesefly-ita-secret-2026'
             },
             body: JSON.stringify(payload),
             signal: AbortSignal.timeout(15000) // 15 second timeout for ITA

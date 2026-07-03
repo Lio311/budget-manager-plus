@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
         // Token Exchange
         // Note: Using sandbox URL. In production, this should switch based on an env variable or config.
-        const tokenUrl = 'https://openapi.taxes.gov.il/shaam/tsandbox/longtimetoken/oauth2/token'
+        const tokenUrl = 'http://151.145.95.175:8080/shaam/tsandbox/longtimetoken/oauth2/token'
         
         const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
@@ -52,7 +52,10 @@ export async function GET(req: NextRequest) {
             method: 'POST',
             headers: {
                 'Authorization': `Basic ${credentials}`,
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'x-ita-proxy-secret': 'kesefly-ita-secret-2026',
+                'x-proxy-secret': 'kesefly-ita-secret-2026',
+                'x-kesefly-proxy-secret': 'kesefly-ita-secret-2026'
             },
             body: body.toString()
         })
