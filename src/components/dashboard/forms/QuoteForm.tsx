@@ -224,7 +224,7 @@ export function QuoteForm({ clients, onSuccess, initialData }: QuoteFormProps) {
                 <div className="md:col-span-2 space-y-4">
                     <div className="flex justify-between items-center mb-1">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            피רוט העסקה *
+                            פירוט העסקה *
                         </label>
                         {!isExemptDealer && (
                             <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-md">
