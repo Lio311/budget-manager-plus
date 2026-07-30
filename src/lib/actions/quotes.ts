@@ -156,6 +156,7 @@ export async function updateQuote(id: string, data: Partial<QuoteFormData>) {
 
         const updateData: any = {}
 
+        if (data.clientId) updateData.clientId = data.clientId
         if (data.quoteNumber) updateData.quoteNumber = data.quoteNumber
         if (data.allocationNumber !== undefined) updateData.allocationNumber = data.allocationNumber
         if (data.issueDate) updateData.issueDate = data.issueDate
