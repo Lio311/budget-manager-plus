@@ -342,6 +342,12 @@ function ProjectCard({
                             </div>
                         </div>
                     )}
+                    
+                    <div className="mt-3 pt-2 text-center opacity-0 group-hover:opacity-100 transition-opacity border-t border-slate-100 dark:border-slate-800">
+                        <span className="text-[10px] text-muted-foreground flex items-center justify-center gap-1">
+                            <Info className="w-3 h-3" /> לחץ לפרטים המלאים ולניהול שלבים
+                        </span>
+                    </div>
                 </CardContent>
             </Card>
         </motion.div>
