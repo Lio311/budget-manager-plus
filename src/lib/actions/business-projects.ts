@@ -231,13 +231,9 @@ export async function createBusinessProject(data: BusinessProjectFormData) {
         if (data.parentId) {
             const parent = await db.project.findFirst({
                 where: { id: data.parentId, userId, scope: 'BUSINESS', parentId: null },
-                include: { _count: { select: { children: true } } }
             })
             if (!parent) {
                 return { success: false, error: 'פרויקט אב לא נמצא או שאינו פרויקט ראשי' }
-            }
-            if (parent._count.children >= 5) {
-                return { success: false, error: 'ניתן ליצור עד 5 תתי-פרויקטים לפרויקט אב' }
             }
         }
 
@@ -299,19 +295,12 @@ export async function updateBusinessProject(id: string, data: BusinessProjectFor
         if (data.parentId) {
             const potentialParent = await db.project.findFirst({
                 where: { id: data.parentId, userId, scope: 'BUSINESS', parentId: null },
-                include: { _count: { select: { children: true } } }
             })
             if (!potentialParent) {
                 return { success: false, error: 'פרויקט אב לא נמצא או שאינו פרויקט ראשי' }
             }
             if (potentialParent.id === id) {
                 return { success: false, error: 'פרויקט לא יכול להיות אב של עצמו' }
-            }
-            
-            // Check if current project is already a child of this parent. If not, check limit.
-            const currentProject = await db.project.findUnique({ where: { id } })
-            if (currentProject?.parentId !== data.parentId && potentialParent._count.children >= 5) {
-                return { success: false, error: 'ניתן ליצור עד 5 תתי-פרויקטים לפרויקט אב' }
             }
         }
 
