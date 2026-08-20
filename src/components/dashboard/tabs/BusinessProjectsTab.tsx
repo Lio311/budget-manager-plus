@@ -118,6 +118,8 @@ function ProjectCard({
     onDelete,
     onAddSubProject,
     onChildClick,
+    onChildEdit,
+    onChildDelete,
     delay,
 }: {
     project: ProjectWithStats
@@ -126,9 +128,10 @@ function ProjectCard({
     onDelete: (e: React.MouseEvent) => void
     onAddSubProject: (e: React.MouseEvent) => void
     onChildClick: (child: ProjectWithStats) => void
+    onChildEdit: (child: ProjectWithStats, e: React.MouseEvent) => void
+    onChildDelete: (child: ProjectWithStats, e: React.MouseEvent) => void
     delay: number
 }) {
-    const [isExpanded, setIsExpanded] = useState(false)
     const statusInfo = STATUS_CONFIG[project.status] || STATUS_CONFIG['ACTIVE']
     const hasChildren = project.children && project.children.length > 0
     const budgetProgress = project.budget
@@ -165,18 +168,18 @@ function ProjectCard({
                                 variant="ghost"
                                 size="icon"
                                 className="h-7 w-7 hover:bg-slate-100 dark:hover:bg-slate-700"
-                                onClick={onEdit}
+                                onClick={onAddSubProject}
+                                title="הוסף תת-פרויקט"
                             >
-                                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                                <Plus className="h-3.5 w-3.5 text-muted-foreground" />
                             </Button>
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 className="h-7 w-7 hover:bg-slate-100 dark:hover:bg-slate-700"
-                                onClick={onAddSubProject}
-                                title="הוסף תת-פרויקט"
+                                onClick={onEdit}
                             >
-                                <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+                                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                             </Button>
                             <Button
                                 variant="ghost"
@@ -266,67 +269,77 @@ function ProjectCard({
                         </div>
                     </div>
 
-                    {/* Sub-projects preview */}
+                    {/* Sub-projects tree */}
                     {hasChildren && (
                         <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50">
-                            <button
-                                type="button"
-                                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-full"
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    setIsExpanded(!isExpanded)
-                                }}
-                            >
-                                {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
                                 <span className="font-medium">תתי-פרויקטים ({project.children.length})</span>
-                            </button>
+                            </div>
 
-                            <AnimatePresence>
-                                {isExpanded && (
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: 'auto' }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="mt-2 relative overflow-hidden"
-                                    >
-                                        <div className="absolute right-3.5 top-0 bottom-4 w-px bg-slate-200 dark:bg-slate-700/50" />
-                                        <div className="space-y-1.5 pl-2 pr-6">
-                                            {project.children.map((child, index) => {
-                                                const childStatus = STATUS_CONFIG[child.status] || STATUS_CONFIG['ACTIVE']
-                                                return (
+                            <div className="relative overflow-hidden">
+                                <div className="absolute right-3.5 top-0 bottom-4 w-px bg-slate-200 dark:bg-slate-700/50" />
+                                <div className="space-y-1.5 pl-2 pr-6">
+                                    {project.children.map((child, index) => {
+                                        const childStatus = STATUS_CONFIG[child.status] || STATUS_CONFIG['ACTIVE']
+                                        return (
+                                            <div
+                                                key={child.id}
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    onChildClick(child)
+                                                }}
+                                                className="flex items-center justify-between p-1.5 rounded bg-slate-50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-700/30 text-xs relative group hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
+                                            >
+                                                {/* Horizontal tree line */}
+                                                <div className="absolute -right-[11px] top-1/2 w-2.5 h-px bg-slate-200 dark:bg-slate-700/50" />
+                                                
+                                                <div className="flex items-center gap-2 min-w-0 flex-1">
                                                     <div
-                                                        key={child.id}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation()
-                                                            onChildClick(child)
-                                                        }}
-                                                        className="flex items-center justify-between p-2 rounded bg-slate-50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-700/30 text-xs relative group hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
-                                                    >
-                                                        {/* Horizontal tree line */}
-                                                        <div className="absolute -right-[11px] top-1/2 w-2.5 h-px bg-slate-200 dark:bg-slate-700/50" />
-                                                        
-                                                        <div className="flex items-center gap-2 min-w-0">
-                                                            <div
-                                                                className="w-1.5 h-1.5 rounded-full shrink-0"
-                                                                style={{ backgroundColor: child.color || project.color || '#3B82F6' }}
-                                                            />
-                                                            <span className="font-medium truncate">{child.name}</span>
-                                                            <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", childStatus.dotColor)} />
-                                                        </div>
-                                                        <span className={cn(
-                                                            "font-semibold dir-ltr shrink-0 mr-2",
-                                                            child.stats.balance >= 0 ? "text-green-600" : "text-red-600"
-                                                        )}>
-                                                            {formatCurrency(child.stats.balance)}
-                                                        </span>
+                                                        className="w-1.5 h-1.5 rounded-full shrink-0"
+                                                        style={{ backgroundColor: child.color || project.color || '#3B82F6' }}
+                                                    />
+                                                    <span className="font-medium truncate">{child.name}</span>
+                                                    <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", childStatus.dotColor)} />
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    <span className={cn(
+                                                        "font-semibold dir-ltr",
+                                                        child.stats.balance >= 0 ? "text-green-600" : "text-red-600"
+                                                    )}>
+                                                        {formatCurrency(child.stats.balance)}
+                                                    </span>
+                                                    
+                                                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-6 w-6 hover:bg-slate-200 dark:hover:bg-slate-700"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                onChildEdit(child, e)
+                                                            }}
+                                                        >
+                                                            <Pencil className="h-3 w-3 text-muted-foreground" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-6 w-6 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                onChildDelete(child, e)
+                                                            }}
+                                                        >
+                                                            <Trash2 className="h-3 w-3 text-muted-foreground" />
+                                                        </Button>
                                                     </div>
-                                                )
-                                            })}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
                         </div>
                     )}
                 </CardContent>
@@ -651,6 +664,8 @@ export function BusinessProjectsTab() {
                             onDelete={(e) => openDelete(project, e)}
                             onAddSubProject={(e) => openAddSubProject(project, e)}
                             onChildClick={(child) => handleProjectClick(child as ProjectWithStats)}
+                            onChildEdit={(child, e) => openEdit(child as ProjectWithStats, e)}
+                            onChildDelete={(child, e) => openDelete(child as ProjectWithStats, e)}
                             delay={idx * 0.07}
                         />
                     ))}
