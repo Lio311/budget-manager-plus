@@ -34,6 +34,7 @@ interface BusinessProjectDetailsDialogProps {
     project: any
     isOpen: boolean
     onClose: () => void
+    onUpdate?: () => void
 }
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; className: string }> = {
@@ -47,6 +48,7 @@ export function BusinessProjectDetailsDialog({
     project,
     isOpen,
     onClose,
+    onUpdate,
 }: BusinessProjectDetailsDialogProps) {
     const [activeTab, setActiveTab] = useState('overview')
 
@@ -320,7 +322,7 @@ export function BusinessProjectDetailsDialog({
                         </TabsContent>
 
                         <TabsContent value="stages" className="mt-3">
-                            <ProjectStagesTab project={project} onUpdate={() => window.location.reload()} />
+                            <ProjectStagesTab project={project} onUpdate={onUpdate || (() => {})} />
                         </TabsContent>
 
                         <TabsContent value="transactions" className="mt-3">

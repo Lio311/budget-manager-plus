@@ -406,6 +406,13 @@ export function ProjectsTab() {
                 project={viewProject}
                 isOpen={isDetailsOpen}
                 onClose={() => setIsDetailsOpen(false)}
+                onUpdate={async () => {
+                    const newProjects = await mutate();
+                    if (newProjects && viewProject) {
+                        const updated = newProjects.data?.find((p: any) => p.id === viewProject.id);
+                        if (updated) setViewProject(updated);
+                    }
+                }}
             />
 
             <ProjectsTutorial

@@ -2,14 +2,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { formatCurrency } from "@/lib/utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowDownLeft, ArrowUpRight, Calendar, FileText, Wallet } from "lucide-react"
+import { ProjectStagesTab } from '../projects/ProjectStagesTab'
+
 
 interface ProjectDetailsDialogProps {
     project: any
     isOpen: boolean
     onClose: () => void
+    onUpdate?: () => void
 }
 
-export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetailsDialogProps) {
+export function ProjectDetailsDialog({ project, isOpen, onClose, onUpdate }: ProjectDetailsDialogProps) {
     if (!project) return null
 
     const totalIncome = project.incomes?.reduce((sum: number, item: any) => sum + item.amount, 0) || 0
@@ -125,6 +128,9 @@ export function ProjectDetailsDialog({ project, isOpen, onClose }: ProjectDetail
                         </div>
                     </TabsContent>
 
+                    <TabsContent value="stages" className="mt-4">
+                        <ProjectStagesTab project={project} onUpdate={onUpdate || (() => {})} />
+                    </TabsContent>
                     <TabsContent value="expenses" className="mt-4">
                         <div className="border rounded-lg overflow-hidden">
                             <table className="w-full text-sm text-center">
