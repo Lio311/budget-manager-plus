@@ -41,10 +41,10 @@ export async function getProjectsWithStats(type: 'PERSONAL' | 'BUSINESS' = 'PERS
             include: {
                 stages: { orderBy: { createdAt: 'asc' } },
                 incomes: {
-                    select: { amount: true }
+                    select: { amount: true, projectStageId: true }
                 },
                 expenses: {
-                    select: { amount: true }
+                    select: { amount: true, projectStageId: true }
                 }
             },
             orderBy: { name: 'asc' }

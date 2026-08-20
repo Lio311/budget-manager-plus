@@ -85,10 +85,10 @@ export async function getBusinessProjects() {
                     select: { id: true, name: true }
                 },
                 incomes: {
-                    select: { amount: true }
+                    select: { amount: true, projectStageId: true }
                 },
                 expenses: {
-                    select: { amount: true }
+                    select: { amount: true, projectStageId: true }
                 },
                 children: {
                     include: {
@@ -97,10 +97,10 @@ export async function getBusinessProjects() {
                             select: { id: true, name: true }
                         },
                         incomes: {
-                            select: { amount: true }
+                            select: { amount: true, projectStageId: true }
                         },
                         expenses: {
-                            select: { amount: true }
+                            select: { amount: true, projectStageId: true }
                         },
                     },
                     orderBy: { name: 'asc' }
@@ -192,10 +192,10 @@ export async function getBusinessProjectDetails(projectId: string) {
                             select: { id: true, name: true }
                         },
                         incomes: {
-                            select: { amount: true }
+                            select: { amount: true, projectStageId: true }
                         },
                         expenses: {
-                            select: { amount: true }
+                            select: { amount: true, projectStageId: true }
                         },
                     },
                     orderBy: { name: 'asc' }
