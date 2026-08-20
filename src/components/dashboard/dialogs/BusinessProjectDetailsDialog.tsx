@@ -103,7 +103,7 @@ export function BusinessProjectDetailsDialog({
                                     style={{ backgroundColor: project.color || '#3B82F6' }}
                                 />
                                 <div>
-                                    <DialogTitle className="text-2xl font-bold">
+                                    <DialogTitle className="text-2xl font-bold mr-6 sm:mr-0">
                                         {project.name}
                                     </DialogTitle>
                                     {project.description && (
@@ -113,13 +113,13 @@ export function BusinessProjectDetailsDialog({
                                     )}
                                 </div>
                             </div>
-                            <Badge className={cn("shrink-0 text-xs font-medium border", statusInfo.className)}>
-                                {statusInfo.label}
-                            </Badge>
                         </div>
 
                         {/* Meta row */}
-                        <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground">
+                            <Badge className={cn("shrink-0 text-xs font-medium border", statusInfo.className)}>
+                                {statusInfo.label}
+                            </Badge>
                             {project.client && (
                                 <div className="flex items-center gap-1.5">
                                     <Users className="h-3.5 w-3.5" />
