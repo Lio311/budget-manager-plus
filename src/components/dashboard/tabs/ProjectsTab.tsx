@@ -267,19 +267,6 @@ export function ProjectsTab() {
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
-                                        <div className="flex items-center gap-2 text-muted-foreground">
-                                            <Wallet className="h-4 w-4" />
-                                            <span className="text-sm font-medium">מאזן</span>
-                                        </div>
-                                        <span className={cn(
-                                            "text-lg font-bold dir-ltr",
-                                            project.stats.balance > 0 ? "text-green-600" : project.stats.balance < 0 ? "text-red-600" : ""
-                                        )}>
-                                            {formatCurrency(project.stats.balance)}
-                                        </span>
-                                    </div>
-
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <div className="flex items-center gap-1.5 text-muted-foreground mb-1 text-xs">
@@ -299,6 +286,19 @@ export function ProjectsTab() {
                                                 {formatCurrency(project.stats.totalExpenses)}
                                             </div>
                                         </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                            <Wallet className="h-4 w-4" />
+                                            <span className="text-sm font-medium">מאזן</span>
+                                        </div>
+                                        <span className={cn(
+                                            "text-lg font-bold dir-ltr",
+                                            project.stats.balance > 0 ? "text-green-600" : project.stats.balance < 0 ? "text-red-600" : ""
+                                        )}>
+                                            {formatCurrency(project.stats.balance)}
+                                        </span>
                                     </div>
                                 </div>
                             </CardContent>

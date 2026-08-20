@@ -238,21 +238,7 @@ function ProjectCard({
                         </div>
                     )}
 
-                    {/* Financial Summary */}
-                    <div className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                        <div className="flex items-center gap-2">
-                            <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
-                            <span className="text-xs font-medium text-muted-foreground">מאזן</span>
-                        </div>
-                        <span className={cn(
-                            "text-sm font-bold dir-ltr",
-                            project.stats.balance > 0 ? "text-green-600" : project.stats.balance < 0 ? "text-red-600" : ""
-                        )}>
-                            {formatCurrency(project.stats.balance)}
-                        </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 mt-2">
+                    <div className="grid grid-cols-2 gap-3 mb-3">
                         <div className="text-center">
                             <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground mb-0.5">
                                 <ArrowUpCircle className="h-3 w-3 text-green-500" />
@@ -267,6 +253,20 @@ function ProjectCard({
                             </div>
                             <p className="text-xs font-semibold dir-ltr">{formatCurrency(project.stats.totalExpenses)}</p>
                         </div>
+                    </div>
+
+                    {/* Financial Summary */}
+                    <div className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                            <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
+                            <span className="text-xs font-medium text-muted-foreground">מאזן</span>
+                        </div>
+                        <span className={cn(
+                            "text-sm font-bold dir-ltr",
+                            project.stats.balance > 0 ? "text-green-600" : project.stats.balance < 0 ? "text-red-600" : ""
+                        )}>
+                            {formatCurrency(project.stats.balance)}
+                        </span>
                     </div>
 
                     {/* Sub-projects tree */}
