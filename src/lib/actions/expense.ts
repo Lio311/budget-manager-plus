@@ -163,6 +163,7 @@ export async function addExpense(
                 // Business Fields
                 supplierId: validatedData.supplierId || null,
                 clientId: validatedData.clientId || null,
+                projectId: validatedData.projectId || null,
                 amountBeforeVat: validatedData.amountBeforeVat || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? parseFloat(((validatedData.amount / (1 + vatRate))).toFixed(2)) : validatedData.amountBeforeVat),
                 vatRate: validatedData.vatRate || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? vatRate : validatedData.vatRate),
                 vatAmount: validatedData.vatAmount || (validatedData.isDeductible && (!validatedData.vatAmount || validatedData.vatAmount === 0) ? parseFloat(((validatedData.amount - (validatedData.amount / (1 + vatRate)))).toFixed(2)) : validatedData.vatAmount),
