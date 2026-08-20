@@ -27,6 +27,8 @@ import {
 import { cn, formatCurrency } from '@/lib/utils'
 import { format } from 'date-fns'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ProjectStagesTab } from '../projects/ProjectStagesTab'
+
 
 interface BusinessProjectDetailsDialogProps {
     project: any
@@ -253,9 +255,10 @@ export function BusinessProjectDetailsDialog({
                 {/* Tabs Content */}
                 <div className="px-6 pb-6 pt-4 overflow-y-auto max-h-[40vh]">
                     <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
-                        <TabsList className="w-full grid grid-cols-3 h-9 bg-slate-100 dark:bg-slate-800/50">
+                        <TabsList className="w-full grid grid-cols-4 h-9 bg-slate-100 dark:bg-slate-800/50">
                             <TabsTrigger value="overview" className="text-xs">סקירה</TabsTrigger>
                             <TabsTrigger value="transactions" className="text-xs">תנועות ({allTransactions.length})</TabsTrigger>
+                            <TabsTrigger value="stages" className="text-xs">שלבים ({project?.stages?.length || 0})</TabsTrigger>
                             {children.length > 0 && (
                                 <TabsTrigger value="children" className="text-xs">
                                     תתי-פרויקטים ({children.length})
@@ -314,6 +317,10 @@ export function BusinessProjectDetailsDialog({
                                     )}
                                 </div>
                             )}
+                        </TabsContent>
+
+                        <TabsContent value="stages" className="mt-3">
+                            <ProjectStagesTab project={project} onUpdate={() => window.location.reload()} />
                         </TabsContent>
 
                         <TabsContent value="transactions" className="mt-3">

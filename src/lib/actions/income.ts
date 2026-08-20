@@ -67,6 +67,7 @@ export async function addIncome(
         // Business Fields
         clientId?: string
         projectId?: string
+        projectStageId?: string
         invoiceId?: string
         amountBeforeVat?: number
         vatRate?: number
@@ -118,7 +119,8 @@ export async function addIncome(
                 recurringEndDate: parseDate(data.recurringEndDate),
                 // Business Fields
                 clientId: data.clientId,
-                projectId: data.projectId, // Added projectId
+                projectId: data.projectId,
+                projectStageId: data.projectStageId,
                 invoiceId: data.invoiceId,
                 amountBeforeVat: data.amountBeforeVat,
                 vatRate: data.vatRate,
@@ -356,6 +358,7 @@ export async function updateIncome(
         // Business Fields
         clientId?: string
         projectId?: string
+        projectStageId?: string
         invoiceId?: string
         amountBeforeVat?: number
         vatRate?: number
@@ -442,6 +445,7 @@ function formatIncomeDataForUpdate(data: any) {
         // Business Fields
         clientId: data.clientId,
         projectId: data.projectId,
+                projectStageId: data.projectStageId,
         invoiceId: data.invoiceId,
         amountBeforeVat: data.amountBeforeVat,
         vatRate: data.vatRate,

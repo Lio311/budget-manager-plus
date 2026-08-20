@@ -80,6 +80,7 @@ export async function getBusinessProjects() {
                 parentId: null, // Only top-level projects
             },
             include: {
+                stages: { orderBy: { createdAt: 'asc' } },
                 client: {
                     select: { id: true, name: true }
                 },
@@ -91,7 +92,8 @@ export async function getBusinessProjects() {
                 },
                 children: {
                     include: {
-                        client: {
+                        stages: { orderBy: { createdAt: 'asc' } },
+                client: {
                             select: { id: true, name: true }
                         },
                         incomes: {
@@ -163,6 +165,7 @@ export async function getBusinessProjectDetails(projectId: string) {
         const project = await db.project.findUnique({
             where: { id: projectId },
             include: {
+                stages: { orderBy: { createdAt: 'asc' } },
                 client: {
                     select: { id: true, name: true, email: true, phone: true }
                 },
@@ -184,7 +187,8 @@ export async function getBusinessProjectDetails(projectId: string) {
                 },
                 children: {
                     include: {
-                        client: {
+                        stages: { orderBy: { createdAt: 'asc' } },
+                client: {
                             select: { id: true, name: true }
                         },
                         incomes: {

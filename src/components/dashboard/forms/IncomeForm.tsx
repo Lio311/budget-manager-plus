@@ -99,6 +99,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         recurringEndDate: initialData.recurringEndDate || undefined,
         clientId: initialData.clientId || '',
         projectId: initialData.projectId || '',
+        projectStageId: (initialData as any).projectStageId || '',
         amountBeforeVat: initialData.amountBeforeVat?.toString() || '',
         vatRate: initialData.vatRate?.toString() || '0.18',
         vatAmount: initialData.vatAmount?.toString() || '',
@@ -119,6 +120,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
         recurringEndDate: undefined as string | undefined,
         clientId: '',
         projectId: '',
+        projectStageId: '',
         amountBeforeVat: '',
         vatRate: '0.18',
         vatAmount: '',
@@ -278,6 +280,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
             recurringEndDate: newIncome.isRecurring ? newIncome.recurringEndDate : undefined,
             clientId: isBusiness ? (newIncome.clientId || undefined) : undefined,
             projectId: newIncome.projectId || undefined,
+            projectStageId: (newIncome as any).projectStageId || undefined,
             amountBeforeVat: isBusiness ? (parseFloat(newIncome.amountBeforeVat) || undefined) : undefined,
             vatRate: isBusiness ? (parseFloat(newIncome.vatRate) || undefined) : undefined,
             vatAmount: isBusiness ? (parseFloat(newIncome.vatAmount) || undefined) : undefined,
@@ -314,6 +317,7 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                         recurringEndDate: undefined,
                         clientId: '',
                         projectId: '',
+        projectStageId: '',
                         amountBeforeVat: '',
                         vatRate: '0.18',
                         vatAmount: '',
@@ -560,6 +564,28 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 placeholder="חפש פרויקט..."
                             />
                         </div>
+                        
+                        {newIncome.projectId && (projects as any[]).find(p => p.id === newIncome.projectId)?.stages?.length > 0 && (
+                            <div className="md:col-span-1 space-y-1">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך לשלב פרויקט (אופציונלי)</label>
+                                <Select
+                                    value={(newIncome as any).projectStageId || ''}
+                                    onValueChange={(val) => setNewIncome({ ...newIncome, projectStageId: val === 'none' ? '' : val })}
+                                >
+                                    <SelectTrigger className="w-full h-10 border bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
+                                        <SelectValue placeholder="בחר שלב..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">ללא שלב</SelectItem>
+                                        {(projects as any[]).find(p => p.id === newIncome.projectId)?.stages.map((stage: any) => (
+                                            <SelectItem key={stage.id} value={stage.id}>
+                                                {stage.title} ({stage.percentage}%)
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
 
                         {isBusiness && (
                             <div className="w-full">
@@ -636,6 +662,28 @@ export function IncomeForm({ categories, clients, onCategoriesChange, isMobile, 
                                 color="green"
                             />
                         </div>
+                        
+                        {newIncome.projectId && (projects as any[]).find(p => p.id === newIncome.projectId)?.stages?.length > 0 && (
+                            <div className="md:col-span-1 space-y-1">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך לשלב פרויקט (אופציונלי)</label>
+                                <Select
+                                    value={(newIncome as any).projectStageId || ''}
+                                    onValueChange={(val) => setNewIncome({ ...newIncome, projectStageId: val === 'none' ? '' : val })}
+                                >
+                                    <SelectTrigger className="w-full h-10 border bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
+                                        <SelectValue placeholder="בחר שלב..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">ללא שלב</SelectItem>
+                                        {(projects as any[]).find(p => p.id === newIncome.projectId)?.stages.map((stage: any) => (
+                                            <SelectItem key={stage.id} value={stage.id}>
+                                                {stage.title} ({stage.percentage}%)
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
 
                         {/* Recurring Checkbox */}
                         <div className={`flex items-start gap-4 p-4 border border-gray-100 dark:border-slate-700 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 w-full ${!isBusiness ? 'bg-white dark:bg-slate-800' : ''}`}>

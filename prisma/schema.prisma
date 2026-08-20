@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 // Enums for Business Support
 enum PlanType {
   PERSONAL
@@ -15,92 +14,92 @@ enum PlanType {
 }
 
 enum VatType {
-  NONE            // Ptor (Eilat etc.)
-  FULL            // 100% recognized
-  PARTIAL         // 2/3 or other %
-  EXEMPT          // Frugality, etc.
+  NONE // Ptor (Eilat etc.)
+  FULL // 100% recognized
+  PARTIAL // 2/3 or other %
+  EXEMPT // Frugality, etc.
 }
 
 model User {
-  id        String   @id 
+  id        String   @id
   email     String   @unique
   city      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-   
-  budgets    Budget[]
-  categories Category[]
-  subscriptions Subscription[]
-  businessProfile BusinessProfile?
-  paymentHistory PaymentHistory[]
-  feedbacks    Feedback[]
-  clients    Client[]
-  clientPackages ClientPackage[]
-  supplierPackages SupplierPackage[]
-  suppliers  Supplier[]
-  invoices   Invoice[]
-  quotes     Quote[]
-  creditNotes    CreditNote[]
-  userPaymentMethods UserPaymentMethod[]
-  workEvents WorkEvent[]
-  storedReports StoredReport[]
-  createdTasks ProjectTask[]
-  projects   Project[]
-  marketingCampaigns MarketingCampaign[]
-  businessExpenses   BusinessExpense[]
-  managementNotifications ManagementNotification[]
-  agreement  EmployeeAgreement?
-  auditLogs  AuditLog[]
 
-  initialBalance Float @default(0) 
-  initialSavings Float @default(0) 
+  budgets                 Budget[]
+  categories              Category[]
+  subscriptions           Subscription[]
+  businessProfile         BusinessProfile?
+  paymentHistory          PaymentHistory[]
+  feedbacks               Feedback[]
+  clients                 Client[]
+  clientPackages          ClientPackage[]
+  supplierPackages        SupplierPackage[]
+  suppliers               Supplier[]
+  invoices                Invoice[]
+  quotes                  Quote[]
+  creditNotes             CreditNote[]
+  userPaymentMethods      UserPaymentMethod[]
+  workEvents              WorkEvent[]
+  storedReports           StoredReport[]
+  createdTasks            ProjectTask[]
+  projects                Project[]
+  marketingCampaigns      MarketingCampaign[]
+  businessExpenses        BusinessExpense[]
+  managementNotifications ManagementNotification[]
+  agreement               EmployeeAgreement?
+  auditLogs               AuditLog[]
+
+  initialBalance         Float @default(0)
+  initialSavings         Float @default(0)
   businessInitialBalance Float @default(0)
-  businessInitialSavings Float @default(0) 
-  
+  businessInitialSavings Float @default(0)
+
   // Trial period
-  trialEndsAt    DateTime?
-  hasUsedTrial   Boolean  @default(false)
+  trialEndsAt  DateTime?
+  hasUsedTrial Boolean   @default(false)
 
   // Onboarding
-  hasSeenOnboarding Boolean  @default(false)
+  hasSeenOnboarding Boolean @default(false)
 
   // Google Calendar Integration
   googleCalendarRefreshToken String?
   googleCalendarId           String?
-  isCalendarSyncEnabled      Boolean   @default(false)
+  isCalendarSyncEnabled      Boolean @default(false)
 
   // Referral Program
-  referralCode          String?   @unique // The code this user shares
-  referredByCode        String?   // The code this user used when verifying (optional tracking)
-  referralCount         Int       @default(0) // Successful referrals
-  referralProgramActive Boolean   @default(false) // Opted-in status
-  referralCoupons       Coupon[]  @relation("UserReferralCoupons") // Derived coupons
+  referralCode          String?  @unique // The code this user shares
+  referredByCode        String? // The code this user used when verifying (optional tracking)
+  referralCount         Int      @default(0) // Successful referrals
+  referralProgramActive Boolean  @default(false) // Opted-in status
+  referralCoupons       Coupon[] @relation("UserReferralCoupons") // Derived coupons
 
   // Integrations
-  shortcutApiKey        String?   @unique
+  shortcutApiKey String? @unique
 
   @@map("users")
 }
 
 model BusinessProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  companyName String
-  companyId   String?  // H.P. / Osek Murshe
-  vatStatus   String   // EXEMPT (Ptor), AUTHORIZED (Murshe), LTD (Baam)
-  logoUrl     String?  // URL to company logo
-  logoPublicId String? // Cloudinary public ID for deletion
-  address     String?  // Business address
-  phone       String?  // Business phone
-  email       String?  // Business email
-  signatureUrl String? // Digital signature (base64)
-  taxRate     Float    @default(0) // Income Tax Rate %
-  marketingBudget Float @default(0) // Total Marketing Budget
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName     String
+  companyId       String? // H.P. / Osek Murshe
+  vatStatus       String // EXEMPT (Ptor), AUTHORIZED (Murshe), LTD (Baam)
+  logoUrl         String? // URL to company logo
+  logoPublicId    String? // Cloudinary public ID for deletion
+  address         String? // Business address
+  phone           String? // Business phone
+  email           String? // Business email
+  signatureUrl    String? // Digital signature (base64)
+  taxRate         Float    @default(0) // Income Tax Rate %
+  marketingBudget Float    @default(0) // Total Marketing Budget
   itaRefreshToken String? // For Israel Tax Authority API
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
   @@map("business_profiles")
 }
 
@@ -114,26 +113,26 @@ enum BudgetType {
 // ... (User/BusinessProfile models remain same)
 
 model Budget {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  month     Int      
-  year      Int      
-  type      BudgetType @default(PERSONAL) // NEW: Supports separating Personal/Business budgets
-  currency  String   @default("₪")
-  incomes   Income[]
-  expenses  Expense[]
-  bills     Bill[]
-  debts     Debt[]
-  savings   Saving[]
-  categoryBudgets CategoryBudget[]
+  id                  String               @id @default(cuid())
+  userId              String
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month               Int
+  year                Int
+  type                BudgetType           @default(PERSONAL) // NEW: Supports separating Personal/Business budgets
+  currency            String               @default("₪")
+  incomes             Income[]
+  expenses            Expense[]
+  bills               Bill[]
+  debts               Debt[]
+  savings             Saving[]
+  categoryBudgets     CategoryBudget[]
   savingCategoryGoals SavingCategoryGoal[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
   initialBalance Float? // Monthly override for starting balance
   initialSavings Float? // Monthly override for starting savings
-  
+
   manualVatRefunds ManualVatRefund[]
 
   // CHANGED: Unique constraint now includes 'type' to allow 2 budgets per month (Personal + Business)
@@ -143,54 +142,53 @@ model Budget {
 }
 
 model ManualVatRefund {
-  id          String   @id @default(cuid())
-  budgetId    String
-  budget      Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  amount      Float
-  description String
-  date        DateTime @default(now())
+  id            String   @id @default(cuid())
+  budgetId      String
+  budget        Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  amount        Float
+  description   String
+  date          DateTime @default(now())
   attachmentUrl String?  @db.Text
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([budgetId])
   @@map("manual_vat_refunds")
 }
 
 model Category {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  type      String   // income, expense, saving
-  scope     BudgetType @default(PERSONAL) // NEW: Category belongs to Personal or Business view
-  color     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  type            String // income, expense, saving
+  scope           BudgetType       @default(PERSONAL) // NEW: Category belongs to Personal or Business view
+  color           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   // ... (Relation to CategoryBudget)
   categoryBudgets CategoryBudget[]
-  
+
   @@unique([userId, name, type, scope])
   @@map("categories")
 }
 
 model CategoryBudget {
-  id        String   @id @default(cuid())
-  budgetId  String
-  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  budgetId   String
+  budget     Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
   categoryId String
-  category  Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
-  limit     Float    @default(0) // The user-defined limit amount
-  
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  limit Float @default(0) // The user-defined limit amount
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([budgetId, categoryId])
   @@map("category_budgets")
 }
-
 
 // SMB Enums
 enum PaymentMethod {
@@ -207,8 +205,6 @@ enum ExpenseType {
   CAPEX // Capital Expenditure (Assets)
 }
 
-
-
 model UserPaymentMethod {
   id        String   @id @default(uuid())
   userId    String
@@ -222,8 +218,6 @@ model UserPaymentMethod {
   @@map("user_payment_methods")
 }
 
-
-
 enum IncomeStatus {
   PAID
   PENDING
@@ -232,92 +226,97 @@ enum IncomeStatus {
 }
 
 model Income {
-  id                String   @id @default(cuid())
-  budgetId          String
-  budget            Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  source            String
-  category          String   @default("כללי")
-  amount            Float
-  status            IncomeStatus @default(PAID)
-  date              DateTime?
-  isRecurring         Boolean  @default(false)
-  recurringSourceId   String?
-  recurringStartDate  DateTime?
-  recurringEndDate    DateTime?
-  
+  id                 String       @id @default(cuid())
+  budgetId           String
+  budget             Budget       @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  source             String
+  category           String       @default("כללי")
+  amount             Float
+  status             IncomeStatus @default(PAID)
+  date               DateTime?
+  isRecurring        Boolean      @default(false)
+  recurringSourceId  String?
+  recurringStartDate DateTime?
+  recurringEndDate   DateTime?
+
   // Business Fields
-  clientId          String?
-  client            Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  invoiceId         String?
-  invoice           Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
-  amountBeforeVat   Float?
-  vatRate           Float?   @default(0) // 0.17 etc.
-  vatAmount         Float?
-  invoiceDate       DateTime? // Tax event date
-  paymentDate       DateTime? // Cash flow date (actual payment)
-  paymentMethod     String?   // Changed from Enum to String for flexibility
-  paymentTerms      Int?     @default(0)
-  payer             String?   // NEW: Who paid this income
-  workTime          String?   // NEW: Optional Work Time
-  acceptedBy        String?   // NEW: Optional Accepted By
-  currency          String   @default("ILS")
-  
+  clientId        String?
+  client          Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  invoiceId       String?
+  invoice         Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  amountBeforeVat Float?
+  vatRate         Float?    @default(0) // 0.17 etc.
+  vatAmount       Float?
+  invoiceDate     DateTime? // Tax event date
+  paymentDate     DateTime? // Cash flow date (actual payment)
+  paymentMethod   String? // Changed from Enum to String for flexibility
+  paymentTerms    Int?      @default(0)
+  payer           String? // NEW: Who paid this income
+  workTime        String? // NEW: Optional Work Time
+  acceptedBy      String? // NEW: Optional Accepted By
+  currency        String    @default("ILS")
+
   // Personal Fields
-  projectId         String?
-  project           Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  projectId      String?
+  project        Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectStageId String?
+  projectStage   ProjectStage? @relation(fields: [projectStageId], references: [id], onDelete: SetNull)
+
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  workEvents WorkEvent[]
+
   @@index([budgetId])
   @@index([clientId])
-  workEvents WorkEvent[]
   @@map("incomes")
 }
 
 model Expense {
-  id                String   @id @default(cuid())
-  budgetId          String
-  budget            Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  category          String
-  amount            Float
-  currency          String   @default("ILS")
-  description       String?
-  date              DateTime?
-  installments      Int      @default(1)
-  currentInstallment Int     @default(1)
-  isRecurring         Boolean  @default(false)
-  recurringSourceId   String?
-  recurringStartDate  DateTime?
-  recurringEndDate    DateTime?
-  
+  id                 String    @id @default(cuid())
+  budgetId           String
+  budget             Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  category           String
+  amount             Float
+  currency           String    @default("ILS")
+  description        String?
+  date               DateTime?
+  installments       Int       @default(1)
+  currentInstallment Int       @default(1)
+  isRecurring        Boolean   @default(false)
+  recurringSourceId  String?
+  recurringStartDate DateTime?
+  recurringEndDate   DateTime?
+
   // Business Fields
-  supplierId        String?
-  supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
-  clientId          String?
-  client            Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  
-  expenseType       ExpenseType? @default(OPEX)
-  amountBeforeVat   Float?
-  vatRate           Float?   @default(0) // 0.17 etc.
-  vatAmount         Float?
-  vatType           VatType? @default(FULL)
-  isDeductible      Boolean? @default(true) // For income tax recognition
-  deductibleRate    Float?   @default(1.0) // 1.0 = 100%, 0.45 = 45% etc.
+  supplierId String?
+  supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  clientId   String?
+  client     Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
 
-  invoiceDate       DateTime? // Tax event date
-  paymentDate       DateTime? // Cash flow date
-  paymentMethod     String?    // Changed from Enum to String for flexibility
-  paymentTerms      Int?     @default(0)
-  paidBy            String?   // Who paid this expense
-  attachmentUrl     String?   @db.Text // Base64 or URL for photographed invoice
-  
+  expenseType     ExpenseType? @default(OPEX)
+  amountBeforeVat Float?
+  vatRate         Float?       @default(0) // 0.17 etc.
+  vatAmount       Float?
+  vatType         VatType?     @default(FULL)
+  isDeductible    Boolean?     @default(true) // For income tax recognition
+  deductibleRate  Float?       @default(1.0) // 1.0 = 100%, 0.45 = 45% etc.
+
+  invoiceDate   DateTime? // Tax event date
+  paymentDate   DateTime? // Cash flow date
+  paymentMethod String? // Changed from Enum to String for flexibility
+  paymentTerms  Int?      @default(0)
+  paidBy        String? // Who paid this expense
+  attachmentUrl String?   @db.Text // Base64 or URL for photographed invoice
+
   // Personal Fields
-  projectId         String?
-  project           Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  
+  projectId      String?
+  project        Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectStageId String?
+  projectStage   ProjectStage? @relation(fields: [projectStageId], references: [id], onDelete: SetNull)
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([budgetId])
   @@index([budgetId, category])
   @@index([supplierId])
@@ -325,85 +324,88 @@ model Expense {
 }
 
 model Bill {
-  id          String   @id @default(cuid())
-  budgetId    String
-  budget      Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  name        String
-  amount      Float
-  currency    String   @default("ILS")
-  dueDate     DateTime @default(now())
-  isPaid      Boolean  @default(false)
-  category    String   @default("חשבונות")
-  isRecurring         Boolean  @default(false)
-  recurringSourceId   String?
-  paidDate            DateTime?
-  paymentMethod       String?   // NEW
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String    @id @default(cuid())
+  budgetId          String
+  budget            Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  name              String
+  amount            Float
+  currency          String    @default("ILS")
+  dueDate           DateTime  @default(now())
+  isPaid            Boolean   @default(false)
+  category          String    @default("חשבונות")
+  isRecurring       Boolean   @default(false)
+  recurringSourceId String?
+  paidDate          DateTime?
+  paymentMethod     String? // NEW
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
   @@index([budgetId])
   @@index([budgetId, isPaid])
   @@map("bills")
 }
 
 model Debt {
-  id              String    @id @default(cuid())
-  budgetId        String
-  budget          Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  creditor        String
-  debtType        String    // owed_by_me, owed_to_me
-  totalAmount     Float
-  currency        String    @default("ILS")
-  monthlyPayment  Float
-  dueDay          Int
-  isPaid          Boolean   @default(false)
-  isRecurring     Boolean   @default(false)
-  recurringSourceId String?
-  totalDebtAmount Float?    // For installments tracking
+  id                   String    @id @default(cuid())
+  budgetId             String
+  budget               Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  creditor             String
+  debtType             String // owed_by_me, owed_to_me
+  totalAmount          Float
+  currency             String    @default("ILS")
+  monthlyPayment       Float
+  dueDay               Int
+  isPaid               Boolean   @default(false)
+  isRecurring          Boolean   @default(false)
+  recurringSourceId    String?
+  totalDebtAmount      Float? // For installments tracking
   numberOfInstallments Int?
-  installmentNumber Int?
-  paidDate        DateTime?
-  paymentMethod   String?   // NEW
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  installmentNumber    Int?
+  paidDate             DateTime?
+  paymentMethod        String? // NEW
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
   @@index([budgetId])
   @@index([budgetId, isPaid])
   @@map("debts")
 }
 
 model Saving {
-  id              String    @id @default(cuid())
-  budgetId        String?
-  budget          Budget?   @relation(fields: [budgetId], references: [id], onDelete: SetNull)
-  name            String    @default("חסכון")
-  targetAmount    Float?
-  currentAmount   Float     @default(0)
-  currency        String    @default("ILS")
-  monthlyDeposit  Float?    // Planned monthly contribution
-  targetDate      DateTime?
-  category        String    @default("חסכון") // e.g., Emergency Fund, Vacation
-  color           String?   // UI color integration
-  notes           String?
-  paymentMethod   String?   // NEW
-  
-  isRecurring         Boolean  @default(false)
-  recurringSourceId   String?
-  recurringStartDate  DateTime?
-  recurringEndDate    DateTime?
+  id             String    @id @default(cuid())
+  budgetId       String?
+  budget         Budget?   @relation(fields: [budgetId], references: [id], onDelete: SetNull)
+  name           String    @default("חסכון")
+  targetAmount   Float?
+  currentAmount  Float     @default(0)
+  currency       String    @default("ILS")
+  monthlyDeposit Float? // Planned monthly contribution
+  targetDate     DateTime?
+  category       String    @default("חסכון") // e.g., Emergency Fund, Vacation
+  color          String? // UI color integration
+  notes          String?
+  paymentMethod  String? // NEW
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  isRecurring        Boolean   @default(false)
+  recurringSourceId  String?
+  recurringStartDate DateTime?
+  recurringEndDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("savings")
 }
 
 model SavingCategoryGoal {
-  id            String   @id @default(cuid())
-  budgetId      String
-  budget        Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
-  category      String
-  targetAmount  Float    @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
+  id           String   @id @default(cuid())
+  budgetId     String
+  budget       Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  category     String
+  targetAmount Float    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   @@unique([budgetId, category])
   @@map("saving_category_goals")
 }
@@ -420,22 +422,23 @@ model Project {
   budget      Float?
   startDate   DateTime?
   endDate     DateTime?
-  
+
   // Client association (business projects)
-  clientId    String?
-  client      Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
   // Sub-project hierarchy (single level)
-  parentId    String?
-  parent      Project?      @relation("ProjectHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  children    Project[]     @relation("ProjectHierarchy")
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  
-  incomes     Income[]
-  expenses    Expense[]
-  
+  parentId String?
+  parent   Project?  @relation("ProjectHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Project[] @relation("ProjectHierarchy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  incomes  Income[]
+  expenses Expense[]
+  stages   ProjectStage[]
+
   @@unique([userId, name, scope])
   @@index([userId, scope])
   @@index([clientId])
@@ -443,24 +446,41 @@ model Project {
   @@map("projects")
 }
 
+model ProjectStage {
+  id         String  @id @default(cuid())
+  projectId  String
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title      String
+  percentage Float
+
+  incomes  Income[]
+  expenses Expense[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("project_stages")
+}
+
 model Subscription {
-  id                String    @id @default(cuid())
-  userId            String
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status            String    @default("inactive") // trial, active, expired, inactive
-  planType          PlanType  @default(PERSONAL)   // NEW: PERSONAL vs BUSINESS
-  couponCode        String?   // Tracks which coupon was used (for Admin display)
-  startDate         DateTime  @default(now())
-  endDate           DateTime?
-  paypalOrderId     String?
-  lastPaymentDate   DateTime?
-  lastPaymentAmount Float?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  expiryNotified30Days Boolean @default(false)
-  expiryNotified7Days  Boolean @default(false)
+  id                   String    @id @default(cuid())
+  userId               String
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status               String    @default("inactive") // trial, active, expired, inactive
+  planType             PlanType  @default(PERSONAL) // NEW: PERSONAL vs BUSINESS
+  couponCode           String? // Tracks which coupon was used (for Admin display)
+  startDate            DateTime  @default(now())
+  endDate              DateTime?
+  paypalOrderId        String?
+  lastPaymentDate      DateTime?
+  lastPaymentAmount    Float?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  expiryNotified30Days Boolean   @default(false)
+  expiryNotified7Days  Boolean   @default(false)
   deletionScheduledFor DateTime?
-  
+
   @@unique([userId, planType]) // CHANGED: Allow one subscription per plan type
   @@map("subscriptions")
 }
@@ -471,9 +491,10 @@ model PaymentHistory {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   amount        Float
   currency      String   @default("ILS")
-  status        String   // completed, failed, pending
+  status        String // completed, failed, pending
   paypalOrderId String?
   createdAt     DateTime @default(now())
+
   @@map("payment_history")
 }
 
@@ -484,15 +505,16 @@ model Coupon {
   expiryDate      DateTime?
   maxUses         Int?
   usedCount       Int       @default(0)
-  specificEmail   String?   // Optional: restrict to specific user email
+  specificEmail   String? // Optional: restrict to specific user email
   planType        PlanType? // Optional: restrict to specific plan (PERSONAL/BUSINESS)
-  
-  // Referral Reward Link
-  ownerId         String? 
-  owner           User?    @relation("UserReferralCoupons", fields: [ownerId], references: [id])
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  // Referral Reward Link
+  ownerId String?
+  owner   User?   @relation("UserReferralCoupons", fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("coupons")
 }
 
@@ -502,7 +524,7 @@ model Feedback {
   user      User     @relation(fields: [userId], references: [id])
   content   String
   createdAt DateTime @default(now())
-  
+
   @@map("feedbacks")
 }
 
@@ -532,7 +554,7 @@ model AIAdviceCache {
   advice    String   @db.Text
   createdAt DateTime @default(now())
   expiresAt DateTime
-  
+
   @@unique([userId, month, year])
   @@index([userId, expiresAt])
   @@map("ai_advice_cache")
@@ -543,9 +565,9 @@ model StoredReport {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   year      Int
-  type      String   // e.g., "BKMVDATA", "PDF_REF"
+  type      String // e.g., "BKMVDATA", "PDF_REF"
   data      String   @db.Text // The actual content (or reference)
-  fileName  String?  // Suggested filename
+  fileName  String? // Suggested filename
   createdAt DateTime @default(now())
 
   @@index([userId, year, type])
@@ -556,149 +578,149 @@ model SiteSettings {
   id              String   @id @default("site_settings")
   maintenanceMode Boolean  @default(false)
   updatedAt       DateTime @updatedAt
-  
+
   @@map("site_settings")
 }
 
 // Business Models
 
 model Client {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Client details
-  name      String
-  email     String?
-  phone     String?
-  taxId     String?  // ח.פ / ע.מ
-  address   String?
-  notes     String?  @db.Text
-  
+  name    String
+  email   String?
+  phone   String?
+  taxId   String? // ח.פ / ע.מ
+  address String?
+  notes   String? @db.Text
+
   // New Fields
   city        String?
   bankName    String?
   bankBranch  String?
   bankAccount String?
-  
+
   // SaaS / Subscription Fields
-  subscriptionType   String?   // WEEKLY, MONTHLY, YEARLY
+  subscriptionType   String? // WEEKLY, MONTHLY, YEARLY
   subscriptionStart  DateTime?
   subscriptionEnd    DateTime?
   subscriptionPrice  Float?
-  subscriptionStatus String?   // PAID, UNPAID, PARTIAL, INSTALLMENTS
-  
-  // Package Relation (New Centralized Model)
-  packageId          String?
-  package            ClientPackage? @relation(fields: [packageId], references: [id])
-  
-  // Legacy Fields (Deprecated - will migrate to Package)
-  packageName        String?
-  subscriptionColor  String?
+  subscriptionStatus String? // PAID, UNPAID, PARTIAL, INSTALLMENTS
 
-  eventLocation      String?  // Physical location of service (optional)
-  
+  // Package Relation (New Centralized Model)
+  packageId String?
+  package   ClientPackage? @relation(fields: [packageId], references: [id])
+
+  // Legacy Fields (Deprecated - will migrate to Package)
+  packageName       String?
+  subscriptionColor String?
+
+  eventLocation String? // Physical location of service (optional)
+
   // Metadata
-  scope     String   @default("BUSINESS")
-  isActive  Boolean  @default(true)
-  isDeleted Boolean  @default(false)
-  agreedToDigitalInvoices Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+  scope                   String   @default("BUSINESS")
+  isActive                Boolean  @default(true)
+  isDeleted               Boolean  @default(false)
+  agreedToDigitalInvoices Boolean  @default(false)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
   // Relations
-  incomes   Income[]
-  expenses  Expense[]
-  invoices  Invoice[]
-  quotes    Quote[]
+  incomes    Income[]
+  expenses   Expense[]
+  invoices   Invoice[]
+  quotes     Quote[]
   workEvents WorkEvent[]
-  projects  Project[]
-  
-  @@index([userId, scope])
+  projects   Project[]
+
   @@unique([userId, name, scope])
+  @@index([userId, scope])
   @@map("clients")
 }
 
 model ClientPackage {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  name      String
-  color     String   @default("#3B82F6") // Hex color
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name  String
+  color String @default("#3B82F6") // Hex color
+
   // Default values for new clients in this package
   defaultPrice Float?
   defaultType  String? // WEEKLY, MONTHLY, etc.
-  
-  clients   Client[]
+
+  clients Client[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@unique([userId, name])
   @@map("client_packages")
 }
 
 model Supplier {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Supplier details
-  name      String
-  email     String?
-  phone     String?
-  taxId     String?  // ח.פ / ע.מ
-  address   String?
-  notes     String?  @db.Text
-  
+  name    String
+  email   String?
+  phone   String?
+  taxId   String? // ח.פ / ע.מ
+  address String?
+  notes   String? @db.Text
+
   // Subscription / Package Details (Replicated from Client)
-  subscriptionType   String?   // WEEKLY, MONTHLY, YEARLY, PROJECT
+  subscriptionType   String? // WEEKLY, MONTHLY, YEARLY, PROJECT
   subscriptionStart  DateTime?
   subscriptionEnd    DateTime?
-  subscriptionPrice  Float?    // This represents COST
-  subscriptionStatus String?   // ACTIVE, INACTIVE, etc.
-  
+  subscriptionPrice  Float? // This represents COST
+  subscriptionStatus String? // ACTIVE, INACTIVE, etc.
+
   // Package Relation
-  packageId          String?
-  package            SupplierPackage? @relation(fields: [packageId], references: [id])
+  packageId String?
+  package   SupplierPackage? @relation(fields: [packageId], references: [id])
 
   // Legacy/Fallback
-  packageName        String?
-  subscriptionColor  String?
+  packageName       String?
+  subscriptionColor String?
 
   // Metadata
   scope     String   @default("BUSINESS")
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // Relations
-  expenses  Expense[]
-  
-  @@index([userId, scope])
+  expenses Expense[]
+
   @@unique([userId, name, scope])
+  @@index([userId, scope])
   @@map("suppliers")
 }
 
 model SupplierPackage {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  name      String
-  color     String   @default("#3B82F6") // Hex color
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name  String
+  color String @default("#3B82F6") // Hex color
+
   // Default values for new suppliers in this package
   defaultPrice Float?
   defaultType  String? // WEEKLY, MONTHLY, etc.
-  
+
   suppliers Supplier[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@unique([userId, name])
   @@map("supplier_packages")
 }
@@ -713,80 +735,80 @@ enum InvoiceStatus {
 }
 
 model Invoice {
-  id            String        @id @default(cuid())
-  userId        String
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clientId      String?       // Made nullable for guest clients
-  client        Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  guestClientName String?     // For one-time clients not in the database
-  
-  // Invoice details
-  invoiceNumber String
-  issueDate     DateTime      @default(now())
-  dueDate       DateTime?
-  status        InvoiceStatus @default(DRAFT)
-  invoiceType   String        @default("INVOICE") // INVOICE, OPT_INVOICE (Tax Invoice), RECEIPT, DEAL_INVOICE
-  allocationNumber String?    // מספר הקצאה
-  allocationStatus String     @default("NOT_REQUIRED") // NOT_REQUIRED, PENDING_ITA, COMPLETED, FAILED
+  id              String  @id @default(cuid())
+  userId          String
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId        String? // Made nullable for guest clients
+  client          Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  guestClientName String? // For one-time clients not in the database
 
-  
+  // Invoice details
+  invoiceNumber    String
+  issueDate        DateTime      @default(now())
+  dueDate          DateTime?
+  status           InvoiceStatus @default(DRAFT)
+  invoiceType      String        @default("INVOICE") // INVOICE, OPT_INVOICE (Tax Invoice), RECEIPT, DEAL_INVOICE
+  allocationNumber String? // מספר הקצאה
+  allocationStatus String        @default("NOT_REQUIRED") // NOT_REQUIRED, PENDING_ITA, COMPLETED, FAILED
+
   // Amounts
   subtotal      Float
-  vatRate       Float         @default(0.18)
+  vatRate       Float   @default(0.18)
   vatAmount     Float
   total         Float
-  currency      String        @default("ILS")
-  paymentMethod String?       // NEW: User selected payment method
-  
+  currency      String  @default("ILS")
+  paymentMethod String? // NEW: User selected payment method
+
   // Payment
-  paidDate      DateTime?
-  paidAmount    Float?
-  
+  paidDate   DateTime?
+  paidAmount Float?
+
   // Notes
-  notes         String?       @db.Text
-  
+  notes String? @db.Text
+
   // Metadata
-  scope         String        @default("BUSINESS")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  
+  scope     String   @default("BUSINESS")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Digital Signing (Green Invoice)
-  token         String?       @unique @default(cuid()) // For public access
-  signature     String?       // Base64 encoded signature
-  documentHash  String?       // SHA-256 Hash
-  signedAt      DateTime?
-  isSigned      Boolean       @default(false)
-  isLocked      Boolean       @default(false)
-  originalPdfUrl String?      // Path or base64 to original generated PDF
-  
+  token          String?   @unique @default(cuid()) // For public access
+  signature      String? // Base64 encoded signature
+  documentHash   String? // SHA-256 Hash
+  signedAt       DateTime?
+  isSigned       Boolean   @default(false)
+  isLocked       Boolean   @default(false)
+  originalPdfUrl String? // Path or base64 to original generated PDF
+
   // Relations
-  incomes       Income[]
-  lineItems     InvoiceLineItem[]
-  creditNotes   CreditNote[] // NEW
-  quote         Quote?
-  
+  incomes     Income[]
+  lineItems   InvoiceLineItem[]
+  creditNotes CreditNote[] // NEW
+  quote       Quote?
+
+  @@unique([userId, invoiceNumber])
   @@index([userId, scope])
   @@index([clientId])
-  @@unique([userId, invoiceNumber])
   @@map("invoices")
 }
 
 model InvoiceLineItem {
-  id          String   @id @default(cuid())
-  invoiceId   String
-  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  
+  id        String  @id @default(cuid())
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
   description String
-  quantity    Float    @default(1)
+  quantity    Float  @default(1)
   price       Float
-  total       Float    // quantity * price
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  total       Float // quantity * price
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([invoiceId])
   @@map("invoice_line_items")
 }
+
 enum QuoteStatus {
   DRAFT
   SENT
@@ -796,69 +818,67 @@ enum QuoteStatus {
 }
 
 model Quote {
-  id            String      @id @default(cuid())
-  userId        String
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clientId      String
-  client        Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  
-  // Quote details
-  quoteNumber   String
-  issueDate     DateTime    @default(now())
-  validUntil    DateTime?
-  status        QuoteStatus @default(DRAFT)
-  allocationNumber String?  // מספר הקצאה
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
-  
+  // Quote details
+  quoteNumber      String
+  issueDate        DateTime    @default(now())
+  validUntil       DateTime?
+  status           QuoteStatus @default(DRAFT)
+  allocationNumber String? // מספר הקצאה
+
   // Amounts
-  subtotal      Float
-  vatRate       Float       @default(0.18)
-  vatAmount     Float
-  total         Float
-  currency      String      @default("₪")
-  
+  subtotal  Float
+  vatRate   Float  @default(0.18)
+  vatAmount Float
+  total     Float
+  currency  String @default("₪")
+
   // Line Items
-  items         Json?       // Stores array of { description, quantity, price, total }
-  
+  items Json? // Stores array of { description, quantity, price, total }
+
   // Notes
-  notes         String?     @db.Text
-  
+  notes String? @db.Text
+
   // Metadata
-  scope         String      @default("BUSINESS")
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  
+  scope     String   @default("BUSINESS")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Digital Signing (Public View)
-  token         String?     @unique @default(cuid()) // For public access
-  signature     String?     // Base64 encoded signature
-  signedAt      DateTime?
-  isSigned      Boolean     @default(false)
+  token     String?   @unique @default(cuid()) // For public access
+  signature String? // Base64 encoded signature
+  signedAt  DateTime?
+  isSigned  Boolean   @default(false)
 
   // Link to Invoice (Converted)
-  invoiceId     String?     @unique
-  invoice       Invoice?    @relation(fields: [invoiceId], references: [id])
+  invoiceId String?  @unique
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
 
+  @@unique([userId, quoteNumber])
   @@index([userId, scope])
   @@index([clientId])
-  @@unique([userId, quoteNumber])
   @@map("quotes")
 }
 
-
 model AuditLog {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  
-  action    String   // e.g., "LOGIN", "UPDATE_INVOICE", "DELETE_CLIENT"
-  entity    String   // e.g., "Invoice", "Client", "Settings"
-  entityId  String?  // The ID of the item being affected
-  
-  details   String?  @db.Text // JSON or text description of changes
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  action   String // e.g., "LOGIN", "UPDATE_INVOICE", "DELETE_CLIENT"
+  entity   String // e.g., "Invoice", "Client", "Settings"
+  entityId String? // The ID of the item being affected
+
+  details String? @db.Text // JSON or text description of changes
+
   ipAddress String?
   userAgent String?
-  
+
   createdAt DateTime @default(now())
 
   @@index([userId])
@@ -867,70 +887,70 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-
 model CreditNote {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Reference to original invoice
-  invoiceId       String
-  invoice         Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
-  
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
   // Credit Note details
   creditNoteNumber String
-  issueDate       DateTime @default(now())
-  
+  issueDate        DateTime @default(now())
+
   // Amounts (can be partial or full credit)
-  creditAmount    Float    // Amount being credited (before VAT)
-  vatAmount       Float
-  totalCredit     Float    // Total including VAT
-  
+  creditAmount Float // Amount being credited (before VAT)
+  vatAmount    Float
+  totalCredit  Float // Total including VAT
+
   // Reason/Notes
-  reason          String?  @db.Text
-  
+  reason String? @db.Text
+
   // Digital Signing
-  documentHash    String?  // SHA-256 Hash
-  signedAt        DateTime?
+  documentHash String? // SHA-256 Hash
+  signedAt     DateTime?
 
   // Metadata
-  scope           String   @default("BUSINESS")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  isLocked        Boolean  @default(false)
-  originalPdfUrl  String?
-  
+  scope          String   @default("BUSINESS")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  isLocked       Boolean  @default(false)
+  originalPdfUrl String?
+
   // Public viewing (no signature needed from client)
-  token           String?  @unique @default(cuid())
-  
+  token String? @unique @default(cuid())
+
+  @@unique([userId, creditNoteNumber])
   @@index([userId, scope])
   @@index([invoiceId])
-  @@unique([userId, creditNoteNumber])
   @@map("credit_notes")
 }
+
 // ... (existing content)
 
 model WorkEvent {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String
   description String?
   start       DateTime
   end         DateTime?
-  allDay      Boolean  @default(false)
+  allDay      Boolean   @default(false)
   location    String?
-  
+
   // Relations
-  clientId    String?
-  client      Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  
-  incomeId    String?
-  income      Income?  @relation(fields: [incomeId], references: [id], onDelete: SetNull)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  incomeId String?
+  income   Income? @relation(fields: [incomeId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId, start])
   @@map("work_events")
 }
@@ -968,76 +988,75 @@ enum ProjectStatus {
 }
 
 model ProjectTask {
-  id          String      @id @default(cuid())
+  id          String     @id @default(cuid())
   title       String
-  description String?      @db.Text
-  status      TaskStatus  @default(TODO)
-  priority    Priority    @default(MEDIUM)
+  description String?    @db.Text
+  status      TaskStatus @default(TODO)
+  priority    Priority   @default(MEDIUM)
   department  Department
-  
-  assignees   String[]
-  
-  dueDate     DateTime?
-  
-  createdBy   String
-  creator     User        @relation(fields: [createdBy], references: [id])
-  
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  
-  completedAt DateTime?
-  
-  @@index([department])
 
+  assignees String[]
+
+  dueDate DateTime?
+
+  createdBy String
+  creator   User   @relation(fields: [createdBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  completedAt DateTime?
+
+  @@index([department])
   @@index([status])
   @@map("project_tasks")
 }
 
 model MarketingCampaign {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  name        String
-  type        String   // e.g. PPC, Collaboration, Social
-  status      String   @default("ACTIVE") // ACTIVE, PAUSED, ENDED
-  priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH
-  
-  startDate   DateTime?
-  endDate     DateTime?
-  
-  cost        Float?    // Budget/Cost
-  currency    String    @default("ILS")
-  paymentMethod String?
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name     String
+  type     String // e.g. PPC, Collaboration, Social
+  status   String @default("ACTIVE") // ACTIVE, PAUSED, ENDED
+  priority String @default("MEDIUM") // LOW, MEDIUM, HIGH
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  cost             Float? // Budget/Cost
+  currency         String  @default("ILS")
+  paymentMethod    String?
   paymentFrequency String? // "ONE_TIME", "MONTHLY"
-  
-  notes       String?   @db.Text
-  
+
+  notes String? @db.Text
+
   // Relations
-//   expenses    Expense[] // REMOVED relation to main Expense
-  expenses    BusinessExpense[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  //   expenses    Expense[] // REMOVED relation to main Expense
+  expenses BusinessExpense[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId])
   @@map("marketing_campaigns")
 }
 
 model EmployeeAgreement {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  version      Int      @default(1)
-  status       String   @default("SIGNED") 
-  signature    String?  @db.Text // base64
-  signedAt     DateTime @default(now())
-  
-  filledValues Json?    // Stores the inputs user filled
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  version   Int      @default(1)
+  status    String   @default("SIGNED")
+  signature String?  @db.Text // base64
+  signedAt  DateTime @default(now())
+
+  filledValues Json? // Stores the inputs user filled
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("employee_agreements")
 }
@@ -1053,32 +1072,30 @@ model VisitorLog {
   @@map("visitor_logs")
 }
 
-
 model BusinessExpense {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   description String   @map("title") // Map description to title to match the column name or just rename field
   amount      Float
   currency    String   @default("ILS")
   date        DateTime @default(now())
-  
-  category    String   @default("General") // Marketing, Hosting, etc.
-  
+
+  category String @default("General") // Marketing, Hosting, etc.
+
   // Relation to Campaign
-  campaignId  String?  @map("marketingCampaignId")
-  campaign    MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
-  
+  campaignId String?            @map("marketingCampaignId")
+  campaign   MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
   paymentMethod String?
-  notes       String?  @db.Text
-  
+  notes         String? @db.Text
+
   responsibles String[] @default(["RON"])
 
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId])
   @@index([campaignId])
   @@map("business_expenses")
@@ -1088,7 +1105,7 @@ model ManagementNotification {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type      String   // TASK_CREATED, TASK_STATUS_CHANGED, CAMPAIGN_CREATED, EXPENSE_CREATED
+  type      String // TASK_CREATED, TASK_STATUS_CHANGED, CAMPAIGN_CREATED, EXPENSE_CREATED
   title     String
   message   String
   isRead    Boolean  @default(false)

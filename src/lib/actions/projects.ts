@@ -39,6 +39,7 @@ export async function getProjectsWithStats(type: 'PERSONAL' | 'BUSINESS' = 'PERS
                 scope: type
             },
             include: {
+                stages: { orderBy: { createdAt: 'asc' } },
                 incomes: {
                     select: { amount: true }
                 },
@@ -170,6 +171,7 @@ export async function getProjectStats(
         const project = await db.project.findUnique({
             where: { id: projectId },
             include: {
+                stages: { orderBy: { createdAt: 'asc' } },
                 incomes: {
                     where: {
                         date: {
@@ -225,6 +227,7 @@ export async function getProjectDetails(projectId: string) {
         const project = await db.project.findUnique({
             where: { id: projectId },
             include: {
+                stages: { orderBy: { createdAt: 'asc' } },
                 incomes: {
                     orderBy: { date: 'desc' }
                 },

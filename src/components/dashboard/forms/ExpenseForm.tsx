@@ -127,6 +127,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         supplierId: initialData.supplierId || '',
         clientId: initialData.clientId || '',
         projectId: initialData.projectId || '',
+        projectStageId: (initialData as any).projectStageId || '',
         amountBeforeVat: initialData.amountBeforeVat?.toString() || '',
         vatRate: initialData.vatRate?.toString() || '0.18',
         vatAmount: initialData.vatAmount?.toString() || '',
@@ -147,6 +148,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
         supplierId: '',
         clientId: '',
         projectId: '',
+        projectStageId: '',
         amountBeforeVat: '',
         vatRate: '0.18',
         vatAmount: '',
@@ -400,6 +402,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
             supplierId: newExpense.supplierId || undefined,
             clientId: newExpense.clientId || undefined,
             projectId: newExpense.projectId || undefined,
+            projectStageId: (newExpense as any).projectStageId || undefined,
             amountBeforeVat: parseFloat(newExpense.amountBeforeVat) || undefined,
             vatRate: parseFloat(newExpense.vatRate) || undefined,
             vatAmount: parseFloat(newExpense.vatAmount) || undefined,
@@ -436,6 +439,7 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                         supplierId: '',
                         clientId: '',
                         projectId: '',
+        projectStageId: '',
                         amountBeforeVat: '',
                         vatRate: '0.18',
                         vatAmount: '',
@@ -880,6 +884,28 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                                 placeholder="חפש פרויקט..."
                             />
                         </div>
+                        
+                        {newExpense.projectId && (projects as any[]).find(p => p.id === newExpense.projectId)?.stages?.length > 0 && (
+                            <div className="md:col-span-1 space-y-1">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך לשלב פרויקט (אופציונלי)</label>
+                                <Select
+                                    value={(newExpense as any).projectStageId || ''}
+                                    onValueChange={(val) => setNewExpense({ ...newExpense, projectStageId: val === 'none' ? '' : val })}
+                                >
+                                    <SelectTrigger className="w-full h-10 border bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
+                                        <SelectValue placeholder="בחר שלב..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">ללא שלב</SelectItem>
+                                        {(projects as any[]).find(p => p.id === newExpense.projectId)?.stages.map((stage: any) => (
+                                            <SelectItem key={stage.id} value={stage.id}>
+                                                {stage.title} ({stage.percentage}%)
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
 
                         <div className="w-full">
                             <PaymentMethodSelector
@@ -891,6 +917,28 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                                 color={isBusiness ? 'red' : 'red'}
                             />
                         </div>
+                        
+                        {newExpense.projectId && (projects as any[]).find(p => p.id === newExpense.projectId)?.stages?.length > 0 && (
+                            <div className="md:col-span-1 space-y-1">
+                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך לשלב פרויקט (אופציונלי)</label>
+                                <Select
+                                    value={(newExpense as any).projectStageId || ''}
+                                    onValueChange={(val) => setNewExpense({ ...newExpense, projectStageId: val === 'none' ? '' : val })}
+                                >
+                                    <SelectTrigger className="w-full h-10 border bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700">
+                                        <SelectValue placeholder="בחר שלב..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">ללא שלב</SelectItem>
+                                        {(projects as any[]).find(p => p.id === newExpense.projectId)?.stages.map((stage: any) => (
+                                            <SelectItem key={stage.id} value={stage.id}>
+                                                {stage.title} ({stage.percentage}%)
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
 
                         {/* Paid By Field */}
                         {isBusiness && (
