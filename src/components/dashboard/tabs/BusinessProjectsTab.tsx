@@ -117,6 +117,7 @@ function ProjectCard({
     onEdit,
     onDelete,
     onAddSubProject,
+    onChildClick,
     delay,
 }: {
     project: ProjectWithStats
@@ -124,6 +125,7 @@ function ProjectCard({
     onEdit: (e: React.MouseEvent) => void
     onDelete: (e: React.MouseEvent) => void
     onAddSubProject: (e: React.MouseEvent) => void
+    onChildClick: (child: ProjectWithStats) => void
     delay: number
 }) {
     const [isExpanded, setIsExpanded] = useState(false)
@@ -286,32 +288,42 @@ function ProjectCard({
                                         animate={{ opacity: 1, height: 'auto' }}
                                         exit={{ opacity: 0, height: 0 }}
                                         transition={{ duration: 0.2 }}
-                                        className="mt-2 space-y-1.5 overflow-hidden"
+                                        className="mt-2 relative overflow-hidden"
                                     >
-                                        {project.children.map((child) => {
-                                            const childStatus = STATUS_CONFIG[child.status] || STATUS_CONFIG['ACTIVE']
-                                            return (
-                                                <div
-                                                    key={child.id}
-                                                    className="flex items-center justify-between p-2 rounded bg-slate-100/70 dark:bg-slate-800/30 text-xs"
-                                                >
-                                                    <div className="flex items-center gap-2 min-w-0">
-                                                        <div
-                                                            className="w-1.5 h-5 rounded-full shrink-0"
-                                                            style={{ backgroundColor: child.color || project.color || '#3B82F6' }}
-                                                        />
-                                                        <span className="font-medium truncate">{child.name}</span>
-                                                        <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", childStatus.dotColor)} />
+                                        <div className="absolute right-3.5 top-0 bottom-4 w-px bg-slate-200 dark:bg-slate-700/50" />
+                                        <div className="space-y-1.5 pl-2 pr-6">
+                                            {project.children.map((child, index) => {
+                                                const childStatus = STATUS_CONFIG[child.status] || STATUS_CONFIG['ACTIVE']
+                                                return (
+                                                    <div
+                                                        key={child.id}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            onChildClick(child)
+                                                        }}
+                                                        className="flex items-center justify-between p-2 rounded bg-slate-50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-700/30 text-xs relative group hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-colors cursor-pointer"
+                                                    >
+                                                        {/* Horizontal tree line */}
+                                                        <div className="absolute -right-[11px] top-1/2 w-2.5 h-px bg-slate-200 dark:bg-slate-700/50" />
+                                                        
+                                                        <div className="flex items-center gap-2 min-w-0">
+                                                            <div
+                                                                className="w-1.5 h-1.5 rounded-full shrink-0"
+                                                                style={{ backgroundColor: child.color || project.color || '#3B82F6' }}
+                                                            />
+                                                            <span className="font-medium truncate">{child.name}</span>
+                                                            <div className={cn("w-1.5 h-1.5 rounded-full shrink-0", childStatus.dotColor)} />
+                                                        </div>
+                                                        <span className={cn(
+                                                            "font-semibold dir-ltr shrink-0 mr-2",
+                                                            child.stats.balance >= 0 ? "text-green-600" : "text-red-600"
+                                                        )}>
+                                                            {formatCurrency(child.stats.balance)}
+                                                        </span>
                                                     </div>
-                                                    <span className={cn(
-                                                        "font-semibold dir-ltr shrink-0 mr-2",
-                                                        child.stats.balance >= 0 ? "text-green-600" : "text-red-600"
-                                                    )}>
-                                                        {formatCurrency(child.stats.balance)}
-                                                    </span>
-                                                </div>
-                                            )
-                                        })}
+                                                )
+                                            })}
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -638,6 +650,7 @@ export function BusinessProjectsTab() {
                             onEdit={(e) => openEdit(project, e)}
                             onDelete={(e) => openDelete(project, e)}
                             onAddSubProject={(e) => openAddSubProject(project, e)}
+                            onChildClick={(child) => handleProjectClick(child as ProjectWithStats)}
                             delay={idx * 0.07}
                         />
                     ))}

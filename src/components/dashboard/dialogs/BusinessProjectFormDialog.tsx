@@ -108,8 +108,8 @@ export function BusinessProjectFormDialog({
             setBudget(initialData.budget || null)
             setStartDate(initialData.startDate ? new Date(initialData.startDate) : undefined)
             setEndDate(initialData.endDate ? new Date(initialData.endDate) : undefined)
-            setClientId(initialData.clientId || '')
-            setParentId(initialData.parentId || '')
+            setClientId(initialData.clientId || 'none')
+            setParentId(initialData.parentId || 'none')
         } else if (isOpen) {
             resetForm()
         }
@@ -123,8 +123,8 @@ export function BusinessProjectFormDialog({
         setBudget(null)
         setStartDate(undefined)
         setEndDate(undefined)
-        setClientId('')
-        setParentId('')
+        setClientId('none')
+        setParentId('none')
         setClientSearch('')
     }
 
@@ -141,8 +141,8 @@ export function BusinessProjectFormDialog({
                 budget,
                 startDate: startDate || null,
                 endDate: endDate || null,
-                clientId: clientId || null,
-                parentId: parentId || null,
+                clientId: clientId === 'none' ? null : (clientId || null),
+                parentId: parentId === 'none' ? null : (parentId || null),
             })
             onClose()
             resetForm()
