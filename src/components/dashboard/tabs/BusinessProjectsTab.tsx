@@ -702,10 +702,10 @@ export function BusinessProjectsTab() {
                 isOpen={isDetailsOpen}
                 onClose={() => setIsDetailsOpen(false)}
                 onUpdate={async () => {
-                    const newProjects = await mutate();
-                    if (newProjects && detailsProject) {
-                        const updated = newProjects.data?.find((p: any) => p.id === detailsProject.id);
-                        if (updated) setDetailsProject(updated);
+                    await mutate();
+                    if (detailsProject) {
+                        const res = await getBusinessProjectDetails(detailsProject.id);
+                        if (res.success) setDetailsProject(res.data);
                     }
                 }}
             />
