@@ -364,14 +364,9 @@ export function BusinessProjectsTab() {
         isDemo ? null : ['clients-list', 'BUSINESS'],
         () => getClients('BUSINESS')
     )
-    const { data: projectsListRes } = useSWR(
-        isDemo ? null : ['business-projects-list'],
-        () => getBusinessProjectsList()
-    )
 
     const projects: ProjectWithStats[] = isDemo ? [] : (projectsRes?.data || [])
     const clients = (clientsRes as any)?.data || []
-    const projectsList = projectsListRes?.data || []
 
     // UI State
     const [searchTerm, setSearchTerm] = useState('')
@@ -692,7 +687,7 @@ export function BusinessProjectsTab() {
                 onSubmit={editingProject?.id ? handleUpdate : handleCreate}
                 initialData={editingProject || undefined}
                 clients={clients.map((c: any) => ({ id: c.id, name: c.name }))}
-                projects={projectsList.map((p: any) => ({ id: p.id, name: p.name, parentId: p.parentId }))}
+                projects={projects.map((p: any) => ({ id: p.id, name: p.name, parentId: null }))}
                 isEdit={!!editingProject?.id}
             />
 

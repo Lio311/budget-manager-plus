@@ -223,7 +223,7 @@ export function BusinessProjectFormDialog({
                     {availableParents.length > 0 && (
                         <div className="space-y-2">
                             <Label>פרויקט אב</Label>
-                            <Select value={parentId} onValueChange={setParentId}>
+                            <Select key={`${parentId}-${availableParents.length}`} value={parentId} onValueChange={setParentId}>
                                 <SelectTrigger className="text-right">
                                     <SelectValue placeholder="בחר פרויקט אב (אופציונלי)" />
                                 </SelectTrigger>
