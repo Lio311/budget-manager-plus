@@ -147,36 +147,38 @@ function ProjectCard({
                     style={{ backgroundColor: project.color || '#3B82F6' }}
                 />
 
-                {/* Hover actions */}
-                <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-all duration-200 flex gap-1.5 z-10">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-sm hover:bg-white dark:hover:bg-slate-700"
-                        onClick={onEdit}
-                    >
-                        <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-sm hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
-                        onClick={onDelete}
-                    >
-                        <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                </div>
-
                 <CardContent className="p-4 pr-5">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-3">
+                    {/* Header with always-visible actions */}
+                    <div className="flex items-start justify-between mb-1">
                         <div className="flex-1 min-w-0">
                             <h3 className="font-bold text-base truncate">{project.name}</h3>
                             {project.description && (
                                 <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{project.description}</p>
                             )}
                         </div>
-                        <Badge className={cn("text-[10px] shrink-0 mr-2 border", statusInfo.className)}>
+                        <div className="flex gap-1 shrink-0 mr-1">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                onClick={onEdit}
+                            >
+                                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500"
+                                onClick={onDelete}
+                            >
+                                <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Status Badge */}
+                    <div className="mb-3">
+                        <Badge className={cn("text-[10px] border", statusInfo.className)}>
                             {statusInfo.label}
                         </Badge>
                     </div>
