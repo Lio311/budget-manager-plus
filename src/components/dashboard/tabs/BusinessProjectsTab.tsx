@@ -242,7 +242,7 @@ function ProjectCard({
                     <div className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                         <div className="flex items-center gap-2">
                             <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
-                            <span className="text-xs font-medium text-muted-foreground">יתרה</span>
+                            <span className="text-xs font-medium text-muted-foreground">מאזן</span>
                         </div>
                         <span className={cn(
                             "text-sm font-bold dir-ltr",

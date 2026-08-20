@@ -402,7 +402,7 @@ export function BusinessProjectDetailsDialog({
                                                             <p className="text-sm font-semibold text-red-600 dir-ltr">{formatCurrency(cExpense)}</p>
                                                         </div>
                                                         <div>
-                                                            <p className="text-[10px] text-muted-foreground">יתרה</p>
+                                                            <p className="text-[10px] text-muted-foreground">מאזן</p>
                                                             <p className={cn("text-sm font-semibold dir-ltr", cBalance >= 0 ? "text-green-600" : "text-red-600")}>
                                                                 {formatCurrency(cBalance)}
                                                             </p>

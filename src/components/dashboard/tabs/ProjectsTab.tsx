@@ -270,7 +270,7 @@ export function ProjectsTab() {
                                     <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
                                         <div className="flex items-center gap-2 text-muted-foreground">
                                             <Wallet className="h-4 w-4" />
-                                            <span className="text-sm font-medium">יתרה</span>
+                                            <span className="text-sm font-medium">מאזן</span>
                                         </div>
                                         <span className={cn(
                                             "text-lg font-bold dir-ltr",
