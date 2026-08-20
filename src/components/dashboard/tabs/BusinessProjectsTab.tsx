@@ -116,12 +116,14 @@ function ProjectCard({
     onClick,
     onEdit,
     onDelete,
+    onAddSubProject,
     delay,
 }: {
     project: ProjectWithStats
     onClick: () => void
     onEdit: (e: React.MouseEvent) => void
     onDelete: (e: React.MouseEvent) => void
+    onAddSubProject: (e: React.MouseEvent) => void
     delay: number
 }) {
     const [isExpanded, setIsExpanded] = useState(false)
@@ -164,6 +166,15 @@ function ProjectCard({
                                 onClick={onEdit}
                             >
                                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                onClick={onAddSubProject}
+                                title="הוסף תת-פרויקט"
+                            >
+                                <Plus className="h-3.5 w-3.5 text-muted-foreground" />
                             </Button>
                             <Button
                                 variant="ghost"
@@ -450,6 +461,12 @@ export function BusinessProjectsTab() {
         setIsFormOpen(true)
     }
 
+    const openAddSubProject = (project: ProjectWithStats, e: React.MouseEvent) => {
+        e.stopPropagation()
+        setEditingProject({ name: '', parentId: project.id })
+        setIsFormOpen(true)
+    }
+
     const openDelete = (project: ProjectWithStats, e: React.MouseEvent) => {
         e.stopPropagation()
         handleDelete(project)
@@ -620,6 +637,7 @@ export function BusinessProjectsTab() {
                             onClick={() => handleProjectClick(project)}
                             onEdit={(e) => openEdit(project, e)}
                             onDelete={(e) => openDelete(project, e)}
+                            onAddSubProject={(e) => openAddSubProject(project, e)}
                             delay={idx * 0.07}
                         />
                     ))}
@@ -643,11 +661,11 @@ export function BusinessProjectsTab() {
                     setIsFormOpen(false)
                     setEditingProject(null)
                 }}
-                onSubmit={editingProject ? handleUpdate : handleCreate}
-                initialData={editingProject}
+                onSubmit={editingProject?.id ? handleUpdate : handleCreate}
+                initialData={editingProject || undefined}
                 clients={clients.map((c: any) => ({ id: c.id, name: c.name }))}
                 projects={projectsList.map((p: any) => ({ id: p.id, name: p.name, parentId: p.parentId }))}
-                isEdit={!!editingProject}
+                isEdit={!!editingProject?.id}
             />
 
             <BusinessProjectDetailsDialog
