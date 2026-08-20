@@ -409,20 +409,37 @@ model SavingCategoryGoal {
 }
 
 model Project {
-  id        String     @id @default(cuid())
-  userId    String
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  color     String?
-  scope     BudgetType @default(PERSONAL)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?       @db.Text
+  color       String?
+  scope       BudgetType    @default(PERSONAL)
+  status      ProjectStatus @default(ACTIVE)
+  budget      Float?
+  startDate   DateTime?
+  endDate     DateTime?
   
-  incomes   Income[]
-  expenses  Expense[]
+  // Client association (business projects)
+  clientId    String?
+  client      Client?       @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  
+  // Sub-project hierarchy (single level)
+  parentId    String?
+  parent      Project?      @relation("ProjectHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Project[]     @relation("ProjectHierarchy")
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  incomes     Income[]
+  expenses    Expense[]
   
   @@unique([userId, name, scope])
   @@index([userId, scope])
+  @@index([clientId])
+  @@index([parentId])
   @@map("projects")
 }
 
@@ -595,6 +612,7 @@ model Client {
   invoices  Invoice[]
   quotes    Quote[]
   workEvents WorkEvent[]
+  projects  Project[]
   
   @@index([userId, scope])
   @@unique([userId, name, scope])
@@ -940,6 +958,13 @@ enum Department {
   QA
   MARKETING
   BIZ_DEV
+}
+
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  ON_HOLD
+  CANCELLED
 }
 
 model ProjectTask {

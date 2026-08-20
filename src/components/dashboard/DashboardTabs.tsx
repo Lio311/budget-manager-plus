@@ -36,6 +36,7 @@ import { DocumentsTab } from './tabs/DocumentsTab'
 import { BudgetLimitsTab } from './tabs/BudgetLimitsTab'
 import ProfitLossTab from './tabs/ProfitLossTab'
 import { ProjectsTab } from './tabs/ProjectsTab'
+import { BusinessProjectsTab } from './tabs/BusinessProjectsTab'
 import { useBudget } from '@/contexts/BudgetContext'
 import { useSWRConfig } from 'swr'
 import { UserButton } from '@clerk/nextjs'
@@ -65,6 +66,7 @@ function QuickActionButton({ budgetType, router }: { budgetType: 'PERSONAL' | 'B
     const businessActions: ActionItem[] = [
         { label: 'יצירת לקוח', icon: Users, tab: 'clients', action: 'new' }, // You might need a way to trigger 'new' specifically
         { label: 'יצירת ספק', icon: Building2, tab: 'suppliers', action: 'new' },
+        { label: 'יצירת פרויקט', icon: FolderOpen, tab: 'projects', action: 'new' },
         { label: 'הוספת הוצאה', icon: TrendingDown, tab: 'expenses', action: 'new' },
         { label: 'הוספת הכנסה', icon: TrendingUp, tab: 'income', action: 'new' },
         { label: 'יצירת חשבונית', icon: FileText, tab: 'documents', type: 'invoice' },
@@ -273,6 +275,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
         { value: 'expenses', label: 'הוצאות', icon: TrendingDown, activeColor: '#dc2626', activeTextColor: '#ffffff' },
         { value: 'clients', label: 'לקוחות', icon: Users, activeColor: '#ec4899', activeTextColor: '#ffffff' },
         { value: 'suppliers', label: 'ספקים', icon: Building2, activeColor: '#2563eb', activeTextColor: '#ffffff' },
+        { value: 'projects', label: 'פרויקטים', icon: FolderOpen, activeColor: '#8b5cf6', activeTextColor: '#ffffff' },
         { value: 'profit_loss', label: 'דוח רווח והפסד', icon: Calculator, activeColor: '#059669', activeTextColor: '#ffffff' },
         { value: 'calendar', label: 'לוח שנה', icon: Calendar, activeColor: '#000000', activeTextColor: '#ffffff' },
     ]
@@ -514,7 +517,7 @@ export function DashboardTabs({ mobileMenuOpen, setMobileMenuOpen }: DashboardTa
                         <DocumentsTab />
                     </TabsContent>
                     <TabsContent value="projects" className="mt-0 outline-none animate-in fade-in-50 slide-in-from-bottom-2 duration-300">
-                        <ProjectsTab />
+                        {budgetType === 'BUSINESS' ? <BusinessProjectsTab /> : <ProjectsTab />}
                     </TabsContent>
                 </div>
             </div>

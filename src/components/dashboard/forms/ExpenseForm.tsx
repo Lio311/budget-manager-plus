@@ -87,10 +87,10 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
     const isBusiness = budgetType === 'BUSINESS'
     const { isDemo, interceptAction } = useDemo()
 
-    // Fetch projects for personal budgets
+    // Fetch projects for the current budget type
     const { data: projectsData, mutate: mutateProjects } = useSWR(
-        !isBusiness ? ['projects', budgetType] : null,
-        () => getProjects('PERSONAL')
+        ['projects', budgetType],
+        () => getProjects(budgetType as 'PERSONAL' | 'BUSINESS')
     )
     const projects = projectsData?.data || []
 
@@ -861,27 +861,25 @@ export function ExpenseForm({ categories, suppliers, clients = [], onCategoriesC
                             </div>
                         )}
 
-                        {/* Project Selector (Personal only) */}
-                        {!isBusiness && (
-                            <div className="w-full">
-                                <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך לפרויקט (אופציונלי)</label>
-                                <ProjectSelector
-                                    projects={projects}
-                                    selectedProjectId={newExpense.projectId}
-                                    onProjectIdChange={(id) => setNewExpense({ ...newExpense, projectId: id })}
-                                    onAddProject={async (name, color) => {
-                                        const result = await addProject({ name, color }, 'PERSONAL')
-                                        if (result.success) {
-                                            mutateProjects()
-                                            toast({ title: 'פרויקט נוסף בהצלחה' })
-                                        } else {
-                                            toast({ title: 'שגיאה', description: result.error, variant: 'destructive' })
-                                        }
-                                    }}
-                                    placeholder="חפש פרויקט..."
-                                />
-                            </div>
-                        )}
+                        {/* Project Selector */}
+                        <div className="w-full">
+                            <label className="text-xs font-bold mb-1.5 block text-[#676879] dark:text-gray-300">שייך לפרויקט (אופציונלי)</label>
+                            <ProjectSelector
+                                projects={projects}
+                                selectedProjectId={newExpense.projectId}
+                                onProjectIdChange={(id) => setNewExpense({ ...newExpense, projectId: id })}
+                                onAddProject={async (name, color) => {
+                                    const result = await addProject({ name, color }, budgetType as 'PERSONAL' | 'BUSINESS')
+                                    if (result.success) {
+                                        mutateProjects()
+                                        toast({ title: 'פרויקט נוסף בהצלחה' })
+                                    } else {
+                                        toast({ title: 'שגיאה', description: result.error, variant: 'destructive' })
+                                    }
+                                }}
+                                placeholder="חפש פרויקט..."
+                            />
+                        </div>
 
                         <div className="w-full">
                             <PaymentMethodSelector
