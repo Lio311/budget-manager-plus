@@ -620,6 +620,13 @@ export function ClientsTab() {
                 client={selectedClientDetails}
                 isOpen={!!selectedClientDetails}
                 onClose={() => setSelectedClientDetails(null)}
+                onUpdate={async () => {
+                    const freshData = await mutate();
+                    if (freshData && selectedClientDetails) {
+                        const updated = freshData.find((c: any) => c.id === selectedClientDetails.id);
+                        if (updated) setSelectedClientDetails(updated);
+                    }
+                }}
             />
 
             {/* Form Dialog */}
@@ -1214,6 +1221,12 @@ export function ClientsTab() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex flex-col gap-1">
+                                                    {(client._count?.projects || 0) > 0 && (
+                                                        <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-folder h-3 w-3 shrink-0 text-blue-500"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                                                            <span>{client._count.projects} פרויקטים</span>
+                                                        </div>
+                                                    )}
                                                     {client.phone && (
                                                         <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                                                             <Phone className="h-3 w-3 shrink-0" />

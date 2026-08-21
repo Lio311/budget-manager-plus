@@ -117,6 +117,9 @@ export async function getClients(scope: string = 'BUSINESS') {
                 },
                 include: {
                     package: true,
+                    projects: {
+                        select: { id: true, name: true, budget: true, status: true, incomes: true, expenses: true, stages: true }
+                    },
                     quotes: { select: { id: true } }, // Fetch quotes IDs to count them
                     invoices: {
                         select: {
@@ -126,6 +129,7 @@ export async function getClients(scope: string = 'BUSINESS') {
                     },
                     _count: {
                         select: {
+                            projects: true,
                             incomes: {
                                 where: { status: 'PAID' }
                             },
